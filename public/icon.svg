@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#312e81" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#1e1b4b" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+
+  <!-- Shield Shape with Shadow -->
+  <g filter="url(#shadow)">
+    <path d="M256 80 L390 135 C390 270 330 365 256 415 C182 365 122 270 122 135 Z" 
+          fill="#ffffff" 
+          opacity="0.96" />
+    
+    <path d="M256 102 L370 148 C370 262 318 344 256 388 C194 344 142 262 142 148 Z" 
+          fill="url(#accentGrad)" 
+          opacity="0.15" />
+
+    <!-- Open Theocratic Book & Checkmark -->
+    <path d="M256 220 L310 185 C325 175 345 185 345 205 L345 300 C345 315 325 315 310 320 L256 335 L202 320 C187 315 167 315 167 300 L167 205 C167 185 187 175 202 185 Z" 
+          fill="#4338ca" />
+    
+    <!-- Spine divider -->
+    <line x1="256" y1="220" x2="256" y2="335" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+    
+    <!-- Central Checkmark / Light -->
+    <circle cx="256" cy="180" r="28" fill="#4f46e5" />
+    <path d="M246 180 L253 187 L267 173" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>

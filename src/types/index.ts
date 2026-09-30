@@ -1,0 +1,752 @@
+// src/types/index.ts
+
+export type Gender = 'hermano' | 'hermana';
+
+export type AssignmentStatus = 'pendiente' | 'confirmada' | 'rechazada';
+
+export type TheocraticPrivilege =
+  | 'anciano'
+  | 'siervo_ministerial'
+  | 'precursor_regular'
+  | 'precursor_especial'
+  | 'precursor_auxiliar'
+  | 'publicador_bautizado'
+  | 'publicador_no_bautizado';
+
+export interface Absence {
+  id: string;
+  startDate: string; // YYYY-MM-DD
+  endDate: string;   // YYYY-MM-DD
+  reason?: string;
+}
+
+export interface StudentLessonRecord {
+  id: string;
+  lessonNumber: number;
+  lessonTitle: string;
+  date: string;
+  status: 'completada' | 'continuar';
+  notes?: string;
+}
+
+export interface PublisherRoles {
+  // Vida y Ministerio Cristianos (Entre semana)
+  vym_presidente: boolean;
+  vym_oracion: boolean;
+  vym_tesoros_discurso: boolean;
+  vym_tesoros_perlas: boolean;
+  vym_tesoros_lectura: boolean;
+  vym_maestros_titular: boolean;
+  vym_maestros_ayudante: boolean;
+  vym_vida_partes: boolean;
+  vym_estudio_conductor: boolean;
+  vym_estudio_lector: boolean;
+
+  // Fin de semana
+  fds_presidente: boolean;
+  fds_atalaya_lector: boolean;
+  fds_oracion: boolean;
+
+  // Deberes
+  deber_acomodador: boolean;
+  deber_seguridad: boolean;
+  deber_audio: boolean;
+  deber_video: boolean;
+  deber_microfonos: boolean;
+  deber_plataforma: boolean;
+  deber_zoom: boolean;
+
+  // Deberes personalizados (clave dinámica booleana)
+  [customDutyKey: string]: boolean;
+}
+
+export interface Publisher {
+  id: string;
+  name: string;
+  gender: Gender;
+  phone: string;
+  privilege?: TheocraticPrivilege;
+  notes?: string;
+  active: boolean;
+  groupNumber?: number; // Grupo de predicación
+  absences: Absence[];
+  currentLessonNumber?: number;
+  lessonsHistory?: StudentLessonRecord[];
+  preparedOutlines?: number[]; // Bosquejos de discursos públicos preparados (NW Scheduler)
+  roles: PublisherRoles;
+  createdAt?: string;
+
+  // Registro Oficial S-21 (Congregation's Publisher Record)
+  birthDate?: string; // YYYY-MM-DD
+  baptismDate?: string; // YYYY-MM-DD
+  hope?: 'otras_ovejas' | 'ungido';
+  address?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  pioneerStatus?: 'ninguno' | 'auxiliar_continuo' | 'regular' | 'especial';
+  pioneerStartDate?: string; // YYYY-MM-DD
+}
+
+// Assignment item in a meeting
+export interface AssignmentItem {
+  id: string;
+  title: string;
+  type: string; // e.g. 'vym_tesoros_discurso', 'vym_maestros_titular', 'deber_audio'
+  timeMinutes?: number;
+  publisherId?: string;
+  assistantId?: string; // For demonstrations
+  room?: 'principal' | 'auxiliar';
+  lessonNumber?: number;
+  status: AssignmentStatus;
+  notes?: string;
+}
+
+export interface MeetingMidweek {
+  date: string; // YYYY-MM-DD
+  bibleReading?: string; // e.g. 'Salmos 80 a 84'
+  songFirst?: number;
+  songMiddle?: number;
+  songConclude?: number;
+  presidentId?: string;
+  auxiliaryCounselorId?: string; // Consejero sala auxiliar
+  initialPrayerId?: string;
+  finalPrayerId?: string;
+  tesoros: {
+    discurso: AssignmentItem;
+    perlas: AssignmentItem;
+    lecturaBiblia: AssignmentItem; // can have auxiliary room
+    lecturaBibliaAux?: AssignmentItem;
+  };
+  maestros: {
+    items: AssignmentItem[]; // Titular + Ayudante, room: 'principal' | 'auxiliar'
+  };
+  vidaCristiana: {
+    items: AssignmentItem[];
+    estudioBiblico: {
+      conductorId?: string;
+      lectorId?: string;
+    };
+  };
+  duties: Record<string, string[]>; // dutyKey -> array of publisherIds (e.g. microfonos: [id1, id2])
+}
+
+export interface MeetingWeekend {
+  date: string; // YYYY-MM-DD
+  presidentId?: string;
+  publicTalkSpeaker?: string; // might be visiting speaker text or local publisherId
+  publicTalkOutlineNumber?: number;
+  publicTalkTheme?: string;
+  isVisitingSpeaker?: boolean;
+  visitingSpeakerCongregation?: string;
+  visitingSpeakerPhone?: string;
+  hospitalityPublisherId?: string; // Hermano asignado para la hospitalidad / comida del orador
+  atalayaConductorId?: string;
+  atalayaLectorId?: string;
+  watchtowerTheme?: string;
+  watchtowerScripture?: string;
+  openingSong?: number;
+  middleSong?: number;
+  closingSong?: number;
+  initialPrayerId?: string;
+  finalPrayerId?: string;
+  duties: Record<string, string[]>;
+}
+
+export interface SpecialEvent {
+  isSpecial: boolean;
+  type?: 'asamblea_circuito' | 'asamblea_regional' | 'conmemoracion' | 'visita_superintendente' | 'otro';
+  title?: string;
+  noMeetingMidweek?: boolean;
+  noMeetingWeekend?: boolean;
+  notes?: string;
+}
+
+export interface MeetingAttendance {
+  weekId: string;
+  midweek: { inPerson: number; zoom: number; total: number };
+  weekend: { inPerson: number; zoom: number; total: number };
+}
+
+export interface WeekSchedule {
+  id: string; // e.g. '2026-W40' or start date '2026-09-28'
+  weekStartDate: string; // YYYY-MM-DD (Monday)
+  weekEndDate: string;   // YYYY-MM-DD (Sunday)
+  specialEvent?: SpecialEvent;
+  midweek: MeetingMidweek;
+  weekend: MeetingWeekend;
+  attendance?: MeetingAttendance;
+  cleaningGroupNumbers: number[]; // Numbers of preaching groups assigned to clean
+  notes?: string;
+}
+
+export interface PreachingGroup {
+  number: number;
+  name: string;
+  overseerId?: string;
+  assistantId?: string;
+  memberIds: string[];
+}
+
+export interface CustomDuty {
+  id: string;
+  key: string;
+  name: string;
+  description?: string;
+  midweek: boolean;
+  weekend: boolean;
+  maxPeople: number;
+}
+
+export interface PublicTalkOutline {
+  number: number;
+  title: string;
+  category?: string;
+}
+
+export interface OutgoingSpeakerAssignment {
+  id: string;
+  publisherId: string;
+  date: string;
+  destinationCongregation: string;
+  outlineNumber: number;
+  outlineTitle: string;
+  notes?: string;
+}
+
+export interface FieldServiceMeeting {
+  id: string;
+  dayOfWeek: string;
+  time: string;
+  location: string;
+  conductorId?: string;
+  groupNumber?: number;
+  territoryNumber?: string;
+  notes?: string;
+}
+
+export interface ConflictRuleSettings {
+  allowPartAndDutySameMeeting: boolean;
+  allowAudioAndMicrophones: boolean;
+  allowPresidentAndOtherPart: boolean;
+  maxConsecutiveWeeksWithDuty: number; // e.g. 3
+  maxConsecutiveWeeksWithPart: number; // e.g. 2
+  enforceSisterDemonstrationRules: boolean; // sisters only with sisters or family
+  warnOutlineRepeatedWithinMonths: number; // e.g. 12 months
+}
+
+export interface ConflictAlert {
+  id: string;
+  weekId: string;
+  weekStartDate: string;
+  meetingType: 'midweek' | 'weekend';
+  severity: 'error' | 'warning';
+  publisherId: string;
+  publisherName: string;
+  type: 'double_assignment' | 'absence' | 'inactive' | 'role_disabled' | 'gender_mismatch' | 'consecutive_weeks' | 'special_event_clash' | 'outgoing_speaker_clash' | 'outline_repeated';
+  description: string;
+  assignmentTitles: string[];
+}
+
+export interface CongregationSettings {
+  congregationName: string;
+  midweekMeetingDay: string;  // e.g. 'Miércoles'
+  midweekMeetingTime: string; // e.g. '19:00'
+  weekendMeetingDay: string;  // e.g. 'Domingo'
+  weekendMeetingTime: string; // e.g. '10:00'
+  hallAddress?: string;
+  conflictRules: ConflictRuleSettings;
+  pdfTemplate: 'clasica' | 'moderna' | 'minimalista' | 'color' | 'nw_scheduler';
+  pdfPageSize: 'letter' | 'a4';
+  pdfSections: {
+    midweek: boolean;
+    weekend: boolean;
+    duties: boolean;
+    cleaning: boolean;
+  };
+}
+
+export interface AssignmentHistoryRecord {
+  id: string;
+  date: string;
+  meetingType: 'midweek' | 'weekend';
+  assignmentTitle: string;
+  roleType: string;
+  publisherId: string;
+  assistantId?: string;
+  room?: string;
+}
+
+// ==========================================
+// ORGANIZED-STYLE THEOCRATIC FEATURES
+// ==========================================
+
+export interface S89Slip {
+  id: string;
+  weekId: string;
+  date: string;
+  meetingDateFormatted?: string;
+  studentId: string;
+  studentName: string;
+  assistantId?: string;
+  assistantName?: string;
+  partNumber: number; // e.g. 1 (Lectura), 2, 3, 4
+  partTitle: string;
+  room: 'principal' | 'auxiliar';
+  lessonNumber?: number;
+  lessonTitle?: string;
+  deliveredStatus: 'pendiente' | 'entregada' | 'confirmada';
+  notes?: string;
+}
+
+export interface CartLocation {
+  id: string;
+  name: string;
+  address: string;
+  notes?: string;
+  active: boolean;
+}
+
+export interface CartShift {
+  id: string;
+  locationId: string;
+  dayOfWeek: string; // 'Lunes' | 'Martes' | 'Miércoles' | 'Jueves' | 'Viernes' | 'Sábado' | 'Domingo'
+  startTime: string; // '09:00'
+  endTime: string;   // '11:00'
+  date?: string;     // YYYY-MM-DD
+  publisher1Id?: string;
+  publisher2Id?: string;
+  notes?: string;
+}
+
+export interface MonthlyServiceReport {
+  id: string;
+  publisherId: string;
+  month: string; // 'YYYY-MM'
+  participated: boolean;
+  hours?: number;
+  bibleStudies: number;
+  notes?: string;
+  reportedAt?: string;
+  isPioneer?: boolean;
+  isAuxiliaryPioneer?: boolean;
+  creditHours?: number;
+}
+
+// ==========================================
+// REGISTRO DE PUBLICADOR DE LA CONGREGACIÓN (S-21)
+// ==========================================
+
+export interface S21MonthRecord {
+  monthKey: string;      // 'YYYY-MM' (e.g. '2025-09')
+  monthName: string;     // 'Septiembre'
+  monthShort: string;    // 'Sep'
+  participated: boolean;
+  hours?: number;
+  bibleStudies: number;
+  isAuxiliaryPioneer?: boolean;
+  notes?: string;
+  hasReport: boolean;
+}
+
+export interface S21ServiceYearCard {
+  serviceYear: string;   // e.g. '2025-2026' (Sep 2025 - Ago 2026)
+  months: S21MonthRecord[];
+  totalMonthsActive: number;
+  totalHours: number;
+  totalBibleStudies: number;
+  avgHoursPerMonth: number;
+  avgStudiesPerMonth: number;
+  auxiliaryPioneerMonthsCount: number;
+}
+
+export interface CongregationNotice {
+  id: string;
+  title: string;
+  category: 'anuncio' | 'asamblea' | 'circuito' | 'campana' | 'carta' | 'limpieza';
+  content: string;
+  date: string;
+  expiresDate?: string;
+  pinned: boolean;
+  author?: string;
+}
+
+// ==========================================
+// REGISTRO DE ASIGNACIÓN DE TERRITORIO (S-13)
+// ==========================================
+
+export type TerritoryType = 'residencial' | 'negocios' | 'rural' | 'edificios' | 'telefonico' | 'campana';
+
+export type TerritoryStatus = 'disponible' | 'asignado' | 'vencido';
+
+export interface NoVisitAddress {
+  id: string;
+  address: string;
+  residentName?: string;
+  dateAdded: string; // YYYY-MM-DD
+  reason?: string;
+}
+
+export interface TerritoryAssignmentRecord {
+  id: string;
+  territoryId: string;
+  publisherId: string;
+  publisherName: string;
+  assignedDate: string; // YYYY-MM-DD
+  dueDate: string;      // YYYY-MM-DD
+  returnedDate?: string; // YYYY-MM-DD
+  notes?: string;
+}
+
+export interface Territory {
+  id: string;
+  number: string; // e.g. "01", "02-A", "14", "R-03"
+  name: string;
+  type: TerritoryType;
+  zone: string; // e.g. "Zona Norte", "Centro", "Altamira"
+  estimatedHomes: number;
+  status: TerritoryStatus;
+  currentAssigneeId?: string;
+  assignedDate?: string; // YYYY-MM-DD
+  dueDate?: string;      // YYYY-MM-DD (4 meses recomendados según pautas S-13)
+  lastCompletedDate?: string; // YYYY-MM-DD
+  mapUrl?: string; // Google Maps URL o enlace digital
+  boundsDescription?: string; // Límites del territorio
+  notes?: string;
+  noVisits: NoVisitAddress[];
+  history: TerritoryAssignmentRecord[];
+}
+
+// ==========================================
+// VISITA DEL SUPERINTENDENTE DE CIRCUITO (SC)
+// ==========================================
+
+export interface MealArrangement {
+  id: string;
+  day: string; // e.g. "Martes", "Miércoles"
+  date: string; // YYYY-MM-DD
+  mealType: 'almuerzo' | 'cena';
+  hostPublisherId?: string;
+  hostName?: string;
+  hostPhone?: string;
+  location?: string;
+  notes?: string;
+  isConfirmed: boolean;
+}
+
+export interface MinistryArrangement {
+  id: string;
+  day: string; // e.g. "Miércoles", "Jueves"
+  session: 'manana' | 'tarde';
+  date: string; // YYYY-MM-DD
+  time: string; // e.g. "09:30"
+  meetingPoint: string;
+  territoryNumber?: string;
+  coCompanionPublisherId?: string; // Acompañante del SC
+  wifeCompanionPublisherId?: string; // Acompañante de la esposa del SC
+  groupNumber?: number;
+  notes?: string;
+}
+
+export interface SpecialMeeting {
+  id: string;
+  title: string;
+  date: string; // YYYY-MM-DD
+  time: string;
+  location: string;
+  attendeesDescription: string;
+  notes?: string;
+}
+
+export interface VisitChecklistItem {
+  id: string;
+  task: string;
+  category: 'secretaria' | 'servicio' | 'cuentas' | 'salon';
+  completed: boolean;
+  notes?: string;
+  assignedRole?: string;
+}
+
+export interface CircuitOverseerVisit {
+  id: string;
+  circuitNumber: string;
+  overseerName: string;
+  overseerPhone?: string;
+  wifeName?: string;
+  startDate: string; // YYYY-MM-DD
+  endDate: string;   // YYYY-MM-DD
+  status: 'proxima' | 'en_curso' | 'concluida';
+  
+  // Temas de discursos
+  midweekTalkTheme: string;
+  midweekSongNumber?: number;
+  weekendPublicTalkTheme: string;
+  weekendFinalTalkTheme: string;
+  weekendSongNumber?: number;
+
+  dietaryPreferences?: string;
+  lodgingNotes?: string;
+
+  meals: MealArrangement[];
+  ministry: MinistryArrangement[];
+  specialMeetings: SpecialMeeting[];
+  checklist: VisitChecklistItem[];
+  notes?: string;
+}
+
+// ==========================================
+// CUENTAS DE LA CONGREGACIÓN (S-26, S-30, S-25)
+// ==========================================
+
+export type AccountFund = 'gastos_locales' | 'obra_mundial' | 'construccion';
+
+export type TransactionType = 'ingreso' | 'gasto';
+
+export type TransactionCategory =
+  | 'donaciones_cajas'
+  | 'donaciones_linea'
+  | 'servicios_electricidad'
+  | 'servicios_agua_gas'
+  | 'servicios_internet'
+  | 'mantenimiento_reparaciones'
+  | 'articulos_limpieza'
+  | 'seguro_salon'
+  | 'resolucion_apoyo_circuito'
+  | 'resolucion_obra_mundial'
+  | 'fondos_transferidos_sucursal'
+  | 'otro';
+
+export interface AccountTransaction {
+  id: string;
+  date: string; // YYYY-MM-DD
+  month: string; // YYYY-MM
+  type: TransactionType;
+  fund: AccountFund;
+  category: TransactionCategory;
+  description: string;
+  amount: number;
+  receiptNumber?: string;
+  payerOrPayee?: string;
+  paymentMethod: 'efectivo' | 'transferencia' | 'cheque';
+  verified: boolean;
+  notes?: string;
+}
+
+export interface MonthlyAccountsRecord {
+  month: string; // YYYY-MM
+  openingBalance: number;
+  totalIncome: number;
+  totalExpenses: number;
+  closingBalance: number;
+  bankBalance: number;
+  cashOnHand: number;
+  reconciled: boolean;
+  notes?: string;
+}
+
+export interface QuarterlyAudit {
+  id: string;
+  quarter: 'Q1' | 'Q2' | 'Q3' | 'Q4';
+  serviceYear: string; // e.g. '2025-2026'
+  monthsCovered: string[]; // e.g. ['2025-09', '2025-10', '2025-11']
+  auditorPublisherId?: string;
+  auditorName: string;
+  auditDate?: string;
+  isCompleted: boolean;
+  reviewedReceipts: boolean;
+  verifiedBankStatements: boolean;
+  checkedS30Announcements: boolean;
+  findingsNotes?: string;
+}
+
+// ==========================================
+// CONMEMORACIÓN DEL MEMORIAL Y ASAMBLEAS TEOCRÁTICAS
+// ==========================================
+
+export interface EmblemServerAssignment {
+  id: string;
+  sectionName: string; // e.g., 'Pasillo Central', 'Pasillo Lateral Izq', 'Pasillo Lateral Der', 'Plataforma y Orador'
+  breadServerPublisherId: string;
+  wineServerPublisherId: string;
+  notes?: string;
+}
+
+export interface MemorialAttendant {
+  id: string;
+  role: 'entrada_principal' | 'pasillo_interior' | 'estacionamiento' | 'audio_video_zoom' | 'conteo_asistencia';
+  publisherId: string;
+  notes?: string;
+}
+
+export interface MemorialPreparation {
+  breadPreparationPublisherId?: string;
+  wineProviderPublisherId?: string;
+  tableArrangementPublisherId?: string;
+  cleaningPublisherId?: string;
+  emblemBreadType?: string;
+  emblemWineType?: string;
+  specialNotes?: string;
+}
+
+export interface MemorialInvitationCampaign {
+  startDate: string;
+  endDate: string;
+  totalInvitationsReceived: number;
+  invitationsPerPublisher: number;
+  territoriesCoveredCount: number;
+  totalCongregationTerritories: number;
+  notes?: string;
+}
+
+export interface MemorialReport {
+  inPersonAttendance: number;
+  streamingAttendance: number;
+  totalAttendance: number;
+  partakersCount: number; // Conteo de participantes (ungidos)
+  partakerNames?: string;
+  reportedToBranch: boolean;
+  reportedDate?: string;
+  notes?: string;
+}
+
+export interface MemorialPlan {
+  id: string;
+  serviceYear: number;
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm
+  sunsetTime: string; // HH:mm
+  location: string;
+  chairmanPublisherId: string;
+  speakerPublisherId: string;
+  speakerTheme: string;
+  breadPrayerPublisherId: string;
+  winePrayerPublisherId: string;
+  initialSongNumber: number;
+  finalSongNumber: number;
+  closingPrayerPublisherId?: string;
+  emblemServers: EmblemServerAssignment[];
+  attendants: MemorialAttendant[];
+  preparation: MemorialPreparation;
+  campaign: MemorialInvitationCampaign;
+  report: MemorialReport;
+}
+
+export type AssemblyType = 'circuito_con_sc' | 'circuito_sin_sc' | 'regional';
+
+export interface AssemblyVolunteer {
+  id: string;
+  publisherId: string;
+  department: 'limpieza' | 'acomodadores' | 'audio_video' | 'primeros_auxilios' | 'bautismo' | 'estacionamiento' | 'otro';
+  roleOrShift: string;
+  shiftDate?: string;
+  shiftTime?: string;
+  notes?: string;
+}
+
+export interface AssemblyBaptismCandidate {
+  id: string;
+  publisherId: string;
+  questionsCompleted: boolean;
+  reviewedByElders?: string;
+  notes?: string;
+}
+
+export interface AssemblyBusArrangement {
+  hasBus: boolean;
+  busCompany?: string;
+  departureTime?: string;
+  departureLocation?: string;
+  returnTime?: string;
+  seatsTotal?: number;
+  seatsBooked?: number;
+  farePerSeat?: number;
+  coordinatorPublisherId?: string;
+  notes?: string;
+}
+
+export interface TheocraticAssembly {
+  id: string;
+  serviceYear: number;
+  type: AssemblyType;
+  theme: string;
+  dates: string;
+  venue: string;
+  circuitNumber?: string;
+  assignedCleaningDepartment?: string;
+  cleaningCoordinatorPublisherId?: string;
+  volunteers: AssemblyVolunteer[];
+  baptismCandidates: AssemblyBaptismCandidate[];
+  busArrangement: AssemblyBusArrangement;
+  congregationAttendance?: {
+    friday?: number;
+    saturday?: number;
+    sunday?: number;
+  };
+  notes?: string;
+}
+
+// ==========================================
+// LITERATURA Y PUBLICACIONES (FORMULARIO S-14)
+// ==========================================
+
+export type LiteratureCategory =
+  | 'biblia'
+  | 'libro'
+  | 'folleto'
+  | 'tratado'
+  | 'revista'
+  | 'campana_especial'
+  | 'otro';
+
+export interface LiteratureItem {
+  id: string;
+  code: string; // ej. 'bi12', 'lff-S', 'wp26-1', 'T-36'
+  title: string;
+  category: LiteratureCategory;
+  language: string; // ej. 'Español', 'Inglés', 'Lengua de Señas'
+  currentStock: number;
+  minimumStock: number;
+  locationBox?: string; // Estante / Armario del Salón
+  lastCountDate?: string;
+  notes?: string;
+}
+
+export type SpecialOrderStatus =
+  | 'solicitado'
+  | 'pedido_a_betel'
+  | 'recibido_en_salon'
+  | 'entregado'
+  | 'cancelado';
+
+export interface LiteratureSpecialOrder {
+  id: string;
+  publisherId: string;
+  itemId?: string;
+  itemTitle: string;
+  language?: string;
+  quantity: number;
+  requestDate: string;
+  status: SpecialOrderStatus;
+  deliveredDate?: string;
+  notes?: string;
+}
+
+export interface LiteratureGroupDistribution {
+  groupNumber: number;
+  magazinesCount: number;
+  tractsCount: number;
+  brochuresCount: number;
+  lastDistributedDate?: string;
+  notes?: string;
+}
+
+export interface LiteratureInventoryRecord {
+  id: string;
+  serviceYear: string; // ej. '2025-2026'
+  countDate: string;
+  servantPublisherId?: string; // Siervo de literatura
+  overseerPublisherId?: string; // Anciano supervisor
+  totalItemsCounted: number;
+  isCountCompleted: boolean;
+  notes?: string;
+}
+

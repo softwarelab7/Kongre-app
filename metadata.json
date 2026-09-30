@@ -1,0 +1,8 @@
+{
+  "name": "Kongre",
+  "description": "Gestor teocrático integral para congregaciones: asignaciones, reuniones, hojas S-89, tarjetas S-21, tarjetas digitales de territorio con mapas y QR, asistencia S-88, modo oscuro y soporte offline.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

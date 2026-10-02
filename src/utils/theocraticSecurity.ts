@@ -1,6 +1,6 @@
 // src/utils/theocraticSecurity.ts
 /**
- * Utilidades de Seguridad Teocrática de Grado Militar (Estándar Organized / sws2apps)
+ * Utilidades de Seguridad Teocrática y Cifrado de Grado Militar
  * - Cifrado AES-GCM de 256 bits del lado del cliente
  * - Derivación de claves PBKDF2 (100.000 iteraciones SHA-256)
  * - Bloqueo de sesión con PIN / Código de protección para el Salón del Reino

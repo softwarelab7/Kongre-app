@@ -49,7 +49,7 @@ export interface OrganizedWeekSchedule {
 }
 
 /**
- * Catálogo Oficial de Programas Semanales de Organized (sws2apps)
+ * Catálogo Oficial de Programas Semanales
  * Contiene los bosquejos completos de la reunión entre semana (MWB) y fin de semana (Discurso público + Atalaya)
  */
 export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
@@ -492,8 +492,8 @@ export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
 ];
 
 /**
- * Encuentra un programa de Organized por clave de semana o aproximación de fecha.
- * Garantiza que cualquier semana (incluso creadas a futuro o pasado) obtenga un bosquejo oficial de Organized.
+ * Encuentra un programa oficial por clave de semana o aproximación de fecha.
+ * Garantiza que cualquier semana (incluso creadas a futuro o pasado) obtenga un bosquejo oficial.
  */
 export function getOrganizedScheduleForWeek(weekId?: string, dateStr?: string): OrganizedWeekSchedule {
   if (weekId) {
@@ -538,7 +538,7 @@ export function getOrganizedScheduleForWeek(weekId?: string, dateStr?: string): 
 }
 
 /**
- * Verifica si una semana necesita enriquecimiento automático de Organized.
+ * Verifica si una semana necesita enriquecimiento automático del programa oficial.
  */
 export function isWeekNeedingOrganizedSync(week: WeekSchedule): boolean {
   if (!week) return false;
@@ -556,7 +556,7 @@ export interface ApplyOrganizedOptions {
 }
 
 /**
- * Aplica los datos de Organized a una semana en el sistema Kongre
+ * Aplica los datos del programa oficial a una semana en el sistema Kongre
  */
 export function applyOrganizedToWeek(
   currentWeek: WeekSchedule,
@@ -652,7 +652,7 @@ export function applyOrganizedToWeek(
 }
 
 /**
- * Parser para importar archivos JSON o texto exportado directamente de Organized (sws2apps)
+ * Parser para importar archivos JSON o texto exportado del programa semanal
  */
 export function parseOrganizedJsonOrText(raw: string): {
   success: boolean;
@@ -675,7 +675,7 @@ export function parseOrganizedJsonOrText(raw: string): {
 
       const schedule: OrganizedWeekSchedule = {
         weekKey: data.weekId || data.week || 'semana_importada',
-        weekDateRange: data.dateRange || data.date || 'Semana Importada de Organized',
+        weekDateRange: data.dateRange || data.date || 'Semana Importada',
         bibleReading: mwbData.bibleReading || mwbData.mwb_weekly_bible_reading || 'Lectura semanal',
         midweek: {
           songFirst: mwbData.songFirst || mwbData.mwb_song_first,
@@ -772,17 +772,17 @@ export function parseOrganizedJsonOrText(raw: string): {
     } catch (err: any) {
       return {
         success: false,
-        errorMessage: `El archivo JSON de Organized no tiene un formato válido: ${err.message}`,
+        errorMessage: `El archivo JSON no tiene un formato válido: ${err.message}`,
       };
     }
   }
 
-  // Handle plain text paste from Organized or jw.org
+  // Handle plain text paste of meeting schedule
   const lines = trimmed.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
   if (lines.length < 3) {
     return {
       success: false,
-      errorMessage: 'El texto introducido es demasiado corto para extraer un programa de Organized.',
+      errorMessage: 'El texto introducido es demasiado corto para extraer el programa semanal.',
     };
   }
 
@@ -882,7 +882,7 @@ export function parseOrganizedJsonOrText(raw: string): {
 
   const schedule: OrganizedWeekSchedule = {
     weekKey: 'texto_copiado',
-    weekDateRange: 'Semana Importada de Organized',
+    weekDateRange: 'Semana Importada',
     bibleReading: 'Lectura Semanal',
     midweek: {
       tesoros: {

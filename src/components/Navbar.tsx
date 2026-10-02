@@ -438,7 +438,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               )}
 
-              {/* Quick Session Lock button if PIN is set (Organized-grade security) */}
+              {/* Quick Session Lock button if PIN is set */}
               {isPinEnabled && (
                 <button
                   onClick={lockSession}
@@ -498,19 +498,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   onClick={onOpenWelcomeLanding}
                   className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors cursor-pointer border border-slate-200 dark:border-slate-700"
-                  title="Abrir página de inicio, bienvenida y registro de la congregación (Estándar Organized)"
+                  title="Abrir página de inicio, bienvenida y registro de la congregación"
                 >
                   <Building2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   <span>Portal</span>
                 </button>
               )}
 
-              {/* Organized Invitation Manager Button (Elders/Coordinator) */}
+              {/* Invitation Manager Button (Elders/Coordinator) */}
               {onOpenInviteManager && effectiveRoleInfo.canModifySettings && (
                 <button
                   onClick={onOpenInviteManager}
                   className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:hover:bg-indigo-900 dark:text-indigo-300 text-xs font-semibold transition-colors cursor-pointer border border-indigo-200 dark:border-indigo-800"
-                  title="Gestionar Invitaciones Teocráticas y Códigos QR (Estándar Organized)"
+                  title="Gestionar Invitaciones Teocráticas y Códigos QR"
                 >
                   <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   <span>Invitar QR</span>
@@ -1077,7 +1077,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 );
               })}
 
-              {/* Organized Welcome Landing in Drawer */}
+              {/* Welcome Landing in Drawer */}
               {onOpenWelcomeLanding && (
                 <button
                   onClick={() => {
@@ -1091,7 +1091,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               )}
 
-              {/* Organized Invitation & Join in Drawer */}
+              {/* Invitation & Join in Drawer */}
               <div className="grid grid-cols-2 gap-2">
                 {onOpenJoinModal && (
                   <button

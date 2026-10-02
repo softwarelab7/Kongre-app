@@ -74,7 +74,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   );
   const [coordinatorPhone, setCoordinatorPhone] = useState(settings.coordinatorPhone || '');
 
-  // Step 4: Security (NW Scheduler Standard: PIN de Congregación + PIN Personal)
+  // Step 4: Security: PIN de Congregación + PIN Personal
   const [congregationPin, setCongregationPinInput] = useState('');
   const [confirmCongregationPin, setConfirmCongregationPin] = useState('');
   const [personalPin, setPersonalPinInput] = useState('');
@@ -98,7 +98,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         return false;
       }
       if (!congregationNumber.trim()) {
-        setError('Por favor introduce el ID / Número de la Congregación (NW Scheduler).');
+        setError('Por favor introduce el ID / Número de la Congregación.');
         return false;
       }
       if (!circuitNumber.trim()) {
@@ -319,7 +319,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 {isMandatory
                   ? 'Debes registrar los datos oficiales de tu congregación para comenzar a usar Kongre'
-                  : 'Asistente de configuración inicial (Estándar Organized)'}
+                  : 'Asistente de configuración inicial teocrática'}
               </p>
             </div>
           </div>
@@ -423,7 +423,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     type="text"
                     value={congregationNumber}
                     onChange={(e) => setCongregationNumber(e.target.value)}
-                    placeholder="Ej: 10582 (Estándar NW Scheduler)"
+                    placeholder="Ej: 10582"
                     className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono font-bold"
                     required
                   />
@@ -641,13 +641,13 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             </div>
           )}
 
-          {/* STEP 4: SECURITY - PIN DE CONGREGACIÓN Y PIN PERSONAL (NW SCHEDULER STANDARD) */}
+          {/* STEP 4: SECURITY - PIN DE CONGREGACIÓN Y PIN PERSONAL */}
           {step === 4 && (
             <div className="space-y-4 animate-fade-in">
               <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-slate-700 dark:text-slate-300">
                 <span className="font-bold text-amber-950 dark:text-amber-200 block mb-1 flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-amber-600" />
-                  Paso 4: Seguridad Teocrática y Roles (Estándar NW Scheduler)
+                  Paso 4: Seguridad Teocrática y Roles
                 </span>
                 <p className="text-amber-900/80 dark:text-amber-300/80">
                   Define el <strong>PIN de Bloqueo de la App</strong> (para bloquear la pantalla) y tu <strong>PIN Personal</strong> (que funciona como código de identificación de roles).
@@ -806,7 +806,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
                 <div className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 space-y-1.5">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                    Seguridad (NW Scheduler)
+                    Seguridad Teocrática
                   </span>
                   <div className="flex flex-col gap-1 text-xs">
                     <div className="flex items-center justify-between">

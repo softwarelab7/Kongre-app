@@ -349,7 +349,7 @@ export function detectConflictsInWeek(
     });
   }
 
-  // --- REPEATED OUTLINE CHECK (NW Scheduler feature) ---
+  // --- REPEATED OUTLINE CHECK ---
   if (week.weekend.publicTalkOutlineNumber) {
     const num = week.weekend.publicTalkOutlineNumber;
     const prevWeekWithSameOutline = allWeeks.find((w) => {

@@ -169,7 +169,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                 Registro Teocrático e Invitaciones
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Sistema de acceso seguro de congregación (Estándar Organized)
+                Sistema de acceso seguro de congregación
               </p>
             </div>
           </div>

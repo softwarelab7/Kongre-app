@@ -27,8 +27,10 @@ import {
 export const ExportPdfTab: React.FC = () => {
   const { weeks, publishersMap, settings, updateSettings, currentWeek } = useCongregation();
 
-  const [activeTemplate, setActiveTemplate] = useState<'clasica' | 'moderna' | 'minimalista' | 'color' | 'nw_scheduler'>(
-    settings.pdfTemplate || 'nw_scheduler'
+  const [activeTemplate, setActiveTemplate] = useState<'clasica' | 'moderna' | 'minimalista' | 'color' | 'oficial'>(
+    settings.pdfTemplate === 'color' || settings.pdfTemplate === 'clasica' || settings.pdfTemplate === 'moderna' || settings.pdfTemplate === 'minimalista'
+      ? settings.pdfTemplate
+      : 'oficial'
   );
   const [pageSize, setPageSize] = useState<'letter' | 'a4'>(settings.pdfPageSize || 'letter');
   const [showMidweek, setShowMidweek] = useState(settings.pdfSections.midweek);
@@ -181,7 +183,7 @@ export const ExportPdfTab: React.FC = () => {
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { id: 'nw_scheduler', name: 'NW Scheduler', desc: 'Cuadrícula oficial y bandas' },
+                  { id: 'oficial', name: 'Cuadrícula Oficial', desc: 'Cuadrícula y bandas teocráticas' },
                   { id: 'color', name: 'A Color', desc: 'Colores oficiales VYM' },
                   { id: 'clasica', name: 'Clásica', desc: 'Institucional y sobria' },
                   { id: 'moderna', name: 'Moderna', desc: 'Tarjetas y bordes suaves' },

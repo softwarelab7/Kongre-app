@@ -133,7 +133,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col justify-between font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
       {/* ========================================================= */}
-      {/* 1. TOP HEADER (Organized Style)                          */}
+      {/* 1. TOP HEADER                                            */}
       {/* ========================================================= */}
       <header className="w-full bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
         {/* Logo and Brand */}
@@ -248,7 +248,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           <div className="lg:col-span-7 xl:col-span-7 hidden lg:flex flex-col space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold w-fit shadow-xs">
               <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <span>Gestor Teocrático Integral • Estándar Organized & NW Scheduler</span>
+              <span>Gestor Teocrático Integral • Seguro y Eficiente</span>
             </div>
 
             <div className="space-y-3">
@@ -346,7 +346,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     ? 'Una herramienta teocrática que facilita la gestión integral de la congregación'
                     : activeTab === 'email_login'
                     ? 'Inicia sesión con Google u otro correo electrónico para entrar a tu cuenta'
-                    : 'Accede con tu ID y PIN de congregación (NW Scheduler) o código de invitación'}
+                    : 'Accede con tu ID y PIN de congregación o código de invitación'}
                 </p>
               </div>
 
@@ -369,7 +369,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                           Registrar mi Congregación
                         </h3>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-200 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 shrink-0">
-                          NW Scheduler
+                          Oficial
                         </span>
                       </div>
                       <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">

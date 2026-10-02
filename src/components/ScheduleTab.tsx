@@ -133,7 +133,7 @@ export const ScheduleTab: React.FC = () => {
   const [noWeekend, setNoWeekend] = useState(false);
   const [eventNotes, setEventNotes] = useState('');
 
-  // Guía de Actividades, Organized & Timer modals
+  // Guía de Actividades, Catálogo & Timer modals
   const [isMwbModalOpen, setIsMwbModalOpen] = useState(false);
   const [isOrganizedModalOpen, setIsOrganizedModalOpen] = useState(false);
   const [organizedModalTab, setOrganizedModalTab] = useState<'catalogo' | 'importar' | 'bosquejos'>('catalogo');
@@ -153,10 +153,10 @@ export const ScheduleTab: React.FC = () => {
 
     const msg =
       scope === 'all'
-        ? `⚡ Bosquejos de Entre Semana y Fin de Semana traídos de Organized (${schedule.bibleReading})`
+        ? `⚡ Bosquejos de Entre Semana y Fin de Semana actualizados (${schedule.bibleReading})`
         : scope === 'midweek'
-        ? `⚡ Bosquejos Entre Semana traídos de Organized (${schedule.bibleReading})`
-        : `⚡ Bosquejo FDS traído de Organized (#${schedule.weekend.outlineNumber}: ${schedule.weekend.outlineTitle})`;
+        ? `⚡ Bosquejos Entre Semana actualizados (${schedule.bibleReading})`
+        : `⚡ Bosquejo FDS actualizado (#${schedule.weekend.outlineNumber}: ${schedule.weekend.outlineTitle})`;
 
     setToastNotification(msg);
     setTimeout(() => setToastNotification(null), 3500);
@@ -176,7 +176,7 @@ export const ScheduleTab: React.FC = () => {
     );
   }
 
-  // Traer automáticamente bosquejos oficiales de Organized al ver la semana si aún no los tiene
+  // Traer automáticamente bosquejos oficiales al ver la semana si aún no los tiene
   React.useEffect(() => {
     if (!currentWeek) return;
     if (isWeekNeedingOrganizedSync(currentWeek)) {
@@ -570,11 +570,11 @@ export const ScheduleTab: React.FC = () => {
 
         {/* Midweek Body */}
         <div className="p-4 sm:p-6 space-y-6">
-          {/* Organized Midweek Info: Lectura Bíblica y Canciones */}
+          {/* Midweek Info: Lectura Bíblica y Canciones */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-xs">
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 font-bold text-[10px] uppercase tracking-wider shadow-2xs">
-                Organized
+                Oficial
               </span>
               <div className="flex items-center gap-1.5 text-indigo-950 dark:text-indigo-200 font-bold">
                 <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -1450,11 +1450,11 @@ export const ScheduleTab: React.FC = () => {
         </div>
 
         <div className="p-4 sm:p-6 space-y-6">
-          {/* Organized Weekend Info: Bosquejo y Canciones */}
+          {/* Weekend Info: Bosquejo y Canciones */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs">
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded-md bg-emerald-600 text-white font-bold text-[10px] uppercase tracking-wider shadow-2xs">
-                Organized
+                Oficial
               </span>
               <div className="flex items-center gap-1.5 text-emerald-950 dark:text-emerald-200 font-bold">
                 <Mic className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -1494,18 +1494,18 @@ export const ScheduleTab: React.FC = () => {
                       setIsOrganizedModalOpen(true);
                     }}
                     className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold border border-indigo-200 transition cursor-pointer"
-                    title="Ver catálogo de 194 bosquejos de Organized"
+                    title="Ver catálogo de 194 bosquejos oficiales"
                   >
                     <Sparkles className="w-3 h-3 text-indigo-600" />
-                    <span>Catálogo Organized (1-194)</span>
+                    <span>Catálogo de Bosquejos (1-194)</span>
                   </button>
                 )}
               </div>
 
-              {/* Selector de Bosquejo Oficial Organized */}
+              {/* Selector de Bosquejo Oficial */}
               <div>
                 <span className="text-[10px] font-semibold text-slate-500 block mb-1">
-                  Seleccionar Bosquejo Oficial de Organized (#1 al 194):
+                  Seleccionar Bosquejo Oficial (#1 al 194):
                 </span>
                 <select
                   value={currentWeek.weekend.publicTalkOutlineNumber || ''}
@@ -1584,7 +1584,7 @@ export const ScheduleTab: React.FC = () => {
                   Estudio de La Atalaya (60 min)
                 </span>
                 <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
-                  Organized
+                  Oficial
                 </span>
               </div>
 
@@ -2005,7 +2005,7 @@ export const ScheduleTab: React.FC = () => {
         />
       )}
 
-      {/* MODAL: ORGANIZED SYNC & OUTLINES (Entre Semana y Fin de Semana) */}
+      {/* MODAL: CATÁLOGO OFICIAL & OUTLINES (Entre Semana y Fin de Semana) */}
       <OrganizedImportModal
         isOpen={isOrganizedModalOpen}
         onClose={() => setIsOrganizedModalOpen(false)}

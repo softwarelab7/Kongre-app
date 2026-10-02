@@ -36,7 +36,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
   const [activeTab, setActiveTab] = useState<'id_pin' | 'codigo'>('id_pin');
 
-  // Fields for Mode 1: ID and Congregation PIN (NW Scheduler)
+  // Fields for Mode 1: ID and Congregation PIN
   const [congregationIdInput, setCongregationIdInput] = useState(settings.congregationNumber || '');
   const [congregationPinInput, setCongregationPinInput] = useState('');
 
@@ -71,7 +71,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       }
 
       if (activeTab === 'id_pin') {
-        // Mode 1: Connect with NW Scheduler Congregation ID & PIN
+        // Mode 1: Connect with Congregation ID & PIN
         if (!congregationIdInput.trim()) {
           setError('Por favor introduce el ID de la Congregación.');
           setIsSubmitting(false);
@@ -184,7 +184,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
                 Conectar a la Congregación
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Seguridad Teocrática (Estándar NW Scheduler)
+                Seguridad Teocrática
               </p>
             </div>
           </div>
@@ -251,7 +251,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
                 }`}
               >
                 <Hash className="w-3.5 h-3.5" />
-                <span>ID y PIN (NW Scheduler)</span>
+                <span>ID y PIN de Congregación</span>
               </button>
               <button
                 type="button"

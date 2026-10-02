@@ -168,7 +168,7 @@ export const SessionLockModal: React.FC = () => {
         </button>
 
         <p className="text-[11px] text-slate-500 mt-4">
-          Protección tipo Organized con cifrado AES-256 local
+          Protección teocrática con cifrado AES-256 local
         </p>
       </div>
     </div>

@@ -99,10 +99,10 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
 
     const scopeMsg =
       scope === 'all'
-        ? '¡Bosquejos de Entre Semana y Fin de Semana de Organized aplicados a la semana!'
+        ? '¡Bosquejos de Entre Semana y Fin de Semana aplicados a la semana!'
         : scope === 'midweek'
-        ? '¡Bosquejos de la Reunión Entre Semana (MWB) de Organized aplicados!'
-        : '¡Bosquejos del Fin de Semana (Discurso + Atalaya) de Organized aplicados!';
+        ? '¡Bosquejos de la Reunión Entre Semana (MWB) aplicados!'
+        : '¡Bosquejos del Fin de Semana (Discurso + Atalaya) aplicados!';
 
     setFeedbackSuccess(scopeMsg);
     setTimeout(() => {
@@ -118,7 +118,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
       setParseResult(res.schedule);
       setParseError(null);
     } else {
-      setParseError(res.errorMessage || 'No se pudo interpretar el formato de Organized.');
+      setParseError(res.errorMessage || 'No se pudo interpretar el formato del archivo.');
       setParseResult(null);
     }
   };
@@ -136,7 +136,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
         setParseResult(res.schedule);
         setParseError(null);
       } else {
-        setParseError(res.errorMessage || 'No se pudo leer el archivo de Organized.');
+        setParseError(res.errorMessage || 'No se pudo leer el archivo de programa.');
       }
     };
     reader.readAsText(file);
@@ -182,12 +182,12 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950">
-                  Organized (sws2apps)
+                  Catálogo Teocrático
                 </span>
-                <span className="text-xs text-indigo-200">Sincronizador Teocrático</span>
+                <span className="text-xs text-indigo-200">Sincronizador Oficial</span>
               </div>
               <h2 className="text-lg sm:text-xl font-bold text-white mt-1">
-                Traer Bosquejos y Programa de Organized
+                Traer Bosquejos y Programa Semanal
               </h2>
               <p className="text-xs text-indigo-100/90 mt-0.5">
                 Carga los temas oficiales para la Reunión Entre Semana (MWB) y Fin de Semana (Discurso Público + Atalaya)
@@ -249,7 +249,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
               {/* Week selector carousel / select */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-2">
-                  Selecciona la semana del programa oficial de Organized:
+                  Selecciona la semana del programa oficial:
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                   {ORGANIZED_OFFICIAL_SCHEDULES.map((s) => {
@@ -368,7 +368,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
                         Bosquejo #{selectedSchedule.weekend.outlineNumber}: {selectedSchedule.weekend.outlineTitle}
                       </p>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                        Sugerido en el catálogo de Organized para este ciclo
+                        Sugerido en el catálogo oficial para este ciclo
                       </p>
                     </div>
 
@@ -441,10 +441,10 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
                 <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-bold mb-1">
-                    Compatibilidad directa con la app Organized (sws2apps)
+                    Carga directa de programas semanales
                   </h4>
                   <p className="leading-relaxed text-indigo-800 dark:text-indigo-300">
-                    Puedes cargar el archivo <code className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 font-mono text-[11px]">.json</code> exportado de Organized o pegar el texto de la reunión copiado directamente del programa.
+                    Puedes cargar un archivo <code className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 font-mono text-[11px]">.json</code> con el programa o pegar el texto de la reunión copiado directamente.
                   </p>
                 </div>
               </div>
@@ -453,7 +453,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
               <div className="flex items-center gap-3">
                 <label className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-xs font-bold cursor-pointer hover:opacity-90 transition shadow-xs">
                   <Upload className="w-4 h-4" />
-                  <span>Seleccionar Archivo JSON de Organized</span>
+                  <span>Seleccionar Archivo JSON de Programa</span>
                   <input
                     type="file"
                     accept=".json,.txt"
@@ -470,7 +470,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
                   rows={6}
                   value={rawInput}
                   onChange={(e) => setRawInput(e.target.value)}
-                  placeholder="Pega aquí el contenido JSON exportado de Organized o el texto de la reunión..."
+                  placeholder="Pega aquí el contenido JSON del programa o el texto de la reunión..."
                   className="w-full p-3.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-indigo-500"
                 />
               </div>
@@ -499,7 +499,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
                   <div className="flex items-center justify-between">
                     <h4 className="font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-2">
                       <Check className="w-4 h-4 text-emerald-600" />
-                      <span>Programa extraído con éxito de Organized</span>
+                      <span>Programa extraído con éxito</span>
                     </h4>
                     <div className="flex flex-wrap items-center gap-1.5">
                       <button
@@ -622,7 +622,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
           <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
             <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
             <span className="hidden sm:inline">
-              Los bosquejos de Organized se sincronizan directamente con la base de datos de la congregación.
+              Los bosquejos oficiales se sincronizan directamente con la base de datos de la congregación.
             </span>
           </div>
           <button

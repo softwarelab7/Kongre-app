@@ -496,7 +496,7 @@ export const PublishersTab: React.FC = () => {
                       {privacyModeEnabled ? (
                         <div
                           className="flex items-center gap-1.5 font-semibold text-slate-500"
-                          title="Protección de privacidad teocrática activa (Organized)"
+                          title="Protección de privacidad teocrática activa"
                         >
                           <Lock className="w-3.5 h-3.5 text-slate-400" />
                           <span>{maskPhoneNumber(pub.phone)}</span>

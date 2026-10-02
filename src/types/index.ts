@@ -73,7 +73,7 @@ export interface Publisher {
   absences: Absence[];
   currentLessonNumber?: number;
   lessonsHistory?: StudentLessonRecord[];
-  preparedOutlines?: number[]; // Bosquejos de discursos públicos preparados (NW Scheduler)
+  preparedOutlines?: number[]; // Bosquejos de discursos públicos preparados
   roles: PublisherRoles;
   createdAt?: string;
 
@@ -250,7 +250,7 @@ export interface ConflictAlert {
 
 export interface CongregationSettings {
   congregationName: string;
-  congregationNumber?: string; // ej. '10582' (ID oficial de congregación NW Scheduler)
+  congregationNumber?: string; // ej. '10582' (ID oficial de congregación)
   congregationId?: string;     // ID único de congregación
   congregationPinHash?: string;// Hash seguro del PIN de Congregación (4-8 dígitos)
   circuitNumber?: string;      // ej. 'CO-04'
@@ -268,7 +268,7 @@ export interface CongregationSettings {
   weekendMeetingTime: string; // e.g. '10:00'
   hallAddress?: string;
   conflictRules: ConflictRuleSettings;
-  pdfTemplate: 'clasica' | 'moderna' | 'minimalista' | 'color' | 'nw_scheduler';
+  pdfTemplate: 'clasica' | 'moderna' | 'minimalista' | 'color' | 'oficial' | 'nw_scheduler';
   pdfPageSize: 'letter' | 'a4';
   pdfSections: {
     midweek: boolean;
@@ -290,7 +290,7 @@ export interface AssignmentHistoryRecord {
 }
 
 // ==========================================
-// ORGANIZED-STYLE THEOCRATIC FEATURES
+// THEOCRATIC FEATURES
 // ==========================================
 
 export interface S89Slip {
@@ -763,7 +763,7 @@ export interface LiteratureInventoryRecord {
   notes?: string;
 }
 
-// Organized-Style Invitation and Registration System
+// Theocratic Invitation and Registration System
 export interface CongregationInvitation {
   id: string;
   code: string; // e.g. 'KONG-SEC-4819'

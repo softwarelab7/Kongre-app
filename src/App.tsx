@@ -100,7 +100,7 @@ const AppContent: React.FC = () => {
     ) {
       return true;
     }
-    // Show Organized welcome screen if the user has not entered yet in this browser
+    // Show welcome screen if the user has not entered yet in this browser
     if (!localStorage.getItem('kongre_has_entered_app')) {
       return true;
     }
@@ -359,16 +359,16 @@ const AppContent: React.FC = () => {
         setActiveTab={setActiveTab}
       />
 
-      {/* Theocratic Session Lock Modal (Organized-grade security) */}
+      {/* Theocratic Session Lock Modal */}
       <SessionLockModal />
 
-      {/* Organized-Style Join Congregation with Code Modal */}
+      {/* Join Congregation with Code Modal */}
       <JoinCongregationModal
         isOpen={isJoinModalOpen}
         onClose={() => setIsJoinModalOpen(false)}
       />
 
-      {/* Organized-Style Theocratic Invitations & QR Manager Modal */}
+      {/* Theocratic Invitations & QR Manager Modal */}
       <InvitationManagerModal
         isOpen={isInviteManagerOpen}
         onClose={() => setIsInviteManagerOpen(false)}

@@ -941,7 +941,7 @@ export const PersonalViewTab: React.FC = () => {
         </div>
       )}
 
-      {/* Cart Witnessing Shifts for this Publisher (Organized) */}
+      {/* Cart Witnessing Shifts for this Publisher */}
       {myCartShifts.length > 0 && (
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
           <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -1115,7 +1115,7 @@ export const PersonalViewTab: React.FC = () => {
         </div>
       )}
 
-      {/* Congregation Notices (Organized) */}
+      {/* Congregation Notices */}
       {notices.length > 0 && (
         <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
           <h3 className="text-base font-bold text-slate-900 flex items-center justify-between">

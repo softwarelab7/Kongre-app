@@ -526,7 +526,7 @@ export const CleaningDutiesTab: React.FC = () => {
         </div>
       </div>
 
-      {/* SECTION 4: SALIDAS PARA LA PREDICACIÓN (NW SCHEDULER FIELD SERVICE) */}
+      {/* SECTION 4: SALIDAS PARA LA PREDICACIÓN (SERVICIO DEL CAMPO) */}
       <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>

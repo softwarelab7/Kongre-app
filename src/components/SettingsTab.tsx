@@ -231,7 +231,7 @@ export const SettingsTab: React.FC = () => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `Respaldo_Cifrado_Organized_${settings.congregationName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.orgenc.json`;
+      link.download = `Respaldo_Cifrado_${settings.congregationName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.enc.json`;
       link.click();
       URL.revokeObjectURL(url);
 
@@ -583,7 +583,7 @@ export const SettingsTab: React.FC = () => {
 
               <div className="sm:col-span-2">
                 <label className="block font-bold text-slate-800 mb-1">
-                  Alerta de repetición de Bosquejos Públicos (NW Scheduler):
+                  Alerta de repetición de Bosquejos Públicos:
                 </label>
                 <select
                   value={warnOutlineMonths}
@@ -661,7 +661,7 @@ export const SettingsTab: React.FC = () => {
         </div>
       </div>
 
-      {/* 4. REGISTRO TEOCRÁTICO E INVITACIONES CON QR (ESTÁNDAR ORGANIZED) */}
+      {/* 4. REGISTRO TEOCRÁTICO E INVITACIONES CON QR */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
           <div className="flex items-center gap-2.5">
@@ -673,7 +673,7 @@ export const SettingsTab: React.FC = () => {
                 Registro Teocrático e Invitaciones con QR
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Acceso cerrado por invitación y clave de congregación al estilo Organized (sws2apps)
+                Acceso cerrado por invitación y clave de congregación
               </p>
             </div>
           </div>
@@ -749,13 +749,13 @@ export const SettingsTab: React.FC = () => {
             </button>
           </div>
 
-          {/* Card 3: Credenciales Teocráticas NW Scheduler */}
+          {/* Card 3: Credenciales Teocráticas */}
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                  Credenciales NW Scheduler
+                  Credenciales de la Congregación
                 </span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200">
                   {isCongregationPinSet ? 'Protegido' : 'Activo'}
@@ -789,7 +789,7 @@ export const SettingsTab: React.FC = () => {
         </div>
       </div>
 
-      {/* 5. SEGURIDAD TEOCRÁTICA Y BLOQUEO DE SESIÓN (ESTÁNDAR ORGANIZED) */}
+      {/* 5. SEGURIDAD TEOCRÁTICA Y BLOQUEO DE SESIÓN */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
           <div className="flex items-center gap-2.5">
@@ -801,7 +801,7 @@ export const SettingsTab: React.FC = () => {
                 Seguridad y Privacidad Teocrática
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Protección de datos y bloqueo de pantalla al estilo Organized (sws2apps)
+                Protección de datos y bloqueo de pantalla teocrática
               </p>
             </div>
           </div>
@@ -926,7 +926,7 @@ export const SettingsTab: React.FC = () => {
       <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
         <h3 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
           <Database className="w-4 h-4 text-indigo-600" />
-          <span>Copias de Seguridad y Respaldo Cifrado (Estándar Organized)</span>
+          <span>Copias de Seguridad y Respaldo Cifrado</span>
         </h3>
 
         <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -1267,13 +1267,13 @@ export const SettingsTab: React.FC = () => {
         </div>
       )}
 
-      {/* Organized-Style Theocratic Invitations & QR Manager Modal */}
+      {/* Theocratic Invitations & QR Manager Modal */}
       <InvitationManagerModal
         isOpen={isSettingsInviteModalOpen}
         onClose={() => setIsSettingsInviteModalOpen(false)}
       />
 
-      {/* Organized-Style Join Congregation Modal */}
+      {/* Join Congregation Modal */}
       <JoinCongregationModal
         isOpen={isSettingsJoinModalOpen}
         onClose={() => setIsSettingsJoinModalOpen(false)}

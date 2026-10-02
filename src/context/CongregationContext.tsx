@@ -136,7 +136,7 @@ interface CongregationContextType {
   updateFieldServiceMeeting: (item: FieldServiceMeeting) => void;
   deleteFieldServiceMeeting: (id: string) => void;
 
-  // Cart Witnessing (Organized)
+  // Cart Witnessing
   addCartLocation: (loc: Omit<CartLocation, 'id'>) => void;
   updateCartLocation: (loc: CartLocation) => void;
   deleteCartLocation: (id: string) => void;
@@ -144,16 +144,16 @@ interface CongregationContextType {
   updateCartShift: (shift: CartShift) => void;
   deleteCartShift: (id: string) => void;
 
-  // Notices (Organized)
+  // Notices
   addNotice: (notice: Omit<CongregationNotice, 'id'>) => void;
   updateNotice: (notice: CongregationNotice) => void;
   deleteNotice: (id: string) => void;
 
-  // Monthly Service Reports S-4 (Organized)
+  // Monthly Service Reports S-4
   updateMonthlyReport: (report: MonthlyServiceReport) => void;
   batchUpdateMonthlyReports: (reports: MonthlyServiceReport[]) => void;
 
-  // Territories S-13 (Organized / NW Scheduler)
+  // Territories S-13
   addTerritory: (terr: Omit<Territory, 'id' | 'history'>) => void;
   updateTerritory: (terr: Territory) => void;
   deleteTerritory: (id: string) => void;
@@ -163,7 +163,7 @@ interface CongregationContextType {
   addNoVisitAddress: (territoryId: string, noVisit: Omit<NoVisitAddress, 'id'>) => void;
   removeNoVisitAddress: (territoryId: string, noVisitId: string) => void;
 
-  // Circuit Overseer Visit (NW Scheduler / Organized)
+  // Circuit Overseer Visit
   updateCircuitVisit: (visit: CircuitOverseerVisit) => void;
   updateMealArrangement: (meal: MealArrangement) => void;
   updateMinistryArrangement: (min: MinistryArrangement) => void;
@@ -193,7 +193,7 @@ interface CongregationContextType {
   updateGroupDistribution: (dist: LiteratureGroupDistribution) => void;
   recordPhysicalCount: (record: Omit<LiteratureInventoryRecord, 'id'>) => void;
 
-  // S-89 Slips extraction (Organized)
+  // S-89 Slips extraction
   getS89SlipsForWeek: (week: WeekSchedule) => S89Slip[];
 
   // Cleaning & Groups
@@ -1113,7 +1113,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, merged);
   };
 
-  // Organized features actions
+  // Carritos de predicación y avisos
   const addCartLocation = (locData: Omit<CartLocation, 'id'>) => {
     const newLoc: CartLocation = {
       ...locData,
@@ -1358,7 +1358,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, updated);
   };
 
-  // Circuit Overseer Visit actions (NW Scheduler / Organized)
+  // Circuit Overseer Visit actions
   const updateCircuitVisit = (visit: CircuitOverseerVisit) => {
     setCircuitVisit(visit);
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, visit);
@@ -1881,7 +1881,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `Respaldo_Organized_${settings.congregationName.replace(/\s+/g, '_')}_${formatDateISO(new Date())}.json`;
+    link.download = `Respaldo_Kongre_${settings.congregationName.replace(/\s+/g, '_')}_${formatDateISO(new Date())}.json`;
     link.click();
     URL.revokeObjectURL(url);
   };

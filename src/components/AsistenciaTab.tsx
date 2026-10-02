@@ -172,7 +172,7 @@ export const AsistenciaTab: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-semibold tracking-wide uppercase">
-              Módulo NW Scheduler
+              Módulo Oficial Teocrático
             </span>
             <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-xs font-semibold">
               Registro del Secretario

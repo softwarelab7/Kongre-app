@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 
 interface RegisterCongregationWizardProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
   onRegisteredSuccess: () => void;
   isMandatory?: boolean;
@@ -35,12 +35,13 @@ interface RegisterCongregationWizardProps {
 }
 
 export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProps> = ({
-  isOpen,
+  isOpen = true,
   onClose,
   onRegisteredSuccess,
   isMandatory = false,
   onOpenJoinWithCode,
 }) => {
+  if (isOpen === false) return null;
   const { settings, updateSettings, publishers, addPublisher } = useCongregation();
   const { user, assignRoleToEmail, setActiveRole, assignPersonalPinToRole } = useAuth();
   const { setCongregationPin, setPersonalPin, setMasterPassphrase } = useSecurity();
@@ -283,14 +284,29 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-slate-950/85 backdrop-blur-md transition-opacity"
-        onClick={onClose}
-      />
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col py-6 sm:py-10 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
+      <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col">
+        {/* Top Back Navigation Bar */}
+        <div className="mb-4 sm:mb-6 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={step > 1 ? handleBack : onClose}
+            className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200 dark:border-slate-800 font-bold text-xs sm:text-sm shadow-xs transition-all cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>{step > 1 ? 'Paso anterior' : 'Volver al Inicio'}</span>
+          </button>
 
-      <div className="relative w-full max-w-2xl lg:max-w-4xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
+          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+              K
+            </div>
+            <span className="hidden sm:inline">Kongre • Registro de Congregación</span>
+          </div>
+        </div>
+
+        {/* Main Card */}
+        <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden flex flex-col flex-1">
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -874,5 +890,6 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         </div>
       </div>
     </div>
+  </div>
   );
 };

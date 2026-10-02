@@ -45,8 +45,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   const { settings } = useCongregation();
   const { isDark, toggleTheme } = useTheme();
 
-  const [activeTab, setActiveTab] = useState<'home' | 'email_login' | 'code_login'>('home');
-  const [isRegisterWizardOpen, setIsRegisterWizardOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'home' | 'email_login' | 'code_login' | 'register'>('home');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   // Invitation code state
@@ -110,6 +109,23 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     }
   };
 
+  // If in registration mode, render the full page registration view (NO pop-up)
+  if (activeTab === 'register') {
+    return (
+      <RegisterCongregationWizard
+        isMandatory={!settings.isRegistered}
+        onOpenJoinWithCode={() => {
+          setActiveTab('code_login');
+        }}
+        onClose={() => setActiveTab('home')}
+        onRegisteredSuccess={() => {
+          localStorage.setItem('kongre_has_entered_app', 'true');
+          onEnterApp();
+        }}
+      />
+    );
+  }
+
   const handleGoogleLogin = async () => {
     setEmailError(null);
     setIsSubmittingEmail(true);
@@ -121,7 +137,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         onEnterApp();
       } else {
         // Registration is mandatory for a new congregation
-        setIsRegisterWizardOpen(true);
+        setActiveTab('register');
       }
     } catch (err: any) {
       setEmailError(err?.message || 'Error al iniciar sesión con Google.');
@@ -356,7 +372,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   {/* Option 1: Registrar una Nueva Congregación (Primary for new user) */}
                   <button
                     type="button"
-                    onClick={() => setIsRegisterWizardOpen(true)}
+                    onClick={() => setActiveTab('register')}
                     className="w-full p-4 sm:p-5 rounded-2xl border-2 border-indigo-500/50 bg-indigo-50/50 dark:bg-indigo-950/30 hover:border-indigo-600 dark:hover:border-indigo-400 hover:shadow-md transition-all text-left flex items-start gap-4 group cursor-pointer"
                   >
                     <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform shadow-xs">
@@ -641,22 +657,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       <footer className="w-full text-center py-4 text-[11px] text-slate-400 dark:text-slate-600">
         Kongre • Gestor Teocrático Integral para Congregaciones
       </footer>
-
-      {/* Step-by-Step Congregation Registration Wizard (Mandatory flow) */}
-      <RegisterCongregationWizard
-        isOpen={isRegisterWizardOpen}
-        isMandatory={!settings.isRegistered}
-        onOpenJoinWithCode={() => {
-          setIsRegisterWizardOpen(false);
-          setActiveTab('code_login');
-        }}
-        onClose={() => setIsRegisterWizardOpen(false)}
-        onRegisteredSuccess={() => {
-          setIsRegisterWizardOpen(false);
-          localStorage.setItem('kongre_has_entered_app', 'true');
-          onEnterApp();
-        }}
-      />
     </div>
   );
 };

@@ -273,6 +273,15 @@ export const SettingsTab: React.FC = () => {
     }
   };
 
+  if (isSettingsWizardOpen) {
+    return (
+      <RegisterCongregationWizard
+        onClose={() => setIsSettingsWizardOpen(false)}
+        onRegisteredSuccess={() => setIsSettingsWizardOpen(false)}
+      />
+    );
+  }
+
   return (
     <div className="w-full space-y-8">
       {/* Header */}
@@ -1277,13 +1286,6 @@ export const SettingsTab: React.FC = () => {
       <JoinCongregationModal
         isOpen={isSettingsJoinModalOpen}
         onClose={() => setIsSettingsJoinModalOpen(false)}
-      />
-
-      {/* Step-by-Step Congregation Registration Wizard */}
-      <RegisterCongregationWizard
-        isOpen={isSettingsWizardOpen}
-        onClose={() => setIsSettingsWizardOpen(false)}
-        onRegisteredSuccess={() => setIsSettingsWizardOpen(false)}
       />
     </div>
   );

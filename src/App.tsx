@@ -173,6 +173,16 @@ const AppContent: React.FC = () => {
     );
   }
 
+  // If registering congregation, show full-page registration view (NO pop-up)
+  if (isRegisterWizardOpen) {
+    return (
+      <RegisterCongregationWizard
+        onClose={() => setIsRegisterWizardOpen(false)}
+        onRegisteredSuccess={() => setIsRegisterWizardOpen(false)}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
       <Navbar
@@ -374,12 +384,6 @@ const AppContent: React.FC = () => {
         onClose={() => setIsInviteManagerOpen(false)}
       />
 
-      {/* Step-by-Step Register Congregation Wizard */}
-      <RegisterCongregationWizard
-        isOpen={isRegisterWizardOpen}
-        onClose={() => setIsRegisterWizardOpen(false)}
-        onRegisteredSuccess={() => setIsRegisterWizardOpen(false)}
-      />
     </div>
   );
 };

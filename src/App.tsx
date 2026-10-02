@@ -159,17 +159,28 @@ const AppContent: React.FC = () => {
 
   if (showWelcomeLanding || !isCongregationRegistered) {
     return (
-      <CongregationWelcomeLanding
-        onEnterApp={() => {
-          if (settings.isRegistered || Boolean(settings.congregationName?.trim())) {
+      <>
+        <CongregationWelcomeLanding
+          onEnterApp={() => {
+            if (settings.isRegistered || Boolean(settings.congregationName?.trim())) {
+              setShowWelcomeLanding(false);
+              sessionStorage.removeItem('kongre_show_landing');
+            }
+          }}
+          onOpenJoinModal={() => {
+            setIsJoinModalOpen(true);
+          }}
+        />
+        <JoinCongregationModal
+          isOpen={isJoinModalOpen}
+          onClose={() => setIsJoinModalOpen(false)}
+          onSuccessRole={() => {
+            setIsJoinModalOpen(false);
             setShowWelcomeLanding(false);
             sessionStorage.removeItem('kongre_show_landing');
-          }
-        }}
-        onOpenJoinModal={() => {
-          setIsJoinModalOpen(true);
-        }}
-      />
+          }}
+        />
+      </>
     );
   }
 

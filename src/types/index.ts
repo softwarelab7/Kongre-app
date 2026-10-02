@@ -65,6 +65,7 @@ export interface Publisher {
   name: string;
   gender: Gender;
   phone: string;
+  email?: string;
   privilege?: TheocraticPrivilege;
   notes?: string;
   active: boolean;
@@ -249,6 +250,18 @@ export interface ConflictAlert {
 
 export interface CongregationSettings {
   congregationName: string;
+  congregationNumber?: string; // ej. '10582' (ID oficial de congregación NW Scheduler)
+  congregationId?: string;     // ID único de congregación
+  congregationPinHash?: string;// Hash seguro del PIN de Congregación (4-8 dígitos)
+  circuitNumber?: string;      // ej. 'CO-04'
+  language?: string;           // ej. 'Español'
+  country?: string;            // ej. 'Colombia'
+  city?: string;               // ej. 'Bogotá'
+  coordinatorName?: string;    // ej. 'Héctor Gutiérrez'
+  coordinatorEmail?: string;   // ej. 'hectorguti95@gmail.com'
+  coordinatorPhone?: string;   // ej. '+57 300 1234567'
+  isRegistered?: boolean;      // true if the congregation registration wizard has been completed
+  registeredAt?: string;       // ISO date
   midweekMeetingDay: string;  // e.g. 'Miércoles'
   midweekMeetingTime: string; // e.g. '19:00'
   weekendMeetingDay: string;  // e.g. 'Domingo'
@@ -748,5 +761,31 @@ export interface LiteratureInventoryRecord {
   totalItemsCounted: number;
   isCountCompleted: boolean;
   notes?: string;
+}
+
+// Organized-Style Invitation and Registration System
+export interface CongregationInvitation {
+  id: string;
+  code: string; // e.g. 'KONG-SEC-4819'
+  role: string; // TheocraticRole
+  targetName?: string;
+  targetEmail?: string;
+  createdByEmail: string;
+  createdAt: string;
+  expiresAt?: string;
+  status: 'active' | 'used' | 'revoked';
+  usedAt?: string;
+  usedByEmail?: string;
+}
+
+export interface ActiveDeviceSession {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  deviceInfo: string;
+  lastActive: string;
+  ipPlaceholder?: string;
+  status: 'active' | 'revoked';
 }
 

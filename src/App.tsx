@@ -38,8 +38,16 @@ import { AssignmentConfirmationModal } from './components/AssignmentConfirmation
 import { DigitalTerritoryModal } from './components/DigitalTerritoryModal';
 import { ThemeToggleModal } from './components/ThemeToggleModal';
 import { OfflineSyncBanner } from './components/OfflineSyncBanner';
+import { ResumenInicioTab } from './components/ResumenInicioTab';
 import { RoleSwitcherModal } from './components/RoleSwitcherModal';
 import { AccessRestrictedView } from './components/AccessRestrictedView';
+import { SecurityProvider } from './context/SecurityContext';
+import { SessionLockModal } from './components/SessionLockModal';
+import { JoinCongregationModal } from './components/JoinCongregationModal';
+import { InvitationManagerModal } from './components/InvitationManagerModal';
+import { CongregationWelcomeLanding } from './components/CongregationWelcomeLanding';
+import { RegisterCongregationWizard } from './components/RegisterCongregationWizard';
+import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 
 const AppContent: React.FC = () => {
@@ -48,7 +56,7 @@ const AppContent: React.FC = () => {
     // If scanning QR code with ?modo=tablero, open personal view directly
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('modo') === 'tablero') return 'mi_vista';
-    return 'programacion';
+    return 'inicio';
   });
 
   const [confirmationParams, setConfirmationParams] = useState<{
@@ -77,7 +85,29 @@ const AppContent: React.FC = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
-  const { setCurrentWeekId, territories } = useCongregation();
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return !!urlParams.get('invite');
+  });
+  const [isInviteManagerOpen, setIsInviteManagerOpen] = useState(false);
+  const [showWelcomeLanding, setShowWelcomeLanding] = useState<boolean>(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (
+      urlParams.get('portal') === '1' ||
+      urlParams.get('inicio') === '1' ||
+      urlParams.get('bienvenida') === '1' ||
+      sessionStorage.getItem('kongre_show_landing') === 'true'
+    ) {
+      return true;
+    }
+    // Show Organized welcome screen if the user has not entered yet in this browser
+    if (!localStorage.getItem('kongre_has_entered_app')) {
+      return true;
+    }
+    return false;
+  });
+  const { setCurrentWeekId, territories, settings } = useCongregation();
+  const [isRegisterWizardOpen, setIsRegisterWizardOpen] = useState(false);
 
   // Digital Territory Direct Link / QR scan via URL: ?territorio=01 or ?t=01
   const [digitalTerritoryNumber, setDigitalTerritoryNumber] = useState<string | null>(() => {
@@ -123,6 +153,26 @@ const AppContent: React.FC = () => {
     }
   };
 
+  // Mandatory Congregation Registration Check:
+  // A user MUST register the congregation (or join an existing one) before using the application
+  const isCongregationRegistered = settings.isRegistered || Boolean(settings.congregationName?.trim());
+
+  if (showWelcomeLanding || !isCongregationRegistered) {
+    return (
+      <CongregationWelcomeLanding
+        onEnterApp={() => {
+          if (settings.isRegistered || Boolean(settings.congregationName?.trim())) {
+            setShowWelcomeLanding(false);
+            sessionStorage.removeItem('kongre_show_landing');
+          }
+        }}
+        onOpenJoinModal={() => {
+          setIsJoinModalOpen(true);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
       <Navbar
@@ -135,6 +185,9 @@ const AppContent: React.FC = () => {
         onOpenSearchModal={() => setIsSearchModalOpen(true)}
         onOpenRoleModal={() => setIsRoleModalOpen(true)}
         onOpenThemeModal={() => setIsThemeModalOpen(true)}
+        onOpenJoinModal={() => setIsJoinModalOpen(true)}
+        onOpenInviteManager={() => setIsInviteManagerOpen(true)}
+        onOpenWelcomeLanding={() => setShowWelcomeLanding(true)}
       />
 
       <main className="flex-1 w-full mx-auto px-3 sm:px-6 lg:px-8 2xl:px-12 py-4 sm:py-6 pb-24 md:pb-8">
@@ -155,11 +208,45 @@ const AppContent: React.FC = () => {
                 ? 'el Cuerpo de Ancianos'
                 : 'un hermano con privilegios autorizados'
             }
-            onNavigateHome={() => setActiveTab('programacion')}
+            onNavigateHome={() => setActiveTab('inicio')}
             onOpenRoleSwitcher={() => setIsRoleModalOpen(true)}
           />
         ) : (
           <>
+            {/* Friendly banner if congregation has not yet been registered */}
+            {!settings.isRegistered && !settings.congregationName && (
+              <div className="mb-6 p-4 rounded-2xl bg-indigo-50/90 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+                <div className="flex items-start sm:items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                      ¡Bienvenido! Tu congregación aún no está configurada
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-300">
+                      Puedes usar y explorar la app libremente, o registrar los datos oficiales (nombre, circuito y reuniones) para comenzar a organizar.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsRegisterWizardOpen(true)}
+                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition-all shrink-0 cursor-pointer text-center"
+                >
+                  Registrar mi Congregación
+                </button>
+              </div>
+            )}
+
+            {activeTab === 'inicio' && (
+              <ResumenInicioTab
+                setActiveTab={setActiveTab}
+                onOpenTimerModal={() => setIsTimerModalOpen(true)}
+                onOpenKioskModal={() => setIsKioskModalOpen(true)}
+                onOpenConflictsModal={() => setIsConflictsModalOpen(true)}
+              />
+            )}
             {activeTab === 'programacion' && <ScheduleTab />}
             {activeTab === 's89' && <S89SlipsTab />}
             {activeTab === 'publicadores' && <PublishersTab />}
@@ -271,6 +358,28 @@ const AppContent: React.FC = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
+
+      {/* Theocratic Session Lock Modal (Organized-grade security) */}
+      <SessionLockModal />
+
+      {/* Organized-Style Join Congregation with Code Modal */}
+      <JoinCongregationModal
+        isOpen={isJoinModalOpen}
+        onClose={() => setIsJoinModalOpen(false)}
+      />
+
+      {/* Organized-Style Theocratic Invitations & QR Manager Modal */}
+      <InvitationManagerModal
+        isOpen={isInviteManagerOpen}
+        onClose={() => setIsInviteManagerOpen(false)}
+      />
+
+      {/* Step-by-Step Register Congregation Wizard */}
+      <RegisterCongregationWizard
+        isOpen={isRegisterWizardOpen}
+        onClose={() => setIsRegisterWizardOpen(false)}
+        onRegisteredSuccess={() => setIsRegisterWizardOpen(false)}
+      />
     </div>
   );
 };
@@ -280,7 +389,9 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <CongregationProvider>
-          <AppContent />
+          <SecurityProvider>
+            <AppContent />
+          </SecurityProvider>
         </CongregationProvider>
       </AuthProvider>
     </ThemeProvider>

@@ -20,8 +20,11 @@ import {
   Check,
   X,
   AlertCircle,
+  Lock,
 } from 'lucide-react';
 import { computePublisherAssignmentStats } from '../utils/autoAssigner';
+import { useSecurity } from '../context/SecurityContext';
+import { maskPhoneNumber } from '../utils/theocraticSecurity';
 
 export const PublishersTab: React.FC = () => {
   const {
@@ -33,6 +36,8 @@ export const PublishersTab: React.FC = () => {
     weeks,
     customDuties,
   } = useCongregation();
+
+  const { privacyModeEnabled } = useSecurity();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterGender, setFilterGender] = useState<string>('all');
@@ -488,23 +493,35 @@ export const PublishersTab: React.FC = () => {
                 <div className="mt-3 space-y-1.5 text-xs text-slate-600">
                   {pub.phone && (
                     <div className="flex items-center justify-between text-slate-500 bg-slate-50 p-2 rounded-xl border border-slate-100">
-                      <a
-                        href={`tel:${pub.phone}`}
-                        className="flex items-center gap-1.5 hover:text-indigo-600 font-semibold"
-                        title="Llamar"
-                      >
-                        <Phone className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{pub.phone}</span>
-                      </a>
-                      <a
-                        href={`https://wa.me/${pub.phone.replace(/[^0-9]/g, '')}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-bold text-[11px] hover:bg-emerald-100 transition-colors"
-                        title="Abrir chat de WhatsApp"
-                      >
-                        WhatsApp
-                      </a>
+                      {privacyModeEnabled ? (
+                        <div
+                          className="flex items-center gap-1.5 font-semibold text-slate-500"
+                          title="Protección de privacidad teocrática activa (Organized)"
+                        >
+                          <Lock className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{maskPhoneNumber(pub.phone)}</span>
+                        </div>
+                      ) : (
+                        <a
+                          href={`tel:${pub.phone}`}
+                          className="flex items-center gap-1.5 hover:text-indigo-600 font-semibold"
+                          title="Llamar"
+                        >
+                          <Phone className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{pub.phone}</span>
+                        </a>
+                      )}
+                      {!privacyModeEnabled && (
+                        <a
+                          href={`https://wa.me/${pub.phone.replace(/[^0-9]/g, '')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-bold text-[11px] hover:bg-emerald-100 transition-colors"
+                          title="Abrir chat de WhatsApp"
+                        >
+                          WhatsApp
+                        </a>
+                      )}
                     </div>
                   )}
                   {pub.notes && (

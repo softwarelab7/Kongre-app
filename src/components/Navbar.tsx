@@ -43,9 +43,16 @@ import {
   Check,
   Sun,
   Moon,
+  LayoutDashboard,
+  Lock,
+  KeyRound,
+  UserPlus,
+  Building2,
 } from 'lucide-react';
+import { useSecurity } from '../context/SecurityContext';
 
 export type ActiveTab =
+  | 'inicio'
   | 'programacion'
   | 's89'
   | 'publicadores'
@@ -78,6 +85,9 @@ interface NavbarProps {
   onOpenSearchModal: () => void;
   onOpenRoleModal?: () => void;
   onOpenThemeModal?: () => void;
+  onOpenJoinModal?: () => void;
+  onOpenInviteManager?: () => void;
+  onOpenWelcomeLanding?: () => void;
 }
 
 interface NavSubItem {
@@ -109,10 +119,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSearchModal,
   onOpenRoleModal,
   onOpenThemeModal,
+  onOpenJoinModal,
+  onOpenInviteManager,
+  onOpenWelcomeLanding,
 }) => {
   const { user, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo } = useAuth();
   const { settings, conflicts, syncStatus, notices, territories } = useCongregation();
   const { themeMode, toggleTheme, isDark, isCabinaMode } = useTheme();
+  const { isPinEnabled, lockSession } = useSecurity();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -338,8 +352,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Top Primary Bar */}
           <div className="flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-4">
             {/* Brand Logo & Name */}
-            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 shrink-0">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-linear-to-br from-indigo-600 to-indigo-800 flex items-center justify-center text-white shadow-md shrink-0">
+            <div
+              onClick={() => handleSelectTab('inicio')}
+              className="flex items-center gap-2.5 sm:gap-3 min-w-0 shrink-0 cursor-pointer group"
+              title="Ir al Resumen General de la congregación"
+            >
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-linear-to-br from-indigo-600 to-indigo-800 flex items-center justify-center text-white shadow-md shrink-0 group-hover:scale-105 transition-transform">
                 <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="truncate">
@@ -420,6 +438,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               )}
 
+              {/* Quick Session Lock button if PIN is set (Organized-grade security) */}
+              {isPinEnabled && (
+                <button
+                  onClick={lockSession}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 text-xs font-semibold border border-slate-200 hover:border-rose-300 transition-colors cursor-pointer shadow-2xs"
+                  title="Bloquear sesión ahora (Salón del Reino)"
+                >
+                  <Lock className="w-3.5 h-3.5 text-slate-600" />
+                  <span className="hidden xl:inline">Bloquear</span>
+                </button>
+              )}
+
               {/* Cloud Sync Indicator */}
               <div className="hidden xl:flex items-center text-xs font-medium">
                 {syncStatus === 'synced' && (
@@ -462,6 +492,42 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <Tv className="w-4 h-4 text-emerald-400" />
                 )}
               </button>
+
+              {/* Welcome / Registration Landing Portal Button */}
+              {onOpenWelcomeLanding && (
+                <button
+                  onClick={onOpenWelcomeLanding}
+                  className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors cursor-pointer border border-slate-200 dark:border-slate-700"
+                  title="Abrir página de inicio, bienvenida y registro de la congregación (Estándar Organized)"
+                >
+                  <Building2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Portal</span>
+                </button>
+              )}
+
+              {/* Organized Invitation Manager Button (Elders/Coordinator) */}
+              {onOpenInviteManager && effectiveRoleInfo.canModifySettings && (
+                <button
+                  onClick={onOpenInviteManager}
+                  className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:hover:bg-indigo-900 dark:text-indigo-300 text-xs font-semibold transition-colors cursor-pointer border border-indigo-200 dark:border-indigo-800"
+                  title="Gestionar Invitaciones Teocráticas y Códigos QR (Estándar Organized)"
+                >
+                  <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Invitar QR</span>
+                </button>
+              )}
+
+              {/* Join Congregation with Code Button */}
+              {onOpenJoinModal && (
+                <button
+                  onClick={onOpenJoinModal}
+                  className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors cursor-pointer border border-slate-200 dark:border-slate-700"
+                  title="Unirse a la congregación con código o clave maestra"
+                >
+                  <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Unirse</span>
+                </button>
+              )}
 
               {/* Theocratic Role Pill Button */}
               {onOpenRoleModal && (
@@ -523,6 +589,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* DESKTOP & TABLET DEPARTMENTAL NAVIGATION BAR */}
           <nav className="hidden md:flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-1 pb-1 text-xs">
             <div className="flex items-center space-x-1 lg:space-x-1.5">
+              {/* Inicio / Panel de Resumen Tab */}
+              <button
+                onClick={() => handleSelectTab('inicio')}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold transition-all cursor-pointer ${
+                  activeTab === 'inicio'
+                    ? 'bg-indigo-600 text-white shadow-xs font-bold'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                }`}
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Resumen</span>
+              </button>
+
               {departments.map((dept) => {
                 const Icon = dept.icon;
                 const isDeptActive = dept.tabIds.includes(activeTab);
@@ -870,11 +949,56 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <span className="text-[10px] bg-black/20 px-2 py-0.5 rounded-full shrink-0 ml-1">Cambiar</span>
                   </button>
                 )}
+
+                {onOpenInviteManager && effectiveRoleInfo.canModifySettings && (
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      onOpenInviteManager();
+                    }}
+                    className="w-full flex items-center justify-between p-3 rounded-2xl text-xs font-bold transition-all shadow-xs bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <QrCode className="w-4 h-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
+                      <span className="truncate">Gestionar Invitaciones & QR</span>
+                    </div>
+                    <span className="text-[10px] bg-indigo-200 dark:bg-indigo-900 px-2 py-0.5 rounded-full shrink-0 ml-1">
+                      Generar
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
 
             {/* Department Accordion Sections */}
             <div className="overflow-y-auto p-4 space-y-4">
+              {/* Inicio / Resumen General Shortcut */}
+              <button
+                onClick={() => handleSelectTab('inicio')}
+                className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-colors cursor-pointer ${
+                  activeTab === 'inicio'
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'bg-slate-50 dark:bg-slate-800/70 text-slate-800 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                <div
+                  className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                    activeTab === 'inicio'
+                      ? 'bg-white/20 text-white'
+                      : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'
+                  }`}
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-xs font-bold block truncate">Resumen de Congregación</span>
+                  <span className={`text-[10px] block truncate ${activeTab === 'inicio' ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'}`}>
+                    Panel general, salud e indicadores de la semana
+                  </span>
+                </div>
+                <ChevronRight className="w-4 h-4 opacity-60 shrink-0" />
+              </button>
+
               {departments.map((dept) => {
                 const DeptIcon = dept.icon;
                 const isDeptActive = dept.tabIds.includes(activeTab);
@@ -952,6 +1076,49 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                 );
               })}
+
+              {/* Organized Welcome Landing in Drawer */}
+              {onOpenWelcomeLanding && (
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onOpenWelcomeLanding();
+                  }}
+                  className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 font-bold text-xs border border-slate-700 shadow-xs cursor-pointer"
+                >
+                  <Building2 className="w-4 h-4 text-indigo-400" />
+                  <span>Portal de Inicio y Registro Teocrático</span>
+                </button>
+              )}
+
+              {/* Organized Invitation & Join in Drawer */}
+              <div className="grid grid-cols-2 gap-2">
+                {onOpenJoinModal && (
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      onOpenJoinModal();
+                    }}
+                    className="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs cursor-pointer border border-slate-200 dark:border-slate-700"
+                  >
+                    <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>Unirse con Código</span>
+                  </button>
+                )}
+
+                {onOpenInviteManager && effectiveRoleInfo.canModifySettings && (
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      onOpenInviteManager();
+                    }}
+                    className="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-bold text-xs cursor-pointer border border-indigo-200 dark:border-indigo-800"
+                  >
+                    <QrCode className="w-3.5 h-3.5" />
+                    <span>Invitar con QR</span>
+                  </button>
+                )}
+              </div>
 
               {/* Status & Google Login in Drawer */}
               <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 space-y-2">

@@ -207,11 +207,48 @@ interface CongregationContextType {
   // Settings & Backup
   updateSettings: (newSettings: Partial<CongregationSettings>) => void;
   exportBackupJSON: () => void;
+  getBackupJSON: () => string;
   importBackupJSON: (jsonString: string) => boolean;
   publishersMap: Map<string, Publisher>;
+  resetAllCongregationData: () => void;
 }
 
 const LOCAL_STORAGE_KEY = 'teocratic_app_data_v1';
+
+// Purge legacy mock data once to ensure a clean slate for new congregation registration
+const PURGE_KEY = 'kongre_data_purged_fresh_start_v3';
+if (typeof window !== 'undefined' && localStorage.getItem(PURGE_KEY) !== 'true') {
+  const keysToClear = [
+    `${LOCAL_STORAGE_KEY}_publishers`,
+    `${LOCAL_STORAGE_KEY}_weeks`,
+    `${LOCAL_STORAGE_KEY}_groups`,
+    `${LOCAL_STORAGE_KEY}_duties`,
+    `${LOCAL_STORAGE_KEY}_settings`,
+    `${LOCAL_STORAGE_KEY}_outgoing_speakers`,
+    `${LOCAL_STORAGE_KEY}_field_service`,
+    `${LOCAL_STORAGE_KEY}_cart_locations`,
+    `${LOCAL_STORAGE_KEY}_cart_shifts`,
+    `${LOCAL_STORAGE_KEY}_notices`,
+    `${LOCAL_STORAGE_KEY}_monthly_reports`,
+    `${LOCAL_STORAGE_KEY}_territories`,
+    `${LOCAL_STORAGE_KEY}_circuit_visit`,
+    `${LOCAL_STORAGE_KEY}_transactions`,
+    `${LOCAL_STORAGE_KEY}_quarterly_audits`,
+    `${LOCAL_STORAGE_KEY}_memorial_plans`,
+    `${LOCAL_STORAGE_KEY}_assemblies`,
+    `${LOCAL_STORAGE_KEY}_literature_items`,
+    `${LOCAL_STORAGE_KEY}_special_orders`,
+    `${LOCAL_STORAGE_KEY}_group_distributions`,
+    `${LOCAL_STORAGE_KEY}_inventory_records`,
+    'kongre_has_entered_app',
+    'kongre_is_registered_congregation',
+    'kongre_theocratic_invitations_v1',
+    'kongre_user_roles_v1',
+    'kongre_device_sessions_v1',
+  ];
+  keysToClear.forEach((k) => localStorage.removeItem(k));
+  localStorage.setItem(PURGE_KEY, 'true');
+}
 
 const CongregationContext = createContext<CongregationContextType | null>(null);
 
@@ -452,6 +489,38 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       docSnap => {
         if (docSnap.exists()) {
           const data = docSnap.data();
+
+          // If Firestore contains old mock data from previous demo sessions, reset it to clean state
+          if (
+            data.settings?.congregationName === 'Congregación El Olivar' ||
+            data.settings?.congregationName === 'Congregación Central' ||
+            data.settings?.isRegistered === false ||
+            !data.settings?.isRegistered
+          ) {
+            setPublishers([]);
+            setPreachingGroups([]);
+            setOutgoingSpeakers([]);
+            setFieldServiceMeetings([]);
+            setCartLocations([]);
+            setCartShifts([]);
+            setNotices([]);
+            setMonthlyReports([]);
+            setTerritories([]);
+            setCircuitVisit(null);
+            setTransactions([]);
+            setQuarterlyAudits([]);
+            setMemorialPlans([]);
+            setTheocraticAssemblies([]);
+            setLiteratureItems([]);
+            setSpecialOrders([]);
+            setGroupDistributions([]);
+            setInventoryRecords([]);
+            setSettings(INITIAL_SETTINGS);
+            setWeeks(generateInitialWeeks());
+            setSyncStatus('synced');
+            return;
+          }
+
           if (data.publishers) setPublishers(data.publishers);
           if (data.weeks) {
             const enrichedWeeks = data.weeks.map((w: WeekSchedule) => {
@@ -1817,6 +1886,33 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     URL.revokeObjectURL(url);
   };
 
+  const getBackupJSON = (): string => {
+    const backupData = {
+      publishers,
+      weeks,
+      preachingGroups,
+      customDuties,
+      settings,
+      outgoingSpeakers,
+      fieldServiceMeetings,
+      cartLocations,
+      cartShifts,
+      notices,
+      monthlyReports,
+      territories,
+      circuitVisit,
+      transactions,
+      quarterlyAudits,
+      memorialPlans,
+      theocraticAssemblies,
+      literatureItems,
+      specialOrders,
+      groupDistributions,
+      inventoryRecords,
+    };
+    return JSON.stringify(backupData, null, 2);
+  };
+
   const importBackupJSON = (jsonString: string): boolean => {
     try {
       const data = JSON.parse(jsonString);
@@ -1871,6 +1967,86 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } catch (err) {
       console.error('Error importing backup JSON:', err);
       return false;
+    }
+  };
+
+  const resetAllCongregationData = () => {
+    setPublishers([]);
+    setPreachingGroups([]);
+    setOutgoingSpeakers([]);
+    setFieldServiceMeetings([]);
+    setCartLocations([]);
+    setCartShifts([]);
+    setNotices([]);
+    setMonthlyReports([]);
+    setTerritories([]);
+    setCircuitVisit(null);
+    setTransactions([]);
+    setQuarterlyAudits([]);
+    setMemorialPlans([]);
+    setTheocraticAssemblies([]);
+    setLiteratureItems([]);
+    setSpecialOrders([]);
+    setGroupDistributions([]);
+    setInventoryRecords([]);
+    setSettings(INITIAL_SETTINGS);
+    const cleanWeeks = generateInitialWeeks();
+    setWeeks(cleanWeeks);
+
+    const keysToClear = [
+      `${LOCAL_STORAGE_KEY}_publishers`,
+      `${LOCAL_STORAGE_KEY}_weeks`,
+      `${LOCAL_STORAGE_KEY}_groups`,
+      `${LOCAL_STORAGE_KEY}_duties`,
+      `${LOCAL_STORAGE_KEY}_settings`,
+      `${LOCAL_STORAGE_KEY}_outgoing_speakers`,
+      `${LOCAL_STORAGE_KEY}_field_service`,
+      `${LOCAL_STORAGE_KEY}_cart_locations`,
+      `${LOCAL_STORAGE_KEY}_cart_shifts`,
+      `${LOCAL_STORAGE_KEY}_notices`,
+      `${LOCAL_STORAGE_KEY}_monthly_reports`,
+      `${LOCAL_STORAGE_KEY}_territories`,
+      `${LOCAL_STORAGE_KEY}_circuit_visit`,
+      `${LOCAL_STORAGE_KEY}_transactions`,
+      `${LOCAL_STORAGE_KEY}_quarterly_audits`,
+      `${LOCAL_STORAGE_KEY}_memorial_plans`,
+      `${LOCAL_STORAGE_KEY}_assemblies`,
+      `${LOCAL_STORAGE_KEY}_literature_items`,
+      `${LOCAL_STORAGE_KEY}_special_orders`,
+      `${LOCAL_STORAGE_KEY}_group_distributions`,
+      `${LOCAL_STORAGE_KEY}_inventory_records`,
+      'kongre_has_entered_app',
+      'kongre_is_registered_congregation',
+      'kongre_theocratic_invitations_v1',
+      'kongre_user_roles_v1',
+      'kongre_device_sessions_v1',
+    ];
+    keysToClear.forEach((k) => localStorage.removeItem(k));
+
+    if (user) {
+      saveToFirestore(
+        [],
+        cleanWeeks,
+        [],
+        customDuties,
+        INITIAL_SETTINGS,
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        null,
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+      );
     }
   };
 
@@ -1972,8 +2148,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         deleteCustomDuty,
         updateSettings,
         exportBackupJSON,
+        getBackupJSON,
         importBackupJSON,
         publishersMap,
+        resetAllCongregationData,
       }}
     >
       {children}

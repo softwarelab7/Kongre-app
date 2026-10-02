@@ -290,7 +290,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         onClick={onClose}
       />
 
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
+      <div className="relative w-full max-w-2xl lg:max-w-4xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-3">

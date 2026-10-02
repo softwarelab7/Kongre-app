@@ -287,13 +287,21 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-slate-950/85 backdrop-blur-md transition-opacity"
-        onClick={isMandatory ? undefined : onClose}
+        onClick={onClose}
       />
 
       <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={step > 1 ? handleBack : onClose}
+              className="p-2 -ml-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center gap-1"
+              title={step > 1 ? 'Paso anterior' : 'Volver atrás'}
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
             <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
               <Building2 className="w-5 h-5" />
             </div>
@@ -316,15 +324,14 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             </div>
           </div>
 
-          {!isMandatory && (
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            title="Cerrar y volver atrás"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Step Indicator Progress Bar */}
@@ -822,35 +829,27 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         </div>
 
         {/* Footer Navigation Buttons */}
-        <div className="p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-between">
-          {step > 1 ? (
+        <div className="p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={handleBack}
-              className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold flex items-center gap-1.5 cursor-pointer"
+              onClick={step > 1 ? handleBack : onClose}
+              className="px-4 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-bold flex items-center gap-2 cursor-pointer transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Anterior</span>
+              <span>{step > 1 ? 'Anterior' : 'Volver atrás'}</span>
             </button>
-          ) : isMandatory ? (
-            onOpenJoinWithCode ? (
+
+            {step === 1 && onOpenJoinWithCode && (
               <button
                 type="button"
                 onClick={onOpenJoinWithCode}
                 className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
               >
-                ¿Tienes un código de invitación? Unirse a congregación
+                ¿Tienes un código? Unirse a congregación
               </button>
-            ) : <div />
-          ) : (
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 font-bold cursor-pointer"
-            >
-              Cancelar
-            </button>
-          )}
+            )}
+          </div>
 
           {step < 5 ? (
             <button

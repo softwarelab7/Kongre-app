@@ -41,6 +41,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     badgeColor: 'bg-indigo-600 text-white shadow-xs',
     description: 'Acceso total y supervisión general de todos los departamentos y ajustes.',
     allowedTabs: [
+      'inicio',
       'programacion',
       's89',
       'discursos',
@@ -85,6 +86,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     badgeColor: 'bg-emerald-600 text-white shadow-xs',
     description: 'Edita el programa entre semana, asignaciones estudiantiles S-89 y lecciones de oratoria.',
     allowedTabs: [
+      'inicio',
       'programacion',
       's89',
       'limpieza_deberes',
@@ -117,6 +119,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     badgeColor: 'bg-blue-600 text-white shadow-xs',
     description: 'Administra tarjetas S-21, informes S-4, asistencia S-88 y directorio de hermanos.',
     allowedTabs: [
+      'inicio',
       'publicadores',
       'tarjetas_s21',
       'informes_servicio',
@@ -149,6 +152,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     badgeColor: 'bg-amber-600 text-white shadow-xs',
     description: 'Asigna oradores locales y visitantes, catálogo de bosquejos y oradores salientes.',
     allowedTabs: [
+      'inicio',
       'discursos',
       'programacion',
       'tablero_anuncios',
@@ -176,6 +180,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     badgeColor: 'bg-teal-600 text-white shadow-xs',
     description: 'Solo ve y gestiona territorios S-13, no visitas, carritos y grupos de servicio.',
     allowedTabs: [
+      'inicio',
       'territorios',
       'grupos_servicio',
       'carritos',
@@ -204,6 +209,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     badgeColor: 'bg-orange-600 text-white shadow-xs',
     description: 'Solo ve y gestiona el inventario de literatura, pedidos especiales y entregas a grupos.',
     allowedTabs: [
+      'inicio',
       'literatura',
       'tablero_anuncios',
       'mi_vista',
@@ -230,6 +236,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     badgeColor: 'bg-rose-600 text-white shadow-xs',
     description: 'Solo ve y gestiona la hoja mensual de cuentas S-26 y auditorías trimestrales.',
     allowedTabs: [
+      'inicio',
       'cuentas',
       'tablero_anuncios',
       'mi_vista',
@@ -256,6 +263,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     badgeColor: 'bg-slate-700 text-white shadow-xs',
     description: 'Vista de solo lectura para el Salón o publicadores. No permite editar ni ver datos confidenciales.',
     allowedTabs: [
+      'inicio',
       'programacion',
       'tablero_anuncios',
       'mi_vista',

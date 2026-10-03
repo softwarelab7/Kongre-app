@@ -3,11 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { CongregationProvider, useCongregation } from './context/CongregationContext';
 import { Navbar, ActiveTab } from './components/Navbar';
+import { isTabAllowedForRole } from './utils/rbac';
 import { ScheduleTab } from './components/ScheduleTab';
 import { S89SlipsTab } from './components/S89SlipsTab';
 import { PublishersTab } from './components/PublishersTab';
@@ -47,11 +48,15 @@ import { JoinCongregationModal } from './components/JoinCongregationModal';
 import { InvitationManagerModal } from './components/InvitationManagerModal';
 import { CongregationWelcomeLanding } from './components/CongregationWelcomeLanding';
 import { RegisterCongregationWizard } from './components/RegisterCongregationWizard';
+import { AppLockPinSuggestionModal } from './components/AppLockPinSuggestionModal';
 import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 
 const AppContent: React.FC = () => {
-  const { effectiveRoleInfo } = useAuth();
+  const { user, effectiveRoleInfo } = useAuth();
+  const [isLockPinSuggestionOpen, setIsLockPinSuggestionOpen] = useState(false);
+  const prevUserRef = useRef(user);
+
   const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
     // If scanning QR code with ?modo=tablero, open personal view directly
     const urlParams = new URLSearchParams(window.location.search);
@@ -153,16 +158,41 @@ const AppContent: React.FC = () => {
     }
   };
 
+  // Suggest setting up app lock PIN on this device after user enters the session / logs in
+  useEffect(() => {
+    if (!showWelcomeLanding) {
+      const hasPersonalPin = localStorage.getItem('kongre_security_pin_hash');
+      const dismissed = localStorage.getItem('kongre_lock_pin_suggestion_dismissed');
+      if (!hasPersonalPin && !dismissed) {
+        const timer = setTimeout(() => {
+          setIsLockPinSuggestionOpen(true);
+        }, 800);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [showWelcomeLanding]);
+
+  useEffect(() => {
+    if (user && !prevUserRef.current && !showWelcomeLanding) {
+      const hasPersonalPin = localStorage.getItem('kongre_security_pin_hash');
+      const dismissed = localStorage.getItem('kongre_lock_pin_suggestion_dismissed');
+      if (!hasPersonalPin && !dismissed) {
+        setIsLockPinSuggestionOpen(true);
+      }
+    }
+    prevUserRef.current = user;
+  }, [user, showWelcomeLanding]);
+
   // Mandatory Congregation Registration Check:
-  // A user MUST register the congregation (or join an existing one) before using the application
-  const isCongregationRegistered = settings.isRegistered || Boolean(settings.congregationName?.trim());
+  // A user MUST register the congregation (or join an existing one) before accessing the platform
+  const isCongregationRegistered = Boolean(settings.isRegistered && settings.congregationName?.trim());
 
   if (showWelcomeLanding || !isCongregationRegistered) {
     return (
       <>
         <CongregationWelcomeLanding
           onEnterApp={() => {
-            if (settings.isRegistered || Boolean(settings.congregationName?.trim())) {
+            if (settings.isRegistered && Boolean(settings.congregationName?.trim())) {
               setShowWelcomeLanding(false);
               sessionStorage.removeItem('kongre_show_landing');
             }
@@ -176,8 +206,10 @@ const AppContent: React.FC = () => {
           onClose={() => setIsJoinModalOpen(false)}
           onSuccessRole={() => {
             setIsJoinModalOpen(false);
-            setShowWelcomeLanding(false);
-            sessionStorage.removeItem('kongre_show_landing');
+            if (settings.isRegistered && Boolean(settings.congregationName?.trim())) {
+              setShowWelcomeLanding(false);
+              sessionStorage.removeItem('kongre_show_landing');
+            }
           }}
         />
       </>
@@ -212,7 +244,7 @@ const AppContent: React.FC = () => {
       />
 
       <main className="flex-1 w-full mx-auto px-3 sm:px-6 lg:px-8 2xl:px-12 py-4 sm:py-6 pb-24 md:pb-8">
-        {!effectiveRoleInfo.allowedTabs.includes(activeTab) ? (
+        {!isTabAllowedForRole(effectiveRoleInfo.id, activeTab) ? (
           <AccessRestrictedView
             requiredRoleName={
               activeTab === 'cuentas'
@@ -393,6 +425,12 @@ const AppContent: React.FC = () => {
       <InvitationManagerModal
         isOpen={isInviteManagerOpen}
         onClose={() => setIsInviteManagerOpen(false)}
+      />
+
+      {/* App Lock PIN Setup Suggestion Modal (appears after session starts / login) */}
+      <AppLockPinSuggestionModal
+        isOpen={isLockPinSuggestionOpen}
+        onClose={() => setIsLockPinSuggestionOpen(false)}
       />
 
     </div>

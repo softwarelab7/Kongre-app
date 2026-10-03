@@ -14,7 +14,6 @@ import {
   Mail,
   Home,
   Sparkles,
-  MousePointerClick,
   KeyRound,
   QrCode,
   Building2,
@@ -44,27 +43,20 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   const { user, signInWithGoogle, signOutUser, setActiveRole, assignRoleToEmail } = useAuth();
   const {
     redeemInvitationCode,
-    isMasterPassphraseSet,
-    verifyMasterPassphrase,
     verifyCongregationPin,
-    setPersonalPin,
   } = useSecurity();
-  const { settings } = useCongregation();
+  const { settings, updateSettings } = useCongregation();
   const { isDark, toggleTheme } = useTheme();
 
   const [activeTab, setActiveTab] = useState<'home' | 'email_login' | 'code_login' | 'register'>('home');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   // ID and PIN / Invitation code state
-  const [connectMethod, setConnectMethod] = useState<'id_pin' | 'code'>('id_pin');
   const [congregationIdInput, setCongregationIdInput] = useState(
     settings.congregationNumber || settings.congregationId || ''
   );
   const [congregationPinInput, setCongregationPinInput] = useState('');
-  const [personalPinInput, setPersonalPinInput] = useState('');
-  const [invitationCode, setInvitationCode] = useState('');
   const [brotherName, setBrotherName] = useState(user?.displayName || '');
-  const [masterPassphrase, setMasterPassphrase] = useState('');
   const [isSubmittingCode, setIsSubmittingCode] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [codeSuccess, setCodeSuccess] = useState<string | null>(null);
@@ -74,12 +66,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
 
-  const handleEnterDemoMode = () => {
-    localStorage.setItem('kongre_has_entered_app', 'true');
-    setActiveRole('coordinador');
-    onEnterApp();
-  };
-
   const handleConnectWithIdPin = async (e: React.FormEvent) => {
     e.preventDefault();
     setCodeError(null);
@@ -87,97 +73,73 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     setIsSubmittingCode(true);
 
     try {
-      if (!congregationIdInput.trim()) {
+      const cleanId = congregationIdInput.trim();
+      const cleanPin = congregationPinInput.trim();
+      const nameToUse = brotherName.trim() || user?.displayName || 'Hermano de la Congregación';
+      const emailToUse = user?.email || `hermano_${cleanId || 'cong'}@kongre.org`;
+
+      if (!cleanId) {
         setCodeError('Por favor introduce el ID o número de la Congregación.');
         setIsSubmittingCode(false);
         return;
       }
-      if (!congregationPinInput.trim()) {
-        setCodeError('Por favor introduce el PIN de la Congregación.');
+      if (!cleanPin) {
+        setCodeError('Por favor introduce el PIN o Código de Invitación.');
         setIsSubmittingCode(false);
         return;
       }
 
-      const expectedId = settings.congregationNumber || settings.congregationId;
-      if (expectedId && congregationIdInput.trim() !== expectedId.trim()) {
-        setCodeError('El ID de Congregación no coincide con la congregación configurada.');
-        setIsSubmittingCode(false);
+      // 1. Intentar validar primero si es un PIN/Código de Invitación
+      const invResult = await redeemInvitationCode(cleanPin, emailToUse, nameToUse);
+      if (invResult.success && invResult.role) {
+        updateSettings({
+          isRegistered: true,
+          congregationName: settings.congregationName || `Congregación #${cleanId}`,
+          congregationNumber: cleanId,
+        });
+        assignRoleToEmail(emailToUse, invResult.role, nameToUse);
+        setActiveRole(invResult.role);
+        localStorage.setItem('kongre_is_registered_congregation', 'true');
+        localStorage.setItem('kongre_has_entered_app', 'true');
+
+        setCodeSuccess(`¡Conexión exitosa! Bienvenido como ${THEOCRATIC_ROLES[invResult.role]?.name || invResult.role}.`);
+        setTimeout(() => {
+          onEnterApp();
+        }, 800);
         return;
       }
 
-      const isPinValid = await verifyCongregationPin(congregationPinInput.trim());
-      if (!isPinValid) {
-        setCodeError('El PIN de la Congregación es incorrecto.');
-        setIsSubmittingCode(false);
-        return;
-      }
-
-      if (personalPinInput.trim()) {
-        if (personalPinInput.trim().length < 4) {
-          setCodeError('Tu PIN Personal debe tener al menos 4 dígitos numéricos.');
+      // 2. Si no es un código de invitación, validar como PIN oficial de la congregación
+      const isPinValid = await verifyCongregationPin(cleanPin);
+      if (isPinValid) {
+        const expectedId = settings.congregationNumber || settings.congregationId;
+        if (expectedId && cleanId !== expectedId.trim()) {
+          setCodeError('El ID de Congregación no coincide con la congregación configurada.');
           setIsSubmittingCode(false);
           return;
         }
-        await setPersonalPin(personalPinInput.trim());
+
+        updateSettings({
+          isRegistered: true,
+          congregationName: settings.congregationName || `Congregación #${cleanId}`,
+          congregationNumber: cleanId,
+        });
+        assignRoleToEmail(emailToUse, 'coordinador', nameToUse);
+        setActiveRole('coordinador');
+        localStorage.setItem('kongre_is_registered_congregation', 'true');
+        localStorage.setItem('kongre_has_entered_app', 'true');
+
+        setCodeSuccess(`¡Conexión exitosa a ${settings.congregationName || 'la congregación'}! Accediendo...`);
+        setTimeout(() => {
+          onEnterApp();
+        }, 800);
+        return;
       }
 
-      const emailToUse = user?.email || `hermano_${congregationIdInput.trim()}@kongre.org`;
-      const nameToUse = brotherName.trim() || user?.displayName || 'Hermano de la Congregación';
-
-      assignRoleToEmail(emailToUse, 'coordinador', nameToUse);
-      setActiveRole('coordinador');
-      localStorage.setItem('kongre_is_registered_congregation', 'true');
-      localStorage.setItem('kongre_has_entered_app', 'true');
-
-      setCodeSuccess(`¡Conexión exitosa a ${settings.congregationName || 'la congregación'}! Accediendo...`);
-
-      setTimeout(() => {
-        onEnterApp();
-      }, 800);
+      // 3. Si no coincide con ninguno
+      setCodeError('El PIN o Código de Invitación es incorrecto o ha expirado.');
     } catch (err: any) {
       setCodeError(err?.message || 'Error al conectar con la congregación.');
-    } finally {
-      setIsSubmittingCode(false);
-    }
-  };
-
-  const handleRedeemCode = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setCodeError(null);
-    setIsSubmittingCode(true);
-
-    try {
-      if (isMasterPassphraseSet && masterPassphrase) {
-        const isMasterValid = await verifyMasterPassphrase(masterPassphrase);
-        if (!isMasterValid) {
-          setCodeError('La Clave Maestra de la Congregación es incorrecta.');
-          setIsSubmittingCode(false);
-          return;
-        }
-      }
-
-      const emailToUse = user?.email || `${invitationCode.toLowerCase().replace(/[^a-z0-9]/g, '')}@kongre.org`;
-      const nameToUse = brotherName.trim() || user?.displayName || 'Hermano Autorizado';
-
-      const result = await redeemInvitationCode(invitationCode.trim(), emailToUse, nameToUse);
-
-      if (!result.success || !result.role) {
-        setCodeError(result.message);
-        setIsSubmittingCode(false);
-        return;
-      }
-
-      assignRoleToEmail(emailToUse, result.role, nameToUse);
-      setActiveRole(result.role);
-      localStorage.setItem('kongre_has_entered_app', 'true');
-
-      setCodeSuccess(`¡Bienvenido! Has accedido con el rol de ${THEOCRATIC_ROLES[result.role]?.name || result.role}.`);
-
-      setTimeout(() => {
-        onEnterApp();
-      }, 1000);
-    } catch (err: any) {
-      setCodeError(err?.message || 'Error al validar el código.');
     } finally {
       setIsSubmittingCode(false);
     }
@@ -400,21 +362,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 </p>
               </div>
             </div>
-
-            {/* Quick Demo Access Bar */}
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={handleEnterDemoMode}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-colors cursor-pointer"
-              >
-                <MousePointerClick className="w-4 h-4 text-indigo-500" />
-                <span>Explorar en Modo Demostración</span>
-              </button>
-              <span className="text-xs text-slate-400 dark:text-slate-500">
-                Pruébalo sin registro previo en este equipo
-              </span>
-            </div>
           </div>
 
           {/* ========================================================= */}
@@ -505,7 +452,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   <button
                     type="button"
                     onClick={() => {
-                      setConnectMethod('id_pin');
                       setActiveTab('code_login');
                       setCodeError(null);
                       setCodeSuccess(null);
@@ -534,17 +480,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       <ArrowRight className="w-4 h-4" />
                     </div>
                   </button>
-
-                  {/* Mobile Demo button */}
-                  <div className="lg:hidden pt-2 text-center">
-                    <button
-                      type="button"
-                      onClick={handleEnterDemoMode}
-                      className="text-xs text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-semibold cursor-pointer underline"
-                    >
-                      O explorar en modo demostración sin registrarse
-                    </button>
-                  </div>
                 </div>
               )}
 
@@ -630,53 +565,24 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 </div>
               )}
 
-              {/* VIEW: CONEXIÓN CON ID & PIN O CÓDIGO DE INVITACIÓN */}
+              {/* VIEW: CONEXIÓN UNIFICADA CON ID Y PIN DE CONGREGACIÓN / INVITACIÓN */}
               {activeTab === 'code_login' && (
                 <div className="space-y-4 pt-2 animate-fade-in">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      Acceso Teocrático a la Congregación
-                    </span>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                        Conectar con ID y PIN de Congregación
+                      </h4>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Introduce el ID y el PIN de la congregación o tu PIN de invitación
+                      </p>
+                    </div>
                     <button
                       type="button"
                       onClick={() => setActiveTab('home')}
-                      className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                      className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer shrink-0"
                     >
                       ← Volver
-                    </button>
-                  </div>
-
-                  {/* Mode switcher tabs */}
-                  <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200 dark:border-slate-700">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setConnectMethod('id_pin');
-                        setCodeError(null);
-                      }}
-                      className={`flex-1 py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                        connectMethod === 'id_pin'
-                          ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
-                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
-                    >
-                      <Hash className="w-3.5 h-3.5" />
-                      <span>ID y PIN</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setConnectMethod('code');
-                        setCodeError(null);
-                      }}
-                      className={`flex-1 py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                        connectMethod === 'code'
-                          ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
-                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                      }`}
-                    >
-                      <KeyRound className="w-3.5 h-3.5" />
-                      <span>Código de Invitación</span>
                     </button>
                   </div>
 
@@ -694,126 +600,60 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     </div>
                   )}
 
-                  {connectMethod === 'id_pin' ? (
-                    <form onSubmit={handleConnectWithIdPin} className="space-y-3">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                          ID de la Congregación: *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={congregationIdInput}
-                          onChange={(e) => setCongregationIdInput(e.target.value)}
-                          placeholder="Ej: 10582"
-                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono"
-                        />
-                      </div>
+                  <form onSubmit={handleConnectWithIdPin} className="space-y-3">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        ID de la Congregación: *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={congregationIdInput}
+                        onChange={(e) => setCongregationIdInput(e.target.value)}
+                        placeholder="Ej: 10582"
+                        className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono"
+                      />
+                    </div>
 
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                          PIN de la Congregación: *
-                        </label>
-                        <input
-                          type="password"
-                          required
-                          value={congregationPinInput}
-                          onChange={(e) => setCongregationPinInput(e.target.value)}
-                          placeholder="PIN configurado para la congregación"
-                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs"
-                        />
-                      </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        PIN de la Congregación o PIN de Invitación: *
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={congregationPinInput}
+                        onChange={(e) => setCongregationPinInput(e.target.value)}
+                        placeholder="Introduce tu PIN o Código de Invitación"
+                        className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs"
+                      />
+                      <span className="text-[10px] text-slate-400 mt-1 block">
+                        Introduce el PIN general de la congregación o el PIN de invitación provisto por los ancianos.
+                      </span>
+                    </div>
 
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                          Nombre del Hermano:
-                        </label>
-                        <input
-                          type="text"
-                          value={brotherName}
-                          onChange={(e) => setBrotherName(e.target.value)}
-                          placeholder="Ej: Juan Pérez"
-                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs"
-                        />
-                      </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                        Nombre del Hermano:
+                      </label>
+                      <input
+                        type="text"
+                        value={brotherName}
+                        onChange={(e) => setBrotherName(e.target.value)}
+                        placeholder="Ej: Juan Pérez"
+                        className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs"
+                      />
+                    </div>
 
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                          Tu PIN Personal (Opcional, 4-6 dígitos):
-                        </label>
-                        <input
-                          type="password"
-                          maxLength={6}
-                          value={personalPinInput}
-                          onChange={(e) => setPersonalPinInput(e.target.value)}
-                          placeholder="Para bloqueo rápido de este dispositivo"
-                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono"
-                        />
-                      </div>
-
-                      <button
-                        type="submit"
-                        disabled={isSubmittingCode || !congregationIdInput.trim() || !congregationPinInput.trim()}
-                        className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                      >
-                        <ShieldCheck className="w-4 h-4" />
-                        <span>{isSubmittingCode ? 'Verificando...' : 'Conectar a la Congregación'}</span>
-                      </button>
-                    </form>
-                  ) : (
-                    <form onSubmit={handleRedeemCode} className="space-y-3">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                          Código de Invitación: *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={invitationCode}
-                          onChange={(e) => setInvitationCode(e.target.value.toUpperCase())}
-                          placeholder="Ej: KONG-SEC-4819"
-                          className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono font-bold text-center tracking-widest text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden uppercase"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                          Nombre del Hermano:
-                        </label>
-                        <input
-                          type="text"
-                          value={brotherName}
-                          onChange={(e) => setBrotherName(e.target.value)}
-                          placeholder="Ej: Juan Pérez"
-                          className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs"
-                        />
-                      </div>
-
-                      {isMasterPassphraseSet && (
-                        <div>
-                          <label className="block text-xs font-bold text-amber-700 dark:text-amber-400 mb-1">
-                            Clave Maestra de la Congregación:
-                          </label>
-                          <input
-                            type="password"
-                            value={masterPassphrase}
-                            onChange={(e) => setMasterPassphrase(e.target.value)}
-                            placeholder="Frase de paso secreta de ancianos"
-                            className="w-full p-2.5 rounded-xl border border-amber-300 dark:border-amber-700/60 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs"
-                          />
-                        </div>
-                      )}
-
-                      <button
-                        type="submit"
-                        disabled={isSubmittingCode || !invitationCode.trim()}
-                        className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                      >
-                        <KeyRound className="w-4 h-4" />
-                        <span>{isSubmittingCode ? 'Validando...' : 'Canjear e Ingresar'}</span>
-                      </button>
-                    </form>
-                  )}
+                    <button
+                      type="submit"
+                      disabled={isSubmittingCode || !congregationIdInput.trim() || !congregationPinInput.trim()}
+                      className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>{isSubmittingCode ? 'Verificando...' : 'Conectar a la Congregación'}</span>
+                    </button>
+                  </form>
                 </div>
               )}
             </div>

@@ -7,6 +7,7 @@ import { CongregationInvitation, ActiveDeviceSession } from '../types';
 interface SecurityContextType {
   isLocked: boolean;
   isPinEnabled: boolean;
+  isPersonalPinSet: boolean;
   autoLockMinutes: number;
   privacyModeEnabled: boolean;
   isMasterPassphraseSet: boolean;
@@ -374,6 +375,7 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       value={{
         isLocked,
         isPinEnabled: !!pinHash || !!congregationPinHash,
+        isPersonalPinSet: !!pinHash,
         autoLockMinutes,
         privacyModeEnabled,
         isMasterPassphraseSet: !!masterPassphraseHash,

@@ -862,7 +862,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 onClick={onOpenJoinWithCode}
                 className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
               >
-                ¿Tienes un código? Unirse a congregación
+                ¿Tienes ID y PIN? Conectar a congregación
               </button>
             )}
           </div>

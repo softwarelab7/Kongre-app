@@ -32,10 +32,6 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
   const [congregationIdInput, setCongregationIdInput] = useState(settings.congregationNumber || '');
   const [congregationPinInput, setCongregationPinInput] = useState('');
 
-  // Common fields: Brother name
-  const [brotherName, setBrotherName] = useState(user?.displayName || '');
-  const [brotherEmail, setBrotherEmail] = useState(user?.email || '');
-
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<{ role: TheocraticRole; message: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,9 +44,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const emailToUse = brotherEmail.trim() || (user?.email ?? 'hermano@kongre.org');
-      const nameToUse = brotherName.trim() || (user?.displayName ?? 'Hermano de la Congregación');
-
+      const emailToUse = user?.email || 'hermano@kongre.org';
       const cleanId = congregationIdInput.trim();
       const cleanPin = congregationPinInput.trim();
 
@@ -60,14 +54,16 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         return;
       }
       if (!cleanPin) {
-        setError('Por favor introduce el PIN o Código de Invitación.');
+        setError('Por favor introduce el PIN de la congregación o PIN de invitación.');
         setIsSubmitting(false);
         return;
       }
 
       // 1. Intentar validar primero si es un código / PIN de invitación
-      const invResult = await redeemInvitationCode(cleanPin, emailToUse, nameToUse);
+      const invResult = await redeemInvitationCode(cleanPin, emailToUse);
       if (invResult.success && invResult.role) {
+        const nameToUse = invResult.targetName || user?.displayName || 'Hermano de la Congregación';
+
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
 
@@ -100,6 +96,8 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
           setIsSubmitting(false);
           return;
         }
+
+        const nameToUse = user?.displayName || 'Hermano de la Congregación';
 
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
@@ -241,21 +239,6 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
               <span className="text-[10px] text-slate-400 mt-1 block">
                 Introduce el PIN de la congregación o el PIN de invitación proporcionado por los ancianos.
               </span>
-            </div>
-
-            {/* Brother's Name */}
-            <div>
-              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Tu Nombre de Publicador: *
-              </label>
-              <input
-                type="text"
-                value={brotherName}
-                onChange={(e) => setBrotherName(e.target.value)}
-                placeholder="Ej: Juan Pérez"
-                className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-                required
-              />
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">

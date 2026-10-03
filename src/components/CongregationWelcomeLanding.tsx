@@ -56,7 +56,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     settings.congregationNumber || settings.congregationId || ''
   );
   const [congregationPinInput, setCongregationPinInput] = useState('');
-  const [brotherName, setBrotherName] = useState(user?.displayName || '');
   const [isSubmittingCode, setIsSubmittingCode] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [codeSuccess, setCodeSuccess] = useState<string | null>(null);
@@ -75,7 +74,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     try {
       const cleanId = congregationIdInput.trim();
       const cleanPin = congregationPinInput.trim();
-      const nameToUse = brotherName.trim() || user?.displayName || 'Hermano de la Congregación';
       const emailToUse = user?.email || `hermano_${cleanId || 'cong'}@kongre.org`;
 
       if (!cleanId) {
@@ -84,14 +82,15 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
       if (!cleanPin) {
-        setCodeError('Por favor introduce el PIN o Código de Invitación.');
+        setCodeError('Por favor introduce el PIN de la congregación o PIN de invitación.');
         setIsSubmittingCode(false);
         return;
       }
 
       // 1. Intentar validar primero si es un PIN/Código de Invitación
-      const invResult = await redeemInvitationCode(cleanPin, emailToUse, nameToUse);
+      const invResult = await redeemInvitationCode(cleanPin, emailToUse);
       if (invResult.success && invResult.role) {
+        const nameToUse = invResult.targetName || user?.displayName || 'Hermano de la Congregación';
         updateSettings({
           isRegistered: true,
           congregationName: settings.congregationName || `Congregación #${cleanId}`,
@@ -118,6 +117,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           setIsSubmittingCode(false);
           return;
         }
+
+        const nameToUse = user?.displayName || 'Hermano de la Congregación';
 
         updateSettings({
           isRegistered: true,
@@ -630,19 +631,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       <span className="text-[10px] text-slate-400 mt-1 block">
                         Introduce el PIN general de la congregación o el PIN de invitación provisto por los ancianos.
                       </span>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                        Nombre del Hermano:
-                      </label>
-                      <input
-                        type="text"
-                        value={brotherName}
-                        onChange={(e) => setBrotherName(e.target.value)}
-                        placeholder="Ej: Juan Pérez"
-                        className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs"
-                      />
                     </div>
 
                     <button

@@ -29,7 +29,7 @@ interface SecurityContextType {
   verifyMasterPassphrase: (passphrase: string) => Promise<boolean>;
   createInvitation: (role: TheocraticRole, targetName?: string, expiresInDays?: number) => Promise<CongregationInvitation>;
   revokeInvitation: (id: string) => void;
-  redeemInvitationCode: (code: string, userEmail?: string, userName?: string) => Promise<{ success: boolean; role?: TheocraticRole; message: string }>;
+  redeemInvitationCode: (code: string, userEmail?: string, userName?: string) => Promise<{ success: boolean; role?: TheocraticRole; message: string; targetName?: string }>;
   revokeSession: (sessionId: string) => void;
 }
 
@@ -263,7 +263,7 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       code: string,
       userEmail?: string,
       userName?: string
-    ): Promise<{ success: boolean; role?: TheocraticRole; message: string }> => {
+    ): Promise<{ success: boolean; role?: TheocraticRole; message: string; targetName?: string }> => {
       const cleanCode = code.trim().toUpperCase();
       const found = invitations.find((inv) => inv.code.toUpperCase() === cleanCode);
 
@@ -326,6 +326,7 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return {
         success: true,
         role: found.role as TheocraticRole,
+        targetName: found.targetName,
         message: `¡Bienvenido a la congregación! Se te ha asignado el rol de: ${found.role}.`,
       };
     },

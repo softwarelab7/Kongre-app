@@ -176,6 +176,130 @@ export interface MeetingWeekend {
   duties: Record<string, string[]>;
 }
 
+export interface HospitalityHost {
+  id: string;
+  publisherId: string;
+  capacity: number; // Capacidad de comensales / invitados
+  dietaryNotes?: string; // Alergias, notas de comida, mascotas
+  alternateAddress?: string; // Dirección específica si es distinta a la del publicador
+  contactPhone?: string;
+  active: boolean;
+  notes?: string;
+}
+
+export interface Breaker {
+  id: string;
+  name: string;
+  descripcion?: string;
+  status: 'on' | 'off' | 'always' | 'event';
+  icon?: string;
+  color?: string;
+  col: 'left' | 'right';
+  order_idx: number;
+  amperage?: number;
+  congregation_id?: string;
+}
+
+export type MaintenanceCategory =
+  | 'climatizacion'
+  | 'electricidad'
+  | 'plomeria'
+  | 'edificacion'
+  | 'seguridad'
+  | 'jardineria'
+  | 'audio_video'
+  | 'limpieza_profunda';
+
+export type MaintenanceFrequency =
+  | 'semanal'
+  | 'mensual'
+  | 'bimestral'
+  | 'trimestral'
+  | 'semestral'
+  | 'anual'
+  | 'segun_necesidad';
+
+export type MaintenanceStatus = 'al_dia' | 'proximo' | 'pendiente' | 'vencido';
+
+export interface MaintenanceChecklistItem {
+  id: string;
+  text: string;
+  completed: boolean;
+}
+
+export interface MaintenanceSheet {
+  id: string;
+  label: string; // Título de la ficha / tarea (ej: "Revisión trimestral de extintores")
+  description?: string;
+  category: MaintenanceCategory;
+  frequency: MaintenanceFrequency;
+  status: MaintenanceStatus;
+  isActive: boolean;
+  orderIndex: number;
+  assignedPublisherIds: string[]; // Publicadores encargados o colaboradores capacitados
+  lastCompletedDate?: string; // YYYY-MM-DD
+  nextDueDate?: string; // YYYY-MM-DD
+  checklist: MaintenanceChecklistItem[];
+  estimatedMinutes?: number;
+  estimatedCost?: number;
+  safetyGear?: string[]; // ej. ["Guantes de protección", "Gafas de seguridad", "Arnés"]
+  notes?: string;
+  congregation_id?: string;
+}
+
+export type AuxPioneerStatus = 'pendiente' | 'aprobada' | 'rechazada';
+
+export interface AuxPioneerRequest {
+  id: string;
+  publisherId: string;
+  publisher_nid?: string;
+  month: number; // 0 (Enero) a 11 (Diciembre)
+  mes?: number;
+  year: number;
+  anio?: number;
+  targetHours: 15 | 30;
+  meta_horas?: 15 | 30;
+  isContinuous?: boolean;
+  status: AuxPioneerStatus;
+  estado?: AuxPioneerStatus;
+  requestDate: string;
+  fecha_solicitud?: string;
+  responseDate?: string;
+  fecha_respuesta?: string;
+  reviewedBy?: string;
+  notes?: string;
+  nota_opcional?: string;
+  congregation_id?: string;
+}
+
+export type S1SubmissionStatus = 'pendiente' | 'enviado';
+
+export interface BranchReportS1 {
+  id: string; // e.g. 's1-2026-10'
+  monthKey: string; // 'YYYY-MM' (e.g. '2026-10')
+  year: number;
+  monthNumber: number; // 1-12
+  status: S1SubmissionStatus;
+  submittedAt?: string;
+  submittedBy?: string;
+  confirmationNumber?: string;
+  notes?: string;
+  manualOverrides?: {
+    midweekMeetingsCount?: number;
+    midweekTotalAttendance?: number;
+    weekendMeetingsCount?: number;
+    weekendTotalAttendance?: number;
+    regularPublishersReporting?: number;
+    auxPioneersReporting?: number;
+    auxPioneerHours?: number;
+    pioneersReporting?: number;
+    pioneerHours?: number;
+    specialPioneersReporting?: number;
+    specialPioneerHours?: number;
+    totalBibleStudies?: number;
+  };
+}
+
 export interface SpecialEvent {
   isSpecial: boolean;
   type?: 'asamblea_circuito' | 'asamblea_regional' | 'conmemoracion' | 'visita_superintendente' | 'otro';

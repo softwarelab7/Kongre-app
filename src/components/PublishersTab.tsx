@@ -31,11 +31,13 @@ import {
   Eye,
   EyeOff,
   ShieldCheck,
+  Users,
 } from 'lucide-react';
 import { computePublisherAssignmentStats } from '../utils/autoAssigner';
 import { useSecurity } from '../context/SecurityContext';
 import { maskPhoneNumber } from '../utils/theocraticSecurity';
 import { AccountLinkRequestsModal } from './AccountLinkRequestsModal';
+import { SectionHeader } from './SectionHeader';
 
 export const PublishersTab: React.FC = () => {
   const {
@@ -510,74 +512,127 @@ export const PublishersTab: React.FC = () => {
         </div>
       )}
 
-      {/* Top action header */}
-      <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Directorio de Publicadores</h2>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
-              {publishers.filter(p => !!p.personalPin).length}/{publishers.length} con PIN único
-            </span>
+      {/* SectionHeader Kongre 1 Style */}
+      <SectionHeader
+        icon={Users}
+        title="Directorio de"
+        highlightWord="Publicadores"
+        subtitle={`${publishers.length} publicadores registrados • ${publishers.filter(p => p.active).length} activos`}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            {publishers.some(p => !p.personalPin) && (
+              <button
+                onClick={handleBatchGeneratePins}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs sm:text-sm font-semibold transition-all shadow-xs cursor-pointer active:scale-95"
+                title="Asignar automáticamente un PIN único a cada publicador que aún no tenga uno"
+              >
+                <Sparkles className="w-4 h-4 text-emerald-500" />
+                <span>Auto-asignar PINs ({publishers.filter(p => !p.personalPin).length})</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => setIsCsvModalOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-slate-700 dark:text-white/80 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold transition-all cursor-pointer"
+            >
+              <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>Importar CSV</span>
+            </button>
+
+            <button
+              onClick={exportPublishersCsv}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-slate-700 dark:text-white/80 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold transition-all cursor-pointer"
+              title="Exportar a CSV"
+            >
+              <Download className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+              <span className="hidden sm:inline">Exportar</span>
+            </button>
+
+            <button
+              onClick={openNewModal}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Nuevo Publicador</span>
+            </button>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500">
-            {publishers.length} publicadores registrados ({publishers.filter(p => p.active).length} activos). Cada publicador cuenta con su propio PIN personal único e intransferible.
-          </p>
+        }
+      />
+
+      {/* KPI Stats Ribbon */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="bg-white dark:bg-[#131d2e] border border-slate-200/70 dark:border-white/[0.06] rounded-2xl p-4 shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <Users className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">{publishers.length}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Publicadores</div>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {publishers.some(p => !p.personalPin) && (
-            <button
-              onClick={handleBatchGeneratePins}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer"
-              title="Asignar automáticamente un PIN único a cada publicador que aún no tenga uno"
-            >
-              <Sparkles className="w-4 h-4 text-emerald-600" />
-              <span>Auto-asignar PINs ({publishers.filter(p => !p.personalPin).length})</span>
-            </button>
-          )}
+        <div className="bg-white dark:bg-[#131d2e] border border-slate-200/70 dark:border-white/[0.06] rounded-2xl p-4 shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">{publishers.filter(p => p.active).length}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Activos</div>
+          </div>
+        </div>
 
-          <button
-            onClick={() => setIsCsvModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold transition-all"
-          >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-            <span>Importar CSV</span>
-          </button>
+        <div className="bg-white dark:bg-[#131d2e] border border-slate-200/70 dark:border-white/[0.06] rounded-2xl p-4 shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">
+              {publishers.filter(p => p.spiritualStatus === 'elder' || p.spiritualStatus === 'ministerial_servant' || p.spiritualStatus === 'anciano' || p.spiritualStatus === 'siervo_ministerial').length}
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Ancianos / Siervos</div>
+          </div>
+        </div>
 
-          <button
-            onClick={exportPublishersCsv}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold transition-all"
-            title="Exportar a CSV"
-          >
-            <Download className="w-4 h-4 text-slate-600" />
-            <span className="hidden sm:inline">Exportar</span>
-          </button>
+        <div className="bg-white dark:bg-[#131d2e] border border-slate-200/70 dark:border-white/[0.06] rounded-2xl p-4 shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">
+              {publishers.filter(p => p.serviceRole === 'regular_pioneer' || p.serviceRole === 'special_pioneer' || p.serviceRole === 'precursor_regular').length}
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Precursores Reg.</div>
+          </div>
+        </div>
 
-          <button
-            onClick={openNewModal}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition-all"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>Nuevo Publicador</span>
-          </button>
+        <div className="bg-white dark:bg-[#131d2e] border border-slate-200/70 dark:border-white/[0.06] rounded-2xl p-4 shadow-xs flex items-center gap-3 col-span-2 sm:col-span-1">
+          <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+            <KeyRound className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">
+              {publishers.filter(p => !!p.personalPin).length} <span className="text-xs font-normal text-slate-400">/ {publishers.length}</span>
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Con PIN Asignado</div>
+          </div>
         </div>
       </div>
 
       {/* Filter and search bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col sm:flex-row gap-3 items-center justify-between">
+      <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex flex-col sm:flex-row gap-3 items-center justify-between">
         <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Buscar por nombre, teléfono, notas..."
-            className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/40 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <div className="flex items-center gap-1 text-xs text-slate-500 font-medium">
+          <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
             <Filter className="w-3.5 h-3.5" />
             <span>Filtros:</span>
           </div>
@@ -585,7 +640,7 @@ export const PublishersTab: React.FC = () => {
           <select
             value={filterGender}
             onChange={e => setFilterGender(e.target.value)}
-            className="text-xs py-1.5 px-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 focus:ring-1 focus:ring-indigo-500"
+            className="text-xs py-1.5 px-3 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/60 text-slate-700 dark:text-white/80 focus:ring-1 focus:ring-indigo-500"
           >
             <option value="all">Todos los géneros</option>
             <option value="hermano">Hermanos</option>
@@ -595,7 +650,7 @@ export const PublishersTab: React.FC = () => {
           <select
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value)}
-            className="text-xs py-1.5 px-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 focus:ring-1 focus:ring-indigo-500"
+            className="text-xs py-1.5 px-3 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/60 text-slate-700 dark:text-white/80 focus:ring-1 focus:ring-indigo-500"
           >
             <option value="all">Todos los estados</option>
             <option value="active">Solo Activos</option>

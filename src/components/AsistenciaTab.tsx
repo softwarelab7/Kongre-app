@@ -15,6 +15,7 @@ import {
   Building2,
   Sparkles,
 } from 'lucide-react';
+import { SectionHeader } from './SectionHeader';
 
 export const AsistenciaTab: React.FC = () => {
   const { weeks, updateMeetingAttendance, settings } = useCongregation();
@@ -167,108 +168,96 @@ export const AsistenciaTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-linear-to-r from-blue-900 via-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-semibold tracking-wide uppercase">
-              Módulo Oficial Teocrático
-            </span>
-            <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-xs font-semibold">
-              Registro del Secretario
-            </span>
-          </div>
-          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <BarChart3 className="w-7 h-7 text-blue-400" />
-            <span>Control de Asistencia a las Reuniones</span>
-          </h2>
-          <p className="text-blue-100 text-sm mt-1 max-w-2xl">
-            Registro semana a semana de asistencia presencial y por Zoom para reuniones de entre
-            semana y fin de semana, con cálculo automático de promedios mensuales.
-          </p>
-        </div>
+      {/* SectionHeader Kongre 1 Style */}
+      <SectionHeader
+        icon={Users}
+        title="Control de"
+        highlightWord="Asistencia"
+        subtitle="Registro de asistencia presencial y por Zoom • Cálculo automático de promedios"
+        colorTheme="emerald"
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Month selector capsule */}
+            <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] px-3 py-1.5 rounded-xl">
+              <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="bg-transparent text-slate-800 dark:text-white font-semibold text-xs sm:text-sm outline-hidden cursor-pointer"
+              >
+                {availableMonths.map((m) => (
+                  <option key={m} value={m} className="text-slate-900 bg-white dark:bg-slate-900">
+                    Mes: {m}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Month selector & Action */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20">
-            <Calendar className="w-4 h-4 text-blue-300" />
-            <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="bg-transparent text-white font-bold text-sm outline-hidden cursor-pointer"
+            <button
+              onClick={handleCopySecretaryReport}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
             >
-              {availableMonths.map((m) => (
-                <option key={m} value={m} className="text-slate-900">
-                  Mes: {m}
-                </option>
-              ))}
-            </select>
+              {copiedSuccess ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+                  <span>¡Informe Copiado!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" />
+                  <span>Copiar Informe</span>
+                </>
+              )}
+            </button>
           </div>
+        }
+      />
 
-          <button
-            onClick={handleCopySecretaryReport}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white text-blue-900 font-bold text-xs hover:bg-blue-50 transition-all shadow-md active:scale-95"
-          >
-            {copiedSuccess ? (
-              <>
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>¡Copiado para el Secretario!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-4 h-4" />
-                <span>Copiar Informe Mensual</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-semibold uppercase">Promedio Entre Semana</span>
-            <Users className="w-4 h-4 text-indigo-600" />
+      {/* KPI Cards Ribbon */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+            <span className="text-xs font-semibold uppercase tracking-wider">Promedio Entre Semana</span>
+            <Users className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           </div>
-          <div className="text-3xl font-extrabold text-slate-900">{metrics.avgMidweek}</div>
-          <p className="text-2xs text-slate-400 mt-1">
-            {settings.midweekMeetingDay} • {metrics.midweekCount} reuniones registradas
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">{metrics.avgMidweek}</div>
+          <p className="text-2xs text-slate-400 dark:text-slate-500 mt-1">
+            {settings.midweekMeetingDay} • {metrics.midweekCount} reuniones
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-semibold uppercase">Promedio Fin de Semana</span>
-            <Users className="w-4 h-4 text-blue-600" />
+        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+            <span className="text-xs font-semibold uppercase tracking-wider">Promedio Fin de Semana</span>
+            <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </div>
-          <div className="text-3xl font-extrabold text-slate-900">{metrics.avgWeekend}</div>
-          <p className="text-2xs text-slate-400 mt-1">
-            {settings.weekendMeetingDay} • {metrics.weekendCount} reuniones registradas
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">{metrics.avgWeekend}</div>
+          <p className="text-2xs text-slate-400 dark:text-slate-500 mt-1">
+            {settings.weekendMeetingDay} • {metrics.weekendCount} reuniones
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-semibold uppercase">Promedio General</span>
-            <TrendingUp className="w-4 h-4 text-emerald-600" />
+        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+            <span className="text-xs font-semibold uppercase tracking-wider">Promedio General</span>
+            <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <div className="text-3xl font-extrabold text-slate-900">{metrics.avgOverall}</div>
-          <p className="text-2xs text-slate-400 mt-1">
-            Máxima del mes: <strong className="text-slate-700">{metrics.maxAttendance}</strong>
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">{metrics.avgOverall}</div>
+          <p className="text-2xs text-slate-400 dark:text-slate-500 mt-1">
+            Máxima del mes: <strong className="text-slate-700 dark:text-slate-300">{metrics.maxAttendance}</strong>
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-          <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-xs font-semibold uppercase">Presencial vs Zoom</span>
-            <Video className="w-4 h-4 text-purple-600" />
+        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+            <span className="text-xs font-semibold uppercase tracking-wider">Presencial vs Zoom</span>
+            <Video className="w-4 h-4 text-purple-600 dark:text-purple-400" />
           </div>
-          <div className="text-2xl font-extrabold text-slate-900">
+          <div className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">
             {metrics.inPersonPct}% / {metrics.zoomPct}%
           </div>
           {/* Progress bar */}
-          <div className="w-full bg-slate-100 h-2 rounded-full mt-2 overflow-hidden flex">
+          <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full mt-2 overflow-hidden flex">
             <div
               className="bg-indigo-600 h-full transition-all"
               style={{ width: `${metrics.inPersonPct}%` }}

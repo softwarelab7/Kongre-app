@@ -20,6 +20,7 @@ import {
   Phone,
   MessageCircle,
 } from 'lucide-react';
+import { SectionHeader } from './SectionHeader';
 
 export const CarritosTab: React.FC = () => {
   const {
@@ -216,84 +217,91 @@ export const CarritosTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header and Controls */}
-      <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900">
-              Testimonio Público
-            </span>
-            <span className="text-xs text-slate-500 font-medium">Carritos Metropolitanos</span>
+      {/* SectionHeader Kongre 1 Style */}
+      <SectionHeader
+        icon={Compass}
+        title="Predicación con"
+        highlightWord="Carritos"
+        subtitle="Puntos autorizados, turnos semanales y asignación de parejas teocráticas"
+        colorTheme="amber"
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={handleCopyScheduleWhatsApp}
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-slate-700 dark:text-white/80 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
+            >
+              {copiedSchedule ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">¡Horario Copiado!</span>
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-4 h-4 text-slate-500" />
+                  <span>Copiar para WhatsApp</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={handleOpenNewLoc}
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-slate-700 dark:text-white/80 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
+            >
+              <MapPin className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span>Puntos de Carrito</span>
+            </button>
+
+            <button
+              onClick={handleOpenNewShift}
+              className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-semibold shadow-md dark:shadow-amber-500/20 transition-all active:scale-95 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Nuevo Turno</span>
+            </button>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-            Carritos de Predicación
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Gestión de puntos autorizados, turnos semanales y asignación de parejas de publicadores.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={handleCopyScheduleWhatsApp}
-            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors"
-          >
-            {copiedSchedule ? (
-              <>
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span className="text-emerald-700 font-bold">¡Horario Copiado!</span>
-              </>
-            ) : (
-              <>
-                <Share2 className="w-4 h-4 text-slate-500" />
-                <span>Copiar para WhatsApp</span>
-              </>
-            )}
-          </button>
-
-          <button
-            onClick={handleOpenNewLoc}
-            className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors"
-          >
-            <MapPin className="w-4 h-4 text-amber-600" />
-            <span>Puntos de Carrito</span>
-          </button>
-
-          <button
-            onClick={handleOpenNewShift}
-            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Nuevo Turno</span>
-          </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold text-slate-400 block uppercase">
-            Total Turnos
-          </span>
-          <span className="text-xl sm:text-2xl font-black text-slate-900">{stats.total}</span>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <Clock className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{stats.total}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Turnos</div>
+          </div>
         </div>
-        <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold text-emerald-600 block uppercase">
-            Turnos Cubiertos
-          </span>
-          <span className="text-xl sm:text-2xl font-black text-emerald-600">{stats.covered}</span>
+
+        <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.covered}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Cubiertos (2 pub.)</div>
+          </div>
         </div>
-        <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold text-amber-600 block uppercase">
-            Incompletos (1 pub.)
-          </span>
-          <span className="text-xl sm:text-2xl font-black text-amber-600">{stats.partial}</span>
+
+        <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+            <Users className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.partial}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Incompletos (1 pub.)</div>
+          </div>
         </div>
-        <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold text-red-500 block uppercase">
-            Vacantes (0 pub.)
-          </span>
-          <span className="text-xl sm:text-2xl font-black text-red-600">{stats.empty}</span>
+
+        <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+            <AlertCircle className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl sm:text-2xl font-bold text-rose-600 dark:text-rose-400">{stats.empty}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Vacantes (0 pub.)</div>
+          </div>
         </div>
       </div>
 

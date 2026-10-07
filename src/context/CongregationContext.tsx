@@ -37,6 +37,12 @@ import {
   LiteratureGroupDistribution,
   LiteratureInventoryRecord,
   AccountLinkRequest,
+  HospitalityHost,
+  Breaker,
+  MaintenanceSheet,
+  AuxPioneerRequest,
+  BranchReportS1,
+  S1SubmissionStatus,
 } from '../types';
 import { TheocraticRole } from '../utils/rbac';
 import {
@@ -60,6 +66,11 @@ import {
   INITIAL_SPECIAL_ORDERS,
   INITIAL_GROUP_DISTRIBUTIONS,
   INITIAL_LITERATURE_INVENTORY_RECORDS,
+  INITIAL_HOSPITALITY_HOSTS,
+  INITIAL_BREAKERS,
+  INITIAL_MAINTENANCE_SHEETS,
+  INITIAL_AUX_PIONEER_REQUESTS,
+  INITIAL_BRANCH_REPORTS_S1,
   generateInitialWeeks,
   createEmptyWeek,
   formatDateISO,
@@ -135,6 +146,48 @@ interface CongregationContextType {
   addOutgoingSpeaker: (item: Omit<OutgoingSpeakerAssignment, 'id'>) => void;
   updateOutgoingSpeaker: (item: OutgoingSpeakerAssignment) => void;
   deleteOutgoingSpeaker: (id: string) => void;
+
+  // Hospitality Hosts
+  hospitalityHosts: HospitalityHost[];
+  addHospitalityHost: (host: Omit<HospitalityHost, 'id'>) => void;
+  updateHospitalityHost: (host: HospitalityHost) => void;
+  deleteHospitalityHost: (id: string) => void;
+
+  // Panel Eléctrico (Circuitos y Breakers del Salón)
+  breakers: Breaker[];
+  addBreaker: (breaker: Omit<Breaker, 'id'>) => void;
+  updateBreaker: (breaker: Breaker) => void;
+  deleteBreaker: (id: string) => void;
+  toggleBreakerStatus: (id: string) => void;
+  setMeetingBreakersPower: (turnOn: boolean) => void;
+  reorderBreakers: (newBreakers: Breaker[]) => void;
+
+  // Fichas de Mantenimiento del Salón
+  maintenanceSheets: MaintenanceSheet[];
+  addMaintenanceSheet: (sheet: Omit<MaintenanceSheet, 'id'>) => void;
+  updateMaintenanceSheet: (sheet: MaintenanceSheet) => void;
+  deleteMaintenanceSheet: (id: string) => void;
+  toggleMaintenanceSheetActive: (id: string) => void;
+  markMaintenanceSheetCompleted: (id: string, notes?: string) => void;
+  reorderMaintenanceSheets: (newSheets: MaintenanceSheet[]) => void;
+
+  // Solicitudes de Precursor Auxiliar
+  auxPioneerRequests: AuxPioneerRequest[];
+  addAuxPioneerRequest: (req: Omit<AuxPioneerRequest, 'id'>) => void;
+  updateAuxPioneerRequest: (req: AuxPioneerRequest) => void;
+  deleteAuxPioneerRequest: (id: string) => void;
+  setAuxPioneerRequestStatus: (id: string, status: 'aprobada' | 'rechazada', reviewedBy?: string) => void;
+
+  // Formulario S-1 (Informe Mensual de la Congregación a la Sucursal)
+  branchReportsS1: BranchReportS1[];
+  updateBranchReportS1: (report: BranchReportS1) => void;
+  markBranchReportS1Status: (
+    monthKey: string,
+    status: S1SubmissionStatus,
+    submittedBy?: string,
+    confirmationNumber?: string,
+    notes?: string
+  ) => void;
 
   // Field Service Meetings
   addFieldServiceMeeting: (item: Omit<FieldServiceMeeting, 'id'>) => void;
@@ -307,6 +360,51 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [outgoingSpeakers, setOutgoingSpeakers] = useState<OutgoingSpeakerAssignment[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_outgoing_speakers`);
     return saved ? JSON.parse(saved) : INITIAL_OUTGOING_SPEAKERS;
+  });
+
+  const [hospitalityHosts, setHospitalityHosts] = useState<HospitalityHost[]>(() => {
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_hospitality_hosts`);
+      return saved ? JSON.parse(saved) : INITIAL_HOSPITALITY_HOSTS;
+    } catch {
+      return INITIAL_HOSPITALITY_HOSTS;
+    }
+  });
+
+  const [breakers, setBreakers] = useState<Breaker[]>(() => {
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_breakers`);
+      return saved ? JSON.parse(saved) : INITIAL_BREAKERS;
+    } catch {
+      return INITIAL_BREAKERS;
+    }
+  });
+
+  const [maintenanceSheets, setMaintenanceSheets] = useState<MaintenanceSheet[]>(() => {
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`);
+      return saved ? JSON.parse(saved) : INITIAL_MAINTENANCE_SHEETS;
+    } catch {
+      return INITIAL_MAINTENANCE_SHEETS;
+    }
+  });
+
+  const [auxPioneerRequests, setAuxPioneerRequests] = useState<AuxPioneerRequest[]>(() => {
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`);
+      return saved ? JSON.parse(saved) : INITIAL_AUX_PIONEER_REQUESTS;
+    } catch {
+      return INITIAL_AUX_PIONEER_REQUESTS;
+    }
+  });
+
+  const [branchReportsS1, setBranchReportsS1] = useState<BranchReportS1[]>(() => {
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_branch_reports_s1`);
+      return saved ? JSON.parse(saved) : INITIAL_BRANCH_REPORTS_S1;
+    } catch {
+      return INITIAL_BRANCH_REPORTS_S1;
+    }
   });
 
   const [fieldServiceMeetings, setFieldServiceMeetings] = useState<FieldServiceMeeting[]>(() => {
@@ -1139,6 +1237,290 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const updated = outgoingSpeakers.filter(o => o.id !== id);
     setOutgoingSpeakers(updated);
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, updated);
+  };
+
+  // Hospitality Hosts Actions
+  const addHospitalityHost = (hostData: Omit<HospitalityHost, 'id'>) => {
+    const newHost: HospitalityHost = {
+      ...hostData,
+      id: `hosp-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    };
+    const updated = [...hospitalityHosts, newHost];
+    setHospitalityHosts(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_hospitality_hosts`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const updateHospitalityHost = (host: HospitalityHost) => {
+    const updated = hospitalityHosts.map(h => (h.id === host.id ? host : h));
+    setHospitalityHosts(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_hospitality_hosts`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const deleteHospitalityHost = (id: string) => {
+    const updated = hospitalityHosts.filter(h => h.id !== id);
+    setHospitalityHosts(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_hospitality_hosts`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  // Panel Eléctrico (Breakers) Actions
+  const addBreaker = (breakerData: Omit<Breaker, 'id'>) => {
+    const colBreakers = breakers.filter(b => b.col === breakerData.col);
+    const newBreaker: Breaker = {
+      ...breakerData,
+      id: `brk-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      order_idx: breakerData.order_idx !== undefined ? breakerData.order_idx : colBreakers.length,
+    };
+    const updated = [...breakers, newBreaker];
+    setBreakers(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const updateBreaker = (breaker: Breaker) => {
+    const updated = breakers.map(b => (b.id === breaker.id ? breaker : b));
+    setBreakers(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const deleteBreaker = (id: string) => {
+    const updated = breakers.filter(b => b.id !== id);
+    setBreakers(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const toggleBreakerStatus = (id: string) => {
+    const breaker = breakers.find(b => b.id === id);
+    if (!breaker || breaker.status === 'always') return;
+    const newStatus = breaker.status === 'off' ? 'on' : 'off';
+    const updated = breakers.map(b => (b.id === id ? { ...b, status: newStatus as Breaker['status'] } : b));
+    setBreakers(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const setMeetingBreakersPower = (turnOn: boolean) => {
+    const updated = breakers.map(b => {
+      if (b.status === 'event') {
+        return { ...b, status: (turnOn ? 'event' : 'off') as Breaker['status'] };
+      }
+      return b;
+    });
+    setBreakers(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const reorderBreakers = (newBreakers: Breaker[]) => {
+    setBreakers(newBreakers);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(newBreakers));
+    } catch {}
+  };
+
+  // Fichas de Mantenimiento del Salón Actions
+  const addMaintenanceSheet = (sheetData: Omit<MaintenanceSheet, 'id'>) => {
+    const newSheet: MaintenanceSheet = {
+      ...sheetData,
+      id: `maint-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      orderIndex: sheetData.orderIndex !== undefined ? sheetData.orderIndex : maintenanceSheets.length,
+    };
+    const updated = [...maintenanceSheets, newSheet];
+    setMaintenanceSheets(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const updateMaintenanceSheet = (sheet: MaintenanceSheet) => {
+    const updated = maintenanceSheets.map(s => (s.id === sheet.id ? sheet : s));
+    setMaintenanceSheets(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const deleteMaintenanceSheet = (id: string) => {
+    const updated = maintenanceSheets.filter(s => s.id !== id);
+    setMaintenanceSheets(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const toggleMaintenanceSheetActive = (id: string) => {
+    const sheet = maintenanceSheets.find(s => s.id === id);
+    if (!sheet) return;
+    const updated = maintenanceSheets.map(s => (s.id === id ? { ...s, isActive: !s.isActive } : s));
+    setMaintenanceSheets(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const markMaintenanceSheetCompleted = (id: string, notes?: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    const updated = maintenanceSheets.map(s => {
+      if (s.id === id) {
+        const nextDate = new Date();
+        switch (s.frequency) {
+          case 'semanal': nextDate.setDate(nextDate.getDate() + 7); break;
+          case 'mensual': nextDate.setMonth(nextDate.getMonth() + 1); break;
+          case 'bimestral': nextDate.setMonth(nextDate.getMonth() + 2); break;
+          case 'trimestral': nextDate.setMonth(nextDate.getMonth() + 3); break;
+          case 'semestral': nextDate.setMonth(nextDate.getMonth() + 6); break;
+          case 'anual': nextDate.setFullYear(nextDate.getFullYear() + 1); break;
+          default: nextDate.setMonth(nextDate.getMonth() + 1);
+        }
+        const nextDueDate = nextDate.toISOString().split('T')[0];
+        const newChecklist = s.checklist.map(item => ({ ...item, completed: true }));
+
+        return {
+          ...s,
+          lastCompletedDate: today,
+          nextDueDate,
+          status: 'al_dia' as MaintenanceStatus,
+          checklist: newChecklist,
+          notes: notes ? (s.notes ? `${s.notes}\n[${today}] ${notes}` : `[${today}] ${notes}`) : s.notes,
+        };
+      }
+      return s;
+    });
+    setMaintenanceSheets(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const reorderMaintenanceSheets = (newSheets: MaintenanceSheet[]) => {
+    setMaintenanceSheets(newSheets);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(newSheets));
+    } catch {}
+  };
+
+  // Solicitudes de Precursor Auxiliar Actions
+  const addAuxPioneerRequest = (reqData: Omit<AuxPioneerRequest, 'id'>) => {
+    const newReq: AuxPioneerRequest = {
+      ...reqData,
+      id: `apr-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      publisher_nid: reqData.publisher_nid || reqData.publisherId,
+      mes: reqData.mes !== undefined ? reqData.mes : reqData.month,
+      anio: reqData.anio !== undefined ? reqData.anio : reqData.year,
+      meta_horas: reqData.meta_horas || reqData.targetHours,
+      estado: reqData.estado || reqData.status || 'pendiente',
+      fecha_solicitud: reqData.fecha_solicitud || reqData.requestDate || new Date().toISOString(),
+    };
+    const updated = [newReq, ...auxPioneerRequests];
+    setAuxPioneerRequests(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const updateAuxPioneerRequest = (req: AuxPioneerRequest) => {
+    const updated = auxPioneerRequests.map((r) => (r.id === req.id ? req : r));
+    setAuxPioneerRequests(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const deleteAuxPioneerRequest = (id: string) => {
+    const updated = auxPioneerRequests.filter((r) => r.id !== id);
+    setAuxPioneerRequests(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const setAuxPioneerRequestStatus = (id: string, status: 'aprobada' | 'rechazada', reviewedBy?: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    const updated = auxPioneerRequests.map((r) => {
+      if (r.id === id) {
+        return {
+          ...r,
+          status,
+          estado: status,
+          responseDate: today,
+          fecha_respuesta: today,
+          reviewedBy: reviewedBy || 'Comité de Servicio de la Congregación',
+        };
+      }
+      return r;
+    });
+    setAuxPioneerRequests(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  // Formulario S-1 (Informe a la Sucursal) Actions
+  const updateBranchReportS1 = (report: BranchReportS1) => {
+    const exists = branchReportsS1.some((r) => r.monthKey === report.monthKey || r.id === report.id);
+    let updated: BranchReportS1[];
+    if (exists) {
+      updated = branchReportsS1.map((r) =>
+        r.monthKey === report.monthKey || r.id === report.id ? report : r
+      );
+    } else {
+      updated = [report, ...branchReportsS1];
+    }
+    setBranchReportsS1(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_branch_reports_s1`, JSON.stringify(updated));
+    } catch {}
+  };
+
+  const markBranchReportS1Status = (
+    monthKey: string,
+    status: S1SubmissionStatus,
+    submittedBy?: string,
+    confirmationNumber?: string,
+    notes?: string
+  ) => {
+    const [yearStr, monthStr] = monthKey.split('-');
+    const year = parseInt(yearStr, 10);
+    const monthNumber = parseInt(monthStr, 10);
+
+    const existing = branchReportsS1.find((r) => r.monthKey === monthKey);
+    let updatedReport: BranchReportS1;
+
+    if (existing) {
+      updatedReport = {
+        ...existing,
+        status,
+        submittedAt: status === 'enviado' ? (existing.submittedAt || new Date().toISOString()) : undefined,
+        submittedBy: submittedBy !== undefined ? submittedBy : existing.submittedBy,
+        confirmationNumber: confirmationNumber !== undefined ? confirmationNumber : existing.confirmationNumber,
+        notes: notes !== undefined ? notes : existing.notes,
+      };
+    } else {
+      updatedReport = {
+        id: `s1-${monthKey}`,
+        monthKey,
+        year,
+        monthNumber,
+        status,
+        submittedAt: status === 'enviado' ? new Date().toISOString() : undefined,
+        submittedBy,
+        confirmationNumber,
+        notes,
+      };
+    }
+    updateBranchReportS1(updatedReport);
   };
 
   const addFieldServiceMeeting = (itemData: Omit<FieldServiceMeeting, 'id'>) => {
@@ -2411,6 +2793,32 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         addOutgoingSpeaker,
         updateOutgoingSpeaker,
         deleteOutgoingSpeaker,
+        hospitalityHosts,
+        addHospitalityHost,
+        updateHospitalityHost,
+        deleteHospitalityHost,
+        breakers,
+        addBreaker,
+        updateBreaker,
+        deleteBreaker,
+        toggleBreakerStatus,
+        setMeetingBreakersPower,
+        reorderBreakers,
+        maintenanceSheets,
+        addMaintenanceSheet,
+        updateMaintenanceSheet,
+        deleteMaintenanceSheet,
+        toggleMaintenanceSheetActive,
+        markMaintenanceSheetCompleted,
+        reorderMaintenanceSheets,
+        auxPioneerRequests,
+        addAuxPioneerRequest,
+        updateAuxPioneerRequest,
+        deleteAuxPioneerRequest,
+        setAuxPioneerRequestStatus,
+        branchReportsS1,
+        updateBranchReportS1,
+        markBranchReportS1Status,
         addFieldServiceMeeting,
         updateFieldServiceMeeting,
         deleteFieldServiceMeeting,

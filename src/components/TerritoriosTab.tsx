@@ -36,6 +36,7 @@ import {
   QrCode,
 } from 'lucide-react';
 import { DigitalTerritoryModal } from './DigitalTerritoryModal';
+import { SectionHeader } from './SectionHeader';
 
 export const TerritoriosTab: React.FC = () => {
   const {
@@ -482,97 +483,122 @@ ${mapLink}${noVisitsText}
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-blue-100 text-blue-700 rounded-lg">
-              <Map className="w-6 h-6" />
+      {/* SectionHeader Kongre 1 Style */}
+      <SectionHeader
+        icon={Map}
+        title="Gestión de"
+        highlightWord="Territorios"
+        subtitle={`${stats.total} territorios • ${stats.disponibles} disponibles • ${stats.vencidos} vencidos`}
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* View Mode Toggle Pill */}
+            <div className="flex rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/80 dark:bg-slate-800/60 p-1">
+              <button
+                onClick={() => setViewMode('cards')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                  viewMode === 'cards'
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Tarjetas
+              </button>
+              <button
+                onClick={() => setViewMode('table')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                  viewMode === 'table'
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Tabla
+              </button>
+              <button
+                onClick={() => setViewMode('s13')}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                  viewMode === 's13'
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Fichero S-13
+              </button>
             </div>
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-800 flex items-center gap-2">
-                Gestión de Territorios
-                <span className="text-xs font-semibold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full">
-                  Formulario S-13
-                </span>
-              </h1>
-              <p className="text-sm text-slate-500">
-                Registro oficial de asignación y cobertura de territorio de la congregación con vencimientos y mapas.
-              </p>
-            </div>
+
+            <button
+              onClick={() => window.print()}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] border border-slate-200/60 dark:border-white/[0.06] rounded-xl transition cursor-pointer"
+              title="Imprimir listado"
+            >
+              <Printer className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+              <span className="hidden sm:inline">Imprimir</span>
+            </button>
+
+            <button
+              onClick={openCreateModal}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Nuevo Territorio</span>
+            </button>
+          </div>
+        }
+      />
+
+      {/* KPI Stats Ribbon */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <Map className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">{stats.total}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Territorios</div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
-            title="Imprimir listado"
-          >
-            <Printer className="w-4 h-4 text-slate-600" />
-            <span className="hidden sm:inline">Imprimir</span>
-          </button>
-
-          <button
-            onClick={openCreateModal}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-lg shadow-sm transition"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Nuevo Territorio</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Metrics Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500 text-xs font-medium uppercase tracking-wider mb-1">
-            <span>Total Territorios</span>
-            <Map className="w-4 h-4 text-slate-400" />
+        <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-5 h-5" />
           </div>
-          <div className="text-2xl font-bold text-slate-800">{stats.total}</div>
-          <p className="text-xs text-slate-500 mt-1">Territorios registrados</p>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-emerald-600 text-xs font-medium uppercase tracking-wider mb-1">
-            <span>Disponibles</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          <div>
+            <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{stats.disponibles}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Disponibles</div>
           </div>
-          <div className="text-2xl font-bold text-emerald-700">{stats.disponibles}</div>
-          <p className="text-xs text-emerald-600/80 mt-1">Listos para asignar</p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-blue-600 text-xs font-medium uppercase tracking-wider mb-1">
-            <span>En Trabajo</span>
-            <User className="w-4 h-4 text-blue-500" />
+        <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <User className="w-5 h-5" />
           </div>
-          <div className="text-2xl font-bold text-blue-700">{stats.asignados}</div>
-          <p className="text-xs text-blue-600/80 mt-1">Asignados a publicadores</p>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-rose-600 text-xs font-medium uppercase tracking-wider mb-1">
-            <span>Vencidos (&gt;4m)</span>
-            <AlertTriangle className="w-4 h-4 text-rose-500" />
+          <div>
+            <div className="text-xl font-bold text-blue-600 dark:text-blue-400">{stats.asignados}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">En Trabajo</div>
           </div>
-          <div className="text-2xl font-bold text-rose-700">{stats.vencidos}</div>
-          <p className="text-xs text-rose-600/80 mt-1">Exceden plazo recomendado</p>
         </div>
 
-        <div className="col-span-2 lg:col-span-1 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-indigo-600 text-xs font-medium uppercase tracking-wider mb-1">
+        <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+            <AlertTriangle className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-rose-600 dark:text-rose-400">{stats.vencidos}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Vencidos (&gt;4m)</div>
+          </div>
+        </div>
+
+        <div className="col-span-2 lg:col-span-1 bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs">
+          <div className="flex items-center justify-between text-indigo-600 dark:text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-1">
             <span>Cobertura Anual</span>
-            <Compass className="w-4 h-4 text-indigo-500" />
+            <Compass className="w-4 h-4" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-indigo-700">{stats.coveragePercentage}%</span>
-            <span className="text-xs text-slate-500">({stats.completedLastYear} de {stats.total})</span>
+            <span className="text-xl font-bold text-slate-900 dark:text-white">{stats.coveragePercentage}%</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">({stats.completedLastYear} de {stats.total})</span>
           </div>
-          <div className="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+          <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
             <div
-              className="bg-indigo-600 h-1.5 rounded-full transition-all"
+              className="bg-indigo-600 dark:bg-indigo-500 h-1.5 rounded-full transition-all"
               style={{ width: `${Math.min(stats.coveragePercentage, 100)}%` }}
             />
           </div>
@@ -580,60 +606,26 @@ ${mapLink}${noVisitsText}
       </div>
 
       {/* Controls & Filter Bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+      <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs space-y-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Search box */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Buscar por número, nombre, calle o publicador..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-9 py-2 border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/40 text-slate-800 dark:text-white placeholder-slate-400 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
               >
                 <X className="w-4 h-4" />
               </button>
             )}
-          </div>
-
-          {/* View mode toggle */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg self-start md:self-auto border border-slate-200">
-            <button
-              onClick={() => setViewMode('cards')}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${
-                viewMode === 'cards'
-                  ? 'bg-white text-blue-700 shadow-sm font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Tarjetas
-            </button>
-            <button
-              onClick={() => setViewMode('table')}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${
-                viewMode === 'table'
-                  ? 'bg-white text-blue-700 shadow-sm font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Tabla
-            </button>
-            <button
-              onClick={() => setViewMode('s13')}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition ${
-                viewMode === 's13'
-                  ? 'bg-white text-blue-700 shadow-sm font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Fichero S-13
-            </button>
           </div>
         </div>
 

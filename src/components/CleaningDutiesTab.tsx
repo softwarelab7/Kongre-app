@@ -18,7 +18,10 @@ import {
   Compass,
   MessageCircle,
   Copy,
+  ClipboardList,
+  ShieldCheck,
 } from 'lucide-react';
+import { SectionHeader } from './SectionHeader';
 
 export const CleaningDutiesTab: React.FC = () => {
   const {
@@ -277,7 +280,93 @@ export const CleaningDutiesTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      {/* SectionHeader Kongre 1 Style */}
+      <SectionHeader
+        icon={ClipboardList}
+        title="Gestión de"
+        highlightWord="Privilegios y Salón"
+        subtitle="Acomodadores, sonido, rotación de limpieza y grupos de predicación"
+        colorTheme="emerald"
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={handleAutoRotateCleaning}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-slate-700 dark:text-white/80 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold transition-all cursor-pointer"
+            >
+              <Brush className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <span>Rotar Limpieza Auto</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setEditingGroup(null);
+                setGroupName('');
+                setGroupNumber(preachingGroups.length + 1);
+                setGroupOverseer('');
+                setGroupAssistant('');
+                setGroupMembers([]);
+                setIsGroupModalOpen(true);
+              }}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-slate-700 dark:text-white/80 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold transition-all cursor-pointer"
+            >
+              <Users className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <span>+ Nuevo Grupo</span>
+            </button>
+
+            <button
+              onClick={openNewDutyModal}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Nuevo Privilegio</span>
+            </button>
+          </div>
+        }
+      />
+
+      {/* KPI Stats Ribbon */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+            <Users className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">{preachingGroups.length}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Grupos de Predicación</div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <Brush className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">{weeks.length} Semanas</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Cronograma de Limpieza</div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">{customDuties.length} Activos</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Privilegios Especiales</div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <Compass className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">{fieldServiceMeetings.length} Puntos</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Salidas a la Predicación</div>
+          </div>
+        </div>
+      </div>
       {/* 1. SECCIÓN: LIMPIEZA DEL SALÓN DEL REINO */}
       <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">

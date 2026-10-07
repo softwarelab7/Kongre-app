@@ -43,6 +43,7 @@ export const DiscursosPublicosTab: React.FC = () => {
     addOutgoingSpeaker,
     updateOutgoingSpeaker,
     deleteOutgoingSpeaker,
+    hospitalityHosts,
     settings,
   } = useCongregation();
 
@@ -1091,11 +1092,28 @@ export const DiscursosPublicosTab: React.FC = () => {
                   className="w-full px-3 py-2 border border-slate-300 rounded-xl bg-white font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-hidden"
                 >
                   <option value="">-- Sin hospitalidad asignada --</option>
-                  {hospitalityPublishers.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} ({p.gender})
-                    </option>
-                  ))}
+                  {hospitalityHosts.filter(h => h.active).length > 0 && (
+                    <optgroup label="⭐ Anfitriones Registrados de Hospitalidad">
+                      {hospitalityHosts
+                        .filter(h => h.active)
+                        .map(h => {
+                          const pub = publishersMap.get(h.publisherId);
+                          if (!pub) return null;
+                          return (
+                            <option key={`host-${h.id}`} value={h.publisherId}>
+                              ⭐ {pub.name} (Capacidad: {h.capacity} pers.){h.dietaryNotes ? ` [${h.dietaryNotes}]` : ''}
+                            </option>
+                          );
+                        })}
+                    </optgroup>
+                  )}
+                  <optgroup label="Todos los Publicadores">
+                    {hospitalityPublishers.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </optgroup>
                 </select>
                 <p className="text-2xs text-slate-400 mt-1">
                   Se generará un mensaje de WhatsApp para recordarle los detalles de la comida.

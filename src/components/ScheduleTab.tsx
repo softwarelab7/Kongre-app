@@ -16,6 +16,7 @@ import { OrganizedImportModal } from './OrganizedImportModal';
 import { MeetingTimerModal } from './MeetingTimerModal';
 import { BatchWhatsAppModal } from './BatchWhatsAppModal';
 import ClmScheduleView from './ClmScheduleView';
+import { SectionHeader } from './SectionHeader';
 import { createAssignmentWhatsAppMessage, openWhatsAppLink } from '../utils/whatsapp';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganizedSync } from '../utils/organizedSync';
 import { OFFICIAL_PUBLIC_TALK_OUTLINES, findOutlineByNumber } from '../utils/theocraticData';
@@ -73,7 +74,7 @@ export const ScheduleTab: React.FC = () => {
   const { effectiveRoleInfo } = useAuth();
   const isReadOnly = effectiveRoleInfo.isReadOnly || !effectiveRoleInfo.canEditSchedule;
 
-  const [viewMode, setViewMode] = useState<'week' | 'clm_vmc'>('week');
+  const [viewMode, setViewMode] = useState<'week' | 'clm_vmc'>('clm_vmc');
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     return (currentWeek?.weekStartDate || new Date().toISOString()).substring(0, 7);
   });
@@ -354,76 +355,78 @@ export const ScheduleTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top control bar: Week navigation & Auto-assign */}
-      <div className="bg-white p-3.5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3.5 sm:gap-4">
-        {/* Week navigation */}
-        <div className="flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2">
-          <button
-            onClick={goToPreviousWeek}
-            disabled={currentIndex <= 0}
-            className="p-2 sm:p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0"
-            title="Semana anterior"
-            aria-label="Semana anterior"
-          >
-            <ChevronLeft className="w-5 h-5 text-slate-700" />
-          </button>
-
-          <div className="text-center px-1 sm:px-2 min-w-0">
-            <div className="flex items-center justify-center gap-1.5 sm:gap-2">
-              <Calendar className="w-4 h-4 text-indigo-600 shrink-0 hidden sm:inline" />
-              <h2 className="text-xs sm:text-base font-bold text-slate-900 truncate">
+      {/* SectionHeader Kongre 1 Style */}
+      <SectionHeader
+        icon={Calendar}
+        title="Programa de"
+        highlightWord="Reuniones"
+        subtitle={`Semana: ${currentWeek.weekStartDate} al ${currentWeek.weekEndDate} • Semana ${currentIndex + 1} de ${sortedWeeks.length}`}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Week navigation capsule */}
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] p-1 rounded-xl">
+              <button
+                onClick={goToPreviousWeek}
+                disabled={currentIndex <= 0}
+                className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
+                title="Semana anterior"
+                aria-label="Semana anterior"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-xs font-bold px-2 text-slate-800 dark:text-white">
                 {currentWeek.weekStartDate} al {currentWeek.weekEndDate}
-              </h2>
+              </span>
+              <button
+                onClick={goToNextWeek}
+                className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
+                title={currentIndex < sortedWeeks.length - 1 ? 'Semana siguiente' : 'Crear siguiente semana'}
+                aria-label="Semana siguiente"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              Semana {currentIndex + 1} de {sortedWeeks.length}
-            </p>
+
+            {/* View Mode Toggle */}
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/[0.05] p-1 rounded-xl border border-slate-200/80 dark:border-white/[0.08]">
+              <button
+                type="button"
+                onClick={() => setViewMode('week')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === 'week'
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Reunión Completa
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('clm_vmc')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  viewMode === 'clm_vmc'
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Programa VMC
+              </button>
+            </div>
+
+            <button
+              onClick={addNextWeek}
+              className="flex items-center gap-1 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md dark:shadow-indigo-500/20 active:scale-95 cursor-pointer"
+              title="Añadir una nueva semana al programa"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Nueva Semana</span>
+            </button>
           </div>
+        }
+      />
 
-          <button
-            onClick={goToNextWeek}
-            className="p-2 sm:p-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0"
-            title={currentIndex < sortedWeeks.length - 1 ? 'Semana siguiente' : 'Crear siguiente semana'}
-            aria-label="Semana siguiente"
-          >
-            <ChevronRight className="w-5 h-5 text-slate-700" />
-          </button>
-
-          <button
-            onClick={addNextWeek}
-            className="flex items-center gap-1 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all min-h-[44px] shrink-0"
-            title="Añadir una nueva semana al programa"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Nueva Semana</span>
-          </button>
-        </div>
-
-        {/* Selector de modo de vista: Completa vs Programa VMC */}
-        <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/10 shrink-0">
-          <button
-            type="button"
-            onClick={() => setViewMode('week')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              viewMode === 'week'
-                ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900'
-            }`}
-          >
-            Reunión Completa
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode('clm_vmc')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              viewMode === 'clm_vmc'
-                ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
-                : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900'
-            }`}
-          >
-            Programa VMC
-          </button>
-        </div>
+      {/* Action Toolbar */}
+      <div className="bg-white dark:bg-[#131d2e] p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex flex-wrap items-center justify-between gap-2.5">
 
         {/* Action buttons: Auto-assign, Copy, Special Event, MWB, Organized, Timer */}
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">

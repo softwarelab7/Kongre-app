@@ -3,7 +3,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useTheme } from '../context/ThemeContext';
+import { useSecurity } from '../context/SecurityContext';
 import { PWAInstallButton } from './PWAInstallButton';
+import { getFriendlyCongregationName } from '../utils/theocraticSecurity';
 import {
   Calendar,
   Users,
@@ -36,7 +38,6 @@ import {
   FileCheck,
   Bell,
   Briefcase,
-  Landmark,
   Flame,
   Package,
   Search,
@@ -46,30 +47,45 @@ import {
   LayoutDashboard,
   Lock,
   KeyRound,
-  UserPlus,
   Building2,
+  LayoutGrid,
+  PanelLeft,
+  Smartphone,
+  Table,
+  CreditCard,
+  ShoppingBag,
+  Coffee,
+  Heart,
+  BookOpen,
+  Landmark,
+  Zap,
+  Wrench,
+  Target,
+  FileBarChart,
 } from 'lucide-react';
-import { useSecurity } from '../context/SecurityContext';
-import { KongreLogo } from './KongreLogo';
-import { getFriendlyCongregationName } from '../utils/theocraticSecurity';
 
 export type ActiveTab =
   | 'inicio'
   | 'programacion'
   | 's89'
   | 'publicadores'
+  | 'precursores_auxiliares'
   | 'grupos_servicio'
   | 'territorios'
   | 'visita_sc'
   | 'memorial_asambleas'
   | 'discursos'
+  | 'hospitalidad'
   | 'carritos'
   | 'asistencia'
+  | 'informe_s1'
   | 'informes_servicio'
   | 'tarjetas_s21'
   | 'cuentas'
   | 'literatura'
   | 'limpieza_deberes'
+  | 'panel_electrico'
+  | 'mantenimiento'
   | 'tablero_anuncios'
   | 'conflictos'
   | 'equidad'
@@ -80,6 +96,8 @@ export type ActiveTab =
 interface NavbarProps {
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
+  isSidebarVisible?: boolean;
+  onToggleSidebar?: () => void;
   onOpenConflictsModal: () => void;
   onOpenQrModal?: () => void;
   onOpenTimerModal?: () => void;
@@ -115,6 +133,8 @@ interface Department {
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
+  isSidebarVisible = true,
+  onToggleSidebar,
   onOpenConflictsModal,
   onOpenQrModal,
   onOpenTimerModal,
@@ -128,8 +148,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenWelcomeLanding,
 }) => {
   const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo } = useAuth();
-  const { settings, updateSettings, conflicts, syncStatus, notices, territories, accountLinkRequests } = useCongregation();
+  const { settings, updateSettings, conflicts, syncStatus, notices, territories, accountLinkRequests, auxPioneerRequests } = useCongregation();
   const pendingRequestsCount = accountLinkRequests.filter((r) => r.status === 'pending').length;
+  const pendingAuxPioneersCount = (auxPioneerRequests || []).filter((r) => (r.status || r.estado || 'pendiente') === 'pendiente').length;
   const { themeMode, toggleTheme, isDark, isCabinaMode } = useTheme();
   const { isPinEnabled, lockSession } = useSecurity();
 
@@ -156,14 +177,41 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const pinnedNoticesCount = notices.filter((n) => n.pinned).length;
 
-  // Structured Theocratic Departments
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnterCategory = (catId: string) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setHoveredCategory(catId);
+  };
+
+  const handleMouseLeaveCategory = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredCategory(null);
+    }, 180);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Full departments for the mobile drawer
   const departments: Department[] = [
     {
       id: 'reuniones',
       title: 'Reuniones',
       shortTitle: 'Reuniones',
       icon: Calendar,
-      tabIds: ['programacion', 's89', 'discursos'],
+      tabIds: ['programacion', 's89', 'discursos', 'hospitalidad'],
       items: [
         {
           id: 'programacion',
@@ -183,6 +231,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           description: 'Catálogo de bosquejos y oradores visitantes',
           icon: Mic,
         },
+        {
+          id: 'hospitalidad',
+          label: 'Hospitalidad de Oradores',
+          description: 'Familias anfitrionas y comidas para oradores',
+          icon: Coffee,
+        },
       ],
     },
     {
@@ -190,13 +244,27 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Secretaría y Registros',
       shortTitle: 'Secretaría',
       icon: FileText,
-      tabIds: ['publicadores', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'cuentas'],
+      tabIds: ['publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'informe_s1', 'cuentas'],
       items: [
         {
           id: 'publicadores',
           label: 'Directorio de Publicadores',
           description: 'Privilegios, teléfonos y responsabilidades',
           icon: Users,
+        },
+        {
+          id: 'precursores_auxiliares',
+          label: 'Precursores Auxiliares',
+          description: 'Solicitudes S-205 y aprobación del comité',
+          icon: Target,
+          badge: pendingAuxPioneersCount || undefined,
+          badgeColor: 'bg-amber-500 text-white',
+        },
+        {
+          id: 'informe_s1',
+          label: 'Informe S-1 Sucursal',
+          description: 'Consolidación mensual de asistencia y predicación para JW Hub',
+          icon: FileBarChart,
         },
         {
           id: 'tarjetas_s21',
@@ -264,13 +332,25 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Salón y Organización',
       shortTitle: 'Salón',
       icon: Brush,
-      tabIds: ['limpieza_deberes', 'visita_sc', 'memorial_asambleas', 'tablero_anuncios'],
+      tabIds: ['limpieza_deberes', 'panel_electrico', 'mantenimiento', 'visita_sc', 'memorial_asambleas', 'tablero_anuncios'],
       items: [
         {
           id: 'limpieza_deberes',
           label: 'Deberes & Limpieza',
           description: 'Sonido, video, microfonistas, acomodadores y aseo',
           icon: Brush,
+        },
+        {
+          id: 'panel_electrico',
+          label: 'Panel Eléctrico',
+          description: 'Tablero de breakers, circuitos y control de energía',
+          icon: Zap,
+        },
+        {
+          id: 'mantenimiento',
+          label: 'Mantenimiento del Salón',
+          description: 'Fichas operativas, plan preventivo y extintores',
+          icon: Wrench,
         },
         {
           id: 'visita_sc',
@@ -337,8 +417,75 @@ export const Navbar: React.FC<NavbarProps> = ({
     },
   ];
 
-  // Determine which department is currently active
-  const activeDepartment = departments.find((dept) => dept.tabIds.includes(activeTab));
+  // Categorías principales teocráticas integradas en la barra lateral con flyout al pasar el puntero
+  const categoriesList = [
+    {
+      id: 'inicio',
+      title: 'Panorama General',
+      icon: LayoutGrid,
+      primaryTab: 'inicio' as ActiveTab,
+      tabIds: ['inicio'] as ActiveTab[],
+      badge: undefined,
+      badgeColor: undefined,
+      colorClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400',
+      items: [] as NavSubItem[],
+    },
+    {
+      id: 'reuniones',
+      title: 'Reuniones',
+      icon: Calendar,
+      primaryTab: 'programacion' as ActiveTab,
+      tabIds: ['programacion', 's89', 'discursos'] as ActiveTab[],
+      badge: undefined,
+      badgeColor: undefined,
+      colorClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400',
+      items: departments[0].items,
+    },
+    {
+      id: 'secretaria',
+      title: 'Secretaría y Registros',
+      icon: FileText,
+      primaryTab: 'publicadores' as ActiveTab,
+      tabIds: ['publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'informe_s1', 'cuentas'] as ActiveTab[],
+      badge: undefined,
+      badgeColor: undefined,
+      colorClass: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/80 dark:text-emerald-400',
+      items: departments[1].items,
+    },
+    {
+      id: 'predicacion',
+      title: 'Predicación',
+      icon: Map,
+      primaryTab: 'territorios' as ActiveTab,
+      tabIds: ['territorios', 'grupos_servicio', 'carritos', 'literatura'] as ActiveTab[],
+      badge: overdueTerritoriesCount || undefined,
+      badgeColor: 'bg-rose-500 text-white',
+      colorClass: 'bg-sky-50 text-sky-600 dark:bg-sky-950/80 dark:text-sky-400',
+      items: departments[2].items,
+    },
+    {
+      id: 'salon',
+      title: 'Salón y Organización',
+      icon: Brush,
+      primaryTab: 'limpieza_deberes' as ActiveTab,
+      tabIds: ['limpieza_deberes', 'visita_sc', 'memorial_asambleas', 'tablero_anuncios'] as ActiveTab[],
+      badge: pinnedNoticesCount || undefined,
+      badgeColor: 'bg-indigo-600 text-white',
+      colorClass: 'bg-amber-50 text-amber-600 dark:bg-amber-950/80 dark:text-amber-400',
+      items: departments[3].items,
+    },
+    {
+      id: 'supervision',
+      title: 'Supervisión & Control',
+      icon: AlertTriangle,
+      primaryTab: 'conflictos' as ActiveTab,
+      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'ajustes'] as ActiveTab[],
+      badge: conflicts.length || undefined,
+      badgeColor: 'bg-amber-500 text-white',
+      colorClass: 'bg-rose-50 text-rose-600 dark:bg-rose-950/80 dark:text-rose-400',
+      items: departments[4].items,
+    },
+  ];
 
   const handleSelectTab = (tabId: ActiveTab) => {
     setActiveTab(tabId);
@@ -346,761 +493,491 @@ export const Navbar: React.FC<NavbarProps> = ({
     setIsMobileMenuOpen(false);
   };
 
-  const toggleDropdown = (deptId: string) => {
-    setOpenDropdown(openDropdown === deptId ? null : deptId);
-  };
+  const displayCongregationName = getFriendlyCongregationName(settings.congregationName, 'Usme');
 
-  const displayCongregationName = getFriendlyCongregationName(settings.congregationName, 'Congregación Central');
+  // Friendly title for the active tab under the congregation name
+  const getCurrentTabSubtitle = (tab: ActiveTab): string => {
+    switch (tab) {
+      case 'inicio':
+        return 'Resumen';
+      case 'programacion':
+        return 'Calendario';
+      case 'asistencia':
+        return 'Estadísticas';
+      case 'informe_s1':
+        return 'Informe S-1 Sucursal';
+      case 'publicadores':
+        return 'Publicadores';
+      case 's89':
+        return 'Hojas S-89';
+      case 'discursos':
+        return 'Discursos Públicos';
+      case 'territorios':
+        return 'Territorios S-13';
+      case 'literatura':
+        return 'Literatura S-14';
+      case 'tablero_anuncios':
+        return 'Tablero de Anuncios';
+      case 'tarjetas_s21':
+        return 'Tarjetas S-21';
+      case 'cuentas':
+        return 'Cuentas S-26';
+      case 'grupos_servicio':
+        return 'Grupos de Servicio';
+      case 'carritos':
+        return 'Carritos';
+      case 'limpieza_deberes':
+        return 'Deberes & Limpieza';
+      case 'visita_sc':
+        return 'Visita del SC';
+      case 'ajustes':
+        return 'Ajustes';
+      default:
+        return 'Kongre';
+    }
+  };
 
   return (
     <>
-      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-xs" ref={dropdownRef}>
-        <div className="w-full px-3 sm:px-6 lg:px-8 2xl:px-12">
-          {/* Top Primary Bar */}
-          <div className="flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-4">
-            {/* Brand Logo & Name */}
-            <div
-              onClick={() => handleSelectTab('inicio')}
-              className="flex items-center gap-2.5 sm:gap-3 min-w-0 shrink-0 cursor-pointer group"
-              title="Ir al Resumen General de la congregación"
-            >
-              <KongreLogo size="lg" className="group-hover:scale-105 transition-transform shrink-0" />
-              <div className="truncate min-w-0">
-                <h1 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5 truncate">
-                  <span className="truncate">{displayCongregationName}</span>
-                  <span className="hidden xl:inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0">
-                    Kongre
-                  </span>
-                </h1>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block truncate">
-                  {settings.midweekMeetingDay} {settings.midweekMeetingTime} • {settings.weekendMeetingDay} {settings.weekendMeetingTime}
-                </p>
-              </div>
-            </div>
+      {/* =========================================================================
+          1. SLIM LEFT VERTICAL SIDEBAR (DESKTOP / TABLET - CATEGORIES & FLYOUT)
+         ========================================================================= */}
+      {isSidebarVisible && (
+        <aside className="hidden md:flex flex-col items-center fixed left-0 top-0 bottom-0 w-16 lg:w-18 z-40 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 py-3 select-none transition-all duration-200 overflow-visible">
+          {/* Top Purple Squircle Button */}
+          <button
+            type="button"
+            onClick={() => handleSelectTab('inicio')}
+            className="w-10 h-10 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center shadow-sm cursor-pointer transition-transform active:scale-95 mb-4 shrink-0"
+            title="Kongre - Panorama General"
+          >
+            <LayoutGrid className="w-5 h-5" />
+          </button>
 
-            {/* Global Search Bar (Cmd + K / Ctrl + K) */}
-            <div className="flex-1 max-w-md mx-1 sm:mx-4">
-              <button
-                onClick={onOpenSearchModal}
-                className="w-full flex items-center justify-between px-3 py-1.5 sm:py-2 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 border border-slate-200/80 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-normal transition-all group cursor-pointer shadow-2xs hover:border-indigo-300"
-                title="Buscador global rápido (Cmd + K / Ctrl + K)"
-              >
-                <div className="flex items-center gap-2 truncate">
-                  <Search className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors shrink-0" />
-                  <span className="truncate text-slate-500 dark:text-slate-300 group-hover:text-slate-800 dark:group-hover:text-white">
-                    Buscar publicador, territorio, discurso...
-                  </span>
-                </div>
-                <div className="hidden sm:flex items-center gap-1 shrink-0 pl-2">
-                  <kbd className="px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded shadow-2xs">
-                    Ctrl K
-                  </kbd>
-                </div>
-              </button>
-            </div>
+          {/* Vertical Categories Stack */}
+          <div className="flex-1 w-full flex flex-col items-center gap-2 overflow-visible py-1">
+            {categoriesList.map((cat, idx) => {
+              const Icon = cat.icon;
+              const isCatActive = cat.tabIds.includes(activeTab);
+              const isHovered = hoveredCategory === cat.id;
+              const hasSubItems = cat.items && cat.items.length > 0;
+              const isNearBottom = idx >= 4;
 
-            {/* Quick Tools & Session Controls */}
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-              {/* Conflict quick alert button */}
-              {conflicts.length > 0 ? (
-                <button
-                  onClick={onOpenConflictsModal}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100 transition-colors text-xs font-bold shadow-xs animate-pulse"
-                  title="Ver conflictos detectados"
+              return (
+                <div
+                  key={cat.id}
+                  className="relative w-full flex justify-center"
+                  onMouseEnter={() => handleMouseEnterCategory(cat.id)}
+                  onMouseLeave={handleMouseLeaveCategory}
                 >
-                  <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600" />
-                  <span>{conflicts.length}</span>
-                  <span className="hidden md:inline">{conflicts.length === 1 ? 'conflicto' : 'cruces'}</span>
-                </button>
-              ) : (
-                <div className="hidden 2xl:flex items-center gap-1 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>0 cruces</span>
-                </div>
-              )}
-
-              {/* Quick Hall Screen (Kiosk) */}
-              {onOpenKioskModal && (
-                <button
-                  onClick={onOpenKioskModal}
-                  className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-800 text-xs font-bold transition-colors border border-indigo-200"
-                  title="Abrir Pantalla Kiosco para monitores del Salón del Reino"
-                >
-                  <Tv className="w-4 h-4 text-indigo-600" />
-                  <span className="hidden lg:inline">Pantalla Salón</span>
-                </button>
-              )}
-
-              {/* Quick Stage Timer */}
-              {onOpenTimerModal && (
-                <button
-                  onClick={onOpenTimerModal}
-                  className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors shadow-xs"
-                  title="Abrir Cronómetro oficial de Presidencia (Modo Atril)"
-                >
-                  <Timer className="w-4 h-4 text-amber-400" />
-                  <span className="hidden lg:inline">Modo Atril</span>
-                </button>
-              )}
-
-              {/* Quick Session Lock button if PIN is set */}
-              {isPinEnabled && (
-                <button
-                  onClick={lockSession}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 text-xs font-semibold border border-slate-200 hover:border-rose-300 transition-colors cursor-pointer shadow-2xs"
-                  title="Bloquear sesión ahora (Salón del Reino)"
-                >
-                  <Lock className="w-3.5 h-3.5 text-slate-600" />
-                  <span className="hidden xl:inline">Bloquear</span>
-                </button>
-              )}
-
-              {/* Cloud Sync Indicator */}
-              <div className="hidden xl:flex items-center text-xs font-medium">
-                {syncStatus === 'synced' && (
-                  <span className="flex items-center gap-1 text-slate-600" title="Sincronizado con Firebase Firestore">
-                    <CloudCheck className="w-4 h-4 text-emerald-600" />
-                  </span>
-                )}
-                {syncStatus === 'saving' && (
-                  <span className="flex items-center gap-1 text-indigo-600 animate-pulse" title="Guardando cambios...">
-                    <CloudUpload className="w-4 h-4" />
-                  </span>
-                )}
-                {syncStatus === 'offline' && (
-                  <span className="flex items-center gap-1 text-slate-500" title="Guardado localmente en este dispositivo">
-                    <WifiOff className="w-4 h-4 text-amber-500" />
-                  </span>
-                )}
-              </div>
-
-              {/* PWA Install Button */}
-              <PWAInstallButton />
-
-              {/* Theme Toggle Button (Light / Dark) */}
-              <button
-                type="button"
-                onClick={toggleTheme}
-                className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer select-none"
-                title={isDark ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
-              >
-                <span className="pointer-events-none flex items-center justify-center">
-                  {themeMode === 'light' ? (
-                    <Sun className="w-4 h-4 text-amber-500" />
-                  ) : themeMode === 'dark' ? (
-                    <Moon className="w-4 h-4 text-indigo-400" />
-                  ) : (
-                    <Tv className="w-4 h-4 text-emerald-400" />
-                  )}
-                </span>
-              </button>
-
-              {/* Welcome / Registration Landing Portal Button */}
-              {onOpenWelcomeLanding && (
-                <button
-                  onClick={onOpenWelcomeLanding}
-                  className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors cursor-pointer border border-slate-200 dark:border-slate-700"
-                  title="Abrir página de inicio, bienvenida y registro de la congregación"
-                >
-                  <Building2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                  <span>Portal</span>
-                </button>
-              )}
-
-              {/* Invitation Manager Button (Elders/Coordinator) */}
-              {onOpenInviteManager && effectiveRoleInfo.canModifySettings && (
-                <button
-                  onClick={onOpenInviteManager}
-                  className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:hover:bg-indigo-900 dark:text-indigo-300 text-xs font-semibold transition-colors cursor-pointer border border-indigo-200 dark:border-indigo-800"
-                  title="Gestionar Invitaciones Teocráticas y Códigos QR"
-                >
-                  <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                  <span>Invitar QR</span>
-                </button>
-              )}
-
-              {/* Account Link Requests Approval Button (Elders/Coordinator) */}
-              {onOpenLinkRequestsModal && effectiveRoleInfo.canModifySettings && (
-                <button
-                  onClick={onOpenLinkRequestsModal}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
-                    pendingRequestsCount > 0
-                      ? 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300 dark:bg-amber-950/80 dark:hover:bg-amber-900 dark:text-amber-200 dark:border-amber-700 shadow-2xs'
-                      : 'hidden lg:flex bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
-                  }`}
-                  title="Solicitudes de vinculación de cuentas Google pendientes de aprobación"
-                >
-                  <UserCheck className={`w-3.5 h-3.5 ${pendingRequestsCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500'}`} />
-                  <span className="hidden md:inline">Vinculaciones</span>
-                  {pendingRequestsCount > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full bg-amber-600 text-white font-black text-[10px] animate-pulse">
-                      {pendingRequestsCount}
-                    </span>
-                  )}
-                </button>
-              )}
-
-              {/* Join Congregation with Code Button */}
-              {onOpenJoinModal && (
-                <button
-                  onClick={onOpenJoinModal}
-                  className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors cursor-pointer border border-slate-200 dark:border-slate-700"
-                  title="Unirse a la congregación con código o clave maestra"
-                >
-                  <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                  <span>Unirse</span>
-                </button>
-              )}
-
-              {/* Theocratic Role Pill Button */}
-              {onOpenRoleModal && (
-                <button
-                  onClick={onOpenRoleModal}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs hover:opacity-95 active:scale-95 ${effectiveRoleInfo.badgeColor}`}
-                  title={`Rol activo: ${effectiveRoleInfo.name}. Clic para cambiar de rol o gestionar permisos.`}
-                >
-                  <Shield className="w-3.5 h-3.5" />
-                  <span className="hidden lg:inline">{effectiveRoleInfo.shortName}</span>
-                  <ChevronDown className="w-3 h-3 opacity-80" />
-                </button>
-              )}
-
-              {/* Google Login / Profile */}
-              {user ? (
-                <div className="flex items-center gap-1.5 sm:gap-2 pl-1 sm:pl-2 border-l border-slate-200 dark:border-slate-700">
                   <button
                     type="button"
-                    onClick={() => setActiveTab('ajustes')}
-                    className="flex items-center gap-1.5 p-0.5 rounded-full hover:ring-2 hover:ring-indigo-500/30 transition-all cursor-pointer"
-                    title="Mi Perfil y Preferencias de Contacto"
+                    onClick={() => {
+                      handleSelectTab(cat.primaryTab);
+                      setHoveredCategory(null);
+                    }}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
+                      isCatActive
+                        ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
+                        : isHovered
+                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white'
+                        : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                    }`}
+                    title={cat.title}
                   >
-                    {(userProfile?.photoURL || user.photoURL) ? (
-                      <img
-                        src={(userProfile?.photoURL || user.photoURL) || undefined}
-                        alt={userProfile?.displayName || user.displayName || 'Usuario'}
-                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-slate-300 dark:border-slate-700 object-cover"
-                      />
-                    ) : (
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                        {((userProfile?.displayName || user.displayName || user.email || 'U').charAt(0)).toUpperCase()}
-                      </div>
+                    <Icon className="w-4 h-4 stroke-[1.8]" />
+
+                    {/* Badge count indicator */}
+                    {cat.badge && (
+                      <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
+                    )}
+
+                    {/* Active Chevron Indicator Badge (matching reference design) */}
+                    {isCatActive && (
+                      <span className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[10px] text-slate-400 shadow-xs z-20 pointer-events-none">
+                        <ChevronRight className="w-2.5 h-2.5" />
+                      </span>
                     )}
                   </button>
-                  <button
-                    onClick={signOutUser}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                    title="Cerrar sesión"
-                  >
-                    <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={signInWithGoogle}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-slate-900 text-white hover:bg-indigo-600 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs font-semibold transition-all shadow-xs"
-                >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Google</span>
-                </button>
-              )}
 
-              {/* Mobile Drawer Trigger (Hamburger) */}
-              <button
-                onClick={() => setIsMobileMenuOpen(true)}
-                className="md:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
-                title="Abrir menú teocrático"
-                aria-label="Abrir menú"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
+                  {/* Flyout Submenu Panel (Opens when pointer hovers over category) */}
+                  {isHovered && hasSubItems && (
+                    <div
+                      onMouseEnter={() => handleMouseEnterCategory(cat.id)}
+                      onMouseLeave={handleMouseLeaveCategory}
+                      className={`absolute left-full ml-2 w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 p-2 z-50 animate-in fade-in zoom-in-95 duration-100 ${
+                        isNearBottom ? 'bottom-0' : 'top-0'
+                      }`}
+                    >
+                      {/* Invisible hover bridge to prevent pointer exit */}
+                      <div className="absolute -left-3 top-0 bottom-0 w-3 bg-transparent" />
+
+                      {/* Header */}
+                      <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-7 h-7 rounded-lg ${cat.colorClass} flex items-center justify-center font-bold`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                              {cat.title}
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-medium">
+                              {cat.items.length} módulos
+                            </span>
+                          </div>
+                        </div>
+                        {cat.badge && (
+                          <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${cat.badgeColor || 'bg-amber-500 text-white'} animate-pulse`}>
+                            {cat.badge}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Modules list */}
+                      <div className="p-1 space-y-1 mt-1 max-h-[70vh] overflow-y-auto scrollbar-none">
+                        {cat.items.map((sub) => {
+                          const SubIcon = sub.icon;
+                          const isSubActive = activeTab === sub.id;
+                          return (
+                            <button
+                              key={sub.id}
+                              type="button"
+                              onClick={() => {
+                                handleSelectTab(sub.id);
+                                setHoveredCategory(null);
+                              }}
+                              className={`w-full flex items-start gap-2.5 p-2.5 rounded-xl text-left transition-all cursor-pointer ${
+                                isSubActive
+                                  ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-900 dark:text-indigo-200 font-bold border border-indigo-200/60 dark:border-indigo-800/60 shadow-2xs'
+                                  : 'hover:bg-slate-50 dark:hover:bg-slate-800/70 text-slate-700 dark:text-slate-200'
+                              }`}
+                            >
+                              <div
+                                className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+                                  isSubActive
+                                    ? 'bg-indigo-600 text-white shadow-2xs'
+                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                                }`}
+                              >
+                                <SubIcon className="w-3.5 h-3.5" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-1">
+                                  <span className="text-xs font-bold truncate">{sub.label}</span>
+                                  {sub.badge && (
+                                    <span
+                                      className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold shrink-0 ${
+                                        sub.badgeColor || 'bg-indigo-600 text-white'
+                                      }`}
+                                    >
+                                      {sub.badge}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5 font-normal">
+                                  {sub.description}
+                                </p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Fallback Tooltip for items without submenu */}
+                  {isHovered && !hasSubItems && (
+                    <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 flex items-center px-2.5 py-1 rounded-lg bg-slate-900 text-white text-[11px] font-medium whitespace-nowrap z-50 shadow-lg pointer-events-none">
+                      {cat.title}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Bottom Quick Settings & Role Indicator */}
+          <div className="mt-auto pt-2 flex flex-col items-center gap-2 border-t border-slate-100 dark:border-slate-800 w-full shrink-0">
+            <button
+              type="button"
+              onClick={() => handleSelectTab('ajustes')}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                activeTab === 'ajustes'
+                  ? 'bg-indigo-50 text-indigo-600'
+                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+              }`}
+              title="Ajustes de la Congregación"
+            >
+              <Settings className="w-4 h-4 stroke-[1.8]" />
+            </button>
+          </div>
+        </aside>
+      )}
+
+      {/* =========================================================================
+          2. TOP HEADER BAR (EXACT REFERENCE DESIGN)
+         ========================================================================= */}
+      <header className={`sticky top-0 z-30 w-full ${isSidebarVisible ? 'md:pl-16 lg:pl-18' : 'pl-0'} bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 transition-all duration-200`}>
+        <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6">
+          {/* Left: Panel Toggle & Congregation Name */}
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Sidebar toggle button (collapses/expands on desktop, opens drawer on mobile) */}
+            <button
+              type="button"
+              onClick={() => {
+                if (window.innerWidth < 768) {
+                  setIsMobileMenuOpen((prev) => !prev);
+                } else if (onToggleSidebar) {
+                  onToggleSidebar();
+                }
+              }}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              title={isSidebarVisible ? 'Ocultar barra lateral' : 'Mostrar barra lateral'}
+            >
+              <PanelLeft className="w-4 h-4" />
+            </button>
+
+            {/* Congregation title & current view */}
+            <div className="truncate">
+              <h1 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight truncate">
+                {displayCongregationName}
+              </h1>
+              <p className="text-[11px] text-slate-400 font-medium leading-none capitalize truncate mt-0.5">
+                {getCurrentTabSubtitle(activeTab)}
+              </p>
             </div>
           </div>
 
-          {/* DESKTOP & TABLET DEPARTMENTAL NAVIGATION BAR */}
-          <nav className="hidden md:flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-1 pb-1 text-xs">
-            <div className="flex items-center space-x-1 lg:space-x-1.5">
-              {/* Inicio / Panel de Resumen Tab */}
+          {/* Center: Segmented Capsule Switcher ([ Resumen ] [ Calendario ] [ Estadísticas ]) */}
+          <div className="hidden sm:inline-flex items-center p-1 rounded-full bg-slate-100/90 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => handleSelectTab('inicio')}
+              className={`px-4 py-1 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                activeTab === 'inicio'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold'
+                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
+              }`}
+            >
+              Resumen
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSelectTab('programacion')}
+              className={`px-4 py-1 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                activeTab === 'programacion'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold'
+                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
+              }`}
+            >
+              Calendario
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSelectTab('asistencia')}
+              className={`px-4 py-1 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                activeTab === 'asistencia'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold'
+                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
+              }`}
+            >
+              Estadísticas
+            </button>
+          </div>
+
+          {/* Right: Quick Utility Icons */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            {/* Search Icon */}
+            <button
+              type="button"
+              onClick={onOpenSearchModal}
+              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              title="Buscar (Ctrl+K)"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+
+            {/* Settings Icon */}
+            <button
+              type="button"
+              onClick={() => handleSelectTab('ajustes')}
+              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              title="Ajustes de la Congregación"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+
+            {/* Bell Notifications with orange dot */}
+            <button
+              type="button"
+              onClick={onOpenConflictsModal}
+              className="relative p-1.5 sm:p-2 rounded-xl text-amber-500 hover:text-amber-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              title="Notificaciones & Cruces"
+            >
+              <Bell className="w-4 h-4" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
+            </button>
+
+            {/* Session Lock Button (Green Lock) */}
+            <button
+              type="button"
+              onClick={lockSession}
+              className="p-1.5 sm:p-2 rounded-xl text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition cursor-pointer"
+              title="Bloquear sesión del Salón"
+            >
+              <Lock className="w-4 h-4" />
+            </button>
+
+            {/* Cloud Sync Status (Green Cloud) */}
+            <div className="p-1.5 sm:p-2 text-emerald-500" title="Sincronizado con Firebase Firestore">
+              <CloudCheck className="w-4 h-4" />
+            </div>
+
+            {/* App Móvil Capsule Pill Button */}
+            {onOpenQrModal ? (
               <button
-                onClick={() => handleSelectTab('inicio')}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold transition-all cursor-pointer ${
-                  activeTab === 'inicio'
-                    ? 'bg-indigo-600 text-white shadow-xs font-bold'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                }`}
+                type="button"
+                onClick={onOpenQrModal}
+                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-indigo-200 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-semibold hover:bg-indigo-100 transition cursor-pointer"
+                title="Abrir código QR y acceso App Móvil"
               >
-                <LayoutDashboard className="w-4 h-4" />
-                <span>Resumen</span>
+                <Smartphone className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span>App Móvil</span>
               </button>
+            ) : (
+              <div className="hidden lg:flex items-center">
+                <PWAInstallButton />
+              </div>
+            )}
 
-              {departments.map((dept) => {
-                const Icon = dept.icon;
-                const isDeptActive = dept.tabIds.includes(activeTab);
-                const isDropdownOpen = openDropdown === dept.id;
+            {/* Dark Mode Moon / Sun Toggle */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              title={isDark ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
+            >
+              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
+            </button>
 
-                // Total badges inside department
-                const deptBadgesCount = dept.items.reduce((acc, curr) => {
-                  return acc + (typeof curr.badge === 'number' ? curr.badge : 0);
-                }, 0);
+            {/* Logout Button */}
+            {user && (
+              <button
+                type="button"
+                onClick={signOutUser}
+                className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer"
+                title="Cerrar sesión"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            )}
 
-                return (
-                  <div key={dept.id} className="relative">
-                    <button
-                      onClick={() => toggleDropdown(dept.id)}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold transition-all cursor-pointer ${
-                        isDeptActive
-                          ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 shadow-2xs font-bold'
-                          : isDropdownOpen
-                          ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
-                          : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                      }`}
-                    >
-                      <Icon
-                        className={`w-4 h-4 ${
-                          isDeptActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'
-                        }`}
-                      />
-                      <span>{dept.title}</span>
-                      {deptBadgesCount > 0 && (
-                        <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white">
-                          {deptBadgesCount}
-                        </span>
-                      )}
-                      <ChevronDown
-                        className={`w-3.5 h-3.5 transition-transform duration-150 ${
-                          isDropdownOpen ? 'rotate-180 text-indigo-600' : 'text-slate-400'
-                        }`}
-                      />
-                    </button>
-
-                    {/* Department Dropdown Menu Panel */}
-                    {isDropdownOpen && (
-                      <div className="absolute left-0 top-full mt-1.5 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                        <div className="px-3.5 py-2 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                            <Icon className="w-3.5 h-3.5" />
-                            {dept.title}
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-medium">
-                            {dept.items.length} módulos
-                          </span>
-                        </div>
-
-                        <div className="p-1 space-y-0.5">
-                          {dept.items.map((item) => {
-                            const SubIcon = item.icon;
-                            const isItemActive = activeTab === item.id;
-                            return (
-                              <button
-                                key={item.id}
-                                onClick={() => handleSelectTab(item.id)}
-                                className={`w-full flex items-start gap-3 p-2.5 rounded-xl text-left transition-colors cursor-pointer ${
-                                  isItemActive
-                                    ? 'bg-indigo-50/90 dark:bg-indigo-950/60 text-indigo-950 dark:text-indigo-200 font-bold'
-                                    : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/60'
-                                }`}
-                              >
-                                <div
-                                  className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
-                                    isItemActive
-                                      ? 'bg-indigo-600 text-white'
-                                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                                  }`}
-                                >
-                                  <SubIcon className="w-4 h-4" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center justify-between gap-1">
-                                    <span className="text-xs font-semibold truncate leading-tight">
-                                      {item.label}
-                                    </span>
-                                    {item.badge !== undefined && (
-                                      <span
-                                        className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                                          item.badgeColor || 'bg-amber-500 text-white'
-                                        }`}
-                                      >
-                                        {item.badge}
-                                      </span>
-                                    )}
-                                  </div>
-                                  <p className="text-[11px] text-slate-500 truncate leading-snug">
-                                    {item.description}
-                                  </p>
-                                </div>
-                                {isItemActive && (
-                                  <Check className="w-4 h-4 text-indigo-600 shrink-0 self-center" />
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
-
-                        {/* Extra departmental helper row */}
-                        {dept.id === 'reuniones' && (
-                          <div className="mt-1 pt-1.5 border-t border-slate-100 px-2 flex items-center justify-between text-[11px]">
-                            {onOpenKioskModal && (
-                              <button
-                                onClick={() => {
-                                  setOpenDropdown(null);
-                                  onOpenKioskModal();
-                                }}
-                                className="flex-1 py-1.5 text-center font-medium text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors flex items-center justify-center gap-1"
-                              >
-                                <Tv className="w-3.5 h-3.5" />
-                                <span>Pantalla Salón</span>
-                              </button>
-                            )}
-                            {onOpenTimerModal && (
-                              <button
-                                onClick={() => {
-                                  setOpenDropdown(null);
-                                  onOpenTimerModal();
-                                }}
-                                className="flex-1 py-1.5 text-center font-medium text-amber-700 hover:bg-amber-50 rounded-lg transition-colors flex items-center justify-center gap-1"
-                              >
-                                <Timer className="w-3.5 h-3.5" />
-                                <span>Cronómetro</span>
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Current Active Tab Breadcrumb Badge */}
-            <div className="hidden lg:flex items-center gap-2 pr-2 text-slate-500">
-              <span className="text-[11px]">Módulo actual:</span>
-              <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200">
-                {activeDepartment?.shortTitle} ›{' '}
-                <span className="text-indigo-600">
-                  {departments
-                    .flatMap((d) => d.items)
-                    .find((i) => i.id === activeTab)?.label || activeTab}
+            {/* User Purple Avatar Circle (with Initial H or user name) */}
+            <button
+              type="button"
+              onClick={() => handleSelectTab('ajustes')}
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-xs cursor-pointer hover:ring-2 hover:ring-indigo-400/50 transition shrink-0 ml-1"
+              title={userProfile?.displayName || user?.displayName || user?.email || 'Héctor'}
+            >
+              {(userProfile?.photoURL || user?.photoURL) ? (
+                <img
+                  src={(userProfile?.photoURL || user?.photoURL) || undefined}
+                  alt="Usuario"
+                  className="w-full h-full rounded-full object-cover"
+                />
+              ) : (
+                <span>
+                  {((userProfile?.displayName || user?.displayName || user?.email || 'H').charAt(0)).toUpperCase()}
                 </span>
-              </span>
-            </div>
-          </nav>
+              )}
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* MOBILE FIXED BOTTOM NAVIGATION BAR */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 md:hidden shadow-lg pb-safe">
-        <div className="grid grid-cols-5 items-center h-16 px-1">
-          {/* 1. Programa */}
-          <button
-            onClick={() => setActiveTab('programacion')}
-            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-colors min-h-[48px] ${
-              activeTab === 'programacion' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Calendar className={`w-5 h-5 ${activeTab === 'programacion' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`} />
-            <span className="text-[10px] tracking-tight mt-1">Programa</span>
-          </button>
-
-          {/* 2. Discursos */}
-          <button
-            onClick={() => setActiveTab('discursos')}
-            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-colors min-h-[48px] ${
-              activeTab === 'discursos' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Mic className={`w-5 h-5 ${activeTab === 'discursos' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`} />
-            <span className="text-[10px] tracking-tight mt-1">Discursos</span>
-          </button>
-
-          {/* 3. Publicadores */}
-          <button
-            onClick={() => setActiveTab('publicadores')}
-            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-colors min-h-[48px] ${
-              activeTab === 'publicadores' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Users className={`w-5 h-5 ${activeTab === 'publicadores' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`} />
-            <span className="text-[10px] tracking-tight mt-1">Hermanos</span>
-          </button>
-
-          {/* 4. Asistencia */}
-          <button
-            onClick={() => setActiveTab('asistencia')}
-            className={`flex flex-col items-center justify-center py-1 rounded-xl transition-colors min-h-[48px] ${
-              activeTab === 'asistencia' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <BarChart3 className={`w-5 h-5 ${activeTab === 'asistencia' ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`} />
-            <span className="text-[10px] tracking-tight mt-1">Asistencia</span>
-          </button>
-
-          {/* 5. Menú Departamentos */}
-          <button
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="flex flex-col items-center justify-center py-1 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors relative min-h-[48px] cursor-pointer"
-          >
-            <Menu className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-            <span className="text-[10px] tracking-tight mt-1">Menú</span>
-            {conflicts.length > 0 && (
-              <span className="absolute top-1 right-3 w-2.5 h-2.5 bg-amber-500 rounded-full ring-2 ring-white dark:ring-slate-900 animate-pulse" />
-            )}
-          </button>
-        </div>
-      </nav>
-
-      {/* MOBILE BOTTOM SHEET / FULL DRAWER GROUPED BY DEPARTMENTS */}
+      {/* =========================================================================
+          3. FULL SLIDE-OVER DRAWER (STRICTLY MOBILE ONLY: md:hidden)
+         ========================================================================= */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex flex-col justify-end">
+        <div className="md:hidden fixed inset-0 z-50 flex">
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
-          {/* Drawer Sheet */}
-          <div className="relative bg-white dark:bg-slate-900 rounded-t-3xl max-h-[90vh] flex flex-col shadow-2xl border-t border-slate-200 dark:border-slate-800 z-10 animate-in slide-in-from-bottom duration-200">
-            {/* Grab handle */}
-            <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-3 shrink-0" />
-
-            {/* Header */}
-            <div className="px-5 pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <div className="min-w-0 pr-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                  Menú Teocrático
-                </span>
-                <h3 className="font-bold text-slate-900 dark:text-white text-base truncate">
-                  {displayCongregationName}
-                </h3>
+          {/* Drawer content */}
+          <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col z-10 border-r border-slate-200 dark:border-slate-800">
+            {/* Drawer Header */}
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold">
+                  <LayoutGrid className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                    {displayCongregationName}
+                  </h3>
+                  <p className="text-[11px] text-slate-400">Menú Teocrático de Navegación</p>
+                </div>
               </div>
               <button
+                type="button"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Quick Search Button in Drawer */}
-            <div className="px-4 pt-3 pb-1">
+            {/* Department Navigation List */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
               <button
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  onOpenSearchModal();
-                }}
-                className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium border border-slate-200 dark:border-slate-700 cursor-pointer"
-              >
-                <div className="flex items-center gap-2">
-                  <Search className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                  <span>Buscar cualquier publicador, bosquejo o fecha...</span>
-                </div>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 font-bold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
-                  Buscar
-                </span>
-              </button>
-            </div>
-
-            {/* Quick Hall Tools Row with Theme */}
-            <div className="px-4 pt-2">
-              <div className="grid grid-cols-4 gap-2">
-                {onOpenKioskModal && (
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      onOpenKioskModal();
-                    }}
-                    className="p-2 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800 flex flex-col items-center text-center gap-1 active:scale-95 transition-transform cursor-pointer"
-                  >
-                    <Tv className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                    <span className="text-[10px] font-bold text-indigo-900 dark:text-indigo-200">Pantalla</span>
-                  </button>
-                )}
-
-                {onOpenQrModal && (
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      onOpenQrModal();
-                    }}
-                    className="p-2 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-col items-center text-center gap-1 active:scale-95 transition-transform cursor-pointer"
-                  >
-                    <QrCode className="w-4 h-4 text-slate-700 dark:text-slate-300" />
-                    <span className="text-[10px] font-bold text-slate-800 dark:text-slate-200">QR</span>
-                  </button>
-                )}
-
-                {onOpenTimerModal && (
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      onOpenTimerModal();
-                    }}
-                    className="p-2 rounded-2xl bg-slate-900 dark:bg-slate-800 text-white flex flex-col items-center text-center gap-1 active:scale-95 transition-transform cursor-pointer"
-                  >
-                    <Timer className="w-4 h-4 text-amber-400" />
-                    <span className="text-[10px] font-bold text-white">Atril</span>
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    toggleTheme();
-                  }}
-                  className="p-2 rounded-2xl bg-amber-50 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 flex flex-col items-center text-center gap-1 active:scale-95 transition-transform cursor-pointer select-none"
-                >
-                  <span className="pointer-events-none flex flex-col items-center gap-1">
-                    {isDark ? (
-                      <Moon className="w-4 h-4 text-indigo-400" />
-                    ) : (
-                      <Sun className="w-4 h-4 text-amber-600" />
-                    )}
-                    <span className="text-[10px] font-bold text-amber-900 dark:text-slate-200">
-                      {isDark ? 'Oscuro' : 'Claro'}
-                    </span>
-                  </span>
-                </button>
-              </div>
-
-              {/* Install PWA Button in Mobile Drawer */}
-              <div className="pt-2 space-y-2">
-                <PWAInstallButton variant="drawer" />
-
-                {onOpenRoleModal && (
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      onOpenRoleModal();
-                    }}
-                    className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs font-bold transition-all shadow-xs ${effectiveRoleInfo.badgeColor}`}
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <Shield className="w-4 h-4 shrink-0" />
-                      <span className="truncate">Rol: {effectiveRoleInfo.name}</span>
-                    </div>
-                    <span className="text-[10px] bg-black/20 px-2 py-0.5 rounded-full shrink-0 ml-1">Cambiar</span>
-                  </button>
-                )}
-
-                {onOpenInviteManager && effectiveRoleInfo.canModifySettings && (
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      onOpenInviteManager();
-                    }}
-                    className="w-full flex items-center justify-between p-3 rounded-2xl text-xs font-bold transition-all shadow-xs bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800"
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <QrCode className="w-4 h-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
-                      <span className="truncate">Gestionar Invitaciones & QR</span>
-                    </div>
-                    <span className="text-[10px] bg-indigo-200 dark:bg-indigo-900 px-2 py-0.5 rounded-full shrink-0 ml-1">
-                      Generar
-                    </span>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Department Accordion Sections */}
-            <div className="overflow-y-auto p-4 space-y-4">
-              {/* Inicio / Resumen General Shortcut */}
-              <button
+                type="button"
                 onClick={() => handleSelectTab('inicio')}
-                className={`w-full flex items-center gap-3 p-3 rounded-2xl text-left transition-colors cursor-pointer ${
+                className={`w-full flex items-center gap-3 p-3 rounded-2xl font-bold text-xs transition-all cursor-pointer ${
                   activeTab === 'inicio'
-                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
-                    : 'bg-slate-50 dark:bg-slate-800/70 text-slate-800 dark:text-slate-200 border border-slate-200/60 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-100'
                 }`}
               >
-                <div
-                  className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                    activeTab === 'inicio'
-                      ? 'bg-white/20 text-white'
-                      : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'
-                  }`}
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span className="text-xs font-bold block truncate">Resumen de Congregación</span>
-                  <span className={`text-[10px] block truncate ${activeTab === 'inicio' ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'}`}>
-                    Panel general, salud e indicadores de la semana
-                  </span>
-                </div>
-                <ChevronRight className="w-4 h-4 opacity-60 shrink-0" />
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Panorama General (Resumen)</span>
               </button>
 
               {departments.map((dept) => {
                 const DeptIcon = dept.icon;
-                const isDeptActive = dept.tabIds.includes(activeTab);
-
                 return (
-                  <div key={dept.id} className="rounded-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-2xs">
-                    <div className="px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <DeptIcon
-                          className={`w-4 h-4 ${
-                            isDeptActive ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-500 dark:text-slate-400'
-                          }`}
-                        />
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-                          {dept.title}
-                        </span>
-                      </div>
-                      {isDeptActive && (
-                        <span className="text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/80 px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">
-                          Activo
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                      {dept.items.map((item) => {
-                        const ItemIcon = item.icon;
-                        const isItemActive = activeTab === item.id;
+                  <div key={dept.id} className="space-y-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 flex items-center gap-1.5">
+                      <DeptIcon className="w-3.5 h-3.5 text-indigo-500" />
+                      {dept.title}
+                    </span>
+                    <div className="space-y-1 pt-1">
+                      {dept.items.map((sub) => {
+                        const SubIcon = sub.icon;
+                        const isSubActive = activeTab === sub.id;
                         return (
                           <button
-                            key={item.id}
-                            onClick={() => handleSelectTab(item.id)}
-                            className={`w-full flex items-center justify-between p-3 text-left transition-colors min-h-[44px] cursor-pointer ${
-                              isItemActive
-                                ? 'bg-indigo-50/80 dark:bg-indigo-950/60 text-indigo-950 dark:text-indigo-200 font-bold'
-                                : 'text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                            key={sub.id}
+                            type="button"
+                            onClick={() => handleSelectTab(sub.id)}
+                            className={`w-full flex items-center justify-between p-2.5 rounded-xl text-left text-xs transition cursor-pointer ${
+                              isSubActive
+                                ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-bold'
+                                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                             }`}
                           >
-                            <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                              <div
-                                className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-                                  isItemActive
-                                    ? 'bg-indigo-600 text-white'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                                }`}
-                              >
-                                <ItemIcon className="w-3.5 h-3.5" />
-                              </div>
-                              <div className="truncate">
-                                <p className="text-xs font-semibold truncate leading-tight">
-                                  {item.label}
-                                </p>
-                                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate leading-snug">
-                                  {item.description}
-                                </p>
-                              </div>
+                            <div className="flex items-center gap-2.5 truncate">
+                              <SubIcon className="w-4 h-4 text-slate-400 shrink-0" />
+                              <span className="truncate">{sub.label}</span>
                             </div>
-
-                            <div className="flex items-center gap-1.5 shrink-0">
-                              {item.badge !== undefined && (
-                                <span
-                                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                                    item.badgeColor || 'bg-amber-500 text-white'
-                                  }`}
-                                >
-                                  {item.badge}
-                                </span>
-                              )}
-                              <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
-                            </div>
+                            {Boolean(sub.badge) && (
+                              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+                                {sub.badge}
+                              </span>
+                            )}
                           </button>
                         );
                       })}
@@ -1108,121 +985,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                 );
               })}
+            </div>
 
-              {/* Welcome Landing in Drawer */}
-              {onOpenWelcomeLanding && (
-                <button
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenWelcomeLanding();
-                  }}
-                  className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 font-bold text-xs border border-slate-700 shadow-xs cursor-pointer"
-                >
-                  <Building2 className="w-4 h-4 text-indigo-400" />
-                  <span>Portal de Inicio y Registro Teocrático</span>
-                </button>
-              )}
-
-              {/* Invitation & Join in Drawer */}
-              <div className="grid grid-cols-2 gap-2">
-                {onOpenJoinModal && (
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      onOpenJoinModal();
-                    }}
-                    className="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs cursor-pointer border border-slate-200 dark:border-slate-700"
-                  >
-                    <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                    <span>Unirse con Código</span>
-                  </button>
-                )}
-
-                {onOpenInviteManager && effectiveRoleInfo.canModifySettings && (
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      onOpenInviteManager();
-                    }}
-                    className="flex items-center justify-center gap-1.5 p-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-bold text-xs cursor-pointer border border-indigo-200 dark:border-indigo-800"
-                  >
-                    <QrCode className="w-3.5 h-3.5" />
-                    <span>Invitar con QR</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Status & Google Login in Drawer */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500 dark:text-slate-400 font-medium">Estado de Guardado:</span>
-                  {syncStatus === 'synced' && (
-                    <span className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400 font-bold">
-                      <CloudCheck className="w-4 h-4" /> En la nube (Firestore)
-                    </span>
-                  )}
-                  {syncStatus === 'saving' && (
-                    <span className="flex items-center gap-1 text-indigo-700 dark:text-indigo-400 font-bold animate-pulse">
-                      <CloudUpload className="w-4 h-4" /> Guardando...
-                    </span>
-                  )}
-                  {syncStatus === 'offline' && (
-                    <span className="flex items-center gap-1 text-amber-700 dark:text-amber-400 font-bold">
-                      <WifiOff className="w-4 h-4" /> Guardado localmente
-                    </span>
-                  )}
-                </div>
-
-                {user ? (
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700 text-xs">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        setActiveTab('ajustes');
-                      }}
-                      className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity min-w-0"
-                    >
-                      {(userProfile?.photoURL || user.photoURL) ? (
-                        <img
-                          src={(userProfile?.photoURL || user.photoURL) || undefined}
-                          alt={userProfile?.displayName || user.displayName || 'Usuario'}
-                          className="w-8 h-8 rounded-full border border-slate-300 dark:border-slate-700 object-cover shrink-0"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
-                          {((userProfile?.displayName || user.displayName || user.email || 'U').charAt(0)).toUpperCase()}
-                        </div>
-                      )}
-                      <div className="min-w-0">
-                        <p className="font-bold text-slate-900 dark:text-white truncate">
-                          {userProfile?.displayName || user.displayName || 'Coordinador'}
-                        </p>
-                        <p className="text-slate-500 dark:text-slate-400 text-[10px] truncate max-w-[170px]">
-                          {user.email}
-                        </p>
-                        <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold block">
-                          Mi Perfil & Contacto →
-                        </span>
-                      </div>
-                    </button>
-                    <button
-                      onClick={signOutUser}
-                      className="px-2.5 py-1 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg font-semibold cursor-pointer shrink-0 ml-2"
-                    >
-                      Salir
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={signInWithGoogle}
-                    className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-xs font-bold cursor-pointer"
-                  >
-                    <LogIn className="w-4 h-4" />
-                    <span>Conectar cuenta de Google</span>
-                  </button>
-                )}
-              </div>
+            {/* Drawer Footer */}
+            <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+              <span>Kongre Teocrático</span>
+              <button
+                type="button"
+                onClick={() => handleSelectTab('ajustes')}
+                className="font-semibold text-indigo-600 hover:underline"
+              >
+                Ajustes
+              </button>
             </div>
           </div>
         </div>

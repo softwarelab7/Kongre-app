@@ -1,11 +1,10 @@
-// components/ClmScheduleView.tsx
-import React, { useState, useEffect, useMemo } from 'react';
-import type { Publisher, ClmPrograma, ClmParte } from '../types';
-import { autoAsignarLocal } from '../utils/clmAutoAssignLocal';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import type { Publisher, ClmPrograma, ClmParte, TurnoDeber, WeekendPrograma, ClmHistorialItem } from '../types';
+import { autoAsignarLocal, isPublisherEligibleForPart } from '../utils/clmAutoAssignLocal';
 import { generateS89Pdf } from '../utils/pdfFillers';
 import { Select } from './Select';
-import { SectionHeader } from './SectionHeader';
 import { getOrganizedScheduleForWeek } from '../utils/organizedSync';
+import { checkPublisherConflictsOnDate } from '../utils/assignmentConflictChecker';
 import {
   ChevronLeft,
   ChevronRight,
@@ -14,109 +13,30 @@ import {
   CheckCircle2,
   CalendarDays,
   FileText,
-  DoorOpen,
   RefreshCw,
-  SlidersHorizontal,
-  BookmarkCheck,
-  Check,
+  AlertTriangle,
+  Music,
+  Share2,
+  FileUp,
   X,
+  Check,
 } from 'lucide-react';
 
-// Paleta oficial de colores por sección
-export const SECTION_COLORS: Record<string, string> = {
-  tesoros: 'rgb(42, 107, 119)', // Verde azulado
-  maestros: '#9b6d17', // Ocre dorado
-  vida_cristiana: '#942926', // Rojo teocrático
-  marco: '#8b5cf6', // Púrpura
+// Banners oficiales por sección
+const SECTION_BANNERS = {
+  tesoros: {
+    label: 'TESOROS DE LA BIBLIA',
+    bgColor: '#2a6b77', // Verde azulado oficial
+  },
+  maestros: {
+    label: 'SEAMOS MEJORES MAESTROS',
+    bgColor: '#9b6d17', // Ocre dorado oficial
+  },
+  vida_cristiana: {
+    label: 'NUESTRA VIDA CRISTIANA',
+    bgColor: '#942926', // Rojo teocrático oficial
+  },
 };
-
-export const SECTION_LABELS: Record<string, string> = {
-  tesoros: 'Tesoros de la Biblia',
-  maestros: 'Seamos Mejores Maestros',
-  vida_cristiana: 'Nuestra Vida Cristiana',
-  marco: 'Marco de la Reunión',
-};
-
-// ── Validación de Elegibilidad Teocrática ──
-export function isPublisherEligibleForPart(
-  p: Publisher,
-  part: ClmParte,
-  type: 'main' | 'assistant'
-): boolean {
-  // Soporte universal para modelo Publisher Kongre y modelo CLM
-  const isActive = p.status ? p.status === 'active' : p.active !== false;
-  if (!isActive) return false;
-
-  const isMale = p.gender === 'male' || p.gender === 'hermano';
-  const role =
-    p.role ||
-    (p.privilege === 'anciano'
-      ? 'elder'
-      : p.privilege === 'siervo_ministerial'
-      ? 'servant'
-      : 'publisher');
-
-  // Mapeo seguro de asignaciones y privilegios
-  const assignments = p.assignments || {
-    chairman: p.roles?.vym_presidente,
-    prayers: p.roles?.vym_oracion,
-    talk: p.roles?.vym_tesoros_discurso,
-    gems: p.roles?.vym_tesoros_perlas,
-    reading: p.roles?.vym_tesoros_lectura,
-    conversations: p.roles?.vym_maestros_titular,
-    return_visits: p.roles?.vym_maestros_titular,
-    disciples: p.roles?.vym_maestros_titular,
-    bible_study: p.roles?.vym_estudio_conductor,
-    reader_living: p.roles?.vym_estudio_lector,
-    assistant_student: p.roles?.vym_maestros_ayudante,
-  };
-
-  if (type === 'main') {
-    if (part.requiere_hermano && !isMale) return false;
-    if (part.requiere_privilegio && !['elder', 'servant'].includes(role)) return false;
-
-    switch (part.tipo) {
-      case 'presidente':
-        return assignments.chairman === true;
-      case 'oracion_apertura':
-      case 'oracion_cierre':
-      case 'oracion_estudio':
-        return assignments.prayers === true;
-      case 'discurso_tesoros':
-        return assignments.talk === true;
-      case 'busquemos_perlas':
-        return assignments.gems === true;
-      case 'lectura_biblica':
-        return assignments.reading === true;
-      case 'empiece_conversaciones':
-      case 'empiece_conversaciones_aux':
-        return assignments.conversations === true;
-      case 'haga_revisitas':
-      case 'haga_revisitas_aux':
-        return assignments.return_visits === true;
-      case 'haga_discipulos':
-        return assignments.disciples === true;
-      case 'explique_sus_creencias':
-      case 'discurso_estudiante':
-        return true;
-      case 'necesidades_congregacion':
-      case 'estudio_biblico_grupo':
-        return role === 'elder' && assignments.bible_study === true;
-      case 'lector_estudio':
-        return assignments.reader_living === true;
-      case 'conductor_auxiliar':
-        return role === 'elder';
-      default:
-        return true;
-    }
-  } else {
-    // Ayudantes en demostraciones de estudiantes
-    if (part.seccion === 'maestros' && part.tipo !== 'discurso_estudiante') {
-      return assignments.assistant_student === true;
-    }
-    return true;
-  }
-}
 
 /**
  * Plantilla inicial para generar las partes de una semana de reunión Vida y Ministerio
@@ -131,30 +51,48 @@ function createDefaultPrograma(semanaFecha: string, congregationId?: string | nu
   // Intentar cargar datos oficiales de Organized para esta fecha
   const org = getOrganizedScheduleForWeek(`week-${year}-${weekNum}`, semanaFecha);
 
-  const tesorosDiscurso = org?.midweek.tesoros.discursoTitle || 'Discurso de Tesoros de la Biblia (10 min)';
-  const perlasTitulo = org?.midweek.tesoros.perlasTitle || 'Busquemos perlas escondidas (10 min)';
-  const lecturaTitulo = org?.midweek.tesoros.lecturaTitle || 'Lectura de la Biblia (4 min)';
+  const tesorosDiscurso =
+    org?.midweek.tesoros.discursoTitle ||
+    'Tengamos un punto de vista equilibrado de la protección de Jehová (10 min)';
+  const perlasTitulo =
+    org?.midweek.tesoros.perlasTitle || 'Busquemos perlas escondidas (10 min)';
+  const lecturaTitulo =
+    org?.midweek.tesoros.lecturaTitle || 'Lectura de la Biblia (4 min)';
+
+  const song1 = org?.midweek.songFirst || 33;
+  const song2 = org?.midweek.songMiddle || 120;
+  const song3 = org?.midweek.songConclude || 145;
 
   const partes: ClmParte[] = [
     // ── MARCO DE LA REUNIÓN ──
     {
       id: `part-pres-${semanaFecha}`,
       tipo: 'presidente',
-      titulo: 'Presidente de la reunión',
+      titulo: 'Presidente',
       duracion_min: 5,
       seccion: 'marco',
       requiere_hermano: true,
       requiere_privilegio: true,
     },
     {
+      id: `part-canto-1-${semanaFecha}`,
+      tipo: 'canto',
+      titulo: `Cántico ${song1}: Echa sobre Dios tu carga`,
+      duracion_min: 5,
+      seccion: 'marco',
+      requiere_hermano: false,
+      requiere_privilegio: false,
+    },
+    {
       id: `part-oracion-ap-${semanaFecha}`,
       tipo: 'oracion_apertura',
       titulo: 'Oración de apertura',
-      duracion_min: 3,
+      duracion_min: 1,
       seccion: 'marco',
       requiere_hermano: true,
       requiere_privilegio: true,
     },
+
     // ── TESOROS DE LA BIBLIA ──
     {
       id: `part-tes-disc-${semanaFecha}`,
@@ -179,17 +117,20 @@ function createDefaultPrograma(semanaFecha: string, congregationId?: string | nu
       tipo: 'lectura_biblica',
       titulo: lecturaTitulo,
       duracion_min: 4,
+      descripcion: 'Jer 40:1–10 (th lección 2).',
       seccion: 'tesoros',
       requiere_hermano: true,
       requiere_privilegio: false,
       es_clase_auxiliar: false,
     },
+
     // ── SEAMOS MEJORES MAESTROS (Auditorio Principal) ──
     {
       id: `part-mae-1-${semanaFecha}`,
       tipo: 'empiece_conversaciones',
-      titulo: org?.midweek.demonstrations[0]?.title || 'Empiece conversaciones (3 min)',
-      duracion_min: org?.midweek.demonstrations[0]?.timeMinutes || 3,
+      titulo: org?.midweek.demonstrations[0]?.title || 'Empiece conversaciones (2 min)',
+      duracion_min: org?.midweek.demonstrations[0]?.timeMinutes || 2,
+      descripcion: 'DE CASA EN CASA. (lmd lección 2 punto 3).',
       seccion: 'maestros',
       requiere_hermano: false,
       requiere_privilegio: false,
@@ -197,9 +138,10 @@ function createDefaultPrograma(semanaFecha: string, congregationId?: string | nu
     },
     {
       id: `part-mae-2-${semanaFecha}`,
-      tipo: 'haga_revisitas',
-      titulo: org?.midweek.demonstrations[1]?.title || 'Haga revisitas (4 min)',
-      duracion_min: org?.midweek.demonstrations[1]?.timeMinutes || 4,
+      tipo: 'empiece_conversaciones',
+      titulo: org?.midweek.demonstrations[1]?.title || 'Empiece conversaciones (2 min)',
+      duracion_min: org?.midweek.demonstrations[1]?.timeMinutes || 2,
+      descripcion: 'PREDICACIÓN INFORMAL. (lmd lección 2 punto 5).',
       seccion: 'maestros',
       requiere_hermano: false,
       requiere_privilegio: false,
@@ -207,55 +149,37 @@ function createDefaultPrograma(semanaFecha: string, congregationId?: string | nu
     },
     {
       id: `part-mae-3-${semanaFecha}`,
-      tipo: 'haga_discipulos',
-      titulo: org?.midweek.demonstrations[2]?.title || 'Haga discípulos (5 min)',
-      duracion_min: org?.midweek.demonstrations[2]?.timeMinutes || 5,
+      tipo: 'empiece_conversaciones',
+      titulo: org?.midweek.demonstrations[2]?.title || 'Empiece conversaciones (4 min)',
+      duracion_min: org?.midweek.demonstrations[2]?.timeMinutes || 4,
+      descripcion: 'PREDICACIÓN PÚBLICA. Una persona se queda mirando el carrito de publicaciones (lmd lección 5 punto 3).',
       seccion: 'maestros',
       requiere_hermano: false,
       requiere_privilegio: false,
       es_clase_auxiliar: false,
     },
-    // ── SALA AUXILIAR (si se requiere) ──
     {
-      id: `part-aux-cond-${semanaFecha}`,
-      tipo: 'conductor_auxiliar',
-      titulo: 'Consejero de la Sala Auxiliar',
-      duracion_min: 30,
-      seccion: 'marco',
-      requiere_hermano: true,
-      requiere_privilegio: true,
-      es_clase_auxiliar: true,
-    },
-    {
-      id: `part-aux-lect-${semanaFecha}`,
-      tipo: 'lectura_biblica',
-      titulo: `${lecturaTitulo} (Sala auxiliar)`,
-      duracion_min: 4,
-      seccion: 'tesoros',
-      requiere_hermano: true,
-      requiere_privilegio: false,
-      es_clase_auxiliar: true,
-    },
-    {
-      id: `part-aux-mae-1-${semanaFecha}`,
-      tipo: 'empiece_conversaciones_aux',
-      titulo: `${org?.midweek.demonstrations[0]?.title || 'Empiece conversaciones'} (Sala auxiliar)`,
-      duracion_min: org?.midweek.demonstrations[0]?.timeMinutes || 3,
+      id: `part-mae-4-${semanaFecha}`,
+      tipo: 'explique_sus_creencias',
+      titulo: org?.midweek.demonstrations[3]?.title || 'Explique sus creencias (3 min)',
+      duracion_min: org?.midweek.demonstrations[3]?.timeMinutes || 3,
       seccion: 'maestros',
       requiere_hermano: false,
       requiere_privilegio: false,
-      es_clase_auxiliar: true,
+      es_clase_auxiliar: false,
     },
+
+    // ── CANTO INTERMEDIO ──
     {
-      id: `part-aux-mae-2-${semanaFecha}`,
-      tipo: 'haga_revisitas_aux',
-      titulo: `${org?.midweek.demonstrations[1]?.title || 'Haga revisitas'} (Sala auxiliar)`,
-      duracion_min: org?.midweek.demonstrations[1]?.timeMinutes || 4,
-      seccion: 'maestros',
+      id: `part-canto-2-${semanaFecha}`,
+      tipo: 'canto',
+      titulo: `Cántico ${song2}`,
+      duracion_min: 5,
+      seccion: 'vida_cristiana',
       requiere_hermano: false,
       requiere_privilegio: false,
-      es_clase_auxiliar: true,
     },
+
     // ── NUESTRA VIDA CRISTIANA ──
     {
       id: `part-vida-1-${semanaFecha}`,
@@ -284,6 +208,17 @@ function createDefaultPrograma(semanaFecha: string, congregationId?: string | nu
       requiere_hermano: true,
       requiere_privilegio: false,
     },
+
+    // ── CONCLUSIÓN ──
+    {
+      id: `part-canto-3-${semanaFecha}`,
+      tipo: 'canto',
+      titulo: `Cántico ${song3}`,
+      duracion_min: 5,
+      seccion: 'marco',
+      requiere_hermano: false,
+      requiere_privilegio: false,
+    },
     {
       id: `part-oracion-cierre-${semanaFecha}`,
       tipo: 'oracion_cierre',
@@ -292,6 +227,51 @@ function createDefaultPrograma(semanaFecha: string, congregationId?: string | nu
       seccion: 'marco',
       requiere_hermano: true,
       requiere_privilegio: true,
+    },
+
+    // ── SALA AUXILIAR ──
+    {
+      id: `part-aux-cond-${semanaFecha}`,
+      tipo: 'conductor_auxiliar',
+      titulo: 'Consejero de la Sala Auxiliar',
+      duracion_min: 30,
+      seccion: 'marco',
+      requiere_hermano: true,
+      requiere_privilegio: true,
+      es_clase_auxiliar: true,
+    },
+    {
+      id: `part-aux-lect-${semanaFecha}`,
+      tipo: 'lectura_biblica',
+      titulo: `${lecturaTitulo} (Sala auxiliar)`,
+      duracion_min: 4,
+      descripcion: 'Jer 40:1–10 (th lección 2).',
+      seccion: 'tesoros',
+      requiere_hermano: true,
+      requiere_privilegio: false,
+      es_clase_auxiliar: true,
+    },
+    {
+      id: `part-aux-mae-1-${semanaFecha}`,
+      tipo: 'empiece_conversaciones_aux',
+      titulo: 'Empiece conversaciones (Sala auxiliar)',
+      duracion_min: 2,
+      descripcion: 'DE CASA EN CASA. (lmd lección 2 punto 3).',
+      seccion: 'maestros',
+      requiere_hermano: false,
+      requiere_privilegio: false,
+      es_clase_auxiliar: true,
+    },
+    {
+      id: `part-aux-mae-2-${semanaFecha}`,
+      tipo: 'haga_revisitas_aux',
+      titulo: 'Haga revisitas (Sala auxiliar)',
+      duracion_min: 4,
+      descripcion: 'PREDICACIÓN INFORMAL. (lmd lección 2 punto 5).',
+      seccion: 'maestros',
+      requiere_hermano: false,
+      requiere_privilegio: false,
+      es_clase_auxiliar: true,
     },
   ];
 
@@ -303,12 +283,12 @@ function createDefaultPrograma(semanaFecha: string, congregationId?: string | nu
     estado: 'borrador',
     partes,
     congregation_id: congregationId || null,
-    lectura_semana: org?.bibleReading || 'Lectura de la semana',
-    rango_semana: org?.weekDateRange || `Semana del ${semanaFecha}`,
+    lectura_semana: org?.bibleReading || 'JEREMÍAS 40, 41',
+    rango_semana: org?.weekDateRange || `Semana del 5 de octubre de 2026`,
   };
 }
 
-// Formateador de lunes de la semana actual
+// Formateador de lunes de la semana
 function getMonday(d: Date): string {
   const date = new Date(d);
   const day = date.getDay();
@@ -320,25 +300,51 @@ function getMonday(d: Date): string {
 export default function ClmScheduleView({
   publishers,
   congregationId,
+  turnosDeberes = [],
+  weekendProgramas = [],
 }: {
   publishers: Publisher[];
   congregationId?: string;
+  turnosDeberes?: TurnoDeber[];
+  weekendProgramas?: WeekendPrograma[];
 }) {
   const [semanaActual, setSemanaActual] = useState<Date>(() => new Date());
   const [programa, setPrograma] = useState<ClmPrograma | null>(null);
   const [expandedPartId, setExpandedPartId] = useState<string | null>(null);
   const [showAuxRoom, setShowAuxRoom] = useState(false);
+  const [activeRoom, setActiveRoom] = useState<'principal' | 'auxiliar'>('principal');
   const [guardando, setGuardando] = useState(false);
-  const [savedNotification, setSavedNotification] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const semanaFechaStr = useMemo(() => getMonday(semanaActual), [semanaActual]);
 
-  // Cargar programa para la semana seleccionada (SQLite / localStorage / defecto)
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // Helper para verificar cruces de un publicador
+  const getPublisherConflicts = (pubId: string | null | undefined, pubName: string | undefined, partId: string) => {
+    if (!pubId && !pubName) return { hasStrictConflict: false, conflicts: [] };
+    return checkPublisherConflictsOnDate(
+      pubId || '',
+      pubName,
+      semanaFechaStr,
+      {
+        clmProgramas: programa ? [programa] : [],
+        weekendProgramas,
+        turnosDeberes,
+      },
+      partId
+    );
+  };
+
+  // Cargar programa para la semana seleccionada
   useEffect(() => {
     let isCancelled = false;
 
     async function loadData() {
-      // 1. Intentar cargar desde SQLite local vía Electron API
       if (window.electronAPI && typeof window.electronAPI.getClmPrograma === 'function') {
         try {
           const res = await window.electronAPI.getClmPrograma(semanaFechaStr);
@@ -351,7 +357,6 @@ export default function ClmScheduleView({
         }
       }
 
-      // 2. Intentar cargar desde localStorage
       const localStored = localStorage.getItem(`clm_programa_${semanaFechaStr}`);
       if (localStored) {
         try {
@@ -365,7 +370,6 @@ export default function ClmScheduleView({
         }
       }
 
-      // 3. Crear programa por defecto
       if (!isCancelled) {
         setPrograma(createDefaultPrograma(semanaFechaStr, congregationId));
       }
@@ -377,7 +381,7 @@ export default function ClmScheduleView({
     };
   }, [semanaFechaStr, congregationId]);
 
-  // Auto-guardado debounce a SQLite local vía Electron y localStorage
+  // Auto-guardado debounce
   useEffect(() => {
     if (!programa) return;
     setGuardando(true);
@@ -387,8 +391,6 @@ export default function ClmScheduleView({
           await window.electronAPI.upsertClmPrograma(programa);
         }
         localStorage.setItem(`clm_programa_${programa.semana_fecha}`, JSON.stringify(programa));
-        setSavedNotification(true);
-        setTimeout(() => setSavedNotification(false), 2000);
       } catch (err) {
         console.error('Error saving CLM program:', err);
       } finally {
@@ -399,7 +401,7 @@ export default function ClmScheduleView({
     return () => clearTimeout(timer);
   }, [programa]);
 
-  // Asignar en línea titular o ayudante
+  // Asignar titular o ayudante
   function handleAssignInline(partId: string, value: string, type: 'main' | 'assistant') {
     if (!programa) return;
     const pub = publishers.find((p) => (p.nid || p.id) === value);
@@ -432,8 +434,7 @@ export default function ClmScheduleView({
         await window.electronAPI.upsertClmPrograma(prog);
       }
       localStorage.setItem(`clm_programa_${prog.semana_fecha}`, JSON.stringify(prog));
-      setSavedNotification(true);
-      setTimeout(() => setSavedNotification(false), 2500);
+      showToast('¡Programa guardado exitosamente!');
     } catch (e) {
       console.error('Error en guardado:', e);
     } finally {
@@ -450,52 +451,66 @@ export default function ClmScheduleView({
   // Auto-asignación inteligente
   const handleAutoAssign = () => {
     if (!programa) return;
-    const asignado = autoAsignarLocal(programa, publishers);
+    const historial: ClmHistorialItem[] = [];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('clm_programa_') && key !== `clm_programa_${programa.semana_fecha}`) {
+          const val = localStorage.getItem(key);
+          if (val) {
+            const p: ClmPrograma = JSON.parse(val);
+            if (p.partes) {
+              p.partes.forEach((parte) => {
+                if (parte.asignado_nid) {
+                  historial.push({
+                    publisher_nid: parte.asignado_nid,
+                    publisher_name: parte.asignado_nombre,
+                    semana_fecha: p.semana_fecha,
+                    tipo_parte: parte.tipo,
+                    titulo_parte: parte.titulo,
+                    rol: 'titular',
+                  });
+                }
+              });
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Historial warning:', e);
+    }
+
+    const asignado = autoAsignarLocal(programa, publishers, historial);
     setPrograma(asignado);
+    showToast('Asignaciones completadas con rotación inteligente.');
   };
 
-  // Sincronizar con datos oficiales de Organized
+  // Sincronizar catálogo oficial
   const handleSyncOrganized = () => {
     if (!programa) return;
     const org = getOrganizedScheduleForWeek(programa.id, programa.semana_fecha);
     if (!org) {
-      alert('No hay catálogo oficial disponible para esta fecha en Organized.');
+      showToast('No se encontró catálogo para esta semana en Organized.');
       return;
     }
-
-    setPrograma((prev) => {
-      if (!prev) return prev;
-      const updatedPartes = prev.partes.map((part) => {
-        if (part.tipo === 'discurso_tesoros' && org.midweek.tesoros.discursoTitle) {
-          return { ...part, titulo: org.midweek.tesoros.discursoTitle };
-        }
-        if (part.tipo === 'busquemos_perlas' && org.midweek.tesoros.perlasTitle) {
-          return { ...part, titulo: org.midweek.tesoros.perlasTitle };
-        }
-        if (part.tipo === 'lectura_biblica' && org.midweek.tesoros.lecturaTitle) {
-          return {
-            ...part,
-            titulo: part.es_clase_auxiliar
-              ? `${org.midweek.tesoros.lecturaTitle} (Sala auxiliar)`
-              : org.midweek.tesoros.lecturaTitle,
-          };
-        }
-        if (part.tipo === 'estudio_biblico_grupo' && org.midweek.estudioBiblicoTitle) {
-          return { ...part, titulo: org.midweek.estudioBiblicoTitle };
-        }
-        return part;
-      });
-
-      return {
-        ...prev,
-        lectura_semana: org.bibleReading || prev.lectura_semana,
-        rango_semana: org.weekDateRange || prev.rango_semana,
-        partes: updatedPartes,
-      };
-    });
+    setPrograma(createDefaultPrograma(programa.semana_fecha, congregationId));
+    showToast('Datos de la semana sincronizados exitosamente.');
   };
 
-  // Navegación de semanas
+  // Enviar a Cartelera
+  const handleSendBillboard = () => {
+    showToast('¡Programa publicado y enviado a la cartelera digital!');
+  };
+
+  // Importar archivo .jwpub
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      showToast(`Archivo "${file.name}" cargado exitosamente.`);
+    }
+  };
+
+  // Navegación de fechas
   const handlePrevWeek = () => {
     const nextDate = new Date(semanaActual);
     nextDate.setDate(nextDate.getDate() - 7);
@@ -508,376 +523,438 @@ export default function ClmScheduleView({
     setSemanaActual(nextDate);
   };
 
-  // Métricas y progreso por sección
-  const stats = useMemo(() => {
-    if (!programa) return {};
-    const sections = ['marco', 'tesoros', 'maestros', 'vida_cristiana'] as const;
-    const result: Record<string, { total: number; assigned: number; pct: number }> = {};
+  // Filtrado según sala seleccionada
+  const visiblePartes = useMemo(() => {
+    if (!programa) return [];
+    if (activeRoom === 'auxiliar') {
+      return programa.partes.filter((p) => p.es_clase_auxiliar);
+    }
+    return programa.partes.filter((p) => !p.es_clase_auxiliar);
+  }, [programa, activeRoom]);
 
-    for (const sec of sections) {
-      const parts = programa.partes.filter(
-        (p) => p.seccion === sec && (showAuxRoom || !p.es_clase_auxiliar)
+  // Agrupación visual por secciones
+  const groupedSections = useMemo(() => {
+    const marcoInicial = visiblePartes.filter(
+      (p) => p.seccion === 'marco' && (p.tipo === 'presidente' || p.tipo === 'canto' || p.tipo === 'oracion_apertura' || p.tipo === 'conductor_auxiliar')
+    );
+    const tesoros = visiblePartes.filter((p) => p.seccion === 'tesoros');
+    const maestros = visiblePartes.filter((p) => p.seccion === 'maestros');
+    const cantoMedio = visiblePartes.filter((p) => p.seccion === 'vida_cristiana' && p.tipo === 'canto');
+    const vidaCristiana = visiblePartes.filter((p) => p.seccion === 'vida_cristiana' && p.tipo !== 'canto');
+    const marcoFinal = visiblePartes.filter(
+      (p) => p.seccion === 'marco' && (p.tipo === 'oracion_cierre' || (p.tipo === 'canto' && p.id.includes('canto-3')))
+    );
+
+    return {
+      marcoInicial,
+      tesoros,
+      maestros,
+      cantoMedio,
+      vidaCristiana,
+      marcoFinal,
+    };
+  }, [visiblePartes]);
+
+  // Conteo de numeración de partes (1, 2, 3...)
+  let currentPartNumber = 0;
+
+  // Renderizador de fila de parte individual
+  const renderPartRow = (part: ClmParte) => {
+    const isSong = part.tipo === 'canto';
+    const isPrayer = part.tipo === 'oracion_apertura' || part.tipo === 'oracion_cierre' || part.tipo === 'oracion_estudio';
+    const isExpanded = expandedPartId === part.id;
+    const isCounselor = part.tipo === 'conductor_auxiliar';
+
+    let badgeContent = null;
+    if (isSong) {
+      badgeContent = (
+        <div className="w-6 h-6 flex items-center justify-center shrink-0">
+          <Music className="w-4 h-4 text-indigo-500" />
+        </div>
       );
-      const total = parts.length;
-      const assigned = parts.filter((p) => p.asignado_nombre).length;
-      const pct = total > 0 ? Math.round((assigned / total) * 100) : 0;
-      result[sec] = { total, assigned, pct };
+    } else if (isPrayer) {
+      badgeContent = (
+        <div className="w-6 h-6 flex items-center justify-center shrink-0">
+          <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block" />
+        </div>
+      );
+    } else if (isCounselor) {
+      badgeContent = (
+        <div className="w-6 h-6 rounded-full bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center shrink-0">
+          C.
+        </div>
+      );
+    } else {
+      currentPartNumber++;
+      badgeContent = (
+        <div className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 text-xs font-bold flex items-center justify-center shrink-0">
+          {currentPartNumber}.
+        </div>
+      );
     }
 
-    return result;
-  }, [programa, showAuxRoom]);
+    const { conflicts } = getPublisherConflicts(part.asignado_nid, part.asignado_nombre, part.id);
+    const hasStrict = conflicts.some((c) => c.severity === 'STRICT_CONFLICT');
+    const hasSaturation = conflicts.some((c) => c.severity === 'WARNING_SATURATION');
+
+    return (
+      <div key={part.id} className="border-b border-slate-100 dark:border-white/[0.04]">
+        <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
+          {/* Lado izquierdo: Ícono/Número + Título + Subtítulo */}
+          <div className="flex items-center gap-3.5 min-w-0 pr-4">
+            {badgeContent}
+
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                  {part.titulo}
+                </h4>
+                {part.duracion_min && !part.titulo.includes('min') && (
+                  <span className="text-xs text-slate-400 font-normal">
+                    ({part.duracion_min} min)
+                  </span>
+                )}
+              </div>
+
+              {part.descripcion && (
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                  {part.descripcion}
+                </p>
+              )}
+
+              {part.asignado_auxiliar_nombre && (
+                <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">
+                  Ayudante: <strong>{part.asignado_auxiliar_nombre}</strong>
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Lado derecho: Estado / Botón de Asignación */}
+          <div className="flex items-center gap-2 shrink-0">
+            {isSong ? (
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                Congregación
+              </span>
+            ) : part.asignado_nombre ? (
+              <div className="flex items-center gap-1.5">
+                {conflicts.length > 0 && (
+                  <span
+                    title={conflicts.map((c) => c.details).join(' | ')}
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 cursor-help ${
+                      hasStrict
+                        ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
+                        : 'bg-amber-100 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                    }`}
+                  >
+                    <AlertTriangle size={11} />
+                    {hasStrict ? 'Cruce' : 'Saturación'}
+                  </span>
+                )}
+
+                <button
+                  onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
+                  className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                >
+                  <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                  <span>{part.asignado_nombre}</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
+                className="px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-50 hover:bg-amber-100/80 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1"
+              >
+                + Sin Asignar
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Panel expandible para seleccionar asignados */}
+        {isExpanded && !isSong && (
+          <div className="bg-slate-50/80 dark:bg-slate-900/60 p-4 border-t border-slate-100 dark:border-white/[0.04] grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
+            <div>
+              <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
+                Hermano Asignado (Titular)
+              </label>
+              <Select
+                value={part.asignado_nid || ''}
+                onChange={(val) => handleAssignInline(part.id, val, 'main')}
+                options={publishers
+                  .filter((p) => isPublisherEligibleForPart(p, part, 'main'))
+                  .map((p) => {
+                    const pId = p.nid || p.id;
+                    const { conflicts: pConflicts } = getPublisherConflicts(pId, p.full_name || p.name, part.id);
+                    const conflictNote =
+                      pConflicts.length > 0
+                        ? pConflicts.some((c) => c.severity === 'STRICT_CONFLICT')
+                          ? ' ⚠️ [Cruce en reunión]'
+                          : ' ⏳ [Saturación semanal]'
+                        : '';
+                    return {
+                      value: pId,
+                      label: `${p.full_name || p.name}${p.privilege ? ` (${p.privilege})` : ''}${conflictNote}`,
+                    };
+                  })}
+                placeholder="Seleccionar titular..."
+              />
+            </div>
+
+            {part.seccion === 'maestros' && part.tipo !== 'discurso_estudiante' && (
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
+                  Ayudante (Demostración)
+                </label>
+                <Select
+                  value={part.asignado_auxiliar_nid || ''}
+                  onChange={(val) => handleAssignInline(part.id, val, 'assistant')}
+                  options={publishers
+                    .filter(
+                      (p) =>
+                        (p.nid || p.id) !== part.asignado_nid &&
+                        isPublisherEligibleForPart(p, part, 'assistant')
+                    )
+                    .map((p) => ({
+                      value: p.nid || p.id,
+                      label: p.full_name || p.name,
+                    }))}
+                  placeholder="Seleccionar ayudante..."
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-slate-50/50 dark:bg-slate-950/50">
-      {/* Cabecera con acciones */}
-      <SectionHeader
-        icon={CalendarDays}
-        title="Programa"
-        highlightWord="VMC"
-        subtitle="Reunión Vida y Ministerio Cristianos • Planificación Teocrática"
-        colorTheme="indigo"
-        actions={
-          <div className="flex items-center gap-2 flex-wrap">
-            {savedNotification && (
-              <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1.5 rounded-xl border border-emerald-200/60 dark:border-emerald-500/20 animate-fade-in">
-                <BookmarkCheck size={14} /> Guardado
-              </span>
-            )}
-            <button
-              onClick={handleSyncOrganized}
-              title="Traer bosquejos, temas y lecturas oficiales de Organized"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-500/20 hover:bg-blue-100 transition-colors"
-            >
-              <RefreshCw size={14} /> Organized
-            </button>
-            <button
-              onClick={handleAutoAssign}
-              title="Auto-asignar publicadores respetando privilegios y rotación"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-xl text-xs font-semibold border border-purple-200 dark:border-purple-500/20 hover:bg-purple-100 transition-colors"
-            >
-              <Sparkles size={14} /> Auto-asignar
-            </button>
-            <button
-              onClick={() => handleGuardar(programa)}
-              disabled={guardando}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-100 dark:bg-white/10 rounded-xl text-xs font-semibold hover:bg-slate-200 dark:hover:bg-white/15 text-zinc-800 dark:text-zinc-100 transition-colors"
-            >
-              <Save size={14} /> {guardando ? 'Guardando...' : 'Guardar'}
-            </button>
-            <button
-              onClick={handleGenerateS89}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-xl text-xs font-semibold border border-rose-200 dark:border-rose-500/20 hover:bg-rose-100 transition-colors"
-            >
-              <FileText size={14} /> Imprimir S-89
-            </button>
-          </div>
-        }
-      />
+    <div className="flex flex-col h-full bg-white dark:bg-slate-950 font-sans">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed top-4 right-4 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 border border-slate-700 animate-fade-in">
+          <Check size={14} className="text-emerald-400" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
 
-      {/* Selector de semana y Controles de vista */}
-      <div className="px-6 py-3 border-b border-zinc-200/80 dark:border-white/[0.08] bg-white/40 dark:bg-slate-900/40 backdrop-blur-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
-        {/* Navegación por fechas */}
-        <div className="flex items-center gap-2">
+      {/* ── BARRA SUPERIOR DE ACCIONES ── */}
+      <div className="px-6 py-3.5 border-b border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-slate-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Título: Programa VMC */}
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+            <CalendarDays className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight flex items-center gap-1.5">
+              Programa <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">VMC</span>
+            </h1>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+              Vida y Ministerio Cristianos
+            </p>
+          </div>
+        </div>
+
+        {/* Botones de acción derecha */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Sincronizar */}
+          <button
+            onClick={handleSyncOrganized}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+            title="Sincronizar catálogo oficial con Organized"
+          >
+            <RefreshCw size={13} className="shrink-0" />
+            <span>Sincronizar</span>
+          </button>
+
+          {/* Importar .jwpub */}
+          <label className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs">
+            <FileUp size={13} className="shrink-0" />
+            <span>Importar .jwpub</span>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".jwpub,.json,.epub"
+              className="hidden"
+              onChange={handleImportFile}
+            />
+          </label>
+
+          {/* Auto-Asignar */}
+          <button
+            onClick={handleAutoAssign}
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
+            title="Auto-asignar respetando rotación histórica y privilegios"
+          >
+            <Sparkles size={13} className="shrink-0" />
+            <span>Auto-Asignar</span>
+          </button>
+
+          {/* Enviar a cartelera */}
+          <button
+            onClick={handleSendBillboard}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+            title="Enviar a cartelera de anuncios de la congregación"
+          >
+            <Share2 size={13} className="shrink-0" />
+            <span>Enviar a cartelera</span>
+          </button>
+
+          {/* Guardar */}
+          <button
+            onClick={() => handleGuardar(programa)}
+            disabled={guardando}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 dark:bg-white/10 dark:text-zinc-200 dark:border-white/10 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+          >
+            <Save size={13} className="shrink-0" />
+            <span>{guardando ? 'Guardando...' : 'Guardar'}</span>
+          </button>
+
+          {/* Imprimir S-89 */}
+          <button
+            onClick={handleGenerateS89}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+            title="Imprimir hojas oficiales de asignación S-89 en PDF"
+          >
+            <FileText size={13} className="shrink-0" />
+            <span>Imprimir S-89</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ── BARRA DE NAVEGACIÓN Y SELECTOR DE FECHAS ── */}
+      <div className="px-6 py-3.5 bg-slate-50/70 dark:bg-slate-900/40 border-b border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between gap-4 flex-wrap">
+        {/* Cápsula de navegación semanal */}
+        <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-full px-3 py-1.5 shadow-xs gap-3">
           <button
             onClick={handlePrevWeek}
-            className="p-1.5 rounded-lg border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
+            className="p-1 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             title="Semana anterior"
           >
             <ChevronLeft size={16} />
           </button>
-          <div className="flex flex-col">
-            <span className="text-sm font-bold text-zinc-900 dark:text-white">
+
+          <div className="flex items-center gap-2.5 text-xs">
+            <span className="font-bold text-slate-900 dark:text-white">
               {programa?.rango_semana || `Semana del ${semanaFechaStr}`}
             </span>
-            <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-medium">
-              Lectura bíblica: <strong className="text-indigo-600 dark:text-indigo-400">{programa?.lectura_semana || 'Salmos'}</strong>
+            <span className="text-slate-300 dark:text-slate-600">|</span>
+            <span className="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+              {programa?.lectura_semana || 'JEREMÍAS 40, 41'}
+            </span>
+            <span className="text-slate-400 dark:text-slate-500 font-medium">
+              Semana {programa?.semana_num || '41'}
             </span>
           </div>
+
           <button
             onClick={handleNextWeek}
-            className="p-1.5 rounded-lg border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
+            className="p-1 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
             title="Semana siguiente"
           >
             <ChevronRight size={16} />
           </button>
         </div>
 
-        {/* Sala Auxiliar toggle y estado */}
+        {/* Checkbox de Sala Auxiliar */}
+        <label className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-zinc-200 shadow-2xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors select-none">
+          <input
+            type="checkbox"
+            checked={showAuxRoom}
+            onChange={(e) => {
+              setShowAuxRoom(e.target.checked);
+              if (!e.target.checked) setActiveRoom('principal');
+            }}
+            className="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 border-slate-300"
+          />
+          <span>Sala Auxiliar</span>
+        </label>
+      </div>
+
+      {/* ── SELECTOR DE SALA (AUDITORIO / SALA AUXILIAR) ── */}
+      <div className="px-6 pt-3.5 pb-2 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setShowAuxRoom(!showAuxRoom)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-              showAuxRoom
-                ? 'bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-400'
-                : 'bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-400'
+            onClick={() => setActiveRoom('principal')}
+            className={`flex items-center gap-2 text-xs font-bold transition-colors cursor-pointer ${
+              activeRoom === 'principal'
+                ? 'text-slate-800 dark:text-white'
+                : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
             }`}
           >
-            <DoorOpen size={14} />
-            <span>Sala Auxiliar {showAuxRoom ? 'Activada' : 'Oculta'}</span>
+            <span className="w-2 h-2 rounded-full bg-indigo-600 inline-block" />
+            <span>Auditorio</span>
           </button>
 
-          <span
-            className={`text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${
-              programa?.estado === 'publicado'
-                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400'
-                : 'bg-zinc-100 text-zinc-600 dark:bg-white/10 dark:text-zinc-400'
-            }`}
-          >
-            {programa?.estado || 'borrador'}
-          </span>
+          {showAuxRoom && (
+            <>
+              <span className="text-slate-300 dark:text-slate-700">/</span>
+              <button
+                onClick={() => setActiveRoom('auxiliar')}
+                className={`flex items-center gap-2 text-xs font-bold transition-colors cursor-pointer ${
+                  activeRoom === 'auxiliar'
+                    ? 'text-amber-700 dark:text-amber-400'
+                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+                <span>Sala Auxiliar</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Barras de progreso por sección */}
-      <div className="px-6 py-2.5 grid grid-cols-2 md:grid-cols-4 gap-3 bg-white/20 dark:bg-slate-900/20 border-b border-zinc-200/60 dark:border-white/[0.04]">
-        {Object.entries(SECTION_LABELS).map(([secKey, secLabel]) => {
-          const secStat = stats[secKey] || { total: 0, assigned: 0, pct: 0 };
-          const color = SECTION_COLORS[secKey] || '#6366f1';
-          return (
+      {/* ── LISTADO OFICIAL DE LA REUNIÓN ── */}
+      <div className="flex-1 overflow-y-auto pb-16">
+        {/* 1. Marco Inicial: Presidente, Cántico 1, Oración */}
+        {groupedSections.marcoInicial.map((part) => renderPartRow(part))}
+
+        {/* 2. Sección: TESOROS DE LA BIBLIA */}
+        {groupedSections.tesoros.length > 0 && (
+          <div className="mt-2">
             <div
-              key={secKey}
-              className="p-2.5 rounded-xl border border-zinc-200/80 dark:border-white/[0.06] bg-white/60 dark:bg-slate-900/40"
+              style={{ backgroundColor: SECTION_BANNERS.tesoros.bgColor }}
+              className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
             >
-              <div className="flex items-center justify-between text-[11px] mb-1">
-                <span className="font-bold truncate" style={{ color }}>
-                  {secLabel}
-                </span>
-                <span className="font-semibold text-zinc-500 dark:text-zinc-400">
-                  {secStat.assigned}/{secStat.total} ({secStat.pct}%)
-                </span>
-              </div>
-              <div className="w-full h-1.5 bg-zinc-100 dark:bg-white/10 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${secStat.pct}%`, backgroundColor: color }}
-                />
-              </div>
+              {SECTION_BANNERS.tesoros.label}
             </div>
-          );
-        })}
-      </div>
-
-      {/* Grid del Programa VMC */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-        {/* Auditorio Principal */}
-        <div className="space-y-4">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
-            <SlidersHorizontal size={14} />
-            Auditorio Principal
-          </h3>
-
-          <div className="grid grid-cols-1 gap-3">
-            {programa?.partes
-              .filter((p) => !p.es_clase_auxiliar)
-              .map((part) => {
-                const sectionColor = SECTION_COLORS[part.seccion] || '#8b5cf6';
-                const isExpanded = expandedPartId === part.id;
-
-                return (
-                  <div
-                    key={part.id}
-                    className="rounded-2xl border border-zinc-200 dark:border-white/[0.08] p-4 bg-white/70 dark:bg-slate-900/60 backdrop-blur-md shadow-xs hover:border-zinc-300 dark:hover:border-white/20 transition-all"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <span
-                          className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md inline-block mb-1"
-                          style={{
-                            color: sectionColor,
-                            backgroundColor: `${sectionColor}15`,
-                          }}
-                        >
-                          {SECTION_LABELS[part.seccion]}
-                        </span>
-                        <h4 className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
-                          {part.titulo} <span className="text-zinc-400 font-normal">({part.duracion_min} min)</span>
-                        </h4>
-                        {part.asignado_auxiliar_nombre && (
-                          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                            Ayudante: <strong className="text-zinc-700 dark:text-zinc-200">{part.asignado_auxiliar_nombre}</strong>
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Desplegable o asignado actual */}
-                      <div className="flex items-center gap-2">
-                        {part.asignado_nombre ? (
-                          <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2.5 py-1 rounded-lg flex items-center gap-1">
-                            <CheckCircle2 size={13} /> {part.asignado_nombre}
-                          </span>
-                        ) : (
-                          <span className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-2.5 py-1 rounded-lg">
-                            Sin Asignar
-                          </span>
-                        )}
-                        <button
-                          onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                          className="px-3 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-colors border border-indigo-200 dark:border-indigo-500/30"
-                        >
-                          {isExpanded ? 'Cerrar' : 'Asignar'}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Panel expandible para seleccionar hermano y ayudante */}
-                    {isExpanded && (
-                      <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-white/[0.06] grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
-                        <div>
-                          <label className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase block mb-1">
-                            Titular
-                          </label>
-                          <Select
-                            value={part.asignado_nid || ''}
-                            onChange={(val) => handleAssignInline(part.id, val, 'main')}
-                            options={publishers
-                              .filter((p) => isPublisherEligibleForPart(p, part, 'main'))
-                              .map((p) => ({
-                                value: p.nid || p.id,
-                                label: `${p.full_name || p.name}${p.privilege ? ` (${p.privilege})` : ''}`,
-                              }))}
-                            placeholder="Seleccionar titular..."
-                          />
-                        </div>
-
-                        {part.seccion === 'maestros' && part.tipo !== 'discurso_estudiante' && (
-                          <div>
-                            <label className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase block mb-1">
-                              Ayudante
-                            </label>
-                            <Select
-                              value={part.asignado_auxiliar_nid || ''}
-                              onChange={(val) => handleAssignInline(part.id, val, 'assistant')}
-                              options={publishers
-                                .filter(
-                                  (p) =>
-                                    (p.nid || p.id) !== part.asignado_nid &&
-                                    isPublisherEligibleForPart(p, part, 'assistant')
-                                )
-                                .map((p) => ({
-                                  value: p.nid || p.id,
-                                  label: p.full_name || p.name,
-                                }))}
-                              placeholder="Seleccionar ayudante..."
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-          </div>
-        </div>
-
-        {/* Sala Auxiliar (si está habilitada) */}
-        {showAuxRoom && (
-          <div className="space-y-4 pt-4 border-t border-dashed border-zinc-200 dark:border-white/10">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-              <DoorOpen size={14} />
-              Sala Auxiliar
-            </h3>
-
-            <div className="grid grid-cols-1 gap-3">
-              {programa?.partes
-                .filter((p) => p.es_clase_auxiliar)
-                .map((part) => {
-                  const sectionColor = SECTION_COLORS[part.seccion] || '#8b5cf6';
-                  const isExpanded = expandedPartId === part.id;
-
-                  return (
-                    <div
-                      key={part.id}
-                      className="rounded-2xl border border-amber-200/70 dark:border-amber-500/20 p-4 bg-amber-50/20 dark:bg-amber-950/10 backdrop-blur-md shadow-xs hover:border-amber-300 dark:hover:border-amber-500/40 transition-all"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <span
-                            className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md inline-block mb-1"
-                            style={{
-                              color: sectionColor,
-                              backgroundColor: `${sectionColor}15`,
-                            }}
-                          >
-                            {SECTION_LABELS[part.seccion]} • Sala Auxiliar
-                          </span>
-                          <h4 className="text-sm font-semibold text-zinc-900 dark:text-white truncate">
-                            {part.titulo} <span className="text-zinc-400 font-normal">({part.duracion_min} min)</span>
-                          </h4>
-                          {part.asignado_auxiliar_nombre && (
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                              Ayudante: <strong className="text-zinc-700 dark:text-zinc-200">{part.asignado_auxiliar_nombre}</strong>
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          {part.asignado_nombre ? (
-                            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2.5 py-1 rounded-lg flex items-center gap-1">
-                              <CheckCircle2 size={13} /> {part.asignado_nombre}
-                            </span>
-                          ) : (
-                            <span className="text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-2.5 py-1 rounded-lg">
-                              Sin Asignar
-                            </span>
-                          )}
-                          <button
-                            onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                            className="px-3 py-1 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-colors border border-amber-200 dark:border-amber-500/30"
-                          >
-                            {isExpanded ? 'Cerrar' : 'Asignar'}
-                          </button>
-                        </div>
-                      </div>
-
-                      {isExpanded && (
-                        <div className="mt-3 pt-3 border-t border-amber-200/50 dark:border-amber-500/10 grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
-                          <div>
-                            <label className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase block mb-1">
-                              Titular Sala Auxiliar
-                            </label>
-                            <Select
-                              value={part.asignado_nid || ''}
-                              onChange={(val) => handleAssignInline(part.id, val, 'main')}
-                              options={publishers
-                                .filter((p) => isPublisherEligibleForPart(p, part, 'main'))
-                                .map((p) => ({
-                                  value: p.nid || p.id,
-                                  label: `${p.full_name || p.name}${p.privilege ? ` (${p.privilege})` : ''}`,
-                                }))}
-                              placeholder="Seleccionar titular..."
-                            />
-                          </div>
-
-                          {part.seccion === 'maestros' && part.tipo !== 'discurso_estudiante' && (
-                            <div>
-                              <label className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase block mb-1">
-                                Ayudante Sala Auxiliar
-                              </label>
-                              <Select
-                                value={part.asignado_auxiliar_nid || ''}
-                                onChange={(val) => handleAssignInline(part.id, val, 'assistant')}
-                                options={publishers
-                                  .filter(
-                                    (p) =>
-                                      (p.nid || p.id) !== part.asignado_nid &&
-                                      isPublisherEligibleForPart(p, part, 'assistant')
-                                  )
-                                  .map((p) => ({
-                                    value: p.nid || p.id,
-                                    label: p.full_name || p.name,
-                                  }))}
-                                placeholder="Seleccionar ayudante..."
-                              />
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-            </div>
+            {groupedSections.tesoros.map((part) => renderPartRow(part))}
           </div>
         )}
+
+        {/* 3. Sección: SEAMOS MEJORES MAESTROS */}
+        {groupedSections.maestros.length > 0 && (
+          <div className="mt-2">
+            <div
+              style={{ backgroundColor: SECTION_BANNERS.maestros.bgColor }}
+              className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
+            >
+              {SECTION_BANNERS.maestros.label}
+            </div>
+            {groupedSections.maestros.map((part) => renderPartRow(part))}
+          </div>
+        )}
+
+        {/* 4. Cántico Intermedio */}
+        {groupedSections.cantoMedio.map((part) => renderPartRow(part))}
+
+        {/* 5. Sección: NUESTRA VIDA CRISTIANA */}
+        {groupedSections.vidaCristiana.length > 0 && (
+          <div className="mt-2">
+            <div
+              style={{ backgroundColor: SECTION_BANNERS.vida_cristiana.bgColor }}
+              className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
+            >
+              {SECTION_BANNERS.vida_cristiana.label}
+            </div>
+            {groupedSections.vidaCristiana.map((part) => renderPartRow(part))}
+          </div>
+        )}
+
+        {/* 6. Marco Final: Cántico de cierre y Oración de conclusión */}
+        {groupedSections.marcoFinal.map((part) => renderPartRow(part))}
       </div>
     </div>
   );

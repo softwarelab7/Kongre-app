@@ -18,12 +18,17 @@ import { VisitaSuperintendenteTab } from './components/VisitaSuperintendenteTab'
 import { MemorialAsambleasTab } from './components/MemorialAsambleasTab';
 import { DiscursosPublicosTab } from './components/DiscursosPublicosTab';
 import { CarritosTab } from './components/CarritosTab';
+import { HospitalidadTab } from './components/HospitalidadTab';
 import { AsistenciaTab } from './components/AsistenciaTab';
 import { InformesServicioTab } from './components/InformesServicioTab';
 import { TarjetasS21Tab } from './components/TarjetasS21Tab';
+import { PrecursoresAuxiliaresTab } from './components/PrecursoresAuxiliaresTab';
+import { InformeSucursalS1Tab } from './components/InformeSucursalS1Tab';
 import { CuentasTab } from './components/CuentasTab';
 import { LiteraturaTab } from './components/LiteraturaTab';
 import { CleaningDutiesTab } from './components/CleaningDutiesTab';
+import { PanelElectricoTab } from './components/PanelElectricoTab';
+import { MantenimientoTab } from './components/MantenimientoTab';
 import { TableroAnunciosTab } from './components/TableroAnunciosTab';
 import { ConflictCenterTab } from './components/ConflictCenterTab';
 import { EquidadDashboardTab } from './components/EquidadDashboardTab';
@@ -116,6 +121,23 @@ const AppContent: React.FC = () => {
   const { setCurrentWeekId, territories, settings, accountLinkRequests } = useCongregation();
   const [isRegisterWizardOpen, setIsRegisterWizardOpen] = useState(false);
   const [isLinkRequestsModalOpen, setIsLinkRequestsModalOpen] = useState(false);
+  const [isSidebarVisible, setIsSidebarVisible] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('kongre_sidebar_visible') !== 'false';
+    } catch {
+      return true;
+    }
+  });
+
+  const handleToggleSidebar = () => {
+    setIsSidebarVisible((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('kongre_sidebar_visible', String(next));
+      } catch {}
+      return next;
+    });
+  };
 
   // Digital Territory Direct Link / QR scan via URL: ?territorio=01 or ?t=01
   const [digitalTerritoryNumber, setDigitalTerritoryNumber] = useState<string | null>(() => {
@@ -261,6 +283,8 @@ const AppContent: React.FC = () => {
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        isSidebarVisible={isSidebarVisible}
+        onToggleSidebar={handleToggleSidebar}
         onOpenConflictsModal={() => setIsConflictsModalOpen(true)}
         onOpenQrModal={() => setIsQrModalOpen(true)}
         onOpenTimerModal={() => setIsTimerModalOpen(true)}
@@ -274,7 +298,7 @@ const AppContent: React.FC = () => {
         onOpenWelcomeLanding={() => setShowWelcomeLanding(true)}
       />
 
-      <main className="flex-1 w-full mx-auto px-3 sm:px-6 lg:px-8 2xl:px-12 py-4 sm:py-6 pb-24 md:pb-8">
+      <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16 lg:pl-18' : 'pl-0'} mx-auto px-3 sm:px-6 lg:px-8 2xl:px-12 py-4 sm:py-6 pb-24 md:pb-8 transition-all duration-200`}>
         {!isTabAllowedForRole(effectiveRoleInfo.id, activeTab) ? (
           <AccessRestrictedView
             requiredRoleName={
@@ -334,18 +358,23 @@ const AppContent: React.FC = () => {
             {activeTab === 'programacion' && <ScheduleTab />}
             {activeTab === 's89' && <S89SlipsTab />}
             {activeTab === 'publicadores' && <PublishersTab />}
+            {activeTab === 'precursores_auxiliares' && <PrecursoresAuxiliaresTab />}
             {activeTab === 'grupos_servicio' && <GruposServicioTab />}
             {activeTab === 'territorios' && <TerritoriosTab />}
             {activeTab === 'visita_sc' && <VisitaSuperintendenteTab />}
             {activeTab === 'memorial_asambleas' && <MemorialAsambleasTab />}
             {activeTab === 'discursos' && <DiscursosPublicosTab />}
+            {activeTab === 'hospitalidad' && <HospitalidadTab />}
             {activeTab === 'carritos' && <CarritosTab />}
             {activeTab === 'asistencia' && <AsistenciaTab />}
+            {activeTab === 'informe_s1' && <InformeSucursalS1Tab />}
             {activeTab === 'informes_servicio' && <InformesServicioTab />}
             {activeTab === 'tarjetas_s21' && <TarjetasS21Tab />}
             {activeTab === 'cuentas' && <CuentasTab />}
             {activeTab === 'literatura' && <LiteraturaTab />}
             {activeTab === 'limpieza_deberes' && <CleaningDutiesTab />}
+            {activeTab === 'panel_electrico' && <PanelElectricoTab />}
+            {activeTab === 'mantenimiento' && <MantenimientoTab />}
             {activeTab === 'tablero_anuncios' && <TableroAnunciosTab />}
             {activeTab === 'conflictos' && (
               <ConflictCenterTab onNavigateToWeek={handleNavigateToWeek} />

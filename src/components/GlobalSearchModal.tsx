@@ -32,6 +32,10 @@ import {
   Sparkles,
   Phone,
   Tag,
+  Zap,
+  Wrench,
+  Target,
+  FileBarChart,
 } from 'lucide-react';
 
 interface GlobalSearchModalProps {
@@ -160,6 +164,15 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       action: () => onNavigate('publicadores'),
     },
     {
+      id: 'mod-precursores',
+      category: 'modulos',
+      categoryLabel: 'Secretaría',
+      title: 'Precursores Auxiliares (S-205)',
+      subtitle: 'Gestión y aprobación de solicitudes de 15 y 30 horas del comité',
+      icon: Target,
+      action: () => onNavigate('precursores_auxiliares'),
+    },
+    {
       id: 'mod-tarjetas-s21',
       category: 'modulos',
       categoryLabel: 'Secretaría',
@@ -185,6 +198,15 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       subtitle: 'Asistencia entre semana y fin de semana, gráficos y promedios',
       icon: BarChart3,
       action: () => onNavigate('asistencia'),
+    },
+    {
+      id: 'mod-informe-s1',
+      category: 'modulos',
+      categoryLabel: 'Secretaría',
+      title: 'Informe S-1 Sucursal (JW Hub)',
+      subtitle: 'Consolidación mensual de asistencia S-88 y predicación S-4 para la sucursal',
+      icon: FileBarChart,
+      action: () => onNavigate('informe_s1'),
     },
     {
       id: 'mod-cuentas-s26',
@@ -239,6 +261,24 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       subtitle: 'Sonido, video, microfonistas, acomodadores y aseo semanal',
       icon: Brush,
       action: () => onNavigate('limpieza_deberes'),
+    },
+    {
+      id: 'mod-panel-electrico',
+      category: 'modulos',
+      categoryLabel: 'Salón',
+      title: 'Tablero / Panel Eléctrico',
+      subtitle: 'Control de breakers, circuitos, modo reunión e impresión de rótulo',
+      icon: Zap,
+      action: () => onNavigate('panel_electrico'),
+    },
+    {
+      id: 'mod-mantenimiento',
+      category: 'modulos',
+      categoryLabel: 'Salón',
+      title: 'Fichas de Mantenimiento del Salón',
+      subtitle: 'Plan preventivo, extintores, climatización, cubiertas y tareas',
+      icon: Wrench,
+      action: () => onNavigate('mantenimiento'),
     },
     {
       id: 'mod-visita-sc',

@@ -56,5 +56,52 @@ export interface ClmPrograma {
   rango_semana?: string;
 }
 
+export interface WeekendParte {
+  id: string;
+  tipo: string;
+  titulo: string;
+  duracion_min?: number;
+  asignado_nid?: string | null;
+  asignado_nombre?: string;
+}
+
+export interface WeekendPrograma {
+  id: string;
+  semana_fecha: string; // Formato YYYY-MM-DD
+  estado?: 'borrador' | 'publicado' | 'cancelado';
+  orador_nombre?: string;
+  discurso_titulo?: string;
+  discurso_numero?: number;
+  congregacion_orador?: string;
+  presidente_nid?: string | null;
+  presidente_nombre?: string;
+  lector_atalaya_nid?: string | null;
+  lector_atalaya_nombre?: string;
+  oracion_cierre_nid?: string | null;
+  oracion_cierre_nombre?: string;
+  partes?: WeekendParte[];
+}
+
+export interface TurnoDeber {
+  id: string;
+  semana_fecha: string;
+  tipo_reunion: 'entre_semana' | 'fin_de_semana';
+  titulo: string;
+  tipo_deber?: 'sonido' | 'microfonos' | 'plataforma' | 'acomodador' | 'seguridad' | 'video' | 'zoom' | string;
+  asignado_nid?: string | null;
+  asignado_nombre?: string;
+}
+
+export interface ClmHistorialItem {
+  id?: string;
+  publisher_nid: string;
+  publisher_name?: string;
+  semana_fecha: string;
+  tipo_parte: ClmPartType | string;
+  titulo_parte?: string;
+  sala?: 'principal' | 'auxiliar';
+  rol?: 'titular' | 'ayudante';
+}
+
 // Re-exportar tipos adicionales de Kongre
 export * from './types/index';

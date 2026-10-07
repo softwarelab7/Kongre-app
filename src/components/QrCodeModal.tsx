@@ -14,10 +14,13 @@ export const QrCodeModal: React.FC<QrCodeModalProps> = ({ isOpen, onClose }) => 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [copied, setCopied] = useState(false);
 
-  const currentUrl = window.location.href.split('?')[0] + '?modo=tablero';
+  const currentUrl =
+    typeof window !== 'undefined' && window.location?.href
+      ? window.location.href.split('?')[0] + '?modo=tablero'
+      : '/?modo=tablero';
 
   useEffect(() => {
-    if (isOpen && canvasRef.current) {
+    if (isOpen && canvasRef.current && currentUrl) {
       QRCode.toCanvas(
         canvasRef.current,
         currentUrl,

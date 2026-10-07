@@ -23,6 +23,8 @@ export interface OrganizedWeekendData {
 
 export interface OrganizedWeekSchedule {
   weekKey: string; // e.g. "2026-W40"
+  startDate?: string; // e.g. "2026-09-28"
+  endDate?: string; // e.g. "2026-10-04"
   weekDateRange: string; // e.g. "28 de septiembre a 4 de octubre de 2026"
   bibleReading: string; // e.g. "Salmos 80 a 82"
   midweek: {
@@ -55,6 +57,8 @@ export interface OrganizedWeekSchedule {
 export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
   {
     weekKey: '2026-W40',
+    startDate: '2026-09-28',
+    endDate: '2026-10-04',
     weekDateRange: '28 de septiembre - 4 de octubre de 2026',
     bibleReading: 'Salmos 80 a 84',
     midweek: {
@@ -103,6 +107,8 @@ export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
   },
   {
     weekKey: '2026-W41',
+    startDate: '2026-10-05',
+    endDate: '2026-10-11',
     weekDateRange: '5 - 11 de octubre de 2026',
     bibleReading: 'Salmos 85 a 88',
     midweek: {
@@ -151,6 +157,8 @@ export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
   },
   {
     weekKey: '2026-W42',
+    startDate: '2026-10-12',
+    endDate: '2026-10-18',
     weekDateRange: '12 - 18 de octubre de 2026',
     bibleReading: 'Salmos 89 a 91',
     midweek: {
@@ -199,6 +207,8 @@ export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
   },
   {
     weekKey: '2026-W43',
+    startDate: '2026-10-19',
+    endDate: '2026-10-25',
     weekDateRange: '19 - 25 de octubre de 2026',
     bibleReading: 'Salmos 92 a 96',
     midweek: {
@@ -251,6 +261,8 @@ export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
   },
   {
     weekKey: '2026-W44',
+    startDate: '2026-10-26',
+    endDate: '2026-11-01',
     weekDateRange: '26 de octubre - 1 de noviembre de 2026',
     bibleReading: 'Salmos 97 a 101',
     midweek: {
@@ -299,6 +311,8 @@ export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
   },
   {
     weekKey: '2026-W45',
+    startDate: '2026-11-02',
+    endDate: '2026-11-08',
     weekDateRange: '2 - 8 de noviembre de 2026',
     bibleReading: 'Salmos 102 a 104',
     midweek: {
@@ -347,6 +361,8 @@ export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
   },
   {
     weekKey: '2026-W46',
+    startDate: '2026-11-09',
+    endDate: '2026-11-15',
     weekDateRange: '9 - 15 de noviembre de 2026',
     bibleReading: 'Salmo 105',
     midweek: {
@@ -395,6 +411,8 @@ export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
   },
   {
     weekKey: '2026-W47',
+    startDate: '2026-11-16',
+    endDate: '2026-11-22',
     weekDateRange: '16 - 22 de noviembre de 2026',
     bibleReading: 'Salmo 106',
     midweek: {
@@ -443,6 +461,8 @@ export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
   },
   {
     weekKey: '2026-W48',
+    startDate: '2026-11-23',
+    endDate: '2026-11-29',
     weekDateRange: '23 - 29 de noviembre de 2026',
     bibleReading: 'Salmos 107 y 108',
     midweek: {
@@ -492,61 +512,97 @@ export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
 ];
 
 /**
- * Encuentra un programa oficial por clave de semana o aproximación de fecha.
- * Garantiza que cualquier semana (incluso creadas a futuro o pasado) obtenga un bosquejo oficial.
+ * Encuentra un programa oficial de Organized por clave de semana o fecha.
+ * Garantiza coincidencia precisa por fechas ISO (ej. 2026-10-05), semana ISO o rango.
  */
 export function getOrganizedScheduleForWeek(weekId?: string, dateStr?: string): OrganizedWeekSchedule {
+  // 1. Coincidencia directa por clave oficial (ej. "2026-W41")
   if (weekId) {
     const exact = ORGANIZED_OFFICIAL_SCHEDULES.find((s) => s.weekKey === weekId);
     if (exact) return exact;
-
-    // Check if weekId has format YYYY-Www (e.g. 2026-W40)
-    const weekNumMatch = weekId.match(/W(\d+)/i);
-    if (weekNumMatch) {
-      const wNum = parseInt(weekNumMatch[1], 10);
-      const matchW = ORGANIZED_OFFICIAL_SCHEDULES.find((s) => s.weekKey.includes(`W${wNum}`));
-      if (matchW) return matchW;
-      const idx = Math.abs(wNum - 40 + ORGANIZED_OFFICIAL_SCHEDULES.length * 10) % ORGANIZED_OFFICIAL_SCHEDULES.length;
-      return ORGANIZED_OFFICIAL_SCHEDULES[idx];
-    }
   }
 
-  if (dateStr) {
-    const match = ORGANIZED_OFFICIAL_SCHEDULES.find((s) => {
-      return s.weekDateRange.includes(dateStr) || s.weekKey.includes(dateStr.slice(0, 7));
-    });
-    if (match) return match;
+  // 2. Extraer fecha ISO (YYYY-MM-DD) de weekId (ej. "week-2026-10-05" -> "2026-10-05") o de dateStr
+  const extractedDate =
+    (weekId ? weekId.match(/\d{4}-\d{2}-\d{2}/)?.[0] : null) ||
+    (dateStr ? dateStr.match(/\d{4}-\d{2}-\d{2}/)?.[0] : null);
 
-    // Approximate week number from date
+  if (extractedDate) {
+    // Coincidencia exacta con fecha de inicio o fin
+    const exactDateMatch = ORGANIZED_OFFICIAL_SCHEDULES.find(
+      (s) => s.startDate === extractedDate || s.endDate === extractedDate
+    );
+    if (exactDateMatch) return exactDateMatch;
+
+    // Coincidencia dentro del rango de la semana (startDate <= extractedDate <= endDate)
+    const rangeMatch = ORGANIZED_OFFICIAL_SCHEDULES.find(
+      (s) => Boolean(s.startDate && s.endDate && s.startDate <= extractedDate && extractedDate <= s.endDate)
+    );
+    if (rangeMatch) return rangeMatch;
+
+    // Cálculo matemático exacto de la semana ISO (UTC)
     try {
-      const d = new Date(dateStr);
-      if (!isNaN(d.getTime())) {
-        const startOfYear = new Date(d.getFullYear(), 0, 1);
-        const pastDays = Math.floor((d.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
-        const weekNum = Math.ceil((pastDays + startOfYear.getDay() + 1) / 7);
-        const matchW = ORGANIZED_OFFICIAL_SCHEDULES.find((s) => s.weekKey.includes(`W${weekNum}`));
-        if (matchW) return matchW;
-        const idx = Math.abs(weekNum) % ORGANIZED_OFFICIAL_SCHEDULES.length;
-        return ORGANIZED_OFFICIAL_SCHEDULES[idx];
-      }
+      const parts = extractedDate.split('-').map(Number);
+      const d = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+      const dayNum = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+
+      const matchW = ORGANIZED_OFFICIAL_SCHEDULES.find((s) => s.weekKey.includes(`W${weekNo}`));
+      if (matchW) return matchW;
+
+      // Si está fuera de rango de las 9 semanas definidas, cicla de forma armónica
+      const idx = Math.abs(weekNo - 40 + ORGANIZED_OFFICIAL_SCHEDULES.length * 10) % ORGANIZED_OFFICIAL_SCHEDULES.length;
+      return ORGANIZED_OFFICIAL_SCHEDULES[idx];
     } catch {
-      // fallback below
+      // fallback
     }
   }
 
-  return ORGANIZED_OFFICIAL_SCHEDULES[0];
+  // 3. Coincidencia por texto de fecha en español si existe
+  if (dateStr) {
+    const match = ORGANIZED_OFFICIAL_SCHEDULES.find((s) => s.weekDateRange.includes(dateStr));
+    if (match) return match;
+  }
+
+  // 4. Fallback al programa oficial de la semana en curso (2026-W41)
+  return ORGANIZED_OFFICIAL_SCHEDULES[1] || ORGANIZED_OFFICIAL_SCHEDULES[0];
 }
 
 /**
- * Verifica si una semana necesita enriquecimiento automático del programa oficial.
+ * Verifica rigurosamente si una semana carece de datos oficiales de Organized
+ * (tanto en la reunión entre semana como en la de fin de semana).
  */
 export function isWeekNeedingOrganizedSync(week: WeekSchedule): boolean {
   if (!week) return false;
-  if (!week.midweek?.bibleReading) return true;
-  if (!week.midweek?.songFirst || !week.weekend?.openingSong) return true;
-  if (week.midweek.tesoros?.discurso?.title?.includes('Discurso de Tesoros de la Biblia (10 mins)')) return true;
-  if (week.weekend?.publicTalkTheme === '¿Quién es el Dios verdadero y qué espera de nosotros?') return true;
-  if (!week.weekend?.watchtowerTheme) return true;
+
+  // 1. Verificación Entre Semana:
+  if (!week.midweek?.bibleReading || week.midweek.bibleReading.trim() === '') return true;
+  if (!week.midweek?.songFirst || !week.midweek?.songMiddle || !week.midweek?.songConclude) return true;
+  
+  const discTitle = week.midweek.tesoros?.discurso?.title || '';
+  if (discTitle.includes('Discurso de Tesoros de la Biblia') || discTitle.trim() === '') return true;
+  
+  const perlasTitle = week.midweek.tesoros?.perlas?.title || '';
+  if (perlasTitle === 'Busquemos perlas escondidas (10 mins)' || perlasTitle.trim() === '') return true;
+  
+  const lectTitle = week.midweek.tesoros?.lecturaBiblia?.title || '';
+  if (lectTitle === 'Lectura de la Biblia (4 mins)' || lectTitle.trim() === '') return true;
+
+  // 2. Verificación Fin de Semana:
+  if (!week.weekend?.publicTalkOutlineNumber) return true;
+  
+  const talkTheme = week.weekend?.publicTalkTheme || '';
+  if (talkTheme === 'Discurso Público' || talkTheme === '¿Quién es el Dios verdadero y qué espera de nosotros?' || talkTheme.trim() === '') {
+    return true;
+  }
+  
+  const wtTheme = week.weekend?.watchtowerTheme || '';
+  if (!wtTheme || wtTheme === 'Estudio de La Atalaya' || wtTheme.trim() === '') return true;
+  
+  if (!week.weekend?.openingSong || !week.weekend?.middleSong || !week.weekend?.closingSong) return true;
+
   return false;
 }
 
@@ -556,7 +612,9 @@ export interface ApplyOrganizedOptions {
 }
 
 /**
- * Aplica los datos del programa oficial a una semana en el sistema Kongre
+ * Aplica los datos oficiales de Organized a una semana en Kongre,
+ * preservando los publicadores ya asignados y actualizando títulos teocráticos,
+ * lecturas, cánticos y bosquejos.
  */
 export function applyOrganizedToWeek(
   currentWeek: WeekSchedule,
@@ -581,40 +639,68 @@ export function applyOrganizedToWeek(
     }
 
     // Tesoros de la Biblia
-    updated.midweek.tesoros.discurso.title = organizedSchedule.midweek.tesoros.discursoTitle;
-    updated.midweek.tesoros.perlas.title = organizedSchedule.midweek.tesoros.perlasTitle;
-    updated.midweek.tesoros.lecturaBiblia.title = organizedSchedule.midweek.tesoros.lecturaTitle;
+    if (updated.midweek.tesoros) {
+      if (updated.midweek.tesoros.discurso) {
+        updated.midweek.tesoros.discurso.title = organizedSchedule.midweek.tesoros.discursoTitle;
+      }
+      if (updated.midweek.tesoros.perlas) {
+        updated.midweek.tesoros.perlas.title = organizedSchedule.midweek.tesoros.perlasTitle;
+      }
+      if (updated.midweek.tesoros.lecturaBiblia) {
+        updated.midweek.tesoros.lecturaBiblia.title = organizedSchedule.midweek.tesoros.lecturaTitle;
+      }
+    }
 
-    // Seamos mejores lectores y maestros
-    updated.midweek.maestros.items = organizedSchedule.midweek.demonstrations.map((d, idx) => ({
-      id: `mwb-demo-${Date.now()}-${idx}`,
-      title: d.title,
-      type: 'vym_maestros_titular',
-      timeMinutes: d.timeMinutes,
-      room: 'principal',
-      lessonNumber: d.lessonNumber,
-      status: 'pendiente',
-    }));
+    // Seamos mejores lectores y maestros (preservando asignaciones si existen)
+    const existingDemos = updated.midweek.maestros?.items || [];
+    updated.midweek.maestros.items = organizedSchedule.midweek.demonstrations.map((d, idx) => {
+      const existing = existingDemos[idx];
+      return {
+        id: existing?.id || `mwb-demo-${currentWeek.id}-${idx}`,
+        title: d.title,
+        type: 'vym_maestros_titular',
+        timeMinutes: d.timeMinutes,
+        room: existing?.room || 'principal',
+        lessonNumber: d.lessonNumber,
+        status: existing?.status || 'pendiente',
+        publisherId: existing?.publisherId || '',
+        assistantId: existing?.assistantId || '',
+        notes: existing?.notes,
+      };
+    });
 
-    // Nuestra Vida Cristiana
-    updated.midweek.vidaCristiana.items = organizedSchedule.midweek.vidaCristiana.map((v, idx) => ({
-      id: `mwb-vida-${Date.now()}-${idx}`,
-      title: v.title,
-      type: 'vym_vida_partes',
-      timeMinutes: v.timeMinutes,
-      status: 'pendiente',
-    }));
+    // Nuestra Vida Cristiana (preservando asignaciones si existen)
+    const existingVida = updated.midweek.vidaCristiana?.items || [];
+    const vidaItems = organizedSchedule.midweek.vidaCristiana.map((v, idx) => {
+      const existing = existingVida[idx];
+      return {
+        id: existing?.id || `mwb-vida-${currentWeek.id}-${idx}`,
+        title: v.title,
+        type: 'vym_vida_partes' as const,
+        timeMinutes: v.timeMinutes,
+        status: existing?.status || 'pendiente',
+        publisherId: existing?.publisherId || '',
+        notes: existing?.notes,
+      };
+    });
 
     // Estudio Bíblico de la Congregación
     if (organizedSchedule.midweek.estudioBiblicoTitle) {
-      updated.midweek.vidaCristiana.items.push({
-        id: `mwb-cbs-${Date.now()}`,
+      const existingCbs = existingVida.find(
+        (item) => item.id?.includes('cbs') || item.title?.toLowerCase().includes('estudio b')
+      );
+      vidaItems.push({
+        id: existingCbs?.id || `mwb-cbs-${currentWeek.id}`,
         title: organizedSchedule.midweek.estudioBiblicoTitle,
-        type: 'vym_vida_partes',
+        type: 'vym_vida_partes' as const,
         timeMinutes: 30,
-        status: 'pendiente',
+        status: existingCbs?.status || 'pendiente',
+        publisherId: existingCbs?.publisherId || '',
+        notes: existingCbs?.notes,
       });
     }
+
+    updated.midweek.vidaCristiana.items = vidaItems;
   }
 
   // 2. REUNIÓN DEL FIN DE SEMANA

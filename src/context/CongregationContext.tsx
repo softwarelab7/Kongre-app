@@ -36,7 +36,9 @@ import {
   LiteratureSpecialOrder,
   LiteratureGroupDistribution,
   LiteratureInventoryRecord,
+  AccountLinkRequest,
 } from '../types';
+import { TheocraticRole } from '../utils/rbac';
 import {
   INITIAL_PUBLISHERS,
   INITIAL_PREACHING_GROUPS,
@@ -66,6 +68,7 @@ import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganiz
 import { detectConflictsInWeek } from '../utils/conflictDetector';
 import { autoAssignWeek } from '../utils/autoAssigner';
 import { OFFICIAL_STUDENT_LESSONS } from '../utils/theocraticData';
+import { isCongregationIdString, getFriendlyCongregationName, sanitizeForFirestore } from '../utils/theocraticSecurity';
 
 interface CongregationContextType {
   publishers: Publisher[];
@@ -106,6 +109,8 @@ interface CongregationContextType {
   updateWeek: (week: WeekSchedule) => void;
   addNextWeek: () => void;
   copyWeekStructure: (fromWeekId: string, toWeekId: string) => void;
+  syncWeekWithOrganized: (weekId: string, scope?: 'all' | 'midweek' | 'weekend') => void;
+  syncAllWeeksWithOrganized: () => void;
   autoAssignCurrentWeek: () => void;
   autoAssignAllWeeksInMonth: (monthPrefix: string) => void;
   replaceAssignment: (
@@ -205,55 +210,40 @@ interface CongregationContextType {
   deleteCustomDuty: (id: string) => void;
 
   // Settings & Backup
-  updateSettings: (newSettings: Partial<CongregationSettings>) => void;
+  updateSettings: (newSettings: Partial<CongregationSettings>) => Promise<void> | void;
   exportBackupJSON: () => void;
   getBackupJSON: () => string;
   importBackupJSON: (jsonString: string) => boolean;
   publishersMap: Map<string, Publisher>;
   resetAllCongregationData: () => void;
+  restorePreviousRegistration: (congName?: string, coordName?: string, pin?: string) => Promise<void>;
+
+  // Account Link Requests (Vinculación de Cuentas de Google)
+  accountLinkRequests: AccountLinkRequest[];
+  createAccountLinkRequest: (
+    email: string,
+    brotherName: string,
+    personalPin: string,
+    role: string,
+    congregationId: string
+  ) => Promise<AccountLinkRequest>;
+  approveAccountLinkRequest: (
+    requestId: string,
+    reviewerEmail: string
+  ) => Promise<void>;
+  rejectAccountLinkRequest: (
+    requestId: string,
+    reviewerEmail: string,
+    reason?: string
+  ) => Promise<void>;
 }
 
 const LOCAL_STORAGE_KEY = 'teocratic_app_data_v1';
 
-// Purge legacy mock data once to ensure a clean slate for new congregation registration
-const PURGE_KEY = 'kongre_data_purged_fresh_start_v3';
-if (typeof window !== 'undefined' && localStorage.getItem(PURGE_KEY) !== 'true') {
-  const keysToClear = [
-    `${LOCAL_STORAGE_KEY}_publishers`,
-    `${LOCAL_STORAGE_KEY}_weeks`,
-    `${LOCAL_STORAGE_KEY}_groups`,
-    `${LOCAL_STORAGE_KEY}_duties`,
-    `${LOCAL_STORAGE_KEY}_settings`,
-    `${LOCAL_STORAGE_KEY}_outgoing_speakers`,
-    `${LOCAL_STORAGE_KEY}_field_service`,
-    `${LOCAL_STORAGE_KEY}_cart_locations`,
-    `${LOCAL_STORAGE_KEY}_cart_shifts`,
-    `${LOCAL_STORAGE_KEY}_notices`,
-    `${LOCAL_STORAGE_KEY}_monthly_reports`,
-    `${LOCAL_STORAGE_KEY}_territories`,
-    `${LOCAL_STORAGE_KEY}_circuit_visit`,
-    `${LOCAL_STORAGE_KEY}_transactions`,
-    `${LOCAL_STORAGE_KEY}_quarterly_audits`,
-    `${LOCAL_STORAGE_KEY}_memorial_plans`,
-    `${LOCAL_STORAGE_KEY}_assemblies`,
-    `${LOCAL_STORAGE_KEY}_literature_items`,
-    `${LOCAL_STORAGE_KEY}_special_orders`,
-    `${LOCAL_STORAGE_KEY}_group_distributions`,
-    `${LOCAL_STORAGE_KEY}_inventory_records`,
-    'kongre_has_entered_app',
-    'kongre_is_registered_congregation',
-    'kongre_theocratic_invitations_v1',
-    'kongre_user_roles_v1',
-    'kongre_device_sessions_v1',
-  ];
-  keysToClear.forEach((k) => localStorage.removeItem(k));
-  localStorage.setItem(PURGE_KEY, 'true');
-}
-
 const CongregationContext = createContext<CongregationContextType | null>(null);
 
 export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuth();
+  const { user, assignRoleToEmail } = useAuth();
 
   const [publishers, setPublishers] = useState<Publisher[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_publishers`);
@@ -287,8 +277,31 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   });
 
   const [settings, setSettings] = useState<CongregationSettings>(() => {
-    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_settings`);
-    return saved ? JSON.parse(saved) : INITIAL_SETTINGS;
+    try {
+      const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_settings`);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const rawName = parsed.congregationName;
+        const cleanName =
+          rawName && !isCongregationIdString(rawName)
+            ? rawName
+            : rawName
+            ? 'Congregación Central'
+            : '';
+        return {
+          ...INITIAL_SETTINGS,
+          ...parsed,
+          congregationName: cleanName,
+          conflictRules: {
+            ...INITIAL_SETTINGS.conflictRules,
+            ...(parsed.conflictRules || {}),
+          },
+        };
+      }
+    } catch {
+      // fallback
+    }
+    return INITIAL_SETTINGS;
   });
 
   const [outgoingSpeakers, setOutgoingSpeakers] = useState<OutgoingSpeakerAssignment[]>(() => {
@@ -370,6 +383,18 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_inventory_records`);
     return saved ? JSON.parse(saved) : INITIAL_LITERATURE_INVENTORY_RECORDS;
   });
+
+  const [accountLinkRequests, setAccountLinkRequests] = useState<AccountLinkRequest[]>(() => {
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_account_link_requests`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      `${LOCAL_STORAGE_KEY}_account_link_requests`,
+      JSON.stringify(accountLinkRequests)
+    );
+  }, [accountLinkRequests]);
 
   const [syncStatus, setSyncStatus] = useState<'synced' | 'saving' | 'offline' | 'error'>(
     user ? 'synced' : 'offline'
@@ -490,13 +515,13 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (docSnap.exists()) {
           const data = docSnap.data();
 
-          // If Firestore contains old mock data from previous demo sessions, reset it to clean state
-          if (
-            data.settings?.congregationName === 'Congregación El Olivar' ||
-            data.settings?.congregationName === 'Congregación Central' ||
-            data.settings?.isRegistered === false ||
-            !data.settings?.isRegistered
-          ) {
+          // If Firestore contains purely the legacy sample demo without real publishers, clean it
+          const isLegacyPureMock =
+            (data.settings?.congregationName === 'Congregación El Olivar' ||
+              data.settings?.congregationName === 'Congregación Central') &&
+            (!data.publishers || data.publishers.length === 0);
+
+          if (isLegacyPureMock) {
             setPublishers([]);
             setPreachingGroups([]);
             setOutgoingSpeakers([]);
@@ -534,7 +559,33 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           }
           if (data.preachingGroups) setPreachingGroups(data.preachingGroups);
           if (data.customDuties) setCustomDuties(data.customDuties);
-          if (data.settings) setSettings(data.settings);
+          if (data.settings) {
+            // If the congregation has a name or has publishers, or was previously registered, mark it registered
+            const isReg = Boolean(
+              data.settings.isRegistered ||
+              (data.settings.congregationName && data.settings.congregationName.trim() !== '') ||
+              (data.publishers && data.publishers.length > 0)
+            );
+            const rawName = data.settings.congregationName;
+            const cleanName =
+              rawName && !isCongregationIdString(rawName)
+                ? rawName
+                : rawName
+                ? 'Congregación Central'
+                : '';
+            const enrichedSettings: CongregationSettings = {
+              ...data.settings,
+              congregationName: cleanName,
+              isRegistered: isReg,
+              coordinatorEmail: data.settings.coordinatorEmail || user.email || '',
+              coordinatorName: data.settings.coordinatorName || user.displayName || 'Coordinador',
+            };
+            setSettings(enrichedSettings);
+            if (isReg) {
+              localStorage.setItem('kongre_is_registered_congregation', 'true');
+              localStorage.setItem('kongre_has_entered_app', 'true');
+            }
+          }
           if (data.outgoingSpeakers) setOutgoingSpeakers(data.outgoingSpeakers);
           if (data.fieldServiceMeetings) setFieldServiceMeetings(data.fieldServiceMeetings);
           if (data.cartLocations) setCartLocations(data.cartLocations);
@@ -551,10 +602,11 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           if (data.specialOrders) setSpecialOrders(data.specialOrders);
           if (data.groupDistributions) setGroupDistributions(data.groupDistributions);
           if (data.inventoryRecords) setInventoryRecords(data.inventoryRecords);
+          if (data.accountLinkRequests) setAccountLinkRequests(data.accountLinkRequests);
           setSyncStatus('synced');
         } else {
           // First time user logged in: write current state to Firestore
-          const initialPayload = {
+          const initialPayload = sanitizeForFirestore({
             publishers,
             weeks,
             preachingGroups,
@@ -576,8 +628,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             specialOrders,
             groupDistributions,
             inventoryRecords,
+            accountLinkRequests,
             updatedAt: new Date().toISOString(),
-          };
+          });
           setDoc(userDocRef, initialPayload, { merge: true })
             .then(() => setSyncStatus('synced'))
             .catch(err => {
@@ -617,13 +670,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     newLiteratureItems = literatureItems,
     newSpecialOrders = specialOrders,
     newGroupDistributions = groupDistributions,
-    newInventoryRecords = inventoryRecords
+    newInventoryRecords = inventoryRecords,
+    newAccountLinkRequests = accountLinkRequests
   ) => {
     if (!user) return;
     setSyncStatus('saving');
     try {
       const userDocRef = doc(db, 'users', user.uid, 'congregation_data', 'main');
-      await setDoc(userDocRef, {
+      const payload = sanitizeForFirestore({
         publishers: newPubs,
         weeks: newWeeks,
         preachingGroups: newGroups,
@@ -645,8 +699,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         specialOrders: newSpecialOrders,
         groupDistributions: newGroupDistributions,
         inventoryRecords: newInventoryRecords,
+        accountLinkRequests: newAccountLinkRequests,
         updatedAt: new Date().toISOString(),
-      }, { merge: true });
+      });
+      await setDoc(userDocRef, payload, { merge: true });
       setSyncStatus('synced');
     } catch (err) {
       console.error('Error syncing to Firestore:', err);
@@ -797,11 +853,38 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       nextMonday = new Date();
     }
 
-    const newWeek = createEmptyWeek(nextMonday, weeks.length);
+    const emptyWeek = createEmptyWeek(nextMonday, weeks.length);
+    const org = getOrganizedScheduleForWeek(emptyWeek.id, emptyWeek.midweek.date);
+    const newWeek = org
+      ? applyOrganizedToWeek(emptyWeek, org, { applyMidweek: true, applyWeekend: true })
+      : emptyWeek;
     const updated = [...weeks, newWeek];
     setWeeks(updated);
     setCurrentWeekId(newWeek.id);
     saveToFirestore(publishers, updated);
+  };
+
+  const syncWeekWithOrganized = (weekId: string, scope: 'all' | 'midweek' | 'weekend' = 'all') => {
+    const target = weeks.find((w) => w.id === weekId);
+    if (!target) return;
+    const org = getOrganizedScheduleForWeek(target.id, target.midweek.date);
+    if (!org) return;
+    const updatedWeek = applyOrganizedToWeek(target, org, {
+      applyMidweek: scope === 'all' || scope === 'midweek',
+      applyWeekend: scope === 'all' || scope === 'weekend',
+    });
+    const updatedWeeks = weeks.map((w) => (w.id === weekId ? updatedWeek : w));
+    setWeeks(updatedWeeks);
+    saveToFirestore(publishers, updatedWeeks);
+  };
+
+  const syncAllWeeksWithOrganized = () => {
+    const updatedWeeks = weeks.map((w) => {
+      const org = getOrganizedScheduleForWeek(w.id, w.midweek.date);
+      return org ? applyOrganizedToWeek(w, org) : w;
+    });
+    setWeeks(updatedWeeks);
+    saveToFirestore(publishers, updatedWeeks);
   };
 
   const copyWeekStructure = (fromWeekId: string, toWeekId: string) => {
@@ -1107,10 +1190,26 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     saveToFirestore(publishers, weeks, preachingGroups, updated);
   };
 
-  const updateSettings = (newSettings: Partial<CongregationSettings>) => {
-    const merged = { ...settings, ...newSettings };
+  const updateSettings = async (newSettings: Partial<CongregationSettings>) => {
+    const cleanCongName =
+      newSettings.congregationName !== undefined
+        ? isCongregationIdString(newSettings.congregationName)
+          ? 'Congregación Central'
+          : newSettings.congregationName.trim()
+        : settings.congregationName;
+
+    const merged: CongregationSettings = {
+      ...settings,
+      ...newSettings,
+      ...(newSettings.congregationName !== undefined ? { congregationName: cleanCongName } : {}),
+      conflictRules: {
+        ...INITIAL_SETTINGS.conflictRules,
+        ...(settings.conflictRules || {}),
+        ...(newSettings.conflictRules || {}),
+      },
+    };
     setSettings(merged);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, merged);
+    await saveToFirestore(publishers, weeks, preachingGroups, customDuties, merged);
   };
 
   // Carritos de predicación y avisos
@@ -2045,7 +2144,220 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         [],
         [],
         [],
+        [],
         []
+      );
+    }
+  };
+
+  /**
+   * Restaura y activa inmediatamente la congregación para usuarios que ya se habían registrado
+   * previamente (incluso antes del cambio de PINs personales únicos).
+   */
+  const restorePreviousRegistration = async (
+    congName?: string,
+    coordName?: string,
+    congPin?: string
+  ) => {
+    const candidateName = congName?.trim() || settings.congregationName || 'Congregación Central';
+    const finalName = getFriendlyCongregationName(candidateName, 'Congregación Central');
+    const finalCoordName = coordName?.trim() || settings.coordinatorName || user?.displayName || 'Coordinador';
+    const finalEmail = user?.email || settings.coordinatorEmail || 'coordinador@kongre.org';
+    const finalId = settings.congregationNumber || settings.congregationId || '1001';
+
+    const newSettings: CongregationSettings = {
+      ...settings,
+      congregationName: finalName,
+      congregationNumber: finalId,
+      congregationId: finalId,
+      coordinatorName: finalCoordName,
+      coordinatorEmail: finalEmail,
+      isRegistered: true,
+      registeredAt: settings.registeredAt || new Date().toISOString(),
+    };
+
+    setSettings(newSettings);
+    localStorage.setItem(`${LOCAL_STORAGE_KEY}_settings`, JSON.stringify(newSettings));
+    localStorage.setItem('kongre_is_registered_congregation', 'true');
+    localStorage.setItem('kongre_has_entered_app', 'true');
+
+    // Assign coordinator role to current email in AuthContext
+    if (finalEmail) {
+      assignRoleToEmail(finalEmail, 'coordinador', finalCoordName);
+    }
+
+    if (user) {
+      const userDocRef = doc(db, 'users', user.uid, 'congregation_data', 'main');
+      await setDoc(userDocRef, sanitizeForFirestore({ settings: newSettings, updatedAt: new Date().toISOString() }), { merge: true });
+    }
+  };
+
+  // Account Link Requests
+  const createAccountLinkRequest = async (
+    email: string,
+    brotherName: string,
+    personalPin: string,
+    role: string,
+    congregationId: string
+  ): Promise<AccountLinkRequest> => {
+    const cleanEmail = email.toLowerCase().trim();
+    const existing = accountLinkRequests.find(
+      (r) => r.email === cleanEmail && r.congregationId === congregationId && r.status === 'pending'
+    );
+    if (existing) return existing;
+
+    const newReq: AccountLinkRequest = {
+      id: `req_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      email: cleanEmail,
+      brotherName: brotherName.trim(),
+      personalPin: personalPin.trim(),
+      role,
+      congregationId,
+      requestedAt: new Date().toISOString(),
+      status: 'pending',
+    };
+
+    const updated = [newReq, ...accountLinkRequests.filter((r) => r.email !== cleanEmail)];
+    setAccountLinkRequests(updated);
+    localStorage.setItem(`${LOCAL_STORAGE_KEY}_account_link_requests`, JSON.stringify(updated));
+
+    if (user) {
+      await saveToFirestore(
+        publishers,
+        weeks,
+        preachingGroups,
+        customDuties,
+        settings,
+        outgoingSpeakers,
+        fieldServiceMeetings,
+        cartLocations,
+        cartShifts,
+        notices,
+        monthlyReports,
+        territories,
+        circuitVisit,
+        transactions,
+        quarterlyAudits,
+        memorialPlans,
+        theocraticAssemblies,
+        literatureItems,
+        specialOrders,
+        groupDistributions,
+        inventoryRecords,
+        updated
+      );
+    }
+
+    return newReq;
+  };
+
+  const approveAccountLinkRequest = async (requestId: string, reviewerEmail: string) => {
+    const targetReq = accountLinkRequests.find((r) => r.id === requestId);
+    if (!targetReq) return;
+
+    const approvedReq: AccountLinkRequest = {
+      ...targetReq,
+      status: 'approved',
+      reviewedBy: reviewerEmail,
+      reviewedAt: new Date().toISOString(),
+    };
+
+    const updatedRequests = accountLinkRequests.map((req) =>
+      req.id === requestId ? approvedReq : req
+    );
+
+    setAccountLinkRequests(updatedRequests);
+    localStorage.setItem(
+      `${LOCAL_STORAGE_KEY}_account_link_requests`,
+      JSON.stringify(updatedRequests)
+    );
+
+    const { email, brotherName, role, personalPin } = approvedReq;
+    const cleanEmail = email.toLowerCase().trim();
+
+    // 1. Update publisher profile email if publisher exists by name
+    let updatedPubs = [...publishers];
+    const pubIndex = updatedPubs.findIndex(
+      (p) => p.name.toLowerCase().trim() === brotherName.toLowerCase().trim()
+    );
+    if (pubIndex >= 0) {
+      updatedPubs[pubIndex] = { ...updatedPubs[pubIndex], email: cleanEmail };
+      setPublishers(updatedPubs);
+    }
+
+    // 2. Assign role to email in AuthContext
+    assignRoleToEmail(cleanEmail, role as TheocraticRole, brotherName, personalPin);
+
+    // 3. Save to Firestore
+    if (user) {
+      await saveToFirestore(
+        updatedPubs,
+        weeks,
+        preachingGroups,
+        customDuties,
+        settings,
+        outgoingSpeakers,
+        fieldServiceMeetings,
+        cartLocations,
+        cartShifts,
+        notices,
+        monthlyReports,
+        territories,
+        circuitVisit,
+        transactions,
+        quarterlyAudits,
+        memorialPlans,
+        theocraticAssemblies,
+        literatureItems,
+        specialOrders,
+        groupDistributions,
+        inventoryRecords,
+        updatedRequests
+      );
+    }
+  };
+
+  const rejectAccountLinkRequest = async (requestId: string, reviewerEmail: string, reason?: string) => {
+    const updatedRequests = accountLinkRequests.map((req) => {
+      if (req.id === requestId) {
+        return {
+          ...req,
+          status: 'rejected' as const,
+          reviewedBy: reviewerEmail,
+          reviewedAt: new Date().toISOString(),
+          rejectionReason: reason || 'Rechazado por los ancianos de la congregación.',
+        };
+      }
+      return req;
+    });
+
+    setAccountLinkRequests(updatedRequests);
+    localStorage.setItem(`${LOCAL_STORAGE_KEY}_account_link_requests`, JSON.stringify(updatedRequests));
+
+    if (user) {
+      await saveToFirestore(
+        publishers,
+        weeks,
+        preachingGroups,
+        customDuties,
+        settings,
+        outgoingSpeakers,
+        fieldServiceMeetings,
+        cartLocations,
+        cartShifts,
+        notices,
+        monthlyReports,
+        territories,
+        circuitVisit,
+        transactions,
+        quarterlyAudits,
+        memorialPlans,
+        theocraticAssemblies,
+        literatureItems,
+        specialOrders,
+        groupDistributions,
+        inventoryRecords,
+        updatedRequests
       );
     }
   };
@@ -2087,6 +2399,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         updateWeek,
         addNextWeek,
         copyWeekStructure,
+        syncWeekWithOrganized,
+        syncAllWeeksWithOrganized,
         autoAssignCurrentWeek,
         autoAssignAllWeeksInMonth,
         replaceAssignment,
@@ -2152,6 +2466,11 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         importBackupJSON,
         publishersMap,
         resetAllCongregationData,
+        restorePreviousRegistration,
+        accountLinkRequests,
+        createAccountLinkRequest,
+        approveAccountLinkRequest,
+        rejectAccountLinkRequest,
       }}
     >
       {children}

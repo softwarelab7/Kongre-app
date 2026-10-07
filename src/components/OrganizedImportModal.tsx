@@ -4,6 +4,7 @@ import { useCongregation } from '../context/CongregationContext';
 import {
   ORGANIZED_OFFICIAL_SCHEDULES,
   OrganizedWeekSchedule,
+  getOrganizedScheduleForWeek,
   applyOrganizedToWeek,
   parseOrganizedJsonOrText,
 } from '../utils/organizedSync';
@@ -45,11 +46,12 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
   initialTab = 'catalogo',
   initialFocus = 'all',
 }) => {
-  const { currentWeek, updateWeek } = useCongregation();
+  const { currentWeek, updateWeek, syncAllWeeksWithOrganized } = useCongregation();
 
   const [activeTab, setActiveTab] = useState<'catalogo' | 'importar' | 'bosquejos'>(initialTab);
   const [selectedScheduleKey, setSelectedScheduleKey] = useState<string>(() => {
-    return currentWeek?.id || ORGANIZED_OFFICIAL_SCHEDULES[0]?.weekKey || '2026-W40';
+    const matched = getOrganizedScheduleForWeek(currentWeek?.id, currentWeek?.midweek.date);
+    return matched?.weekKey || ORGANIZED_OFFICIAL_SCHEDULES[1]?.weekKey || '2026-W41';
   });
 
   // Custom text / JSON input
@@ -73,14 +75,23 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
     if (isOpen) {
       setActiveTab(initialTab);
       // Auto select matching schedule for current week if found
-      const match = ORGANIZED_OFFICIAL_SCHEDULES.find((s) => s.weekKey === currentWeek?.id);
+      const match = getOrganizedScheduleForWeek(currentWeek?.id, currentWeek?.midweek.date);
       if (match) {
         setSelectedScheduleKey(match.weekKey);
       }
     }
-  }, [isOpen, initialTab, currentWeek?.id]);
+  }, [isOpen, initialTab, currentWeek?.id, currentWeek?.midweek.date]);
 
   if (!isOpen || !currentWeek) return null;
+
+  const handleApplyToAllWeeks = () => {
+    syncAllWeeksWithOrganized();
+    setFeedbackSuccess('¡Todas las semanas de la congregación han sido sincronizadas con Organized!');
+    setTimeout(() => {
+      setFeedbackSuccess(null);
+      onClose();
+    }, 1500);
+  };
 
   // Selected schedule from catalog
   const selectedSchedule =
@@ -424,10 +435,21 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
                   <button
                     type="button"
                     onClick={() => handleApplySchedule(selectedSchedule, 'all')}
-                    className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+                    className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                    title="Aplica todo el programa a esta semana"
                   >
                     <Check className="w-4 h-4" />
-                    <span>Aplicar Todo (Entre Semana + Fin de Semana)</span>
+                    <span>Aplicar a esta semana (Ambas reuniones)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleApplyToAllWeeks}
+                    className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 border border-slate-700"
+                    title="Aplica automáticamente los programas oficiales de Organized a todas las semanas de la congregación"
+                  >
+                    <Sparkles className="w-4 h-4 text-amber-300" />
+                    <span>Sincronizar Todas las Semanas</span>
                   </button>
                 </div>
               </div>

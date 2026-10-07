@@ -2,7 +2,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSecurity } from '../context/SecurityContext';
 import { useCongregation } from '../context/CongregationContext';
-import { ShieldCheck, Lock, Unlock, AlertCircle, KeyRound, Delete } from 'lucide-react';
+import { ShieldCheck, Lock, Unlock, AlertCircle, KeyRound, Delete, ShieldAlert } from 'lucide-react';
+import {
+  getPinLockoutRemainingSeconds,
+  recordFailedPinAttempt,
+  resetFailedPinAttempts,
+} from '../utils/theocraticSecurity';
 
 export const SessionLockModal: React.FC = () => {
   const { isLocked, unlockSession } = useSecurity();
@@ -12,19 +17,39 @@ export const SessionLockModal: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [shake, setShake] = useState(false);
+  const [lockoutSeconds, setLockoutSeconds] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Check lockout on mount and on lock
   useEffect(() => {
     if (isLocked) {
       setEnteredPin('');
       setErrorMsg(null);
+      const remaining = getPinLockoutRemainingSeconds();
+      setLockoutSeconds(remaining);
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isLocked]);
 
+  // Countdown timer for lockout
+  useEffect(() => {
+    if (lockoutSeconds <= 0) return;
+    const timer = setInterval(() => {
+      setLockoutSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [lockoutSeconds]);
+
   if (!isLocked) return null;
 
   const handleKeyPress = (digit: string) => {
+    if (lockoutSeconds > 0) return;
     if (enteredPin.length < 8) {
       const next = enteredPin + digit;
       setEnteredPin(next);
@@ -33,17 +58,24 @@ export const SessionLockModal: React.FC = () => {
   };
 
   const handleDelete = () => {
+    if (lockoutSeconds > 0) return;
     setEnteredPin((prev) => prev.slice(0, -1));
     setErrorMsg(null);
   };
 
   const handleClear = () => {
+    if (lockoutSeconds > 0) return;
     setEnteredPin('');
     setErrorMsg(null);
   };
 
   const handleUnlock = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (lockoutSeconds > 0) {
+      setErrorMsg(`Por seguridad teocrática, espera ${lockoutSeconds}s para volver a intentar.`);
+      return;
+    }
+
     if (!enteredPin) {
       setErrorMsg('Ingrese el PIN de seguridad');
       return;
@@ -55,8 +87,17 @@ export const SessionLockModal: React.FC = () => {
     const success = await unlockSession(enteredPin);
     setIsSubmitting(false);
 
-    if (!success) {
-      setErrorMsg('PIN incorrecto. Intente nuevamente.');
+    if (success) {
+      resetFailedPinAttempts();
+      setLockoutSeconds(0);
+    } else {
+      const lockout = recordFailedPinAttempt();
+      if (lockout.isLockedOut) {
+        setLockoutSeconds(lockout.remainingSeconds);
+        setErrorMsg(`Demasiados intentos fallidos. Bloqueado por ${lockout.remainingSeconds}s.`);
+      } else {
+        setErrorMsg(`PIN incorrecto (intento ${lockout.attempts}/5).`);
+      }
       setShake(true);
       setTimeout(() => setShake(false), 500);
       setEnteredPin('');
@@ -121,36 +162,48 @@ export const SessionLockModal: React.FC = () => {
           </div>
         )}
 
+        {/* Lockout Notice */}
+        {lockoutSeconds > 0 && (
+          <div className="mb-4 p-3 rounded-2xl bg-amber-500/20 border border-amber-500/30 text-amber-200 text-xs font-semibold flex items-center justify-center gap-2 animate-pulse">
+            <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>Bloqueo temporal de seguridad: {lockoutSeconds}s</span>
+          </div>
+        )}
+
         {/* On-screen Numeric Keypad for Touchscreens / Booth Tablet */}
         <div className="grid grid-cols-3 gap-2.5 mb-6 max-w-[260px] mx-auto">
           {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
             <button
               key={num}
               type="button"
+              disabled={lockoutSeconds > 0}
               onClick={() => handleKeyPress(num)}
-              className="h-12 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-white font-bold text-lg border border-slate-700/60 active:scale-95 transition-all shadow-xs"
+              className="h-12 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-white font-bold text-lg border border-slate-700/60 active:scale-95 transition-all shadow-xs disabled:opacity-40 disabled:pointer-events-none"
             >
               {num}
             </button>
           ))}
           <button
             type="button"
+            disabled={lockoutSeconds > 0}
             onClick={handleClear}
-            className="h-12 rounded-2xl bg-slate-800/40 hover:bg-slate-800 text-slate-400 font-semibold text-xs border border-slate-700/40 active:scale-95 transition-all"
+            className="h-12 rounded-2xl bg-slate-800/40 hover:bg-slate-800 text-slate-400 font-semibold text-xs border border-slate-700/40 active:scale-95 transition-all disabled:opacity-40"
           >
             C
           </button>
           <button
             type="button"
+            disabled={lockoutSeconds > 0}
             onClick={() => handleKeyPress('0')}
-            className="h-12 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-white font-bold text-lg border border-slate-700/60 active:scale-95 transition-all shadow-xs"
+            className="h-12 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 text-white font-bold text-lg border border-slate-700/60 active:scale-95 transition-all shadow-xs disabled:opacity-40 disabled:pointer-events-none"
           >
             0
           </button>
           <button
             type="button"
+            disabled={lockoutSeconds > 0}
             onClick={handleDelete}
-            className="h-12 rounded-2xl bg-slate-800/40 hover:bg-slate-800 text-slate-400 flex items-center justify-center border border-slate-700/40 active:scale-95 transition-all"
+            className="h-12 rounded-2xl bg-slate-800/40 hover:bg-slate-800 text-slate-400 flex items-center justify-center border border-slate-700/40 active:scale-95 transition-all disabled:opacity-40"
             title="Borrar"
           >
             <Delete className="w-5 h-5" />

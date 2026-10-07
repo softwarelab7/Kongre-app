@@ -29,40 +29,55 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return 'light';
   });
 
+  const applyThemeToDOM = (mode: ThemeMode) => {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+
+    if (mode === 'light') {
+      root.classList.remove('dark');
+      root.classList.remove('theme-cabina');
+      if (metaTheme) metaTheme.setAttribute('content', '#4f46e5');
+    } else if (mode === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('theme-cabina');
+      if (metaTheme) metaTheme.setAttribute('content', '#0f172a');
+    } else if (mode === 'cabina') {
+      root.classList.add('dark');
+      root.classList.add('theme-cabina');
+      if (metaTheme) metaTheme.setAttribute('content', '#000000');
+    }
+  };
+
   useEffect(() => {
     try {
       localStorage.setItem('kongre_theme', themeMode);
     } catch (e) {
       // ignore
     }
-
-    const root = document.documentElement;
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
-
-    if (themeMode === 'light') {
-      root.classList.remove('dark');
-      root.classList.remove('theme-cabina');
-      if (metaTheme) metaTheme.setAttribute('content', '#4f46e5');
-    } else if (themeMode === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('theme-cabina');
-      if (metaTheme) metaTheme.setAttribute('content', '#0f172a');
-    } else if (themeMode === 'cabina') {
-      root.classList.add('dark');
-      root.classList.add('theme-cabina');
-      if (metaTheme) metaTheme.setAttribute('content', '#000000');
-    }
+    applyThemeToDOM(themeMode);
   }, [themeMode]);
 
   const setThemeMode = (mode: ThemeMode) => {
+    try {
+      localStorage.setItem('kongre_theme', mode);
+    } catch (e) {}
+    applyThemeToDOM(mode);
     setThemeModeState(mode);
   };
 
   const toggleTheme = () => {
     setThemeModeState((prev) => {
-      if (prev === 'light') return 'dark';
-      if (prev === 'dark') return 'cabina';
-      return 'light';
+      // Check both React state AND current DOM dark class so it never requires a double click
+      const isDomDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+      const isCurrentlyDark = prev === 'dark' || prev === 'cabina' || isDomDark;
+      const nextMode: ThemeMode = isCurrentlyDark ? 'light' : 'dark';
+
+      try {
+        localStorage.setItem('kongre_theme', nextMode);
+      } catch (e) {}
+      applyThemeToDOM(nextMode);
+      return nextMode;
     });
   };
 

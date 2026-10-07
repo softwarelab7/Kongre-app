@@ -4,7 +4,7 @@ import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useSecurity } from '../context/SecurityContext';
-import { encryptTheocraticData, decryptTheocraticData } from '../utils/theocraticSecurity';
+import { encryptTheocraticData, decryptTheocraticData, getFriendlyCongregationName } from '../utils/theocraticSecurity';
 import {
   Settings,
   Shield,
@@ -33,12 +33,16 @@ import {
   Eye,
   EyeOff,
   QrCode,
+  User,
   UserPlus,
   Building2,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { JoinCongregationModal } from './JoinCongregationModal';
 import { InvitationManagerModal } from './InvitationManagerModal';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
+import { UserProfileSettingsView } from './UserProfileSettingsView';
 
 export const SettingsTab: React.FC = () => {
   const { settings, updateSettings, exportBackupJSON, getBackupJSON, importBackupJSON } = useCongregation();
@@ -62,26 +66,40 @@ export const SettingsTab: React.FC = () => {
   const [isSettingsInviteModalOpen, setIsSettingsInviteModalOpen] = useState(false);
   const [isSettingsJoinModalOpen, setIsSettingsJoinModalOpen] = useState(false);
   const [isSettingsWizardOpen, setIsSettingsWizardOpen] = useState(false);
+  const [settingsSubView, setSettingsSubView] = useState<'perfil' | 'general' | 'seguridad' | 'respaldos'>('perfil');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [congName, setCongName] = useState(settings.congregationName);
+  const [congName, setCongName] = useState(() =>
+    getFriendlyCongregationName(settings.congregationName, 'Congregación Central')
+  );
   const [midDay, setMidDay] = useState(settings.midweekMeetingDay);
   const [midTime, setMidTime] = useState(settings.midweekMeetingTime);
   const [fdsDay, setFdsDay] = useState(settings.weekendMeetingDay);
   const [fdsTime, setFdsTime] = useState(settings.weekendMeetingTime);
   const [hallAddress, setHallAddress] = useState(settings.hallAddress || '');
 
-  // Rules state
-  const [allowPartAndDuty, setAllowPartAndDuty] = useState(settings.conflictRules.allowPartAndDutySameMeeting);
-  const [allowAudioAndMics, setAllowAudioAndMics] = useState(settings.conflictRules.allowAudioAndMicrophones);
-  const [allowPresAndPart, setAllowPresAndPart] = useState(settings.conflictRules.allowPresidentAndOtherPart);
-  const [maxConsecutiveDuty, setMaxConsecutiveDuty] = useState(settings.conflictRules.maxConsecutiveWeeksWithDuty);
-  const [maxConsecutivePart, setMaxConsecutivePart] = useState(settings.conflictRules.maxConsecutiveWeeksWithPart);
-  const [enforceSisters, setEnforceSisters] = useState(settings.conflictRules.enforceSisterDemonstrationRules);
-  const [warnOutlineMonths, setWarnOutlineMonths] = useState(settings.conflictRules.warnOutlineRepeatedWithinMonths || 12);
+  // Rules state with safe defaults
+  const rules = settings.conflictRules || {
+    allowPartAndDutySameMeeting: false,
+    allowAudioAndMicrophones: false,
+    allowPresidentAndOtherPart: false,
+    maxConsecutiveWeeksWithDuty: 2,
+    maxConsecutiveWeeksWithPart: 2,
+    enforceSisterDemonstrationRules: true,
+    warnOutlineRepeatedWithinMonths: 12,
+  };
+
+  const [allowPartAndDuty, setAllowPartAndDuty] = useState(rules.allowPartAndDutySameMeeting);
+  const [allowAudioAndMics, setAllowAudioAndMics] = useState(rules.allowAudioAndMicrophones);
+  const [allowPresAndPart, setAllowPresAndPart] = useState(rules.allowPresidentAndOtherPart);
+  const [maxConsecutiveDuty, setMaxConsecutiveDuty] = useState(rules.maxConsecutiveWeeksWithDuty);
+  const [maxConsecutivePart, setMaxConsecutivePart] = useState(rules.maxConsecutiveWeeksWithPart);
+  const [enforceSisters, setEnforceSisters] = useState(rules.enforceSisterDemonstrationRules);
+  const [warnOutlineMonths, setWarnOutlineMonths] = useState(rules.warnOutlineRepeatedWithinMonths || 12);
 
   const [savedFeedback, setSavedFeedback] = useState(false);
+  const [copiedCongId, setCopiedCongId] = useState(false);
   const [importStatus, setImportStatus] = useState<string | null>(null);
 
   // Security PIN Modal States
@@ -289,13 +307,78 @@ export const SettingsTab: React.FC = () => {
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
             <Settings className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <span>Configuración y Reglas del Sistema</span>
+            <span>Configuración y Preferencias del Sistema</span>
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Personaliza los horarios de reunión, las reglas de prevención de conflictos y los respaldos en la nube.
+            Personaliza tu perfil de usuario, preferencias de contacto, datos de la congregación y respaldos.
           </p>
         </div>
       </div>
+
+      {/* Sub-navigation Tabs */}
+      <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 overflow-x-auto">
+        <button
+          type="button"
+          onClick={() => setSettingsSubView('perfil')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            settingsSubView === 'perfil'
+              ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs ring-1 ring-slate-200/50 dark:ring-slate-700'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <User className="w-4 h-4" />
+          <span>Mi Perfil y Contacto</span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-semibold border border-indigo-200 dark:border-indigo-800">
+            Firestore
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setSettingsSubView('general')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            settingsSubView === 'general'
+              ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs ring-1 ring-slate-200/50 dark:ring-slate-700'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Calendar className="w-4 h-4" />
+          <span>Congregación y Horarios</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setSettingsSubView('seguridad')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            settingsSubView === 'seguridad'
+              ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs ring-1 ring-slate-200/50 dark:ring-slate-700'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Shield className="w-4 h-4" />
+          <span>Seguridad y PINs</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setSettingsSubView('respaldos')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+            settingsSubView === 'respaldos'
+              ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs ring-1 ring-slate-200/50 dark:ring-slate-700'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Cloud className="w-4 h-4" />
+          <span>Respaldos y Nube</span>
+        </button>
+      </div>
+
+      {/* VISTA 1: MI PERFIL Y PREFERENCIAS DE CONTACTO (FIRESTORE) */}
+      {settingsSubView === 'perfil' && <UserProfileSettingsView />}
+
+      {/* VISTA 2: CONGREGACIÓN Y HORARIOS */}
+      {settingsSubView === 'general' && (
+        <div className="space-y-8 animate-fade-in">
 
       {/* AMBIENTACIÓN Y MODO OSCURO (CABINA & SALÓN DEL REINO) */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
@@ -392,9 +475,12 @@ export const SettingsTab: React.FC = () => {
                 required
                 value={congName}
                 onChange={e => setCongName(e.target.value)}
-                placeholder="Ej. Congregación El Olivar"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                placeholder="Ej. Congregación Central"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden font-semibold"
               />
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
+                Este nombre oficial es el que se mostrará en el banner superior, programas y hojas S-89 (el ID de conexión es independiente).
+              </span>
             </div>
 
             <div>
@@ -626,50 +712,12 @@ export const SettingsTab: React.FC = () => {
           </button>
         </div>
       </form>
+    </div>
+  )}
 
-      {/* 3. SINCRONIZACIÓN EN LA NUBE Y GOOGLE AUTH */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-        <h3 className="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-          <Cloud className="w-4 h-4 text-indigo-600" />
-          <span>Sincronización en la Nube con Google y Firebase</span>
-        </h3>
-
-        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold text-slate-800">
-              {user ? `Conectado como: ${user.displayName || user.email}` : 'Modo fuera de línea / Almacenamiento local'}
-            </p>
-            <p className="text-xs text-slate-500 mt-0.5">
-              {user
-                ? 'Tus datos se sincronizan automáticamente en Firestore vinculados a tu cuenta de Google.'
-                : 'Inicia sesión con Google para sincronizar en tiempo real entre tu teléfono celular y tu computadora.'}
-            </p>
-          </div>
-
-          <div>
-            {user ? (
-              <button
-                type="button"
-                onClick={signOutUser}
-                className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold transition-all flex items-center gap-1.5"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Desconectar Cuenta</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={signInWithGoogle}
-                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
-              >
-                <LogIn className="w-4 h-4" />
-                <span>Iniciar Sesión con Google</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
+  {/* VISTA 3: SEGURIDAD Y PINS */}
+  {settingsSubView === 'seguridad' && (
+    <div className="space-y-8 animate-fade-in">
       {/* 4. REGISTRO TEOCRÁTICO E INVITACIONES CON QR */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
@@ -771,12 +819,31 @@ export const SettingsTab: React.FC = () => {
                 </span>
               </div>
               <div className="space-y-1.5 text-xs mt-2">
-                <div className="flex justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">ID Congregación:</span>
-                  <span className="font-mono font-bold text-slate-900 dark:text-white">{settings.congregationNumber || settings.congregationId || 'No asignado'}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500 dark:text-slate-400">ID de la Congregación:</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-slate-900 dark:text-white">
+                      {settings.congregationNumber || settings.congregationId || 'No asignado'}
+                    </span>
+                    {(settings.congregationNumber || settings.congregationId) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const id = settings.congregationNumber || settings.congregationId || '';
+                          navigator.clipboard.writeText(id);
+                          setCopiedCongId(true);
+                          setTimeout(() => setCopiedCongId(false), 2000);
+                        }}
+                        className="p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-all cursor-pointer"
+                        title="Copiar ID de la Congregación"
+                      >
+                        {copiedCongId ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">PIN Congregación:</span>
+                  <span className="text-slate-500 dark:text-slate-400">PIN de la Congregación:</span>
                   <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">•••• (Configurado)</span>
                 </div>
                 <div className="flex justify-between">
@@ -930,11 +997,59 @@ export const SettingsTab: React.FC = () => {
           </label>
         </div>
       </div>
+    </div>
+  )}
 
-      {/* 5. COPIAS DE SEGURIDAD Y CIFRADO MILITAR E2EE */}
+  {/* VISTA 4: RESPALDOS Y NUBE */}
+  {settingsSubView === 'respaldos' && (
+    <div className="space-y-8 animate-fade-in">
+      {/* SINCRONIZACIÓN EN LA NUBE Y GOOGLE AUTH */}
       <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
         <h3 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
-          <Database className="w-4 h-4 text-indigo-600" />
+          <Cloud className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          <span>Sincronización Segura en la Nube con tu Cuenta de Google</span>
+        </h3>
+
+        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold text-slate-800 dark:text-white">
+              {user ? `Conectado como: ${user.displayName || user.email}` : 'Modo fuera de línea / Almacenamiento local'}
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              {user
+                ? 'Tus datos teocráticos y perfil se sincronizan automáticamente y en tiempo real con Firestore en la nube.'
+                : 'Inicia sesión con Google para sincronizar en tiempo real entre tu teléfono celular y tu computadora.'}
+            </p>
+          </div>
+
+          <div>
+            {user ? (
+              <button
+                type="button"
+                onClick={signOutUser}
+                className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Desconectar Cuenta</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={signInWithGoogle}
+                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Iniciar Sesión con Google</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* COPIAS DE SEGURIDAD Y CIFRADO MILITAR E2EE */}
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+        <h3 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
+          <Database className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           <span>Copias de Seguridad y Respaldo Cifrado</span>
         </h3>
 
@@ -993,6 +1108,8 @@ export const SettingsTab: React.FC = () => {
           </button>
         </div>
       </div>
+    </div>
+  )}
 
       {/* MODAL 1: SETUP PIN MODAL */}
       {showPinSetupModal && (

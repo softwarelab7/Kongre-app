@@ -15,6 +15,7 @@ import { MwbImportModal } from './MwbImportModal';
 import { OrganizedImportModal } from './OrganizedImportModal';
 import { MeetingTimerModal } from './MeetingTimerModal';
 import { BatchWhatsAppModal } from './BatchWhatsAppModal';
+import ClmScheduleView from './ClmScheduleView';
 import { createAssignmentWhatsAppMessage, openWhatsAppLink } from '../utils/whatsapp';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganizedSync } from '../utils/organizedSync';
 import { OFFICIAL_PUBLIC_TALK_OUTLINES, findOutlineByNumber } from '../utils/theocraticData';
@@ -59,10 +60,12 @@ export const ScheduleTab: React.FC = () => {
     updateWeek,
     addNextWeek,
     copyWeekStructure,
+    syncAllWeeksWithOrganized,
     autoAssignCurrentWeek,
     autoAssignAllWeeksInMonth,
     preachingGroups,
     customDuties,
+    publishers,
     publishersMap,
     conflicts,
     settings,
@@ -70,7 +73,7 @@ export const ScheduleTab: React.FC = () => {
   const { effectiveRoleInfo } = useAuth();
   const isReadOnly = effectiveRoleInfo.isReadOnly || !effectiveRoleInfo.canEditSchedule;
 
-  const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
+  const [viewMode, setViewMode] = useState<'week' | 'clm_vmc'>('week');
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     return (currentWeek?.weekStartDate || new Date().toISOString()).substring(0, 7);
   });
@@ -396,8 +399,59 @@ export const ScheduleTab: React.FC = () => {
           </button>
         </div>
 
-        {/* Action buttons: Auto-assign, Copy, Special Event, MWB, Timer */}
+        {/* Selector de modo de vista: Completa vs Programa VMC */}
+        <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/10 shrink-0">
+          <button
+            type="button"
+            onClick={() => setViewMode('week')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              viewMode === 'week'
+                ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
+                : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900'
+            }`}
+          >
+            Reunión Completa
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('clm_vmc')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              viewMode === 'clm_vmc'
+                ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
+                : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900'
+            }`}
+          >
+            Programa VMC
+          </button>
+        </div>
+
+        {/* Action buttons: Auto-assign, Copy, Special Event, MWB, Organized, Timer */}
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
+          {!isReadOnly && (
+            <div className="flex items-center gap-1 col-span-2 sm:col-span-1">
+              <button
+                type="button"
+                onClick={() => handleQuickSyncOrganized('all')}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all shadow-xs min-h-[42px] cursor-pointer"
+                title="Traer datos oficiales de Organized para esta semana (Entre semana y Fin de semana)"
+              >
+                <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <span className="truncate">Traer de Organized</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setOrganizedModalTab('catalogo');
+                  setIsOrganizedModalOpen(true);
+                }}
+                className="p-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all min-h-[42px] cursor-pointer"
+                title="Abrir Catálogo de semanas y bosquejos oficiales de Organized"
+              >
+                <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              </button>
+            </div>
+          )}
+
           {!isReadOnly && (
             <button
               onClick={() => setIsMwbModalOpen(true)}
@@ -519,10 +573,19 @@ export const ScheduleTab: React.FC = () => {
         </div>
       )}
 
-      {/* REUNIÓN DE ENTRE SEMANA: VIDA Y MINISTERIO CRISTIANOS */}
-      <div className={`bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs transition-opacity ${
-        currentWeek.specialEvent?.noMeetingMidweek ? 'opacity-60 pointer-events-none' : ''
-      }`}>
+      {viewMode === 'clm_vmc' ? (
+        <div className="rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white dark:bg-slate-900 shadow-xs">
+          <ClmScheduleView
+            publishers={publishers}
+            congregationId={settings.congregationName || currentWeek.id}
+          />
+        </div>
+      ) : (
+        <>
+          {/* REUNIÓN DE ENTRE SEMANA: VIDA Y MINISTERIO CRISTIANOS */}
+          <div className={`bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs transition-opacity ${
+            currentWeek.specialEvent?.noMeetingMidweek ? 'opacity-60 pointer-events-none' : ''
+          }`}>
         {/* Section Header */}
         <div className="p-4 sm:p-5 bg-linear-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -588,6 +651,18 @@ export const ScheduleTab: React.FC = () => {
                 <span className="font-semibold text-slate-700 dark:text-slate-300">Canciones:</span>
                 <span>{currentWeek.midweek.songFirst || 44} (inicio) • {currentWeek.midweek.songMiddle || 85} (intermedia) • {currentWeek.midweek.songConclude || 110} (conclusión)</span>
               </span>
+
+              {!isReadOnly && (
+                <button
+                  type="button"
+                  onClick={() => handleQuickSyncOrganized('midweek')}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-900 hover:bg-indigo-100 dark:hover:bg-slate-800 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-bold text-[11px] transition shadow-2xs cursor-pointer ml-auto"
+                  title="Traer de Organized temas, lectura y cánticos oficiales para la reunión entre semana"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Traer de Organized</span>
+                </button>
+              )}
             </div>
           </div>
           {/* Prayers row */}
@@ -1470,6 +1545,18 @@ export const ScheduleTab: React.FC = () => {
                 <span className="font-semibold text-slate-700 dark:text-slate-300">Canciones FDS:</span>
                 <span>{currentWeek.weekend.openingSong || 12} (apertura) • {currentWeek.weekend.middleSong || 68} (intermedia) • {currentWeek.weekend.closingSong || 138} (conclusión)</span>
               </span>
+
+              {!isReadOnly && (
+                <button
+                  type="button"
+                  onClick={() => handleQuickSyncOrganized('weekend')}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-900 hover:bg-emerald-100 dark:hover:bg-slate-800 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold text-[11px] transition shadow-2xs cursor-pointer ml-auto"
+                  title="Traer de Organized el bosquejo oficial de discurso público, estudio de La Atalaya y canciones del fin de semana"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>Traer de Organized</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -1790,6 +1877,8 @@ export const ScheduleTab: React.FC = () => {
           })}
         </div>
       </div>
+      </>
+      )}
 
       {/* MODAL: ASSIGNMENT SELECTOR */}
       {selectorState.isOpen && (

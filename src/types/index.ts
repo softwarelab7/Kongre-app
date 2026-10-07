@@ -1,4 +1,5 @@
 // src/types/index.ts
+import type { TheocraticRole } from '../utils/rbac';
 
 export type Gender = 'hermano' | 'hermana';
 
@@ -67,6 +68,8 @@ export interface Publisher {
   phone: string;
   email?: string;
   privilege?: TheocraticPrivilege;
+  theocraticRole?: TheocraticRole;
+  personalPin?: string;
   notes?: string;
   active: boolean;
   groupNumber?: number; // Grupo de predicación
@@ -86,6 +89,26 @@ export interface Publisher {
   emergencyContactPhone?: string;
   pioneerStatus?: 'ninguno' | 'auxiliar_continuo' | 'regular' | 'especial';
   pioneerStartDate?: string; // YYYY-MM-DD
+
+  // Extensiones de compatibilidad CLM (Vida y Ministerio)
+  nid?: string;
+  full_name?: string;
+  status?: 'active' | 'inactive';
+  role?: 'elder' | 'servant' | 'publisher' | string;
+  assignments?: {
+    chairman?: boolean;
+    prayers?: boolean;
+    talk?: boolean;
+    gems?: boolean;
+    reading?: boolean;
+    conversations?: boolean;
+    return_visits?: boolean;
+    disciples?: boolean;
+    bible_study?: boolean;
+    reader_living?: boolean;
+    assistant_student?: boolean;
+    [key: string]: boolean | undefined;
+  };
 }
 
 // Assignment item in a meeting
@@ -252,6 +275,8 @@ export interface CongregationSettings {
   congregationName: string;
   congregationNumber?: string; // ej. '10582' (ID oficial de congregación)
   congregationId?: string;     // ID único de congregación
+  customCode?: string;         // Código único o ID personalizado
+  isCustomId?: boolean;        // true si el usuario definió un código personalizado
   congregationPinHash?: string;// Hash seguro del PIN de Congregación (4-8 dígitos)
   circuitNumber?: string;      // ej. 'CO-04'
   language?: string;           // ej. 'Español'
@@ -787,5 +812,103 @@ export interface ActiveDeviceSession {
   lastActive: string;
   ipPlaceholder?: string;
   status: 'active' | 'revoked';
+}
+
+export interface AccountLinkRequest {
+  id: string;
+  email: string;
+  brotherName: string;
+  personalPin: string;
+  role: string;
+  congregationId: string;
+  requestedAt: string;
+  status: 'pending' | 'approved' | 'rejected';
+  reviewedBy?: string;
+  reviewedAt?: string;
+  rejectionReason?: string;
+}
+
+// User Profile and Contact Preferences
+export type PreferredContactMethod = 'whatsapp' | 'email' | 'phone' | 'sms';
+export type ContactTimePreference = 'morning' | 'afternoon' | 'evening' | 'anytime';
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  displayName: string;
+  photoURL?: string;
+  phone?: string;
+  secondaryEmail?: string;
+  preferredContactMethod: PreferredContactMethod;
+  contactTimePreference: ContactTimePreference;
+  notificationsEnabled: boolean;
+  notes?: string;
+  updatedAt?: string;
+}
+
+// ── Modelos de Datos CLM (Vida y Ministerio Cristianos) ──
+export type ClmPartType =
+  | 'canto'
+  | 'presidente'
+  | 'oracion_apertura'
+  | 'oracion_cierre'
+  | 'oracion_estudio'
+  | 'discurso_tesoros'
+  | 'busquemos_perlas'
+  | 'lectura_biblica'
+  | 'empiece_conversaciones'
+  | 'empiece_conversaciones_aux'
+  | 'haga_revisitas'
+  | 'haga_revisitas_aux'
+  | 'haga_discipulos'
+  | 'explique_sus_creencias'
+  | 'discurso_estudiante'
+  | 'necesidades_congregacion'
+  | 'estudio_biblico_grupo'
+  | 'lector_estudio'
+  | 'conductor_auxiliar'
+  | 'demo_auxiliar';
+
+export type ClmProgramaEstado = 'borrador' | 'publicado' | 'cancelado';
+
+export interface ClmParte {
+  id: string;
+  tipo: ClmPartType;
+  titulo: string;
+  duracion_min: number;
+  seccion: 'tesoros' | 'maestros' | 'vida_cristiana' | 'marco';
+  asignado_nid?: string | null;
+  asignado_nombre?: string;
+  asignado_auxiliar_nid?: string | null;
+  asignado_auxiliar_nombre?: string;
+  requiere_hermano: boolean;
+  requiere_privilegio: boolean;
+  descripcion?: string;
+  notas?: string;
+  es_clase_auxiliar?: boolean;
+}
+
+export interface ClmPrograma {
+  id: string;
+  semana_fecha: string; // Formato YYYY-MM-DD (lunes de la semana)
+  anio: number;
+  semana_num: number;
+  estado: ClmProgramaEstado;
+  partes: ClmParte[];
+  notas?: string;
+  generado_por?: 'manual' | 'ai';
+  congregation_id?: string | null;
+  lectura_semana?: string;
+  rango_semana?: string;
+}
+
+declare global {
+  interface Window {
+    electronAPI?: {
+      upsertClmPrograma?: (programa: ClmPrograma) => Promise<any>;
+      getClmPrograma?: (semanaFecha: string) => Promise<ClmPrograma | null>;
+      [key: string]: any;
+    };
+  }
 }
 

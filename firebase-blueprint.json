@@ -1,0 +1,140 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Perfil de usuario con foto, nombre visible y preferencias de contacto",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "ID de usuario de autenticación en Firebase"
+        },
+        "email": {
+          "type": "string",
+          "description": "Correo electrónico asociado al usuario"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Nombre visible preferido por el usuario en la aplicación"
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL o imagen codificada de la foto de perfil del usuario"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Número de teléfono o WhatsApp principal"
+        },
+        "preferredContactMethod": {
+          "type": "string",
+          "enum": ["whatsapp", "email", "phone", "sms"],
+          "description": "Método preferido de contacto para avisos y asignaciones"
+        },
+        "contactTimePreference": {
+          "type": "string",
+          "enum": ["morning", "afternoon", "evening", "anytime"],
+          "description": "Franja horaria preferida para contactar al usuario"
+        },
+        "notificationsEnabled": {
+          "type": "boolean",
+          "description": "Preferencia para recibir avisos y recordatorios de asignaciones"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Notas adicionales sobre contacto, disponibilidad o circunstancias"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha y hora de la última actualización del perfil"
+        }
+      },
+      "required": ["uid", "email"]
+    },
+    "CongregationSettings": {
+      "title": "CongregationSettings",
+      "description": "Ajustes de la congregación incluyendo identificador único, código personalizado y configuraciones teocráticas",
+      "type": "object",
+      "properties": {
+        "congregationName": {
+          "type": "string",
+          "description": "Nombre oficial de la congregación"
+        },
+        "congregationNumber": {
+          "type": "string",
+          "description": "ID o número de la congregación"
+        },
+        "congregationId": {
+          "type": "string",
+          "description": "ID único teocrático de la congregación"
+        },
+        "customCode": {
+          "type": "string",
+          "description": "Código único o ID personalizado configurado por el usuario"
+        },
+        "isCustomId": {
+          "type": "boolean",
+          "description": "Indica si el usuario configuró un ID personalizado o automático"
+        },
+        "congregationPinHash": {
+          "type": "string",
+          "description": "Hash seguro del PIN de congregación"
+        },
+        "circuitNumber": {
+          "type": "string",
+          "description": "Número de circuito asignado"
+        },
+        "country": {
+          "type": "string",
+          "description": "País de la congregación"
+        },
+        "city": {
+          "type": "string",
+          "description": "Ciudad de la congregación"
+        },
+        "hallAddress": {
+          "type": "string",
+          "description": "Dirección del Salón del Reino"
+        },
+        "isRegistered": {
+          "type": "boolean",
+          "description": "Estado de registro de la congregación"
+        },
+        "registeredAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha y hora de registro en formato ISO"
+        }
+      },
+      "required": ["congregationName", "isRegistered"]
+    },
+    "CongregationData": {
+      "title": "CongregationData",
+      "description": "Documento principal con los datos completos y ajustes de la congregación",
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "object",
+          "description": "Ajustes de la congregación",
+          "$ref": "CongregationSettings"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Fecha de última sincronización"
+        }
+      },
+      "required": ["settings"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Documento de perfil del usuario que almacena su foto, nombre visible y preferencias de contacto"
+    },
+    "/users/{userId}/congregation_data/main": {
+      "schema": "CongregationData",
+      "description": "Almacena los ajustes del documento de la congregación y colecciones teocráticas asociadas al usuario administrador"
+    }
+  }
+}

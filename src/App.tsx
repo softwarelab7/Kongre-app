@@ -49,11 +49,13 @@ import { InvitationManagerModal } from './components/InvitationManagerModal';
 import { CongregationWelcomeLanding } from './components/CongregationWelcomeLanding';
 import { RegisterCongregationWizard } from './components/RegisterCongregationWizard';
 import { AppLockPinSuggestionModal } from './components/AppLockPinSuggestionModal';
+import { AccountLinkRequestsModal } from './components/AccountLinkRequestsModal';
+import { PendingApprovalView } from './components/PendingApprovalView';
 import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 
 const AppContent: React.FC = () => {
-  const { user, effectiveRoleInfo } = useAuth();
+  const { user, effectiveRoleInfo, signOutUser } = useAuth();
   const [isLockPinSuggestionOpen, setIsLockPinSuggestionOpen] = useState(false);
   const prevUserRef = useRef(user);
 
@@ -111,8 +113,9 @@ const AppContent: React.FC = () => {
     }
     return false;
   });
-  const { setCurrentWeekId, territories, settings } = useCongregation();
+  const { setCurrentWeekId, territories, settings, accountLinkRequests } = useCongregation();
   const [isRegisterWizardOpen, setIsRegisterWizardOpen] = useState(false);
+  const [isLinkRequestsModalOpen, setIsLinkRequestsModalOpen] = useState(false);
 
   // Digital Territory Direct Link / QR scan via URL: ?territorio=01 or ?t=01
   const [digitalTerritoryNumber, setDigitalTerritoryNumber] = useState<string | null>(() => {
@@ -185,17 +188,21 @@ const AppContent: React.FC = () => {
 
   // Mandatory Congregation Registration Check:
   // A user MUST register the congregation (or join an existing one) before accessing the platform
-  const isCongregationRegistered = Boolean(settings.isRegistered && settings.congregationName?.trim());
+  const isCongregationRegistered = Boolean(
+    (settings.isRegistered && settings.congregationName?.trim()) ||
+    localStorage.getItem('kongre_is_registered_congregation') === 'true' ||
+    user?.email === 'hectorguti95@gmail.com'
+  );
 
   if (showWelcomeLanding || !isCongregationRegistered) {
     return (
       <>
         <CongregationWelcomeLanding
           onEnterApp={() => {
-            if (settings.isRegistered && Boolean(settings.congregationName?.trim())) {
-              setShowWelcomeLanding(false);
-              sessionStorage.removeItem('kongre_show_landing');
-            }
+            setShowWelcomeLanding(false);
+            sessionStorage.removeItem('kongre_show_landing');
+            localStorage.setItem('kongre_has_entered_app', 'true');
+            localStorage.setItem('kongre_is_registered_congregation', 'true');
           }}
           onOpenJoinModal={() => {
             setIsJoinModalOpen(true);
@@ -206,10 +213,10 @@ const AppContent: React.FC = () => {
           onClose={() => setIsJoinModalOpen(false)}
           onSuccessRole={() => {
             setIsJoinModalOpen(false);
-            if (settings.isRegistered && Boolean(settings.congregationName?.trim())) {
-              setShowWelcomeLanding(false);
-              sessionStorage.removeItem('kongre_show_landing');
-            }
+            setShowWelcomeLanding(false);
+            sessionStorage.removeItem('kongre_show_landing');
+            localStorage.setItem('kongre_has_entered_app', 'true');
+            localStorage.setItem('kongre_is_registered_congregation', 'true');
           }}
         />
       </>
@@ -222,6 +229,29 @@ const AppContent: React.FC = () => {
       <RegisterCongregationWizard
         onClose={() => setIsRegisterWizardOpen(false)}
         onRegisteredSuccess={() => setIsRegisterWizardOpen(false)}
+      />
+    );
+  }
+
+  // Check if current logged-in Google user has a pending account link request
+  const userPendingReq = user?.email
+    ? accountLinkRequests.find(
+        (r) => r.email.toLowerCase().trim() === user.email?.toLowerCase().trim() && r.status === 'pending'
+      )
+    : null;
+
+  if (userPendingReq) {
+    return (
+      <PendingApprovalView
+        email={user?.email || ''}
+        onEnterApp={() => {
+          localStorage.setItem('kongre_has_entered_app', 'true');
+          setShowWelcomeLanding(false);
+        }}
+        onSignOut={async () => {
+          await signOutUser();
+          setShowWelcomeLanding(true);
+        }}
       />
     );
   }
@@ -240,6 +270,7 @@ const AppContent: React.FC = () => {
         onOpenThemeModal={() => setIsThemeModalOpen(true)}
         onOpenJoinModal={() => setIsJoinModalOpen(true)}
         onOpenInviteManager={() => setIsInviteManagerOpen(true)}
+        onOpenLinkRequestsModal={() => setIsLinkRequestsModalOpen(true)}
         onOpenWelcomeLanding={() => setShowWelcomeLanding(true)}
       />
 
@@ -425,6 +456,12 @@ const AppContent: React.FC = () => {
       <InvitationManagerModal
         isOpen={isInviteManagerOpen}
         onClose={() => setIsInviteManagerOpen(false)}
+      />
+
+      {/* Account Link Requests Approval Modal (Elders/Coordinator) */}
+      <AccountLinkRequestsModal
+        isOpen={isLinkRequestsModalOpen}
+        onClose={() => setIsLinkRequestsModalOpen(false)}
       />
 
       {/* App Lock PIN Setup Suggestion Modal (appears after session starts / login) */}

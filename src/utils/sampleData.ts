@@ -28,6 +28,9 @@ import { getOrganizedScheduleForWeek, applyOrganizedToWeek } from './organizedSy
 export const INITIAL_SETTINGS: CongregationSettings = {
   congregationName: '',
   congregationNumber: '',
+  congregationId: '',
+  customCode: '',
+  isCustomId: false,
   circuitNumber: '',
   language: 'Español',
   country: '',

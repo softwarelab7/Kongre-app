@@ -50,6 +50,8 @@ import {
   Building2,
 } from 'lucide-react';
 import { useSecurity } from '../context/SecurityContext';
+import { KongreLogo } from './KongreLogo';
+import { getFriendlyCongregationName } from '../utils/theocraticSecurity';
 
 export type ActiveTab =
   | 'inicio'
@@ -87,6 +89,7 @@ interface NavbarProps {
   onOpenThemeModal?: () => void;
   onOpenJoinModal?: () => void;
   onOpenInviteManager?: () => void;
+  onOpenLinkRequestsModal?: () => void;
   onOpenWelcomeLanding?: () => void;
 }
 
@@ -121,10 +124,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenThemeModal,
   onOpenJoinModal,
   onOpenInviteManager,
+  onOpenLinkRequestsModal,
   onOpenWelcomeLanding,
 }) => {
-  const { user, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo } = useAuth();
-  const { settings, conflicts, syncStatus, notices, territories } = useCongregation();
+  const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo } = useAuth();
+  const { settings, updateSettings, conflicts, syncStatus, notices, territories, accountLinkRequests } = useCongregation();
+  const pendingRequestsCount = accountLinkRequests.filter((r) => r.status === 'pending').length;
   const { themeMode, toggleTheme, isDark, isCabinaMode } = useTheme();
   const { isPinEnabled, lockSession } = useSecurity();
 
@@ -345,6 +350,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     setOpenDropdown(openDropdown === deptId ? null : deptId);
   };
 
+  const displayCongregationName = getFriendlyCongregationName(settings.congregationName, 'Congregación Central');
+
   return (
     <>
       <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-xs" ref={dropdownRef}>
@@ -357,13 +364,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="flex items-center gap-2.5 sm:gap-3 min-w-0 shrink-0 cursor-pointer group"
               title="Ir al Resumen General de la congregación"
             >
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-linear-to-br from-indigo-600 to-indigo-800 flex items-center justify-center text-white shadow-md shrink-0 group-hover:scale-105 transition-transform">
-                <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
-              </div>
-              <div className="truncate">
+              <KongreLogo size="lg" className="group-hover:scale-105 transition-transform shrink-0" />
+              <div className="truncate min-w-0">
                 <h1 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5 truncate">
-                  <span className="truncate">{settings.congregationName || 'Gestor Teocrático'}</span>
-                  <span className="hidden xl:inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  <span className="truncate">{displayCongregationName}</span>
+                  <span className="hidden xl:inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0">
                     Kongre
                   </span>
                 </h1>
@@ -472,25 +477,22 @@ export const Navbar: React.FC<NavbarProps> = ({
               {/* PWA Install Button */}
               <PWAInstallButton />
 
-              {/* Theme Toggle Button (Light / Dark / Cabina & Acomodadores) */}
+              {/* Theme Toggle Button (Light / Dark) */}
               <button
-                onClick={onOpenThemeModal || toggleTheme}
-                className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer"
-                title={`Tema actual: ${
-                  themeMode === 'light'
-                    ? 'Modo Claro (Día)'
-                    : themeMode === 'dark'
-                    ? 'Modo Oscuro (Noche)'
-                    : 'Modo Cabina & Acomodadores (Auditorio)'
-                }. Clic para cambiar.`}
+                type="button"
+                onClick={toggleTheme}
+                className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700 cursor-pointer select-none"
+                title={isDark ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
               >
-                {themeMode === 'light' ? (
-                  <Sun className="w-4 h-4 text-amber-500" />
-                ) : themeMode === 'dark' ? (
-                  <Moon className="w-4 h-4 text-indigo-400" />
-                ) : (
-                  <Tv className="w-4 h-4 text-emerald-400" />
-                )}
+                <span className="pointer-events-none flex items-center justify-center">
+                  {themeMode === 'light' ? (
+                    <Sun className="w-4 h-4 text-amber-500" />
+                  ) : themeMode === 'dark' ? (
+                    <Moon className="w-4 h-4 text-indigo-400" />
+                  ) : (
+                    <Tv className="w-4 h-4 text-emerald-400" />
+                  )}
+                </span>
               </button>
 
               {/* Welcome / Registration Landing Portal Button */}
@@ -514,6 +516,27 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   <span>Invitar QR</span>
+                </button>
+              )}
+
+              {/* Account Link Requests Approval Button (Elders/Coordinator) */}
+              {onOpenLinkRequestsModal && effectiveRoleInfo.canModifySettings && (
+                <button
+                  onClick={onOpenLinkRequestsModal}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${
+                    pendingRequestsCount > 0
+                      ? 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300 dark:bg-amber-950/80 dark:hover:bg-amber-900 dark:text-amber-200 dark:border-amber-700 shadow-2xs'
+                      : 'hidden lg:flex bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                  }`}
+                  title="Solicitudes de vinculación de cuentas Google pendientes de aprobación"
+                >
+                  <UserCheck className={`w-3.5 h-3.5 ${pendingRequestsCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500'}`} />
+                  <span className="hidden md:inline">Vinculaciones</span>
+                  {pendingRequestsCount > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full bg-amber-600 text-white font-black text-[10px] animate-pulse">
+                      {pendingRequestsCount}
+                    </span>
+                  )}
                 </button>
               )}
 
@@ -545,17 +568,24 @@ export const Navbar: React.FC<NavbarProps> = ({
               {/* Google Login / Profile */}
               {user ? (
                 <div className="flex items-center gap-1.5 sm:gap-2 pl-1 sm:pl-2 border-l border-slate-200 dark:border-slate-700">
-                  {user.photoURL ? (
-                    <img
-                      src={user.photoURL}
-                      alt={user.displayName || 'Usuario'}
-                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-slate-300 dark:border-slate-700"
-                    />
-                  ) : (
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-bold text-xs">
-                      {(user.displayName || user.email || 'U').charAt(0).toUpperCase()}
-                    </div>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('ajustes')}
+                    className="flex items-center gap-1.5 p-0.5 rounded-full hover:ring-2 hover:ring-indigo-500/30 transition-all cursor-pointer"
+                    title="Mi Perfil y Preferencias de Contacto"
+                  >
+                    {(userProfile?.photoURL || user.photoURL) ? (
+                      <img
+                        src={(userProfile?.photoURL || user.photoURL) || undefined}
+                        alt={userProfile?.displayName || user.displayName || 'Usuario'}
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-slate-300 dark:border-slate-700 object-cover"
+                      />
+                    ) : (
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                        {((userProfile?.displayName || user.displayName || user.email || 'U').charAt(0)).toUpperCase()}
+                      </div>
+                    )}
+                  </button>
                   <button
                     onClick={signOutUser}
                     className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -834,11 +864,13 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Header */}
             <div className="px-5 pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <div>
+              <div className="min-w-0 pr-2">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                   Menú Teocrático
                 </span>
-                <h3 className="font-bold text-slate-900 dark:text-white text-base">{settings.congregationName}</h3>
+                <h3 className="font-bold text-slate-900 dark:text-white text-base truncate">
+                  {displayCongregationName}
+                </h3>
               </div>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -910,22 +942,22 @@ export const Navbar: React.FC<NavbarProps> = ({
                 )}
 
                 <button
+                  type="button"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
-                    if (onOpenThemeModal) onOpenThemeModal();
-                    else toggleTheme();
+                    toggleTheme();
                   }}
-                  className="p-2 rounded-2xl bg-amber-50 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 flex flex-col items-center text-center gap-1 active:scale-95 transition-transform cursor-pointer"
+                  className="p-2 rounded-2xl bg-amber-50 dark:bg-slate-800 border border-amber-200 dark:border-slate-700 flex flex-col items-center text-center gap-1 active:scale-95 transition-transform cursor-pointer select-none"
                 >
-                  {themeMode === 'light' ? (
-                    <Sun className="w-4 h-4 text-amber-600" />
-                  ) : themeMode === 'dark' ? (
-                    <Moon className="w-4 h-4 text-indigo-400" />
-                  ) : (
-                    <Tv className="w-4 h-4 text-emerald-400" />
-                  )}
-                  <span className="text-[10px] font-bold text-amber-900 dark:text-slate-200">
-                    {themeMode === 'light' ? 'Claro' : themeMode === 'dark' ? 'Oscuro' : 'Cabina'}
+                  <span className="pointer-events-none flex flex-col items-center gap-1">
+                    {isDark ? (
+                      <Moon className="w-4 h-4 text-indigo-400" />
+                    ) : (
+                      <Sun className="w-4 h-4 text-amber-600" />
+                    )}
+                    <span className="text-[10px] font-bold text-amber-900 dark:text-slate-200">
+                      {isDark ? 'Oscuro' : 'Claro'}
+                    </span>
                   </span>
                 </button>
               </div>
@@ -1143,13 +1175,40 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                 {user ? (
                   <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700 text-xs">
-                    <div>
-                      <p className="font-bold text-slate-900 dark:text-white">{user.displayName || 'Coordinador'}</p>
-                      <p className="text-slate-500 dark:text-slate-400 text-[11px] truncate max-w-[200px]">{user.email}</p>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setActiveTab('ajustes');
+                      }}
+                      className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity min-w-0"
+                    >
+                      {(userProfile?.photoURL || user.photoURL) ? (
+                        <img
+                          src={(userProfile?.photoURL || user.photoURL) || undefined}
+                          alt={userProfile?.displayName || user.displayName || 'Usuario'}
+                          className="w-8 h-8 rounded-full border border-slate-300 dark:border-slate-700 object-cover shrink-0"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center font-bold text-xs shadow-xs shrink-0">
+                          {((userProfile?.displayName || user.displayName || user.email || 'U').charAt(0)).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="font-bold text-slate-900 dark:text-white truncate">
+                          {userProfile?.displayName || user.displayName || 'Coordinador'}
+                        </p>
+                        <p className="text-slate-500 dark:text-slate-400 text-[10px] truncate max-w-[170px]">
+                          {user.email}
+                        </p>
+                        <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold block">
+                          Mi Perfil & Contacto →
+                        </span>
+                      </div>
+                    </button>
                     <button
                       onClick={signOutUser}
-                      className="px-2.5 py-1 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg font-semibold cursor-pointer"
+                      className="px-2.5 py-1 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg font-semibold cursor-pointer shrink-0 ml-2"
                     >
                       Salir
                     </button>

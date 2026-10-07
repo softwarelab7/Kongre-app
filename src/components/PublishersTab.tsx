@@ -1,7 +1,10 @@
 // src/components/PublishersTab.tsx
 import React, { useState, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
-import { Publisher, Gender, Absence } from '../types';
+import { Publisher, Gender, Absence, TheocraticPrivilege } from '../types';
+import { useAuth } from '../context/AuthContext';
+import { TheocraticRole, THEOCRATIC_ROLES } from '../utils/rbac';
+import { generateSecurePublisherPin } from '../utils/theocraticSecurity';
 import {
   Search,
   UserPlus,
@@ -21,10 +24,18 @@ import {
   X,
   AlertCircle,
   Lock,
+  UserCheck,
+  KeyRound,
+  Sparkles,
+  Copy,
+  Eye,
+  EyeOff,
+  ShieldCheck,
 } from 'lucide-react';
 import { computePublisherAssignmentStats } from '../utils/autoAssigner';
 import { useSecurity } from '../context/SecurityContext';
 import { maskPhoneNumber } from '../utils/theocraticSecurity';
+import { AccountLinkRequestsModal } from './AccountLinkRequestsModal';
 
 export const PublishersTab: React.FC = () => {
   const {
@@ -35,13 +46,20 @@ export const PublishersTab: React.FC = () => {
     importPublishersFromCSV,
     weeks,
     customDuties,
+    accountLinkRequests,
   } = useCongregation();
 
+  const { assignPersonalPinToPublisher } = useAuth();
   const { privacyModeEnabled } = useSecurity();
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const pendingLinkCount = accountLinkRequests.filter((r) => r.status === 'pending').length;
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterGender, setFilterGender] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [visiblePins, setVisiblePins] = useState<Record<string, boolean>>({});
+  const [copiedPinId, setCopiedPinId] = useState<string | null>(null);
+  const [pinActionFeedback, setPinActionFeedback] = useState<string | null>(null);
 
   // Modals state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -58,6 +76,12 @@ export const PublishersTab: React.FC = () => {
   const [formActive, setFormActive] = useState<boolean>(true);
   const [formAbsences, setFormAbsences] = useState<Absence[]>([]);
   const [formRoles, setFormRoles] = useState<Record<string, boolean>>({});
+
+  // Publisher Privileges & Personal PIN
+  const [formPrivilege, setFormPrivilege] = useState<TheocraticPrivilege>('publicador_bautizado');
+  const [formTheocraticRole, setFormTheocraticRole] = useState<TheocraticRole>('publico');
+  const [formPersonalPin, setFormPersonalPin] = useState<string>('');
+  const [formPinError, setFormPinError] = useState<string | null>(null);
 
   // New absence fields
   const [newAbsStart, setNewAbsStart] = useState('');
@@ -102,6 +126,12 @@ export const PublishersTab: React.FC = () => {
     setFormGroup(1);
     setFormActive(true);
     setFormAbsences([]);
+    setFormPrivilege('publicador_bautizado');
+    setFormTheocraticRole('publico');
+    // Generar automáticamente un PIN numérico seguro de 4 dígitos no repetido
+    const existingPins = publishers.map((p) => p.personalPin?.trim()).filter(Boolean) as string[];
+    setFormPersonalPin(generateSecurePublisherPin(existingPins));
+    setFormPinError(null);
     // Default roles
     setFormRoles({
       vym_presidente: false,
@@ -138,15 +168,49 @@ export const PublishersTab: React.FC = () => {
     setFormActive(pub.active);
     setFormAbsences([...pub.absences]);
     setFormRoles({ ...pub.roles });
+    setFormPrivilege(pub.privilege || 'publicador_bautizado');
+    setFormTheocraticRole(pub.theocraticRole || 'publico');
+    setFormPersonalPin(pub.personalPin || '');
+    setFormPinError(null);
     setIsEditModalOpen(true);
+  };
+
+  const handleGeneratePinInModal = () => {
+    const existingPins = publishers
+      .filter((p) => !selectedPublisher || p.id !== selectedPublisher.id)
+      .map((p) => p.personalPin?.trim())
+      .filter(Boolean) as string[];
+    const newPin = generateSecurePublisherPin(existingPins);
+    setFormPersonalPin(newPin);
+    setFormPinError(null);
   };
 
   const handleSavePublisher = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim()) return;
 
+    const cleanPin = formPersonalPin.trim();
+    if (cleanPin) {
+      if (cleanPin.length < 4) {
+        setFormPinError('El PIN debe tener al menos 4 dígitos numéricos.');
+        return;
+      }
+      // Validar unicidad estricta: ningún otro publicador puede tener este mismo PIN
+      const duplicate = publishers.find(
+        (p) =>
+          p.personalPin?.trim() === cleanPin &&
+          (!selectedPublisher || p.id !== selectedPublisher.id)
+      );
+      if (duplicate) {
+        setFormPinError(
+          `El PIN ${cleanPin} ya pertenece al hermano "${duplicate.name}". Los PINs deben ser únicos por publicador.`
+        );
+        return;
+      }
+    }
+
     if (selectedPublisher) {
-      updatePublisher({
+      const updated: Publisher = {
         ...selectedPublisher,
         name: formName.trim(),
         gender: formGender,
@@ -156,9 +220,28 @@ export const PublishersTab: React.FC = () => {
         active: formActive,
         absences: formAbsences,
         roles: formRoles as any,
-      });
+        privilege: formPrivilege,
+        theocraticRole: formTheocraticRole,
+        personalPin: cleanPin || undefined,
+      };
+      updatePublisher(updated);
+
+      if (cleanPin) {
+        assignPersonalPinToPublisher(
+          selectedPublisher.id,
+          cleanPin,
+          formTheocraticRole,
+          formName.trim(),
+          selectedPublisher.email,
+          formPrivilege
+        );
+      }
+      setPinActionFeedback(`¡Publicador ${formName.trim()} actualizado correctamente!`);
+      setTimeout(() => setPinActionFeedback(null), 2500);
     } else {
-      addPublisher({
+      const newPubId = `pub-${Date.now()}`;
+      const newPub: Publisher = {
+        id: newPubId,
         name: formName.trim(),
         gender: formGender,
         phone: formPhone.trim(),
@@ -167,9 +250,81 @@ export const PublishersTab: React.FC = () => {
         active: formActive,
         absences: formAbsences,
         roles: formRoles as any,
-      });
+        privilege: formPrivilege,
+        theocraticRole: formTheocraticRole,
+        personalPin: cleanPin || undefined,
+      };
+      addPublisher(newPub);
+
+      if (cleanPin) {
+        assignPersonalPinToPublisher(
+          newPubId,
+          cleanPin,
+          formTheocraticRole,
+          formName.trim(),
+          undefined,
+          formPrivilege
+        );
+      }
+      setPinActionFeedback(`¡Publicador ${formName.trim()} registrado con su PIN único!`);
+      setTimeout(() => setPinActionFeedback(null), 2500);
     }
     setIsEditModalOpen(false);
+  };
+
+  const handleAssignPinToSinglePub = (pub: Publisher) => {
+    const existingPins = publishers
+      .filter((p) => p.id !== pub.id)
+      .map((p) => p.personalPin?.trim())
+      .filter(Boolean) as string[];
+    const newPin = generateSecurePublisherPin(existingPins);
+    const role = pub.theocraticRole || 'publico';
+    const updated: Publisher = {
+      ...pub,
+      personalPin: newPin,
+      theocraticRole: role,
+    };
+    updatePublisher(updated);
+    assignPersonalPinToPublisher(pub.id, newPin, role, pub.name, pub.email, pub.privilege);
+    setPinActionFeedback(`¡PIN único ${newPin} asignado a ${pub.name}!`);
+    setTimeout(() => setPinActionFeedback(null), 3000);
+  };
+
+  const handleBatchGeneratePins = () => {
+    const missing = publishers.filter((p) => !p.personalPin);
+    if (missing.length === 0) {
+      alert('Todos los publicadores ya cuentan con un PIN personal único asignado.');
+      return;
+    }
+    if (!confirm(`¿Generar un PIN personal único para los ${missing.length} publicadores que aún no tienen PIN?`)) {
+      return;
+    }
+    const takenPins = publishers.map((p) => p.personalPin?.trim()).filter(Boolean) as string[];
+    missing.forEach((pub) => {
+      const pin = generateSecurePublisherPin(takenPins);
+      takenPins.push(pin);
+      const role = pub.theocraticRole || 'publico';
+      updatePublisher({
+        ...pub,
+        personalPin: pin,
+        theocraticRole: role,
+      });
+      assignPersonalPinToPublisher(pub.id, pin, role, pub.name, pub.email, pub.privilege);
+    });
+    setPinActionFeedback(`¡Se asignó un PIN único a ${missing.length} publicadores!`);
+    setTimeout(() => setPinActionFeedback(null), 3500);
+  };
+
+  const handleCopyCredentials = (pub: Publisher) => {
+    if (!pub.personalPin) return;
+    const roleTitle = pub.theocraticRole ? THEOCRATIC_ROLES[pub.theocraticRole]?.name : 'Publicador';
+    const privilegeTitle = pub.privilege
+      ? pub.privilege.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+      : 'Publicador';
+    const text = `🔐 ACCESO KONGRE - CREDENCIALES TEOCRÁTICAS\n━━━━━━━━━━━━━━━━━━━━\n👤 Publicador: ${pub.name}\n📜 Privilegio: ${privilegeTitle}\n🏛️ Rol Asignado: ${roleTitle}\n🔑 Tu PIN Personal Único: ${pub.personalPin}\n━━━━━━━━━━━━━━━━━━━━\nIntroduce tu PIN Personal en la app Kongre para identificarte y acceder a tus funciones teocráticas.`;
+    navigator.clipboard.writeText(text);
+    setCopiedPinId(pub.id);
+    setTimeout(() => setCopiedPinId(null), 2500);
   };
 
   const handleAddAbsence = () => {
@@ -321,16 +476,66 @@ export const PublishersTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Pending Account Link Requests Banner */}
+      {pendingLinkCount > 0 && (
+        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
+              <UserCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-amber-900 dark:text-amber-200">
+                {pendingLinkCount} solicitud{pendingLinkCount > 1 ? 'es' : ''} de vinculación de correo pendiente{pendingLinkCount > 1 ? 's' : ''}
+              </h4>
+              <p className="text-xs text-amber-700 dark:text-amber-300">
+                Publicadores han verificado el PIN de la congregación y esperan aprobación para usar su cuenta de Google.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsLinkModalOpen(true)}
+            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all shrink-0 cursor-pointer text-center"
+          >
+            Revisar y Aprobar
+          </button>
+        </div>
+      )}
+
+      {/* PIN Action Feedback Banner */}
+      {pinActionFeedback && (
+        <div className="p-3.5 rounded-2xl bg-emerald-600 text-white text-xs font-bold text-center shadow-xs animate-in fade-in flex items-center justify-center gap-2">
+          <Sparkles className="w-4 h-4 text-emerald-200" />
+          <span>{pinActionFeedback}</span>
+        </div>
+      )}
+
       {/* Top action header */}
       <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Directorio de Publicadores</h2>
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Directorio de Publicadores</h2>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+              {publishers.filter(p => !!p.personalPin).length}/{publishers.length} con PIN único
+            </span>
+          </div>
           <p className="text-xs sm:text-sm text-slate-500">
-            {publishers.length} publicadores registrados ({publishers.filter(p => p.active).length} activos). Configura roles y ausencias para bloquear asignaciones automáticamente.
+            {publishers.length} publicadores registrados ({publishers.filter(p => p.active).length} activos). Cada publicador cuenta con su propio PIN personal único e intransferible.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {publishers.some(p => !p.personalPin) && (
+            <button
+              onClick={handleBatchGeneratePins}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer"
+              title="Asignar automáticamente un PIN único a cada publicador que aún no tenga uno"
+            >
+              <Sparkles className="w-4 h-4 text-emerald-600" />
+              <span>Auto-asignar PINs ({publishers.filter(p => !p.personalPin).length})</span>
+            </button>
+          )}
+
           <button
             onClick={() => setIsCsvModalOpen(true)}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold transition-all"
@@ -444,6 +649,28 @@ export const PublishersTab: React.FC = () => {
                       <span className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
                         <span className="capitalize">{pub.gender}</span> • Grupo {pub.groupNumber || 1}
                       </span>
+
+                      {/* Spiritual Privilege & Theocratic Role Badges */}
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {pub.privilege && pub.privilege !== 'publicador_bautizado' && (
+                          <span
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold capitalize ${
+                              pub.privilege === 'anciano'
+                                ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300'
+                                : pub.privilege === 'siervo_ministerial'
+                                ? 'bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300'
+                                : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                            }`}
+                          >
+                            {pub.privilege.replace(/_/g, ' ')}
+                          </span>
+                        )}
+                        {pub.theocraticRole && pub.theocraticRole !== 'publico' && (
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-blue-100 text-blue-900 border border-blue-200">
+                            {THEOCRATIC_ROLES[pub.theocraticRole]?.shortName || pub.theocraticRole}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -476,6 +703,62 @@ export const PublishersTab: React.FC = () => {
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
+                  </div>
+                </div>
+
+                {/* PIN Personal Único del Publicador */}
+                <div className="mt-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <KeyRound className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                    <span className="text-[11px] font-semibold text-slate-500 shrink-0">PIN:</span>
+                    {pub.personalPin ? (
+                      <span className="font-mono font-bold text-xs text-indigo-700 tracking-wider">
+                        {visiblePins[pub.id] ? pub.personalPin : '••••'}
+                      </span>
+                    ) : (
+                      <span className="text-[11px] text-amber-700 italic">Sin PIN asignado</span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1 shrink-0">
+                    {pub.personalPin ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setVisiblePins((prev) => ({ ...prev, [pub.id]: !prev[pub.id] }))}
+                          className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-white transition-colors cursor-pointer"
+                          title={visiblePins[pub.id] ? 'Ocultar PIN' : 'Ver PIN'}
+                        >
+                          {visiblePins[pub.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyCredentials(pub)}
+                          className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-white transition-colors cursor-pointer"
+                          title="Copiar credenciales teocráticas para WhatsApp"
+                        >
+                          {copiedPinId === pub.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleAssignPinToSinglePub(pub)}
+                          className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 px-1 py-0.5 rounded hover:bg-white transition-colors cursor-pointer"
+                          title="Regenerar nuevo PIN único"
+                        >
+                          Regenerar
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleAssignPinToSinglePub(pub)}
+                        className="px-2 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
+                        title="Generar PIN personal único"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        <span>Generar PIN</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -690,16 +973,105 @@ export const PublishersTab: React.FC = () => {
                 </label>
               </div>
 
+              {/* Privilegios Teocráticos y PIN Personal Único */}
+              <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/60 space-y-4">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-950 dark:text-indigo-200">
+                    Seguridad y Privilegios Teocráticos (PIN Único)
+                  </h4>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                      Privilegio Espiritual
+                    </label>
+                    <select
+                      value={formPrivilege}
+                      onChange={e => setFormPrivilege(e.target.value as TheocraticPrivilege)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium"
+                    >
+                      <option value="publicador_bautizado">Publicador Bautizado</option>
+                      <option value="anciano">Anciano</option>
+                      <option value="siervo_ministerial">Siervo Ministerial</option>
+                      <option value="precursor_regular">Precursor Regular</option>
+                      <option value="precursor_auxiliar">Precursor Auxiliar</option>
+                      <option value="precursor_especial">Precursor Especial</option>
+                      <option value="publicador_no_bautizado">Publicador No Bautizado</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                      Rol Asignado en Kongre
+                    </label>
+                    <select
+                      value={formTheocraticRole}
+                      onChange={e => setFormTheocraticRole(e.target.value as TheocraticRole)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium"
+                    >
+                      <option value="publico">Publicador (Sin rol administrativo)</option>
+                      <option value="coordinador">Coordinador del Cuerpo de Ancianos</option>
+                      <option value="secretario">Secretario</option>
+                      <option value="superintendente_vym">Superintendente de Vida y Ministerio</option>
+                      <option value="siervo_territorios">Siervo de Territorios</option>
+                      <option value="siervo_literatura">Siervo de Literatura</option>
+                      <option value="siervo_cuentas">Siervo de Cuentas</option>
+                      <option value="siervo_discursos">Siervo de Discursos Públicos</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* PIN Personal Único del Publicador */}
+                <div className="pt-2 border-t border-indigo-100/80 dark:border-indigo-900/60">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                      <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                      <span>PIN Personal Único del Publicador:</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleGeneratePinInModal}
+                      className="text-xs text-indigo-600 dark:text-indigo-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Generar nuevo PIN único</span>
+                    </button>
+                  </div>
+
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={formPersonalPin}
+                    onChange={e => {
+                      setFormPersonalPin(e.target.value.replace(/\D/g, ''));
+                      setFormPinError(null);
+                    }}
+                    placeholder="Ej. 4821 (4 dígitos numéricos)"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-base focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  />
+
+                  {formPinError ? (
+                    <p className="text-xs font-bold text-rose-600 mt-1.5">{formPinError}</p>
+                  ) : (
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                      💡 El PIN es <strong>exclusivo e intransferible</strong> de este publicador. Al ingresar su PIN, el sistema reconoce quién es y activa sus permisos correspondientes.
+                    </p>
+                  )}
+                </div>
+              </div>
+
               {/* Notes */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Notas / Privilegios teocráticos
+                  Notas adicionales
                 </label>
                 <input
                   type="text"
                   value={formNotes}
                   onChange={e => setFormNotes(e.target.value)}
-                  placeholder="Ej. Anciano, Siervo ministerial, Precursor, etc."
+                  placeholder="Ej. Conductor de grupo, precursor auxiliar en marzo, etc."
                   className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
                 />
               </div>
@@ -1167,6 +1539,12 @@ export const PublishersTab: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Account Link Requests Modal */}
+      <AccountLinkRequestsModal
+        isOpen={isLinkModalOpen}
+        onClose={() => setIsLinkModalOpen(false)}
+      />
     </div>
   );
 };

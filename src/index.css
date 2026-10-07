@@ -28,6 +28,20 @@
     background-color: #020408;
     color: #e2e8f0;
   }
+
+  /* Prevent automatic zoom on input focus in iOS Safari / WebKit */
+  @supports (-webkit-touch-callout: none) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  /* En pantallas móviles asegurar al menos 16px para inputs */
+  @media screen and (max-width: 640px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
 }
 
 /* Hide scrollbars while allowing swipeable lists on mobile */

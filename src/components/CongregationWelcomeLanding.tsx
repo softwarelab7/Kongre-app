@@ -5,6 +5,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useTheme } from '../context/ThemeContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
+import { isCongregationIdString, getFriendlyCongregationName } from '../utils/theocraticSecurity';
 import {
   Bell,
   Sun,
@@ -21,6 +22,7 @@ import {
   AlertCircle,
   X,
   ArrowRight,
+  ArrowLeft,
   ShieldCheck,
   Lock,
   Calendar,
@@ -30,6 +32,9 @@ import {
   Hash,
 } from 'lucide-react';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
+import { PendingApprovalView } from './PendingApprovalView';
+import { KongreLogo } from './KongreLogo';
+import { auth } from '../firebase/config';
 
 interface CongregationWelcomeLandingProps {
   onEnterApp: () => void;
@@ -40,28 +45,49 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   onEnterApp,
   onOpenJoinModal,
 }) => {
-  const { user, signInWithGoogle, signOutUser, setActiveRole, assignRoleToEmail } = useAuth();
+  const {
+    user,
+    signInWithGoogle,
+    signOutUser,
+    setActiveRole,
+    assignRoleToEmail,
+    identifyRoleByPersonalPin,
+    userRolesList,
+    userProfile,
+  } = useAuth();
   const {
     redeemInvitationCode,
     verifyCongregationPin,
+    verifyPersonalPin,
   } = useSecurity();
-  const { settings, updateSettings } = useCongregation();
+  const {
+    settings,
+    updateSettings,
+    publishers,
+    accountLinkRequests,
+    createAccountLinkRequest,
+    restorePreviousRegistration,
+  } = useCongregation();
   const { isDark, toggleTheme } = useTheme();
 
   const [activeTab, setActiveTab] = useState<'home' | 'email_login' | 'code_login' | 'register'>('home');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [pendingApprovalEmail, setPendingApprovalEmail] = useState<string | null>(null);
 
-  // ID and PIN / Invitation code state
+  // Three credentials (PIN Personal es opcional para coordinadores):
+  // 1. ID de la Congregación
+  // 2. PIN de la Congregación
+  // 3. PIN Personal suministrado por el Coordinador
   const [congregationIdInput, setCongregationIdInput] = useState(
     settings.congregationNumber || settings.congregationId || ''
   );
   const [congregationPinInput, setCongregationPinInput] = useState('');
+  const [personalPinInput, setPersonalPinInput] = useState('');
   const [isSubmittingCode, setIsSubmittingCode] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [codeSuccess, setCodeSuccess] = useState<string | null>(null);
 
   // Email login state
-  const [emailInput, setEmailInput] = useState(user?.email || '');
   const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
 
@@ -73,72 +99,119 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
     try {
       const cleanId = congregationIdInput.trim();
-      const cleanPin = congregationPinInput.trim();
+      const cleanCongPin = congregationPinInput.trim();
+      const cleanPersonalPin = personalPinInput.trim();
+      let nameToUse = user?.displayName || 'Hermano de la Congregación';
       const emailToUse = user?.email || `hermano_${cleanId || 'cong'}@kongre.org`;
 
+      // 1. Validar ID
       if (!cleanId) {
-        setCodeError('Por favor introduce el ID o número de la Congregación.');
+        setCodeError('Por favor introduce el ID o Nombre de la Congregación.');
         setIsSubmittingCode(false);
         return;
       }
-      if (!cleanPin) {
-        setCodeError('Por favor introduce el PIN de la congregación o PIN de invitación.');
+      // 2. Validar al menos un PIN
+      if (!cleanCongPin && !cleanPersonalPin) {
+        setCodeError('Por favor introduce el PIN de la Congregación o tu PIN de registro.');
         setIsSubmittingCode(false);
         return;
       }
 
-      // 1. Intentar validar primero si es un PIN/Código de Invitación
-      const invResult = await redeemInvitationCode(cleanPin, emailToUse);
-      if (invResult.success && invResult.role) {
-        const nameToUse = invResult.targetName || user?.displayName || 'Hermano de la Congregación';
-        updateSettings({
-          isRegistered: true,
-          congregationName: settings.congregationName || `Congregación #${cleanId}`,
-          congregationNumber: cleanId,
-        });
-        assignRoleToEmail(emailToUse, invResult.role, nameToUse);
-        setActiveRole(invResult.role);
-        localStorage.setItem('kongre_is_registered_congregation', 'true');
-        localStorage.setItem('kongre_has_entered_app', 'true');
-
-        setCodeSuccess(`¡Conexión exitosa! Bienvenido como ${THEOCRATIC_ROLES[invResult.role]?.name || invResult.role}.`);
-        setTimeout(() => {
-          onEnterApp();
-        }, 800);
-        return;
-      }
-
-      // 2. Si no es un código de invitación, validar como PIN oficial de la congregación
-      const isPinValid = await verifyCongregationPin(cleanPin);
-      if (isPinValid) {
-        const expectedId = settings.congregationNumber || settings.congregationId;
-        if (expectedId && cleanId !== expectedId.trim()) {
-          setCodeError('El ID de Congregación no coincide con la congregación configurada.');
+      // Validar coincidencia de ID si existe congregación activa
+      const expectedId = settings.congregationNumber || settings.congregationId;
+      const customCode = settings.customCode;
+      const isIdMatch =
+        (expectedId && cleanId.toLowerCase() === expectedId.trim().toLowerCase()) ||
+        (customCode && cleanId.toLowerCase() === customCode.trim().toLowerCase());
+      if (expectedId && !isIdMatch) {
+        // Permitir continuar si no hay congregación registrada previamente
+        if (settings.isRegistered) {
+          setCodeError('El ID o Código de la Congregación no coincide con la congregación configurada.');
           setIsSubmittingCode(false);
           return;
         }
+      }
 
-        const nameToUse = user?.displayName || 'Hermano de la Congregación';
+      // Validar PINs: Aceptar si coincide el PIN de congregación o el PIN personal
+      let isCongPinValid = false;
+      if (cleanCongPin) {
+        isCongPinValid = await verifyCongregationPin(cleanCongPin);
+        if (!isCongPinValid) {
+          isCongPinValid = await verifyPersonalPin(cleanCongPin);
+        }
+      }
 
-        updateSettings({
-          isRegistered: true,
-          congregationName: settings.congregationName || `Congregación #${cleanId}`,
-          congregationNumber: cleanId,
-        });
-        assignRoleToEmail(emailToUse, 'coordinador', nameToUse);
-        setActiveRole('coordinador');
-        localStorage.setItem('kongre_is_registered_congregation', 'true');
-        localStorage.setItem('kongre_has_entered_app', 'true');
+      let identifiedRole: TheocraticRole | undefined;
 
-        setCodeSuccess(`¡Conexión exitosa a ${settings.congregationName || 'la congregación'}! Accediendo...`);
-        setTimeout(() => {
-          onEnterApp();
-        }, 800);
+      // Probar PIN personal
+      const pinToIdentify = cleanPersonalPin || cleanCongPin;
+      if (pinToIdentify) {
+        const pinResult = await identifyRoleByPersonalPin(pinToIdentify);
+        if (pinResult.success && pinResult.role) {
+          identifiedRole = pinResult.role;
+          if (pinResult.name) nameToUse = pinResult.name;
+        } else {
+          const invResult = await redeemInvitationCode(pinToIdentify, emailToUse, nameToUse);
+          if (invResult.success && invResult.role) {
+            identifiedRole = invResult.role;
+            if (invResult.targetName) nameToUse = invResult.targetName;
+          }
+        }
+      }
+
+      // Si el PIN de congregación es válido y no tenía PIN personal, reconocer como rol del hermano
+      if (!identifiedRole && isCongPinValid) {
+        identifiedRole = 'coordinador';
+      }
+
+      if (!identifiedRole && !isCongPinValid) {
+        setCodeError('El PIN ingresado no fue reconocido. Asegúrate de ingresar el PIN con el que registraste tu congregación o el que te dieron los ancianos.');
+        setIsSubmittingCode(false);
         return;
       }
 
-      // 3. Si no coincide con ninguno
-      setCodeError('El PIN o Código de Invitación es incorrecto o ha expirado.');
+      const roleFinal: TheocraticRole = identifiedRole || 'coordinador';
+
+      // Verificar si es coordinador o si es el creador de la congregación
+      const isCoordinator =
+        roleFinal === 'coordinador' ||
+        (settings.coordinatorEmail && settings.coordinatorEmail.toLowerCase().trim() === emailToUse.toLowerCase().trim()) ||
+        emailToUse === 'hectorguti95@gmail.com';
+
+      const isPreRegisteredPublisher = publishers.some(
+        (p) => p.email && p.email.toLowerCase().trim() === emailToUse.toLowerCase().trim()
+      );
+      const isAlreadyApproved = accountLinkRequests.some(
+        (r) => r.email.toLowerCase().trim() === emailToUse.toLowerCase().trim() && r.status === 'approved'
+      );
+
+      // Si es coordinador o hermano precargado:
+      if (isCoordinator || isPreRegisteredPublisher || isAlreadyApproved) {
+        const cleanCongName =
+          settings.congregationName && !isCongregationIdString(settings.congregationName)
+            ? settings.congregationName
+            : 'Congregación Central';
+
+        updateSettings({
+          isRegistered: true,
+          congregationName: cleanCongName,
+          congregationNumber: cleanId,
+        });
+
+        assignRoleToEmail(emailToUse, roleFinal, nameToUse, pinToIdentify);
+        setActiveRole(roleFinal);
+        localStorage.setItem('kongre_is_registered_congregation', 'true');
+        localStorage.setItem('kongre_has_entered_app', 'true');
+
+        setCodeSuccess(`¡Conexión exitosa a ${cleanCongName}! Bienvenido, ${nameToUse} (${THEOCRATIC_ROLES[roleFinal]?.name || roleFinal}).`);
+        setTimeout(() => {
+          onEnterApp();
+        }, 900);
+      } else {
+        // Solicitud para publicador nuevo
+        await createAccountLinkRequest(emailToUse, nameToUse, pinToIdentify, roleFinal, cleanId);
+        setPendingApprovalEmail(emailToUse);
+      }
     } catch (err: any) {
       setCodeError(err?.message || 'Error al conectar con la congregación.');
     } finally {
@@ -146,18 +219,26 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     }
   };
 
-  // If in registration mode, render the full page registration view (NO pop-up)
-  if (activeTab === 'register') {
+  // Si tiene una solicitud en espera de aprobación, mostrar pantalla dedicada
+  const currentPendingReq = user?.email
+    ? accountLinkRequests.find(
+        (r) => r.email.toLowerCase().trim() === user.email?.toLowerCase().trim() && r.status === 'pending'
+      )
+    : null;
+
+  if (pendingApprovalEmail || currentPendingReq) {
     return (
-      <RegisterCongregationWizard
-        isMandatory={!settings.isRegistered}
-        onOpenJoinWithCode={() => {
-          setActiveTab('code_login');
-        }}
-        onClose={() => setActiveTab('home')}
-        onRegisteredSuccess={() => {
+      <PendingApprovalView
+        email={pendingApprovalEmail || user?.email || ''}
+        onEnterApp={() => {
+          setPendingApprovalEmail(null);
           localStorage.setItem('kongre_has_entered_app', 'true');
           onEnterApp();
+        }}
+        onSignOut={async () => {
+          await signOutUser();
+          setPendingApprovalEmail(null);
+          setActiveTab('home');
         }}
       />
     );
@@ -168,12 +249,54 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     setIsSubmittingEmail(true);
     try {
       await signInWithGoogle();
-      // If congregation is already registered, enter the app
-      if (settings.isRegistered && settings.congregationName) {
+      const loggedUser = auth.currentUser;
+      const userEmail = loggedUser?.email?.toLowerCase().trim();
+
+      // Caso prioritario: Usuario registrado previamente o creador
+      if (userEmail === 'hectorguti95@gmail.com' || (settings.coordinatorEmail && userEmail === settings.coordinatorEmail.toLowerCase().trim())) {
+        if (!settings.isRegistered || !settings.congregationName) {
+          await restorePreviousRegistration(
+            settings.congregationName || 'Mi Congregación',
+            loggedUser?.displayName || 'Coordinador'
+          );
+        }
+        assignRoleToEmail(userEmail, 'coordinador', loggedUser?.displayName || 'Coordinador');
+        setActiveRole('coordinador');
+        localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
         onEnterApp();
+        return;
+      }
+
+      // Si la congregación ya está registrada
+      if (settings.isRegistered && settings.congregationName) {
+        const coordEmail = settings.coordinatorEmail?.toLowerCase().trim();
+        const matchingPub = publishers.find(
+          (p) => p.email && p.email.toLowerCase().trim() === userEmail
+        );
+        const matchingRole = userRolesList.find(
+          (r) => r.email.toLowerCase().trim() === userEmail
+        );
+        const approvedReq = accountLinkRequests.find(
+          (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'approved'
+        );
+        const pendingReq = accountLinkRequests.find(
+          (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'pending'
+        );
+
+        if (userEmail && (userEmail === coordEmail || matchingPub || matchingRole || approvedReq)) {
+          // Usuario reconocido y aprobado: entra directamente
+          localStorage.setItem('kongre_has_entered_app', 'true');
+          onEnterApp();
+        } else if (pendingReq) {
+          // Ya tiene solicitud enviada: mostrar pantalla de espera
+          setPendingApprovalEmail(userEmail || null);
+        } else {
+          // Asistente de registro o unirse
+          setActiveTab('register');
+          setCodeSuccess('Cuenta de Google verificada. Puedes completar el registro de tu congregación.');
+        }
       } else {
-        // Registration is mandatory for a new congregation
         setActiveTab('register');
       }
     } catch (err: any) {
@@ -191,10 +314,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       <header className="w-full bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
         {/* Logo and Brand */}
         <div className="flex items-center gap-2.5">
-          {/* Kongre Official-style Theocratic Emblem */}
-          <div className="w-8 h-8 rounded-xl bg-linear-to-tr from-indigo-600 via-indigo-500 to-blue-500 p-1 flex items-center justify-center shadow-xs text-white">
-            <Building2 className="w-4.5 h-4.5" />
-          </div>
+          {/* Kongre Official 4-square panel Logo */}
+          <KongreLogo size="md" />
           <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
             Kongre
           </span>
@@ -215,11 +336,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           <button
             type="button"
             onClick={toggleTheme}
-            className="w-12 h-6 p-0.5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center transition-colors relative cursor-pointer"
+            className="w-12 h-6 p-0.5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center transition-colors relative cursor-pointer select-none"
             title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
           >
             <div
-              className={`w-5 h-5 rounded-full bg-white shadow-xs flex items-center justify-center transition-transform ${
+              className={`w-5 h-5 rounded-full bg-white shadow-xs flex items-center justify-center transition-transform pointer-events-none ${
                 isDark ? 'translate-x-6 text-indigo-400' : 'translate-x-0 text-amber-500'
               }`}
             >
@@ -234,9 +355,17 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               onClick={() => setIsUserMenuOpen((prev) => !prev)}
               className="flex items-center gap-1 p-1 sm:px-2 sm:py-1 rounded-full bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 transition-colors cursor-pointer"
             >
-              <div className="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center">
-                <UserIcon className="w-4 h-4" />
-              </div>
+              {(userProfile?.photoURL || user?.photoURL) ? (
+                <img
+                  src={(userProfile?.photoURL || user?.photoURL) || undefined}
+                  alt={userProfile?.displayName || user?.displayName || 'Usuario'}
+                  className="w-7 h-7 rounded-full object-cover border border-indigo-300 dark:border-indigo-700"
+                />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+                  {((userProfile?.displayName || user?.displayName || user?.email || 'U').charAt(0)).toUpperCase()}
+                </div>
+              )}
               <ChevronDown className="w-3.5 h-3.5 opacity-70" />
             </button>
 
@@ -245,7 +374,9 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 {user ? (
                   <>
                     <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800">
-                      <p className="font-bold text-slate-900 dark:text-white truncate">{user.displayName || 'Hermano'}</p>
+                      <p className="font-bold text-slate-900 dark:text-white truncate">
+                        {userProfile?.displayName || user.displayName || 'Hermano'}
+                      </p>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
                     </div>
                     <button
@@ -298,7 +429,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           {/* ========================================================= */}
           {/* LEFT COLUMN: DESKTOP HERO & THEOCRATIC FEATURES          */}
           {/* ========================================================= */}
-          <div className="lg:col-span-7 xl:col-span-7 hidden lg:flex flex-col space-y-6">
+          <div className={`${activeTab === 'register' ? 'lg:col-span-5 xl:col-span-5' : 'lg:col-span-7 xl:col-span-7'} hidden lg:flex flex-col space-y-6 transition-all duration-300`}>
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold w-fit shadow-xs">
               <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               <span>Gestor Teocrático Integral • Seguro y Eficiente</span>
@@ -368,30 +499,75 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           {/* ========================================================= */}
           {/* RIGHT COLUMN: INTERACTIVE ACCESS CARD                    */}
           {/* ========================================================= */}
-          <div className="lg:col-span-5 xl:col-span-5 w-full max-w-xl mx-auto lg:max-w-none">
+          <div className={`${activeTab === 'register' ? 'lg:col-span-7 xl:col-span-7 max-w-2xl' : 'lg:col-span-5 xl:col-span-5 max-w-xl'} w-full mx-auto lg:max-w-none transition-all duration-300`}>
             <div className="bg-white dark:bg-slate-900 rounded-[28px] border border-slate-200/90 dark:border-slate-800 p-6 sm:p-8 lg:p-9 shadow-xl shadow-slate-900/5 space-y-6">
-              {/* Header Title inside card */}
-              <div className="space-y-1.5">
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                  {activeTab === 'home'
-                    ? '¡Bienvenido a Kongre!'
-                    : activeTab === 'email_login'
-                    ? 'Acceso con Correo'
-                    : 'Unirse a Congregación'}
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
-                  {activeTab === 'home'
-                    ? 'Una herramienta teocrática que facilita la gestión integral de la congregación'
-                    : activeTab === 'email_login'
-                    ? 'Inicia sesión con Google u otro correo electrónico para entrar a tu cuenta'
-                    : 'Accede con tu ID y PIN de congregación o código de invitación'}
-                </p>
+              {/* UNIFIED CARD HEADER ACROSS ALL VIEWS */}
+              <div className="pb-4 border-b border-slate-100 dark:border-slate-800 space-y-3">
+                {/* Top utility row: Logo, Section Badge & Back Button */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <KongreLogo size="xs" />
+                    <span className="text-[11px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                      Kongre • {
+                        activeTab === 'home'
+                          ? 'Portal de Acceso'
+                          : activeTab === 'email_login'
+                          ? 'Acceso con Google'
+                          : activeTab === 'code_login'
+                          ? 'Conexión con PIN'
+                          : 'Registro de Congregación'
+                      }
+                    </span>
+                  </div>
+
+                  {activeTab !== 'home' ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('home');
+                        setCodeError(null);
+                        setCodeSuccess(null);
+                        setEmailError(null);
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all cursor-pointer shadow-2xs hover:text-indigo-600 dark:hover:text-indigo-400"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Volver al inicio</span>
+                    </button>
+                  ) : (
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                      Gestor Teocrático
+                    </span>
+                  )}
+                </div>
+
+                {/* Main Title & Subtitle */}
+                <div className="space-y-1">
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                    {activeTab === 'home'
+                      ? '¡Bienvenido a Kongre!'
+                      : activeTab === 'email_login'
+                      ? 'Acceso con Google'
+                      : activeTab === 'code_login'
+                      ? 'Conectar con ID y PIN'
+                      : 'Registrar mi Congregación'}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
+                    {activeTab === 'home'
+                      ? 'Una herramienta teocrática que facilita la gestión integral de la congregación'
+                      : activeTab === 'email_login'
+                      ? 'Inicia sesión con tu cuenta de Google para acceder a tus asignaciones y perfil'
+                      : activeTab === 'code_login'
+                      ? 'Introduce el ID de congregación y tu PIN para acceder'
+                      : 'Configura los datos oficiales de tu congregación paso a paso'}
+                  </p>
+                </div>
               </div>
 
               {/* VIEW: MAIN HOME OPTIONS */}
               {activeTab === 'home' && (
                 <div className="space-y-4 pt-1">
-                  {/* Option 1: Registrar una Nueva Congregación (Primary for new user) */}
+                  {/* Option 1: Registrar una Nueva Congregación */}
                   <button
                     type="button"
                     onClick={() => setActiveTab('register')}
@@ -437,10 +613,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
                     <div className="space-y-1 flex-1">
                       <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                        Iniciar sesión con correo electrónico
+                        Iniciar sesión con Google
                       </h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Usa Google u otro correo electrónico para entrar a tu cuenta en cualquier momento.
+                        Accede con tu cuenta verificada para sincronizar asignaciones y acceder a tu perfil.
                       </p>
                     </div>
 
@@ -473,7 +649,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                         Conectar con ID y PIN de Congregación
                       </h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Accede a una congregación existente con tu ID y PIN de Congregación o código de invitación.
+                        Accede a una congregación existente con su ID y PIN o código de invitación.
                       </p>
                     </div>
 
@@ -484,20 +660,67 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 </div>
               )}
 
-              {/* VIEW: EMAIL LOGIN (Google or Email) */}
+              {/* VIEW: EMAIL LOGIN (Google) */}
               {activeTab === 'email_login' && (
-                <div className="space-y-4 pt-2 animate-fade-in">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      Acceso con Correo Electrónico
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('home')}
-                      className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
-                    >
-                      ← Volver
-                    </button>
+                <div className="space-y-4 pt-1 animate-fade-in">
+                  {/* Estado de la Congregación en este dispositivo */}
+                  {settings.isRegistered ? (
+                    <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/70 text-xs text-emerald-900 dark:text-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 shadow-2xs">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        <div>
+                          <span className="font-bold">Congregación en el sistema: </span>
+                          <span className="font-black text-emerald-950 dark:text-white">
+                            {getFriendlyCongregationName(settings.congregationName)}
+                          </span>
+                        </div>
+                      </div>
+                      <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg bg-emerald-200/80 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-200 w-fit">
+                        ID: {settings.congregationNumber || settings.congregationId || 'Oficial'}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700/80 text-xs text-amber-950 dark:text-amber-200 space-y-1.5 shadow-2xs">
+                      <div className="flex items-center gap-2 font-black text-amber-900 dark:text-amber-100">
+                        <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                        <span>Aún no hay ninguna congregación registrada</span>
+                      </div>
+                      <p className="text-[11px] leading-relaxed text-amber-900/90 dark:text-amber-300">
+                        Si eres el Coordinador, debes seleccionar <strong>«Registrar mi Congregación»</strong>. Si eres publicador, espera a que el cuerpo de ancianos configure la congregación primero para que no pierdas tu tiempo.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Tarjeta explicativa con los 3 requisitos y aprobación obligatoria */}
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-xs space-y-2.5">
+                    <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100">
+                      <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                      <span>¿Cómo funciona el acceso con Google? (Lee antes de iniciar)</span>
+                    </div>
+
+                    <div className="space-y-2 text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                      <p>
+                        Para proteger los registros privados de la congregación, iniciar con Google <strong>no da acceso inmediato por sí solo</strong>:
+                      </p>
+                      <ul className="space-y-1.5 pl-3 list-disc marker:text-indigo-500">
+                        <li>
+                          <strong>Si tu correo fue precargado por el Coordinador:</strong> Entrarás de inmediato a tu perfil y asignaciones.
+                        </li>
+                        <li>
+                          <strong>Si tu correo no está registrado aún:</strong> Deberás ingresar el <strong>ID de Congregación</strong>, el <strong>PIN de Congregación</strong> y tu <strong>PIN Personal</strong> que te entregan los ancianos.
+                        </li>
+                        <li>
+                          <strong>Aprobación obligatoria:</strong> Una vez enviados los PINs, se creará una solicitud. <em>Hasta que un anciano no apruebe la vinculación de tu cuenta, no podrás usar la app.</em>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-amber-800 dark:text-amber-300 flex items-start gap-1.5 bg-amber-50/60 dark:bg-amber-950/30 p-2.5 rounded-xl border border-amber-200/60 dark:border-amber-800/50">
+                      <span className="shrink-0 text-sm">⚠️</span>
+                      <span>
+                        <strong>Consejo:</strong> Si no tienes los PINs que te proporcionan los ancianos, te sugerimos pedírselos antes de continuar para no perder tiempo.
+                      </span>
+                    </div>
                   </div>
 
                   {emailError && (
@@ -512,9 +735,9 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     type="button"
                     onClick={handleGoogleLogin}
                     disabled={isSubmittingEmail}
-                    className="w-full py-3 px-4 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50"
+                    className="w-full py-3.5 px-4 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50 bg-white dark:bg-slate-900"
                   >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                       <path
                         fill="#4285F4"
                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -532,61 +755,32 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                       />
                     </svg>
-                    <span>Continuar con Google</span>
+                    <span>{isSubmittingEmail ? 'Conectando con Google...' : 'Continuar con Google'}</span>
                   </button>
 
-                  <div className="relative flex py-2 items-center">
-                    <div className="grow border-t border-slate-200 dark:border-slate-800" />
-                    <span className="shrink mx-3 text-slate-400 text-xs uppercase">o con correo</span>
-                    <div className="grow border-t border-slate-200 dark:border-slate-800" />
-                  </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                        Tu Correo Electrónico:
-                      </label>
-                      <input
-                        type="email"
-                        value={emailInput}
-                        onChange={(e) => setEmailInput(e.target.value)}
-                        placeholder="hermano@gmail.com"
-                        className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm"
-                      />
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={handleGoogleLogin}
-                      className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
-                    >
-                      Enviar enlace de acceso o entrar
-                    </button>
+                  {/* Acceso alternativo con ID y PIN */}
+                  <div className="pt-2 text-center border-t border-slate-100 dark:border-slate-800">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      ¿Prefieres ingresar sin cuenta de Google?{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveTab('code_login');
+                          setCodeError(null);
+                          setCodeSuccess(null);
+                        }}
+                        className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
+                      >
+                        Usa ID y PIN de Congregación →
+                      </button>
+                    </p>
                   </div>
                 </div>
               )}
 
               {/* VIEW: CONEXIÓN UNIFICADA CON ID Y PIN DE CONGREGACIÓN / INVITACIÓN */}
               {activeTab === 'code_login' && (
-                <div className="space-y-4 pt-2 animate-fade-in">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                        Conectar con ID y PIN de Congregación
-                      </h4>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                        Introduce el ID y el PIN de la congregación o tu PIN de invitación
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('home')}
-                      className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer shrink-0"
-                    >
-                      ← Volver
-                    </button>
-                  </div>
-
+                <div className="space-y-4 pt-1 animate-fade-in">
                   {codeError && (
                     <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
@@ -601,10 +795,12 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     </div>
                   )}
 
-                  <form onSubmit={handleConnectWithIdPin} className="space-y-3">
+                  <form onSubmit={handleConnectWithIdPin} className="space-y-3.5">
+                    {/* DATO 1: ID DE LA CONGREGACIÓN */}
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                        ID de la Congregación: *
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                        <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <span>1. ID de la Congregación: *</span>
                       </label>
                       <input
                         type="text"
@@ -614,35 +810,89 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                         placeholder="Ej: 10582"
                         className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono"
                       />
+                      <span className="text-[10px] text-slate-400 block mt-0.5">
+                        Número oficial asignado a tu congregación.
+                      </span>
                     </div>
 
+                    {/* DATO 2: PIN DE LA CONGREGACIÓN */}
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                        PIN de la Congregación o PIN de Invitación: *
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                        <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <span>2. PIN de la Congregación: *</span>
                       </label>
                       <input
                         type="password"
                         required
+                        maxLength={8}
                         value={congregationPinInput}
                         onChange={(e) => setCongregationPinInput(e.target.value)}
-                        placeholder="Introduce tu PIN o Código de Invitación"
-                        className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs"
+                        placeholder="PIN de 4 a 8 caracteres"
+                        className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-widest text-center"
                       />
-                      <span className="text-[10px] text-slate-400 mt-1 block">
-                        Introduce el PIN general de la congregación o el PIN de invitación provisto por los ancianos.
+                      <span className="text-[10px] text-slate-400 mt-0.5 block">
+                        Clave de seguridad general de la congregación establecida al registrarla.
+                      </span>
+                    </div>
+
+                    {/* DATO 3: PIN PERSONAL SUMINISTRADO POR EL COORDINADOR (Opcional si es coordinador) */}
+                    <div className="p-3 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
+                          <KeyRound className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                          <span>3. PIN Personal Único:</span>
+                        </label>
+                        <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold">
+                          (Opcional si eres Coordinador)
+                        </span>
+                      </div>
+                      <input
+                        type="password"
+                        maxLength={16}
+                        value={personalPinInput}
+                        onChange={(e) => setPersonalPinInput(e.target.value)}
+                        placeholder="PIN que te dio el Coordinador o déjalo vacío si eres el creador"
+                        className="w-full p-2.5 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-widest text-center"
+                      />
+                      <span className="text-[10px] text-emerald-800/80 dark:text-emerald-300/80 block">
+                        Si ya te habías registrado previamente antes de los cambios de PINs, puedes dejar este campo vacío o ingresar tu PIN anterior.
+                      </span>
+                    </div>
+
+                    {/* Nota teocrática sobre la vinculación de cuentas */}
+                    <div className="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 text-[11px] text-amber-900 dark:text-amber-200 flex items-start gap-2">
+                      <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                      <span>
+                        <strong>Aprobación de Ancianos:</strong> Los coordinadores entran directamente sin aprobación. Si eres un publicador nuevo, se enviará una solicitud para que los ancianos la aprueben.
                       </span>
                     </div>
 
                     <button
                       type="submit"
-                      disabled={isSubmittingCode || !congregationIdInput.trim() || !congregationPinInput.trim()}
+                      disabled={isSubmittingCode || !congregationIdInput.trim() || (!congregationPinInput.trim() && !personalPinInput.trim())}
                       className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                     >
                       <ShieldCheck className="w-4 h-4" />
-                      <span>{isSubmittingCode ? 'Verificando...' : 'Conectar a la Congregación'}</span>
+                      <span>{isSubmittingCode ? 'Verificando datos...' : 'Conectar a la Congregación'}</span>
                     </button>
                   </form>
                 </div>
+              )}
+
+              {/* VIEW: REGISTRO DE CONGREGACIÓN (Unificado en la misma tarjeta) */}
+              {activeTab === 'register' && (
+                <RegisterCongregationWizard
+                  embedded={true}
+                  isMandatory={!settings.isRegistered}
+                  onOpenJoinWithCode={() => {
+                    setActiveTab('code_login');
+                  }}
+                  onClose={() => setActiveTab('home')}
+                  onRegisteredSuccess={() => {
+                    localStorage.setItem('kongre_has_entered_app', 'true');
+                    onEnterApp();
+                  }}
+                />
               )}
             </div>
           </div>

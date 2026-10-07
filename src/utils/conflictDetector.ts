@@ -1,6 +1,16 @@
 // src/utils/conflictDetector.ts
 import { WeekSchedule, Publisher, ConflictRuleSettings, ConflictAlert, OutgoingSpeakerAssignment } from '../types';
 
+export const DEFAULT_CONFLICT_RULES: ConflictRuleSettings = {
+  allowPartAndDutySameMeeting: false,
+  allowAudioAndMicrophones: false,
+  allowPresidentAndOtherPart: false,
+  maxConsecutiveWeeksWithDuty: 2,
+  maxConsecutiveWeeksWithPart: 2,
+  enforceSisterDemonstrationRules: true,
+  warnOutlineRepeatedWithinMonths: 12,
+};
+
 interface AssignmentEntry {
   publisherId: string;
   roleType: string;
@@ -13,12 +23,16 @@ export function detectConflictsInWeek(
   week: WeekSchedule,
   allWeeks: WeekSchedule[],
   publishersMap: Map<string, Publisher>,
-  rules: ConflictRuleSettings,
+  rules?: ConflictRuleSettings,
   outgoingSpeakers: OutgoingSpeakerAssignment[] = []
 ): ConflictAlert[] {
   const alerts: ConflictAlert[] = [];
   const weekId = week.id;
   const weekStartDate = week.weekStartDate;
+  const safeRules: ConflictRuleSettings = {
+    ...DEFAULT_CONFLICT_RULES,
+    ...(rules || {}),
+  };
 
   // If special event completely cancels meeting, check if assignments were left
   if (week.specialEvent?.isSpecial) {
@@ -154,7 +168,7 @@ export function detectConflictsInWeek(
         const titularPub = publishersMap.get(item.publisherId);
         if (item.assistantId && titularPub) {
           const assistantPub = publishersMap.get(item.assistantId);
-          if (rules.enforceSisterDemonstrationRules && titularPub.gender === 'hermana' && assistantPub && assistantPub.gender === 'hermano') {
+          if (safeRules.enforceSisterDemonstrationRules && titularPub.gender === 'hermana' && assistantPub && assistantPub.gender === 'hermano') {
             alerts.push({
               id: `gender-helper-${weekId}-${item.id}`,
               weekId,
@@ -229,7 +243,7 @@ export function detectConflictsInWeek(
     });
 
     // Run rules on midweek entries
-    analyzeMeetingEntries(midweekEntries, 'midweek', midweekDate, weekId, weekStartDate, publishersMap, rules, alerts);
+    analyzeMeetingEntries(midweekEntries, 'midweek', midweekDate, weekId, weekStartDate, publishersMap, safeRules, alerts);
   }
 
   // --- ANALYZE WEEKEND MEETING ---
@@ -320,7 +334,7 @@ export function detectConflictsInWeek(
       });
     });
 
-    analyzeMeetingEntries(weekendEntries, 'weekend', weekendDate, weekId, weekStartDate, publishersMap, rules, alerts);
+    analyzeMeetingEntries(weekendEntries, 'weekend', weekendDate, weekId, weekStartDate, publishersMap, safeRules, alerts);
   }
 
   // --- OUTGOING SPEAKERS CONFLICT CHECK ---
@@ -375,7 +389,7 @@ export function detectConflictsInWeek(
   }
 
   // --- CHECK CONSECUTIVE WEEKS FATIGUE ---
-  checkConsecutiveWeeksFatigue(week, allWeeks, publishersMap, rules, alerts);
+  checkConsecutiveWeeksFatigue(week, allWeeks, publishersMap, safeRules, alerts);
 
   return alerts;
 }
@@ -575,7 +589,9 @@ function checkConsecutiveWeeksFatigue(
   const currentIndex = sortedWeeks.findIndex(w => w.id === currentWeek.id);
   if (currentIndex < 0) return;
 
-  const maxConsecutive = Math.max(rules.maxConsecutiveWeeksWithDuty, rules.maxConsecutiveWeeksWithPart, 1);
+  const maxDuty = typeof rules?.maxConsecutiveWeeksWithDuty === 'number' ? rules.maxConsecutiveWeeksWithDuty : 2;
+  const maxPart = typeof rules?.maxConsecutiveWeeksWithPart === 'number' ? rules.maxConsecutiveWeeksWithPart : 2;
+  const maxConsecutive = Math.max(maxDuty, maxPart, 1);
   if (currentIndex < maxConsecutive) return;
 
   // Check past N weeks up to current week

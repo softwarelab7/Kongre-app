@@ -386,13 +386,19 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       );
       setActiveRole('coordinador');
 
-      // 4. Add Coordinator as first publisher if publishers list is empty
-      if (publishers.length === 0 && coordinatorName.trim()) {
+      // 4. Add Coordinator to publishers list if not already present
+      const alreadyHasCoord = publishers.some(
+        (p) =>
+          (p.name && coordinatorName.trim() && p.name.trim().toLowerCase() === coordinatorName.trim().toLowerCase()) ||
+          (p.email && coordinatorEmail.trim() && p.email.trim().toLowerCase() === coordinatorEmail.trim().toLowerCase())
+      );
+      if (!alreadyHasCoord && coordinatorName.trim()) {
         addPublisher({
           name: coordinatorName.trim(),
           gender: 'hermano',
           phone: coordinatorPhone.trim(),
           email: coordinatorEmail.trim().toLowerCase(),
+          personalPin: personalPin.trim(),
           notes: 'Coordinador del Cuerpo de Ancianos',
           active: true,
           groupNumber: 1,

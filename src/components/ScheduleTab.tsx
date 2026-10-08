@@ -74,7 +74,7 @@ export const ScheduleTab: React.FC = () => {
   const { effectiveRoleInfo } = useAuth();
   const isReadOnly = effectiveRoleInfo.isReadOnly || !effectiveRoleInfo.canEditSchedule;
 
-  const [viewMode, setViewMode] = useState<'week' | 'clm_vmc'>('clm_vmc');
+  const [viewMode, setViewMode] = useState<'all' | 'midweek' | 'weekend' | 'clm_interactivo'>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     return (currentWeek?.weekStartDate || new Date().toISOString()).substring(0, 7);
   });
@@ -388,28 +388,50 @@ export const ScheduleTab: React.FC = () => {
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/[0.05] p-1 rounded-xl border border-slate-200/80 dark:border-white/[0.08]">
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/[0.05] p-1 rounded-xl border border-slate-200/80 dark:border-white/[0.08] overflow-x-auto">
               <button
                 type="button"
-                onClick={() => setViewMode('week')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === 'week'
+                onClick={() => setViewMode('all')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  viewMode === 'all'
                     ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
                     : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Reunión Completa
+                Entre Semana y Fin de Semana
               </button>
               <button
                 type="button"
-                onClick={() => setViewMode('clm_vmc')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                  viewMode === 'clm_vmc'
+                onClick={() => setViewMode('midweek')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  viewMode === 'midweek'
                     ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
                     : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Programa VMC
+                Entre Semana (VMC)
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('weekend')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  viewMode === 'weekend'
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Fin de Semana
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('clm_interactivo')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  viewMode === 'clm_interactivo'
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Asignador Oficial VMC
               </button>
             </div>
 
@@ -576,7 +598,7 @@ export const ScheduleTab: React.FC = () => {
         </div>
       )}
 
-      {viewMode === 'clm_vmc' ? (
+      {viewMode === 'clm_interactivo' ? (
         <div className="rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white dark:bg-slate-900 shadow-xs">
           <ClmScheduleView
             publishers={publishers}
@@ -585,10 +607,11 @@ export const ScheduleTab: React.FC = () => {
         </div>
       ) : (
         <>
-          {/* REUNIÓN DE ENTRE SEMANA: VIDA Y MINISTERIO CRISTIANOS */}
-          <div className={`bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs transition-opacity ${
-            currentWeek.specialEvent?.noMeetingMidweek ? 'opacity-60 pointer-events-none' : ''
-          }`}>
+          {(viewMode === 'all' || viewMode === 'midweek') && (
+            /* REUNIÓN DE ENTRE SEMANA: VIDA Y MINISTERIO CRISTIANOS */
+            <div className={`bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs transition-opacity ${
+              currentWeek.specialEvent?.noMeetingMidweek ? 'opacity-60 pointer-events-none' : ''
+            }`}>
         {/* Section Header */}
         <div className="p-4 sm:p-5 bg-linear-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -1479,11 +1502,13 @@ export const ScheduleTab: React.FC = () => {
           </div>
         </div>
       </div>
+          )}
 
-      {/* REUNIÓN DE FIN DE SEMANA */}
-      <div className={`bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs transition-opacity ${
-        currentWeek.specialEvent?.noMeetingWeekend ? 'opacity-60 pointer-events-none' : ''
-      }`}>
+          {(viewMode === 'all' || viewMode === 'weekend') && (
+            /* REUNIÓN DE FIN DE SEMANA */
+            <div className={`bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs transition-opacity ${
+              currentWeek.specialEvent?.noMeetingWeekend ? 'opacity-60 pointer-events-none' : ''
+            }`}>
         <div className="p-4 sm:p-5 bg-linear-to-r from-emerald-950 via-slate-900 to-emerald-950 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300">
@@ -1846,6 +1871,7 @@ export const ScheduleTab: React.FC = () => {
           </div>
         </div>
       </div>
+          )}
 
       {/* LIMPIEZA DEL SALÓN DEL REINO */}
       <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1880,7 +1906,7 @@ export const ScheduleTab: React.FC = () => {
           })}
         </div>
       </div>
-      </>
+        </>
       )}
 
       {/* MODAL: ASSIGNMENT SELECTOR */}

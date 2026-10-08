@@ -223,19 +223,13 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Reuniones',
       shortTitle: 'Reuniones',
       icon: Calendar,
-      tabIds: ['programacion', 'clm_vmc', 's89', 'discursos', 'hospitalidad'],
+      tabIds: ['programacion', 's89', 'discursos', 'hospitalidad'],
       items: [
         {
           id: 'programacion',
-          label: 'Programa Semanal',
-          description: 'Vida y Ministerio Cristianos y Fin de Semana',
+          label: 'Reunión Entre Semana y Fin de Semana',
+          description: 'Vida y Ministerio Cristianos y Fin de Semana en un solo programa',
           icon: Calendar,
-        },
-        {
-          id: 'clm_vmc',
-          label: 'Programa VMC (Oficial)',
-          description: 'Vista interactiva CLM con elegibilidad, Sala Auxiliar y S-89',
-          icon: ClipboardList,
         },
         {
           id: 's89',
@@ -453,7 +447,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Reuniones',
       icon: Calendar,
       primaryTab: 'programacion' as ActiveTab,
-      tabIds: ['programacion', 'clm_vmc', 's89', 'discursos'] as ActiveTab[],
+      tabIds: ['programacion', 's89', 'discursos'] as ActiveTab[],
       badge: undefined,
       badgeColor: undefined,
       colorClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400',

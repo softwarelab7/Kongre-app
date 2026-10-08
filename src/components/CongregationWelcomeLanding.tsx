@@ -5,7 +5,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useTheme } from '../context/ThemeContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
-import { isCongregationIdString, getFriendlyCongregationName } from '../utils/theocraticSecurity';
+import { isCongregationIdString, getFriendlyCongregationName, verifyPasscode } from '../utils/theocraticSecurity';
 import {
   Bell,
   Sun,
@@ -54,6 +54,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     identifyRoleByPersonalPin,
     userRolesList,
     userProfile,
+    assignPersonalPinToPublisher,
   } = useAuth();
   const {
     redeemInvitationCode,
@@ -68,6 +69,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     createAccountLinkRequest,
     restorePreviousRegistration,
     uploadLocalDataToGoogle,
+    loadCongregationFromCloud,
   } = useCongregation();
   const { isDark, toggleTheme } = useTheme();
 
@@ -103,7 +105,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       const cleanCongPin = congregationPinInput.trim();
       const cleanPersonalPin = personalPinInput.trim();
       let nameToUse = user?.displayName || 'Hermano de la Congregación';
-      const emailToUse = user?.email || `hermano_${cleanId || 'cong'}@kongre.org`;
+      let emailToUse = user?.email || `hermano_${cleanId || 'cong'}@kongre.org`;
 
       // 1. Validar ID
       if (!cleanId) {
@@ -118,80 +120,100 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
 
-      // Validar coincidencia de ID si existe congregación activa
-      const expectedId = settings.congregationNumber || settings.congregationId;
-      const customCode = settings.customCode;
-      const isIdMatch =
-        (expectedId && cleanId.toLowerCase() === expectedId.trim().toLowerCase()) ||
-        (customCode && cleanId.toLowerCase() === customCode.trim().toLowerCase());
-      if (expectedId && !isIdMatch) {
-        // Permitir continuar si no hay congregación registrada previamente
-        if (settings.isRegistered) {
-          setCodeError('El ID o Código de la Congregación no coincide con la congregación configurada.');
-          setIsSubmittingCode(false);
-          return;
-        }
-      }
+      // 1. Cargar datos actualizados de la congregación desde la nube en Firestore primero si existen
+      const cloudRes = await loadCongregationFromCloud(cleanId);
+      const cloudData = cloudRes?.data;
 
-      // Validar PINs: Aceptar si coincide el PIN de congregación o el PIN personal
+      // 2. Validar coincidencia de PIN de Congregación
+      const effectivePinHash = cloudData?.settings?.congregationPinHash || settings.congregationPinHash;
       let isCongPinValid = false;
       if (cleanCongPin) {
         isCongPinValid = await verifyCongregationPin(cleanCongPin);
         if (!isCongPinValid) {
           isCongPinValid = await verifyPersonalPin(cleanCongPin);
         }
+        if (!isCongPinValid && effectivePinHash) {
+          isCongPinValid = await verifyPasscode(cleanCongPin, effectivePinHash);
+        }
       }
 
       let identifiedRole: TheocraticRole | undefined;
 
-      // Probar PIN personal
+      // 3. Probar PIN personal en el directorio de la congregación (nube y local)
       const pinToIdentify = cleanPersonalPin || cleanCongPin;
       if (pinToIdentify) {
-        const pinResult = await identifyRoleByPersonalPin(pinToIdentify);
-        if (pinResult.success && pinResult.role) {
-          identifiedRole = pinResult.role;
-          if (pinResult.name) nameToUse = pinResult.name;
+        const congPubs = (cloudData?.publishers || publishers) as any[];
+        const matchingPub = congPubs.find(
+          (p) => p.personalPin && p.personalPin.trim() === pinToIdentify.trim()
+        );
+
+        if (matchingPub) {
+          const finalRole: TheocraticRole =
+            matchingPub.theocraticRole ||
+            (matchingPub.privilege === 'anciano'
+              ? 'anciano'
+              : matchingPub.privilege === 'siervo_ministerial'
+              ? 'siervo_ministerial'
+              : 'publicador_bautizado');
+          identifiedRole = finalRole;
+          nameToUse = matchingPub.name;
+          if (matchingPub.email) emailToUse = matchingPub.email;
+          assignPersonalPinToPublisher(
+            matchingPub.id,
+            pinToIdentify.trim(),
+            finalRole,
+            matchingPub.name,
+            matchingPub.email,
+            matchingPub.privilege
+          );
         } else {
-          const invResult = await redeemInvitationCode(pinToIdentify, emailToUse, nameToUse);
-          if (invResult.success && invResult.role) {
-            identifiedRole = invResult.role;
-            if (invResult.targetName) nameToUse = invResult.targetName;
+          const pinResult = await identifyRoleByPersonalPin(pinToIdentify);
+          if (pinResult.success && pinResult.role) {
+            identifiedRole = pinResult.role;
+            if (pinResult.name) nameToUse = pinResult.name;
+          } else {
+            const invResult = await redeemInvitationCode(pinToIdentify, emailToUse, nameToUse);
+            if (invResult.success && invResult.role) {
+              identifiedRole = invResult.role;
+              if (invResult.targetName) nameToUse = invResult.targetName;
+            }
           }
         }
       }
 
-      // Si el PIN de congregación es válido y no tenía PIN personal, reconocer como rol del hermano
+      // Si el PIN de congregación es válido y no tenía PIN personal identificado:
       if (!identifiedRole && isCongPinValid) {
+        // Si el correo coincide con el coordinador o si no hay otro rol, es coordinador
+        const coordName = cloudData?.settings?.coordinatorName || settings.coordinatorName;
         identifiedRole = 'coordinador';
+        if (coordName && nameToUse === 'Hermano') {
+          nameToUse = coordName;
+        }
       }
 
       if (!identifiedRole && !isCongPinValid) {
-        setCodeError('El PIN ingresado no fue reconocido. Asegúrate de ingresar el PIN con el que registraste tu congregación o el que te dieron los ancianos.');
+        setCodeError('El PIN ingresado no fue reconocido. Asegúrate de ingresar el PIN con el que registraste tu congregación o el PIN personal que te asignaron los ancianos.');
         setIsSubmittingCode(false);
         return;
       }
 
       const roleFinal: TheocraticRole = identifiedRole || 'coordinador';
 
-      // Verificar si es coordinador o si es el creador de la congregación
-      const isCoordinator =
+      // 4. Si el PIN de congregación es válido o el PIN personal fue reconocido en el directorio:
+      const isAuthorizedMember =
+        isCongPinValid ||
+        Boolean(identifiedRole) ||
         roleFinal === 'coordinador' ||
-        (settings.coordinatorEmail && settings.coordinatorEmail.toLowerCase().trim() === emailToUse.toLowerCase().trim()) ||
         emailToUse === 'hectorguti95@gmail.com';
 
-      const isPreRegisteredPublisher = publishers.some(
-        (p) => p.email && p.email.toLowerCase().trim() === emailToUse.toLowerCase().trim()
-      );
-      const isAlreadyApproved = accountLinkRequests.some(
-        (r) => r.email.toLowerCase().trim() === emailToUse.toLowerCase().trim() && r.status === 'approved'
-      );
-
-      // Si es coordinador o hermano precargado:
-      if (isCoordinator || isPreRegisteredPublisher || isAlreadyApproved) {
+      if (isAuthorizedMember) {
         const cleanCongName =
-          settings.congregationName && !isCongregationIdString(settings.congregationName)
+          (cloudRes?.success && cloudRes.congregationName && !isCongregationIdString(cloudRes.congregationName)
+            ? cloudRes.congregationName
+            : null) ||
+          (settings.congregationName && !isCongregationIdString(settings.congregationName)
             ? settings.congregationName
-            : 'Congregación Central';
+            : 'Congregación Central');
 
         updateSettings({
           isRegistered: true,

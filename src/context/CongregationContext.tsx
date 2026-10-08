@@ -1,7 +1,7 @@
 // src/context/CongregationContext.tsx
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { db, auth } from '../firebase/config';
 import { useAuth } from './AuthContext';
 import {
   Publisher,
@@ -280,6 +280,7 @@ interface CongregationContextType {
   restorePreviousRegistration: (congName?: string, coordName?: string, pin?: string) => Promise<void>;
   uploadLocalDataToGoogle: () => Promise<{ success: boolean; message: string }>;
   downloadDataFromGoogle: () => Promise<{ success: boolean; message: string }>;
+  loadCongregationFromCloud: (congId: string) => Promise<{ success: boolean; congregationName?: string; message: string; data?: any }>;
 
   // Account Link Requests (Vinculación de Cuentas de Google)
   accountLinkRequests: AccountLinkRequest[];
@@ -692,6 +693,210 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
   };
 
+  // Helper centralizado para hidratar estado y localStorage desde datos de Firestore
+  const hydrateAllFromData = (data: any) => {
+    if (!data) return;
+
+    if (data.publishers && Array.isArray(data.publishers)) {
+      setPublishers(data.publishers);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(data.publishers));
+    }
+    if (data.weeks && Array.isArray(data.weeks)) {
+      const enrichedWeeks = data.weeks.map((w: WeekSchedule) => {
+        if (isWeekNeedingOrganizedSync(w)) {
+          const org = getOrganizedScheduleForWeek(w.id, w.weekStartDate);
+          return org ? applyOrganizedToWeek(w, org) : w;
+        }
+        return w;
+      });
+      setWeeks(enrichedWeeks);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_weeks`, JSON.stringify(enrichedWeeks));
+    }
+    if (data.preachingGroups && Array.isArray(data.preachingGroups)) {
+      setPreachingGroups(data.preachingGroups);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_groups`, JSON.stringify(data.preachingGroups));
+    }
+    if (data.customDuties && Array.isArray(data.customDuties)) {
+      setCustomDuties(data.customDuties);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_duties`, JSON.stringify(data.customDuties));
+    }
+    if (data.settings) {
+      const isReg = Boolean(
+        data.settings.isRegistered ||
+        (data.settings.congregationName && data.settings.congregationName.trim() !== '') ||
+        (data.publishers && data.publishers.length > 0)
+      );
+      const rawName = data.settings.congregationName;
+      const cleanName =
+        rawName && !isCongregationIdString(rawName)
+          ? rawName
+          : rawName
+          ? 'Congregación Central'
+          : '';
+      const enrichedSettings: CongregationSettings = {
+        ...data.settings,
+        congregationName: cleanName,
+        isRegistered: isReg,
+        coordinatorEmail: data.settings.coordinatorEmail || user?.email || '',
+        coordinatorName: data.settings.coordinatorName || user?.displayName || 'Coordinador',
+      };
+      setSettings(enrichedSettings);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_settings`, JSON.stringify(enrichedSettings));
+      if (isReg) {
+        localStorage.setItem('kongre_is_registered_congregation', 'true');
+        localStorage.setItem('kongre_has_entered_app', 'true');
+      }
+    }
+    if (data.outgoingSpeakers && Array.isArray(data.outgoingSpeakers)) {
+      setOutgoingSpeakers(data.outgoingSpeakers);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_outgoing_speakers`, JSON.stringify(data.outgoingSpeakers));
+    }
+    if (data.fieldServiceMeetings && Array.isArray(data.fieldServiceMeetings)) {
+      setFieldServiceMeetings(data.fieldServiceMeetings);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_field_service`, JSON.stringify(data.fieldServiceMeetings));
+    }
+    if (data.cartLocations && Array.isArray(data.cartLocations)) {
+      setCartLocations(data.cartLocations);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_cart_locations`, JSON.stringify(data.cartLocations));
+    }
+    if (data.cartShifts && Array.isArray(data.cartShifts)) {
+      setCartShifts(data.cartShifts);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_cart_shifts`, JSON.stringify(data.cartShifts));
+    }
+    if (data.notices && Array.isArray(data.notices)) {
+      setNotices(data.notices);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_notices`, JSON.stringify(data.notices));
+    }
+    if (data.monthlyReports && Array.isArray(data.monthlyReports)) {
+      setMonthlyReports(data.monthlyReports);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_monthly_reports`, JSON.stringify(data.monthlyReports));
+    }
+    if (data.territories && Array.isArray(data.territories)) {
+      setTerritories(data.territories);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_territories`, JSON.stringify(data.territories));
+    }
+    if (data.circuitVisit !== undefined) {
+      setCircuitVisit(data.circuitVisit);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_circuit_visit`, JSON.stringify(data.circuitVisit));
+    }
+    if (data.transactions && Array.isArray(data.transactions)) {
+      setTransactions(data.transactions);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_transactions`, JSON.stringify(data.transactions));
+    }
+    if (data.quarterlyAudits && Array.isArray(data.quarterlyAudits)) {
+      setQuarterlyAudits(data.quarterlyAudits);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_quarterly_audits`, JSON.stringify(data.quarterlyAudits));
+    }
+    if (data.memorialPlans && Array.isArray(data.memorialPlans)) {
+      setMemorialPlans(data.memorialPlans);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_memorial_plans`, JSON.stringify(data.memorialPlans));
+    }
+    if (data.theocraticAssemblies && Array.isArray(data.theocraticAssemblies)) {
+      setTheocraticAssemblies(data.theocraticAssemblies);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_assemblies`, JSON.stringify(data.theocraticAssemblies));
+    }
+    if (data.literatureItems && Array.isArray(data.literatureItems)) {
+      setLiteratureItems(data.literatureItems);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_literature_items`, JSON.stringify(data.literatureItems));
+    }
+    if (data.specialOrders && Array.isArray(data.specialOrders)) {
+      setSpecialOrders(data.specialOrders);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_special_orders`, JSON.stringify(data.specialOrders));
+    }
+    if (data.groupDistributions && Array.isArray(data.groupDistributions)) {
+      setGroupDistributions(data.groupDistributions);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_group_distributions`, JSON.stringify(data.groupDistributions));
+    }
+    if (data.inventoryRecords && Array.isArray(data.inventoryRecords)) {
+      setInventoryRecords(data.inventoryRecords);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_inventory_records`, JSON.stringify(data.inventoryRecords));
+    }
+    if (data.accountLinkRequests && Array.isArray(data.accountLinkRequests)) {
+      setAccountLinkRequests(data.accountLinkRequests);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_account_link_requests`, JSON.stringify(data.accountLinkRequests));
+    }
+    if (data.clmProgramas && typeof data.clmProgramas === 'object') {
+      setClmProgramas(data.clmProgramas);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_clm_programas`, JSON.stringify(data.clmProgramas));
+    }
+    if (data.hospitalityHosts && Array.isArray(data.hospitalityHosts)) {
+      setHospitalityHosts(data.hospitalityHosts);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_hospitality_hosts`, JSON.stringify(data.hospitalityHosts));
+    }
+    if (data.breakers && Array.isArray(data.breakers)) {
+      setBreakers(data.breakers);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(data.breakers));
+    }
+    if (data.maintenanceSheets && Array.isArray(data.maintenanceSheets)) {
+      setMaintenanceSheets(data.maintenanceSheets);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(data.maintenanceSheets));
+    }
+    if (data.auxPioneerRequests && Array.isArray(data.auxPioneerRequests)) {
+      setAuxPioneerRequests(data.auxPioneerRequests);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`, JSON.stringify(data.auxPioneerRequests));
+    }
+    if (data.branchReportsS1 && Array.isArray(data.branchReportsS1)) {
+      setBranchReportsS1(data.branchReportsS1);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_branch_reports_s1`, JSON.stringify(data.branchReportsS1));
+    }
+  };
+
+  // Asegurar que el Coordinador aparezca SIEMPRE en el directorio de publicadores
+  useEffect(() => {
+    const coordName = settings.coordinatorName?.trim();
+    if (!coordName || !settings.isRegistered) return;
+
+    const coordEmail = settings.coordinatorEmail?.trim().toLowerCase();
+    const alreadyExists = publishers.some((p) => {
+      const matchName = p.name && p.name.trim().toLowerCase() === coordName.toLowerCase();
+      const matchEmail = coordEmail && p.email && p.email.trim().toLowerCase() === coordEmail;
+      return matchName || matchEmail;
+    });
+
+    if (!alreadyExists) {
+      const newCoordinatorPub: Publisher = {
+        id: `pub-coord-${Date.now()}`,
+        name: coordName,
+        gender: 'hermano',
+        phone: settings.coordinatorPhone?.trim() || '',
+        email: coordEmail || '',
+        notes: 'Coordinador del Cuerpo de Ancianos',
+        active: true,
+        groupNumber: 1,
+        privilege: 'anciano',
+        hope: 'otras_ovejas',
+        absences: [],
+        createdAt: new Date().toISOString(),
+        roles: {
+          vym_presidente: true,
+          vym_oracion: true,
+          vym_tesoros_discurso: true,
+          vym_tesoros_perlas: true,
+          vym_tesoros_lectura: true,
+          vym_maestros_titular: true,
+          vym_maestros_ayudante: true,
+          vym_vida_partes: true,
+          vym_estudio_conductor: true,
+          vym_estudio_lector: true,
+          fds_presidente: true,
+          fds_atalaya_lector: true,
+          fds_oracion: true,
+          deber_acomodador: true,
+          deber_seguridad: true,
+          deber_audio: true,
+          deber_video: true,
+          deber_microfonos: true,
+          deber_plataforma: true,
+          deber_zoom: true,
+        },
+      };
+
+      const updated = [newCoordinatorPub, ...publishers];
+      setPublishers(updated);
+      saveToFirestore(updated);
+    }
+  }, [settings.coordinatorName, settings.coordinatorEmail, settings.isRegistered, publishers.length]);
+
   // Firestore Sync: Load, listen and smart-merge when user logs in with Google
   useEffect(() => {
     if (!user) {
@@ -716,6 +921,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           // Primera vez que este usuario de Google se conecta y no tiene documento en la nube:
           // Subir directamente el estado actual (incluidos los datos configurados con la app)
           const fresh = getFreshLocalCongregationData();
+          const cleanId = (
+            fresh.settings.congregationNumber ||
+            fresh.settings.congregationId ||
+            settings.congregationNumber ||
+            settings.congregationId ||
+            ''
+          ).trim().toUpperCase();
+
           const initialPayload = sanitizeForFirestore({
             ...fresh,
             settings: {
@@ -724,10 +937,16 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
               coordinatorEmail: fresh.settings.coordinatorEmail || user.email || '',
               coordinatorName: fresh.settings.coordinatorName || user.displayName || 'Coordinador',
             },
+            congregationId: cleanId,
             updatedAt: nowISO,
           });
+
           try {
             await setDoc(userDocRef, initialPayload, { merge: true });
+            if (cleanId) {
+              const congDocRef = doc(db, 'congregations', cleanId);
+              await setDoc(congDocRef, initialPayload, { merge: true });
+            }
             localStorage.removeItem('kongre_needs_cloud_upload');
             localStorage.setItem('kongre_last_local_update', nowISO);
             localStorage.setItem('kongre_is_registered_congregation', 'true');
@@ -782,8 +1001,15 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           );
 
           if (shouldUploadLocalToCloud) {
-            console.log('Subiendo datos locales de congregación a Firestore para el usuario Google...');
             skipNextSnapshotEcho = true;
+            const cleanId = (
+              fresh.settings.congregationNumber ||
+              fresh.settings.congregationId ||
+              settings.congregationNumber ||
+              settings.congregationId ||
+              ''
+            ).trim().toUpperCase();
+
             const uploadPayload = sanitizeForFirestore({
               ...fresh,
               settings: {
@@ -792,10 +1018,16 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 coordinatorEmail: fresh.settings.coordinatorEmail || user.email || '',
                 coordinatorName: fresh.settings.coordinatorName || user.displayName || 'Coordinador',
               },
+              congregationId: cleanId,
               updatedAt: nowISO,
             });
+
             try {
               await setDoc(userDocRef, uploadPayload, { merge: true });
+              if (cleanId) {
+                const congDocRef = doc(db, 'congregations', cleanId);
+                await setDoc(congDocRef, uploadPayload, { merge: true });
+              }
               localStorage.removeItem('kongre_needs_cloud_upload');
               localStorage.setItem('kongre_last_local_update', nowISO);
               localStorage.setItem('kongre_is_registered_congregation', 'true');
@@ -803,204 +1035,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             } catch (err) {
               console.error('Error actualizando Firestore con datos locales:', err);
             }
-            return; // Conservar los datos locales recién subidos
-          }
-        }
-
-        // Si la nube contiene datos y es un mock antiguo mientras en local tenemos datos reales:
-        const isLegacyPureMock =
-          (!data.publishers || data.publishers.length === 0) &&
-          (!data.settings?.congregationName ||
-            data.settings?.congregationName === 'Congregación El Olivar' ||
-            data.settings?.congregationName === 'Congregación Central');
-
-        if (isLegacyPureMock) {
-          const fresh = getFreshLocalCongregationData();
-          if (fresh.publishers.length > 0 || (fresh.settings.congregationName && fresh.settings.congregationName !== 'Congregación Central')) {
-            // Guardar nuestros datos reales en la nube en lugar de borrarlos
-            skipNextSnapshotEcho = true;
-            const uploadPayload = sanitizeForFirestore({
-              ...fresh,
-              settings: {
-                ...fresh.settings,
-                isRegistered: true,
-                coordinatorEmail: fresh.settings.coordinatorEmail || user.email || '',
-                coordinatorName: fresh.settings.coordinatorName || user.displayName || 'Coordinador',
-              },
-              updatedAt: nowISO,
-            });
-            await setDoc(userDocRef, uploadPayload, { merge: true });
-            setSyncStatus('synced');
             return;
           }
-
-          setPublishers([]);
-          setPreachingGroups([]);
-          setOutgoingSpeakers([]);
-          setFieldServiceMeetings([]);
-          setCartLocations([]);
-          setCartShifts([]);
-          setNotices([]);
-          setMonthlyReports([]);
-          setTerritories([]);
-          setCircuitVisit(null);
-          setTransactions([]);
-          setQuarterlyAudits([]);
-          setMemorialPlans([]);
-          setTheocraticAssemblies([]);
-          setLiteratureItems([]);
-          setSpecialOrders([]);
-          setGroupDistributions([]);
-          setInventoryRecords([]);
-          setSettings(INITIAL_SETTINGS);
-          setWeeks(generateInitialWeeks());
-          setSyncStatus('synced');
-          return;
         }
 
         // Hidratar estado y localStorage desde Firestore
-        if (data.publishers) {
-          setPublishers(data.publishers);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(data.publishers));
-        }
-        if (data.weeks) {
-          const enrichedWeeks = data.weeks.map((w: WeekSchedule) => {
-            if (isWeekNeedingOrganizedSync(w)) {
-              const org = getOrganizedScheduleForWeek(w.id, w.weekStartDate);
-              return org ? applyOrganizedToWeek(w, org) : w;
-            }
-            return w;
-          });
-          setWeeks(enrichedWeeks);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_weeks`, JSON.stringify(enrichedWeeks));
-        }
-        if (data.preachingGroups) {
-          setPreachingGroups(data.preachingGroups);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_groups`, JSON.stringify(data.preachingGroups));
-        }
-        if (data.customDuties) {
-          setCustomDuties(data.customDuties);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_duties`, JSON.stringify(data.customDuties));
-        }
-        if (data.settings) {
-          const isReg = Boolean(
-            data.settings.isRegistered ||
-            (data.settings.congregationName && data.settings.congregationName.trim() !== '') ||
-            (data.publishers && data.publishers.length > 0)
-          );
-          const rawName = data.settings.congregationName;
-          const cleanName =
-            rawName && !isCongregationIdString(rawName)
-              ? rawName
-              : rawName
-              ? 'Congregación Central'
-              : '';
-          const enrichedSettings: CongregationSettings = {
-            ...data.settings,
-            congregationName: cleanName,
-            isRegistered: isReg,
-            coordinatorEmail: data.settings.coordinatorEmail || user.email || '',
-            coordinatorName: data.settings.coordinatorName || user.displayName || 'Coordinador',
-          };
-          setSettings(enrichedSettings);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_settings`, JSON.stringify(enrichedSettings));
-          if (isReg) {
-            localStorage.setItem('kongre_is_registered_congregation', 'true');
-            localStorage.setItem('kongre_has_entered_app', 'true');
-          }
-        }
-        if (data.outgoingSpeakers) {
-          setOutgoingSpeakers(data.outgoingSpeakers);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_outgoing_speakers`, JSON.stringify(data.outgoingSpeakers));
-        }
-        if (data.fieldServiceMeetings) {
-          setFieldServiceMeetings(data.fieldServiceMeetings);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_field_service`, JSON.stringify(data.fieldServiceMeetings));
-        }
-        if (data.cartLocations) {
-          setCartLocations(data.cartLocations);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_cart_locations`, JSON.stringify(data.cartLocations));
-        }
-        if (data.cartShifts) {
-          setCartShifts(data.cartShifts);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_cart_shifts`, JSON.stringify(data.cartShifts));
-        }
-        if (data.notices) {
-          setNotices(data.notices);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_notices`, JSON.stringify(data.notices));
-        }
-        if (data.monthlyReports) {
-          setMonthlyReports(data.monthlyReports);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_monthly_reports`, JSON.stringify(data.monthlyReports));
-        }
-        if (data.territories) {
-          setTerritories(data.territories);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_territories`, JSON.stringify(data.territories));
-        }
-        if (data.circuitVisit) {
-          setCircuitVisit(data.circuitVisit);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_circuit_visit`, JSON.stringify(data.circuitVisit));
-        }
-        if (data.transactions) {
-          setTransactions(data.transactions);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_transactions`, JSON.stringify(data.transactions));
-        }
-        if (data.quarterlyAudits) {
-          setQuarterlyAudits(data.quarterlyAudits);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_quarterly_audits`, JSON.stringify(data.quarterlyAudits));
-        }
-        if (data.memorialPlans) {
-          setMemorialPlans(data.memorialPlans);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_memorial_plans`, JSON.stringify(data.memorialPlans));
-        }
-        if (data.theocraticAssemblies) {
-          setTheocraticAssemblies(data.theocraticAssemblies);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_assemblies`, JSON.stringify(data.theocraticAssemblies));
-        }
-        if (data.literatureItems) {
-          setLiteratureItems(data.literatureItems);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_literature_items`, JSON.stringify(data.literatureItems));
-        }
-        if (data.specialOrders) {
-          setSpecialOrders(data.specialOrders);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_special_orders`, JSON.stringify(data.specialOrders));
-        }
-        if (data.groupDistributions) {
-          setGroupDistributions(data.groupDistributions);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_group_distributions`, JSON.stringify(data.groupDistributions));
-        }
-        if (data.inventoryRecords) {
-          setInventoryRecords(data.inventoryRecords);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_inventory_records`, JSON.stringify(data.inventoryRecords));
-        }
-        if (data.accountLinkRequests) {
-          setAccountLinkRequests(data.accountLinkRequests);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_account_link_requests`, JSON.stringify(data.accountLinkRequests));
-        }
-        if (data.clmProgramas) {
-          setClmProgramas(data.clmProgramas);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_clm_programas`, JSON.stringify(data.clmProgramas));
-        }
-        if (data.hospitalityHosts) {
-          setHospitalityHosts(data.hospitalityHosts);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_hospitality_hosts`, JSON.stringify(data.hospitalityHosts));
-        }
-        if (data.breakers) {
-          setBreakers(data.breakers);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(data.breakers));
-        }
-        if (data.maintenanceSheets) {
-          setMaintenanceSheets(data.maintenanceSheets);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(data.maintenanceSheets));
-        }
-        if (data.auxPioneerRequests) {
-          setAuxPioneerRequests(data.auxPioneerRequests);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`, JSON.stringify(data.auxPioneerRequests));
-        }
-        if (data.branchReportsS1) {
-          setBranchReportsS1(data.branchReportsS1);
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_branch_reports_s1`, JSON.stringify(data.branchReportsS1));
-        }
+        hydrateAllFromData(data);
         setSyncStatus('synced');
       },
       (err) => {
@@ -1041,72 +1081,118 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const nowISO = new Date().toISOString();
     localStorage.setItem('kongre_last_local_update', nowISO);
 
-    if (!user) {
-      // Marcar que hay cambios locales pendientes de sincronizar con Google
-      localStorage.setItem('kongre_needs_cloud_upload', 'true');
-      setSyncStatus('offline');
-      return;
+    const congDocId = (
+      newSettings.congregationNumber ||
+      newSettings.congregationId ||
+      settings.congregationNumber ||
+      settings.congregationId ||
+      ''
+    ).trim().toUpperCase();
+
+    const payload = sanitizeForFirestore({
+      publishers: newPubs,
+      weeks: newWeeks,
+      preachingGroups: newGroups,
+      customDuties: newDuties,
+      settings: newSettings,
+      outgoingSpeakers: newOutgoing,
+      fieldServiceMeetings: newFieldService,
+      cartLocations: newCartLocs,
+      cartShifts: newCartShifts,
+      notices: newNotices,
+      monthlyReports: newReports,
+      territories: newTerritories,
+      circuitVisit: newCircuitVisit,
+      transactions: newTransactions,
+      quarterlyAudits: newQuarterlyAudits,
+      memorialPlans: newMemorialPlans,
+      theocraticAssemblies: newAssemblies,
+      literatureItems: newLiteratureItems,
+      specialOrders: newSpecialOrders,
+      groupDistributions: newGroupDistributions,
+      inventoryRecords: newInventoryRecords,
+      accountLinkRequests: newAccountLinkRequests,
+      clmProgramas: newClm,
+      hospitalityHosts,
+      breakers,
+      maintenanceSheets,
+      auxPioneerRequests,
+      branchReportsS1,
+      congregationId: congDocId,
+      updatedAt: nowISO,
+    });
+
+    // 1. Guardar siempre en la colección central de congregaciones en Firestore
+    if (congDocId) {
+      try {
+        const congDocRef = doc(db, 'congregations', congDocId);
+        await setDoc(congDocRef, payload, { merge: true });
+      } catch (err) {
+        console.warn('Error guardando en documento de congregación:', err);
+      }
     }
 
-    setSyncStatus('saving');
-    try {
-      const userDocRef = doc(db, 'users', user.uid, 'congregation_data', 'main');
-      const payload = sanitizeForFirestore({
-        publishers: newPubs,
-        weeks: newWeeks,
-        preachingGroups: newGroups,
-        customDuties: newDuties,
-        settings: newSettings,
-        outgoingSpeakers: newOutgoing,
-        fieldServiceMeetings: newFieldService,
-        cartLocations: newCartLocs,
-        cartShifts: newCartShifts,
-        notices: newNotices,
-        monthlyReports: newReports,
-        territories: newTerritories,
-        circuitVisit: newCircuitVisit,
-        transactions: newTransactions,
-        quarterlyAudits: newQuarterlyAudits,
-        memorialPlans: newMemorialPlans,
-        theocraticAssemblies: newAssemblies,
-        literatureItems: newLiteratureItems,
-        specialOrders: newSpecialOrders,
-        groupDistributions: newGroupDistributions,
-        inventoryRecords: newInventoryRecords,
-        accountLinkRequests: newAccountLinkRequests,
-        clmProgramas: newClm,
-        updatedAt: nowISO,
-      });
-      await setDoc(userDocRef, payload, { merge: true });
-      localStorage.removeItem('kongre_needs_cloud_upload');
+    // 2. Si el usuario está autenticado con Google (o auth.currentUser), sincronizar también en su documento personal
+    const activeUser = user || auth.currentUser;
+    if (activeUser) {
+      setSyncStatus('saving');
+      try {
+        const userDocRef = doc(db, 'users', activeUser.uid, 'congregation_data', 'main');
+        await setDoc(userDocRef, payload, { merge: true });
+        localStorage.removeItem('kongre_needs_cloud_upload');
+        setSyncStatus('synced');
+      } catch (err) {
+        console.error('Error syncing to Firestore user:', err);
+        setSyncStatus('error');
+      }
+    } else {
+      localStorage.setItem('kongre_needs_cloud_upload', 'true');
       setSyncStatus('synced');
-    } catch (err) {
-      console.error('Error syncing to Firestore:', err);
-      setSyncStatus('error');
     }
   };
 
-  // Función explícita para forzar subida de datos locales a la cuenta de Google
+  // Función explícita para forzar subida de datos locales a la cuenta de Google y a la congregación
   const uploadLocalDataToGoogle = async (): Promise<{ success: boolean; message: string }> => {
-    if (!user) {
+    const activeUser = user || auth.currentUser;
+    if (!activeUser) {
       return { success: false, message: 'Primero inicia sesión con tu cuenta de Google.' };
     }
     setSyncStatus('saving');
     try {
-      const userDocRef = doc(db, 'users', user.uid, 'congregation_data', 'main');
+      const userDocRef = doc(db, 'users', activeUser.uid, 'congregation_data', 'main');
       const nowISO = new Date().toISOString();
       const fresh = getFreshLocalCongregationData();
+      const cleanId = (
+        fresh.settings.congregationNumber ||
+        fresh.settings.congregationId ||
+        settings.congregationNumber ||
+        settings.congregationId ||
+        ''
+      ).trim().toUpperCase();
+
       const payload = sanitizeForFirestore({
         ...fresh,
         settings: {
           ...fresh.settings,
           isRegistered: true,
-          coordinatorEmail: fresh.settings.coordinatorEmail || user.email || '',
-          coordinatorName: fresh.settings.coordinatorName || user.displayName || 'Coordinador',
+          coordinatorEmail: fresh.settings.coordinatorEmail || activeUser.email || '',
+          coordinatorName: fresh.settings.coordinatorName || activeUser.displayName || 'Coordinador',
         },
+        congregationId: cleanId,
         updatedAt: nowISO,
       });
+
       await setDoc(userDocRef, payload, { merge: true });
+
+      if (cleanId) {
+        try {
+          const congDocRef = doc(db, 'congregations', cleanId);
+          await setDoc(congDocRef, payload, { merge: true });
+        } catch (e) {
+          console.warn('Error sincronizando en doc de congregación:', e);
+        }
+      }
+
       localStorage.removeItem('kongre_needs_cloud_upload');
       localStorage.setItem('kongre_last_local_update', nowISO);
       localStorage.setItem('kongre_is_registered_congregation', 'true');
@@ -1121,84 +1207,53 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Función explícita para descargar datos desde la cuenta de Google
   const downloadDataFromGoogle = async (): Promise<{ success: boolean; message: string }> => {
-    if (!user) {
+    const activeUser = user || auth.currentUser;
+    if (!activeUser) {
       return { success: false, message: 'Primero inicia sesión con tu cuenta de Google.' };
     }
     setSyncStatus('saving');
     try {
-      const userDocRef = doc(db, 'users', user.uid, 'congregation_data', 'main');
+      const userDocRef = doc(db, 'users', activeUser.uid, 'congregation_data', 'main');
       const snap = await getDoc(userDocRef);
       if (!snap.exists()) {
         setSyncStatus('synced');
         return { success: false, message: 'No hay datos guardados en la nube para esta cuenta de Google.' };
       }
       const data = snap.data();
-      if (data.publishers) {
-        setPublishers(data.publishers);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(data.publishers));
-      }
-      if (data.weeks) {
-        setWeeks(data.weeks);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_weeks`, JSON.stringify(data.weeks));
-      }
-      if (data.settings) {
-        setSettings(data.settings);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_settings`, JSON.stringify(data.settings));
-      }
-      if (data.preachingGroups) {
-        setPreachingGroups(data.preachingGroups);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_groups`, JSON.stringify(data.preachingGroups));
-      }
-      if (data.customDuties) {
-        setCustomDuties(data.customDuties);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_duties`, JSON.stringify(data.customDuties));
-      }
-      if (data.clmProgramas) {
-        setClmProgramas(data.clmProgramas);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_clm_programas`, JSON.stringify(data.clmProgramas));
-      }
-      if (data.territories) {
-        setTerritories(data.territories);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_territories`, JSON.stringify(data.territories));
-      }
-      if (data.monthlyReports) {
-        setMonthlyReports(data.monthlyReports);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_monthly_reports`, JSON.stringify(data.monthlyReports));
-      }
-      if (data.transactions) {
-        setTransactions(data.transactions);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_transactions`, JSON.stringify(data.transactions));
-      }
-      if (data.literatureItems) {
-        setLiteratureItems(data.literatureItems);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_literature_items`, JSON.stringify(data.literatureItems));
-      }
-      if (data.hospitalityHosts) {
-        setHospitalityHosts(data.hospitalityHosts);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_hospitality_hosts`, JSON.stringify(data.hospitalityHosts));
-      }
-      if (data.breakers) {
-        setBreakers(data.breakers);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(data.breakers));
-      }
-      if (data.maintenanceSheets) {
-        setMaintenanceSheets(data.maintenanceSheets);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(data.maintenanceSheets));
-      }
-      if (data.auxPioneerRequests) {
-        setAuxPioneerRequests(data.auxPioneerRequests);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`, JSON.stringify(data.auxPioneerRequests));
-      }
-      if (data.branchReportsS1) {
-        setBranchReportsS1(data.branchReportsS1);
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_branch_reports_s1`, JSON.stringify(data.branchReportsS1));
-      }
+      hydrateAllFromData(data);
       setSyncStatus('synced');
       return { success: true, message: '¡Datos de la congregación restaurados desde Google con éxito!' };
     } catch (err: any) {
       console.error('Error al descargar de Firestore:', err);
       setSyncStatus('error');
       return { success: false, message: err?.message || 'Error al descargar datos de Firestore.' };
+    }
+  };
+
+  // Función para cargar los datos de una congregación existente desde Firestore (incluso sin Google Auth)
+  const loadCongregationFromCloud = async (congId: string): Promise<{ success: boolean; congregationName?: string; message: string; data?: any }> => {
+    const cleanId = congId.trim().toUpperCase();
+    if (!cleanId) return { success: false, message: 'ID de congregación no válido.' };
+
+    try {
+      const congDocRef = doc(db, 'congregations', cleanId);
+      const snap = await getDoc(congDocRef);
+      if (!snap.exists()) {
+        return { success: false, message: 'No se encontraron datos en la nube para este ID de congregación.' };
+      }
+
+      const data = snap.data();
+      hydrateAllFromData(data);
+      setSyncStatus('synced');
+      return {
+        success: true,
+        data,
+        congregationName: data.settings?.congregationName || 'Congregación',
+        message: '¡Datos de la congregación cargados exitosamente desde la nube!',
+      };
+    } catch (err: any) {
+      console.error('Error cargando congregación desde la nube:', err);
+      return { success: false, message: err?.message || 'Error al conectar con la nube.' };
     }
   };
 
@@ -3382,6 +3437,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         restorePreviousRegistration,
         uploadLocalDataToGoogle,
         downloadDataFromGoogle,
+        loadCongregationFromCloud,
         accountLinkRequests,
         createAccountLinkRequest,
         approveAccountLinkRequest,

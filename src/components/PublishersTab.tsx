@@ -49,6 +49,7 @@ export const PublishersTab: React.FC = () => {
     weeks,
     customDuties,
     accountLinkRequests,
+    settings,
   } = useCongregation();
 
   const { assignPersonalPinToPublisher } = useAuth();
@@ -707,6 +708,13 @@ export const PublishersTab: React.FC = () => {
 
                       {/* Spiritual Privilege & Theocratic Role Badges */}
                       <div className="flex flex-wrap gap-1 mt-1.5">
+                        {((settings.coordinatorName && pub.name.toLowerCase().trim() === settings.coordinatorName.toLowerCase().trim()) ||
+                          (settings.coordinatorEmail && pub.email && pub.email.toLowerCase().trim() === settings.coordinatorEmail.toLowerCase().trim()) ||
+                          pub.notes?.toLowerCase().includes('coordinador')) && (
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-purple-100 text-purple-900 border border-purple-200 flex items-center gap-1">
+                            <span>👑</span> Coordinador
+                          </span>
+                        )}
                         {pub.privilege && pub.privilege !== 'publicador_bautizado' && (
                           <span
                             className={`px-2 py-0.5 rounded-md text-[10px] font-bold capitalize ${

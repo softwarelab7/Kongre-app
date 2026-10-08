@@ -95,6 +95,8 @@ export interface Publisher {
   full_name?: string;
   status?: 'active' | 'inactive';
   role?: 'elder' | 'servant' | 'publisher' | string;
+  spiritualStatus?: 'elder' | 'ministerial_servant' | 'anciano' | 'siervo_ministerial' | 'publicador' | 'publisher' | string;
+  serviceRole?: 'regular_pioneer' | 'special_pioneer' | 'precursor_regular' | 'precursor_auxiliar' | 'publicador' | string;
   assignments?: {
     chairman?: boolean;
     prayers?: boolean;
@@ -1010,6 +1012,9 @@ export interface ClmParte {
   descripcion?: string;
   notas?: string;
   es_clase_auxiliar?: boolean;
+  leccion_numero?: number;
+  leccion_titulo?: string;
+  leccion_estado?: 'completada' | 'continuar' | 'pendiente';
 }
 
 export interface ClmPrograma {

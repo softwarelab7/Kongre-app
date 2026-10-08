@@ -45,9 +45,50 @@ import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 import { UserProfileSettingsView } from './UserProfileSettingsView';
 
 export const SettingsTab: React.FC = () => {
-  const { settings, updateSettings, exportBackupJSON, getBackupJSON, importBackupJSON } = useCongregation();
+  const {
+    settings,
+    updateSettings,
+    exportBackupJSON,
+    getBackupJSON,
+    importBackupJSON,
+    uploadLocalDataToGoogle,
+    downloadDataFromGoogle,
+    syncStatus,
+  } = useCongregation();
   const { user, signInWithGoogle, signOutUser } = useAuth();
   const { themeMode, setThemeMode } = useTheme();
+
+  const [isSyncingCloud, setIsSyncingCloud] = useState(false);
+  const [cloudActionStatus, setCloudActionStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+
+  const handleUploadToGoogle = async () => {
+    setIsSyncingCloud(true);
+    setCloudActionStatus(null);
+    try {
+      const res = await uploadLocalDataToGoogle();
+      setCloudActionStatus({ type: res.success ? 'success' : 'error', msg: res.message });
+    } catch (e: any) {
+      setCloudActionStatus({ type: 'error', msg: e?.message || 'Error al guardar en la nube de Google.' });
+    } finally {
+      setIsSyncingCloud(false);
+    }
+  };
+
+  const handleDownloadFromGoogle = async () => {
+    if (!window.confirm('¿Deseas descargar y reemplazar los datos locales con la copia guardada en tu cuenta de Google?')) {
+      return;
+    }
+    setIsSyncingCloud(true);
+    setCloudActionStatus(null);
+    try {
+      const res = await downloadDataFromGoogle();
+      setCloudActionStatus({ type: res.success ? 'success' : 'error', msg: res.message });
+    } catch (e: any) {
+      setCloudActionStatus({ type: 'error', msg: e?.message || 'Error al descargar datos desde Google.' });
+    } finally {
+      setIsSyncingCloud(false);
+    }
+  };
   const {
     isPinEnabled,
     lockSession,
@@ -1004,42 +1045,120 @@ export const SettingsTab: React.FC = () => {
   {settingsSubView === 'respaldos' && (
     <div className="space-y-8 animate-fade-in">
       {/* SINCRONIZACIÓN EN LA NUBE Y GOOGLE AUTH */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-        <h3 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
-          <Cloud className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-          <span>Sincronización Segura en la Nube con tu Cuenta de Google</span>
-        </h3>
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 flex-wrap gap-2">
+          <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Cloud className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <span>Sincronización en la Nube con tu Cuenta de Google</span>
+          </h3>
+          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+            user
+              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+              : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+          }`}>
+            <span className={`w-2 h-2 rounded-full ${user ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+            {user ? 'Google Conectado' : 'Modo Datos de Aplicación (Local)'}
+          </span>
+        </div>
 
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold text-slate-800 dark:text-white">
-              {user ? `Conectado como: ${user.displayName || user.email}` : 'Modo fuera de línea / Almacenamiento local'}
+        {/* Sync message alert if any */}
+        {cloudActionStatus && (
+          <div className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between gap-2.5 animate-fade-in ${
+            cloudActionStatus.type === 'success'
+              ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+              : 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+          }`}>
+            <div className="flex items-center gap-2.5">
+              {cloudActionStatus.type === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              ) : (
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+              )}
+              <span>{cloudActionStatus.msg}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setCloudActionStatus(null)}
+              className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-xs cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <p className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+              {user ? (
+                <>
+                  <span>Conectado como:</span>
+                  <span className="text-indigo-600 dark:text-indigo-400 font-mono text-xs">{user.email}</span>
+                </>
+              ) : (
+                <span>Modo Local / Credenciales de Aplicación</span>
+              )}
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl">
               {user
-                ? 'Tus datos teocráticos y perfil se sincronizan automáticamente y en tiempo real con Firestore en la nube.'
-                : 'Inicia sesión con Google para sincronizar en tiempo real entre tu teléfono celular y tu computadora.'}
+                ? 'Tus datos teocráticos (publicadores, reuniones, programas CLM, asignaciones y ajustes) se sincronizan en tiempo real con Firestore en la nube de Google. Puedes forzar la subida de datos locales o descargar la copia de la nube en cualquier momento.'
+                : 'Estás conectado con los datos de tu congregación (ID y PIN). Toda tu información y cambios se guardan localmente en este dispositivo. Para que tus datos se guarden en la nube y estén siempre disponibles cuando te conectes con Google, pulsa "Conectar con Google y Respaldar".'}
             </p>
           </div>
 
-          <div>
+          <div className="flex items-center gap-2 flex-wrap shrink-0">
             {user ? (
-              <button
-                type="button"
-                onClick={signOutUser}
-                className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>Desconectar Cuenta</span>
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={handleUploadToGoogle}
+                  disabled={isSyncingCloud}
+                  className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer disabled:opacity-60"
+                  title="Subir y guardar todos los datos locales actuales en tu cuenta de Google Firestore"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>{isSyncingCloud ? 'Guardando...' : 'Subir datos a Google'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadFromGoogle}
+                  disabled={isSyncingCloud}
+                  className="px-3.5 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer disabled:opacity-60"
+                  title="Descargar y restaurar datos teocráticos desde tu cuenta de Google Firestore"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Restaurar de Google</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={signOutUser}
+                  className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-600 hover:text-rose-600 dark:text-slate-400 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                  title="Desconectar cuenta de Google"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Desconectar</span>
+                </button>
+              </>
             ) : (
               <button
                 type="button"
-                onClick={signInWithGoogle}
-                className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+                onClick={async () => {
+                  setIsSyncingCloud(true);
+                  setCloudActionStatus(null);
+                  try {
+                    await signInWithGoogle();
+                    const res = await uploadLocalDataToGoogle();
+                    setCloudActionStatus({ type: res.success ? 'success' : 'error', msg: res.message });
+                  } catch (e: any) {
+                    setCloudActionStatus({ type: 'error', msg: e?.message || 'Error al conectar con Google.' });
+                  } finally {
+                    setIsSyncingCloud(false);
+                  }
+                }}
+                disabled={isSyncingCloud}
+                className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95 cursor-pointer"
               >
                 <LogIn className="w-4 h-4" />
-                <span>Iniciar Sesión con Google</span>
+                <span>Conectar con Google y Respaldar Datos</span>
               </button>
             )}
           </div>

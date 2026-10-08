@@ -10,6 +10,7 @@ import { CongregationProvider, useCongregation } from './context/CongregationCon
 import { Navbar, ActiveTab } from './components/Navbar';
 import { isTabAllowedForRole } from './utils/rbac';
 import { ScheduleTab } from './components/ScheduleTab';
+import ClmScheduleView from './components/ClmScheduleView';
 import { S89SlipsTab } from './components/S89SlipsTab';
 import { PublishersTab } from './components/PublishersTab';
 import { GruposServicioTab } from './components/GruposServicioTab';
@@ -118,7 +119,7 @@ const AppContent: React.FC = () => {
     }
     return false;
   });
-  const { setCurrentWeekId, territories, settings, accountLinkRequests } = useCongregation();
+  const { setCurrentWeekId, territories, settings, accountLinkRequests, publishers } = useCongregation();
   const [isRegisterWizardOpen, setIsRegisterWizardOpen] = useState(false);
   const [isLinkRequestsModalOpen, setIsLinkRequestsModalOpen] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState<boolean>(() => {
@@ -356,6 +357,12 @@ const AppContent: React.FC = () => {
               />
             )}
             {activeTab === 'programacion' && <ScheduleTab />}
+            {activeTab === 'clm_vmc' && (
+              <ClmScheduleView
+                publishers={publishers}
+                congregationId={settings.congregationName}
+              />
+            )}
             {activeTab === 's89' && <S89SlipsTab />}
             {activeTab === 'publicadores' && <PublishersTab />}
             {activeTab === 'precursores_auxiliares' && <PrecursoresAuxiliaresTab />}

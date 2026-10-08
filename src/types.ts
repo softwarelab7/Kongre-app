@@ -40,6 +40,9 @@ export interface ClmParte {
   descripcion?: string;
   notas?: string;
   es_clase_auxiliar?: boolean;
+  leccion_numero?: number;
+  leccion_titulo?: string;
+  leccion_estado?: 'completada' | 'continuar' | 'pendiente';
 }
 
 export interface ClmPrograma {

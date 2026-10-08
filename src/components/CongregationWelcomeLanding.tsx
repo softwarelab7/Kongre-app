@@ -67,6 +67,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     accountLinkRequests,
     createAccountLinkRequest,
     restorePreviousRegistration,
+    uploadLocalDataToGoogle,
   } = useCongregation();
   const { isDark, toggleTheme } = useTheme();
 
@@ -202,6 +203,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         setActiveRole(roleFinal);
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
+        localStorage.setItem('kongre_needs_cloud_upload', 'true');
+        localStorage.setItem('kongre_last_local_update', new Date().toISOString());
 
         setCodeSuccess(`¡Conexión exitosa a ${cleanCongName}! Bienvenido, ${nameToUse} (${THEOCRATIC_ROLES[roleFinal]?.name || roleFinal}).`);
         setTimeout(() => {
@@ -264,12 +267,18 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         setActiveRole('coordinador');
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
+        await uploadLocalDataToGoogle();
         onEnterApp();
         return;
       }
 
-      // Si la congregación ya está registrada
-      if (settings.isRegistered && settings.congregationName) {
+      // Si la congregación ya está registrada en este dispositivo o con datos de aplicación:
+      const isDeviceRegistered =
+        Boolean(settings.isRegistered && settings.congregationName) ||
+        localStorage.getItem('kongre_is_registered_congregation') === 'true' ||
+        publishers.length > 0;
+
+      if (isDeviceRegistered && userEmail) {
         const coordEmail = settings.coordinatorEmail?.toLowerCase().trim();
         const matchingPub = publishers.find(
           (p) => p.email && p.email.toLowerCase().trim() === userEmail
@@ -284,13 +293,33 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'pending'
         );
 
-        if (userEmail && (userEmail === coordEmail || matchingPub || matchingRole || approvedReq)) {
-          // Usuario reconocido y aprobado: entra directamente
+        // Si es el dispositivo donde se registró la congregación o un hermano autorizado:
+        const isDeviceOwner =
+          !coordEmail ||
+          coordEmail === userEmail ||
+          localStorage.getItem('kongre_is_registered_congregation') === 'true';
+
+        if (isDeviceOwner || matchingPub || matchingRole || approvedReq) {
+          // Si no había correo registrado o coincide, vincular esta cuenta de Google como coordinador
+          if (!coordEmail || isDeviceOwner) {
+            await updateSettings({
+              coordinatorEmail: userEmail,
+              coordinatorName: loggedUser?.displayName || settings.coordinatorName || 'Coordinador',
+              isRegistered: true,
+            });
+          }
+          assignRoleToEmail(userEmail, 'coordinador', loggedUser?.displayName || 'Coordinador');
+          setActiveRole('coordinador');
+          localStorage.setItem('kongre_is_registered_congregation', 'true');
           localStorage.setItem('kongre_has_entered_app', 'true');
+          // Guardar y sincronizar automáticamente datos locales a Google
+          await uploadLocalDataToGoogle();
           onEnterApp();
+          return;
         } else if (pendingReq) {
           // Ya tiene solicitud enviada: mostrar pantalla de espera
           setPendingApprovalEmail(userEmail || null);
+          return;
         } else {
           // Asistente de registro o unirse
           setActiveTab('register');

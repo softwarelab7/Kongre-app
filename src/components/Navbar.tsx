@@ -36,6 +36,7 @@ import {
   MapPin,
   Map,
   FileCheck,
+  ClipboardList,
   Bell,
   Briefcase,
   Flame,
@@ -67,6 +68,7 @@ import {
 export type ActiveTab =
   | 'inicio'
   | 'programacion'
+  | 'clm_vmc'
   | 's89'
   | 'publicadores'
   | 'precursores_auxiliares'
@@ -148,7 +150,17 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenWelcomeLanding,
 }) => {
   const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo } = useAuth();
-  const { settings, updateSettings, conflicts, syncStatus, notices, territories, accountLinkRequests, auxPioneerRequests } = useCongregation();
+  const {
+    settings,
+    updateSettings,
+    conflicts,
+    syncStatus,
+    notices,
+    territories,
+    accountLinkRequests,
+    auxPioneerRequests,
+    uploadLocalDataToGoogle,
+  } = useCongregation();
   const pendingRequestsCount = accountLinkRequests.filter((r) => r.status === 'pending').length;
   const pendingAuxPioneersCount = (auxPioneerRequests || []).filter((r) => (r.status || r.estado || 'pendiente') === 'pendiente').length;
   const { themeMode, toggleTheme, isDark, isCabinaMode } = useTheme();
@@ -211,13 +223,19 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Reuniones',
       shortTitle: 'Reuniones',
       icon: Calendar,
-      tabIds: ['programacion', 's89', 'discursos', 'hospitalidad'],
+      tabIds: ['programacion', 'clm_vmc', 's89', 'discursos', 'hospitalidad'],
       items: [
         {
           id: 'programacion',
           label: 'Programa Semanal',
           description: 'Vida y Ministerio Cristianos y Fin de Semana',
           icon: Calendar,
+        },
+        {
+          id: 'clm_vmc',
+          label: 'Programa VMC (Oficial)',
+          description: 'Vista interactiva CLM con elegibilidad, Sala Auxiliar y S-89',
+          icon: ClipboardList,
         },
         {
           id: 's89',
@@ -435,7 +453,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Reuniones',
       icon: Calendar,
       primaryTab: 'programacion' as ActiveTab,
-      tabIds: ['programacion', 's89', 'discursos'] as ActiveTab[],
+      tabIds: ['programacion', 'clm_vmc', 's89', 'discursos'] as ActiveTab[],
       badge: undefined,
       badgeColor: undefined,
       colorClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400',
@@ -849,6 +867,41 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="hidden lg:flex items-center">
                 <PWAInstallButton />
               </div>
+            )}
+
+            {/* Google Cloud Status / Quick Connect Button */}
+            {user ? (
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await uploadLocalDataToGoogle();
+                  } catch {}
+                  handleSelectTab('ajustes');
+                }}
+                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition cursor-pointer"
+                title={`Sincronizado con Google (${user.email}). Pulsa para sincronizar o ver ajustes`}
+              >
+                <CloudCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span className="hidden xl:inline">Google Conectado</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await signInWithGoogle();
+                    await uploadLocalDataToGoogle();
+                  } catch {}
+                }}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 text-[11px] font-bold hover:bg-amber-100 dark:hover:bg-amber-900/40 transition cursor-pointer shadow-2xs"
+                title="Has iniciado con datos de aplicación. Pulsa para respaldar y guardar tus datos en tu cuenta de Google"
+              >
+                <CloudUpload className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 animate-bounce" />
+                <span className="hidden md:inline">Respaldar en Google</span>
+                <span className="md:hidden">Respaldar</span>
+              </button>
             )}
 
             {/* Dark Mode Moon / Sun Toggle */}

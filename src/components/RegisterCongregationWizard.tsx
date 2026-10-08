@@ -427,6 +427,8 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       // 5. Store registration flag in localStorage
       localStorage.setItem('kongre_is_registered_congregation', 'true');
       localStorage.setItem('kongre_has_entered_app', 'true');
+      localStorage.setItem('kongre_needs_cloud_upload', 'true');
+      localStorage.setItem('kongre_last_local_update', new Date().toISOString());
       sessionStorage.removeItem('kongre_show_landing');
 
       setIsSubmitting(false);

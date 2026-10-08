@@ -288,5 +288,6 @@ export function isTabAllowedForRole(role: TheocraticRole, tab: ActiveTab): boole
   if (tab === 'inicio') return true;
   const roleInfo = THEOCRATIC_ROLES[role];
   if (!roleInfo) return false;
+  if (tab === 'clm_vmc') return roleInfo.allowedTabs.includes('programacion');
   return roleInfo.allowedTabs.includes(tab);
 }

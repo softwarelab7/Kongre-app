@@ -224,6 +224,20 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           congregationId: cleanId,
         });
 
+        const cleanPhoto =
+          cloudData?.settings?.coordinatorPhotoURL ||
+          cloudData?.coordinatorPhotoURL ||
+          localStorage.getItem('kongre_coordinator_photo') ||
+          localStorage.getItem('kongre_google_photo') ||
+          '';
+
+        if (cleanPhoto) {
+          localStorage.setItem('kongre_coordinator_photo', cleanPhoto);
+          if (!localStorage.getItem('kongre_user_photo') || roleFinal === 'coordinador') {
+            localStorage.setItem('kongre_user_photo', cleanPhoto);
+          }
+        }
+
         assignRoleToEmail(emailToUse, roleFinal, nameToUse, pinToIdentify);
         setActiveRole(roleFinal);
         localStorage.setItem('kongre_is_registered_congregation', 'true');
@@ -409,17 +423,36 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               onClick={() => setIsUserMenuOpen((prev) => !prev)}
               className="flex items-center gap-1 p-1 sm:px-2 sm:py-1 rounded-full bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 transition-colors cursor-pointer"
             >
-              {(userProfile?.photoURL || user?.photoURL) ? (
-                <img
-                  src={(userProfile?.photoURL || user?.photoURL) || undefined}
-                  alt={userProfile?.displayName || user?.displayName || 'Usuario'}
-                  className="w-7 h-7 rounded-full object-cover border border-indigo-300 dark:border-indigo-700"
-                />
-              ) : (
-                <div className="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
-                  {((userProfile?.displayName || user?.displayName || user?.email || 'U').charAt(0)).toUpperCase()}
-                </div>
-              )}
+              {(() => {
+                const effectiveAvatar =
+                  userProfile?.photoURL ||
+                  user?.photoURL ||
+                  settings?.coordinatorPhotoURL ||
+                  (typeof window !== 'undefined'
+                    ? (localStorage.getItem('kongre_user_photo') ||
+                       localStorage.getItem('kongre_google_photo') ||
+                       localStorage.getItem('kongre_coordinator_photo'))
+                    : null);
+
+                if (effectiveAvatar) {
+                  return (
+                    <img
+                      src={effectiveAvatar}
+                      alt={userProfile?.displayName || user?.displayName || 'Usuario'}
+                      className="w-7 h-7 rounded-full object-cover border border-indigo-300 dark:border-indigo-700"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  );
+                }
+
+                return (
+                  <div className="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">
+                    {((userProfile?.displayName || user?.displayName || settings?.coordinatorName || user?.email || 'U').charAt(0)).toUpperCase()}
+                  </div>
+                );
+              })()}
               <ChevronDown className="w-3.5 h-3.5 opacity-70" />
             </button>
 

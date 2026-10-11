@@ -1,6 +1,6 @@
-// src/components/UserProfileSettingsView.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useCongregation } from '../context/CongregationContext';
 import { UserProfile, PreferredContactMethod, ContactTimePreference } from '../types';
 import {
   User,
@@ -88,6 +88,7 @@ const AVATAR_PRESETS = [
 
 export const UserProfileSettingsView: React.FC = () => {
   const { user, userProfile, updateUserProfile, effectiveRoleInfo, signInWithGoogle } = useAuth();
+  const { settings, updateSettings } = useCongregation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -111,20 +112,46 @@ export const UserProfileSettingsView: React.FC = () => {
 
   // Initialize form when userProfile changes
   useEffect(() => {
+    const fallbackPhoto =
+      userProfile?.photoURL ||
+      user?.photoURL ||
+      settings?.coordinatorPhotoURL ||
+      (typeof window !== 'undefined'
+        ? (localStorage.getItem('kongre_user_photo') ||
+           localStorage.getItem('kongre_google_photo') ||
+           localStorage.getItem('kongre_coordinator_photo'))
+        : '') ||
+      '';
+
+    const fallbackName =
+      userProfile?.displayName ||
+      user?.displayName ||
+      settings?.coordinatorName ||
+      (typeof window !== 'undefined'
+        ? (localStorage.getItem('kongre_user_confirmed_name') ||
+           localStorage.getItem('kongre_google_display_name') ||
+           localStorage.getItem('kongre_current_brother_name'))
+        : '') ||
+      '';
+
     if (userProfile) {
-      setDisplayName(userProfile.displayName || user?.displayName || '');
-      setPhotoURL(userProfile.photoURL || user?.photoURL || '');
-      setPhone(userProfile.phone || '');
+      setDisplayName(userProfile.displayName || fallbackName);
+      setPhotoURL(userProfile.photoURL || fallbackPhoto);
+      setPhone(userProfile.phone || settings?.coordinatorPhone || '');
       setSecondaryEmail(userProfile.secondaryEmail || '');
       setPreferredContactMethod(userProfile.preferredContactMethod || 'whatsapp');
       setContactTimePreference(userProfile.contactTimePreference || 'anytime');
       setNotificationsEnabled(userProfile.notificationsEnabled ?? true);
       setNotes(userProfile.notes || '');
     } else if (user) {
-      setDisplayName(user.displayName || (user.email ? user.email.split('@')[0] : ''));
-      setPhotoURL(user.photoURL || '');
+      setDisplayName(user.displayName || fallbackName || (user.email ? user.email.split('@')[0] : ''));
+      setPhotoURL(user.photoURL || fallbackPhoto);
+      setSecondaryEmail(user.email || '');
+    } else {
+      if (fallbackPhoto) setPhotoURL(fallbackPhoto);
+      if (fallbackName) setDisplayName(fallbackName);
     }
-  }, [userProfile, user]);
+  }, [userProfile, user, settings?.coordinatorPhotoURL, settings?.coordinatorName, settings?.coordinatorPhone]);
 
   // Handle image upload from disk, compress to max 256x256 WebP/JPEG dataURL
   const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,8 +205,16 @@ export const UserProfileSettingsView: React.FC = () => {
 
   // Restore Google photo
   const handleRestoreGooglePhoto = () => {
-    if (user?.photoURL) {
-      setPhotoURL(user.photoURL);
+    const googlePhoto =
+      user?.photoURL ||
+      (typeof window !== 'undefined'
+        ? (localStorage.getItem('kongre_google_photo') ||
+           localStorage.getItem('kongre_user_photo') ||
+           localStorage.getItem('kongre_coordinator_photo'))
+        : null);
+
+    if (googlePhoto) {
+      setPhotoURL(googlePhoto);
       setSelectedPresetId(null);
       setShowUrlInput(false);
     }
@@ -213,9 +248,10 @@ export const UserProfileSettingsView: React.FC = () => {
     setSaveSuccess(false);
     setSaveError(null);
 
+    const cleanPhoto = photoURL.trim();
     const result = await updateUserProfile({
       displayName: displayName.trim(),
-      photoURL: photoURL.trim(),
+      photoURL: cleanPhoto,
       phone: phone.trim(),
       secondaryEmail: secondaryEmail.trim().toLowerCase(),
       preferredContactMethod,
@@ -223,6 +259,14 @@ export const UserProfileSettingsView: React.FC = () => {
       notificationsEnabled,
       notes: notes.trim(),
     });
+
+    if (cleanPhoto) {
+      try {
+        localStorage.setItem('kongre_user_photo', cleanPhoto);
+        localStorage.setItem('kongre_coordinator_photo', cleanPhoto);
+        updateSettings({ coordinatorPhotoURL: cleanPhoto });
+      } catch {}
+    }
 
     setIsSaving(false);
 
@@ -398,15 +442,27 @@ export const UserProfileSettingsView: React.FC = () => {
                   <span>Subir Foto</span>
                 </button>
 
-                {user?.photoURL && user.photoURL !== photoURL && (
-                  <button
-                    type="button"
-                    onClick={handleRestoreGooglePhoto}
-                    className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-slate-200 dark:border-slate-700"
-                  >
-                    <span>Usar foto de Google</span>
-                  </button>
-                )}
+                {(() => {
+                  const googlePhoto =
+                    user?.photoURL ||
+                    (typeof window !== 'undefined'
+                      ? (localStorage.getItem('kongre_google_photo') ||
+                         localStorage.getItem('kongre_user_photo'))
+                      : null);
+
+                  if (googlePhoto && googlePhoto !== photoURL) {
+                    return (
+                      <button
+                        type="button"
+                        onClick={handleRestoreGooglePhoto}
+                        className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-slate-200 dark:border-slate-700"
+                      >
+                        <span>Usar foto de Google</span>
+                      </button>
+                    );
+                  }
+                  return null;
+                })()}
 
                 <button
                   type="button"

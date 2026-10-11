@@ -67,6 +67,7 @@ export interface Publisher {
   gender: Gender;
   phone: string;
   email?: string;
+  photoURL?: string;
   privilege?: TheocraticPrivilege;
   theocraticRole?: TheocraticRole;
   personalPin?: string;
@@ -411,6 +412,7 @@ export interface CongregationSettings {
   coordinatorName?: string;    // ej. 'Héctor Gutiérrez'
   coordinatorEmail?: string;   // ej. 'hectorguti95@gmail.com'
   coordinatorPhone?: string;   // ej. '+57 300 1234567'
+  coordinatorPhotoURL?: string; // Foto de perfil del coordinador (Google Auth / nube)
   isRegistered?: boolean;      // true if the congregation registration wizard has been completed
   registeredAt?: string;       // ISO date
   updatedAt?: string;          // ISO date

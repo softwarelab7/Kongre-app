@@ -1023,6 +1023,13 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         ? { ...INITIAL_SETTINGS, ...data.settings, ...(currentLocal || {}) }
         : { ...INITIAL_SETTINGS, ...(currentLocal || {}), ...data.settings };
 
+      const cloudCoordPhoto =
+        data.settings?.coordinatorPhotoURL ||
+        data.coordinatorPhotoURL ||
+        currentLocal?.coordinatorPhotoURL ||
+        (typeof window !== 'undefined' ? (localStorage.getItem('kongre_coordinator_photo') || localStorage.getItem('kongre_user_photo') || localStorage.getItem('kongre_google_photo')) : '') ||
+        '';
+
       const enrichedSettings: CongregationSettings = {
         ...baseMerged,
         congregationName: finalCongName,
@@ -1036,7 +1043,17 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         isRegistered: isReg,
         coordinatorEmail: (isLocalNewer ? currentLocal?.coordinatorEmail : data.settings.coordinatorEmail) || currentLocal?.coordinatorEmail || data.settings.coordinatorEmail || user?.email || '',
         coordinatorName: (isLocalNewer ? currentLocal?.coordinatorName : data.settings.coordinatorName) || currentLocal?.coordinatorName || data.settings.coordinatorName || user?.displayName || 'Coordinador',
+        coordinatorPhotoURL: cloudCoordPhoto,
       };
+
+      if (cloudCoordPhoto) {
+        try {
+          localStorage.setItem('kongre_coordinator_photo', cloudCoordPhoto);
+          if (!localStorage.getItem('kongre_user_photo')) {
+            localStorage.setItem('kongre_user_photo', cloudCoordPhoto);
+          }
+        } catch {}
+      }
 
       setSettings(enrichedSettings);
       latestSettingsRef.current = enrichedSettings;
@@ -1473,12 +1490,28 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       resolvedSettings.congregationId = congDocId;
     }
 
+    const activeCoordPhoto =
+      resolvedSettings.coordinatorPhotoURL ||
+      latestSettingsRef.current.coordinatorPhotoURL ||
+      user?.photoURL ||
+      auth.currentUser?.photoURL ||
+      (typeof window !== 'undefined' ? (localStorage.getItem('kongre_user_photo') || localStorage.getItem('kongre_google_photo') || localStorage.getItem('kongre_coordinator_photo')) : '') ||
+      '';
+
+    if (activeCoordPhoto) {
+      resolvedSettings.coordinatorPhotoURL = activeCoordPhoto;
+      try {
+        localStorage.setItem('kongre_coordinator_photo', activeCoordPhoto);
+      } catch {}
+    }
+
     const payload = sanitizeForFirestore({
       publishers: newPubs,
       weeks: newWeeks,
       preachingGroups: newGroups,
       customDuties: newDuties,
       settings: resolvedSettings,
+      coordinatorPhotoURL: activeCoordPhoto,
       outgoingSpeakers: newOutgoing,
       fieldServiceMeetings: newFieldService,
       cartLocations: newCartLocs,
@@ -1600,6 +1633,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const cleanId = resolveCongregationDocId(fresh.settings);
       if (cleanId) ensureCongregationIdPersisted(cleanId);
 
+      const activeCoordPhoto =
+        fresh.settings.coordinatorPhotoURL ||
+        activeUser.photoURL ||
+        (typeof window !== 'undefined' ? (localStorage.getItem('kongre_user_photo') || localStorage.getItem('kongre_google_photo') || localStorage.getItem('kongre_coordinator_photo')) : '') ||
+        '';
+
       const payload = sanitizeForFirestore({
         ...fresh,
         settings: {
@@ -1608,7 +1647,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           isRegistered: true,
           coordinatorEmail: fresh.settings.coordinatorEmail || activeUser.email || '',
           coordinatorName: fresh.settings.coordinatorName || activeUser.displayName || 'Coordinador',
+          coordinatorPhotoURL: activeCoordPhoto,
         },
+        coordinatorPhotoURL: activeCoordPhoto,
         congregationId: cleanId,
         updatedAt: nowISO,
       });
@@ -1711,6 +1752,17 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       hydrateAllFromData(data);
       const effectiveId = data.congregationId || rawClean;
       ensureCongregationIdPersisted(effectiveId);
+
+      const downloadedPhoto = data.settings?.coordinatorPhotoURL || data.coordinatorPhotoURL || '';
+      if (downloadedPhoto) {
+        try {
+          localStorage.setItem('kongre_coordinator_photo', downloadedPhoto);
+          if (!localStorage.getItem('kongre_user_photo')) {
+            localStorage.setItem('kongre_user_photo', downloadedPhoto);
+          }
+        } catch {}
+      }
+
       setSyncStatus('synced');
       return {
         success: true,

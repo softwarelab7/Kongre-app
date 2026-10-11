@@ -172,6 +172,20 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
           congregationId: cleanId,
         });
 
+        const cleanPhoto =
+          effectiveSettings.coordinatorPhotoURL ||
+          cloudRes?.data?.coordinatorPhotoURL ||
+          localStorage.getItem('kongre_coordinator_photo') ||
+          localStorage.getItem('kongre_google_photo') ||
+          '';
+
+        if (cleanPhoto) {
+          localStorage.setItem('kongre_coordinator_photo', cleanPhoto);
+          if (!localStorage.getItem('kongre_user_photo') || identifiedRole === 'coordinador') {
+            localStorage.setItem('kongre_user_photo', cleanPhoto);
+          }
+        }
+
         assignRoleToEmail(emailToUse, identifiedRole, finalBrotherName, cleanPersonalPin);
         setActiveRole(identifiedRole);
 

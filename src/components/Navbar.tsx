@@ -1040,20 +1040,39 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => handleSelectTab('perfil')}
               className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${
                 activeTab === 'perfil' ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900' : ''
-              } bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-xs cursor-pointer hover:ring-2 hover:ring-indigo-400/50 transition shrink-0 ml-1`}
-              title={`Mi Perfil (${userProfile?.displayName || user?.displayName || user?.email || 'Usuario'})`}
+              } bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-xs cursor-pointer hover:ring-2 hover:ring-indigo-400/50 transition shrink-0 ml-1 overflow-hidden`}
+              title={`Mi Perfil (${userProfile?.displayName || user?.displayName || settings?.coordinatorName || 'Usuario'})`}
             >
-              {(userProfile?.photoURL || user?.photoURL) ? (
-                <img
-                  src={(userProfile?.photoURL || user?.photoURL) || undefined}
-                  alt="Usuario"
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                <span>
-                  {((userProfile?.displayName || user?.displayName || user?.email || 'H').charAt(0)).toUpperCase()}
-                </span>
-              )}
+              {(() => {
+                const effectiveAvatar =
+                  userProfile?.photoURL ||
+                  user?.photoURL ||
+                  settings?.coordinatorPhotoURL ||
+                  (typeof window !== 'undefined'
+                    ? (localStorage.getItem('kongre_user_photo') ||
+                       localStorage.getItem('kongre_google_photo') ||
+                       localStorage.getItem('kongre_coordinator_photo'))
+                    : null);
+
+                if (effectiveAvatar) {
+                  return (
+                    <img
+                      src={effectiveAvatar}
+                      alt="Usuario"
+                      className="w-full h-full rounded-full object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  );
+                }
+
+                return (
+                  <span>
+                    {((userProfile?.displayName || user?.displayName || settings?.coordinatorName || user?.email || 'H').charAt(0)).toUpperCase()}
+                  </span>
+                );
+              })()}
             </button>
           </div>
         </div>

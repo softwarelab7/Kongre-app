@@ -119,8 +119,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // User Profile state (almacenado en Firestore: /users/{userId})
   const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
     try {
-      const cached = localStorage.getItem('kongre_user_profile_active');
-      if (cached) return JSON.parse(cached);
+      const activeCached = localStorage.getItem('kongre_user_profile_active');
+      const fallbackPhoto =
+        localStorage.getItem('kongre_user_photo') ||
+        localStorage.getItem('kongre_google_photo') ||
+        localStorage.getItem('kongre_coordinator_photo') ||
+        '';
+
+      if (activeCached) {
+        const parsed = JSON.parse(activeCached);
+        if (!parsed.photoURL && fallbackPhoto) parsed.photoURL = fallbackPhoto;
+        return parsed;
+      }
+      const guestCached = localStorage.getItem('kongre_user_profile_guest');
+      if (guestCached) {
+        const parsed = JSON.parse(guestCached);
+        if (!parsed.photoURL && fallbackPhoto) parsed.photoURL = fallbackPhoto;
+        return parsed;
+      }
+      if (fallbackPhoto) {
+        return {
+          uid: 'guest',
+          email: localStorage.getItem('kongre_user_email') || '',
+          displayName: localStorage.getItem(LOCAL_STORAGE_BROTHER_NAME_KEY) || 'Usuario',
+          photoURL: fallbackPhoto,
+          phone: '',
+          secondaryEmail: '',
+          preferredContactMethod: 'whatsapp',
+          contactTimePreference: 'anytime',
+          notificationsEnabled: true,
+          notes: '',
+          updatedAt: new Date().toISOString(),
+        };
+      }
     } catch {}
     return null;
   });
@@ -422,6 +453,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+      if (currentUser) {
+        if (currentUser.photoURL) {
+          localStorage.setItem('kongre_google_photo', currentUser.photoURL);
+          localStorage.setItem('kongre_user_photo', currentUser.photoURL);
+          localStorage.setItem('kongre_coordinator_photo', currentUser.photoURL);
+        }
+        if (currentUser.displayName) {
+          localStorage.setItem('kongre_google_display_name', currentUser.displayName);
+        }
+        if (currentUser.email) {
+          localStorage.setItem('kongre_user_email', currentUser.email);
+        }
+      }
       if (currentUser?.email) {
         const email = currentUser.email.toLowerCase().trim();
         const found = userRolesList.find((r) => r.email.toLowerCase().trim() === email);
@@ -443,8 +487,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (!user) {
       try {
-        const cached = localStorage.getItem('kongre_user_profile_guest');
-        if (cached) setUserProfile(JSON.parse(cached));
+        const fallbackPhoto =
+          localStorage.getItem('kongre_user_photo') ||
+          localStorage.getItem('kongre_google_photo') ||
+          localStorage.getItem('kongre_coordinator_photo') ||
+          '';
+
+        const activeCached = localStorage.getItem('kongre_user_profile_active');
+        if (activeCached) {
+          const parsed = JSON.parse(activeCached);
+          if (!parsed.photoURL && fallbackPhoto) parsed.photoURL = fallbackPhoto;
+          setUserProfile(parsed);
+          return;
+        }
+
+        const guestCached = localStorage.getItem('kongre_user_profile_guest');
+        if (guestCached) {
+          const parsed = JSON.parse(guestCached);
+          if (!parsed.photoURL && fallbackPhoto) parsed.photoURL = fallbackPhoto;
+          setUserProfile(parsed);
+          return;
+        }
+
+        if (fallbackPhoto) {
+          setUserProfile({
+            uid: 'guest',
+            email: localStorage.getItem('kongre_user_email') || '',
+            displayName: currentBrotherName || 'Hermano',
+            photoURL: fallbackPhoto,
+            phone: '',
+            secondaryEmail: '',
+            preferredContactMethod: 'whatsapp',
+            contactTimePreference: 'anytime',
+            notificationsEnabled: true,
+            notes: '',
+            updatedAt: new Date().toISOString(),
+          });
+        }
       } catch {}
       return;
     }
@@ -459,11 +538,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       (docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data();
+          const effectivePhoto =
+            data.photoURL ||
+            user.photoURL ||
+            localStorage.getItem('kongre_google_photo') ||
+            localStorage.getItem('kongre_user_photo') ||
+            '';
+
           const loaded: UserProfile = {
             uid: user.uid,
             email: data.email || user.email || '',
             displayName: data.displayName || user.displayName || (currentBrotherName || 'Hno. ' + (user.email ? user.email.split('@')[0] : 'Usuario')),
-            photoURL: data.photoURL || user.photoURL || '',
+            photoURL: effectivePhoto,
             phone: data.phone || '',
             secondaryEmail: data.secondaryEmail || '',
             preferredContactMethod: data.preferredContactMethod || 'whatsapp',
@@ -475,17 +561,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUserProfile(loaded);
           localStorage.setItem('kongre_user_profile_active', JSON.stringify(loaded));
           localStorage.setItem(`kongre_user_profile_${user.uid}`, JSON.stringify(loaded));
+          if (effectivePhoto) {
+            localStorage.setItem('kongre_user_photo', effectivePhoto);
+            localStorage.setItem('kongre_coordinator_photo', effectivePhoto);
+          }
           if (loaded.displayName) {
             setCurrentBrotherName(loaded.displayName);
             localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, loaded.displayName);
           }
         } else {
           // Si el documento en Firestore no existe todavía, crear objeto inicial predeterminado
+          const fallbackPhoto = user.photoURL || localStorage.getItem('kongre_google_photo') || localStorage.getItem('kongre_user_photo') || '';
           const initial: UserProfile = {
             uid: user.uid,
             email: user.email || '',
             displayName: user.displayName || (currentBrotherName || (user.email?.toLowerCase() === 'hectorguti95@gmail.com' ? 'Hno. Héctor Gutiérrez' : 'Hno. ' + (user.email ? user.email.split('@')[0] : 'Usuario'))),
-            photoURL: user.photoURL || '',
+            photoURL: fallbackPhoto,
             phone: '',
             secondaryEmail: '',
             preferredContactMethod: 'whatsapp',
@@ -496,6 +587,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           };
           setUserProfile(initial);
           localStorage.setItem('kongre_user_profile_active', JSON.stringify(initial));
+          if (fallbackPhoto) {
+            localStorage.setItem('kongre_user_photo', fallbackPhoto);
+            localStorage.setItem('kongre_coordinator_photo', fallbackPhoto);
+          }
         }
       },
       (err) => {
@@ -564,6 +659,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // 2. Persistir localmente en memoria y almacenamiento local
       localStorage.setItem('kongre_user_profile_active', JSON.stringify(merged));
       localStorage.setItem(`kongre_user_profile_${targetUid}`, JSON.stringify(merged));
+      if (merged.photoURL) {
+        localStorage.setItem('kongre_user_photo', merged.photoURL);
+        localStorage.setItem('kongre_coordinator_photo', merged.photoURL);
+      }
       setUserProfile(merged);
 
       // 3. Sincronizar el nombre activo en la sesión

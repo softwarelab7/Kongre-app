@@ -1935,41 +1935,32 @@ export default function ClmScheduleView({
           </div>
         </>
       ) : (
-        /* ── ENCABEZADO VMC LIMPIO Y SELECTOR DE SALAS (MODO EMBEBIDO / UNIFICADO) ── */
-        <div className="px-5 py-3.5 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-              <CalendarDays className="w-4 h-4 sm:w-5 sm:h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
-                  Reunión de Entre Semana (VMC)
-                </h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
-                  {effectivePrograma?.lectura_semana || 'JEREMÍAS 40, 41'}
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
-                Vida y Ministerio Cristianos • Semana {effectivePrograma?.semana_num || '41'}
-              </p>
-            </div>
+        /* ── ENCABEZADO VMC SUPER MINIMALISTA (MODO EMBEBIDO / UNIFICADO) ── */
+        <div className="px-5 py-2.5 bg-slate-50/70 dark:bg-slate-800/30 border-b border-slate-200/70 dark:border-white/[0.05] flex items-center justify-between gap-3 flex-wrap text-xs">
+          {/* Lectura bíblica y semana */}
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-800 dark:text-zinc-200">
+              Reunión Entre Semana (VMC)
+            </span>
+            <span className="text-slate-300 dark:text-slate-600">•</span>
+            <span className="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">
+              {effectivePrograma?.lectura_semana || 'JEREMÍAS 40, 41'}
+            </span>
           </div>
 
-          {/* Controles de Sala (Auditorio / Sala Auxiliar) */}
-          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
-            {/* Selector Auditorio / Sala Auxiliar */}
-            <div className="flex items-center gap-1 bg-white dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-bold shadow-2xs">
+          {/* Selector de salas y configuración auxiliar compacta */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Píldora de sala Auditorio / Sala Auxiliar si está habilitada */}
+            <div className="flex items-center gap-0.5 bg-white dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-semibold shadow-2xs">
               <button
                 type="button"
                 onClick={() => setActiveRoom('principal')}
-                className={`px-3 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-2.5 py-1 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
                   activeRoom === 'principal'
-                    ? 'bg-indigo-600 text-white shadow-xs'
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
                     : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-300 inline-block" />
                 <span>Auditorio</span>
               </button>
 
@@ -1977,97 +1968,50 @@ export default function ClmScheduleView({
                 <button
                   type="button"
                   onClick={() => setActiveRoom('auxiliar')}
-                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-2.5 py-1 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
                     activeRoom === 'auxiliar'
-                      ? 'bg-amber-500 text-white shadow-xs'
+                      ? 'bg-amber-500 text-white font-bold shadow-xs'
                       : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-300 inline-block" />
                   <span>Sala Auxiliar</span>
                 </button>
               )}
             </div>
 
-            {/* Botón Consejero de Sala Auxiliar */}
-            {showAuxRoom && (
-              <button
-                type="button"
-                onClick={() => setIsAuxCounselorModalOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 transition-all cursor-pointer shadow-2xs"
-                title="Abrir panel de control del Consejero de la Sala Auxiliar"
-              >
-                <UserCheck size={13} className="shrink-0" />
-                <span>
-                  Consejero:{' '}
-                  <strong className="font-bold">
-                    {auxCounselorPart?.asignado_nombre
-                      ? auxCounselorPart.asignado_nombre.split(' ')[0]
-                      : 'Sin asignar'}
-                  </strong>
-                </span>
-              </button>
-            )}
-
-            {/* Checkbox de Sala Auxiliar */}
-            <label className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-zinc-200 shadow-2xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors select-none">
+            {/* Checkbox discreto para activar Sala Auxiliar */}
+            <label className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white text-xs font-medium cursor-pointer transition-colors select-none">
               <input
                 type="checkbox"
                 checked={showAuxRoom}
                 onChange={(e) => handleToggleAuxRoom(e.target.checked)}
                 className="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 border-slate-300 cursor-pointer"
               />
-              <span>Sala Auxiliar</span>
+              <span className="text-[11px]">2 Salas</span>
             </label>
 
-            {/* Botón Quitar Asignados */}
-            <button
-              type="button"
-              onClick={handleQuickClearAllAssignments}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
-              title="Quitar a todos los publicadores asignados en esta reunión de entre semana"
-            >
-              <UserMinus size={13} className="shrink-0 text-rose-600 dark:text-rose-400" />
-              <span>Quitar Asignados</span>
-            </button>
+            {/* Acceso a Consejero si la sala auxiliar está activa */}
+            {showAuxRoom && (
+              <button
+                type="button"
+                onClick={() => setIsAuxCounselorModalOpen(true)}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/40 transition-all cursor-pointer"
+                title="Consejero de la Sala Auxiliar"
+              >
+                <UserCheck size={12} className="shrink-0" />
+                <span>
+                  {auxCounselorPart?.asignado_nombre
+                    ? auxCounselorPart.asignado_nombre.split(' ')[0]
+                    : 'Consejero'}
+                </span>
+              </button>
+            )}
           </div>
         </div>
       )}
 
       {/* ── LISTADO OFICIAL DE LA REUNIÓN ── */}
       <div className="flex-1 overflow-y-auto pb-16">
-        {/* Barra compacta cuando se incluye en ScheduleTab */}
-        {hideHeaderToolbar && (
-          <div className="px-5 py-2.5 bg-slate-50/90 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-white/5 flex flex-wrap items-center justify-between gap-2.5">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="text-xs font-bold text-slate-800 dark:text-zinc-200">
-                Programa Vida y Ministerio Cristianos (VMC)
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleAutoAssign}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 text-xs font-bold transition-all cursor-pointer shadow-2xs"
-                title="Auto-asignar todas las partes de entre semana"
-              >
-                <Sparkles size={12} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
-                <span>Autoasignar VMC</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleQuickClearAllAssignments}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 text-xs font-bold transition-all cursor-pointer shadow-2xs"
-                title="Quitar a todos los publicadores asignados en esta reunión de entre semana"
-              >
-                <UserMinus size={12} className="shrink-0 text-rose-600 dark:text-rose-400" />
-                <span>Quitar Asignados VMC</span>
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Banner de la Sala Auxiliar cuando está activa */}
         {activeRoom === 'auxiliar' && (
           <div className="mx-6 mt-3 mb-4 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-200/80 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">

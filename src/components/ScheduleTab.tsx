@@ -62,6 +62,8 @@ import {
   CalendarDays,
   ShieldCheck,
   UserMinus,
+  MoreHorizontal,
+  ChevronDown,
 } from 'lucide-react';
 
 export const ScheduleTab: React.FC = () => {
@@ -167,6 +169,7 @@ export const ScheduleTab: React.FC = () => {
   const [isConflictsModalOpen, setIsConflictsModalOpen] = useState(false);
   const [isClearWeekAssignmentsModalOpen, setIsClearWeekAssignmentsModalOpen] = useState(false);
   const [clearScope, setClearScope] = useState<'all' | 'midweek' | 'weekend' | 'duties'>('all');
+  const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [toastNotification, setToastNotification] = useState<string | null>(null);
 
   const handleConfirmClearAssignments = async () => {
@@ -449,24 +452,24 @@ export const ScheduleTab: React.FC = () => {
         highlightWord="Reuniones"
         subtitle={`Semana: ${currentWeek.weekStartDate} al ${currentWeek.weekEndDate} • Semana ${currentIndex + 1} de ${sortedWeeks.length}`}
         actions={
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Week navigation capsule */}
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] p-1 rounded-xl">
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Cápsula de navegación de semana minimalista */}
+            <div className="flex items-center bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] p-1 rounded-xl">
               <button
                 onClick={goToPreviousWeek}
                 disabled={currentIndex <= 0}
-                className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-30 disabled:hover:bg-transparent transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
+                className="p-1 rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
                 title="Semana anterior"
                 aria-label="Semana anterior"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-xs font-bold px-2 text-slate-800 dark:text-white">
+              <span className="text-xs font-bold px-2.5 text-slate-800 dark:text-white select-none whitespace-nowrap">
                 {currentWeek.weekStartDate} al {currentWeek.weekEndDate}
               </span>
               <button
                 onClick={goToNextWeek}
-                className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
+                className="p-1 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
                 title={currentIndex < sortedWeeks.length - 1 ? 'Semana siguiente' : 'Crear siguiente semana'}
                 aria-label="Semana siguiente"
               >
@@ -474,231 +477,247 @@ export const ScheduleTab: React.FC = () => {
               </button>
             </div>
 
-            {/* Selector de visualización de reunión */}
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/[0.05] p-1 rounded-xl border border-slate-200/80 dark:border-white/[0.08] overflow-x-auto">
+            {/* Selector de tipo de reunión compacto */}
+            <div className="flex items-center bg-slate-100 dark:bg-white/[0.05] p-1 rounded-xl border border-slate-200/80 dark:border-white/[0.08]">
               <button
                 type="button"
                 onClick={() => setViewMode('all')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                   viewMode === 'all'
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-2xs font-bold'
                     : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Entre Semana y Fin de Semana
+                Todo
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('midweek')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                   viewMode === 'midweek'
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-2xs font-bold'
                     : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Reunión Entre Semana (Asignador Oficial)
+                Entre Semana
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('weekend')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                   viewMode === 'weekend'
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-2xs font-bold'
                     : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Reunión Fin de Semana
+                Fin de Semana
               </button>
             </div>
 
-            {/* Botón Nueva Semana */}
+            {/* Botón Nueva Semana sutil */}
             <button
               onClick={addNextWeek}
-              className="flex items-center gap-1 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md dark:shadow-indigo-500/20 active:scale-95 cursor-pointer"
-              title="Añadir una nueva semana al programa"
+              className="p-2 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer"
+              title="Añadir nueva semana"
             >
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Nueva Semana</span>
             </button>
           </div>
         }
       >
-        {/* ── BARRA DE HERRAMIENTAS INTEGRADA EN EL ENCABEZADO (ÚNICA Y UNIFICADA) ── */}
-        <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-200/60 dark:border-white/[0.06] w-full">
-          {!isReadOnly ? (
-            <>
+        {/* ── BARRA DE HERRAMIENTAS ULTRA MINIMALISTA ── */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-slate-200/60 dark:border-white/[0.06] w-full text-xs">
+          {/* Lado izquierdo: Acciones clave con diseño limpio */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {!isReadOnly ? (
               <button
                 onClick={autoAssignCurrentWeek}
-                className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white text-xs font-bold shadow-sm hover:shadow transition-all min-h-[36px] cursor-pointer"
-                title="Autoasignar toda esta semana eligiendo a los publicadores con más tiempo sin participar y sin cruces"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-2xs cursor-pointer"
+                title="Autoasignar toda esta semana respetando rotación y sin cruces"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-                <span>Autoasignar Semana</span>
+                <span>Autoasignar</span>
               </button>
-
-              <button
-                type="button"
-                onClick={() => setIsClearWeekAssignmentsModalOpen(true)}
-                className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all shadow-2xs min-h-[36px] cursor-pointer"
-                title="Quitar de forma rápida a los publicadores asignados en esta semana"
-              >
-                <UserMinus className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
-                <span>Quitar Asignados</span>
-              </button>
-            </>
-          ) : (
-            <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold">
-              <span className="w-2 h-2 rounded-full bg-slate-400" />
-              <span>Solo Lectura ({effectiveRoleInfo.shortName})</span>
-            </div>
-          )}
-
-          {!isReadOnly && (
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => handleQuickSyncOrganized('all')}
-                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all shadow-2xs min-h-[36px] cursor-pointer"
-                title="Traer datos oficiales de Organized para esta semana"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                <span className="truncate">Traer de Organized</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setOrganizedModalTab('catalogo');
-                  setIsOrganizedModalOpen(true);
-                }}
-                className="p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all min-h-[36px] cursor-pointer"
-                title="Abrir Catálogo de semanas y bosquejos oficiales de Organized"
-              >
-                <Layers className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-              </button>
-            </div>
-          )}
-
-          {!isReadOnly && (
-            <button
-              onClick={() => setIsMwbModalOpen(true)}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 text-xs font-bold transition-all shadow-2xs min-h-[36px] cursor-pointer"
-              title="Importar temas de la Guía de Actividades (MWB) para esta semana"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
-              <span className="truncate">Importar Guía (MWB)</span>
-            </button>
-          )}
-
-          <button
-            onClick={() => setIsBatchWhatsAppOpen(true)}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-2xs min-h-[36px] cursor-pointer"
-            title="Enviar recordatorios de la semana por WhatsApp"
-          >
-            <MessageCircle className="w-3.5 h-3.5 text-white shrink-0" />
-            <span className="truncate">WhatsApp</span>
-          </button>
-
-          {/* Imprimir S-89 */}
-          <button
-            type="button"
-            onClick={handlePrintS89}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 text-xs font-semibold transition-all shadow-2xs min-h-[36px] cursor-pointer"
-            title="Imprimir hojas oficiales de asignación S-89 en PDF para esta semana"
-          >
-            <FileText className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
-            <span className="truncate">Imprimir S-89</span>
-          </button>
-
-          {/* Fichas S-38 */}
-          <button
-            type="button"
-            onClick={handleOpenS38}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 text-xs font-semibold transition-all shadow-2xs min-h-[36px] cursor-pointer"
-            title="Ver registros oficiales S-38 de progreso de estudiantes"
-          >
-            <Award className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-            <span className="truncate">Fichas S-38</span>
-          </button>
-
-          {/* Cartelera Mensual */}
-          <button
-            type="button"
-            onClick={() => setIsMonthlyBillboardModalOpen(true)}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-semibold transition-all shadow-2xs min-h-[36px] cursor-pointer"
-            title="Abrir programa apaisado para la cartelera de anuncios del Salón"
-          >
-            <CalendarDays className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span className="truncate">Cartelera Mensual</span>
-          </button>
-
-          {/* Modo Atril / Reloj */}
-          <button
-            onClick={() => setIsTimerModalOpen(true)}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-2xs min-h-[36px] cursor-pointer"
-            title="Abrir cronómetro y modo atril para la cabina y presidente"
-          >
-            <Timer className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span className="truncate">Modo Atril</span>
-          </button>
-
-          {/* Evento Especial */}
-          {!isReadOnly && (
-            <button
-              onClick={() => {
-                setEventTitle(currentWeek.specialEvent?.title || '');
-                setEventType(currentWeek.specialEvent?.type || 'visita_superintendente');
-                setNoMidweek(Boolean(currentWeek.specialEvent?.noMeetingMidweek));
-                setNoWeekend(Boolean(currentWeek.specialEvent?.noMeetingWeekend));
-                setEventNotes(currentWeek.specialEvent?.notes || '');
-                setIsSpecialEventModalOpen(true);
-              }}
-              className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all min-h-[36px] cursor-pointer ${
-                currentWeek.specialEvent?.isSpecial
-                  ? 'bg-amber-100 text-amber-900 border border-amber-300 font-bold'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/5 dark:text-zinc-300 dark:border dark:border-white/10'
-              }`}
-            >
-              <Sparkle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-              <span className="truncate">
-                {currentWeek.specialEvent?.isSpecial ? 'Evento Especial (Activo)' : 'Evento Especial'}
-              </span>
-            </button>
-          )}
-
-          {/* Copiar Estructura */}
-          {!isReadOnly && (
-            <button
-              onClick={() => {
-                setSourceWeekId(sortedWeeks[0]?.id || '');
-                setIsCopyModalOpen(true);
-              }}
-              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/5 dark:text-zinc-300 text-xs font-semibold transition-all min-h-[36px] cursor-pointer"
-            >
-              <Copy className="w-3.5 h-3.5 text-slate-600 shrink-0" />
-              <span className="truncate">Copiar Estructura</span>
-            </button>
-          )}
-
-          {/* Auditoría / Cruces */}
-          <button
-            type="button"
-            onClick={() => setIsConflictsModalOpen(true)}
-            className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all min-h-[36px] cursor-pointer border ${
-              weekConflictsCount > 0
-                ? 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 animate-pulse'
-                : 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
-            }`}
-            title="Verificar auditoría de cruces de esta semana"
-          >
-            {weekConflictsCount > 0 ? (
-              <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
             ) : (
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span className="text-slate-500 text-xs font-medium px-2 py-1 bg-slate-100 dark:bg-white/5 rounded-lg">
+                Solo lectura ({effectiveRoleInfo.shortName})
+              </span>
             )}
-            <span className="truncate">
-              {weekConflictsCount > 0 ? `${weekConflictsCount} Cruces` : 'Sin Cruces'}
-            </span>
-          </button>
+
+            <button
+              onClick={() => setIsBatchWhatsAppOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 font-medium transition-all cursor-pointer"
+              title="Enviar recordatorios de la semana por WhatsApp"
+            >
+              <MessageCircle className="w-3.5 h-3.5 shrink-0" />
+              <span>WhatsApp</span>
+            </button>
+          </div>
+
+          {/* Lado derecho: Documentos, Cruces y Menú Más */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {/* S-89 oficial */}
+            <button
+              type="button"
+              onClick={handlePrintS89}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 font-medium transition-all cursor-pointer"
+              title="Descargar hojas oficiales de asignación S-89 en PDF"
+            >
+              <FileText className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+              <span>S-89</span>
+            </button>
+
+            {/* Fichas S-38 */}
+            <button
+              type="button"
+              onClick={handleOpenS38}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 font-medium transition-all cursor-pointer"
+              title="Registros S-38 y folleto de oratoria"
+            >
+              <Award className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+              <span>S-38</span>
+            </button>
+
+            {/* Cruces */}
+            <button
+              type="button"
+              onClick={() => setIsConflictsModalOpen(true)}
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-medium transition-all cursor-pointer border ${
+                weekConflictsCount > 0
+                  ? 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
+                  : 'text-slate-600 dark:text-zinc-300 border-slate-200/80 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5'
+              }`}
+              title="Auditoría de cruces de esta semana"
+            >
+              {weekConflictsCount > 0 ? (
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+              ) : (
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              )}
+              <span>{weekConflictsCount > 0 ? `${weekConflictsCount} Cruces` : 'Sin Cruces'}</span>
+            </button>
+
+            {/* Menú Desplegable "Más Opciones" */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsMoreMenuOpen((prev) => !prev)}
+                className="flex items-center gap-1 p-1.5 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer"
+                title="Más herramientas y opciones"
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </button>
+
+              {isMoreMenuOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsMoreMenuOpen(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-1.5 w-60 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-100">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMoreMenuOpen(false);
+                        setIsMwbModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                    >
+                      <BookOpen className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>Importar Guía de Actividades (MWB)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMoreMenuOpen(false);
+                        setOrganizedModalTab('catalogo');
+                        setIsOrganizedModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                    >
+                      <Layers className="w-4 h-4 text-indigo-600 shrink-0" />
+                      <span>Catálogo de Semanas Organized</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMoreMenuOpen(false);
+                        setIsMonthlyBillboardModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                    >
+                      <CalendarDays className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <span>Cartelera Mensual del Salón</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMoreMenuOpen(false);
+                        setIsTimerModalOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                    >
+                      <Timer className="w-4 h-4 text-amber-500 shrink-0" />
+                      <span>Modo Atril / Cronómetro</span>
+                    </button>
+
+                    {!isReadOnly && (
+                      <>
+                        <div className="my-1 border-t border-slate-100 dark:border-white/5" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsMoreMenuOpen(false);
+                            setEventTitle(currentWeek.specialEvent?.title || '');
+                            setEventType(currentWeek.specialEvent?.type || 'visita_superintendente');
+                            setNoMidweek(Boolean(currentWeek.specialEvent?.noMeetingMidweek));
+                            setNoWeekend(Boolean(currentWeek.specialEvent?.noMeetingWeekend));
+                            setEventNotes(currentWeek.specialEvent?.notes || '');
+                            setIsSpecialEventModalOpen(true);
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                        >
+                          <Sparkle className="w-4 h-4 text-amber-600 shrink-0" />
+                          <span>
+                            {currentWeek.specialEvent?.isSpecial ? 'Evento Especial (Activo)' : 'Configurar Evento Especial'}
+                          </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsMoreMenuOpen(false);
+                            setSourceWeekId(sortedWeeks[0]?.id || '');
+                            setIsCopyModalOpen(true);
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                        >
+                          <Copy className="w-4 h-4 text-slate-500 shrink-0" />
+                          <span>Copiar Estructura de Semana</span>
+                        </button>
+
+                        <div className="my-1 border-t border-slate-100 dark:border-white/5" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsMoreMenuOpen(false);
+                            setIsClearWeekAssignmentsModalOpen(true);
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer text-left"
+                        >
+                          <UserMinus className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+                          <span>Quitar Asignados de la Semana</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </SectionHeader>
 

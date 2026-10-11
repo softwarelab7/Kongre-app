@@ -435,6 +435,8 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       localStorage.setItem('kongre_has_entered_app', 'true');
       localStorage.setItem('kongre_needs_cloud_upload', 'true');
       localStorage.setItem('kongre_congregation_name', congregationName.trim());
+      localStorage.setItem('kongre_congregation_number', finalId);
+      localStorage.setItem('kongre_congregation_id', finalId);
       localStorage.setItem('kongre_midweek_day', midweekDay);
       localStorage.setItem('kongre_midweek_time', midweekTime);
       localStorage.setItem('kongre_weekend_day', weekendDay);

@@ -822,6 +822,66 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
   };
 
+  // Helper centralizado para resolver el ID canónico de la congregación desde cualquier origen
+  const resolveCongregationDocId = (explicitSettings?: Partial<CongregationSettings>): string => {
+    // 1. Configuración explícita pasada por argumento
+    const fromExplicit = (explicitSettings?.congregationNumber || explicitSettings?.congregationId || '').trim();
+    if (fromExplicit) return fromExplicit.toUpperCase();
+
+    // 2. State & latest ref en memoria
+    const fromRef = (latestSettingsRef.current?.congregationNumber || latestSettingsRef.current?.congregationId || '').trim();
+    if (fromRef) return fromRef.toUpperCase();
+
+    const fromState = (settings?.congregationNumber || settings?.congregationId || '').trim();
+    if (fromState) return fromState.toUpperCase();
+
+    // 3. Claves directas de localStorage
+    const fromStorageNum = (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_number') || '' : '').trim();
+    if (fromStorageNum) return fromStorageNum.toUpperCase();
+
+    const fromStorageId = (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_id') || '' : '').trim();
+    if (fromStorageId) return fromStorageId.toUpperCase();
+
+    // 4. Objetos JSON de configuración guardados
+    if (typeof window !== 'undefined') {
+      try {
+        const rawBackup = localStorage.getItem('kongre_saved_settings_backup');
+        if (rawBackup) {
+          const parsed = JSON.parse(rawBackup);
+          const fromParsed = (parsed.congregationNumber || parsed.congregationId || '').trim();
+          if (fromParsed) return fromParsed.toUpperCase();
+        }
+      } catch {}
+
+      try {
+        const rawStored = localStorage.getItem(`${LOCAL_STORAGE_KEY}_settings`);
+        if (rawStored) {
+          const parsed = JSON.parse(rawStored);
+          const fromParsed = (parsed.congregationNumber || parsed.congregationId || '').trim();
+          if (fromParsed) return fromParsed.toUpperCase();
+        }
+      } catch {}
+    }
+
+    return '';
+  };
+
+  // Asegura que el ID de la congregación quede guardado en todos los almacenes locales
+  const ensureCongregationIdPersisted = (id: string) => {
+    if (!id || id.length < 3) return;
+    const clean = id.trim().toUpperCase();
+    if (['1001', 'CENTRAL', 'MAIN', 'ID'].includes(clean)) return;
+
+    try {
+      localStorage.setItem('kongre_congregation_number', clean);
+      localStorage.setItem('kongre_congregation_id', clean);
+      if (latestSettingsRef.current) {
+        latestSettingsRef.current.congregationNumber = clean;
+        latestSettingsRef.current.congregationId = clean;
+      }
+    } catch {}
+  };
+
   // Helper centralizado para hidratar estado y localStorage desde datos de Firestore
   const hydrateAllFromData = (data: any) => {
     if (!data) return;
@@ -930,11 +990,30 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           ? data.settings.hallAddress
           : (userConfirmedAddress || currentLocal?.hallAddress || localStorage.getItem('kongre_hall_address') || data.settings.hallAddress || ''));
 
+      // Resolver ID canónico asegurando que nunca se pierda
+      const resolvedCongId = (
+        data.congregationId ||
+        data.settings?.congregationNumber ||
+        data.settings?.congregationId ||
+        currentLocal?.congregationNumber ||
+        currentLocal?.congregationId ||
+        (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_number') : null) ||
+        (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_id') : null) ||
+        settings.congregationNumber ||
+        settings.congregationId ||
+        ''
+      ).trim().toUpperCase();
+
+      if (resolvedCongId) {
+        ensureCongregationIdPersisted(resolvedCongId);
+      }
+
       const isReg = Boolean(
         data.settings.isRegistered ||
         currentLocal?.isRegistered ||
         settings.isRegistered ||
         Boolean(finalCongName && finalCongName.trim() !== '') ||
+        Boolean(resolvedCongId) ||
         (data.publishers && data.publishers.length > 0)
       );
 
@@ -947,6 +1026,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const enrichedSettings: CongregationSettings = {
         ...baseMerged,
         congregationName: finalCongName,
+        congregationNumber: resolvedCongId || baseMerged.congregationNumber || '',
+        congregationId: resolvedCongId || baseMerged.congregationId || '',
         midweekMeetingDay: finalMidDay,
         midweekMeetingTime: finalMidTime,
         weekendMeetingDay: finalFdsDay,
@@ -962,6 +1043,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       try {
         localStorage.setItem(`${LOCAL_STORAGE_KEY}_settings`, JSON.stringify(enrichedSettings));
         localStorage.setItem('kongre_saved_settings_backup', JSON.stringify(enrichedSettings));
+        if (resolvedCongId) {
+          localStorage.setItem('kongre_congregation_number', resolvedCongId);
+          localStorage.setItem('kongre_congregation_id', resolvedCongId);
+        }
         if (finalCongName && finalCongName !== 'Congregación Central' && !isCongregationIdString(finalCongName)) {
           localStorage.setItem('kongre_congregation_name', finalCongName);
           localStorage.setItem('kongre_user_confirmed_name', finalCongName);
@@ -1137,18 +1222,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             return;
           }
           const fresh = getFreshLocalCongregationData();
-          const cleanId = (
-            fresh.settings.congregationNumber ||
-            fresh.settings.congregationId ||
-            settings.congregationNumber ||
-            settings.congregationId ||
-            ''
-          ).trim().toUpperCase();
+          const cleanId = resolveCongregationDocId(fresh.settings);
+          if (cleanId) ensureCongregationIdPersisted(cleanId);
 
           const initialPayload = sanitizeForFirestore({
             ...fresh,
             settings: {
               ...fresh.settings,
+              ...(cleanId ? { congregationNumber: cleanId, congregationId: cleanId } : {}),
               isRegistered: true,
               coordinatorEmail: fresh.settings.coordinatorEmail || user.email || '',
               coordinatorName: fresh.settings.coordinatorName || user.displayName || 'Coordinador',
@@ -1159,9 +1240,13 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
           try {
             await setDoc(userDocRef, initialPayload, { merge: true });
-            if (cleanId) {
+            if (cleanId && cleanId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(cleanId)) {
               const congDocRef = doc(db, 'congregations', cleanId);
               await setDoc(congDocRef, initialPayload, { merge: true });
+              const unhyphenated = cleanId.replace(/-/g, '');
+              if (unhyphenated !== cleanId && unhyphenated.length >= 3) {
+                await setDoc(doc(db, 'congregations', unhyphenated), initialPayload, { merge: true });
+              }
             }
             localStorage.removeItem('kongre_needs_cloud_upload');
             localStorage.setItem('kongre_last_local_update', nowISO);
@@ -1245,18 +1330,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
               return;
             }
             skipNextSnapshotEcho = true;
-            const cleanId = (
-              fresh.settings.congregationNumber ||
-              fresh.settings.congregationId ||
-              settings.congregationNumber ||
-              settings.congregationId ||
-              ''
-            ).trim().toUpperCase();
+            const cleanId = resolveCongregationDocId(fresh.settings);
+            if (cleanId) ensureCongregationIdPersisted(cleanId);
 
             const uploadPayload = sanitizeForFirestore({
               ...fresh,
               settings: {
                 ...fresh.settings,
+                ...(cleanId ? { congregationNumber: cleanId, congregationId: cleanId } : {}),
                 isRegistered: true,
                 coordinatorEmail: fresh.settings.coordinatorEmail || user.email || '',
                 coordinatorName: fresh.settings.coordinatorName || user.displayName || 'Coordinador',
@@ -1267,9 +1348,13 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
             try {
               await setDoc(userDocRef, uploadPayload, { merge: true });
-              if (cleanId) {
+              if (cleanId && cleanId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(cleanId)) {
                 const congDocRef = doc(db, 'congregations', cleanId);
                 await setDoc(congDocRef, uploadPayload, { merge: true });
+                const unhyphenated = cleanId.replace(/-/g, '');
+                if (unhyphenated !== cleanId && unhyphenated.length >= 3) {
+                  await setDoc(doc(db, 'congregations', unhyphenated), uploadPayload, { merge: true });
+                }
               }
               localStorage.removeItem('kongre_needs_cloud_upload');
               localStorage.setItem('kongre_last_local_update', nowISO);
@@ -1381,13 +1466,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return;
     }
 
-    const congDocId = (
-      resolvedSettings.congregationNumber ||
-      resolvedSettings.congregationId ||
-      latestSettingsRef.current.congregationNumber ||
-      latestSettingsRef.current.congregationId ||
-      ''
-    ).trim().toUpperCase();
+    const congDocId = resolveCongregationDocId(resolvedSettings);
+    if (congDocId) {
+      ensureCongregationIdPersisted(congDocId);
+      resolvedSettings.congregationNumber = congDocId;
+      resolvedSettings.congregationId = congDocId;
+    }
 
     const payload = sanitizeForFirestore({
       publishers: newPubs,
@@ -1423,7 +1507,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
 
     const activeUser = user || auth.currentUser;
-    if (!activeUser) {
+    // Si no hay usuario Google ni ID de congregación para guardar en la nube
+    if (!activeUser && (!congDocId || congDocId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId))) {
       localStorage.setItem('kongre_needs_cloud_upload', 'true');
       setSyncStatus('synced');
       return;
@@ -1437,15 +1522,23 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       try {
         skipNextSnapshotEchoRef.current = true;
+        // 1. Si el usuario inició sesión con Google, guardar en su perfil personal
         if (activeUser) {
           const userDocRef = doc(db, 'users', activeUser.uid, 'congregation_data', 'main');
           await setDoc(userDocRef, payload, { merge: true });
           localStorage.removeItem('kongre_needs_cloud_upload');
         }
+        // 2. Guardar SIEMPRE en la colección global de congregaciones por ID para sincronizar todos los dispositivos y usuarios por ID
         if (congDocId && congDocId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId)) {
           try {
             const congDocRef = doc(db, 'congregations', congDocId);
             await setDoc(congDocRef, payload, { merge: true });
+
+            // Alias sin guiones
+            const unhyphenated = congDocId.replace(/-/g, '');
+            if (unhyphenated !== congDocId && unhyphenated.length >= 3) {
+              await setDoc(doc(db, 'congregations', unhyphenated), payload, { merge: true });
+            }
           } catch (congErr: any) {
             if (isQuotaError(congErr)) throw congErr;
             console.warn('Aviso guardando en congregación:', congErr);
@@ -1504,18 +1597,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const userDocRef = doc(db, 'users', activeUser.uid, 'congregation_data', 'main');
       const nowISO = new Date().toISOString();
       const fresh = getFreshLocalCongregationData();
-      const cleanId = (
-        fresh.settings.congregationNumber ||
-        fresh.settings.congregationId ||
-        settings.congregationNumber ||
-        settings.congregationId ||
-        ''
-      ).trim().toUpperCase();
+      const cleanId = resolveCongregationDocId(fresh.settings);
+      if (cleanId) ensureCongregationIdPersisted(cleanId);
 
       const payload = sanitizeForFirestore({
         ...fresh,
         settings: {
           ...fresh.settings,
+          ...(cleanId ? { congregationNumber: cleanId, congregationId: cleanId } : {}),
           isRegistered: true,
           coordinatorEmail: fresh.settings.coordinatorEmail || activeUser.email || '',
           coordinatorName: fresh.settings.coordinatorName || activeUser.displayName || 'Coordinador',
@@ -1526,10 +1615,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       await setDoc(userDocRef, payload, { merge: true });
 
-      if (cleanId) {
+      if (cleanId && cleanId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(cleanId)) {
         try {
           const congDocRef = doc(db, 'congregations', cleanId);
           await setDoc(congDocRef, payload, { merge: true });
+          const unhyphenated = cleanId.replace(/-/g, '');
+          if (unhyphenated !== cleanId && unhyphenated.length >= 3) {
+            await setDoc(doc(db, 'congregations', unhyphenated), payload, { merge: true });
+          }
         } catch (e: any) {
           if (isQuotaError(e)) throw e;
           console.warn('Error sincronizando en doc de congregación:', e);
@@ -1591,18 +1684,33 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Función para cargar los datos de una congregación existente desde Firestore (incluso sin Google Auth)
   const loadCongregationFromCloud = async (congId: string): Promise<{ success: boolean; congregationName?: string; message: string; data?: any }> => {
-    const cleanId = congId.trim().toUpperCase();
-    if (!cleanId) return { success: false, message: 'ID de congregación no válido.' };
+    const rawClean = congId.trim().toUpperCase();
+    if (!rawClean) return { success: false, message: 'ID de congregación no válido.' };
 
     try {
-      const congDocRef = doc(db, 'congregations', cleanId);
-      const snap = await getDoc(congDocRef);
+      // 1. Probar con el ID introducido directamente
+      let snap = await getDoc(doc(db, 'congregations', rawClean));
+
+      // 2. Si no existe y no tiene guiones, probar formato con guiones KGR-XXXX-XXXX
+      if (!snap.exists() && !rawClean.includes('-') && rawClean.startsWith('KGR') && rawClean.length === 11) {
+        const hyphenated = `${rawClean.slice(0, 3)}-${rawClean.slice(3, 7)}-${rawClean.slice(7)}`;
+        snap = await getDoc(doc(db, 'congregations', hyphenated));
+      }
+
+      // 3. Si no existe y tiene guiones, probar sin guiones
+      if (!snap.exists() && rawClean.includes('-')) {
+        const unhyphenated = rawClean.replace(/-/g, '');
+        snap = await getDoc(doc(db, 'congregations', unhyphenated));
+      }
+
       if (!snap.exists()) {
         return { success: false, message: 'No se encontraron datos en la nube para este ID de congregación.' };
       }
 
       const data = snap.data();
       hydrateAllFromData(data);
+      const effectiveId = data.congregationId || rawClean;
+      ensureCongregationIdPersisted(effectiveId);
       setSyncStatus('synced');
       return {
         success: true,
@@ -1620,6 +1728,68 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return { success: false, message: err?.message || 'Error al conectar con la nube.' };
     }
   };
+
+  // Auto-cargar datos más recientes desde Firestore para sesiones ID (sin Google)
+  useEffect(() => {
+    if (user) return;
+    const currentId = resolveCongregationDocId();
+    if (!currentId || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(currentId)) return;
+
+    let isMounted = true;
+    const syncIdSession = async () => {
+      try {
+        const res = await loadCongregationFromCloud(currentId);
+        if (res.success && isMounted) {
+          console.log('Congregación sincronizada con la nube por ID:', currentId);
+        }
+      } catch (e) {
+        console.warn('Aviso sincronizando sesión ID en arranque:', e);
+      }
+    };
+
+    syncIdSession();
+    return () => { isMounted = false; };
+  }, [user]);
+
+  // Listener en tiempo real de Firestore para sesiones ID (sin Google)
+  useEffect(() => {
+    if (user) return;
+    const currentId = resolveCongregationDocId();
+    if (!currentId || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(currentId)) return;
+
+    if (isFirestoreQuotaExceeded()) {
+      setSyncStatus('offline');
+      return;
+    }
+
+    const congRef = doc(db, 'congregations', currentId);
+    const unsubscribe = onSnapshot(
+      congRef,
+      (snapshot) => {
+        if (!snapshot.exists()) return;
+        if (snapshot.metadata.hasPendingWrites) return;
+        if (saveTimeoutRef.current) return;
+
+        const data = snapshot.data();
+        const lastLocalTs = localStorage.getItem('kongre_last_local_update');
+        const cloudTs = data?.updatedAt || data?.settings?.updatedAt;
+        if (lastLocalTs && cloudTs && lastLocalTs > cloudTs) return;
+
+        hydrateAllFromData(data);
+        setSyncStatus('synced');
+      },
+      (err) => {
+        if (isQuotaError(err)) {
+          markFirestoreQuotaExceeded();
+          setSyncStatus('offline');
+        } else {
+          console.warn('Aviso de listener en congregación ID:', err);
+        }
+      }
+    );
+
+    return () => unsubscribe();
+  }, [user, settings.congregationNumber, settings.congregationId]);
 
   // Auto-sync pending local changes when internet connection is restored
   useEffect(() => {
@@ -2870,9 +3040,15 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const nowISO = new Date().toISOString();
 
+    const effectiveCongId = resolveCongregationDocId(newSettings);
+    if (effectiveCongId) {
+      ensureCongregationIdPersisted(effectiveCongId);
+    }
+
     const merged: CongregationSettings = {
       ...latestSettingsRef.current,
       ...newSettings,
+      ...(effectiveCongId ? { congregationNumber: effectiveCongId, congregationId: effectiveCongId } : {}),
       ...(newSettings.congregationName !== undefined ? { congregationName: cleanCongName } : {}),
       updatedAt: nowISO,
       conflictRules: {
@@ -2889,6 +3065,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_settings`, JSON.stringify(merged));
       localStorage.setItem('kongre_saved_settings_backup', JSON.stringify(merged));
+      if (effectiveCongId) {
+        localStorage.setItem('kongre_congregation_number', effectiveCongId);
+        localStorage.setItem('kongre_congregation_id', effectiveCongId);
+      }
       localStorage.setItem('kongre_settings_user_saved', 'true');
       localStorage.setItem('kongre_last_settings_update', nowISO);
       localStorage.setItem('kongre_last_local_update', nowISO);

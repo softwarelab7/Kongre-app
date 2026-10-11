@@ -282,9 +282,25 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
       console.warn('Error escribiendo en localStorage:', storageErr);
     }
 
+    const preservedCongId = (
+      settings.congregationNumber ||
+      settings.congregationId ||
+      (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_number') : null) ||
+      (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_id') : null) ||
+      ''
+    ).trim().toUpperCase();
+
+    if (preservedCongId) {
+      try {
+        localStorage.setItem('kongre_congregation_number', preservedCongId);
+        localStorage.setItem('kongre_congregation_id', preservedCongId);
+      } catch {}
+    }
+
     try {
       await updateSettings({
         congregationName: trimmedName,
+        ...(preservedCongId ? { congregationNumber: preservedCongId, congregationId: preservedCongId } : {}),
         midweekMeetingDay: midDay,
         midweekMeetingTime: midTime,
         weekendMeetingDay: fdsDay,

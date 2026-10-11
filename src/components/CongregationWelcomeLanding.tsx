@@ -215,10 +215,13 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             ? settings.congregationName
             : (localStorage.getItem('kongre_congregation_name') || ''));
 
+        localStorage.setItem('kongre_congregation_number', cleanId);
+        localStorage.setItem('kongre_congregation_id', cleanId);
         updateSettings({
           isRegistered: true,
           ...(cleanCongName ? { congregationName: cleanCongName } : {}),
           congregationNumber: cleanId,
+          congregationId: cleanId,
         });
 
         assignRoleToEmail(emailToUse, roleFinal, nameToUse, pinToIdentify);

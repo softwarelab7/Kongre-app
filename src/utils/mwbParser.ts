@@ -121,6 +121,10 @@ export function parseMwbText(rawText: string): ParsedMwbWeek {
 
     // Seamos mejores maestros lines
     if (currentSection === 'maestros') {
+      if (lower.includes('lectura de la biblia') || lower.includes('lectura bíblica')) {
+        lecturaBibliaTitle = line;
+        continue;
+      }
       if (
         lower.includes('empiece') ||
         lower.includes('haga revisitas') ||

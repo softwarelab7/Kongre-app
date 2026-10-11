@@ -13,6 +13,7 @@ import {
   findOutlineByNumber,
   searchOutlines,
 } from '../utils/theocraticData';
+import { createDefaultPrograma } from '../utils/clmDefaultProgram';
 import { PublicTalkOutline, WeekSchedule } from '../types';
 import {
   X,
@@ -46,7 +47,14 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
   initialTab = 'catalogo',
   initialFocus = 'all',
 }) => {
-  const { currentWeek, updateWeek, syncAllWeeksWithOrganized } = useCongregation();
+  const {
+    currentWeek,
+    updateWeek,
+    syncAllWeeksWithOrganized,
+    updateClmPrograma,
+    publishers,
+    settings,
+  } = useCongregation();
 
   const [activeTab, setActiveTab] = useState<'catalogo' | 'importar' | 'bosquejos'>(initialTab);
   const [selectedScheduleKey, setSelectedScheduleKey] = useState<string>(() => {
@@ -107,6 +115,14 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
       applyWeekend: scope === 'all' || scope === 'weekend',
     });
     updateWeek(updated);
+
+    if (scope === 'all' || scope === 'midweek') {
+      const freshClm = createDefaultPrograma(currentWeek.weekStartDate, settings.congregationName || currentWeek.id, updated, publishers);
+      updateClmPrograma(freshClm);
+      try {
+        localStorage.setItem(`clm_programa_${currentWeek.weekStartDate}`, JSON.stringify(freshClm));
+      } catch {}
+    }
 
     const scopeMsg =
       scope === 'all'

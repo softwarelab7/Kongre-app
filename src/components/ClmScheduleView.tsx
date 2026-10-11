@@ -11,7 +11,7 @@ import { ClmMonthlyBillboardModal } from './ClmMonthlyBillboardModal';
 import { ClmAuxiliaryCounselorModal } from './ClmAuxiliaryCounselorModal';
 import { generateCounselorSheetPdf } from '../utils/clmCounselorPdf';
 import { useCongregation } from '../context/CongregationContext';
-import { getOrganizedScheduleForWeek } from '../utils/organizedSync';
+import { getOrganizedScheduleForWeek, applyOrganizedToWeek } from '../utils/organizedSync';
 import { createDefaultPrograma, getMonday } from '../utils/clmDefaultProgram';
 import { checkPublisherConflictsOnDate } from '../utils/assignmentConflictChecker';
 import { OFFICIAL_STUDENT_LESSONS } from '../utils/theocraticData';
@@ -46,6 +46,7 @@ import {
   ShieldCheck,
   UserCheck,
   UserMinus,
+  Edit3,
 } from 'lucide-react';
 
 // Banners oficiales por sección
@@ -215,6 +216,7 @@ export default function ClmScheduleView({
     advancePublisherLesson,
     repeatPublisherLesson,
     updatePublisher,
+    updateWeek,
   } = useCongregation();
 
   const [semanaActual, setSemanaActual] = useState<Date>(() => {
@@ -275,6 +277,8 @@ export default function ClmScheduleView({
   const [isMonthlyBillboardModalOpen, setIsMonthlyBillboardModalOpen] = useState(false);
   const [isAuxCounselorModalOpen, setIsAuxCounselorModalOpen] = useState(false);
   const [isConfirmClearClmOpen, setIsConfirmClearClmOpen] = useState(false);
+  const [editingSongPart, setEditingSongPart] = useState<ClmParte | null>(null);
+  const [songNumberInput, setSongNumberInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const auxCounselorPart = useMemo(() => {
@@ -630,6 +634,45 @@ export default function ClmScheduleView({
     });
   }
 
+  // Modificar número de cántico de forma interactiva
+  const handleSaveSong = () => {
+    if (!editingSongPart || !programa) return;
+    const cleanNum = songNumberInput.trim().replace(/[^0-9]/g, '');
+    const newTitle = cleanNum ? `Cántico ${cleanNum}` : editingSongPart.titulo;
+    const updatedProg: ClmPrograma = {
+      ...programa,
+      partes: programa.partes.map((p) =>
+        p.id === editingSongPart.id ? { ...p, titulo: newTitle } : p
+      ),
+    };
+    setPrograma(updatedProg);
+    updateClmPrograma(updatedProg);
+
+    if (currentWeek) {
+      const numVal = parseInt(cleanNum, 10);
+      if (!isNaN(numVal)) {
+        const weekCopy = JSON.parse(JSON.stringify(currentWeek));
+        if (
+          editingSongPart.id.includes('canto-1') ||
+          (!editingSongPart.id.includes('canto-2') && !editingSongPart.id.includes('canto-3'))
+        ) {
+          weekCopy.midweek.songFirst = numVal;
+        } else if (
+          editingSongPart.id.includes('canto-2') ||
+          editingSongPart.seccion === 'vida_cristiana'
+        ) {
+          weekCopy.midweek.songMiddle = numVal;
+        } else if (editingSongPart.id.includes('canto-3')) {
+          weekCopy.midweek.songConclude = numVal;
+        }
+        updateWeek(weekCopy);
+      }
+    }
+
+    setEditingSongPart(null);
+    showToast(`Cántico actualizado a: ${newTitle}`);
+  };
+
   // Cambiar lección asignada en la parte
   const handleUpdatePartLesson = (partId: string, lessonNum: number) => {
     if (!programa) return;
@@ -880,16 +923,26 @@ export default function ClmScheduleView({
     showToast('Se quitaron todos los asignados de esta reunión.');
   };
 
-  // Sincronizar catálogo oficial
+  // Sincronizar catálogo oficial exactamente como en Organized
   const handleSyncOrganized = () => {
     if (!programa) return;
+    const correspondingWeek = weeks.find((w) => w.weekStartDate === programa.semana_fecha);
     const org = getOrganizedScheduleForWeek(programa.id, programa.semana_fecha);
     if (!org) {
       showToast('No se encontró catálogo para esta semana en Organized.');
       return;
     }
-    setPrograma(createDefaultPrograma(programa.semana_fecha, congregationId));
-    showToast('Datos de la semana sincronizados exitosamente.');
+    if (correspondingWeek) {
+      const updatedWeek = applyOrganizedToWeek(correspondingWeek, org);
+      updateWeek(updatedWeek);
+    }
+    const fresh = createDefaultPrograma(programa.semana_fecha, congregationId, correspondingWeek, publishers);
+    setPrograma(fresh);
+    try {
+      localStorage.setItem(`clm_programa_${programa.semana_fecha}`, JSON.stringify(fresh));
+    } catch {}
+    updateClmPrograma(fresh);
+    showToast('Datos de la semana sincronizados exactamente con Organized.');
   };
 
   // Enviar a Cartelera
@@ -946,16 +999,81 @@ export default function ClmScheduleView({
 
   // Agrupación visual por secciones
   const groupedSections = useMemo(() => {
-    const marcoInicial = visiblePartes.filter(
-      (p) => p.seccion === 'marco' && (p.tipo === 'presidente' || p.tipo === 'canto' || p.tipo === 'oracion_apertura' || p.tipo === 'conductor_auxiliar')
+    // Clasificar con precisión los cánticos de la reunión (Inicial, Intermedio y Final)
+    const cantos = visiblePartes.filter((p) => p.tipo === 'canto');
+    const cantoInicial =
+      cantos.find((p) => p.id.includes('canto-1') || p.id.includes('inicio') || p.id.includes('apertura')) ||
+      (cantos.length > 0 ? cantos[0] : null);
+    const cantoFinal =
+      cantos.find((p) => p.id.includes('canto-3') || p.id.includes('cierre') || p.id.includes('conclu')) ||
+      (cantos.length >= 3 ? cantos[cantos.length - 1] : null);
+    const cantoIntermedio =
+      cantos.find(
+        (p) =>
+          p.id.includes('canto-2') ||
+          (p.seccion === 'vida_cristiana' && p !== cantoInicial && p !== cantoFinal)
+      ) || (cantos.length > 2 && cantos[1] !== cantoFinal ? cantos[1] : null);
+
+    // 1. Marco Inicial: Solo Presidente, Cántico 1 (inicial), Oración de apertura y Conductor auxiliar
+    const marcoInicial = visiblePartes.filter((p) => {
+      if (p.seccion !== 'marco') return false;
+      if (p.tipo === 'canto') {
+        return p === cantoInicial;
+      }
+      return p.tipo === 'presidente' || p.tipo === 'oracion_apertura' || p.tipo === 'conductor_auxiliar';
+    });
+
+    // 2. Tesoros de la Biblia (Exactamente una sola lectura bíblica, sin duplicados)
+    const tesorosRaw = visiblePartes.filter((p) => p.seccion === 'tesoros');
+    let hasReading = false;
+    const tesoros = tesorosRaw.filter((p) => {
+      const isReading = p.tipo === 'lectura_biblica' || p.titulo.toLowerCase().includes('lectura de la biblia');
+      if (isReading) {
+        if (hasReading) return false;
+        hasReading = true;
+      }
+      return true;
+    });
+
+    // 3. Seamos mejores maestros (Demostraciones estudiantiles, sin lecturas duplicadas)
+    const maestros = visiblePartes.filter(
+      (p) =>
+        p.seccion === 'maestros' &&
+        p.tipo !== 'lectura_biblica' &&
+        !p.titulo.toLowerCase().includes('lectura de la biblia')
     );
-    const tesoros = visiblePartes.filter((p) => p.seccion === 'tesoros');
-    const maestros = visiblePartes.filter((p) => p.seccion === 'maestros');
-    const cantoMedio = visiblePartes.filter((p) => p.seccion === 'vida_cristiana' && p.tipo === 'canto');
-    const vidaCristiana = visiblePartes.filter((p) => p.seccion === 'vida_cristiana' && p.tipo !== 'canto');
-    const marcoFinal = visiblePartes.filter(
-      (p) => p.seccion === 'marco' && (p.tipo === 'oracion_cierre' || (p.tipo === 'canto' && p.id.includes('canto-3')))
-    );
+
+    // 4. Cántico Intermedio (inicia Nuestra Vida Cristiana)
+    const cantoMedio = visiblePartes.filter((p) => {
+      if (p.tipo !== 'canto') return false;
+      if (cantoIntermedio && p === cantoIntermedio) return true;
+      return p.seccion === 'vida_cristiana' && p !== cantoInicial && p !== cantoFinal;
+    });
+
+    // 5. Nuestra Vida Cristiana (excluyendo cánticos y deduplicando estudio bíblico)
+    let hasCbs = false;
+    const vidaCristiana = visiblePartes.filter((p) => {
+      if (p.seccion !== 'vida_cristiana' || p.tipo === 'canto') return false;
+      const isCbs =
+        p.tipo === 'estudio_biblico_grupo' ||
+        p.id.includes('cbs') ||
+        p.titulo.toLowerCase().includes('estudio bíblico') ||
+        p.titulo.toLowerCase().includes('estudio biblico');
+      if (isCbs && p.tipo !== 'lector_estudio') {
+        if (hasCbs) return false;
+        hasCbs = true;
+      }
+      return true;
+    });
+
+    // 6. Marco Final: Cántico 3 (conclusión) y Oración de conclusión
+    const marcoFinal = visiblePartes.filter((p) => {
+      if (p.tipo === 'oracion_cierre') return true;
+      if (p.tipo === 'canto') {
+        return p === cantoFinal && p !== cantoInicial;
+      }
+      return false;
+    });
 
     return {
       marcoInicial,
@@ -1142,9 +1260,24 @@ export default function ClmScheduleView({
           {/* Lado derecho: Estado / Botón de Asignación */}
           <div className="flex items-center gap-2 shrink-0">
             {isSong ? (
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                Congregación
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                  Congregación
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const numMatch = part.titulo.match(/\d+/);
+                    setSongNumberInput(numMatch ? numMatch[0] : '');
+                    setEditingSongPart(part);
+                  }}
+                  className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  title="Cambiar o corregir número de cántico"
+                >
+                  <Edit3 size={13} />
+                </button>
+              </div>
             ) : part.asignado_nombre ? (
               <div className="flex items-center gap-1.5">
                 {conflicts.length > 0 && (
@@ -2423,6 +2556,74 @@ export default function ClmScheduleView({
               >
                 <UserMinus size={14} />
                 <span>Sí, Quitar Asignados</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal para editar número de cántico */}
+      {editingSongPart && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-white/10">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                  <Music size={18} />
+                </div>
+                <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                  Cambiar Cántico
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingSongPart(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-slate-600 dark:text-zinc-300 block mb-1">
+                Número del Cántico
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="158"
+                value={songNumberInput}
+                onChange={(e) => setSongNumberInput(e.target.value)}
+                placeholder="Ej. 145"
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-bold"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSaveSong();
+                  }
+                }}
+              />
+              <p className="text-[11px] text-slate-400 dark:text-zinc-500 mt-1.5">
+                Cántico actual: <span className="font-semibold text-slate-600 dark:text-zinc-300">{editingSongPart.titulo}</span>
+              </p>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 dark:border-white/10 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setEditingSongPart(null)}
+                className="px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveSong}
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
+              >
+                <Check size={14} />
+                <span>Guardar Cántico</span>
               </button>
             </div>
           </div>

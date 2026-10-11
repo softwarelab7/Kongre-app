@@ -109,46 +109,41 @@ export const ORGANIZED_OFFICIAL_SCHEDULES: OrganizedWeekSchedule[] = [
     weekKey: '2026-W41',
     startDate: '2026-10-05',
     endDate: '2026-10-11',
-    weekDateRange: 'Semana del 5 de octubre de 2026',
-    bibleReading: 'JEREMÍAS 40, 41',
+    weekDateRange: '5 - 11 de octubre de 2026',
+    bibleReading: 'Salmos 85 a 88',
     midweek: {
-      songFirst: 33,
-      songMiddle: 120,
-      songConclude: 145,
+      songFirst: 25,
+      songMiddle: 92,
+      songConclude: 115,
       tesoros: {
-        discursoTitle: 'Tengamos un punto de vista equilibrado de la protección de Jehová (10 min)',
-        perlasTitle: 'Busquemos perlas escondidas (10 min)',
-        lecturaTitle: 'Lectura de la Biblia (4 min)',
+        discursoTitle: '“El amor leal de Jehová dura para siempre” (10 min.)',
+        perlasTitle: 'Busquemos perlas escondidas en Salmos 85 a 88 (10 min.)',
+        lecturaTitle: 'Lectura de la Biblia: Salmo 86:1-17 (4 min.)',
       },
       demonstrations: [
         {
-          title: 'Empiece conversaciones (2 min)',
-          timeMinutes: 2,
+          title: 'Empiece conversaciones: Predicación informal en el trabajo o escuela (3 min.)',
+          timeMinutes: 3,
           lessonNumber: 2,
         },
         {
-          title: 'Empiece conversaciones (2 min)',
-          timeMinutes: 2,
-          lessonNumber: 2,
-        },
-        {
-          title: 'Empiece conversaciones (4 min)',
+          title: 'Haga revisitas: Persona que aceptó un tratado (4 min.)',
           timeMinutes: 4,
           lessonNumber: 5,
         },
         {
-          title: 'Explique sus creencias (3 min)',
-          timeMinutes: 3,
-          lessonNumber: 8,
+          title: 'Discurso de estudiante: "Jehová es bueno y está dispuesto a perdonar" (5 min.)',
+          timeMinutes: 5,
+          lessonNumber: 9,
         },
       ],
       vidaCristiana: [
         {
-          title: 'Nuestra Vida Cristiana (15 min)',
+          title: 'Necesidades de la congregación (15 min.)',
           timeMinutes: 15,
         },
       ],
-      estudioBiblicoTitle: 'Estudio bíblico de la congregación (30 min)',
+      estudioBiblicoTitle: 'Estudio bíblico de la congregación: libro "bt" cap. 15 párrs. 8-12',
     },
     weekend: {
       outlineNumber: 7,
@@ -924,6 +919,10 @@ export function parseOrganizedJsonOrText(raw: string): {
         discursoTitle = line;
       }
     } else if (currentSection === 'maestros') {
+      if (lower.includes('lectura de la biblia') || lower.includes('lectura bíblica')) {
+        lecturaTitle = line;
+        continue;
+      }
       if (
         lower.includes('empiece') ||
         lower.includes('revisita') ||

@@ -166,6 +166,67 @@ export function bridgeWeekToClm(
     }
   };
 
+  // Sincronizar títulos, cánticos y lectura oficial de la semana desde week
+  if (week.midweek) {
+    // 1. Cánticos oficiales
+    const c1 = partes.find(p => p.id?.includes('canto-1') || (p.tipo === 'canto' && p.seccion === 'marco' && !p.id?.includes('canto-3')));
+    if (c1 && week.midweek.songFirst) {
+      c1.titulo = `Cántico ${week.midweek.songFirst}`;
+    }
+
+    const c2 = partes.find(p => p.id?.includes('canto-2') || (p.tipo === 'canto' && p.seccion === 'vida_cristiana'));
+    if (c2 && week.midweek.songMiddle) {
+      c2.titulo = `Cántico ${week.midweek.songMiddle}`;
+    }
+
+    const c3 = partes.find(p => p.id?.includes('canto-3') || (p.tipo === 'canto' && p.seccion === 'marco' && p !== c1));
+    if (c3 && week.midweek.songConclude) {
+      c3.titulo = `Cántico ${week.midweek.songConclude}`;
+    }
+
+    // 2. Tesoros de la Biblia
+    if (week.midweek.tesoros) {
+      const disc = partes.find(p => p.tipo === 'discurso_tesoros');
+      if (disc && week.midweek.tesoros.discurso?.title) {
+        disc.titulo = week.midweek.tesoros.discurso.title;
+      }
+      const perl = partes.find(p => p.tipo === 'busquemos_perlas');
+      if (perl && week.midweek.tesoros.perlas?.title) {
+        perl.titulo = week.midweek.tesoros.perlas.title;
+      }
+      const lect = partes.find(p => p.tipo === 'lectura_biblica' && !p.es_clase_auxiliar);
+      if (lect && week.midweek.tesoros.lecturaBiblia?.title) {
+        lect.titulo = week.midweek.tesoros.lecturaBiblia.title;
+        if (week.midweek.bibleReading) {
+          lect.descripcion = week.midweek.bibleReading;
+        }
+      }
+    }
+  }
+
+  // Deduplicación estricta de partes (evita doble lectura de la biblia y doble estudio bíblico)
+  let foundMainReading = false;
+  let foundCbsGroup = false;
+  const deduplicatedPartes = partes.filter(p => {
+    // Excluir cualquier lectura de la biblia colocada por error en maestros
+    if (p.seccion === 'maestros' && (p.tipo === 'lectura_biblica' || p.titulo.toLowerCase().includes('lectura de la biblia'))) {
+      return false;
+    }
+    // Asegurar exactamente una sola lectura principal
+    if (!p.es_clase_auxiliar && (p.tipo === 'lectura_biblica' || (p.seccion === 'tesoros' && p.titulo.toLowerCase().includes('lectura de la biblia')))) {
+      if (foundMainReading) return false;
+      foundMainReading = true;
+    }
+    // Deduplicar estudio bíblico de la congregación
+    if (p.seccion === 'vida_cristiana' && (p.tipo === 'estudio_biblico_grupo' || p.id.includes('cbs') || p.titulo.toLowerCase().includes('estudio bíblico') || p.titulo.toLowerCase().includes('estudio biblico'))) {
+      if (p.tipo !== 'lector_estudio') {
+        if (foundCbsGroup) return false;
+        foundCbsGroup = true;
+      }
+    }
+    return true;
+  });
+
   // Marco
   helperSet('presidente', week.midweek.presidentId, false);
   helperSet('conductor_auxiliar', week.midweek.auxiliaryCounselorId, false);
@@ -187,8 +248,11 @@ export function bridgeWeekToClm(
     const auxPub = findPublisher(publishers, item.assistantId);
 
     // Buscar parte correspondiente en CLM
-    let target = partes.filter(p => p.seccion === 'maestros' && (isAux ? p.es_clase_auxiliar : !p.es_clase_auxiliar))[idx];
+    let target = deduplicatedPartes.filter(p => p.seccion === 'maestros' && (isAux ? p.es_clase_auxiliar : !p.es_clase_auxiliar))[idx];
     if (target) {
+      if (item.title) {
+        target.titulo = item.title;
+      }
       if (item.publisherId) {
         target.asignado_nid = item.publisherId;
         target.asignado_nombre = pub?.full_name || pub?.name || '';
@@ -210,9 +274,9 @@ export function bridgeWeekToClm(
     anio: year,
     semana_num: weekNum,
     estado: existingClm?.estado || 'borrador',
-    partes: partes.length > 0 ? partes : (existingClm?.partes || []),
+    partes: deduplicatedPartes.length > 0 ? deduplicatedPartes : (existingClm?.partes || []),
     congregation_id: existingClm?.congregation_id || null,
-    lectura_semana: existingClm?.lectura_semana || week.midweek.bibleReading || '',
+    lectura_semana: week.midweek.bibleReading || existingClm?.lectura_semana || '',
     rango_semana: existingClm?.rango_semana || `Semana del ${week.weekStartDate} al ${week.weekEndDate}`,
     sala_auxiliar_habilitada: existingClm?.sala_auxiliar_habilitada ?? basePrograma?.sala_auxiliar_habilitada ?? false,
   };

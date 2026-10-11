@@ -23,6 +23,7 @@ import ClmScheduleView from './ClmScheduleView';
 import { SectionHeader } from './SectionHeader';
 import { createAssignmentWhatsAppMessage, openWhatsAppLink } from '../utils/whatsapp';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganizedSync } from '../utils/organizedSync';
+import { createDefaultPrograma } from '../utils/clmDefaultProgram';
 import { OFFICIAL_PUBLIC_TALK_OUTLINES, findOutlineByNumber } from '../utils/theocraticData';
 import { generateS89Pdf as generateS89PdfFillers } from '../utils/pdfFillers';
 import { generateS89Pdf as generateS89PdfLegacy } from '../utils/pdfGenerator';
@@ -84,6 +85,7 @@ export const ScheduleTab: React.FC = () => {
     settings,
     clmProgramas,
     getClmPrograma,
+    updateClmPrograma,
     advancePublisherLesson,
     repeatPublisherLesson,
     updatePublisher,
@@ -231,6 +233,14 @@ export const ScheduleTab: React.FC = () => {
       applyWeekend: scope === 'all' || scope === 'weekend',
     });
     updateWeek(updated);
+
+    if (scope === 'all' || scope === 'midweek') {
+      const freshClm = createDefaultPrograma(currentWeek.weekStartDate, settings.congregationName || currentWeek.id, updated, publishers);
+      updateClmPrograma(freshClm);
+      try {
+        localStorage.setItem(`clm_programa_${currentWeek.weekStartDate}`, JSON.stringify(freshClm));
+      } catch {}
+    }
 
     const msg =
       scope === 'all'

@@ -131,8 +131,12 @@ export function createDefaultPrograma(
   ];
 
   // ── SEAMOS MEJORES MAESTROS (Auditorio Principal) ──
-  if (week?.midweek?.maestros?.items && week.midweek.maestros.items.length > 0) {
-    week.midweek.maestros.items.forEach((item, index) => {
+  const studentItems = (week?.midweek?.maestros?.items || []).filter(
+    (item) => item.type !== 'lectura_biblica' && !item.title.toLowerCase().includes('lectura de la biblia')
+  );
+
+  if (studentItems.length > 0) {
+    studentItems.forEach((item, index) => {
       const isAux = item.room === 'auxiliar';
       partes.push({
         id: item.id || `part-mae-${index + 1}-${semanaFecha}`,
@@ -188,7 +192,17 @@ export function createDefaultPrograma(
   });
 
   // ── NUESTRA VIDA CRISTIANA ──
-  const vidaItems = week?.midweek?.vidaCristiana?.items || [];
+  const rawVidaItems = week?.midweek?.vidaCristiana?.items || [];
+  // Excluir cualquier estudio bíblico duplicado en los items regulares ya que tiene su bloque propio abajo
+  const vidaItems = rawVidaItems.filter(
+    (vi) =>
+      vi.type !== 'estudio_biblico_grupo' &&
+      vi.type !== 'lector_estudio' &&
+      !vi.id?.includes('cbs') &&
+      !vi.title?.toLowerCase().includes('estudio bíblico') &&
+      !vi.title?.toLowerCase().includes('estudio biblico')
+  );
+
   if (vidaItems.length > 0) {
     vidaItems.forEach((vi, idx) => {
       partes.push({
@@ -253,7 +267,6 @@ export function createDefaultPrograma(
     requiere_hermano: false,
     requiere_privilegio: false,
   });
-
   partes.push({
     id: `part-oracion-cierre-${semanaFecha}`,
     tipo: 'oracion_cierre',
@@ -266,42 +279,45 @@ export function createDefaultPrograma(
     asignado_nombre: getPubName(week?.midweek?.finalPrayerId),
   });
 
-  // ── SALA AUXILIAR ──
-  partes.push({
-    id: `part-aux-cond-${semanaFecha}`,
-    tipo: 'conductor_auxiliar',
-    titulo: 'Consejero de la Sala Auxiliar',
-    duracion_min: 30,
-    seccion: 'marco',
-    requiere_hermano: true,
-    requiere_privilegio: true,
-    es_clase_auxiliar: true,
-    asignado_nid: week?.midweek?.auxiliaryCounselorId || null,
-    asignado_nombre: getPubName(week?.midweek?.auxiliaryCounselorId),
-  });
-
-  // Lectura auxiliar
-  const auxLecturaPub = week?.midweek?.tesoros?.lecturaBibliaAux?.publisherId;
-  partes.push({
-    id: `part-aux-lect-${semanaFecha}`,
-    tipo: 'lectura_biblica',
-    titulo: `${lecturaTitulo} (Sala auxiliar)`,
-    duracion_min: 4,
-    descripcion: week?.midweek?.bibleReading || org?.bibleReading || 'Jer 40:1–10 (th lección 2).',
-    seccion: 'tesoros',
-    requiere_hermano: true,
-    requiere_privilegio: false,
-    es_clase_auxiliar: true,
-    asignado_nid: auxLecturaPub || null,
-    asignado_nombre: getPubName(auxLecturaPub),
-    leccion_numero: 2,
-  });
-
+  // ── SALA AUXILIAR (Solo si está explícitamente habilitada o tiene estudiantes/consejero) ──
   const hasAuxiliaryExplicit = Boolean(
     week?.midweek?.auxiliaryCounselorId ||
     week?.midweek?.tesoros?.lecturaBibliaAux?.publisherId ||
     week?.midweek?.maestros?.items?.some((i) => i.room === 'auxiliar')
   );
+
+  if (hasAuxiliaryExplicit) {
+    partes.push({
+      id: `part-aux-cond-${semanaFecha}`,
+      tipo: 'conductor_auxiliar',
+      titulo: 'Consejero de la Sala Auxiliar',
+      duracion_min: 30,
+      seccion: 'marco',
+      requiere_hermano: true,
+      requiere_privilegio: true,
+      es_clase_auxiliar: true,
+      asignado_nid: week?.midweek?.auxiliaryCounselorId || null,
+      asignado_nombre: getPubName(week?.midweek?.auxiliaryCounselorId),
+    });
+
+    const auxLecturaPub = week?.midweek?.tesoros?.lecturaBibliaAux?.publisherId;
+    if (auxLecturaPub) {
+      partes.push({
+        id: `part-aux-lect-${semanaFecha}`,
+        tipo: 'lectura_biblica',
+        titulo: `${lecturaTitulo} (Sala auxiliar)`,
+        duracion_min: 4,
+        descripcion: week?.midweek?.bibleReading || org?.bibleReading || 'Lectura de la Biblia (th lección 2).',
+        seccion: 'tesoros',
+        requiere_hermano: true,
+        requiere_privilegio: false,
+        es_clase_auxiliar: true,
+        asignado_nid: auxLecturaPub,
+        asignado_nombre: getPubName(auxLecturaPub),
+        leccion_numero: 2,
+      });
+    }
+  }
 
   return {
     id: `clm-${semanaFecha}`,
@@ -311,7 +327,7 @@ export function createDefaultPrograma(
     estado: 'borrador',
     partes,
     congregation_id: congregationId || null,
-    lectura_semana: week?.midweek?.bibleReading || org?.bibleReading || 'JEREMÍAS 40, 41',
+    lectura_semana: week?.midweek?.bibleReading || org?.bibleReading || 'Salmos 85 a 88',
     rango_semana:
       org?.weekDateRange ||
       (week ? `Semana del ${week.weekStartDate} al ${week.weekEndDate}` : `Semana del ${semanaFecha}`),

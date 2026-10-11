@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { User, onAuthStateChanged, signInWithPopup, signOut, updateProfile } from 'firebase/auth';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { auth, googleProvider, db } from '../firebase/config';
+import { auth, googleProvider, db, isFirestoreQuotaExceeded, markFirestoreQuotaExceeded, isQuotaError } from '../firebase/config';
 import { TheocraticRole, TheocraticRoleInfo, THEOCRATIC_ROLES } from '../utils/rbac';
 import { generateSecurePublisherPin, verifyPasscode, sanitizeForFirestore } from '../utils/theocraticSecurity';
 import { UserProfile, PreferredContactMethod, ContactTimePreference } from '../types';
@@ -449,6 +449,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    if (isFirestoreQuotaExceeded()) {
+      return;
+    }
+
     const userDocRef = doc(db, 'users', user.uid);
     const unsubscribeProfile = onSnapshot(
       userDocRef,
@@ -495,7 +499,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       },
       (err) => {
-        console.warn('Aviso de sincronización de perfil Firestore:', err);
+        if (isQuotaError(err)) {
+          markFirestoreQuotaExceeded();
+        } else {
+          console.warn('Aviso de sincronización de perfil Firestore:', err);
+        }
       }
     );
 
@@ -527,10 +535,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: now,
       };
 
-      // 1. Guardar en Firestore en el documento /users/{userId}
+      // 1. Guardar en Firestore en el documento /users/{userId} si cuota disponible
       if (user && user.uid) {
-        const userDocRef = doc(db, 'users', user.uid);
-        await setDoc(userDocRef, sanitizeForFirestore(merged), { merge: true });
+        if (!isFirestoreQuotaExceeded()) {
+          try {
+            const userDocRef = doc(db, 'users', user.uid);
+            await setDoc(userDocRef, sanitizeForFirestore(merged), { merge: true });
+          } catch (firestoreErr) {
+            if (isQuotaError(firestoreErr)) {
+              await markFirestoreQuotaExceeded();
+            } else {
+              console.warn('Aviso al guardar perfil en Firestore:', firestoreErr);
+            }
+          }
+        }
 
         // Actualizar datos del objeto nativo de Firebase Auth si es posible
         try {

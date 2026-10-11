@@ -349,7 +349,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         {
           id: 'limpieza_deberes',
           label: 'Deberes & Limpieza',
-          description: 'Sonido, video, microfonistas, acomodadores y aseo',
+          description: 'Audio y video, microfonistas, acomodadores y aseo',
           icon: Brush,
         },
         {
@@ -505,7 +505,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     setIsMobileMenuOpen(false);
   };
 
-  const displayCongregationName = getFriendlyCongregationName(settings.congregationName, 'Usme');
+  const displayCongregationName = getFriendlyCongregationName(settings.congregationName, 'Congregación Central');
 
   // Friendly title for the active tab under the congregation name
   const getCurrentTabSubtitle = (tab: ActiveTab): string => {

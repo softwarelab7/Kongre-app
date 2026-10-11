@@ -8,6 +8,7 @@ import {
   AssignmentStatus,
   SpecialEvent,
   Gender,
+  Publisher,
 } from '../types';
 import { AssignmentSelectorModal } from './AssignmentSelectorModal';
 import { ReplacementsModal } from './ReplacementsModal';
@@ -15,11 +16,16 @@ import { MwbImportModal } from './MwbImportModal';
 import { OrganizedImportModal } from './OrganizedImportModal';
 import { MeetingTimerModal } from './MeetingTimerModal';
 import { BatchWhatsAppModal } from './BatchWhatsAppModal';
+import { ClmMonthlyBillboardModal } from './ClmMonthlyBillboardModal';
+import { StudentS38HistoryModal } from './StudentS38HistoryModal';
+import { ConflictsModal } from './ConflictsModal';
 import ClmScheduleView from './ClmScheduleView';
 import { SectionHeader } from './SectionHeader';
 import { createAssignmentWhatsAppMessage, openWhatsAppLink } from '../utils/whatsapp';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganizedSync } from '../utils/organizedSync';
 import { OFFICIAL_PUBLIC_TALK_OUTLINES, findOutlineByNumber } from '../utils/theocraticData';
+import { generateS89Pdf as generateS89PdfFillers } from '../utils/pdfFillers';
+import { generateS89Pdf as generateS89PdfLegacy } from '../utils/pdfGenerator';
 import {
   Calendar,
   ChevronLeft,
@@ -50,6 +56,11 @@ import {
   Music,
   Search,
   Check,
+  FileText,
+  Award,
+  CalendarDays,
+  ShieldCheck,
+  UserMinus,
 } from 'lucide-react';
 
 export const ScheduleTab: React.FC = () => {
@@ -64,17 +75,23 @@ export const ScheduleTab: React.FC = () => {
     syncAllWeeksWithOrganized,
     autoAssignCurrentWeek,
     autoAssignAllWeeksInMonth,
+    clearWeekAssignments,
     preachingGroups,
     customDuties,
     publishers,
     publishersMap,
     conflicts,
     settings,
+    clmProgramas,
+    getClmPrograma,
+    advancePublisherLesson,
+    repeatPublisherLesson,
+    updatePublisher,
   } = useCongregation();
   const { effectiveRoleInfo } = useAuth();
   const isReadOnly = effectiveRoleInfo.isReadOnly || !effectiveRoleInfo.canEditSchedule;
 
-  const [viewMode, setViewMode] = useState<'all' | 'midweek' | 'weekend' | 'clm_interactivo'>('all');
+  const [viewMode, setViewMode] = useState<'all' | 'midweek' | 'weekend'>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     return (currentWeek?.weekStartDate || new Date().toISOString()).substring(0, 7);
   });
@@ -137,13 +154,73 @@ export const ScheduleTab: React.FC = () => {
   const [noWeekend, setNoWeekend] = useState(false);
   const [eventNotes, setEventNotes] = useState('');
 
-  // Guía de Actividades, Catálogo & Timer modals
+  // Guía de Actividades, Catálogo, Timer & Herramientas Unificadas
   const [isMwbModalOpen, setIsMwbModalOpen] = useState(false);
   const [isOrganizedModalOpen, setIsOrganizedModalOpen] = useState(false);
   const [organizedModalTab, setOrganizedModalTab] = useState<'catalogo' | 'importar' | 'bosquejos'>('catalogo');
   const [organizedModalFocus, setOrganizedModalFocus] = useState<'all' | 'midweek' | 'weekend'>('all');
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
+  const [selectedStudentForS38, setSelectedStudentForS38] = useState<Publisher | null>(null);
+  const [isMonthlyBillboardModalOpen, setIsMonthlyBillboardModalOpen] = useState(false);
+  const [isConflictsModalOpen, setIsConflictsModalOpen] = useState(false);
+  const [isClearWeekAssignmentsModalOpen, setIsClearWeekAssignmentsModalOpen] = useState(false);
+  const [clearScope, setClearScope] = useState<'all' | 'midweek' | 'weekend' | 'duties'>('all');
   const [toastNotification, setToastNotification] = useState<string | null>(null);
+
+  const handleConfirmClearAssignments = async () => {
+    if (!currentWeek) return;
+    setIsClearWeekAssignmentsModalOpen(false);
+    try {
+      await clearWeekAssignments(currentWeek.id, clearScope);
+      const scopeLabels: Record<string, string> = {
+        all: 'todas las asignaciones de la semana',
+        midweek: 'los asignados de la reunión de entre semana',
+        weekend: 'los asignados de la reunión del fin de semana',
+        duties: 'los asignados a turnos y deberes operativos',
+      };
+      setToastNotification(`Se quitaron ${scopeLabels[clearScope] || 'las asignaciones'}.`);
+      setTimeout(() => setToastNotification(null), 3500);
+    } catch {
+      setToastNotification('Error al quitar las asignaciones.');
+      setTimeout(() => setToastNotification(null), 3500);
+    }
+  };
+
+  const weekConflictsCount = useMemo(() => {
+    if (!currentWeek) return 0;
+    const weekPrefix = currentWeek.weekStartDate.substring(0, 7);
+    return conflicts.filter((c) => c.weekId === currentWeek.id || c.weekStartDate?.startsWith(weekPrefix)).length;
+  }, [conflicts, currentWeek]);
+
+  const handleOpenS38 = () => {
+    if (!currentWeek) return;
+    const clmProg = getClmPrograma(currentWeek.weekStartDate);
+    const studentPart = clmProg?.partes.find(
+      (p) => (p.seccion === 'maestros' || p.tipo === 'lectura_biblica') && p.asignado_nid
+    );
+    const pub = studentPart
+      ? publishers.find((p) => (p.nid || p.id) === studentPart.asignado_nid)
+      : publishers.find((p) => p.roles.vym_maestros_titular || p.roles.vym_maestros_ayudante) || publishers[0];
+    if (pub) {
+      setSelectedStudentForS38(pub);
+    } else {
+      setToastNotification('No hay estudiantes disponibles.');
+      setTimeout(() => setToastNotification(null), 3000);
+    }
+  };
+
+  const handlePrintS89 = () => {
+    if (!currentWeek) return;
+    const clmProg = getClmPrograma(currentWeek.weekStartDate);
+    if (clmProg && clmProg.partes && clmProg.partes.length > 0) {
+      generateS89PdfFillers(clmProg, publishers);
+      setToastNotification('Hojas oficiales S-89 generadas en PDF.');
+    } else {
+      generateS89PdfLegacy(currentWeek, publishersMap, settings?.congregationName || 'Congregación');
+      setToastNotification('Hojas oficiales S-89 generadas en PDF.');
+    }
+    setTimeout(() => setToastNotification(null), 3000);
+  };
 
   const handleQuickSyncOrganized = (scope: 'all' | 'midweek' | 'weekend' = 'all') => {
     if (!currentWeek) return;
@@ -355,7 +432,7 @@ export const ScheduleTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* SectionHeader Kongre 1 Style */}
+      {/* SectionHeader Kongre 1 Style con BARRA DE HERRAMIENTAS Y ACCIONES UNIFICADA */}
       <SectionHeader
         icon={Calendar}
         title="Programa de"
@@ -387,7 +464,7 @@ export const ScheduleTab: React.FC = () => {
               </button>
             </div>
 
-            {/* View Mode Toggle */}
+            {/* Selector de visualización de reunión */}
             <div className="flex items-center gap-1 bg-slate-100 dark:bg-white/[0.05] p-1 rounded-xl border border-slate-200/80 dark:border-white/[0.08] overflow-x-auto">
               <button
                 type="button"
@@ -409,7 +486,7 @@ export const ScheduleTab: React.FC = () => {
                     : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Entre Semana (VMC)
+                Reunión Entre Semana (Asignador Oficial)
               </button>
               <button
                 type="button"
@@ -420,21 +497,11 @@ export const ScheduleTab: React.FC = () => {
                     : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                Fin de Semana
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('clm_interactivo')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                  viewMode === 'clm_interactivo'
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                Asignador Oficial VMC
+                Reunión Fin de Semana
               </button>
             </div>
 
+            {/* Botón Nueva Semana */}
             <button
               onClick={addNextWeek}
               className="flex items-center gap-1 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md dark:shadow-indigo-500/20 active:scale-95 cursor-pointer"
@@ -445,22 +512,46 @@ export const ScheduleTab: React.FC = () => {
             </button>
           </div>
         }
-      />
+      >
+        {/* ── BARRA DE HERRAMIENTAS INTEGRADA EN EL ENCABEZADO (ÚNICA Y UNIFICADA) ── */}
+        <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-200/60 dark:border-white/[0.06] w-full">
+          {!isReadOnly ? (
+            <>
+              <button
+                onClick={autoAssignCurrentWeek}
+                className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white text-xs font-bold shadow-sm hover:shadow transition-all min-h-[36px] cursor-pointer"
+                title="Autoasignar toda esta semana eligiendo a los publicadores con más tiempo sin participar y sin cruces"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                <span>Autoasignar Semana</span>
+              </button>
 
-      {/* Action Toolbar */}
-      <div className="bg-white dark:bg-[#131d2e] p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex flex-wrap items-center justify-between gap-2.5">
+              <button
+                type="button"
+                onClick={() => setIsClearWeekAssignmentsModalOpen(true)}
+                className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all shadow-2xs min-h-[36px] cursor-pointer"
+                title="Quitar de forma rápida a los publicadores asignados en esta semana"
+              >
+                <UserMinus className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
+                <span>Quitar Asignados</span>
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold">
+              <span className="w-2 h-2 rounded-full bg-slate-400" />
+              <span>Solo Lectura ({effectiveRoleInfo.shortName})</span>
+            </div>
+          )}
 
-        {/* Action buttons: Auto-assign, Copy, Special Event, MWB, Organized, Timer */}
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
           {!isReadOnly && (
-            <div className="flex items-center gap-1 col-span-2 sm:col-span-1">
+            <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => handleQuickSyncOrganized('all')}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all shadow-xs min-h-[42px] cursor-pointer"
-                title="Traer datos oficiales de Organized para esta semana (Entre semana y Fin de semana)"
+                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all shadow-2xs min-h-[36px] cursor-pointer"
+                title="Traer datos oficiales de Organized para esta semana"
               >
-                <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span className="truncate">Traer de Organized</span>
               </button>
               <button
@@ -469,10 +560,10 @@ export const ScheduleTab: React.FC = () => {
                   setOrganizedModalTab('catalogo');
                   setIsOrganizedModalOpen(true);
                 }}
-                className="p-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all min-h-[42px] cursor-pointer"
+                className="p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all min-h-[36px] cursor-pointer"
                 title="Abrir Catálogo de semanas y bosquejos oficiales de Organized"
               >
-                <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <Layers className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
               </button>
             </div>
           )}
@@ -480,32 +571,67 @@ export const ScheduleTab: React.FC = () => {
           {!isReadOnly && (
             <button
               onClick={() => setIsMwbModalOpen(true)}
-              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-bold transition-all shadow-xs min-h-[42px]"
-              title="Importar temas de la Guía de Actividades para esta semana"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 text-xs font-bold transition-all shadow-2xs min-h-[36px] cursor-pointer"
+              title="Importar temas de la Guía de Actividades (MWB) para esta semana"
             >
-              <BookOpen className="w-4 h-4 text-amber-700 shrink-0" />
+              <BookOpen className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 shrink-0" />
               <span className="truncate">Importar Guía (MWB)</span>
             </button>
           )}
 
           <button
             onClick={() => setIsBatchWhatsAppOpen(true)}
-            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs min-h-[42px]"
-            title="Enviar recordatorios de la semana por WhatsApp con enlace de confirmación a todos los hermanos asignados"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-2xs min-h-[36px] cursor-pointer"
+            title="Enviar recordatorios de la semana por WhatsApp"
           >
-            <MessageCircle className="w-4 h-4 text-white shrink-0" />
-            <span className="truncate">Recordatorios WhatsApp</span>
+            <MessageCircle className="w-3.5 h-3.5 text-white shrink-0" />
+            <span className="truncate">WhatsApp</span>
           </button>
 
+          {/* Imprimir S-89 */}
+          <button
+            type="button"
+            onClick={handlePrintS89}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 text-xs font-semibold transition-all shadow-2xs min-h-[36px] cursor-pointer"
+            title="Imprimir hojas oficiales de asignación S-89 en PDF para esta semana"
+          >
+            <FileText className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
+            <span className="truncate">Imprimir S-89</span>
+          </button>
+
+          {/* Fichas S-38 */}
+          <button
+            type="button"
+            onClick={handleOpenS38}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 text-xs font-semibold transition-all shadow-2xs min-h-[36px] cursor-pointer"
+            title="Ver registros oficiales S-38 de progreso de estudiantes"
+          >
+            <Award className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <span className="truncate">Fichas S-38</span>
+          </button>
+
+          {/* Cartelera Mensual */}
+          <button
+            type="button"
+            onClick={() => setIsMonthlyBillboardModalOpen(true)}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-semibold transition-all shadow-2xs min-h-[36px] cursor-pointer"
+            title="Abrir programa apaisado para la cartelera de anuncios del Salón"
+          >
+            <CalendarDays className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span className="truncate">Cartelera Mensual</span>
+          </button>
+
+          {/* Modo Atril / Reloj */}
           <button
             onClick={() => setIsTimerModalOpen(true)}
-            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs min-h-[42px]"
-            title="Abrir cronómetro y modo atril para el presidente / cabina"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-2xs min-h-[36px] cursor-pointer"
+            title="Abrir cronómetro y modo atril para la cabina y presidente"
           >
-            <Timer className="w-4 h-4 text-amber-400 shrink-0" />
-            <span className="truncate">Modo Atril / Reloj</span>
+            <Timer className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span className="truncate">Modo Atril</span>
           </button>
 
+          {/* Evento Especial */}
           {!isReadOnly && (
             <button
               onClick={() => {
@@ -516,49 +642,55 @@ export const ScheduleTab: React.FC = () => {
                 setEventNotes(currentWeek.specialEvent?.notes || '');
                 setIsSpecialEventModalOpen(true);
               }}
-              className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all min-h-[42px] ${
+              className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all min-h-[36px] cursor-pointer ${
                 currentWeek.specialEvent?.isSpecial
                   ? 'bg-amber-100 text-amber-900 border border-amber-300 font-bold'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/5 dark:text-zinc-300 dark:border dark:border-white/10'
               }`}
             >
-              <Sparkle className="w-4 h-4 text-amber-600 shrink-0" />
+              <Sparkle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
               <span className="truncate">
                 {currentWeek.specialEvent?.isSpecial ? 'Evento Especial (Activo)' : 'Evento Especial'}
               </span>
             </button>
           )}
 
+          {/* Copiar Estructura */}
           {!isReadOnly && (
             <button
               onClick={() => {
                 setSourceWeekId(sortedWeeks[0]?.id || '');
                 setIsCopyModalOpen(true);
               }}
-              className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all min-h-[42px]"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/5 dark:text-zinc-300 text-xs font-semibold transition-all min-h-[36px] cursor-pointer"
             >
-              <Copy className="w-4 h-4 text-slate-600 shrink-0" />
+              <Copy className="w-3.5 h-3.5 text-slate-600 shrink-0" />
               <span className="truncate">Copiar Estructura</span>
             </button>
           )}
 
-          {!isReadOnly ? (
-            <button
-              onClick={autoAssignCurrentWeek}
-              className="col-span-2 sm:col-span-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-linear-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all min-h-[44px]"
-              title="Autoasignar toda esta semana eligiendo a los publicadores con más tiempo sin participar y sin cruces"
-            >
-              <Sparkles className="w-4 h-4 text-amber-300 shrink-0" />
-              <span>Autoasignar Semana</span>
-            </button>
-          ) : (
-            <div className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold">
-              <span className="w-2 h-2 rounded-full bg-slate-400" />
-              <span>Solo Lectura ({effectiveRoleInfo.shortName})</span>
-            </div>
-          )}
+          {/* Auditoría / Cruces */}
+          <button
+            type="button"
+            onClick={() => setIsConflictsModalOpen(true)}
+            className={`flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all min-h-[36px] cursor-pointer border ${
+              weekConflictsCount > 0
+                ? 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 animate-pulse'
+                : 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
+            }`}
+            title="Verificar auditoría de cruces de esta semana"
+          >
+            {weekConflictsCount > 0 ? (
+              <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+            ) : (
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            )}
+            <span className="truncate">
+              {weekConflictsCount > 0 ? `${weekConflictsCount} Cruces` : 'Sin Cruces'}
+            </span>
+          </button>
         </div>
-      </div>
+      </SectionHeader>
 
       {/* SPECIAL EVENT BANNER IF ACTIVE */}
       {currentWeek.specialEvent?.isSpecial && (
@@ -598,911 +730,117 @@ export const ScheduleTab: React.FC = () => {
         </div>
       )}
 
-      {viewMode === 'clm_interactivo' ? (
-        <div className="rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white dark:bg-slate-900 shadow-xs">
-          <ClmScheduleView
-            publishers={publishers}
-            congregationId={settings.congregationName || currentWeek.id}
-          />
-        </div>
-      ) : (
-        <>
-          {(viewMode === 'all' || viewMode === 'midweek') && (
-            /* REUNIÓN DE ENTRE SEMANA: VIDA Y MINISTERIO CRISTIANOS */
-            <div className={`bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs transition-opacity ${
-              currentWeek.specialEvent?.noMeetingMidweek ? 'opacity-60 pointer-events-none' : ''
-            }`}>
-        {/* Section Header */}
-        <div className="p-4 sm:p-5 bg-linear-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300">
-              <Calendar className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-300">
-                {settings.midweekMeetingDay} • {currentWeek.midweek.date} ({settings.midweekMeetingTime})
-              </span>
-              <h3 className="text-lg font-bold tracking-tight">Vida y Ministerio Cristianos</h3>
-            </div>
-          </div>
-
-          {/* Quick status pill */}
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-300">Presidencia:</span>
-            <button
-              onClick={() =>
-                openSelector(
-                  'Presidente de la reunión entre semana',
-                  'vym_presidente',
-                  'hermano',
-                  currentWeek.midweek.date,
-                  'midweek',
-                  currentWeek.midweek.presidentId,
-                  pid => {
-                    const u = JSON.parse(JSON.stringify(currentWeek));
-                    u.midweek.presidentId = pid;
-                    updateWeek(u);
-                  },
-                  () => {
-                    const u = JSON.parse(JSON.stringify(currentWeek));
-                    u.midweek.presidentId = undefined;
-                    updateWeek(u);
-                  }
-                )
-              }
-              className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold border border-white/20 transition-all"
-            >
-              {publishersMap.get(currentWeek.midweek.presidentId || '')?.name || 'Seleccionar Presidente'}
-            </button>
-          </div>
-        </div>
-
-        {/* Midweek Body */}
-        <div className="p-4 sm:p-6 space-y-6">
-          {/* Midweek Info: Lectura Bíblica y Canciones */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-md bg-amber-400 text-slate-950 font-bold text-[10px] uppercase tracking-wider shadow-2xs">
-                Oficial
-              </span>
-              <div className="flex items-center gap-1.5 text-indigo-950 dark:text-indigo-200 font-bold">
-                <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                <span>Lectura Bíblica: {currentWeek.midweek.bibleReading || 'Salmos 80 a 84 (Guía de Actividades)'}</span>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 text-slate-600 dark:text-slate-400 text-[11px]">
-              <span className="flex items-center gap-1">
-                <Music className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                <span className="font-semibold text-slate-700 dark:text-slate-300">Canciones:</span>
-                <span>{currentWeek.midweek.songFirst || 44} (inicio) • {currentWeek.midweek.songMiddle || 85} (intermedia) • {currentWeek.midweek.songConclude || 110} (conclusión)</span>
-              </span>
-
-              {!isReadOnly && (
-                <button
-                  type="button"
-                  onClick={() => handleQuickSyncOrganized('midweek')}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-900 hover:bg-indigo-100 dark:hover:bg-slate-800 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-bold text-[11px] transition shadow-2xs cursor-pointer ml-auto"
-                  title="Traer de Organized temas, lectura y cánticos oficiales para la reunión entre semana"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                  <span>Traer de Organized</span>
-                </button>
-              )}
-            </div>
-          </div>
-          {/* Prayers row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200">
-            <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Oración Inicial</p>
-                <p className="text-xs sm:text-sm font-bold text-slate-800">
-                  {publishersMap.get(currentWeek.midweek.initialPrayerId || '')?.name || 'Sin asignar'}
-                </p>
-              </div>
-              <button
-                onClick={() =>
-                  openSelector(
-                    'Oración inicial entre semana',
-                    'vym_oracion',
-                    'hermano',
-                    currentWeek.midweek.date,
-                    'midweek',
-                    currentWeek.midweek.initialPrayerId,
-                    pid => {
-                      const u = JSON.parse(JSON.stringify(currentWeek));
-                      u.midweek.initialPrayerId = pid;
-                      updateWeek(u);
-                    },
-                    () => {
-                      const u = JSON.parse(JSON.stringify(currentWeek));
-                      u.midweek.initialPrayerId = undefined;
-                      updateWeek(u);
-                    }
-                  )
+      {/* REUNIÓN DE ENTRE SEMANA (VMC - ASIGNADOR OFICIAL) */}
+      {(viewMode === 'all' || viewMode === 'midweek') && (
+        <div className="space-y-4">
+          <div className="rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white dark:bg-slate-900 shadow-xs">
+            <ClmScheduleView
+              key={currentWeek.weekStartDate}
+              publishers={publishers}
+              congregationId={settings.congregationName || currentWeek.id}
+              selectedWeekDate={currentWeek.weekStartDate}
+              hideHeaderToolbar={true}
+              onWeekChange={(mondayDate) => {
+                const matchedWeek = weeks.find((w) => w.weekStartDate === mondayDate);
+                if (matchedWeek) {
+                  setCurrentWeekId(matchedWeek.id);
                 }
-                className="px-2.5 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-              >
-                Cambiar
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200">
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Oración Final</p>
-                <p className="text-xs sm:text-sm font-bold text-slate-800">
-                  {publishersMap.get(currentWeek.midweek.finalPrayerId || '')?.name || 'Sin asignar'}
-                </p>
-              </div>
-              <button
-                onClick={() =>
-                  openSelector(
-                    'Oración final entre semana',
-                    'vym_oracion',
-                    'hermano',
-                    currentWeek.midweek.date,
-                    'midweek',
-                    currentWeek.midweek.finalPrayerId,
-                    pid => {
-                      const u = JSON.parse(JSON.stringify(currentWeek));
-                      u.midweek.finalPrayerId = pid;
-                      updateWeek(u);
-                    },
-                    () => {
-                      const u = JSON.parse(JSON.stringify(currentWeek));
-                      u.midweek.finalPrayerId = undefined;
-                      updateWeek(u);
-                    }
-                  )
-                }
-                className="px-2.5 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-              >
-                Cambiar
-              </button>
-            </div>
+              }}
+            />
           </div>
 
-          {/* 1. TESOROS DE LA BIBLIA (Gris / Azul Teocrático) */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 pb-1 border-b-2 border-slate-300">
-              <div className="w-3 h-3 rounded-full bg-slate-600" />
-              <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
-                Tesoros de la Biblia
-              </h4>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {/* Discurso 10 mins */}
-              <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 flex flex-col justify-between">
+          {/* TURNOS Y DEBERES DE ENTRE SEMANA (Sonido, Micrófonos, Acomodadores) */}
+          {customDuties.some((d) => d.midweek) && (
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-xs">
+              <div className="flex items-center justify-between mb-3">
                 <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase text-slate-500">Discurso (10 min)</span>
-                    <button
-                      onClick={() =>
-                        handleSendWhatsApp(
-                          currentWeek.midweek.tesoros.discurso.publisherId,
-                          currentWeek.midweek.tesoros.discurso.title,
-                          'midweek',
-                          currentWeek.midweek.date,
-                          { timeMinutes: 10 }
-                        )
-                      }
-                      className="text-emerald-600 hover:text-emerald-700 p-1"
-                      title="Enviar por WhatsApp"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <input
-                    type="text"
-                    value={currentWeek.midweek.tesoros.discurso.title}
-                    onChange={e => {
-                      const u = JSON.parse(JSON.stringify(currentWeek));
-                      u.midweek.tesoros.discurso.title = e.target.value;
-                      updateWeek(u);
-                    }}
-                    placeholder="Título del discurso de Tesoros"
-                    className="mt-1 w-full text-xs font-semibold text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-500 focus:outline-hidden py-0.5"
-                  />
-                  <p className="mt-2 text-xs font-bold text-slate-900">
-                    {publishersMap.get(currentWeek.midweek.tesoros.discurso.publisherId || '')?.name || (
-                      <span className="text-slate-400 font-normal italic">Sin asignar</span>
-                    )}
-                  </p>
-                </div>
-
-                <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <button
-                    onClick={() =>
-                      openSelector(
-                        'Tesoros: Discurso de 10 min',
-                        'vym_tesoros_discurso',
-                        'hermano',
-                        currentWeek.midweek.date,
-                        'midweek',
-                        currentWeek.midweek.tesoros.discurso.publisherId,
-                        pid => {
-                          const u = JSON.parse(JSON.stringify(currentWeek));
-                          u.midweek.tesoros.discurso.publisherId = pid;
-                          updateWeek(u);
-                        },
-                        () => {
-                          const u = JSON.parse(JSON.stringify(currentWeek));
-                          u.midweek.tesoros.discurso.publisherId = undefined;
-                          updateWeek(u);
-                        }
-                      )
-                    }
-                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800"
-                  >
-                    Asignar
-                  </button>
-                  {currentWeek.midweek.tesoros.discurso.publisherId && (
-                    <button
-                      onClick={() =>
-                        setReplacementState({
-                          isOpen: true,
-                          weekId: currentWeek.id,
-                          meetingType: 'midweek',
-                          meetingDate: currentWeek.midweek.date,
-                          assignmentTitle: currentWeek.midweek.tesoros.discurso.title,
-                          assignmentPath: 'tesoros.discurso',
-                          currentPublisherId: currentWeek.midweek.tesoros.discurso.publisherId,
-                          currentStatus: currentWeek.midweek.tesoros.discurso.status,
-                          roleKey: 'vym_tesoros_discurso',
-                          targetGender: 'hermano',
-                        })
-                      }
-                      className="text-[11px] text-slate-500 hover:text-slate-800"
-                    >
-                      Reemplazo
-                    </button>
-                  )}
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                    Servicios de la Congregación
+                  </span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                    Deberes y Turnos de Entre Semana (Audio y Video, Micrófonos y Acomodadores)
+                  </h4>
                 </div>
               </div>
 
-              {/* Perlas escondidas 10 mins */}
-              <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase text-slate-500">Perlas Escondidas (10 min)</span>
-                    <button
-                      onClick={() =>
-                        handleSendWhatsApp(
-                          currentWeek.midweek.tesoros.perlas.publisherId,
-                          'Busquemos perlas escondidas',
-                          'midweek',
-                          currentWeek.midweek.date,
-                          { timeMinutes: 10 }
-                        )
-                      }
-                      className="text-emerald-600 hover:text-emerald-700 p-1"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <input
-                    type="text"
-                    value={currentWeek.midweek.tesoros.perlas.title}
-                    onChange={e => {
-                      const u = JSON.parse(JSON.stringify(currentWeek));
-                      u.midweek.tesoros.perlas.title = e.target.value;
-                      updateWeek(u);
-                    }}
-                    className="mt-1 w-full text-xs font-semibold text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-500 focus:outline-hidden py-0.5"
-                  />
-                  <p className="mt-2 text-xs font-bold text-slate-900">
-                    {publishersMap.get(currentWeek.midweek.tesoros.perlas.publisherId || '')?.name || (
-                      <span className="text-slate-400 font-normal italic">Sin asignar</span>
-                    )}
-                  </p>
-                </div>
-
-                <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <button
-                    onClick={() =>
-                      openSelector(
-                        'Tesoros: Perlas Escondidas',
-                        'vym_tesoros_perlas',
-                        'hermano',
-                        currentWeek.midweek.date,
-                        'midweek',
-                        currentWeek.midweek.tesoros.perlas.publisherId,
-                        pid => {
-                          const u = JSON.parse(JSON.stringify(currentWeek));
-                          u.midweek.tesoros.perlas.publisherId = pid;
-                          updateWeek(u);
-                        },
-                        () => {
-                          const u = JSON.parse(JSON.stringify(currentWeek));
-                          u.midweek.tesoros.perlas.publisherId = undefined;
-                          updateWeek(u);
-                        }
-                      )
-                    }
-                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800"
-                  >
-                    Asignar
-                  </button>
-                  {currentWeek.midweek.tesoros.perlas.publisherId && (
-                    <button
-                      onClick={() =>
-                        setReplacementState({
-                          isOpen: true,
-                          weekId: currentWeek.id,
-                          meetingType: 'midweek',
-                          meetingDate: currentWeek.midweek.date,
-                          assignmentTitle: currentWeek.midweek.tesoros.perlas.title,
-                          assignmentPath: 'tesoros.perlas',
-                          currentPublisherId: currentWeek.midweek.tesoros.perlas.publisherId,
-                          currentStatus: currentWeek.midweek.tesoros.perlas.status,
-                          roleKey: 'vym_tesoros_perlas',
-                          targetGender: 'hermano',
-                        })
-                      }
-                      className="text-[11px] text-slate-500 hover:text-slate-800"
-                    >
-                      Reemplazo
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Lectura de la Biblia (Estudiante) */}
-              <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase text-slate-500">Lectura de la Biblia (4 min)</span>
-                    <button
-                      onClick={() =>
-                        handleSendWhatsApp(
-                          currentWeek.midweek.tesoros.lecturaBiblia.publisherId,
-                          'Lectura de la Biblia',
-                          'midweek',
-                          currentWeek.midweek.date,
-                          { timeMinutes: 4, room: 'principal' }
-                        )
-                      }
-                      className="text-emerald-600 hover:text-emerald-700 p-1"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <p className="mt-1 text-xs font-medium text-slate-500">Sala Principal</p>
-                  <p className="mt-1 text-xs font-bold text-slate-900">
-                    {publishersMap.get(currentWeek.midweek.tesoros.lecturaBiblia.publisherId || '')?.name || (
-                      <span className="text-slate-400 font-normal italic">Sin estudiante asignado</span>
-                    )}
-                  </p>
-                </div>
-
-                <div className="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between">
-                  <button
-                    onClick={() =>
-                      openSelector(
-                        'Lectura de la Biblia (Estudiante)',
-                        'vym_tesoros_lectura',
-                        'hermano',
-                        currentWeek.midweek.date,
-                        'midweek',
-                        currentWeek.midweek.tesoros.lecturaBiblia.publisherId,
-                        (pid, suggestedLesson) => {
-                          const u = JSON.parse(JSON.stringify(currentWeek));
-                          u.midweek.tesoros.lecturaBiblia.publisherId = pid;
-                          if (suggestedLesson) {
-                            u.midweek.tesoros.lecturaBiblia.lessonNumber = suggestedLesson;
-                          }
-                          updateWeek(u);
-                        },
-                        () => {
-                          const u = JSON.parse(JSON.stringify(currentWeek));
-                          u.midweek.tesoros.lecturaBiblia.publisherId = undefined;
-                          updateWeek(u);
-                        }
-                      )
-                    }
-                    className="text-xs font-bold text-indigo-600 hover:text-indigo-800"
-                  >
-                    Asignar
-                  </button>
-                  {currentWeek.midweek.tesoros.lecturaBiblia.publisherId && (
-                    <button
-                      onClick={() =>
-                        setReplacementState({
-                          isOpen: true,
-                          weekId: currentWeek.id,
-                          meetingType: 'midweek',
-                          meetingDate: currentWeek.midweek.date,
-                          assignmentTitle: 'Lectura de la Biblia',
-                          assignmentPath: 'tesoros.lecturaBiblia',
-                          currentPublisherId: currentWeek.midweek.tesoros.lecturaBiblia.publisherId,
-                          currentStatus: currentWeek.midweek.tesoros.lecturaBiblia.status,
-                          roleKey: 'vym_tesoros_lectura',
-                          targetGender: 'hermano',
-                        })
-                      }
-                      className="text-[11px] text-slate-500 hover:text-slate-800"
-                    >
-                      Reemplazo
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 2. SEAMOS MEJORES MAESTROS (Dorado / Amarillo Teocrático) */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between pb-1 border-b-2 border-amber-400">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-amber-500" />
-                <h4 className="text-xs font-extrabold uppercase tracking-wider text-amber-900">
-                  Seamos Mejores Maestros (Demostraciones)
-                </h4>
-              </div>
-              <button
-                onClick={handleAddDemonstration}
-                className="text-xs font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1"
-              >
-                <Plus className="w-3.5 h-3.5" /> Añadir Asignación
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {currentWeek.midweek.maestros.items.map((item, idx) => {
-                const titularPub = item.publisherId ? publishersMap.get(item.publisherId) : undefined;
-                const assistantPub = item.assistantId ? publishersMap.get(item.assistantId) : undefined;
-
-                return (
-                  <div
-                    key={item.id}
-                    className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/80 flex flex-col justify-between space-y-3"
-                  >
-                    <div>
-                      {/* Title & Room switcher */}
-                      <div className="flex items-center justify-between gap-2">
-                        <input
-                          type="text"
-                          value={item.title}
-                          onChange={e => {
-                            const u = JSON.parse(JSON.stringify(currentWeek));
-                            u.midweek.maestros.items[idx].title = e.target.value;
-                            updateWeek(u);
-                          }}
-                          className="text-xs font-bold text-slate-900 bg-transparent border-b border-dashed border-amber-300 focus:border-amber-600 focus:outline-hidden py-0.5 w-full"
-                        />
-                        <button
-                          onClick={() => {
-                            const u = JSON.parse(JSON.stringify(currentWeek));
-                            u.midweek.maestros.items[idx].room =
-                              item.room === 'auxiliar' ? 'principal' : 'auxiliar';
-                            updateWeek(u);
-                          }}
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                            item.room === 'auxiliar'
-                              ? 'bg-purple-100 text-purple-800 border border-purple-300'
-                              : 'bg-amber-100 text-amber-800 border border-amber-300'
-                          }`}
-                        >
-                          {item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}
-                        </button>
-                      </div>
-
-                      {/* Titular and Assistant cards */}
-                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                        {/* Titular */}
-                        <div className="p-2.5 rounded-xl bg-white border border-amber-200/70">
-                          <span className="text-[10px] font-bold uppercase text-slate-400 block">
-                            Estudiante (Titular)
-                          </span>
-                          <p className="font-bold text-slate-900 mt-0.5">
-                            {titularPub ? titularPub.name : <span className="text-slate-400 italic font-normal">Sin asignar</span>}
-                          </p>
-                          <div className="mt-2 flex items-center justify-between">
-                            <button
-                              onClick={() =>
-                                openSelector(
-                                  `Estudiante: ${item.title}`,
-                                  'vym_maestros_titular',
-                                  'any',
-                                  currentWeek.midweek.date,
-                                  'midweek',
-                                  item.publisherId,
-                                  (pid, suggestedLesson) => {
-                                    const u = JSON.parse(JSON.stringify(currentWeek));
-                                    u.midweek.maestros.items[idx].publisherId = pid;
-                                    if (suggestedLesson) {
-                                      u.midweek.maestros.items[idx].lessonNumber = suggestedLesson;
-                                    }
-                                    updateWeek(u);
-                                  },
-                                  () => {
-                                    const u = JSON.parse(JSON.stringify(currentWeek));
-                                    u.midweek.maestros.items[idx].publisherId = undefined;
-                                    updateWeek(u);
-                                  }
-                                )
-                              }
-                              className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800"
-                            >
-                              Asignar
-                            </button>
-                            {item.publisherId && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+                {customDuties
+                  .filter((d) => d.midweek)
+                  .map((duty) => {
+                    const assignedIds = currentWeek.midweek?.duties?.[duty.key] || [];
+                    return (
+                      <div
+                        key={duty.id}
+                        className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-white/10 flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block truncate">
+                              {duty.name}
+                            </span>
+                            {assignedIds.length > 0 && !isReadOnly && (
                               <button
-                                onClick={() =>
-                                  setReplacementState({
-                                    isOpen: true,
-                                    weekId: currentWeek.id,
-                                    meetingType: 'midweek',
-                                    meetingDate: currentWeek.midweek.date,
-                                    assignmentTitle: item.title,
-                                    assignmentPath: `maestros.${idx}`,
-                                    currentPublisherId: item.publisherId,
-                                    currentStatus: item.status,
-                                    roleKey: 'vym_maestros_titular',
-                                    targetGender: 'any',
-                                  })
-                                }
-                                className="text-[10px] text-slate-500 hover:text-slate-700"
-                              >
-                                Reemplazo
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Assistant */}
-                        <div className="p-2.5 rounded-xl bg-white border border-amber-200/70">
-                          <span className="text-[10px] font-bold uppercase text-slate-400 block">
-                            Ayudante
-                          </span>
-                          <p className="font-bold text-slate-900 mt-0.5">
-                            {assistantPub ? assistantPub.name : <span className="text-slate-400 italic font-normal">Sin ayudante</span>}
-                          </p>
-                          <div className="mt-2 flex items-center justify-between">
-                            <button
-                              onClick={() =>
-                                openSelector(
-                                  `Ayudante para: ${item.title}`,
-                                  'vym_maestros_ayudante',
-                                  titularPub?.gender === 'hermana' ? 'hermana' : 'any',
-                                  currentWeek.midweek.date,
-                                  'midweek',
-                                  item.assistantId,
-                                  pid => {
-                                    const u = JSON.parse(JSON.stringify(currentWeek));
-                                    u.midweek.maestros.items[idx].assistantId = pid;
-                                    updateWeek(u);
-                                  },
-                                  () => {
-                                    const u = JSON.parse(JSON.stringify(currentWeek));
-                                    u.midweek.maestros.items[idx].assistantId = undefined;
-                                    updateWeek(u);
-                                  }
-                                )
-                              }
-                              className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800"
-                            >
-                              Asignar
-                            </button>
-                            {item.assistantId && (
-                              <button
+                                type="button"
                                 onClick={() => {
                                   const u = JSON.parse(JSON.stringify(currentWeek));
-                                  u.midweek.maestros.items[idx].assistantId = undefined;
+                                  if (!u.midweek.duties) u.midweek.duties = {};
+                                  u.midweek.duties[duty.key] = [];
                                   updateWeek(u);
                                 }}
-                                className="text-[10px] text-rose-500 hover:text-rose-700"
+                                className="text-[10px] text-rose-500 hover:text-rose-700 font-semibold cursor-pointer"
+                                title={`Quitar a todos los asignados a ${duty.name}`}
                               >
-                                Quitar
+                                Limpiar
                               </button>
                             )}
                           </div>
+                          <div className="mt-1 space-y-1">
+                            {assignedIds.length === 0 ? (
+                              <p className="text-xs text-slate-400 italic">Sin asignar</p>
+                            ) : (
+                              assignedIds.map((pid) => (
+                                <div key={pid} className="flex items-center justify-between text-xs">
+                                  <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                                    {publishersMap.get(pid)?.name || 'Hno.'}
+                                  </span>
+                                  <button
+                                    onClick={() => handleToggleDutyPublisher('midweek', duty.key, pid)}
+                                    className="text-rose-500 hover:text-rose-700 ml-1 cursor-pointer"
+                                    title="Quitar asignación"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              ))
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </div>
 
-                    {/* Bottom row: WhatsApp & Delete item */}
-                    <div className="pt-2 border-t border-amber-200/60 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {item.publisherId && (
-                          <button
-                            onClick={() =>
-                              handleSendWhatsApp(item.publisherId, item.title, 'midweek', currentWeek.midweek.date, {
-                                assistantName: assistantPub?.name,
-                                room: item.room,
-                                timeMinutes: item.timeMinutes,
-                              })
-                            }
-                            className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-100/60 hover:bg-emerald-100 px-2 py-1 rounded-lg transition-colors"
-                          >
-                            <MessageCircle className="w-3.5 h-3.5" />
-                            <span>WhatsApp</span>
-                          </button>
-                        )}
-                        <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${
-                            item.status === 'confirmada'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : item.status === 'rechazada'
-                              ? 'bg-rose-100 text-rose-800'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          {item.status}
-                        </span>
-                      </div>
-
-                      {currentWeek.midweek.maestros.items.length > 1 && (
                         <button
-                          onClick={() => handleRemoveDemonstration(idx)}
-                          className="text-slate-400 hover:text-rose-600 p-1"
-                          title="Eliminar asignación"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 3. NUESTRA VIDA CRISTIANA (Guinda / Rojo Teocrático) */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between pb-1 border-b-2 border-rose-400">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-rose-600" />
-                <h4 className="text-xs font-extrabold uppercase tracking-wider text-rose-900">
-                  Nuestra Vida Cristiana
-                </h4>
-              </div>
-              <button
-                onClick={handleAddVidaPart}
-                className="text-xs font-bold text-rose-800 hover:text-rose-950 flex items-center gap-1"
-              >
-                <Plus className="w-3.5 h-3.5" /> Añadir Parte
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {/* Dynamic Vida Cristiana Parts */}
-              {currentWeek.midweek.vidaCristiana.items.map((part, idx) => (
-                <div
-                  key={part.id}
-                  className="p-3.5 rounded-2xl bg-rose-50/50 border border-rose-200/80 flex flex-col justify-between space-y-2"
-                >
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase text-slate-500">Parte #{idx + 1}</span>
-                      <button
-                        onClick={() =>
-                          handleSendWhatsApp(part.publisherId, part.title, 'midweek', currentWeek.midweek.date, {
-                            timeMinutes: part.timeMinutes || 15,
-                          })
-                        }
-                        className="text-emerald-600 hover:text-emerald-700 p-1"
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <input
-                      type="text"
-                      value={part.title}
-                      onChange={e => {
-                        const u = JSON.parse(JSON.stringify(currentWeek));
-                        u.midweek.vidaCristiana.items[idx].title = e.target.value;
-                        updateWeek(u);
-                      }}
-                      className="mt-1 w-full text-xs font-semibold text-slate-800 bg-transparent border-b border-dashed border-rose-300 focus:border-rose-600 focus:outline-hidden py-0.5"
-                    />
-                    <p className="mt-2 text-xs font-bold text-slate-900">
-                      {publishersMap.get(part.publisherId || '')?.name || (
-                        <span className="text-slate-400 font-normal italic">Sin asignar</span>
-                      )}
-                    </p>
-                  </div>
-
-                  <div className="mt-3 pt-2 border-t border-rose-200/60 flex items-center justify-between">
-                    <button
-                      onClick={() =>
-                        openSelector(
-                          part.title,
-                          'vym_vida_partes',
-                          'hermano',
-                          currentWeek.midweek.date,
-                          'midweek',
-                          part.publisherId,
-                          pid => {
-                            const u = JSON.parse(JSON.stringify(currentWeek));
-                            u.midweek.vidaCristiana.items[idx].publisherId = pid;
-                            updateWeek(u);
-                          },
-                          () => {
-                            const u = JSON.parse(JSON.stringify(currentWeek));
-                            u.midweek.vidaCristiana.items[idx].publisherId = undefined;
-                            updateWeek(u);
+                          onClick={() =>
+                            openSelector(
+                              `Añadir a: ${duty.name} (Entre Semana)`,
+                              duty.key,
+                              'any',
+                              currentWeek.midweek?.date || currentWeek.weekStartDate,
+                              'midweek',
+                              undefined,
+                              (pid) => handleToggleDutyPublisher('midweek', duty.key, pid),
+                              () => {}
+                            )
                           }
-                        )
-                      }
-                      className="text-xs font-bold text-indigo-600 hover:text-indigo-800"
-                    >
-                      Asignar
-                    </button>
-                    {part.publisherId && (
-                      <button
-                        onClick={() =>
-                          setReplacementState({
-                            isOpen: true,
-                            weekId: currentWeek.id,
-                            meetingType: 'midweek',
-                            meetingDate: currentWeek.midweek.date,
-                            assignmentTitle: part.title,
-                            assignmentPath: `vida.${idx}`,
-                            currentPublisherId: part.publisherId,
-                            currentStatus: part.status,
-                            roleKey: 'vym_vida_partes',
-                            targetGender: 'hermano',
-                          })
-                        }
-                        className="text-[11px] text-slate-500 hover:text-slate-800"
-                      >
-                        Reemplazo
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-              {/* Estudio Bíblico de Congregación (Conductor y Lector) */}
-              <div className="p-3.5 rounded-2xl bg-rose-50/50 border border-rose-200/80 flex flex-col justify-between space-y-3">
-                <div>
-                  <span className="text-[10px] font-bold uppercase text-slate-500">
-                    Estudio Bíblico de Congregación (30 min)
-                  </span>
-
-                  <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                    {/* Conductor */}
-                    <div className="p-2.5 rounded-xl bg-white border border-rose-200/70">
-                      <span className="text-[10px] font-bold uppercase text-slate-400 block">Conductor</span>
-                      <p className="font-bold text-slate-900 mt-0.5">
-                        {publishersMap.get(currentWeek.midweek.vidaCristiana.estudioBiblico.conductorId || '')?.name || (
-                          <span className="text-slate-400 font-normal italic">Sin asignar</span>
-                        )}
-                      </p>
-                      <button
-                        onClick={() =>
-                          openSelector(
-                            'Conductor Estudio Bíblico de Congregación',
-                            'vym_estudio_conductor',
-                            'hermano',
-                            currentWeek.midweek.date,
-                            'midweek',
-                            currentWeek.midweek.vidaCristiana.estudioBiblico.conductorId,
-                            pid => {
-                              const u = JSON.parse(JSON.stringify(currentWeek));
-                              u.midweek.vidaCristiana.estudioBiblico.conductorId = pid;
-                              updateWeek(u);
-                            },
-                            () => {
-                              const u = JSON.parse(JSON.stringify(currentWeek));
-                              u.midweek.vidaCristiana.estudioBiblico.conductorId = undefined;
-                              updateWeek(u);
-                            }
-                          )
-                        }
-                        className="mt-2 text-[11px] font-bold text-indigo-600 hover:text-indigo-800 block"
-                      >
-                        Asignar
-                      </button>
-                    </div>
-
-                    {/* Lector */}
-                    <div className="p-2.5 rounded-xl bg-white border border-rose-200/70">
-                      <span className="text-[10px] font-bold uppercase text-slate-400 block">Lector</span>
-                      <p className="font-bold text-slate-900 mt-0.5">
-                        {publishersMap.get(currentWeek.midweek.vidaCristiana.estudioBiblico.lectorId || '')?.name || (
-                          <span className="text-slate-400 font-normal italic">Sin asignar</span>
-                        )}
-                      </p>
-                      <button
-                        onClick={() =>
-                          openSelector(
-                            'Lector Estudio Bíblico de Congregación',
-                            'vym_estudio_lector',
-                            'hermano',
-                            currentWeek.midweek.date,
-                            'midweek',
-                            currentWeek.midweek.vidaCristiana.estudioBiblico.lectorId,
-                            pid => {
-                              const u = JSON.parse(JSON.stringify(currentWeek));
-                              u.midweek.vidaCristiana.estudioBiblico.lectorId = pid;
-                              updateWeek(u);
-                            },
-                            () => {
-                              const u = JSON.parse(JSON.stringify(currentWeek));
-                              u.midweek.vidaCristiana.estudioBiblico.lectorId = undefined;
-                              updateWeek(u);
-                            }
-                          )
-                        }
-                        className="mt-2 text-[11px] font-bold text-indigo-600 hover:text-indigo-800 block"
-                      >
-                        Asignar
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                          className="mt-2 pt-2 border-t border-slate-200 dark:border-white/10 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 text-left cursor-pointer"
+                        >
+                          + Asignar persona
+                        </button>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
-          </div>
-
-          {/* DEBERES OPERATIVOS ENTRE SEMANA */}
-          <div className="space-y-3 pt-3 border-t border-slate-100">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
-              Deberes Operativos (Entre Semana)
-            </h4>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2.5">
-              {customDuties.filter(d => d.midweek).map(duty => {
-                const assignedIds = currentWeek.midweek.duties[duty.key] || [];
-
-                return (
-                  <div
-                    key={duty.id}
-                    className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between"
-                  >
-                    <div>
-                      <span className="text-[10px] font-bold uppercase text-slate-500 block truncate">
-                        {duty.name}
-                      </span>
-                      <div className="mt-1 space-y-1">
-                        {assignedIds.length === 0 ? (
-                          <p className="text-xs text-slate-400 italic">Sin asignar</p>
-                        ) : (
-                          assignedIds.map(pid => (
-                            <div key={pid} className="flex items-center justify-between text-xs">
-                              <span className="font-semibold text-slate-800 truncate">
-                                {publishersMap.get(pid)?.name || 'Hno.'}
-                              </span>
-                              <button
-                                onClick={() => handleToggleDutyPublisher('midweek', duty.key, pid)}
-                                className="text-rose-500 hover:text-rose-700 ml-1"
-                              >
-                                ×
-                              </button>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() =>
-                        openSelector(
-                          `Añadir a: ${duty.name}`,
-                          duty.key,
-                          'any',
-                          currentWeek.midweek.date,
-                          'midweek',
-                          undefined,
-                          pid => handleToggleDutyPublisher('midweek', duty.key, pid),
-                          () => {}
-                        )
-                      }
-                      className="mt-2 pt-2 border-t border-slate-200 text-[11px] font-bold text-indigo-600 hover:text-indigo-800 text-left"
-                    >
-                      + Asignar persona
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
           )}
+        </div>
+      )}
 
           {(viewMode === 'all' || viewMode === 'weekend') && (
             /* REUNIÓN DE FIN DE SEMANA */
@@ -1524,31 +862,47 @@ export const ScheduleTab: React.FC = () => {
 
           <div className="flex items-center gap-2 text-xs">
             <span className="text-slate-300">Presidencia:</span>
-            <button
-              onClick={() =>
-                openSelector(
-                  'Presidente reunión fin de semana',
-                  'fds_presidente',
-                  'hermano',
-                  currentWeek.weekend.date,
-                  'weekend',
-                  currentWeek.weekend.presidentId,
-                  pid => {
-                    const u = JSON.parse(JSON.stringify(currentWeek));
-                    u.weekend.presidentId = pid;
-                    updateWeek(u);
-                  },
-                  () => {
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() =>
+                  openSelector(
+                    'Presidente reunión fin de semana',
+                    'fds_presidente',
+                    'hermano',
+                    currentWeek.weekend.date,
+                    'weekend',
+                    currentWeek.weekend.presidentId,
+                    pid => {
+                      const u = JSON.parse(JSON.stringify(currentWeek));
+                      u.weekend.presidentId = pid;
+                      updateWeek(u);
+                    },
+                    () => {
+                      const u = JSON.parse(JSON.stringify(currentWeek));
+                      u.weekend.presidentId = undefined;
+                      updateWeek(u);
+                    }
+                  )
+                }
+                className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold border border-white/20 transition-all cursor-pointer"
+              >
+                {publishersMap.get(currentWeek.weekend.presidentId || '')?.name || 'Seleccionar Presidente'}
+              </button>
+              {currentWeek.weekend.presidentId && !isReadOnly && (
+                <button
+                  type="button"
+                  onClick={() => {
                     const u = JSON.parse(JSON.stringify(currentWeek));
                     u.weekend.presidentId = undefined;
                     updateWeek(u);
-                  }
-                )
-              }
-              className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold border border-white/20 transition-all"
-            >
-              {publishersMap.get(currentWeek.weekend.presidentId || '')?.name || 'Seleccionar Presidente'}
-            </button>
+                  }}
+                  className="p-1 rounded-lg bg-rose-500/20 hover:bg-rose-600 text-rose-200 hover:text-white border border-rose-400/40 transition cursor-pointer"
+                  title="Quitar presidente asignado (dejar libre)"
+                >
+                  <UserMinus className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1733,75 +1087,225 @@ export const ScheduleTab: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                 {/* Conductor */}
-                <div className="p-2.5 rounded-xl bg-white border border-emerald-200">
-                  <span className="text-[10px] font-bold uppercase text-slate-400 block">Conductor</span>
-                  <p className="font-bold text-slate-900 mt-0.5">
-                    {publishersMap.get(currentWeek.weekend.atalayaConductorId || '')?.name || (
-                      <span className="text-slate-400 font-normal italic">Sin asignar</span>
-                    )}
-                  </p>
-                  <button
-                    onClick={() =>
-                      openSelector(
-                        'Conductor de La Atalaya',
-                        'fds_presidente',
-                        'hermano',
-                        currentWeek.weekend.date,
-                        'weekend',
-                        currentWeek.weekend.atalayaConductorId,
-                        pid => {
-                          const u = JSON.parse(JSON.stringify(currentWeek));
-                          u.weekend.atalayaConductorId = pid;
-                          updateWeek(u);
-                        },
-                        () => {
+                <div className="p-2.5 rounded-xl bg-white border border-emerald-200 flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Conductor</span>
+                    <p className="font-bold text-slate-900 mt-0.5 truncate">
+                      {publishersMap.get(currentWeek.weekend.atalayaConductorId || '')?.name || (
+                        <span className="text-slate-400 font-normal italic">Sin asignar</span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between pt-1 border-t border-emerald-100">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openSelector(
+                          'Conductor de La Atalaya',
+                          'fds_presidente',
+                          'hermano',
+                          currentWeek.weekend.date,
+                          'weekend',
+                          currentWeek.weekend.atalayaConductorId,
+                          pid => {
+                            const u = JSON.parse(JSON.stringify(currentWeek));
+                            u.weekend.atalayaConductorId = pid;
+                            updateWeek(u);
+                          },
+                          () => {
+                            const u = JSON.parse(JSON.stringify(currentWeek));
+                            u.weekend.atalayaConductorId = undefined;
+                            updateWeek(u);
+                          }
+                        )
+                      }
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                    >
+                      {currentWeek.weekend.atalayaConductorId ? 'Cambiar' : 'Asignar'}
+                    </button>
+                    {currentWeek.weekend.atalayaConductorId && !isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={() => {
                           const u = JSON.parse(JSON.stringify(currentWeek));
                           u.weekend.atalayaConductorId = undefined;
                           updateWeek(u);
-                        }
-                      )
-                    }
-                    className="mt-2 text-[11px] font-bold text-emerald-700 hover:text-emerald-900 block"
-                  >
-                    Asignar
-                  </button>
+                        }}
+                        className="text-[11px] font-bold text-rose-600 hover:text-rose-800 flex items-center gap-0.5 cursor-pointer"
+                        title="Quitar conductor asignado"
+                      >
+                        <UserMinus className="w-3 h-3" />
+                        <span>Quitar</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Lector */}
-                <div className="p-2.5 rounded-xl bg-white border border-emerald-200">
-                  <span className="text-[10px] font-bold uppercase text-slate-400 block">Lector</span>
-                  <p className="font-bold text-slate-900 mt-0.5">
-                    {publishersMap.get(currentWeek.weekend.atalayaLectorId || '')?.name || (
-                      <span className="text-slate-400 font-normal italic">Sin asignar</span>
-                    )}
-                  </p>
-                  <button
-                    onClick={() =>
-                      openSelector(
-                        'Lector de La Atalaya',
-                        'fds_atalaya_lector',
-                        'hermano',
-                        currentWeek.weekend.date,
-                        'weekend',
-                        currentWeek.weekend.atalayaLectorId,
-                        pid => {
-                          const u = JSON.parse(JSON.stringify(currentWeek));
-                          u.weekend.atalayaLectorId = pid;
-                          updateWeek(u);
-                        },
-                        () => {
+                <div className="p-2.5 rounded-xl bg-white border border-emerald-200 flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Lector</span>
+                    <p className="font-bold text-slate-900 mt-0.5 truncate">
+                      {publishersMap.get(currentWeek.weekend.atalayaLectorId || '')?.name || (
+                        <span className="text-slate-400 font-normal italic">Sin asignar</span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between pt-1 border-t border-emerald-100">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openSelector(
+                          'Lector de La Atalaya',
+                          'fds_atalaya_lector',
+                          'hermano',
+                          currentWeek.weekend.date,
+                          'weekend',
+                          currentWeek.weekend.atalayaLectorId,
+                          pid => {
+                            const u = JSON.parse(JSON.stringify(currentWeek));
+                            u.weekend.atalayaLectorId = pid;
+                            updateWeek(u);
+                          },
+                          () => {
+                            const u = JSON.parse(JSON.stringify(currentWeek));
+                            u.weekend.atalayaLectorId = undefined;
+                            updateWeek(u);
+                          }
+                        )
+                      }
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                    >
+                      {currentWeek.weekend.atalayaLectorId ? 'Cambiar' : 'Asignar'}
+                    </button>
+                    {currentWeek.weekend.atalayaLectorId && !isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={() => {
                           const u = JSON.parse(JSON.stringify(currentWeek));
                           u.weekend.atalayaLectorId = undefined;
                           updateWeek(u);
-                        }
-                      )
-                    }
-                    className="mt-2 text-[11px] font-bold text-emerald-700 hover:text-emerald-900 block"
-                  >
-                    Asignar
-                  </button>
+                        }}
+                        className="text-[11px] font-bold text-rose-600 hover:text-rose-800 flex items-center gap-0.5 cursor-pointer"
+                        title="Quitar lector asignado"
+                      >
+                        <UserMinus className="w-3 h-3" />
+                        <span>Quitar</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Oración Inicial Fin de Semana */}
+                <div className="p-2.5 rounded-xl bg-white border border-emerald-200 flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Oración Inicial</span>
+                    <p className="font-bold text-slate-900 mt-0.5 truncate">
+                      {publishersMap.get(currentWeek.weekend.initialPrayerId || '')?.name || (
+                        <span className="text-slate-400 font-normal italic">Sin asignar</span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between pt-1 border-t border-emerald-100">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openSelector(
+                          'Oración inicial reunión fin de semana',
+                          'fds_presidente',
+                          'hermano',
+                          currentWeek.weekend.date,
+                          'weekend',
+                          currentWeek.weekend.initialPrayerId,
+                          pid => {
+                            const u = JSON.parse(JSON.stringify(currentWeek));
+                            u.weekend.initialPrayerId = pid;
+                            updateWeek(u);
+                          },
+                          () => {
+                            const u = JSON.parse(JSON.stringify(currentWeek));
+                            u.weekend.initialPrayerId = undefined;
+                            updateWeek(u);
+                          }
+                        )
+                      }
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                    >
+                      {currentWeek.weekend.initialPrayerId ? 'Cambiar' : 'Asignar'}
+                    </button>
+                    {currentWeek.weekend.initialPrayerId && !isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const u = JSON.parse(JSON.stringify(currentWeek));
+                          u.weekend.initialPrayerId = undefined;
+                          updateWeek(u);
+                        }}
+                        className="text-[11px] font-bold text-rose-600 hover:text-rose-800 flex items-center gap-0.5 cursor-pointer"
+                        title="Quitar oración inicial asignada"
+                      >
+                        <UserMinus className="w-3 h-3" />
+                        <span>Quitar</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Oración Final Fin de Semana */}
+                <div className="p-2.5 rounded-xl bg-white border border-emerald-200 flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Oración Final</span>
+                    <p className="font-bold text-slate-900 mt-0.5 truncate">
+                      {publishersMap.get(currentWeek.weekend.finalPrayerId || '')?.name || (
+                        <span className="text-slate-400 font-normal italic">Sin asignar</span>
+                      )}
+                    </p>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between pt-1 border-t border-emerald-100">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        openSelector(
+                          'Oración final reunión fin de semana',
+                          'fds_presidente',
+                          'hermano',
+                          currentWeek.weekend.date,
+                          'weekend',
+                          currentWeek.weekend.finalPrayerId,
+                          pid => {
+                            const u = JSON.parse(JSON.stringify(currentWeek));
+                            u.weekend.finalPrayerId = pid;
+                            updateWeek(u);
+                          },
+                          () => {
+                            const u = JSON.parse(JSON.stringify(currentWeek));
+                            u.weekend.finalPrayerId = undefined;
+                            updateWeek(u);
+                          }
+                        )
+                      }
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                    >
+                      {currentWeek.weekend.finalPrayerId ? 'Cambiar' : 'Asignar'}
+                    </button>
+                    {currentWeek.weekend.finalPrayerId && !isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const u = JSON.parse(JSON.stringify(currentWeek));
+                          u.weekend.finalPrayerId = undefined;
+                          updateWeek(u);
+                        }}
+                        className="text-[11px] font-bold text-rose-600 hover:text-rose-800 flex items-center gap-0.5 cursor-pointer"
+                        title="Quitar oración final asignada"
+                      >
+                        <UserMinus className="w-3 h-3" />
+                        <span>Quitar</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1823,9 +1327,26 @@ export const ScheduleTab: React.FC = () => {
                     className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between"
                   >
                     <div>
-                      <span className="text-[10px] font-bold uppercase text-slate-500 block truncate">
-                        {duty.name}
-                      </span>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase text-slate-500 block truncate">
+                          {duty.name}
+                        </span>
+                        {assignedIds.length > 0 && !isReadOnly && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const u = JSON.parse(JSON.stringify(currentWeek));
+                              if (!u.weekend.duties) u.weekend.duties = {};
+                              u.weekend.duties[duty.key] = [];
+                              updateWeek(u);
+                            }}
+                            className="text-[10px] text-rose-500 hover:text-rose-700 font-semibold cursor-pointer"
+                            title={`Quitar a todos los asignados a ${duty.name}`}
+                          >
+                            Limpiar
+                          </button>
+                        )}
+                      </div>
                       <div className="mt-1 space-y-1">
                         {assignedIds.length === 0 ? (
                           <p className="text-xs text-slate-400 italic">Sin asignar</p>
@@ -1906,8 +1427,6 @@ export const ScheduleTab: React.FC = () => {
           })}
         </div>
       </div>
-        </>
-      )}
 
       {/* MODAL: ASSIGNMENT SELECTOR */}
       {selectorState.isOpen && (
@@ -2130,6 +1649,146 @@ export const ScheduleTab: React.FC = () => {
         initialTab={organizedModalTab}
         initialFocus={organizedModalFocus}
       />
+
+      {/* MODAL: S-38 REGISTRO DE ESTUDIANTES */}
+      {selectedStudentForS38 && (
+        <StudentS38HistoryModal
+          publisher={selectedStudentForS38}
+          isOpen={Boolean(selectedStudentForS38)}
+          onClose={() => setSelectedStudentForS38(null)}
+          allWeeks={weeks}
+          clmProgramas={clmProgramas}
+          onAdvanceLesson={advancePublisherLesson}
+          onRepeatLesson={repeatPublisherLesson}
+          onUpdatePublisher={updatePublisher}
+        />
+      )}
+
+      {/* MODAL: CARTELERA MENSUAL */}
+      {isMonthlyBillboardModalOpen && (
+        <ClmMonthlyBillboardModal
+          isOpen={isMonthlyBillboardModalOpen}
+          onClose={() => setIsMonthlyBillboardModalOpen(false)}
+          congregationName={settings?.congregationName || 'la congregación'}
+          clmProgramas={clmProgramas}
+          publishers={publishers}
+          currentDate={new Date(currentWeek.weekStartDate)}
+        />
+      )}
+
+      {/* MODAL: AUDITORÍA DE CONFLICTOS / CRUCES */}
+      {isConflictsModalOpen && (
+        <ConflictsModal
+          isOpen={isConflictsModalOpen}
+          onClose={() => setIsConflictsModalOpen(false)}
+          onNavigateToWeek={(wId) => {
+            setCurrentWeekId(wId);
+            setIsConflictsModalOpen(false);
+          }}
+        />
+      )}
+
+      {/* MODAL: QUITAR ASIGNADOS DE LA SEMANA */}
+      {isClearWeekAssignmentsModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-white/10">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 flex items-center justify-center text-rose-600 dark:text-rose-400">
+                  <UserMinus className="w-4 h-4" />
+                </div>
+                <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                  Quitar Asignados de la Semana
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsClearWeekAssignmentsModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              >
+                <XCircle className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-zinc-300">
+              Selecciona qué sección de la semana ({currentWeek.weekStartDate}) deseas dejar sin asignar:
+            </p>
+
+            <div className="space-y-2">
+              {[
+                {
+                  id: 'all',
+                  label: 'Toda la semana completa',
+                  desc: 'Entre Semana (VMC), Fin de Semana y Servicios/Deberes operativos',
+                },
+                {
+                  id: 'midweek',
+                  label: 'Solo Reunión Entre Semana (VMC)',
+                  desc: 'Presidente, lecturas, demostraciones, perlas y estudio bíblico',
+                },
+                {
+                  id: 'weekend',
+                  label: 'Solo Reunión Fin de Semana',
+                  desc: 'Presidente, orador, conductor/lector de La Atalaya y oraciones',
+                },
+                {
+                  id: 'duties',
+                  label: 'Solo Deberes y Turnos Operativos',
+                  desc: 'Audio/Video, micrófonos, plataforma, acomodadores y seguridad',
+                },
+              ].map((opt) => (
+                <label
+                  key={opt.id}
+                  className={`flex items-start gap-3 p-3 rounded-2xl border cursor-pointer transition-all ${
+                    clearScope === opt.id
+                      ? 'border-rose-500 bg-rose-50/40 dark:bg-rose-950/20 ring-1 ring-rose-400'
+                      : 'border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="clearScopeOption"
+                    value={opt.id}
+                    checked={clearScope === opt.id}
+                    onChange={() => setClearScope(opt.id as any)}
+                    className="mt-0.5 text-rose-600 focus:ring-rose-500"
+                  />
+                  <div>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white block">
+                      {opt.label}
+                    </span>
+                    <span className="text-[11px] text-slate-500 dark:text-zinc-400 block mt-0.5 leading-snug">
+                      {opt.desc}
+                    </span>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <p className="text-[11px] text-slate-400 dark:text-zinc-500 leading-relaxed bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-100 dark:border-white/5">
+              ℹ️ Los temas oficiales, canciones, lecturas y números de bosquejo se conservan intactos. Solo se liberan las personas asignadas.
+            </p>
+
+            <div className="pt-2 border-t border-slate-100 dark:border-white/10 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setIsClearWeekAssignmentsModalOpen(false)}
+                className="px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmClearAssignments}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
+              >
+                <UserMinus className="w-3.5 h-3.5" />
+                <span>Confirmar y Quitar Asignados</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TOAST NOTIFICATION */}
       {toastNotification && (

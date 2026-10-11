@@ -70,8 +70,7 @@ export const INITIAL_SETTINGS: CongregationSettings = {
 
 // Standard duties for kingdom hall meetings (with no pre-assigned publishers)
 export const INITIAL_CUSTOM_DUTIES: CustomDuty[] = [
-  { id: 'duty-audio', key: 'deber_audio', name: 'Audio / Sonido', description: 'Control de sonido y cabina en la reunión', midweek: true, weekend: true, maxPeople: 1 },
-  { id: 'duty-video', key: 'deber_video', name: 'Video / Multimedia', description: 'Transmisión de videos y pantallas del auditorio', midweek: true, weekend: true, maxPeople: 1 },
+  { id: 'duty-audio', key: 'deber_audio', name: 'Audio y Video', description: 'Control de cabina, audio, video y pantallas en la reunión', midweek: true, weekend: true, maxPeople: 2 },
   { id: 'duty-mics', key: 'deber_microfonos', name: 'Micrófonos', description: 'Pase de micrófonos en el auditorio', midweek: true, weekend: true, maxPeople: 2 },
   { id: 'duty-plat', key: 'deber_plataforma', name: 'Plataforma', description: 'Ajuste de atriles, micrófonos y escenario', midweek: true, weekend: true, maxPeople: 1 },
   { id: 'duty-acom', key: 'deber_acomodador', name: 'Acomodador Auditorio / Puerta', description: 'Bienvenida, acomodación y conteo de asistencia', midweek: true, weekend: true, maxPeople: 2 },
@@ -100,7 +99,9 @@ export const INITIAL_GROUP_DISTRIBUTIONS: LiteratureGroupDistribution[] = [];
 export const INITIAL_LITERATURE_INVENTORY_RECORDS: LiteratureInventoryRecord[] = [];
 export const INITIAL_HOSPITALITY_HOSTS: HospitalityHost[] = [];
 
-export const INITIAL_BREAKERS: Breaker[] = [
+export const INITIAL_BREAKERS: Breaker[] = [];
+
+export const SAMPLE_BREAKERS_TEMPLATE: Breaker[] = [
   // Columna Izquierda
   {
     id: 'brk-1',
@@ -237,28 +238,27 @@ export const INITIAL_BREAKERS: Breaker[] = [
   },
 ];
 
-export const INITIAL_MAINTENANCE_SHEETS: MaintenanceSheet[] = [
+export const INITIAL_MAINTENANCE_SHEETS: MaintenanceSheet[] = [];
+
+export const SAMPLE_MAINTENANCE_SHEETS_TEMPLATE: MaintenanceSheet[] = [
   {
     id: 'maint-1',
     label: 'Revisión Trimestral de Extintores y Señalización',
     description: 'Inspección de presión de manómetros, precintos, pasadores y señalética de emergencia fotoluminiscente',
     category: 'seguridad',
     frequency: 'trimestral',
-    status: 'al_dia',
+    status: 'pendiente',
     isActive: true,
     orderIndex: 0,
     assignedPublisherIds: [],
-    lastCompletedDate: '2026-08-15',
-    nextDueDate: '2026-11-15',
     estimatedMinutes: 45,
     safetyGear: ['Guantes de trabajo ligero', 'Gafas de seguridad'],
     checklist: [
-      { id: 'c1', text: 'Verificar presión en aguja verde de los 4 extintores', completed: true },
-      { id: 'c2', text: 'Comprobar precinto plástico y pasador metálico sin alteraciones', completed: true },
-      { id: 'c3', text: 'Asegurar que la señalética esté visible y libre de obstrucciones', completed: true },
-      { id: 'c4', text: 'Firmar y colocar fecha en las tarjetas de inspección física', completed: true },
+      { id: 'c1', text: 'Verificar presión en aguja verde de los 4 extintores', completed: false },
+      { id: 'c2', text: 'Comprobar precinto plástico y pasador metálico sin alteraciones', completed: false },
+      { id: 'c3', text: 'Asegurar que la señalética esté visible y libre de obstrucciones', completed: false },
+      { id: 'c4', text: 'Firmar y colocar fecha en las tarjetas de inspección física', completed: false },
     ],
-    notes: 'Extintor de cabina de audio reemplazado con CO2 nuevo en junio.',
   },
   {
     id: 'maint-2',
@@ -266,21 +266,18 @@ export const INITIAL_MAINTENANCE_SHEETS: MaintenanceSheet[] = [
     description: 'Lavado de filtros antipolvo, revisión de drenajes y limpieza de unidades condensadoras exteriores',
     category: 'climatizacion',
     frequency: 'mensual',
-    status: 'proximo',
+    status: 'pendiente',
     isActive: true,
     orderIndex: 1,
     assignedPublisherIds: [],
-    lastCompletedDate: '2026-09-05',
-    nextDueDate: '2026-10-15',
     estimatedMinutes: 90,
     safetyGear: ['Mascarilla antipolvo', 'Guantes de nitrilo', 'Escalera certificada'],
     checklist: [
-      { id: 'c1', text: 'Retirar y lavar con agua a presión los filtros de nylon', completed: true },
-      { id: 'c2', text: 'Desinfectar bandejas y purgar mangueras de condensado', completed: true },
+      { id: 'c1', text: 'Retirar y lavar con agua a presión los filtros de nylon', completed: false },
+      { id: 'c2', text: 'Desinfectar bandejas y purgar mangueras de condensado', completed: false },
       { id: 'c3', text: 'Comprobar que no existan vibraciones o ruidos anómalos', completed: false },
       { id: 'c4', text: 'Revisar carga de pilas de controles remotos en cabina', completed: false },
     ],
-    notes: 'Unidad norte requiere limpieza química profunda en el próximo semestre.',
   },
   {
     id: 'maint-3',
@@ -288,21 +285,18 @@ export const INITIAL_MAINTENANCE_SHEETS: MaintenanceSheet[] = [
     description: 'Despeje de hojas en canaletas, bajantes de lluvia y sellado de posibles goteras antes de temporada de lluvias',
     category: 'edificacion',
     frequency: 'semestral',
-    status: 'al_dia',
+    status: 'pendiente',
     isActive: true,
     orderIndex: 2,
     assignedPublisherIds: [],
-    lastCompletedDate: '2026-07-20',
-    nextDueDate: '2027-01-20',
     estimatedMinutes: 120,
     safetyGear: ['Arnés de seguridad con línea de vida', 'Calzado antideslizante', 'Casco'],
     checklist: [
-      { id: 'c1', text: 'Barrer hojas y tierra acumulada en cumbreras y canaletas', completed: true },
-      { id: 'c2', text: 'Comprobar que bajantes fluviales descarguen con flujo libre', completed: true },
-      { id: 'c3', text: 'Revisar tornillos y sellos de silicona en traslapes de láminas', completed: true },
-      { id: 'c4', text: 'Inspeccionar cielo falso del auditorio por manchas de humedad', completed: true },
+      { id: 'c1', text: 'Barrer hojas y tierra acumulada en cumbreras y canaletas', completed: false },
+      { id: 'c2', text: 'Comprobar que bajantes fluviales descarguen con flujo libre', completed: false },
+      { id: 'c3', text: 'Revisar tornillos y sellos de silicona en traslapes de láminas', completed: false },
+      { id: 'c4', text: 'Inspeccionar cielo falso del auditorio por manchas de humedad', completed: false },
     ],
-    notes: 'Requiere siempre 2 hermanos presentes según pautas de seguridad teocráticas.',
   },
   {
     id: 'maint-4',
@@ -314,8 +308,6 @@ export const INITIAL_MAINTENANCE_SHEETS: MaintenanceSheet[] = [
     isActive: true,
     orderIndex: 3,
     assignedPublisherIds: [],
-    lastCompletedDate: '2026-08-30',
-    nextDueDate: '2026-09-30',
     estimatedMinutes: 30,
     checklist: [
       { id: 'c1', text: 'Desconectar circuito de prueba en el tablero eléctrico', completed: false },
@@ -323,7 +315,6 @@ export const INITIAL_MAINTENANCE_SHEETS: MaintenanceSheet[] = [
       { id: 'c3', text: 'Dejar encendidas durante 20 minutos para comprobar batería', completed: false },
       { id: 'c4', text: 'Reconectar breaker y certificar LED verde de carga activa', completed: false },
     ],
-    notes: 'Lámpara de salida lateral parpadeó el mes pasado; revisar si requiere cambio de batería.',
   },
   {
     id: 'maint-5',
@@ -331,17 +322,15 @@ export const INITIAL_MAINTENANCE_SHEETS: MaintenanceSheet[] = [
     description: 'Comprobación de ciclos de encendido de la bomba hidroneumática, presión del tanque y calidad de agua',
     category: 'plomeria',
     frequency: 'bimestral',
-    status: 'al_dia',
+    status: 'pendiente',
     isActive: true,
     orderIndex: 4,
     assignedPublisherIds: [],
-    lastCompletedDate: '2026-08-25',
-    nextDueDate: '2026-10-25',
     estimatedMinutes: 40,
     checklist: [
-      { id: 'c1', text: 'Comprobar rango de presión del manómetro (20 a 40 PSI)', completed: true },
-      { id: 'c2', text: 'Verificar hermeticidad en llaves de corte y fluxómetros de baños', completed: true },
-      { id: 'c3', text: 'Inspeccionar flotador de cisterna y ausencia de rebose continuo', completed: true },
+      { id: 'c1', text: 'Comprobar rango de presión del manómetro (20 a 40 PSI)', completed: false },
+      { id: 'c2', text: 'Verificar hermeticidad en llaves de corte y fluxómetros de baños', completed: false },
+      { id: 'c3', text: 'Inspeccionar flotador de cisterna y ausencia de rebose continuo', completed: false },
     ],
   },
   {
@@ -350,19 +339,17 @@ export const INITIAL_MAINTENANCE_SHEETS: MaintenanceSheet[] = [
     description: 'Corte de césped, poda de ramas que interfieran con alumbrado o cámaras, y retiro de maleza en adoquines',
     category: 'jardineria',
     frequency: 'mensual',
-    status: 'al_dia',
+    status: 'pendiente',
     isActive: true,
     orderIndex: 5,
     assignedPublisherIds: [],
-    lastCompletedDate: '2026-09-28',
-    nextDueDate: '2026-10-28',
     estimatedMinutes: 120,
     safetyGear: ['Gafas de seguridad', 'Protección auditiva', 'Guantes de carnaza'],
     checklist: [
-      { id: 'c1', text: 'Cortar pasto y orillar banquetas de acceso al Salón', completed: true },
-      { id: 'c2', text: 'Retirar ramas bajas sobre rejas perimetrales', completed: true },
-      { id: 'c3', text: 'Barrer y recoger residuos en bolsas para compost o basura', completed: true },
-      { id: 'c4', text: 'Inspeccionar que no haya hormigueros cerca de los cimientos', completed: true },
+      { id: 'c1', text: 'Cortar pasto y orillar banquetas de acceso al Salón', completed: false },
+      { id: 'c2', text: 'Retirar ramas bajas sobre rejas perimetrales', completed: false },
+      { id: 'c3', text: 'Barrer y recoger residuos en bolsas para compost o basura', completed: false },
+      { id: 'c4', text: 'Inspeccionar que no haya hormigueros cerca de los cimientos', completed: false },
     ],
   },
   {
@@ -371,18 +358,16 @@ export const INITIAL_MAINTENANCE_SHEETS: MaintenanceSheet[] = [
     description: 'Desinfección de rejillas de micrófonos, soplado de rack de amplificación y revisión de cables de plataforma',
     category: 'audio_video',
     frequency: 'trimestral',
-    status: 'al_dia',
+    status: 'pendiente',
     isActive: true,
     orderIndex: 6,
     assignedPublisherIds: [],
-    lastCompletedDate: '2026-09-10',
-    nextDueDate: '2026-12-10',
     estimatedMinutes: 60,
     checklist: [
-      { id: 'c1', text: 'Desmontar y lavar con solución alcohólica las rejillas metálicas de micrófonos', completed: true },
-      { id: 'c2', text: 'Soplar con aire comprimido las rejillas de ventilación del rack', completed: true },
-      { id: 'c3', text: 'Probar continuidad y ausencia de ruidos en cables de atril y micrófonos de mano', completed: true },
-      { id: 'c4', text: 'Limpiar lentes ópticos de proyector / pantallas LED', completed: true },
+      { id: 'c1', text: 'Desmontar y lavar con solución alcohólica las rejillas metálicas de micrófonos', completed: false },
+      { id: 'c2', text: 'Soplar con aire comprimido las rejillas de ventilación del rack', completed: false },
+      { id: 'c3', text: 'Probar continuidad y ausencia de ruidos en cables de atril y micrófonos de mano', completed: false },
+      { id: 'c4', text: 'Limpiar lentes ópticos de proyector / pantallas LED', completed: false },
     ],
   },
   {
@@ -391,12 +376,10 @@ export const INITIAL_MAINTENANCE_SHEETS: MaintenanceSheet[] = [
     description: 'Aspirado a fondo y extracción de manchas en silletería tapizada de tela del auditorio principal',
     category: 'limpieza_profunda',
     frequency: 'semestral',
-    status: 'proximo',
+    status: 'pendiente',
     isActive: true,
     orderIndex: 7,
     assignedPublisherIds: [],
-    lastCompletedDate: '2026-05-10',
-    nextDueDate: '2026-11-10',
     estimatedMinutes: 180,
     checklist: [
       { id: 'c1', text: 'Aspirado minucioso de respaldos y asientos', completed: false },
@@ -407,78 +390,9 @@ export const INITIAL_MAINTENANCE_SHEETS: MaintenanceSheet[] = [
   },
 ];
 
-export const INITIAL_AUX_PIONEER_REQUESTS: AuxPioneerRequest[] = [
-  {
-    id: 'apr-1',
-    publisherId: 'pub-3',
-    month: 9, // Octubre
-    year: 2026,
-    targetHours: 30,
-    status: 'pendiente',
-    requestDate: '2026-09-25',
-    isContinuous: false,
-    notes: 'Deseo apoyar la predicación de los fines de semana y carritos metropolitanos.',
-  },
-  {
-    id: 'apr-2',
-    publisherId: 'pub-4',
-    month: 9, // Octubre
-    year: 2026,
-    targetHours: 15,
-    status: 'pendiente',
-    requestDate: '2026-09-28',
-    isContinuous: false,
-    notes: 'Aprovecharé las vacaciones para alcanzar la meta de 15 horas durante la visita del superintendente.',
-  },
-  {
-    id: 'apr-3',
-    publisherId: 'pub-2',
-    month: 8, // Septiembre
-    year: 2026,
-    targetHours: 30,
-    status: 'aprobada',
-    requestDate: '2026-08-20',
-    responseDate: '2026-08-24',
-    reviewedBy: 'Comité de Servicio (Coordinador y Secretario)',
-    isContinuous: false,
-    notes: 'Aprobado unánimemente en la reunión del comité de servicio.',
-  },
-  {
-    id: 'apr-4',
-    publisherId: 'pub-5',
-    month: 8, // Septiembre
-    year: 2026,
-    targetHours: 30,
-    status: 'aprobada',
-    requestDate: '2026-08-22',
-    responseDate: '2026-08-24',
-    reviewedBy: 'Comité de Servicio (Coordinador y Secretario)',
-    isContinuous: true,
-    notes: 'Solicitud continua de precursorado auxiliar renovada.',
-  },
-];
+export const INITIAL_AUX_PIONEER_REQUESTS: AuxPioneerRequest[] = [];
 
-export const INITIAL_BRANCH_REPORTS_S1: BranchReportS1[] = [
-  {
-    id: 's1-2026-09',
-    monthKey: '2026-09',
-    year: 2026,
-    monthNumber: 9,
-    status: 'enviado',
-    submittedAt: '2026-10-04T16:00:00Z',
-    submittedBy: 'Héctor Gutiérrez (Secretario)',
-    confirmationNumber: 'HUB-202609-CO-10582',
-    notes: 'Informe consolidado y enviado exitosamente a la sucursal por JW Hub.',
-  },
-  {
-    id: 's1-2026-10',
-    monthKey: '2026-10',
-    year: 2026,
-    monthNumber: 10,
-    status: 'pendiente',
-    notes: 'Mes de servicio actual en curso.',
-  },
-];
+export const INITIAL_BRANCH_REPORTS_S1: BranchReportS1[] = [];
 
 // Helper to format Date to YYYY-MM-DD
 export function formatDateISO(date: Date): string {

@@ -103,9 +103,9 @@ export function downloadMonthIcsSchedule(
 
       const pres = publishersMap.get(w.midweek.presidentId || '')?.name || '---';
       const disc = publishersMap.get(w.midweek.tesoros.discurso.publisherId || '')?.name || '---';
-      const audio = (w.midweek.duties.deber_audio || []).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---';
+      const audioVideo = Array.from(new Set([...(w.midweek.duties.deber_audio || []), ...(w.midweek.duties.deber_video || [])])).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---';
 
-      const desc = `Reunión Vida y Ministerio Cristianos\\nPresidente: ${pres}\\nDiscurso: ${w.midweek.tesoros.discurso.title} (${disc})\\nAudio: ${audio}`;
+      const desc = `Reunión Vida y Ministerio Cristianos\\nPresidente: ${pres}\\nDiscurso: ${w.midweek.tesoros.discurso.title} (${disc})\\nAudio y Video: ${audioVideo}`;
 
       events.push([
         'BEGIN:VEVENT',

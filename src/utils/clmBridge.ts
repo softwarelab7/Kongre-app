@@ -1,5 +1,6 @@
 // src/utils/clmBridge.ts
 import type { ClmPrograma, ClmParte, WeekSchedule, Publisher, AssignmentItem } from '../types';
+import { createDefaultPrograma } from './clmDefaultProgram';
 
 /**
  * Busca un publicador por ID o NID
@@ -144,10 +145,15 @@ export function bridgeWeekToClm(
   const year = d.getFullYear();
   const weekNum = Math.ceil(((d.getTime() - new Date(year, 0, 1).getTime()) / 86400000 + 1) / 7);
 
-  // Copia del programa existente o estructura base
-  const partes: ClmParte[] = existingClm?.partes
+  // Si no hay programa previo o sus partes están vacías, generamos la plantilla completa
+  const basePrograma = (!existingClm?.partes || existingClm.partes.length === 0)
+    ? createDefaultPrograma(semanaFecha, existingClm?.congregation_id || null, week, publishers)
+    : null;
+
+  // Copia del programa existente o de la plantilla base recién generada
+  const partes: ClmParte[] = existingClm?.partes && existingClm.partes.length > 0
     ? JSON.parse(JSON.stringify(existingClm.partes))
-    : [];
+    : (basePrograma?.partes ? JSON.parse(JSON.stringify(basePrograma.partes)) : []);
 
   const helperSet = (tipo: string, pubId?: string | null, esAuxiliar: boolean = false) => {
     if (!pubId) return;
@@ -208,5 +214,6 @@ export function bridgeWeekToClm(
     congregation_id: existingClm?.congregation_id || null,
     lectura_semana: existingClm?.lectura_semana || week.midweek.bibleReading || '',
     rango_semana: existingClm?.rango_semana || `Semana del ${week.weekStartDate} al ${week.weekEndDate}`,
+    sala_auxiliar_habilitada: existingClm?.sala_auxiliar_habilitada ?? basePrograma?.sala_auxiliar_habilitada ?? false,
   };
 }

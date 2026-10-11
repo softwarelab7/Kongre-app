@@ -414,28 +414,20 @@ export function isCongregationIdString(name?: string | null): boolean {
   const clean = name.trim();
   const lower = clean.toLowerCase();
 
-  // Exact ID o empieza con ID: / ID / ID-
-  if (lower === 'id' || /^id\s*[:#-]/i.test(clean) || /^id\s+[0-9a-z_-]+$/i.test(clean)) return true;
+  // Exact technical string "id"
+  if (lower === 'id' || lower === 'id:' || lower === 'id#-') return true;
 
-  // Formato autogenerado "Congregación #..." o "Congregación ID..."
-  if (/^congregaci[oó]n\s*(#|id\s*:?|c[oó]digo\s*:?)?\s*([0-9]+|[0-9a-z_-]{4,})$/i.test(clean)) {
-    return true;
-  }
-
-  // Formato UUID estándar (8-4-4-4-12 caracteres)
+  // Formato UUID estándar (8-4-4-4-12 caracteres hexadecimales)
   if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clean)) return true;
 
-  // Identificadores de Firebase / Cloud Run / AI Studio (e.g. ai-studio-kongre-... o ais-...)
-  if (/^(ai-studio|ais-dev|ais-pre|applet)[0-9a-z_-]*/i.test(clean)) return true;
+  // Identificadores de sistema Firebase / Cloud Run / AI Studio (e.g. ai-studio-kongre-... o ais-...)
+  if (/^(ai-studio|ais-dev|ais-pre|applet)[0-9a-z_-]+/i.test(clean)) return true;
 
-  // Solo números (como "10582", "1001", "#1001")
-  if (/^#?[0-9]{2,10}$/.test(clean)) return true;
+  // Código técnico KGR-... o CONG_... con números/códigos largos
+  if (/^(kgr|cong)[_-][0-9a-z]{6,}$/i.test(clean)) return true;
 
-  // Código técnico KGR-... o CONG_... o C-...
-  if (/^(kgr|cong|c)[_-][0-9a-z]{3,}/i.test(clean)) return true;
-
-  // Hash / doc ID largo sin espacios (más de 14 caracteres alfanuméricos)
-  if (!clean.includes(' ') && /^[a-z0-9_-]{14,}$/i.test(clean)) return true;
+  // Hash técnico sin espacios de más de 16 caracteres hexadecimales
+  if (!clean.includes(' ') && /^[a-f0-9]{16,}$/i.test(clean)) return true;
 
   return false;
 }

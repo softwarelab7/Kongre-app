@@ -374,19 +374,15 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
               <div className="space-y-2.5 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400 flex items-center gap-1.5">
-                    <Volume2 className="w-3.5 h-3.5 text-indigo-400" /> Audio:
+                    <Tv className="w-3.5 h-3.5 text-indigo-400" /> Audio y Video:
                   </span>
                   <span className="font-bold text-white">
-                    {getDutyPublishers('deber_audio')}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400 flex items-center gap-1.5">
-                    <Tv className="w-3.5 h-3.5 text-purple-400" /> Video / Pantalla:
-                  </span>
-                  <span className="font-bold text-white">
-                    {getDutyPublishers('deber_video')}
+                    {(() => {
+                      const audioPubs = (currentDuties['deber_audio'] || []).map(id => publishersMap.get(id)?.name).filter(Boolean);
+                      const videoPubs = (currentDuties['deber_video'] || []).map(id => publishersMap.get(id)?.name).filter(Boolean);
+                      const combined = Array.from(new Set([...audioPubs, ...videoPubs]));
+                      return combined.length > 0 ? combined.join(', ') : '---';
+                    })()}
                   </span>
                 </div>
 

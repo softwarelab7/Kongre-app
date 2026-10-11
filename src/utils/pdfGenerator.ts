@@ -172,7 +172,7 @@ export function generateProgramPdf(
     const midDisc = publishersMap.get(week.midweek.tesoros.discurso.publisherId || '')?.name || '---';
     const midPerl = publishersMap.get(week.midweek.tesoros.perlas.publisherId || '')?.name || '---';
     const midLect = publishersMap.get(week.midweek.tesoros.lecturaBiblia.publisherId || '')?.name || '---';
-    const audio = (week.midweek.duties.deber_audio || []).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---';
+    const audioVideo = Array.from(new Set([...(week.midweek.duties.deber_audio || []), ...(week.midweek.duties.deber_video || [])])).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---';
     const mics = (week.midweek.duties.deber_microfonos || []).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---';
 
     doc.setFontSize(8.5);
@@ -181,20 +181,20 @@ export function generateProgramPdf(
     doc.setFont('helvetica', 'bold');
     doc.text(`Entre Semana (${week.midweek.date}):`, 12, curY);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Pres: ${midPres} | Disc: ${midDisc} | Perlas: ${midPerl} | Lect: ${midLect} | Audio: ${audio} | Mics: ${mics}`, 58, curY);
+    doc.text(`Pres: ${midPres} | Disc: ${midDisc} | Perlas: ${midPerl} | Lect: ${midLect} | Audio y Video: ${audioVideo} | Mics: ${mics}`, 58, curY);
 
     curY += 6;
 
     // Weekend block
     const fdsPres = publishersMap.get(week.weekend.presidentId || '')?.name || '---';
     const fdsLector = publishersMap.get(week.weekend.atalayaLectorId || '')?.name || '---';
-    const fdsAudio = (week.weekend.duties.deber_audio || []).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---';
+    const fdsAudioVideo = Array.from(new Set([...(week.weekend.duties.deber_audio || []), ...(week.weekend.duties.deber_video || [])])).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---';
     const fdsMics = (week.weekend.duties.deber_microfonos || []).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---';
 
     doc.setFont('helvetica', 'bold');
     doc.text(`Fin de Semana (${week.weekend.date}):`, 12, curY);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Pres: ${fdsPres} | Lector Atalaya: ${fdsLector} | Discurso: ${week.weekend.publicTalkSpeaker || '---'} | Audio: ${fdsAudio} | Mics: ${fdsMics}`, 58, curY);
+    doc.text(`Pres: ${fdsPres} | Lector Atalaya: ${fdsLector} | Discurso: ${week.weekend.publicTalkSpeaker || '---'} | Audio y Video: ${fdsAudioVideo} | Mics: ${fdsMics}`, 58, curY);
 
     curY += 6;
 

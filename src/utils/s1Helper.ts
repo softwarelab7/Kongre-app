@@ -367,10 +367,10 @@ export function calculateS1Metrics(
     monthNameFull,
     serviceYear: getCurrentServiceYear(),
 
-    congregationName: settings.congregationName || 'Congregación El Olivar',
-    congregationNumber: settings.congregationNumber || '10582',
-    circuitNumber: settings.circuitNumber || 'CO-04',
-    coordinatorName: settings.coordinatorName || 'Héctor Gutiérrez',
+    congregationName: settings.congregationName || '',
+    congregationNumber: settings.congregationNumber || '',
+    circuitNumber: settings.circuitNumber || '',
+    coordinatorName: settings.coordinatorName || '',
 
     midweekMeetingsCount,
     midweekTotalAttendance,

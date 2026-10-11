@@ -57,6 +57,7 @@ export interface ClmPrograma {
   congregation_id?: string | null;
   lectura_semana?: string;
   rango_semana?: string;
+  sala_auxiliar_habilitada?: boolean;
 }
 
 export interface WeekendParte {

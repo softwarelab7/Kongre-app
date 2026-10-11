@@ -546,7 +546,7 @@ export const CleaningDutiesTab: React.FC = () => {
               <span>Deberes Operativos y Personalizados</span>
             </h3>
             <p className="text-xs text-slate-500">
-              Crea responsabilidades personalizadas como audio, estacionamiento, acomodadores o deberes locales.
+              Crea responsabilidades personalizadas como estacionamiento, acomodadores o deberes locales.
             </p>
           </div>
           <button

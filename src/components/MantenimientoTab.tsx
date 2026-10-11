@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { MaintenanceSheet, MaintenanceCategory, MaintenanceStatus } from '../types';
+import { SAMPLE_MAINTENANCE_SHEETS_TEMPLATE } from '../utils/sampleData';
 import { SectionHeader } from './SectionHeader';
 import { MaintenanceSheetCard } from './maintenance/MaintenanceSheetCard';
 import { MaintenanceSheetModal } from './maintenance/MaintenanceSheetModal';
@@ -400,16 +401,31 @@ export const MantenimientoTab: React.FC = () => {
               Intenta cambiar los filtros de búsqueda o crea una nueva ficha para organizar el plan del
               Salón.
             </p>
-            <button
-              onClick={() => {
-                setEditingSheet(null);
-                setIsModalOpen(true);
-              }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold"
-            >
-              <Plus size={15} />
-              <span>Crear Nueva Ficha</span>
-            </button>
+            <div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
+              <button
+                onClick={() => {
+                  setEditingSheet(null);
+                  setIsModalOpen(true);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer"
+              >
+                <Plus size={15} />
+                <span>Crear Nueva Ficha</span>
+              </button>
+              {maintenanceSheets.length === 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    SAMPLE_MAINTENANCE_SHEETS_TEMPLATE.forEach((sheet) => addMaintenanceSheet(sheet));
+                  }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all border border-slate-200 dark:border-slate-700 cursor-pointer"
+                  title="Cargar fichas de mantenimiento recomendadas para Salones del Reino"
+                >
+                  <Sparkles size={15} className="text-amber-500" />
+                  <span>Cargar Plantilla Recomendada</span>
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

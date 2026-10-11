@@ -258,7 +258,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       category: 'modulos',
       categoryLabel: 'Salón',
       title: 'Deberes del Salón & Limpieza',
-      subtitle: 'Sonido, video, microfonistas, acomodadores y aseo semanal',
+      subtitle: 'Audio y video, microfonistas, acomodadores y aseo semanal',
       icon: Brush,
       action: () => onNavigate('limpieza_deberes'),
     },

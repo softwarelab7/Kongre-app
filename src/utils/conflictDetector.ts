@@ -533,7 +533,7 @@ function analyzeMeetingEntries(
           publisherId: pubId,
           publisherName: pub.name,
           type: 'double_assignment',
-          description: `CRUCE OPERATIVO: ${pub.name} está asignado al sonido/video y a los micrófonos/acomodador al mismo tiempo.`,
+          description: `CRUCE OPERATIVO: ${pub.name} está asignado a Audio y Video y a los micrófonos/acomodador al mismo tiempo.`,
           assignmentTitles: pubEntries.map(e => e.title),
         });
       }

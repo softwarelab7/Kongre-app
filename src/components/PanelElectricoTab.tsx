@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { Breaker } from '../types';
+import { SAMPLE_BREAKERS_TEMPLATE } from '../utils/sampleData';
 import { SectionHeader } from './SectionHeader';
 import { BreakerCard } from './electrical/BreakerCard';
 import { BreakerModal } from './electrical/BreakerModal';
@@ -306,6 +307,38 @@ export const PanelElectricoTab: React.FC = () => {
             </div>
           }
         />
+
+        {/* Banner cuando no hay circuitos configurados */}
+        {breakers.length === 0 && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                <Zap size={20} />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-800 dark:text-white">
+                  Tablero eléctrico limpio (sin datos de prueba)
+                </h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Agrega los circuitos reales de tu Salón del Reino con el botón "Nuevo Circuito" o carga una plantilla recomendada de ejemplo.
+                </p>
+              </div>
+            </div>
+            {!isReadOnly && (
+              <button
+                type="button"
+                onClick={() => {
+                  reorderBreakers(SAMPLE_BREAKERS_TEMPLATE);
+                  showToast('Plantilla sugerida de breakers cargada.');
+                }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
+              >
+                <Sparkles size={14} className="text-amber-300" />
+                <span>Cargar Plantilla Recomendada</span>
+              </button>
+            )}
+          </div>
+        )}
 
         {/* 5 KPI Summary Ribbon */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">

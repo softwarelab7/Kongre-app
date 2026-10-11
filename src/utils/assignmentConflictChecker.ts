@@ -96,7 +96,7 @@ export function checkPublisherConflictsOnDate(
     });
   }
 
-  // 2. VERIFICAR DEBERES DE APOYO (Sonido, Video, Micrófonos, Acomodadores)
+  // 2. VERIFICAR DEBERES DE APOYO (Audio y Video, Micrófonos, Acomodadores)
   // A) Desde turnosDeberes explícitos
   const deberes = context.turnosDeberes?.filter(
     (t) => t.semana_fecha === semanaFecha && t.tipo_reunion === 'entre_semana'

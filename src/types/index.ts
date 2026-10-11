@@ -413,6 +413,7 @@ export interface CongregationSettings {
   coordinatorPhone?: string;   // ej. '+57 300 1234567'
   isRegistered?: boolean;      // true if the congregation registration wizard has been completed
   registeredAt?: string;       // ISO date
+  updatedAt?: string;          // ISO date
   midweekMeetingDay: string;  // e.g. 'Miércoles'
   midweekMeetingTime: string; // e.g. '19:00'
   weekendMeetingDay: string;  // e.g. 'Domingo'
@@ -1029,6 +1030,7 @@ export interface ClmPrograma {
   congregation_id?: string | null;
   lectura_semana?: string;
   rango_semana?: string;
+  sala_auxiliar_habilitada?: boolean;
 }
 
 declare global {

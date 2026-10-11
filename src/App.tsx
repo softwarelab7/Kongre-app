@@ -214,6 +214,7 @@ const AppContent: React.FC = () => {
   const isCongregationRegistered = Boolean(
     (settings.isRegistered && settings.congregationName?.trim()) ||
     localStorage.getItem('kongre_is_registered_congregation') === 'true' ||
+    Boolean(localStorage.getItem('kongre_congregation_name')?.trim()) ||
     user?.email === 'hectorguti95@gmail.com'
   );
 

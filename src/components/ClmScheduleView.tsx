@@ -12,6 +12,7 @@ import { ClmAuxiliaryCounselorModal } from './ClmAuxiliaryCounselorModal';
 import { generateCounselorSheetPdf } from '../utils/clmCounselorPdf';
 import { useCongregation } from '../context/CongregationContext';
 import { getOrganizedScheduleForWeek } from '../utils/organizedSync';
+import { createDefaultPrograma, getMonday } from '../utils/clmDefaultProgram';
 import { checkPublisherConflictsOnDate } from '../utils/assignmentConflictChecker';
 import { OFFICIAL_STUDENT_LESSONS } from '../utils/theocraticData';
 import {
@@ -44,6 +45,7 @@ import {
   ArrowRightLeft,
   ShieldCheck,
   UserCheck,
+  UserMinus,
 } from 'lucide-react';
 
 // Banners oficiales por sección
@@ -61,265 +63,6 @@ const SECTION_BANNERS = {
     bgColor: '#942926', // Rojo teocrático oficial
   },
 };
-
-/**
- * Plantilla inicial para generar las partes de una semana de reunión Vida y Ministerio
- */
-function createDefaultPrograma(semanaFecha: string, congregationId?: string | null): ClmPrograma {
-  const dateObj = new Date(semanaFecha);
-  const year = dateObj.getFullYear();
-  const weekNum = Math.ceil(
-    ((dateObj.getTime() - new Date(year, 0, 1).getTime()) / 86400000 + 1) / 7
-  );
-
-  // Intentar cargar datos oficiales de Organized para esta fecha
-  const org = getOrganizedScheduleForWeek(`week-${year}-${weekNum}`, semanaFecha);
-
-  const tesorosDiscurso =
-    org?.midweek.tesoros.discursoTitle ||
-    'Tengamos un punto de vista equilibrado de la protección de Jehová (10 min)';
-  const perlasTitulo =
-    org?.midweek.tesoros.perlasTitle || 'Busquemos perlas escondidas (10 min)';
-  const lecturaTitulo =
-    org?.midweek.tesoros.lecturaTitle || 'Lectura de la Biblia (4 min)';
-
-  const song1 = org?.midweek.songFirst || 33;
-  const song2 = org?.midweek.songMiddle || 120;
-  const song3 = org?.midweek.songConclude || 145;
-
-  const partes: ClmParte[] = [
-    // ── MARCO DE LA REUNIÓN ──
-    {
-      id: `part-pres-${semanaFecha}`,
-      tipo: 'presidente',
-      titulo: 'Presidente',
-      duracion_min: 5,
-      seccion: 'marco',
-      requiere_hermano: true,
-      requiere_privilegio: true,
-    },
-    {
-      id: `part-canto-1-${semanaFecha}`,
-      tipo: 'canto',
-      titulo: `Cántico ${song1}: Echa sobre Dios tu carga`,
-      duracion_min: 5,
-      seccion: 'marco',
-      requiere_hermano: false,
-      requiere_privilegio: false,
-    },
-    {
-      id: `part-oracion-ap-${semanaFecha}`,
-      tipo: 'oracion_apertura',
-      titulo: 'Oración de apertura',
-      duracion_min: 1,
-      seccion: 'marco',
-      requiere_hermano: true,
-      requiere_privilegio: true,
-    },
-
-    // ── TESOROS DE LA BIBLIA ──
-    {
-      id: `part-tes-disc-${semanaFecha}`,
-      tipo: 'discurso_tesoros',
-      titulo: tesorosDiscurso,
-      duracion_min: 10,
-      seccion: 'tesoros',
-      requiere_hermano: true,
-      requiere_privilegio: true,
-    },
-    {
-      id: `part-tes-perlas-${semanaFecha}`,
-      tipo: 'busquemos_perlas',
-      titulo: perlasTitulo,
-      duracion_min: 10,
-      seccion: 'tesoros',
-      requiere_hermano: true,
-      requiere_privilegio: true,
-    },
-    {
-      id: `part-tes-lectura-${semanaFecha}`,
-      tipo: 'lectura_biblica',
-      titulo: lecturaTitulo,
-      duracion_min: 4,
-      descripcion: 'Jer 40:1–10 (th lección 2).',
-      seccion: 'tesoros',
-      requiere_hermano: true,
-      requiere_privilegio: false,
-      es_clase_auxiliar: false,
-    },
-
-    // ── SEAMOS MEJORES MAESTROS (Auditorio Principal) ──
-    {
-      id: `part-mae-1-${semanaFecha}`,
-      tipo: 'empiece_conversaciones',
-      titulo: org?.midweek.demonstrations[0]?.title || 'Empiece conversaciones (2 min)',
-      duracion_min: org?.midweek.demonstrations[0]?.timeMinutes || 2,
-      descripcion: 'DE CASA EN CASA. (lmd lección 2 punto 3).',
-      seccion: 'maestros',
-      requiere_hermano: false,
-      requiere_privilegio: false,
-      es_clase_auxiliar: false,
-    },
-    {
-      id: `part-mae-2-${semanaFecha}`,
-      tipo: 'empiece_conversaciones',
-      titulo: org?.midweek.demonstrations[1]?.title || 'Empiece conversaciones (2 min)',
-      duracion_min: org?.midweek.demonstrations[1]?.timeMinutes || 2,
-      descripcion: 'PREDICACIÓN INFORMAL. (lmd lección 2 punto 5).',
-      seccion: 'maestros',
-      requiere_hermano: false,
-      requiere_privilegio: false,
-      es_clase_auxiliar: false,
-    },
-    {
-      id: `part-mae-3-${semanaFecha}`,
-      tipo: 'empiece_conversaciones',
-      titulo: org?.midweek.demonstrations[2]?.title || 'Empiece conversaciones (4 min)',
-      duracion_min: org?.midweek.demonstrations[2]?.timeMinutes || 4,
-      descripcion: 'PREDICACIÓN PÚBLICA. Una persona se queda mirando el carrito de publicaciones (lmd lección 5 punto 3).',
-      seccion: 'maestros',
-      requiere_hermano: false,
-      requiere_privilegio: false,
-      es_clase_auxiliar: false,
-    },
-    {
-      id: `part-mae-4-${semanaFecha}`,
-      tipo: 'explique_sus_creencias',
-      titulo: org?.midweek.demonstrations[3]?.title || 'Explique sus creencias (3 min)',
-      duracion_min: org?.midweek.demonstrations[3]?.timeMinutes || 3,
-      seccion: 'maestros',
-      requiere_hermano: false,
-      requiere_privilegio: false,
-      es_clase_auxiliar: false,
-    },
-
-    // ── CANTO INTERMEDIO ──
-    {
-      id: `part-canto-2-${semanaFecha}`,
-      tipo: 'canto',
-      titulo: `Cántico ${song2}`,
-      duracion_min: 5,
-      seccion: 'vida_cristiana',
-      requiere_hermano: false,
-      requiere_privilegio: false,
-    },
-
-    // ── NUESTRA VIDA CRISTIANA ──
-    {
-      id: `part-vida-1-${semanaFecha}`,
-      tipo: 'necesidades_congregacion',
-      titulo: org?.midweek.vidaCristiana[0]?.title || 'Nuestra Vida Cristiana (15 min)',
-      duracion_min: org?.midweek.vidaCristiana[0]?.timeMinutes || 15,
-      seccion: 'vida_cristiana',
-      requiere_hermano: true,
-      requiere_privilegio: true,
-    },
-    {
-      id: `part-vida-cbs-${semanaFecha}`,
-      tipo: 'estudio_biblico_grupo',
-      titulo: org?.midweek.estudioBiblicoTitle || 'Estudio bíblico de la congregación (30 min)',
-      duracion_min: 30,
-      seccion: 'vida_cristiana',
-      requiere_hermano: true,
-      requiere_privilegio: true,
-    },
-    {
-      id: `part-vida-lector-${semanaFecha}`,
-      tipo: 'lector_estudio',
-      titulo: 'Lector del estudio bíblico',
-      duracion_min: 30,
-      seccion: 'vida_cristiana',
-      requiere_hermano: true,
-      requiere_privilegio: false,
-    },
-
-    // ── CONCLUSIÓN ──
-    {
-      id: `part-canto-3-${semanaFecha}`,
-      tipo: 'canto',
-      titulo: `Cántico ${song3}`,
-      duracion_min: 5,
-      seccion: 'marco',
-      requiere_hermano: false,
-      requiere_privilegio: false,
-    },
-    {
-      id: `part-oracion-cierre-${semanaFecha}`,
-      tipo: 'oracion_cierre',
-      titulo: 'Oración de conclusión',
-      duracion_min: 3,
-      seccion: 'marco',
-      requiere_hermano: true,
-      requiere_privilegio: true,
-    },
-
-    // ── SALA AUXILIAR ──
-    {
-      id: `part-aux-cond-${semanaFecha}`,
-      tipo: 'conductor_auxiliar',
-      titulo: 'Consejero de la Sala Auxiliar',
-      duracion_min: 30,
-      seccion: 'marco',
-      requiere_hermano: true,
-      requiere_privilegio: true,
-      es_clase_auxiliar: true,
-    },
-    {
-      id: `part-aux-lect-${semanaFecha}`,
-      tipo: 'lectura_biblica',
-      titulo: `${lecturaTitulo} (Sala auxiliar)`,
-      duracion_min: 4,
-      descripcion: 'Jer 40:1–10 (th lección 2).',
-      seccion: 'tesoros',
-      requiere_hermano: true,
-      requiere_privilegio: false,
-      es_clase_auxiliar: true,
-    },
-    {
-      id: `part-aux-mae-1-${semanaFecha}`,
-      tipo: 'empiece_conversaciones_aux',
-      titulo: 'Empiece conversaciones (Sala auxiliar)',
-      duracion_min: 2,
-      descripcion: 'DE CASA EN CASA. (lmd lección 2 punto 3).',
-      seccion: 'maestros',
-      requiere_hermano: false,
-      requiere_privilegio: false,
-      es_clase_auxiliar: true,
-    },
-    {
-      id: `part-aux-mae-2-${semanaFecha}`,
-      tipo: 'haga_revisitas_aux',
-      titulo: 'Haga revisitas (Sala auxiliar)',
-      duracion_min: 4,
-      descripcion: 'PREDICACIÓN INFORMAL. (lmd lección 2 punto 5).',
-      seccion: 'maestros',
-      requiere_hermano: false,
-      requiere_privilegio: false,
-      es_clase_auxiliar: true,
-    },
-  ];
-
-  return {
-    id: `clm-${semanaFecha}`,
-    semana_fecha: semanaFecha,
-    anio: year,
-    semana_num: weekNum,
-    estado: 'borrador',
-    partes,
-    congregation_id: congregationId || null,
-    lectura_semana: org?.bibleReading || 'JEREMÍAS 40, 41',
-    rango_semana: org?.weekDateRange || `Semana del 5 de octubre de 2026`,
-  };
-}
-
-// Formateador de lunes de la semana
-function getMonday(d: Date): string {
-  const date = new Date(d);
-  const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-  date.setDate(diff);
-  return date.toISOString().split('T')[0];
-}
 
 /**
  * Construye el mensaje oficial y cortés para enviar por WhatsApp al publicador o estudiante
@@ -448,11 +191,17 @@ export default function ClmScheduleView({
   congregationId,
   turnosDeberes = [],
   weekendProgramas = [],
+  selectedWeekDate,
+  onWeekChange,
+  hideHeaderToolbar = false,
 }: {
   publishers: Publisher[];
   congregationId?: string;
   turnosDeberes?: TurnoDeber[];
   weekendProgramas?: WeekendPrograma[];
+  selectedWeekDate?: string;
+  onWeekChange?: (weekStartDate: string) => void;
+  hideHeaderToolbar?: boolean;
 }) {
   const {
     clmProgramas,
@@ -468,10 +217,52 @@ export default function ClmScheduleView({
     updatePublisher,
   } = useCongregation();
 
-  const [semanaActual, setSemanaActual] = useState<Date>(() => new Date());
-  const [programa, setPrograma] = useState<ClmPrograma | null>(null);
+  const [semanaActual, setSemanaActual] = useState<Date>(() => {
+    if (selectedWeekDate) {
+      const d = new Date(selectedWeekDate.length === 10 ? selectedWeekDate + 'T12:00:00' : selectedWeekDate);
+      if (!isNaN(d.getTime())) return d;
+    }
+    return new Date();
+  });
+
+  useEffect(() => {
+    if (selectedWeekDate) {
+      const d = new Date(selectedWeekDate.length === 10 ? selectedWeekDate + 'T12:00:00' : selectedWeekDate);
+      if (!isNaN(d.getTime())) {
+        setSemanaActual(d);
+      }
+    }
+  }, [selectedWeekDate]);
+  const semanaFechaStr = useMemo(() => {
+    if (selectedWeekDate && selectedWeekDate.length === 10) {
+      return selectedWeekDate;
+    }
+    return getMonday(semanaActual);
+  }, [semanaActual, selectedWeekDate]);
+
+  const [programa, setPrograma] = useState<ClmPrograma | null>(() => {
+    const initialDate = selectedWeekDate && selectedWeekDate.length === 10 ? selectedWeekDate : getMonday(new Date());
+    const fromCtx = getClmPrograma(initialDate);
+    if (fromCtx && fromCtx.partes && fromCtx.partes.length > 0) return fromCtx;
+    const correspondingWeek = weeks.find((w) => w.weekStartDate === initialDate);
+    return createDefaultPrograma(initialDate, congregationId, correspondingWeek, publishers);
+  });
+
   const [expandedPartId, setExpandedPartId] = useState<string | null>(null);
-  const [showAuxRoom, setShowAuxRoom] = useState(false);
+  const [showAuxRoom, setShowAuxRoom] = useState<boolean>(() => {
+    if (programa?.sala_auxiliar_habilitada !== undefined) {
+      return Boolean(programa.sala_auxiliar_habilitada);
+    }
+    return Boolean(
+      programa?.partes.some(
+        (p) =>
+          p.es_clase_auxiliar &&
+          (p.tipo === 'conductor_auxiliar'
+            ? Boolean(p.asignado_nid)
+            : Boolean(p.asignado_nid || p.asignado_nombre))
+      )
+    );
+  });
   const [activeRoom, setActiveRoom] = useState<'principal' | 'auxiliar'>('principal');
   const [guardando, setGuardando] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -483,19 +274,37 @@ export default function ClmScheduleView({
   const [isWeeklyConflictsModalOpen, setIsWeeklyConflictsModalOpen] = useState(false);
   const [isMonthlyBillboardModalOpen, setIsMonthlyBillboardModalOpen] = useState(false);
   const [isAuxCounselorModalOpen, setIsAuxCounselorModalOpen] = useState(false);
+  const [isConfirmClearClmOpen, setIsConfirmClearClmOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const semanaFechaStr = useMemo(() => getMonday(semanaActual), [semanaActual]);
 
   const auxCounselorPart = useMemo(() => {
     return programa?.partes.find((p) => p.tipo === 'conductor_auxiliar');
   }, [programa]);
 
+  // Sincronizar showAuxRoom respetando la preferencia del usuario o si el programa tiene sala auxiliar habilitada
   useEffect(() => {
-    if (programa?.partes.some((p) => p.es_clase_auxiliar && (p.asignado_nid || p.tipo === 'conductor_auxiliar'))) {
-      setShowAuxRoom(true);
+    if (!programa) return;
+    if (programa.sala_auxiliar_habilitada !== undefined) {
+      setShowAuxRoom(programa.sala_auxiliar_habilitada);
+      if (!programa.sala_auxiliar_habilitada) {
+        setActiveRoom('principal');
+      }
+    } else {
+      const hasAux = Boolean(
+        programa.partes.some(
+          (p) =>
+            p.es_clase_auxiliar &&
+            (p.tipo === 'conductor_auxiliar'
+              ? Boolean(p.asignado_nid)
+              : Boolean(p.asignado_nid || p.asignado_nombre))
+        )
+      );
+      setShowAuxRoom(hasAux);
+      if (!hasAux) {
+        setActiveRoom('principal');
+      }
     }
-  }, [programa]);
+  }, [programa?.id, programa?.semana_fecha, programa?.sala_auxiliar_habilitada]);
 
   const [notifiedPartIds, setNotifiedPartIds] = useState<Record<string, boolean>>(() => {
     try {
@@ -693,7 +502,7 @@ export default function ClmScheduleView({
     async function loadData() {
       // 1. Probar desde context / Firestore (siempre el estado más actualizado y compartido)
       const fromContext = getClmPrograma(semanaFechaStr);
-      if (fromContext && !isCancelled) {
+      if (fromContext && fromContext.partes && fromContext.partes.length > 0 && !isCancelled) {
         setPrograma(fromContext);
         return;
       }
@@ -702,7 +511,7 @@ export default function ClmScheduleView({
       if (window.electronAPI && typeof window.electronAPI.getClmPrograma === 'function') {
         try {
           const res = await window.electronAPI.getClmPrograma(semanaFechaStr);
-          if (res && !isCancelled) {
+          if (res && res.partes && res.partes.length > 0 && !isCancelled) {
             setPrograma(res);
             return;
           }
@@ -716,7 +525,7 @@ export default function ClmScheduleView({
       if (localStored) {
         try {
           const parsed = JSON.parse(localStored);
-          if (parsed && !isCancelled) {
+          if (parsed && parsed.partes && parsed.partes.length > 0 && !isCancelled) {
             setPrograma(parsed);
             return;
           }
@@ -725,9 +534,10 @@ export default function ClmScheduleView({
         }
       }
 
-      // 4. Fallback con Organized
+      // 4. Fallback con Organized y WeekSchedule de la congregación
       if (!isCancelled) {
-        setPrograma(createDefaultPrograma(semanaFechaStr, congregationId));
+        const correspondingWeek = weeks.find((w) => w.weekStartDate === semanaFechaStr);
+        setPrograma(createDefaultPrograma(semanaFechaStr, congregationId, correspondingWeek, publishers));
       }
     }
 
@@ -735,11 +545,11 @@ export default function ClmScheduleView({
     return () => {
       isCancelled = true;
     };
-  }, [semanaFechaStr, congregationId, clmProgramas]);
+  }, [semanaFechaStr, congregationId, clmProgramas, weeks, publishers]);
 
   // Auto-guardado debounce con sincronización bidireccional a Firestore
   useEffect(() => {
-    if (!programa) return;
+    if (!programa || !programa.partes || programa.partes.length === 0) return;
     setGuardando(true);
     const timer = setTimeout(async () => {
       try {
@@ -921,8 +731,60 @@ export default function ClmScheduleView({
       }
       return p;
     });
-    setPrograma({ ...programa, partes: updated });
+
+    const willHaveAux = updated.some(
+      (p) => p.es_clase_auxiliar && (p.tipo === 'conductor_auxiliar' ? Boolean(p.asignado_nid) : true)
+    );
+    if (willHaveAux && !showAuxRoom) {
+      setShowAuxRoom(true);
+    }
+
+    const updatedProg: ClmPrograma = {
+      ...programa,
+      sala_auxiliar_habilitada: willHaveAux ? true : programa.sala_auxiliar_habilitada,
+      partes: updated,
+    };
+
+    setPrograma(updatedProg);
+    try {
+      localStorage.setItem(`clm_programa_${semanaFechaStr}`, JSON.stringify(updatedProg));
+    } catch {}
+    updateClmPrograma(updatedProg);
     showToast('Asignación transferida de sala correctamente.');
+  };
+
+  // Alternar activación de la Sala Auxiliar para esta semana
+  const handleToggleAuxRoom = (enabled: boolean) => {
+    setShowAuxRoom(enabled);
+    if (!enabled) {
+      setActiveRoom('principal');
+    }
+    if (!programa) return;
+
+    let updatedPartes = (programa.partes || []).map((p) => {
+      // Si se desactiva la sala auxiliar, devolver cualquier asignación de estudiante al Auditorio Principal
+      if (!enabled && p.es_clase_auxiliar && p.tipo !== 'conductor_auxiliar') {
+        return {
+          ...p,
+          es_clase_auxiliar: false,
+          titulo: p.titulo.replace(' (Sala auxiliar)', '').trim(),
+        };
+      }
+      return p;
+    });
+
+    const updatedProg: ClmPrograma = {
+      ...programa,
+      sala_auxiliar_habilitada: enabled,
+      partes: updatedPartes,
+    };
+
+    setPrograma(updatedProg);
+    try {
+      localStorage.setItem(`clm_programa_${semanaFechaStr}`, JSON.stringify(updatedProg));
+    } catch {}
+    updateClmPrograma(updatedProg);
+    showToast(enabled ? 'Sala Auxiliar activada para esta semana.' : 'Sala Auxiliar desactivada correctamente.');
   };
 
   // Guardar manualmente en Firestore
@@ -983,6 +845,41 @@ export default function ClmScheduleView({
     showToast('Asignaciones completadas con rotación inteligente.');
   };
 
+  // Quitar rápidamente a todos los publicadores asignados de esta reunión
+  const handleQuickClearAllAssignments = () => {
+    if (!programa) return;
+    const hasAnyAssigned = (programa.partes || []).some(
+      (p) => p.asignado_nid || p.asignado_nombre || p.asignado_auxiliar_nid || p.asignado_auxiliar_nombre
+    );
+    if (!hasAnyAssigned) {
+      showToast('No hay participantes asignados en esta reunión.');
+      return;
+    }
+    setIsConfirmClearClmOpen(true);
+  };
+
+  const handleConfirmClearClm = () => {
+    if (!programa) return;
+    setIsConfirmClearClmOpen(false);
+
+    const cleared: ClmPrograma = {
+      ...programa,
+      partes: (programa.partes || []).map((p) => ({
+        ...p,
+        asignado_nid: null,
+        asignado_nombre: '',
+        asignado_auxiliar_nid: null,
+        asignado_auxiliar_nombre: '',
+      })),
+    };
+    setPrograma(cleared);
+    try {
+      localStorage.setItem(`clm_programa_${semanaFechaStr}`, JSON.stringify(cleared));
+    } catch {}
+    updateClmPrograma(cleared);
+    showToast('Se quitaron todos los asignados de esta reunión.');
+  };
+
   // Sincronizar catálogo oficial
   const handleSyncOrganized = () => {
     if (!programa) return;
@@ -1013,22 +910,39 @@ export default function ClmScheduleView({
     const nextDate = new Date(semanaActual);
     nextDate.setDate(nextDate.getDate() - 7);
     setSemanaActual(nextDate);
+    onWeekChange?.(getMonday(nextDate));
   };
 
   const handleNextWeek = () => {
     const nextDate = new Date(semanaActual);
     nextDate.setDate(nextDate.getDate() + 7);
     setSemanaActual(nextDate);
+    onWeekChange?.(getMonday(nextDate));
   };
+
+  // Garantizar que siempre exista un programa con partes completas (evita pantalla vacía)
+  const effectivePrograma = useMemo(() => {
+    if (programa && programa.partes && programa.partes.length > 0 && programa.semana_fecha === semanaFechaStr) {
+      return programa;
+    }
+    const fromCtx = getClmPrograma(semanaFechaStr);
+    if (fromCtx && fromCtx.partes && fromCtx.partes.length > 0) return fromCtx;
+    const correspondingWeek = weeks.find((w) => w.weekStartDate === semanaFechaStr);
+    return createDefaultPrograma(semanaFechaStr, congregationId, correspondingWeek, publishers);
+  }, [programa, semanaFechaStr, clmProgramas, weeks, publishers, congregationId]);
+
+  // Sala activa efectiva (si sala auxiliar está desactivada, siempre es Auditorio)
+  const currentRoom = showAuxRoom ? activeRoom : 'principal';
 
   // Filtrado según sala seleccionada
   const visiblePartes = useMemo(() => {
-    if (!programa) return [];
-    if (activeRoom === 'auxiliar') {
-      return programa.partes.filter((p) => p.es_clase_auxiliar);
+    const prog = effectivePrograma;
+    if (!prog || !prog.partes) return [];
+    if (currentRoom === 'auxiliar') {
+      return prog.partes.filter((p) => p.es_clase_auxiliar);
     }
-    return programa.partes.filter((p) => !p.es_clase_auxiliar);
-  }, [programa, activeRoom]);
+    return prog.partes.filter((p) => !p.es_clase_auxiliar);
+  }, [effectivePrograma, currentRoom]);
 
   // Agrupación visual por secciones
   const groupedSections = useMemo(() => {
@@ -1131,9 +1045,23 @@ export default function ClmScheduleView({
               )}
 
               {part.asignado_auxiliar_nombre && (
-                <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium mt-0.5">
-                  Ayudante: <strong>{part.asignado_auxiliar_nombre}</strong>
-                </p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">
+                    Ayudante: <strong>{part.asignado_auxiliar_nombre}</strong>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAssignInline(part.id, '', 'assistant');
+                    }}
+                    className="p-0.5 rounded-md text-rose-500 hover:text-white hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer"
+                    title={`Quitar a ${part.asignado_auxiliar_nombre} como ayudante`}
+                    aria-label="Quitar ayudante"
+                  >
+                    <X size={11} />
+                  </button>
+                </div>
               )}
 
               {/* Distintivo de Consejero de la Sala Auxiliar */}
@@ -1242,6 +1170,47 @@ export default function ClmScheduleView({
                   <span>{part.asignado_nombre}</span>
                 </button>
 
+                {/* Botón Rápido Quitar Titular */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAssignInline(part.id, '', 'main');
+                  }}
+                  className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                  title={`Quitar a ${part.asignado_nombre} (dejar libre)`}
+                  aria-label="Quitar asignado"
+                >
+                  <X size={13} />
+                </button>
+
+                {/* Asignado Ayudante si aplica */}
+                {part.asignado_auxiliar_nombre && (
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
+                      className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 hover:bg-indigo-100/90 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                      title="Cambiar ayudante"
+                    >
+                      <span className="text-[10px] text-indigo-500 font-bold">Ayudante:</span>
+                      <span>{part.asignado_auxiliar_nombre}</span>
+                    </button>
+                    {/* Botón Rápido Quitar Ayudante */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAssignInline(part.id, '', 'assistant');
+                      }}
+                      className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                      title={`Quitar ayudante a ${part.asignado_auxiliar_nombre} (dejar libre)`}
+                      aria-label="Quitar ayudante"
+                    >
+                      <X size={13} />
+                    </button>
+                  </div>
+                )}
+
                 {/* Botón Ficha S-38 Estudiante */}
                 {isStudentPart && studentPub && (
                   <button
@@ -1317,9 +1286,21 @@ export default function ClmScheduleView({
         {isExpanded && !isSong && (
           <div className="bg-slate-50/80 dark:bg-slate-900/60 p-4 border-t border-slate-100 dark:border-white/[0.04] grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
             <div>
-              <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                Hermano Asignado (Titular)
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[10px] font-bold text-slate-500 uppercase">
+                  Hermano Asignado (Titular)
+                </label>
+                {part.asignado_nid && (
+                  <button
+                    type="button"
+                    onClick={() => handleAssignInline(part.id, '', 'main')}
+                    className="text-[10px] font-bold text-rose-600 hover:text-rose-700 hover:underline flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <X size={11} />
+                    <span>Dejar sin asignar</span>
+                  </button>
+                )}
+              </div>
               <Select
                 value={part.asignado_nid || ''}
                 onChange={(val) => handleAssignInline(part.id, val, 'main')}
@@ -1350,9 +1331,21 @@ export default function ClmScheduleView({
 
             {part.seccion === 'maestros' && part.tipo !== 'discurso_estudiante' && (
               <div>
-                <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
-                  Ayudante (Demostración)
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[10px] font-bold text-slate-500 uppercase">
+                    Ayudante (Demostración)
+                  </label>
+                  {part.asignado_auxiliar_nid && (
+                    <button
+                      type="button"
+                      onClick={() => handleAssignInline(part.id, '', 'assistant')}
+                      className="text-[10px] font-bold text-rose-600 hover:text-rose-700 hover:underline flex items-center gap-0.5 cursor-pointer"
+                    >
+                      <X size={11} />
+                      <span>Quitar ayudante</span>
+                    </button>
+                  )}
+                </div>
                 <Select
                   value={part.asignado_auxiliar_nid || ''}
                   onChange={(val) => handleAssignInline(part.id, val, 'assistant')}
@@ -1527,298 +1520,421 @@ export default function ClmScheduleView({
         </div>
       )}
 
-      {/* ── BARRA SUPERIOR DE ACCIONES ── */}
-      <div className="px-6 py-3.5 border-b border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-slate-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        {/* Título: Programa VMC */}
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-            <CalendarDays className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight flex items-center gap-1.5">
-              Programa <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">VMC</span>
-            </h1>
-            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
-              Vida y Ministerio Cristianos
-            </p>
-          </div>
-        </div>
+      {/* ── BARRA SUPERIOR DE ACCIONES (SOLO CUANDO NO ESTÁ EMBEBIDO EN LA BARRA UNIFICADA) ── */}
+      {!hideHeaderToolbar ? (
+        <>
+          <div className="px-6 py-3.5 border-b border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-slate-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* Título: Programa VMC */}
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                <CalendarDays className="w-5 h-5" />
+              </div>
+              <div>
+                <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight flex items-center gap-1.5">
+                  Programa <span className="text-indigo-600 dark:text-indigo-400 font-extrabold">VMC</span>
+                </h1>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                  Vida y Ministerio Cristianos
+                </p>
+              </div>
+            </div>
 
-        {/* Botones de acción derecha */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Sincronizar */}
-          <button
-            onClick={handleSyncOrganized}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-            title="Sincronizar catálogo oficial con Organized"
-          >
-            <RefreshCw size={13} className="shrink-0" />
-            <span>Sincronizar</span>
-          </button>
-
-          {/* Importar .jwpub */}
-          <label className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs">
-            <FileUp size={13} className="shrink-0" />
-            <span>Importar .jwpub</span>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".jwpub,.json,.epub"
-              className="hidden"
-              onChange={handleImportFile}
-            />
-          </label>
-
-          {/* Auto-Asignar */}
-          <button
-            onClick={handleAutoAssign}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
-            title="Auto-asignar respetando rotación histórica y privilegios"
-          >
-            <Sparkles size={13} className="shrink-0" />
-            <span>Auto-Asignar</span>
-          </button>
-
-          {/* Cartelera Mensual Salón del Reino */}
-          <button
-            type="button"
-            onClick={() => setIsMonthlyBillboardModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-            title="Abrir programa mensual apaisado para la cartelera de anuncios del Salón del Reino"
-          >
-            <CalendarDays size={13} className="shrink-0" />
-            <span>Cartelera Mensual</span>
-          </button>
-
-          {/* WhatsApp VMC Notificador */}
-          <button
-            onClick={() => setIsWhatsAppModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
-            title="Centro de envíos de asignaciones y recordatorios por WhatsApp"
-          >
-            <MessageCircle size={13} className="shrink-0" />
-            <span>WhatsApp VMC</span>
-          </button>
-
-          {/* Indicador de Estado de Sincronización en la Nube */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-slate-600 dark:text-slate-300">
-            {syncStatus === 'saving' || guardando ? (
-              <>
-                <RefreshCw size={13} className="animate-spin text-indigo-500" />
-                <span className="hidden sm:inline">Guardando en nube...</span>
-              </>
-            ) : syncStatus === 'synced' ? (
-              <>
-                <CloudCheck size={14} className="text-emerald-500" />
-                <span className="hidden sm:inline">Nube al día</span>
-              </>
-            ) : syncStatus === 'error' ? (
-              <>
-                <AlertTriangle size={14} className="text-rose-500" />
-                <span className="hidden sm:inline">Error de sync</span>
-              </>
-            ) : (
-              <>
-                <WifiOff size={14} className="text-amber-500" />
-                <span className="hidden sm:inline">Modo local</span>
-              </>
-            )}
-          </div>
-
-          {/* Guardar */}
-          <button
-            onClick={() => handleGuardar(programa)}
-            disabled={guardando}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 dark:bg-white/10 dark:text-zinc-200 dark:border-white/10 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-            title="Guardar y sincronizar con Firestore inmediatamente"
-          >
-            <Save size={13} className="shrink-0" />
-            <span>{guardando ? 'Guardando...' : 'Guardar'}</span>
-          </button>
-
-          {/* Imprimir S-89 */}
-          <button
-            onClick={handleGenerateS89}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-            title="Imprimir hojas oficiales de asignación S-89 en PDF"
-          >
-            <FileText size={13} className="shrink-0" />
-            <span>Imprimir S-89</span>
-          </button>
-
-          {/* Fichas S-38 / Folleto Maestros */}
-          <button
-            type="button"
-            onClick={() => {
-              const studentInProg = programa?.partes.find(
-                (p) => (p.seccion === 'maestros' || p.tipo === 'lectura_biblica') && p.asignado_nid
-              );
-              const pub = studentInProg
-                ? publishers.find((p) => (p.nid || p.id) === studentInProg.asignado_nid)
-                : publishers[0];
-              if (pub) setSelectedStudentForModal(pub);
-              else showToast('No hay estudiantes disponibles.');
-            }}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-            title="Ver registros oficiales S-38 y control de lecciones del folleto de oratoria"
-          >
-            <Award size={13} className="shrink-0" />
-            <span>Fichas S-38</span>
-          </button>
-
-          {/* Consejero Sala Auxiliar */}
-          <button
-            type="button"
-            onClick={() => {
-              setShowAuxRoom(true);
-              setIsAuxCounselorModalOpen(true);
-            }}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-            title="Gestionar el Consejero y asignaciones de la Sala Auxiliar"
-          >
-            <UserCheck size={13} className="shrink-0" />
-            <span>
-              {auxCounselorPart?.asignado_nombre
-                ? `Consejero: ${auxCounselorPart.asignado_nombre.split(' ')[0]}`
-                : 'Consejero Auxiliar'}
-            </span>
-          </button>
-
-          {/* Botón Centro de Conflictos de la Semana */}
-          <button
-            type="button"
-            onClick={() => setIsWeeklyConflictsModalOpen(true)}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-2xs border ${
-              currentWeekConflictStats.strict > 0
-                ? 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 animate-pulse'
-                : currentWeekConflictStats.warning > 0
-                ? 'bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800'
-                : 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
-            }`}
-            title="Ver auditoría de cruces, ausencias y saturaciones de esta semana"
-          >
-            {currentWeekConflictStats.strict > 0 ? (
-              <AlertTriangle size={13} className="text-rose-600" />
-            ) : currentWeekConflictStats.warning > 0 ? (
-              <AlertTriangle size={13} className="text-amber-600" />
-            ) : (
-              <ShieldCheck size={13} className="text-emerald-600" />
-            )}
-            <span>
-              {currentWeekConflictStats.strict > 0
-                ? `${currentWeekConflictStats.strict} Cruces`
-                : currentWeekConflictStats.warning > 0
-                ? `${currentWeekConflictStats.warning} Saturación`
-                : 'Sin Cruces'}
-            </span>
-          </button>
-        </div>
-      </div>
-
-      {/* ── BARRA DE NAVEGACIÓN Y SELECTOR DE FECHAS ── */}
-      <div className="px-6 py-3.5 bg-slate-50/70 dark:bg-slate-900/40 border-b border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between gap-4 flex-wrap">
-        {/* Cápsula de navegación semanal */}
-        <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-full px-3 py-1.5 shadow-xs gap-3">
-          <button
-            onClick={handlePrevWeek}
-            className="p-1 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-            title="Semana anterior"
-          >
-            <ChevronLeft size={16} />
-          </button>
-
-          <div className="flex items-center gap-2.5 text-xs">
-            <span className="font-bold text-slate-900 dark:text-white">
-              {programa?.rango_semana || `Semana del ${semanaFechaStr}`}
-            </span>
-            <span className="text-slate-300 dark:text-slate-600">|</span>
-            <span className="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-              {programa?.lectura_semana || 'JEREMÍAS 40, 41'}
-            </span>
-            <span className="text-slate-400 dark:text-slate-500 font-medium">
-              Semana {programa?.semana_num || '41'}
-            </span>
-          </div>
-
-          <button
-            onClick={handleNextWeek}
-            className="p-1 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-            title="Semana siguiente"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
-
-        {/* Checkbox de Sala Auxiliar */}
-        <label className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-zinc-200 shadow-2xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors select-none">
-          <input
-            type="checkbox"
-            checked={showAuxRoom}
-            onChange={(e) => {
-              setShowAuxRoom(e.target.checked);
-              if (!e.target.checked) setActiveRoom('principal');
-            }}
-            className="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 border-slate-300"
-          />
-          <span>Sala Auxiliar</span>
-        </label>
-      </div>
-
-      {/* ── SELECTOR DE SALA (AUDITORIO / SALA AUXILIAR) ── */}
-      <div className="px-6 pt-3.5 pb-2 flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setActiveRoom('principal')}
-            className={`flex items-center gap-2 text-xs font-bold transition-colors cursor-pointer ${
-              activeRoom === 'principal'
-                ? 'text-slate-800 dark:text-white'
-                : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-            }`}
-          >
-            <span className="w-2 h-2 rounded-full bg-indigo-600 inline-block" />
-            <span>Auditorio</span>
-          </button>
-
-          {showAuxRoom && (
-            <>
-              <span className="text-slate-300 dark:text-slate-700">/</span>
+            {/* Botones de acción derecha */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Sincronizar */}
               <button
-                onClick={() => setActiveRoom('auxiliar')}
+                onClick={handleSyncOrganized}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                title="Sincronizar catálogo oficial con Organized"
+              >
+                <RefreshCw size={13} className="shrink-0" />
+                <span>Sincronizar</span>
+              </button>
+
+              {/* Importar .jwpub */}
+              <label className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs">
+                <FileUp size={13} className="shrink-0" />
+                <span>Importar .jwpub</span>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".jwpub,.json,.epub"
+                  className="hidden"
+                  onChange={handleImportFile}
+                />
+              </label>
+
+              {/* Auto-Asignar */}
+              <button
+                onClick={handleAutoAssign}
+                className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
+                title="Auto-asignar respetando rotación histórica y privilegios"
+              >
+                <Sparkles size={13} className="shrink-0" />
+                <span>Auto-Asignar</span>
+              </button>
+
+              {/* Quitar Asignados */}
+              <button
+                type="button"
+                onClick={handleQuickClearAllAssignments}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                title="Quitar a todas las personas asignadas de esta reunión"
+              >
+                <UserMinus size={13} className="shrink-0 text-rose-600 dark:text-rose-400" />
+                <span>Quitar Asignados</span>
+              </button>
+
+              {/* Cartelera Mensual Salón del Reino */}
+              <button
+                type="button"
+                onClick={() => setIsMonthlyBillboardModalOpen(true)}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                title="Abrir programa mensual apaisado para la cartelera de anuncios del Salón del Reino"
+              >
+                <CalendarDays size={13} className="shrink-0" />
+                <span>Cartelera Mensual</span>
+              </button>
+
+              {/* WhatsApp VMC Notificador */}
+              <button
+                onClick={() => setIsWhatsAppModalOpen(true)}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
+                title="Centro de envíos de asignaciones y recordatorios por WhatsApp"
+              >
+                <MessageCircle size={13} className="shrink-0" />
+                <span>WhatsApp VMC</span>
+              </button>
+
+              {/* Indicador de Estado de Sincronización en la Nube */}
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-slate-600 dark:text-slate-300">
+                {syncStatus === 'saving' || guardando ? (
+                  <>
+                    <RefreshCw size={13} className="animate-spin text-indigo-500" />
+                    <span className="hidden sm:inline">Guardando en nube...</span>
+                  </>
+                ) : syncStatus === 'synced' ? (
+                  <>
+                    <CloudCheck size={14} className="text-emerald-500" />
+                    <span className="hidden sm:inline">Nube al día</span>
+                  </>
+                ) : syncStatus === 'error' ? (
+                  <>
+                    <AlertTriangle size={14} className="text-rose-500" />
+                    <span className="hidden sm:inline">Error de sync</span>
+                  </>
+                ) : (
+                  <>
+                    <WifiOff size={14} className="text-amber-500" />
+                    <span className="hidden sm:inline">Modo local seguro</span>
+                  </>
+                )}
+              </div>
+
+              {/* Guardar */}
+              <button
+                onClick={() => handleGuardar(programa)}
+                disabled={guardando}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 dark:bg-white/10 dark:text-zinc-200 dark:border-white/10 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                title="Guardar y sincronizar con Firestore inmediatamente"
+              >
+                <Save size={13} className="shrink-0" />
+                <span>{guardando ? 'Guardando...' : 'Guardar'}</span>
+              </button>
+
+              {/* Imprimir S-89 */}
+              <button
+                onClick={handleGenerateS89}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                title="Imprimir hojas oficiales de asignación S-89 en PDF"
+              >
+                <FileText size={13} className="shrink-0" />
+                <span>Imprimir S-89</span>
+              </button>
+
+              {/* Fichas S-38 / Folleto Maestros */}
+              <button
+                type="button"
+                onClick={() => {
+                  const studentInProg = programa?.partes.find(
+                    (p) => (p.seccion === 'maestros' || p.tipo === 'lectura_biblica') && p.asignado_nid
+                  );
+                  const pub = studentInProg
+                    ? publishers.find((p) => (p.nid || p.id) === studentInProg.asignado_nid)
+                    : publishers[0];
+                  if (pub) setSelectedStudentForModal(pub);
+                  else showToast('No hay estudiantes disponibles.');
+                }}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                title="Ver registros oficiales S-38 y control de lecciones del folleto de oratoria"
+              >
+                <Award size={13} className="shrink-0" />
+                <span>Fichas S-38</span>
+              </button>
+
+              {/* Consejero Sala Auxiliar */}
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAuxRoom(true);
+                  setIsAuxCounselorModalOpen(true);
+                }}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+                title="Gestionar el Consejero y asignaciones de la Sala Auxiliar"
+              >
+                <UserCheck size={13} className="shrink-0" />
+                <span>
+                  {auxCounselorPart?.asignado_nombre
+                    ? `Consejero: ${auxCounselorPart.asignado_nombre.split(' ')[0]}`
+                    : 'Consejero Auxiliar'}
+                </span>
+              </button>
+
+              {/* Botón Centro de Conflictos de la Semana */}
+              <button
+                type="button"
+                onClick={() => setIsWeeklyConflictsModalOpen(true)}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shadow-2xs border ${
+                  currentWeekConflictStats.strict > 0
+                    ? 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 animate-pulse'
+                    : currentWeekConflictStats.warning > 0
+                    ? 'bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800'
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800'
+                }`}
+                title="Ver auditoría de cruces, ausencias y saturaciones de esta semana"
+              >
+                {currentWeekConflictStats.strict > 0 ? (
+                  <AlertTriangle size={13} className="text-rose-600" />
+                ) : currentWeekConflictStats.warning > 0 ? (
+                  <AlertTriangle size={13} className="text-amber-600" />
+                ) : (
+                  <ShieldCheck size={13} className="text-emerald-600" />
+                )}
+                <span>
+                  {currentWeekConflictStats.strict > 0
+                    ? `${currentWeekConflictStats.strict} Cruces`
+                    : currentWeekConflictStats.warning > 0
+                    ? `${currentWeekConflictStats.warning} Saturación`
+                    : 'Sin Cruces'}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* ── BARRA DE NAVEGACIÓN Y SELECTOR DE FECHAS STANDALONE ── */}
+          <div className="px-6 py-3.5 bg-slate-50/70 dark:bg-slate-900/40 border-b border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between gap-4 flex-wrap">
+            {/* Cápsula de navegación semanal */}
+            <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-full px-3 py-1.5 shadow-xs gap-3">
+              <button
+                onClick={handlePrevWeek}
+                className="p-1 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                title="Semana anterior"
+              >
+                <ChevronLeft size={16} />
+              </button>
+
+              <div className="flex items-center gap-2.5 text-xs">
+                <span className="font-bold text-slate-900 dark:text-white">
+                  {programa?.rango_semana || `Semana del ${semanaFechaStr}`}
+                </span>
+                <span className="text-slate-300 dark:text-slate-600">|</span>
+                <span className="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                  {programa?.lectura_semana || 'JEREMÍAS 40, 41'}
+                </span>
+                <span className="text-slate-400 dark:text-slate-500 font-medium">
+                  Semana {programa?.semana_num || '41'}
+                </span>
+              </div>
+
+              <button
+                onClick={handleNextWeek}
+                className="p-1 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                title="Semana siguiente"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+
+            {/* Checkbox de Sala Auxiliar */}
+            <label className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-zinc-200 shadow-2xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors select-none">
+              <input
+                type="checkbox"
+                checked={showAuxRoom}
+                onChange={(e) => handleToggleAuxRoom(e.target.checked)}
+                className="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 border-slate-300 cursor-pointer"
+              />
+              <span>Sala Auxiliar</span>
+            </label>
+          </div>
+
+          {/* Selector de sala standalone */}
+          <div className="px-6 pt-3.5 pb-2 flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setActiveRoom('principal')}
                 className={`flex items-center gap-2 text-xs font-bold transition-colors cursor-pointer ${
-                  activeRoom === 'auxiliar'
-                    ? 'text-amber-700 dark:text-amber-400'
+                  activeRoom === 'principal'
+                    ? 'text-slate-800 dark:text-white'
                     : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
                 }`}
               >
-                <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
-                <span>Sala Auxiliar</span>
+                <span className="w-2 h-2 rounded-full bg-indigo-600 inline-block" />
+                <span>Auditorio</span>
               </button>
-            </>
-          )}
-        </div>
 
-        {showAuxRoom && (
-          <button
-            type="button"
-            onClick={() => setIsAuxCounselorModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 transition-all cursor-pointer shadow-2xs"
-            title="Abrir panel de control del Consejero de la Sala Auxiliar"
-          >
-            <UserCheck size={13} className="shrink-0" />
-            <span>
-              Consejero:{' '}
-              <strong className="font-bold">
-                {auxCounselorPart?.asignado_nombre
-                  ? auxCounselorPart.asignado_nombre.split(' ')[0]
-                  : 'Sin asignar'}
-              </strong>
-            </span>
-          </button>
-        )}
-      </div>
+              {showAuxRoom && (
+                <>
+                  <span className="text-slate-300 dark:text-slate-700">/</span>
+                  <button
+                    onClick={() => setActiveRoom('auxiliar')}
+                    className={`flex items-center gap-2 text-xs font-bold transition-colors cursor-pointer ${
+                      activeRoom === 'auxiliar'
+                        ? 'text-amber-700 dark:text-amber-400'
+                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                    }`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+                    <span>Sala Auxiliar</span>
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </>
+      ) : (
+        /* ── ENCABEZADO VMC LIMPIO Y SELECTOR DE SALAS (MODO EMBEBIDO / UNIFICADO) ── */
+        <div className="px-5 py-3.5 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+              <CalendarDays className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                  Reunión de Entre Semana (VMC)
+                </h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
+                  {effectivePrograma?.lectura_semana || 'JEREMÍAS 40, 41'}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                Vida y Ministerio Cristianos • Semana {effectivePrograma?.semana_num || '41'}
+              </p>
+            </div>
+          </div>
+
+          {/* Controles de Sala (Auditorio / Sala Auxiliar) */}
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+            {/* Selector Auditorio / Sala Auxiliar */}
+            <div className="flex items-center gap-1 bg-white dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-bold shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setActiveRoom('principal')}
+                className={`px-3 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeRoom === 'principal'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-300 inline-block" />
+                <span>Auditorio</span>
+              </button>
+
+              {showAuxRoom && (
+                <button
+                  type="button"
+                  onClick={() => setActiveRoom('auxiliar')}
+                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    activeRoom === 'auxiliar'
+                      ? 'bg-amber-500 text-white shadow-xs'
+                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-300 inline-block" />
+                  <span>Sala Auxiliar</span>
+                </button>
+              )}
+            </div>
+
+            {/* Botón Consejero de Sala Auxiliar */}
+            {showAuxRoom && (
+              <button
+                type="button"
+                onClick={() => setIsAuxCounselorModalOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 transition-all cursor-pointer shadow-2xs"
+                title="Abrir panel de control del Consejero de la Sala Auxiliar"
+              >
+                <UserCheck size={13} className="shrink-0" />
+                <span>
+                  Consejero:{' '}
+                  <strong className="font-bold">
+                    {auxCounselorPart?.asignado_nombre
+                      ? auxCounselorPart.asignado_nombre.split(' ')[0]
+                      : 'Sin asignar'}
+                  </strong>
+                </span>
+              </button>
+            )}
+
+            {/* Checkbox de Sala Auxiliar */}
+            <label className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-zinc-200 shadow-2xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors select-none">
+              <input
+                type="checkbox"
+                checked={showAuxRoom}
+                onChange={(e) => handleToggleAuxRoom(e.target.checked)}
+                className="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 border-slate-300 cursor-pointer"
+              />
+              <span>Sala Auxiliar</span>
+            </label>
+
+            {/* Botón Quitar Asignados */}
+            <button
+              type="button"
+              onClick={handleQuickClearAllAssignments}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+              title="Quitar a todos los publicadores asignados en esta reunión de entre semana"
+            >
+              <UserMinus size={13} className="shrink-0 text-rose-600 dark:text-rose-400" />
+              <span>Quitar Asignados</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── LISTADO OFICIAL DE LA REUNIÓN ── */}
       <div className="flex-1 overflow-y-auto pb-16">
+        {/* Barra compacta cuando se incluye en ScheduleTab */}
+        {hideHeaderToolbar && (
+          <div className="px-5 py-2.5 bg-slate-50/90 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-white/5 flex flex-wrap items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-xs font-bold text-slate-800 dark:text-zinc-200">
+                Programa Vida y Ministerio Cristianos (VMC)
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleAutoAssign}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                title="Auto-asignar todas las partes de entre semana"
+              >
+                <Sparkles size={12} className="shrink-0 text-indigo-600 dark:text-indigo-400" />
+                <span>Autoasignar VMC</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleQuickClearAllAssignments}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                title="Quitar a todos los publicadores asignados en esta reunión de entre semana"
+              >
+                <UserMinus size={12} className="shrink-0 text-rose-600 dark:text-rose-400" />
+                <span>Quitar Asignados VMC</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Banner de la Sala Auxiliar cuando está activa */}
         {activeRoom === 'auxiliar' && (
           <div className="mx-6 mt-3 mb-4 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-200/80 dark:border-amber-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
@@ -1875,6 +1991,34 @@ export default function ClmScheduleView({
               >
                 <FileText size={13} />
                 <span>Hoja PDF</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Mensaje de guía si la Sala Auxiliar no tiene estudiantes asignados */}
+        {activeRoom === 'auxiliar' && visiblePartes.filter((p) => p.seccion === 'maestros' || p.tipo === 'lectura_biblica').length === 0 && (
+          <div className="mx-6 mb-5 p-5 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 text-center">
+            <h4 className="text-xs sm:text-sm font-bold text-amber-900 dark:text-amber-200">
+              No hay estudiantes programados en la Sala Auxiliar
+            </h4>
+            <p className="text-[11px] sm:text-xs text-amber-800/80 dark:text-amber-300/80 mt-1 max-w-md mx-auto">
+              Todo el programa regular se muestra en el Auditorio Principal. Puedes transferir intervenciones a esta sala desde el Auditorio o desactivar la Sala Auxiliar si tu congregación no la utilizará esta semana.
+            </p>
+            <div className="mt-3.5 flex items-center justify-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setActiveRoom('principal')}
+                className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+              >
+                Volver al Auditorio Principal
+              </button>
+              <button
+                type="button"
+                onClick={() => handleToggleAuxRoom(false)}
+                className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200 hover:bg-amber-100/50 text-xs font-semibold transition-all shadow-2xs cursor-pointer"
+              >
+                Desactivar Sala Auxiliar
               </button>
             </div>
           </div>
@@ -2234,6 +2378,55 @@ export default function ClmScheduleView({
           onRepeatLesson={handleRepeatLesson}
           onToast={showToast}
         />
+      )}
+      {/* Modal de Confirmación para Quitar Asignados VMC */}
+      {isConfirmClearClmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-white/10">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 flex items-center justify-center text-rose-600 dark:text-rose-400">
+                  <UserMinus size={18} />
+                </div>
+                <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                  Quitar Asignados de la Reunión
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsConfirmClearClmOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <p className="text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">
+              ¿Deseas quitar a todas las personas asignadas de esta reunión de entre semana?
+            </p>
+            <p className="text-xs text-slate-400 dark:text-zinc-500">
+              Los temas oficiales, canciones, lecturas de la Biblia y configuración de salas se mantendrán intactos. Solo se liberarán los participantes para que puedas reasignar libremente.
+            </p>
+
+            <div className="pt-3 border-t border-slate-100 dark:border-white/10 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setIsConfirmClearClmOpen(false)}
+                className="px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmClearClm}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
+              >
+                <UserMinus size={14} />
+                <span>Sí, Quitar Asignados</span>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

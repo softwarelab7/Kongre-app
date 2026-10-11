@@ -99,7 +99,10 @@ export function getEligibleCandidates(
     if (isAbsent) continue;
 
     // 4. Role enabled check
-    if (!pub.roles || !pub.roles[roleKey]) continue;
+    const hasRole = Boolean(
+      pub.roles && (pub.roles[roleKey] || (roleKey === 'deber_audio' && pub.roles.deber_video))
+    );
+    if (!hasRole) continue;
 
     // 5. Check if already has an assignment in this specific meeting
     const alreadyInMeeting = currentAssignedIdsInMeeting.has(pub.id);

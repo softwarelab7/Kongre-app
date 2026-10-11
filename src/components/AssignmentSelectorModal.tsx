@@ -14,6 +14,7 @@ import {
   Clock,
   BookOpen,
   Award,
+  UserMinus,
 } from 'lucide-react';
 
 interface AssignmentSelectorModalProps {
@@ -153,15 +154,18 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
               className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
             />
           </div>
-          {currentAssignedId && (
+          {onClearAssignment && (
             <button
+              type="button"
               onClick={() => {
                 onClearAssignment();
                 onClose();
               }}
-              className="px-3 py-2 text-xs font-semibold rounded-xl text-rose-600 hover:bg-rose-50 border border-rose-200 transition-colors shrink-0"
+              className="px-3.5 py-2 text-xs font-bold rounded-xl text-rose-600 hover:text-white hover:bg-rose-600 bg-rose-50 border border-rose-200 transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              title="Quitar asignación actual y dejar libre"
             >
-              Dejar Vacío
+              <UserMinus className="w-3.5 h-3.5" />
+              <span>Quitar Asignado</span>
             </button>
           )}
         </div>

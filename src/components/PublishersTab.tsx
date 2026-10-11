@@ -32,6 +32,9 @@ import {
   EyeOff,
   ShieldCheck,
   Users,
+  CheckSquare,
+  Square,
+  UserMinus,
 } from 'lucide-react';
 import { computePublisherAssignmentStats } from '../utils/autoAssigner';
 import { useSecurity } from '../context/SecurityContext';
@@ -45,6 +48,8 @@ export const PublishersTab: React.FC = () => {
     addPublisher,
     updatePublisher,
     deletePublisher,
+    deletePublishersBatch,
+    clearAllPublishers,
     importPublishersFromCSV,
     weeks,
     customDuties,
@@ -69,6 +74,69 @@ export const PublishersTab: React.FC = () => {
   const [isCsvModalOpen, setIsCsvModalOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
+  const [publisherToDelete, setPublisherToDelete] = useState<Publisher | null>(null);
+  const [selectedPubIds, setSelectedPubIds] = useState<string[]>([]);
+  const [isConfirmBatchDeleteOpen, setIsConfirmBatchDeleteOpen] = useState(false);
+  const [isConfirmClearAllOpen, setIsConfirmClearAllOpen] = useState(false);
+  const [actionFeedbackToast, setActionFeedbackToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const handleToggleSelectPub = (id: string) => {
+    setSelectedPubIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  const handleSelectAllFiltered = () => {
+    const allFilteredIds = filteredPublishers.map(p => p.id);
+    const allSelected = allFilteredIds.length > 0 && allFilteredIds.every(id => selectedPubIds.includes(id));
+    if (allSelected) {
+      setSelectedPubIds(prev => prev.filter(id => !allFilteredIds.includes(id)));
+    } else {
+      setSelectedPubIds(prev => Array.from(new Set([...prev, ...allFilteredIds])));
+    }
+  };
+
+  const handleConfirmSingleDelete = async () => {
+    if (!publisherToDelete) return;
+    const name = publisherToDelete.name;
+    const pubId = publisherToDelete.id;
+    setPublisherToDelete(null);
+    try {
+      await deletePublisher(pubId);
+      setSelectedPubIds(prev => prev.filter(id => id !== pubId));
+      setActionFeedbackToast({ message: `Publicador "${name}" eliminado correctamente.`, type: 'success' });
+      setTimeout(() => setActionFeedbackToast(null), 3500);
+    } catch {
+      setActionFeedbackToast({ message: `Error al eliminar "${name}".`, type: 'error' });
+      setTimeout(() => setActionFeedbackToast(null), 3500);
+    }
+  };
+
+  const handleConfirmBatchDelete = async () => {
+    if (selectedPubIds.length === 0) return;
+    const count = selectedPubIds.length;
+    try {
+      await deletePublishersBatch(selectedPubIds);
+      setSelectedPubIds([]);
+      setIsConfirmBatchDeleteOpen(false);
+      setActionFeedbackToast({ message: `Se eliminaron ${count} publicadores correctamente.`, type: 'success' });
+      setTimeout(() => setActionFeedbackToast(null), 3500);
+    } catch {
+      setActionFeedbackToast({ message: `Error al eliminar los publicadores seleccionados.`, type: 'error' });
+      setTimeout(() => setActionFeedbackToast(null), 3500);
+    }
+  };
+
+  const handleConfirmClearAllPublishers = async () => {
+    try {
+      await clearAllPublishers();
+      setIsConfirmClearAllOpen(false);
+      setSelectedPubIds([]);
+      setActionFeedbackToast({ message: 'Se eliminaron todos los publicadores correctamente.', type: 'success' });
+      setTimeout(() => setActionFeedbackToast(null), 3500);
+    } catch {
+      setActionFeedbackToast({ message: 'Error al vaciar los publicadores.', type: 'error' });
+      setTimeout(() => setActionFeedbackToast(null), 3500);
+    }
+  };
 
   // Form state for creating / editing publisher
   const [formName, setFormName] = useState('');
@@ -296,10 +364,8 @@ export const PublishersTab: React.FC = () => {
   const handleBatchGeneratePins = () => {
     const missing = publishers.filter((p) => !p.personalPin);
     if (missing.length === 0) {
-      alert('Todos los publicadores ya cuentan con un PIN personal único asignado.');
-      return;
-    }
-    if (!confirm(`¿Generar un PIN personal único para los ${missing.length} publicadores que aún no tienen PIN?`)) {
+      setPinActionFeedback('Todos los publicadores ya cuentan con un PIN personal único asignado.');
+      setTimeout(() => setPinActionFeedback(null), 3000);
       return;
     }
     const takenPins = publishers.map((p) => p.personalPin?.trim()).filter(Boolean) as string[];
@@ -505,6 +571,24 @@ export const PublishersTab: React.FC = () => {
         </div>
       )}
 
+      {/* Action Feedback Toast */}
+      {actionFeedbackToast && (
+        <div
+          className={`p-3.5 rounded-2xl text-xs font-bold text-center shadow-xs animate-in fade-in flex items-center justify-center gap-2 ${
+            actionFeedbackToast.type === 'success'
+              ? 'bg-emerald-600 text-white'
+              : 'bg-rose-600 text-white'
+          }`}
+        >
+          {actionFeedbackToast.type === 'success' ? (
+            <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+          ) : (
+            <AlertCircle className="w-4 h-4 text-rose-200" />
+          )}
+          <span>{actionFeedbackToast.message}</span>
+        </div>
+      )}
+
       {/* PIN Action Feedback Banner */}
       {pinActionFeedback && (
         <div className="p-3.5 rounded-2xl bg-emerald-600 text-white text-xs font-bold text-center shadow-xs animate-in fade-in flex items-center justify-center gap-2">
@@ -548,6 +632,18 @@ export const PublishersTab: React.FC = () => {
               <Download className="w-4 h-4 text-slate-600 dark:text-slate-400" />
               <span className="hidden sm:inline">Exportar</span>
             </button>
+
+            {publishers.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setIsConfirmClearAllOpen(true)}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs sm:text-sm font-semibold transition-all cursor-pointer"
+                title="Vaciar todos los publicadores"
+              >
+                <Trash2 className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                <span className="hidden sm:inline">Vaciar Lista</span>
+              </button>
+            )}
 
             <button
               onClick={openNewModal}
@@ -661,18 +757,79 @@ export const PublishersTab: React.FC = () => {
         </div>
       </div>
 
+      {/* Batch selection and action bar */}
+      {selectedPubIds.length > 0 ? (
+        <div className="bg-indigo-50/90 dark:bg-indigo-950/60 p-3.5 rounded-2xl border border-indigo-200 dark:border-indigo-800 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs animate-in fade-in">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="w-6 h-6 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">
+                {selectedPubIds.length}
+              </span>
+              <span className="text-xs font-bold text-indigo-950 dark:text-indigo-200">
+                publicador{selectedPubIds.length > 1 ? 'es' : ''} seleccionado{selectedPubIds.length > 1 ? 's' : ''}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleSelectAllFiltered}
+              className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+            >
+              {filteredPublishers.length > 0 && filteredPublishers.every(p => selectedPubIds.includes(p.id))
+                ? 'Deseleccionar todos'
+                : 'Seleccionar todos los visibles'}
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setSelectedPubIds([])}
+              className="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsConfirmBatchDeleteOpen(true)}
+              className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Eliminar seleccionados ({selectedPubIds.length})</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        publishers.length > 0 && (
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 px-1">
+            <span>
+              Mostrando {filteredPublishers.length} de {publishers.length} publicadores
+            </span>
+            <button
+              type="button"
+              onClick={handleSelectAllFiltered}
+              className="flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+            >
+              <CheckSquare className="w-3.5 h-3.5" />
+              <span>Seleccionar múltiples para borrar</span>
+            </button>
+          </div>
+        )
+      )}
+
       {/* Publishers grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
         {filteredPublishers.map(pub => {
           const pubStat = stats.get(pub.id);
           const today = new Date().toISOString().split('T')[0];
           const currentAbsence = pub.absences.find(a => a.startDate <= today && a.endDate >= today);
+          const isSelected = selectedPubIds.includes(pub.id);
 
           return (
             <div
               key={pub.id}
               className={`bg-white rounded-2xl border p-4 sm:p-5 flex flex-col justify-between transition-all hover:shadow-md ${
-                !pub.active
+                isSelected
+                  ? 'border-indigo-500 ring-2 ring-indigo-500/30 bg-indigo-50/20'
+                  : !pub.active
                   ? 'border-slate-200 bg-slate-50/70 opacity-80'
                   : currentAbsence
                   ? 'border-amber-200 bg-amber-50/20'
@@ -682,6 +839,18 @@ export const PublishersTab: React.FC = () => {
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleSelectPub(pub.id)}
+                      className="p-1 -ml-1 text-slate-300 hover:text-indigo-600 transition-colors cursor-pointer"
+                      title={isSelected ? 'Deseleccionar' : 'Seleccionar'}
+                    >
+                      {isSelected ? (
+                        <CheckSquare className="w-4 h-4 text-indigo-600" />
+                      ) : (
+                        <Square className="w-4 h-4 text-slate-300 hover:text-slate-500" />
+                      )}
+                    </button>
                     <div
                       className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
                         pub.gender === 'hermana'
@@ -756,12 +925,9 @@ export const PublishersTab: React.FC = () => {
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => {
-                        if (confirm(`¿Eliminar a ${pub.name}?`)) {
-                          deletePublisher(pub.id);
-                        }
-                      }}
-                      className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
+                      type="button"
+                      onClick={() => setPublisherToDelete(pub)}
+                      className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center cursor-pointer"
                       title="Eliminar publicador"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -902,9 +1068,9 @@ export const PublishersTab: React.FC = () => {
                       Pres. FDS
                     </span>
                   )}
-                  {pub.roles.deber_audio && (
+                  {(pub.roles.deber_audio || pub.roles.deber_video) && (
                     <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700">
-                      Audio/Video
+                      Audio y Video
                     </span>
                   )}
                   {pub.roles.deber_microfonos && (
@@ -1364,23 +1530,22 @@ export const PublishersTab: React.FC = () => {
                     Deberes y Logística
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    <label className="flex items-center gap-2 cursor-pointer col-span-1 sm:col-span-2 bg-white/70 p-1.5 rounded-lg border border-slate-200/60">
                       <input
                         type="checkbox"
-                        checked={Boolean(formRoles.deber_audio)}
-                        onChange={() => handleToggleRole('deber_audio')}
+                        checked={Boolean(formRoles.deber_audio || formRoles.deber_video)}
+                        onChange={() => {
+                          const nextVal = !(formRoles.deber_audio || formRoles.deber_video);
+                          setFormRoles(prev => ({
+                            ...prev,
+                            deber_audio: nextVal,
+                            deber_video: nextVal,
+                          }));
+                        }}
                         className="rounded text-indigo-600 focus:ring-indigo-500"
                       />
-                      <span>Operador de Audio</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.deber_video)}
-                        onChange={() => handleToggleRole('deber_video')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Operador de Video</span>
+                      <span className="font-semibold text-slate-800">Operador de Audio y Video</span>
+                      <span className="text-[10px] text-slate-400 font-normal ml-auto">Cabina / Pantallas</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -1445,20 +1610,38 @@ export const PublishersTab: React.FC = () => {
               </div>
 
               {/* Modal buttons */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsEditModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-sm"
-                >
-                  {selectedPublisher ? 'Guardar Cambios' : 'Registrar Publicador'}
-                </button>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                {selectedPublisher ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const pubToDel = selectedPublisher;
+                      setIsEditModalOpen(false);
+                      setPublisherToDelete(pubToDel);
+                    }}
+                    className="px-3.5 py-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Eliminar</span>
+                  </button>
+                ) : (
+                  <div />
+                )}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditModalOpen(false)}
+                    className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-sm cursor-pointer"
+                  >
+                    {selectedPublisher ? 'Guardar Cambios' : 'Registrar Publicador'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -1597,6 +1780,156 @@ export const PublishersTab: React.FC = () => {
                 className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
               >
                 Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: CONFIRMAR ELIMINACIÓN DE PUBLICADOR */}
+      {publisherToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
+                  <Trash2 className="w-4 h-4" />
+                </div>
+                <h3 className="font-bold text-base text-slate-900">
+                  Eliminar Publicador
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPublisherToDelete(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-sm text-slate-600 leading-relaxed">
+              ¿Estás seguro de que deseas eliminar a <strong>{publisherToDelete.name}</strong> del directorio de publicadores?
+            </p>
+            <p className="text-xs text-slate-400">
+              Se eliminará de la lista y se liberarán automáticamente todas las asignaciones o tareas de reunión que tenga programadas.
+            </p>
+
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setPublisherToDelete(null)}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSingleDelete}
+                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Sí, Eliminar Publicador</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: CONFIRMAR ELIMINACIÓN POR LOTE */}
+      {isConfirmBatchDeleteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
+                  <Trash2 className="w-4 h-4" />
+                </div>
+                <h3 className="font-bold text-base text-slate-900">
+                  Eliminar {selectedPubIds.length} Publicadores
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsConfirmBatchDeleteOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-sm text-slate-600 leading-relaxed">
+              ¿Estás seguro de que deseas eliminar permanentemente a los <strong>{selectedPubIds.length} publicadores</strong> seleccionados?
+            </p>
+            <p className="text-xs text-rose-500 font-medium">
+              Esta acción limpiará sus asignaciones programadas en todas las reuniones y grupos.
+            </p>
+
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setIsConfirmBatchDeleteOpen(false)}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmBatchDelete}
+                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Sí, Eliminar {selectedPubIds.length} Publicadores</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: CONFIRMAR VACIAR TODOS LOS PUBLICADORES */}
+      {isConfirmClearAllOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center text-rose-700">
+                  <Trash2 className="w-4 h-4" />
+                </div>
+                <h3 className="font-bold text-base text-rose-950">
+                  Vaciar Todo el Directorio
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsConfirmClearAllOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-sm text-slate-600 leading-relaxed">
+              ¿Estás seguro de que deseas eliminar <strong>todos los {publishers.length} publicadores</strong> de la congregación?
+            </p>
+            <p className="text-xs text-amber-600 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+              Esta opción es útil si importaste datos de demostración o deseas reiniciar el padrón desde cero. La configuración del Salón y las fechas de reuniones se mantendrán.
+            </p>
+
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setIsConfirmClearAllOpen(false)}
+                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmClearAllPublishers}
+                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Sí, Vaciar Todos los Publicadores</span>
               </button>
             </div>
           </div>

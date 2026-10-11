@@ -1,8 +1,15 @@
 // src/firebase/config.ts
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, setLogLevel, disableNetwork, enableNetwork } from 'firebase/firestore';
 import firebaseConfigJson from '../../firebase-applet-config.json';
+
+// Silence Firestore internal log noise and backoff warnings
+try {
+  setLogLevel('silent');
+} catch {
+  // ignore
+}
 
 const firebaseConfig = {
   apiKey: firebaseConfigJson.apiKey,
@@ -23,5 +30,74 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
 export const db = firebaseConfigJson.firestoreDatabaseId && firebaseConfigJson.firestoreDatabaseId !== '(default)'
   ? getFirestore(app, firebaseConfigJson.firestoreDatabaseId)
   : getFirestore(app);
+
+export const pauseFirestoreNetwork = async () => {
+  try {
+    await disableNetwork(db);
+  } catch {
+    // ignore
+  }
+};
+
+export const resumeFirestoreNetwork = async () => {
+  try {
+    await enableNetwork(db);
+  } catch {
+    // ignore
+  }
+};
+
+export const isQuotaError = (err: any): boolean => {
+  if (!err) return false;
+  const code = err.code || err?.name || '';
+  const message = typeof err.message === 'string' ? err.message : '';
+  const stringified = String(err);
+  return (
+    code === 'resource-exhausted' ||
+    message.includes('resource-exhausted') ||
+    message.includes('Quota limit exceeded') ||
+    message.includes('quota metric') ||
+    message.includes('Quota exceeded') ||
+    message.includes('Free daily write units') ||
+    stringified.includes('resource-exhausted') ||
+    stringified.includes('Quota limit exceeded')
+  );
+};
+
+export const isFirestoreQuotaExceeded = (): boolean => {
+  try {
+    const saved = localStorage.getItem('kongre_firestore_quota_cooldown');
+    if (!saved) return false;
+    const until = parseInt(saved, 10);
+    return !isNaN(until) && Date.now() < until;
+  } catch {
+    return false;
+  }
+};
+
+export const markFirestoreQuotaExceeded = async (durationMinutes = 720): Promise<void> => {
+  try {
+    const until = Date.now() + durationMinutes * 60 * 1000;
+    localStorage.setItem('kongre_firestore_quota_cooldown', String(until));
+    await pauseFirestoreNetwork();
+  } catch {
+    // ignore
+  }
+};
+
+// Check on boot if quota was already exceeded and pause network if so
+if (typeof window !== 'undefined') {
+  if (isFirestoreQuotaExceeded()) {
+    pauseFirestoreNetwork();
+  }
+
+  // Intercept unhandled Firestore quota rejections from background workers
+  window.addEventListener('unhandledrejection', (event) => {
+    if (isQuotaError(event.reason)) {
+      event.preventDefault();
+      markFirestoreQuotaExceeded(720);
+    }
+  });
+}
 
 export default app;

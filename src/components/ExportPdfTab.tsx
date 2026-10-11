@@ -97,7 +97,8 @@ export const ExportPdfTab: React.FC = () => {
         text += `• Maestros #${idx + 1}: ${m.title} -> ${getPub(m.publisherId)}${m.assistantId ? ` (Ayudante: ${getPub(m.assistantId)})` : ''}\n`;
       });
       text += `• Estudio Bíblico: Conductor: ${getPub(currentWeek.midweek.vidaCristiana.estudioBiblico.conductorId)} | Lector: ${getPub(currentWeek.midweek.vidaCristiana.estudioBiblico.lectorId)}\n`;
-      text += `• Audio: ${(currentWeek.midweek.duties.deber_audio || []).map(getPub).join(', ') || '---'}\n`;
+      const midAudioVideo = Array.from(new Set([...(currentWeek.midweek.duties.deber_audio || []), ...(currentWeek.midweek.duties.deber_video || [])])).map(getPub).join(', ') || '---';
+      text += `• Audio y Video: ${midAudioVideo}\n`;
       text += `• Micrófonos: ${(currentWeek.midweek.duties.deber_microfonos || []).map(getPub).join(', ') || '---'}\n\n`;
     }
 
@@ -106,7 +107,8 @@ export const ExportPdfTab: React.FC = () => {
       text += `• Presidente: ${getPub(currentWeek.weekend.presidentId)}\n`;
       text += `• Discurso Público: ${currentWeek.weekend.publicTalkSpeaker || '---'} ("${currentWeek.weekend.publicTalkTheme || ''}")\n`;
       text += `• Estudio Atalaya: Conductor: ${getPub(currentWeek.weekend.atalayaConductorId)} | Lector: ${getPub(currentWeek.weekend.atalayaLectorId)}\n`;
-      text += `• Audio: ${(currentWeek.weekend.duties.deber_audio || []).map(getPub).join(', ') || '---'}\n`;
+      const fdsAudioVideo = Array.from(new Set([...(currentWeek.weekend.duties.deber_audio || []), ...(currentWeek.weekend.duties.deber_video || [])])).map(getPub).join(', ') || '---';
+      text += `• Audio y Video: ${fdsAudioVideo}\n`;
       text += `• Micrófonos: ${(currentWeek.weekend.duties.deber_microfonos || []).map(getPub).join(', ') || '---'}\n\n`;
     }
 
@@ -475,8 +477,7 @@ export const ExportPdfTab: React.FC = () => {
                           <div className="pt-2 border-t border-slate-100 text-slate-600">
                             <p>
                               <strong className="text-slate-800">Deberes:</strong>{' '}
-                              Audio: {(w.midweek.duties.deber_audio || []).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---'} |{' '}
-                              Video: {(w.midweek.duties.deber_video || []).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---'} |{' '}
+                              Audio y Video: {Array.from(new Set([...(w.midweek.duties.deber_audio || []), ...(w.midweek.duties.deber_video || [])])).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---'} |{' '}
                               Micrófonos: {(w.midweek.duties.deber_microfonos || []).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---'} |{' '}
                               Acomodador: {(w.midweek.duties.deber_acomodador || []).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---'}
                             </p>

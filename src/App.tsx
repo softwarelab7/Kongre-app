@@ -36,6 +36,7 @@ import { EquidadDashboardTab } from './components/EquidadDashboardTab';
 import { ExportPdfTab } from './components/ExportPdfTab';
 import { PersonalViewTab } from './components/PersonalViewTab';
 import { SettingsTab } from './components/SettingsTab';
+import { UserProfileSettingsView } from './components/UserProfileSettingsView';
 import { ConflictsModal } from './components/ConflictsModal';
 import { QrCodeModal } from './components/QrCodeModal';
 import { MeetingTimerModal } from './components/MeetingTimerModal';
@@ -390,7 +391,10 @@ const AppContent: React.FC = () => {
             {activeTab === 'equidad' && <EquidadDashboardTab />}
             {activeTab === 'exportar_pdf' && <ExportPdfTab />}
             {activeTab === 'mi_vista' && <PersonalViewTab />}
-            {activeTab === 'ajustes' && <SettingsTab />}
+            {activeTab === 'perfil' && <UserProfileSettingsView />}
+            {activeTab === 'ajustes' && (
+              <SettingsTab onNavigateToProfile={() => setActiveTab('perfil')} />
+            )}
           </>
         )}
       </main>

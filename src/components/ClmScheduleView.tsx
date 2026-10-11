@@ -1980,14 +1980,17 @@ export default function ClmScheduleView({
             </div>
 
             {/* Checkbox discreto para activar Sala Auxiliar */}
-            <label className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white text-xs font-medium cursor-pointer transition-colors select-none">
+            <label
+              className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white text-xs font-medium cursor-pointer transition-colors select-none"
+              title="Activar o desactivar Sala Auxiliar"
+            >
               <input
                 type="checkbox"
                 checked={showAuxRoom}
                 onChange={(e) => handleToggleAuxRoom(e.target.checked)}
                 className="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 border-slate-300 cursor-pointer"
               />
-              <span className="text-[11px]">2 Salas</span>
+              <span className="text-[11px] font-semibold">Sala Auxiliar</span>
             </label>
 
             {/* Acceso a Consejero si la sala auxiliar está activa */}

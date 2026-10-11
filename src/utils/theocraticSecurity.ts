@@ -440,12 +440,22 @@ export function getFriendlyCongregationName(
   congregationName?: string | null,
   fallback = 'Congregación Central'
 ): string {
+  const localStoredName = typeof window !== 'undefined'
+    ? localStorage.getItem('kongre_user_confirmed_name')?.trim() ||
+      localStorage.getItem('kongre_congregation_name')?.trim() ||
+      ''
+    : '';
+
+  const candidateLocal = localStoredName && !isCongregationIdString(localStoredName) && localStoredName !== 'Congregación Central'
+    ? localStoredName
+    : null;
+
   if (!congregationName || !congregationName.trim()) {
-    return fallback;
+    return candidateLocal || fallback;
   }
   const clean = congregationName.trim();
-  if (isCongregationIdString(clean)) {
-    return fallback;
+  if (isCongregationIdString(clean) || (clean === 'Congregación Central' && candidateLocal)) {
+    return candidateLocal || fallback;
   }
   return clean;
 }

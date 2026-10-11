@@ -36,6 +36,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
     publishers,
     accountLinkRequests,
     createAccountLinkRequest,
+    loadCongregationFromCloud,
   } = useCongregation();
 
   // Exactly three required theocratic credentials:
@@ -88,10 +89,13 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         return;
       }
 
-      // Comprobar coincidencia de ID si ya hay una congregación configurada
-      const expectedId = settings.congregationNumber || settings.congregationId;
-      const customCode = settings.customCode;
+      // 1. Cargar datos actualizados de la congregación desde la nube en Firestore primero si existen
+      const cloudRes = await loadCongregationFromCloud(cleanId);
+      const effectiveSettings = cloudRes?.data?.settings || settings;
+      const expectedId = effectiveSettings.congregationNumber || effectiveSettings.congregationId;
+      const customCode = effectiveSettings.customCode;
       const isIdMatch =
+        !expectedId ||
         (expectedId && cleanId.toLowerCase() === expectedId.trim().toLowerCase()) ||
         (customCode && cleanId.toLowerCase() === customCode.trim().toLowerCase());
       if (expectedId && !isIdMatch) {
@@ -101,9 +105,11 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       }
 
       // Verificar PIN de la Congregación
-      const isCongPinValid =
-        (await verifyCongregationPin(cleanCongPin)) ||
-        (settings.congregationPinHash ? await verifyPasscode(cleanCongPin, settings.congregationPinHash) : false);
+      const effectivePinHash = cloudRes?.data?.settings?.congregationPinHash || effectiveSettings.congregationPinHash;
+      let isCongPinValid = await verifyCongregationPin(cleanCongPin);
+      if (!isCongPinValid && effectivePinHash) {
+        isCongPinValid = await verifyPasscode(cleanCongPin, effectivePinHash);
+      }
 
       if (!isCongPinValid) {
         setError('El PIN de la Congregación es incorrecto.');

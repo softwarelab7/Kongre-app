@@ -169,7 +169,7 @@ export const ScheduleTab: React.FC = () => {
   const [isMonthlyBillboardModalOpen, setIsMonthlyBillboardModalOpen] = useState(false);
   const [isConflictsModalOpen, setIsConflictsModalOpen] = useState(false);
   const [isClearWeekAssignmentsModalOpen, setIsClearWeekAssignmentsModalOpen] = useState(false);
-  const [clearScope, setClearScope] = useState<'all' | 'midweek' | 'weekend' | 'duties'>('all');
+  const [clearScope, setClearScope] = useState<'all' | 'midweek' | 'weekend'>('all');
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isWeekendEditModalOpen, setIsWeekendEditModalOpen] = useState(false);
   const [weekendEditTab, setWeekendEditTab] = useState<'discurso' | 'atalaya' | 'canciones'>('discurso');
@@ -181,10 +181,9 @@ export const ScheduleTab: React.FC = () => {
     try {
       await clearWeekAssignments(currentWeek.id, clearScope);
       const scopeLabels: Record<string, string> = {
-        all: 'todas las asignaciones de la semana',
+        all: 'todas las asignaciones de las reuniones de la semana',
         midweek: 'los asignados de la reunión de entre semana',
         weekend: 'los asignados de la reunión del fin de semana',
-        duties: 'los asignados a turnos y deberes operativos',
       };
       setToastNotification(`Se quitaron ${scopeLabels[clearScope] || 'las asignaciones'}.`);
       setTimeout(() => setToastNotification(null), 3500);
@@ -413,38 +412,6 @@ export const ScheduleTab: React.FC = () => {
     updateWeek(updated);
   };
 
-  // Toggle duty assignment in week
-  const handleToggleDutyPublisher = (
-    meetingType: 'midweek' | 'weekend',
-    dutyKey: string,
-    publisherId: string
-  ) => {
-    const updated = JSON.parse(JSON.stringify(currentWeek)) as WeekSchedule;
-    const dutiesObj = meetingType === 'midweek' ? updated.midweek.duties : updated.weekend.duties;
-    if (!dutiesObj[dutyKey]) dutiesObj[dutyKey] = [];
-
-    const list = dutiesObj[dutyKey];
-    const idx = list.indexOf(publisherId);
-    if (idx >= 0) {
-      list.splice(idx, 1);
-    } else {
-      list.push(publisherId);
-    }
-    updateWeek(updated);
-  };
-
-  // Cleaning group toggle
-  const handleToggleCleaningGroup = (groupNumber: number) => {
-    const updated = JSON.parse(JSON.stringify(currentWeek)) as WeekSchedule;
-    const list = updated.cleaningGroupNumbers;
-    const idx = list.indexOf(groupNumber);
-    if (idx >= 0) {
-      if (list.length > 1) list.splice(idx, 1);
-    } else {
-      list.push(groupNumber);
-    }
-    updateWeek(updated);
-  };
 
   return (
     <div className="space-y-6">
@@ -617,7 +584,7 @@ export const ScheduleTab: React.FC = () => {
                     className="fixed inset-0 z-40"
                     onClick={() => setIsMoreMenuOpen(false)}
                   />
-                  <div className="absolute right-0 top-full mt-1.5 w-60 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="absolute right-0 top-full mt-1.5 w-60 max-h-[calc(100vh-140px)] overflow-y-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-100">
                     <button
                       type="button"
                       onClick={() => {
@@ -780,97 +747,6 @@ export const ScheduleTab: React.FC = () => {
               }}
             />
           </div>
-
-          {/* TURNOS Y DEBERES DE ENTRE SEMANA (Sonido, Micrófonos, Acomodadores) */}
-          {customDuties.some((d) => d.midweek) && (
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-xs">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                    Servicios de la Congregación
-                  </span>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                    Deberes y Turnos de Entre Semana (Audio y Video, Micrófonos y Acomodadores)
-                  </h4>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
-                {customDuties
-                  .filter((d) => d.midweek)
-                  .map((duty) => {
-                    const assignedIds = currentWeek.midweek?.duties?.[duty.key] || [];
-                    return (
-                      <div
-                        key={duty.id}
-                        className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-white/10 flex flex-col justify-between"
-                      >
-                        <div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block truncate">
-                              {duty.name}
-                            </span>
-                            {assignedIds.length > 0 && !isReadOnly && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const u = JSON.parse(JSON.stringify(currentWeek));
-                                  if (!u.midweek.duties) u.midweek.duties = {};
-                                  u.midweek.duties[duty.key] = [];
-                                  updateWeek(u);
-                                }}
-                                className="text-[10px] text-rose-500 hover:text-rose-700 font-semibold cursor-pointer"
-                                title={`Quitar a todos los asignados a ${duty.name}`}
-                              >
-                                Limpiar
-                              </button>
-                            )}
-                          </div>
-                          <div className="mt-1 space-y-1">
-                            {assignedIds.length === 0 ? (
-                              <p className="text-xs text-slate-400 italic">Sin asignar</p>
-                            ) : (
-                              assignedIds.map((pid) => (
-                                <div key={pid} className="flex items-center justify-between text-xs">
-                                  <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
-                                    {publishersMap.get(pid)?.name || 'Hno.'}
-                                  </span>
-                                  <button
-                                    onClick={() => handleToggleDutyPublisher('midweek', duty.key, pid)}
-                                    className="text-rose-500 hover:text-rose-700 ml-1 cursor-pointer"
-                                    title="Quitar asignación"
-                                  >
-                                    ×
-                                  </button>
-                                </div>
-                              ))
-                            )}
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() =>
-                            openSelector(
-                              `Añadir a: ${duty.name} (Entre Semana)`,
-                              duty.key,
-                              'any',
-                              currentWeek.midweek?.date || currentWeek.weekStartDate,
-                              'midweek',
-                              undefined,
-                              (pid) => handleToggleDutyPublisher('midweek', duty.key, pid),
-                              () => {}
-                            )
-                          }
-                          className="mt-2 pt-2 border-t border-slate-200 dark:border-white/10 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 text-left cursor-pointer"
-                        >
-                          + Asignar persona
-                        </button>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          )}
         </div>
       )}
 
@@ -1197,8 +1073,8 @@ export const ScheduleTab: React.FC = () => {
                 <div className="border-b border-slate-100 dark:border-white/[0.04]">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-3">
                     <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
-                      <div className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
-                        1.
+                      <div className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                        <Mic className="w-3.5 h-3.5" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -1388,13 +1264,13 @@ export const ScheduleTab: React.FC = () => {
                 <div className="border-b border-slate-100 dark:border-white/[0.04]">
                   <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
                     <div className="flex items-center gap-3.5 min-w-0 pr-4">
-                      <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">
-                        2.
+                      <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                        <BookOpen className="w-3.5 h-3.5" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
                           <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
-                            Conductor de La Atalaya
+                            Quién dirige La Atalaya (Conductor)
                           </h4>
                         </div>
                         <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
@@ -1498,8 +1374,8 @@ export const ScheduleTab: React.FC = () => {
                 <div className="border-b border-slate-100 dark:border-white/[0.04]">
                   <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
                     <div className="flex items-center gap-3.5 min-w-0 pr-4">
-                      <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">
-                        3.
+                      <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                        <FileText className="w-3.5 h-3.5" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
@@ -1758,132 +1634,9 @@ export const ScheduleTab: React.FC = () => {
             </div>
           </div>
 
-          {/* TURNOS Y DEBERES DE FIN DE SEMANA (Audio, Video, Micrófonos, Acomodadores) */}
-          {customDuties.some((d) => d.weekend) && (
-            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-xs">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                    Servicios de la Congregación
-                  </span>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                    Deberes y Turnos de Fin de Semana (Audio y Video, Micrófonos y Acomodadores)
-                  </h4>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
-                {customDuties
-                  .filter((d) => d.weekend)
-                  .map((duty) => {
-                    const assignedIds = currentWeek.weekend.duties?.[duty.key] || [];
-                    return (
-                      <div
-                        key={duty.id}
-                        className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-white/10 flex flex-col justify-between"
-                      >
-                        <div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block truncate">
-                              {duty.name}
-                            </span>
-                            {assignedIds.length > 0 && !isReadOnly && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const u = JSON.parse(JSON.stringify(currentWeek));
-                                  if (!u.weekend.duties) u.weekend.duties = {};
-                                  u.weekend.duties[duty.key] = [];
-                                  updateWeek(u);
-                                }}
-                                className="text-[10px] text-rose-500 hover:text-rose-700 font-semibold cursor-pointer"
-                                title={`Quitar a todos los asignados a ${duty.name}`}
-                              >
-                                Limpiar
-                              </button>
-                            )}
-                          </div>
-                          <div className="mt-1 space-y-1">
-                            {assignedIds.length === 0 ? (
-                              <p className="text-xs text-slate-400 italic">Sin asignar</p>
-                            ) : (
-                              assignedIds.map((pid) => (
-                                <div key={pid} className="flex items-center justify-between text-xs">
-                                  <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
-                                    {publishersMap.get(pid)?.name || 'Hno.'}
-                                  </span>
-                                  <button
-                                    onClick={() => handleToggleDutyPublisher('weekend', duty.key, pid)}
-                                    className="text-rose-500 hover:text-rose-700 ml-1 cursor-pointer"
-                                    title="Quitar asignación"
-                                  >
-                                    ×
-                                  </button>
-                                </div>
-                              ))
-                            )}
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() =>
-                            openSelector(
-                              `Añadir a: ${duty.name} (Fin de Semana)`,
-                              duty.key,
-                              'any',
-                              currentWeek.weekend.date,
-                              'weekend',
-                              undefined,
-                              (pid) => handleToggleDutyPublisher('weekend', duty.key, pid),
-                              () => {}
-                            )
-                          }
-                          className="mt-2 pt-2 border-t border-slate-200 dark:border-white/10 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 text-left cursor-pointer"
-                        >
-                          + Asignar persona
-                        </button>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          )}
         </div>
       )}
 
-      {/* LIMPIEZA DEL SALÓN DEL REINO */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-            Mantenimiento Teocrático
-          </span>
-          <h4 className="text-sm font-bold text-slate-900 mt-0.5">
-            Limpieza del Salón del Reino esta semana:
-          </h4>
-          <p className="text-xs text-slate-500">
-            Rotación automática entre grupos de predicación. Puedes seleccionar uno o más grupos.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {preachingGroups.map(group => {
-            const isAssigned = currentWeek.cleaningGroupNumbers.includes(group.number);
-            return (
-              <button
-                key={group.number}
-                onClick={() => handleToggleCleaningGroup(group.number)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                  isAssigned
-                    ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
-              >
-                Grupo #{group.number} {group.name ? `(${group.name})` : ''}
-              </button>
-            );
-          })}
-        </div>
-      </div>
 
       {/* MODAL: ASSIGNMENT SELECTOR */}
       {selectorState.isOpen && (
@@ -2175,8 +1928,8 @@ export const ScheduleTab: React.FC = () => {
               {[
                 {
                   id: 'all',
-                  label: 'Toda la semana completa',
-                  desc: 'Entre Semana (VMC), Fin de Semana y Servicios/Deberes operativos',
+                  label: 'Ambas reuniones (Semana completa)',
+                  desc: 'Entre Semana (VMC) y Fin de Semana (Discurso Público y La Atalaya)',
                 },
                 {
                   id: 'midweek',
@@ -2187,11 +1940,6 @@ export const ScheduleTab: React.FC = () => {
                   id: 'weekend',
                   label: 'Solo Reunión Fin de Semana',
                   desc: 'Presidente, orador, conductor/lector de La Atalaya y oraciones',
-                },
-                {
-                  id: 'duties',
-                  label: 'Solo Deberes y Turnos Operativos',
-                  desc: 'Audio/Video, micrófonos, plataforma, acomodadores y seguridad',
                 },
               ].map((opt) => (
                 <label

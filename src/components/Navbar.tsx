@@ -9,6 +9,7 @@ import { getFriendlyCongregationName } from '../utils/theocraticSecurity';
 import {
   Calendar,
   Users,
+  User,
   AlertTriangle,
   FileText,
   UserCheck,
@@ -93,6 +94,7 @@ export type ActiveTab =
   | 'equidad'
   | 'exportar_pdf'
   | 'mi_vista'
+  | 'perfil'
   | 'ajustes';
 
 interface NavbarProps {
@@ -190,11 +192,39 @@ export const Navbar: React.FC<NavbarProps> = ({
   const pinnedNoticesCount = notices.filter((n) => n.pinned).length;
 
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const [flyoutStyle, setFlyoutStyle] = useState<{ top: number; left: number } | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const activeTriggerRef = useRef<HTMLElement | null>(null);
+  const flyoutRef = useRef<HTMLDivElement | null>(null);
 
-  const handleMouseEnterCategory = (catId: string) => {
+  const calculateFlyoutPos = (triggerEl: HTMLElement, itemCount: number = 4) => {
+    const rect = triggerEl.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const padding = 12;
+    // Estimated height: header ~54px, each module ~54px, margins ~16px
+    const estimatedHeight = 60 + itemCount * 54;
+
+    let top = rect.top;
+    if (top + estimatedHeight > vh - padding) {
+      top = vh - estimatedHeight - padding;
+    }
+    if (top < padding) {
+      top = padding;
+    }
+
+    return {
+      top: Math.round(top),
+      left: Math.round(rect.right + 8),
+    };
+  };
+
+  const handleMouseEnterCategory = (catId: string, triggerEl?: HTMLElement | null, itemCount?: number) => {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
+    }
+    if (triggerEl) {
+      activeTriggerRef.current = triggerEl;
+      setFlyoutStyle(calculateFlyoutPos(triggerEl, itemCount));
     }
     setHoveredCategory(catId);
   };
@@ -207,6 +237,55 @@ export const Navbar: React.FC<NavbarProps> = ({
       setHoveredCategory(null);
     }, 180);
   };
+
+  // Adjust exact measured height once mounted to ensure pixel perfection
+  useEffect(() => {
+    if (!hoveredCategory || !flyoutRef.current || !activeTriggerRef.current) return;
+    const rect = activeTriggerRef.current.getBoundingClientRect();
+    const menuHeight = flyoutRef.current.offsetHeight;
+    const vh = window.innerHeight;
+    const padding = 12;
+
+    let top = rect.top;
+    if (top + menuHeight > vh - padding) {
+      top = vh - menuHeight - padding;
+    }
+    if (top < padding) {
+      top = padding;
+    }
+
+    setFlyoutStyle({
+      top: Math.round(top),
+      left: Math.round(rect.right + 8),
+    });
+  }, [hoveredCategory]);
+
+  useEffect(() => {
+    if (!hoveredCategory) return;
+    const handleReposition = () => {
+      if (!flyoutRef.current || !activeTriggerRef.current) return;
+      const rect = activeTriggerRef.current.getBoundingClientRect();
+      const menuHeight = flyoutRef.current.offsetHeight;
+      const vh = window.innerHeight;
+      const padding = 12;
+
+      let top = rect.top;
+      if (top + menuHeight > vh - padding) {
+        top = vh - menuHeight - padding;
+      }
+      if (top < padding) {
+        top = padding;
+      }
+
+      setFlyoutStyle({
+        top: Math.round(top),
+        left: Math.round(rect.right + 8),
+      });
+    };
+
+    window.addEventListener('resize', handleReposition);
+    return () => window.removeEventListener('resize', handleReposition);
+  }, [hoveredCategory]);
 
   useEffect(() => {
     return () => {
@@ -348,9 +427,9 @@ export const Navbar: React.FC<NavbarProps> = ({
       items: [
         {
           id: 'limpieza_deberes',
-          label: 'Deberes & Limpieza',
-          description: 'Audio y video, microfonistas, acomodadores y aseo',
-          icon: Brush,
+          label: 'Servicios de la Congregación',
+          description: 'Deberes y turnos (audio, video, micrófonos, acomodadores) y limpieza',
+          icon: ShieldCheck,
         },
         {
           id: 'panel_electrico',
@@ -391,7 +470,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Supervisión & Control',
       shortTitle: 'Supervisión',
       icon: AlertTriangle,
-      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'ajustes'],
+      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'ajustes'],
       items: [
         {
           id: 'conflictos',
@@ -418,6 +497,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           label: 'Mi Portal de Publicador',
           description: 'Ver mis próximas asignaciones y tareas asignadas',
           icon: UserCheck,
+        },
+        {
+          id: 'perfil',
+          label: 'Mi Perfil de Usuario',
+          description: 'Foto de perfil, nombre visible y canales de contacto',
+          icon: User,
         },
         {
           id: 'ajustes',
@@ -491,7 +576,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Supervisión & Control',
       icon: AlertTriangle,
       primaryTab: 'conflictos' as ActiveTab,
-      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'ajustes'] as ActiveTab[],
+      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'ajustes'] as ActiveTab[],
       badge: conflicts.length || undefined,
       badgeColor: 'bg-amber-500 text-white',
       colorClass: 'bg-rose-50 text-rose-600 dark:bg-rose-950/80 dark:text-rose-400',
@@ -539,11 +624,13 @@ export const Navbar: React.FC<NavbarProps> = ({
       case 'carritos':
         return 'Carritos';
       case 'limpieza_deberes':
-        return 'Deberes & Limpieza';
+        return 'Servicios de la Congregación';
       case 'visita_sc':
         return 'Visita del SC';
+      case 'perfil':
+        return 'Mi Perfil';
       case 'ajustes':
-        return 'Ajustes';
+        return 'Ajustes de la Congregación';
       default:
         return 'Kongre';
     }
@@ -573,13 +660,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               const isCatActive = cat.tabIds.includes(activeTab);
               const isHovered = hoveredCategory === cat.id;
               const hasSubItems = cat.items && cat.items.length > 0;
-              const isNearBottom = idx >= 4;
-
               return (
                 <div
                   key={cat.id}
                   className="relative w-full flex justify-center"
-                  onMouseEnter={() => handleMouseEnterCategory(cat.id)}
+                  onMouseEnter={(e) => handleMouseEnterCategory(cat.id, e.currentTarget, cat.items.length)}
                   onMouseLeave={handleMouseLeaveCategory}
                 >
                   <button
@@ -615,17 +700,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {/* Flyout Submenu Panel (Opens when pointer hovers over category) */}
                   {isHovered && hasSubItems && (
                     <div
+                      ref={flyoutRef}
                       onMouseEnter={() => handleMouseEnterCategory(cat.id)}
                       onMouseLeave={handleMouseLeaveCategory}
-                      className={`absolute left-full ml-2 w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 p-2 z-50 animate-in fade-in zoom-in-95 duration-100 ${
-                        isNearBottom ? 'bottom-0' : 'top-0'
-                      }`}
+                      style={{
+                        top: flyoutStyle ? `${flyoutStyle.top}px` : '12px',
+                        left: flyoutStyle ? `${flyoutStyle.left}px` : '72px',
+                        maxHeight: 'calc(100vh - 24px)',
+                      }}
+                      className="fixed w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 p-2 z-50 animate-in fade-in zoom-in-95 duration-100 flex flex-col"
                     >
                       {/* Invisible hover bridge to prevent pointer exit */}
                       <div className="absolute -left-3 top-0 bottom-0 w-3 bg-transparent" />
 
                       {/* Header */}
-                      <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                      <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-2">
                           <div className={`w-7 h-7 rounded-lg ${cat.colorClass} flex items-center justify-center font-bold`}>
                             <Icon className="w-4 h-4" />
@@ -647,7 +736,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </div>
 
                       {/* Modules list */}
-                      <div className="p-1 space-y-1 mt-1 max-h-[70vh] overflow-y-auto scrollbar-none">
+                      <div className="p-1 space-y-1 mt-1 overflow-y-auto flex-1 min-h-0">
                         {cat.items.map((sub) => {
                           const SubIcon = sub.icon;
                           const isSubActive = activeTab === sub.id;
@@ -709,14 +798,26 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </div>
 
-          {/* Bottom Quick Settings & Role Indicator */}
+          {/* Bottom Quick Settings & Profile */}
           <div className="mt-auto pt-2 flex flex-col items-center gap-2 border-t border-slate-100 dark:border-slate-800 w-full shrink-0">
+            <button
+              type="button"
+              onClick={() => handleSelectTab('perfil')}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                activeTab === 'perfil'
+                  ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/70 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
+                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+              }`}
+              title="Mi Perfil y Contacto"
+            >
+              <User className="w-4 h-4 stroke-[1.8]" />
+            </button>
             <button
               type="button"
               onClick={() => handleSelectTab('ajustes')}
               className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                 activeTab === 'ajustes'
-                  ? 'bg-indigo-50 text-indigo-600'
+                  ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/70 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
               }`}
               title="Ajustes de la Congregación"
@@ -920,12 +1021,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            {/* User Purple Avatar Circle (with Initial H or user name) */}
+            {/* User Avatar Circle -> Navigates directly to personal profile */}
             <button
               type="button"
-              onClick={() => handleSelectTab('ajustes')}
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-xs cursor-pointer hover:ring-2 hover:ring-indigo-400/50 transition shrink-0 ml-1"
-              title={userProfile?.displayName || user?.displayName || user?.email || 'Héctor'}
+              onClick={() => handleSelectTab('perfil')}
+              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${
+                activeTab === 'perfil' ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900' : ''
+              } bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-xs cursor-pointer hover:ring-2 hover:ring-indigo-400/50 transition shrink-0 ml-1`}
+              title={`Mi Perfil (${userProfile?.displayName || user?.displayName || user?.email || 'Usuario'})`}
             >
               {(userProfile?.photoURL || user?.photoURL) ? (
                 <img
@@ -1035,14 +1138,22 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             {/* Drawer Footer */}
-            <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
-              <span>Kongre Teocrático</span>
+            <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+              <button
+                type="button"
+                onClick={() => handleSelectTab('perfil')}
+                className="font-semibold text-indigo-600 hover:underline flex items-center gap-1.5"
+              >
+                <User className="w-3.5 h-3.5" />
+                <span>Mi Perfil</span>
+              </button>
               <button
                 type="button"
                 onClick={() => handleSelectTab('ajustes')}
-                className="font-semibold text-indigo-600 hover:underline"
+                className="font-semibold text-slate-600 dark:text-slate-400 hover:underline flex items-center gap-1.5"
               >
-                Ajustes
+                <Settings className="w-3.5 h-3.5" />
+                <span>Ajustes</span>
               </button>
             </div>
           </div>

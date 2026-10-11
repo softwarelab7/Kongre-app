@@ -1,5 +1,5 @@
 // src/components/ExportPdfTab.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { generateProgramPdf, generateS89Pdf } from '../utils/pdfGenerator';
 import { createAssignmentWhatsAppMessage, openWhatsAppLink } from '../utils/whatsapp';

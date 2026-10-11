@@ -2,7 +2,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import { useSecurity } from '../context/SecurityContext';
 import { encryptTheocraticData, decryptTheocraticData, getFriendlyCongregationName, isCongregationIdString } from '../utils/theocraticSecurity';
 import {
@@ -39,13 +38,17 @@ import {
   Copy,
   Check,
   Trash2,
+  Loader2,
 } from 'lucide-react';
 import { JoinCongregationModal } from './JoinCongregationModal';
 import { InvitationManagerModal } from './InvitationManagerModal';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
-import { UserProfileSettingsView } from './UserProfileSettingsView';
 
-export const SettingsTab: React.FC = () => {
+interface SettingsTabProps {
+  onNavigateToProfile?: () => void;
+}
+
+export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile }) => {
   const {
     settings,
     updateSettings,
@@ -60,7 +63,6 @@ export const SettingsTab: React.FC = () => {
     resetAllCongregationData,
   } = useCongregation();
   const { user, signInWithGoogle, signOutUser } = useAuth();
-  const { themeMode, setThemeMode } = useTheme();
 
   const [isSyncingCloud, setIsSyncingCloud] = useState(false);
   const [cloudActionStatus, setCloudActionStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
@@ -118,22 +120,30 @@ export const SettingsTab: React.FC = () => {
   const [isSettingsInviteModalOpen, setIsSettingsInviteModalOpen] = useState(false);
   const [isSettingsJoinModalOpen, setIsSettingsJoinModalOpen] = useState(false);
   const [isSettingsWizardOpen, setIsSettingsWizardOpen] = useState(false);
-  const [settingsSubView, setSettingsSubView] = useState<'perfil' | 'general' | 'seguridad' | 'respaldos'>('perfil');
+  const [settingsSubView, setSettingsSubView] = useState<'general' | 'seguridad' | 'respaldos'>('general');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [congName, setCongName] = useState(() => {
-    const raw = settings.congregationName?.trim();
-    if (raw && !isCongregationIdString(raw)) return raw;
-    return '';
+    const raw =
+      settings.congregationName?.trim() ||
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_user_confirmed_name')?.trim() ||
+          localStorage.getItem('kongre_congregation_name')?.trim()
+        : null) ||
+      '';
+    if (raw && !isCongregationIdString(raw) && raw !== 'Congregación Central') return raw;
+    return raw && !isCongregationIdString(raw) ? raw : '';
   });
-  const [midDay, setMidDay] = useState(settings.midweekMeetingDay || 'Miércoles');
-  const [midTime, setMidTime] = useState(settings.midweekMeetingTime || '19:00');
-  const [fdsDay, setFdsDay] = useState(settings.weekendMeetingDay || 'Domingo');
-  const [fdsTime, setFdsTime] = useState(settings.weekendMeetingTime || '10:00');
-  const [hallAddress, setHallAddress] = useState(settings.hallAddress || '');
+  const [midDay, setMidDay] = useState(() => settings.midweekMeetingDay || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_midweek_day') || localStorage.getItem('kongre_midweek_day') : null) || 'Miércoles');
+  const [midTime, setMidTime] = useState(() => settings.midweekMeetingTime || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_midweek_time') || localStorage.getItem('kongre_midweek_time') : null) || '19:00');
+  const [fdsDay, setFdsDay] = useState(() => settings.weekendMeetingDay || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_weekend_day') || localStorage.getItem('kongre_weekend_day') : null) || 'Domingo');
+  const [fdsTime, setFdsTime] = useState(() => settings.weekendMeetingTime || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_weekend_time') || localStorage.getItem('kongre_weekend_time') : null) || '10:00');
+  const [hallAddress, setHallAddress] = useState(() => settings.hallAddress || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_address') || localStorage.getItem('kongre_hall_address') : null) || '');
 
   const userHasEditedRef = useRef(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState<string | null>(null);
 
   const isFormDirty = Boolean(
     (congName.trim() !== (settings.congregationName || '').trim()) ||
@@ -149,17 +159,32 @@ export const SettingsTab: React.FC = () => {
     if (userHasEditedRef.current) return;
 
     if (settings) {
-      const cleanName = settings.congregationName && !isCongregationIdString(settings.congregationName)
-        ? settings.congregationName.trim()
+      const storedName = typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_user_confirmed_name')?.trim() ||
+          localStorage.getItem('kongre_congregation_name')?.trim()
         : '';
+      const cleanName = settings.congregationName && !isCongregationIdString(settings.congregationName) && settings.congregationName !== 'Congregación Central'
+        ? settings.congregationName.trim()
+        : (storedName && !isCongregationIdString(storedName) && storedName !== 'Congregación Central' ? storedName : (settings.congregationName?.trim() || ''));
+
       if (cleanName) {
         setCongName(cleanName);
       }
-      if (settings.midweekMeetingDay) setMidDay(settings.midweekMeetingDay);
-      if (settings.midweekMeetingTime) setMidTime(settings.midweekMeetingTime);
-      if (settings.weekendMeetingDay) setFdsDay(settings.weekendMeetingDay);
-      if (settings.weekendMeetingTime) setFdsTime(settings.weekendMeetingTime);
-      if (settings.hallAddress !== undefined) setHallAddress(settings.hallAddress);
+      const resolvedMidDay = settings.midweekMeetingDay || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_midweek_day') || localStorage.getItem('kongre_midweek_day') : null);
+      if (resolvedMidDay) setMidDay(resolvedMidDay);
+
+      const resolvedMidTime = settings.midweekMeetingTime || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_midweek_time') || localStorage.getItem('kongre_midweek_time') : null);
+      if (resolvedMidTime) setMidTime(resolvedMidTime);
+
+      const resolvedFdsDay = settings.weekendMeetingDay || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_weekend_day') || localStorage.getItem('kongre_weekend_day') : null);
+      if (resolvedFdsDay) setFdsDay(resolvedFdsDay);
+
+      const resolvedFdsTime = settings.weekendMeetingTime || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_weekend_time') || localStorage.getItem('kongre_weekend_time') : null);
+      if (resolvedFdsTime) setFdsTime(resolvedFdsTime);
+
+      const resolvedAddress = settings.hallAddress ?? (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_address') || localStorage.getItem('kongre_hall_address') || '' : '');
+      if (resolvedAddress !== undefined) setHallAddress(resolvedAddress);
+
       if (settings.conflictRules) {
         setAllowPartAndDuty(Boolean(settings.conflictRules.allowPartAndDutySameMeeting));
         setAllowAudioAndMics(Boolean(settings.conflictRules.allowAudioAndMicrophones));
@@ -227,26 +252,73 @@ export const SettingsTab: React.FC = () => {
 
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSaving(true);
+    setSaveSuccessMsg(null);
     userHasEditedRef.current = false;
-    await updateSettings({
-      congregationName: congName.trim(),
-      midweekMeetingDay: midDay,
-      midweekMeetingTime: midTime,
-      weekendMeetingDay: fdsDay,
-      weekendMeetingTime: fdsTime,
-      hallAddress: hallAddress.trim(),
-      conflictRules: {
-        allowPartAndDutySameMeeting: allowPartAndDuty,
-        allowAudioAndMicrophones: allowAudioAndMics,
-        allowPresidentAndOtherPart: allowPresAndPart,
-        maxConsecutiveWeeksWithDuty: Number(maxConsecutiveDuty),
-        maxConsecutiveWeeksWithPart: Number(maxConsecutivePart),
-        enforceSisterDemonstrationRules: enforceSisters,
-        warnOutlineRepeatedWithinMonths: Number(warnOutlineMonths) || 12,
-      },
-    });
-    setSavedFeedback(true);
-    setTimeout(() => setSavedFeedback(false), 3000);
+
+    const trimmedName = congName.trim();
+    const trimmedAddress = hallAddress.trim();
+
+    // 1. Guardado síncrono ultra-robusto en localStorage de inmediato
+    try {
+      if (trimmedName && !isCongregationIdString(trimmedName)) {
+        localStorage.setItem('kongre_congregation_name', trimmedName);
+        localStorage.setItem('kongre_user_confirmed_name', trimmedName);
+      }
+      localStorage.setItem('kongre_midweek_day', midDay);
+      localStorage.setItem('kongre_user_confirmed_midweek_day', midDay);
+      localStorage.setItem('kongre_midweek_time', midTime);
+      localStorage.setItem('kongre_user_confirmed_midweek_time', midTime);
+      localStorage.setItem('kongre_weekend_day', fdsDay);
+      localStorage.setItem('kongre_user_confirmed_weekend_day', fdsDay);
+      localStorage.setItem('kongre_weekend_time', fdsTime);
+      localStorage.setItem('kongre_user_confirmed_weekend_time', fdsTime);
+      localStorage.setItem('kongre_hall_address', trimmedAddress);
+      localStorage.setItem('kongre_user_confirmed_address', trimmedAddress);
+      localStorage.setItem('kongre_settings_user_saved', 'true');
+      localStorage.setItem('kongre_is_registered_congregation', 'true');
+      localStorage.setItem('kongre_has_entered_app', 'true');
+    } catch (storageErr) {
+      console.warn('Error escribiendo en localStorage:', storageErr);
+    }
+
+    try {
+      await updateSettings({
+        congregationName: trimmedName,
+        midweekMeetingDay: midDay,
+        midweekMeetingTime: midTime,
+        weekendMeetingDay: fdsDay,
+        weekendMeetingTime: fdsTime,
+        hallAddress: trimmedAddress,
+        isRegistered: true,
+        conflictRules: {
+          allowPartAndDutySameMeeting: allowPartAndDuty,
+          allowAudioAndMicrophones: allowAudioAndMics,
+          allowPresidentAndOtherPart: allowPresAndPart,
+          maxConsecutiveWeeksWithDuty: Number(maxConsecutiveDuty),
+          maxConsecutiveWeeksWithPart: Number(maxConsecutivePart),
+          enforceSisterDemonstrationRules: enforceSisters,
+          warnOutlineRepeatedWithinMonths: Number(warnOutlineMonths) || 12,
+        },
+      });
+
+      setSavedFeedback(true);
+      setSaveSuccessMsg('¡Configuración guardada correctamente en el dispositivo y sincronizada!');
+      setTimeout(() => {
+        setSavedFeedback(false);
+        setSaveSuccessMsg(null);
+      }, 3500);
+    } catch (saveErr) {
+      console.error('Error al guardar ajustes:', saveErr);
+      setSavedFeedback(true);
+      setSaveSuccessMsg('¡Configuración guardada localmente en tu dispositivo!');
+      setTimeout(() => {
+        setSavedFeedback(false);
+        setSaveSuccessMsg(null);
+      }, 3500);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleSavePin = async (e: React.FormEvent) => {
@@ -404,36 +476,32 @@ export const SettingsTab: React.FC = () => {
   return (
     <div className="w-full space-y-8">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <Settings className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <span>Configuración y Preferencias del Sistema</span>
+            <Building2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <span>Configuración de la Congregación</span>
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Personaliza tu perfil de usuario, preferencias de contacto, datos de la congregación y respaldos.
+            Parámetros del Salón del Reino, circuito, horarios de reuniones, seguridad y copias de seguridad de la congregación.
           </p>
         </div>
+
+        {onNavigateToProfile && (
+          <button
+            type="button"
+            onClick={onNavigateToProfile}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer self-start sm:self-auto shadow-2xs"
+            title="Ir a configurar foto de perfil, teléfono y canales de contacto"
+          >
+            <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span>Mi Perfil Personal</span>
+          </button>
+        )}
       </div>
 
       {/* Sub-navigation Tabs */}
       <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 overflow-x-auto">
-        <button
-          type="button"
-          onClick={() => setSettingsSubView('perfil')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            settingsSubView === 'perfil'
-              ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs ring-1 ring-slate-200/50 dark:ring-slate-700'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          <User className="w-4 h-4" />
-          <span>Mi Perfil y Contacto</span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-semibold border border-indigo-200 dark:border-indigo-800">
-            Firestore
-          </span>
-        </button>
-
         <button
           type="button"
           onClick={() => setSettingsSubView('general')}
@@ -474,97 +542,16 @@ export const SettingsTab: React.FC = () => {
         </button>
       </div>
 
-      {/* VISTA 1: MI PERFIL Y PREFERENCIAS DE CONTACTO (FIRESTORE) */}
-      {settingsSubView === 'perfil' && <UserProfileSettingsView />}
-
-      {/* VISTA 2: CONGREGACIÓN Y HORARIOS */}
+      {/* VISTA 1: CONGREGACIÓN Y HORARIOS */}
       {settingsSubView === 'general' && (
         <div className="space-y-8 animate-fade-in">
-
-      {/* AMBIENTACIÓN Y MODO OSCURO (CABINA & SALÓN DEL REINO) */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
-          <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <span>Ambientación y Modo Oscuro (Cabina & Salón)</span>
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Optimizado para la cabina de audio y video, consola de Zoom y acomodadores en el fondo del auditorio.
-            </p>
-          </div>
-          <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 self-start sm:self-auto">
-            Activo: {themeMode === 'light' ? '☀️ Modo Claro' : themeMode === 'dark' ? '🌙 Modo Oscuro' : '🎛️ Modo Cabina'}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-          {/* 1. Modo Claro */}
-          <button
-            type="button"
-            onClick={() => setThemeMode('light')}
-            className={`p-4 rounded-2xl border text-left transition-all relative cursor-pointer ${
-              themeMode === 'light'
-                ? 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-400 ring-2 ring-amber-400/20 shadow-xs'
-                : 'bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 hover:border-slate-300'
-            }`}
-          >
-            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center mb-3">
-              <Sun className="w-5 h-5" />
-            </div>
-            <h4 className="text-sm font-bold text-slate-900 dark:text-white">Modo Claro (Día)</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Fondo blanco estándar. Óptimo para lectura diurna, secretaría y preparación de asignaciones en casa.
-            </p>
-          </button>
-
-          {/* 2. Modo Oscuro */}
-          <button
-            type="button"
-            onClick={() => setThemeMode('dark')}
-            className={`p-4 rounded-2xl border text-left transition-all relative cursor-pointer ${
-              themeMode === 'dark'
-                ? 'bg-indigo-950/30 border-indigo-500 ring-2 ring-indigo-500/20 shadow-xs'
-                : 'bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 hover:border-slate-300'
-            }`}
-          >
-            <div className="w-10 h-10 rounded-xl bg-indigo-900/60 text-indigo-400 flex items-center justify-center mb-3 border border-indigo-800">
-              <Moon className="w-5 h-5" />
-            </div>
-            <h4 className="text-sm font-bold text-slate-900 dark:text-white">Modo Oscuro (Noche)</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Tonos carbón y pizarra. Descansa la vista y ahorra batería en dispositivos portátiles.
-            </p>
-          </button>
-
-          {/* 3. Modo Cabina & Acomodadores */}
-          <button
-            type="button"
-            onClick={() => setThemeMode('cabina')}
-            className={`p-4 rounded-2xl border text-left transition-all relative cursor-pointer ${
-              themeMode === 'cabina'
-                ? 'bg-emerald-950/40 border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs'
-                : 'bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 hover:border-slate-300'
-            }`}
-          >
-            <div className="w-10 h-10 rounded-xl bg-emerald-950/70 text-emerald-400 flex items-center justify-center mb-3 border border-emerald-800">
-              <Tv className="w-5 h-5" />
-            </div>
-            <h4 className="text-sm font-bold text-slate-900 dark:text-white">Modo Cabina & Salón</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Negro OLED ultra-profundo con atenuación de destellos para no iluminar el auditorio durante la reunión.
-            </p>
-          </button>
-        </div>
-      </div>
-
-      <form onSubmit={handleSaveSettings} className="space-y-8">
-        {/* 1. INFORMACIÓN DE LA CONGREGACIÓN */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-          <h3 className="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-indigo-600" />
-            <span>Información y Horarios de Reunión</span>
-          </h3>
+          <form onSubmit={handleSaveSettings} className="space-y-8">
+            {/* 1. INFORMACIÓN DE LA CONGREGACIÓN */}
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span>Información y Horarios de Reunión</span>
+              </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -575,9 +562,12 @@ export const SettingsTab: React.FC = () => {
                 type="text"
                 required
                 value={congName}
-                onChange={e => setCongName(e.target.value)}
+                onChange={e => {
+                  setCongName(e.target.value);
+                  userHasEditedRef.current = true;
+                }}
                 placeholder="Ej. Congregación Central"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden font-semibold"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden font-semibold"
               />
               <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
                 Este nombre oficial es el que se mostrará en el banner superior, programas y hojas S-89 (el ID de conexión es independiente).
@@ -585,28 +575,34 @@ export const SettingsTab: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                 Dirección del Salón del Reino
               </label>
               <input
                 type="text"
                 value={hallAddress}
-                onChange={e => setHallAddress(e.target.value)}
+                onChange={e => {
+                  setHallAddress(e.target.value);
+                  userHasEditedRef.current = true;
+                }}
                 placeholder="Ej. Av. Las Palmeras 450"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
               />
             </div>
 
             {/* Midweek meeting day & time */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-2 gap-3">
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
                   Día Entre Semana
                 </label>
                 <select
                   value={midDay}
-                  onChange={e => setMidDay(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-slate-200 bg-white"
+                  onChange={e => {
+                    setMidDay(e.target.value);
+                    userHasEditedRef.current = true;
+                  }}
+                  className="w-full p-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
                 >
                   <option value="Lunes">Lunes</option>
                   <option value="Martes">Martes</option>
@@ -617,28 +613,34 @@ export const SettingsTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
                   Hora de Inicio
                 </label>
                 <input
                   type="time"
                   value={midTime}
-                  onChange={e => setMidTime(e.target.value)}
-                  className="w-full p-1.5 text-xs rounded-lg border border-slate-200 bg-white"
+                  onChange={e => {
+                    setMidTime(e.target.value);
+                    userHasEditedRef.current = true;
+                  }}
+                  className="w-full p-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
                 />
               </div>
             </div>
 
             {/* Weekend meeting day & time */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-2 gap-3">
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
                   Día Fin de Semana
                 </label>
                 <select
                   value={fdsDay}
-                  onChange={e => setFdsDay(e.target.value)}
-                  className="w-full p-2 text-xs rounded-lg border border-slate-200 bg-white"
+                  onChange={e => {
+                    setFdsDay(e.target.value);
+                    userHasEditedRef.current = true;
+                  }}
+                  className="w-full p-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
                 >
                   <option value="Sábado">Sábado</option>
                   <option value="Domingo">Domingo</option>
@@ -646,14 +648,17 @@ export const SettingsTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1">
+                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
                   Hora de Inicio
                 </label>
                 <input
                   type="time"
                   value={fdsTime}
-                  onChange={e => setFdsTime(e.target.value)}
-                  className="w-full p-1.5 text-xs rounded-lg border border-slate-200 bg-white"
+                  onChange={e => {
+                    setFdsTime(e.target.value);
+                    userHasEditedRef.current = true;
+                  }}
+                  className="w-full p-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
                 />
               </div>
             </div>
@@ -797,19 +802,48 @@ export const SettingsTab: React.FC = () => {
         </div>
 
         {/* Save button bar */}
-        <div className="flex items-center justify-end gap-3">
-          {savedFeedback && (
-            <span className="text-xs font-bold text-emerald-600 flex items-center gap-1 animate-fade-in">
-              <CheckCircle2 className="w-4 h-4" />
-              ¡Configuración guardada correctamente!
-            </span>
-          )}
+        <div className="flex flex-col sm:flex-row items-end sm:items-center justify-between gap-3 pt-2">
+          <div className="text-xs">
+            {saveSuccessMsg ? (
+              <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 animate-fade-in bg-emerald-50 dark:bg-emerald-950/50 px-3.5 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>{saveSuccessMsg}</span>
+              </span>
+            ) : isFormDirty ? (
+              <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                Tienes cambios sin guardar en los ajustes
+              </span>
+            ) : null}
+          </div>
+
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-md transition-all flex items-center gap-2"
+            disabled={isSaving}
+            className={`px-6 py-2.5 rounded-xl text-white text-sm font-bold shadow-md transition-all flex items-center gap-2 cursor-pointer ${
+              isSaving
+                ? 'bg-indigo-400 cursor-not-allowed opacity-80'
+                : savedFeedback
+                ? 'bg-emerald-600 hover:bg-emerald-700'
+                : 'bg-indigo-600 hover:bg-indigo-700 active:scale-98'
+            }`}
           >
-            <Save className="w-4 h-4" />
-            <span>Guardar Configuración</span>
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Guardando...</span>
+              </>
+            ) : savedFeedback ? (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                <span>¡Guardado con éxito!</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>Guardar Configuración</span>
+              </>
+            )}
           </button>
         </div>
       </form>

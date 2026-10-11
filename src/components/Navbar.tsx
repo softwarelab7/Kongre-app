@@ -5,6 +5,7 @@ import { useCongregation } from '../context/CongregationContext';
 import { useTheme } from '../context/ThemeContext';
 import { useSecurity } from '../context/SecurityContext';
 import { PWAInstallButton } from './PWAInstallButton';
+import { KongreLogo } from './KongreLogo';
 import { getFriendlyCongregationName } from '../utils/theocraticSecurity';
 import {
   Calendar,
@@ -643,14 +644,14 @@ export const Navbar: React.FC<NavbarProps> = ({
          ========================================================================= */}
       {isSidebarVisible && (
         <aside className="hidden md:flex flex-col items-center fixed left-0 top-0 bottom-0 w-16 lg:w-18 z-40 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 py-3 select-none transition-all duration-200 overflow-visible">
-          {/* Top Purple Squircle Button */}
+          {/* Top Brand Squircle Logo Button */}
           <button
             type="button"
             onClick={() => handleSelectTab('inicio')}
-            className="w-10 h-10 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center shadow-sm cursor-pointer transition-transform active:scale-95 mb-4 shrink-0"
+            className="w-10 h-10 flex items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95 mb-4 shrink-0 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 rounded-2xl"
             title="Kongre - Panorama General"
           >
-            <LayoutGrid className="w-5 h-5" />
+            <KongreLogo size="lg" className="w-10 h-10 rounded-2xl shadow-sm hover:shadow-md transition-shadow" />
           </button>
 
           {/* Vertical Categories Stack */}
@@ -850,6 +851,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <PanelLeft className="w-4 h-4" />
             </button>
+
+            {/* If desktop sidebar is collapsed: show brand logo button */}
+            {!isSidebarVisible && (
+              <button
+                type="button"
+                onClick={() => handleSelectTab('inicio')}
+                className="shrink-0 cursor-pointer transition-transform hover:scale-105 active:scale-95 hidden md:block"
+                title="Kongre - Panorama General"
+              >
+                <KongreLogo size="sm" className="w-7 h-7" />
+              </button>
+            )}
 
             {/* Congregation title & current view */}
             <div className="truncate">
@@ -1062,9 +1075,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Drawer Header */}
             <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold">
-                  <LayoutGrid className="w-5 h-5" />
-                </div>
+                <KongreLogo size="lg" className="w-9 h-9 shadow-xs" />
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                     {displayCongregationName}

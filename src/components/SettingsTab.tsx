@@ -133,8 +133,21 @@ export const SettingsTab: React.FC = () => {
   const [fdsTime, setFdsTime] = useState(settings.weekendMeetingTime || '10:00');
   const [hallAddress, setHallAddress] = useState(settings.hallAddress || '');
 
-  // Sincronizar campos cuando settings cambie (por hidratación de almacenamiento o nube)
+  const userHasEditedRef = useRef(false);
+
+  const isFormDirty = Boolean(
+    (congName.trim() !== (settings.congregationName || '').trim()) ||
+    (midDay !== (settings.midweekMeetingDay || 'Miércoles')) ||
+    (midTime !== (settings.midweekMeetingTime || '19:00')) ||
+    (fdsDay !== (settings.weekendMeetingDay || 'Domingo')) ||
+    (fdsTime !== (settings.weekendMeetingTime || '10:00')) ||
+    (hallAddress.trim() !== (settings.hallAddress || '').trim())
+  );
+
+  // Sincronizar campos cuando settings cambie (solo si el usuario NO está editando activamente)
   useEffect(() => {
+    if (userHasEditedRef.current) return;
+
     if (settings) {
       const cleanName = settings.congregationName && !isCongregationIdString(settings.congregationName)
         ? settings.congregationName.trim()
@@ -214,6 +227,7 @@ export const SettingsTab: React.FC = () => {
 
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
+    userHasEditedRef.current = false;
     await updateSettings({
       congregationName: congName.trim(),
       midweekMeetingDay: midDay,
@@ -232,7 +246,7 @@ export const SettingsTab: React.FC = () => {
       },
     });
     setSavedFeedback(true);
-    setTimeout(() => setSavedFeedback(false), 2000);
+    setTimeout(() => setSavedFeedback(false), 3000);
   };
 
   const handleSavePin = async (e: React.FormEvent) => {

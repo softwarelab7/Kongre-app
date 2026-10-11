@@ -155,11 +155,11 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         const cleanCongName =
           settings.congregationName && !isCongregationIdString(settings.congregationName)
             ? settings.congregationName
-            : 'Congregación Central';
+            : (localStorage.getItem('kongre_congregation_name') || '');
 
         updateSettings({
           isRegistered: true,
-          congregationName: cleanCongName,
+          ...(cleanCongName ? { congregationName: cleanCongName } : {}),
           congregationNumber: cleanId,
         });
 

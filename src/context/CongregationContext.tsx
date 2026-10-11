@@ -397,15 +397,23 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [settings, setSettings] = useState<CongregationSettings>(() => {
     try {
       const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_settings`) || localStorage.getItem('kongre_saved_settings_backup');
-      const storedCongName = localStorage.getItem('kongre_congregation_name') || '';
-      const storedMidDay = localStorage.getItem('kongre_midweek_day');
-      const storedMidTime = localStorage.getItem('kongre_midweek_time');
-      const storedFdsDay = localStorage.getItem('kongre_weekend_day');
-      const storedFdsTime = localStorage.getItem('kongre_weekend_time');
+      const confirmedName = localStorage.getItem('kongre_user_confirmed_name');
+      const confirmedMidDay = localStorage.getItem('kongre_user_confirmed_midweek_day');
+      const confirmedMidTime = localStorage.getItem('kongre_user_confirmed_midweek_time');
+      const confirmedFdsDay = localStorage.getItem('kongre_user_confirmed_weekend_day');
+      const confirmedFdsTime = localStorage.getItem('kongre_user_confirmed_weekend_time');
+      const confirmedAddress = localStorage.getItem('kongre_user_confirmed_address');
+
+      const storedCongName = confirmedName || localStorage.getItem('kongre_congregation_name') || '';
+      const storedMidDay = confirmedMidDay || localStorage.getItem('kongre_midweek_day');
+      const storedMidTime = confirmedMidTime || localStorage.getItem('kongre_midweek_time');
+      const storedFdsDay = confirmedFdsDay || localStorage.getItem('kongre_weekend_day');
+      const storedFdsTime = confirmedFdsTime || localStorage.getItem('kongre_weekend_time');
+      const storedAddress = confirmedAddress !== null && confirmedAddress !== undefined ? confirmedAddress : localStorage.getItem('kongre_hall_address');
 
       if (saved) {
         const parsed = JSON.parse(saved);
-        const rawName = parsed.congregationName || storedCongName;
+        const rawName = confirmedName || parsed.congregationName || storedCongName;
         const cleanName =
           rawName && !isCongregationIdString(rawName)
             ? rawName
@@ -414,11 +422,11 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           ...INITIAL_SETTINGS,
           ...parsed,
           congregationName: cleanName || parsed.congregationName || storedCongName || '',
-          midweekMeetingDay: parsed.midweekMeetingDay || storedMidDay || INITIAL_SETTINGS.midweekMeetingDay,
-          midweekMeetingTime: parsed.midweekMeetingTime || storedMidTime || INITIAL_SETTINGS.midweekMeetingTime,
-          weekendMeetingDay: parsed.weekendMeetingDay || storedFdsDay || INITIAL_SETTINGS.weekendMeetingDay,
-          weekendMeetingTime: parsed.weekendMeetingTime || storedFdsTime || INITIAL_SETTINGS.weekendMeetingTime,
-          hallAddress: parsed.hallAddress || INITIAL_SETTINGS.hallAddress,
+          midweekMeetingDay: confirmedMidDay || parsed.midweekMeetingDay || storedMidDay || INITIAL_SETTINGS.midweekMeetingDay,
+          midweekMeetingTime: confirmedMidTime || parsed.midweekMeetingTime || storedMidTime || INITIAL_SETTINGS.midweekMeetingTime,
+          weekendMeetingDay: confirmedFdsDay || parsed.weekendMeetingDay || storedFdsDay || INITIAL_SETTINGS.weekendMeetingDay,
+          weekendMeetingTime: confirmedFdsTime || parsed.weekendMeetingTime || storedFdsTime || INITIAL_SETTINGS.weekendMeetingTime,
+          hallAddress: (confirmedAddress !== null && confirmedAddress !== undefined) ? confirmedAddress : (parsed.hallAddress || storedAddress || INITIAL_SETTINGS.hallAddress),
           isRegistered: parsed.isRegistered || Boolean(cleanName) || localStorage.getItem('kongre_is_registered_congregation') === 'true',
           conflictRules: {
             ...INITIAL_SETTINGS.conflictRules,
@@ -433,6 +441,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           midweekMeetingTime: storedMidTime || INITIAL_SETTINGS.midweekMeetingTime,
           weekendMeetingDay: storedFdsDay || INITIAL_SETTINGS.weekendMeetingDay,
           weekendMeetingTime: storedFdsTime || INITIAL_SETTINGS.weekendMeetingTime,
+          hallAddress: storedAddress || INITIAL_SETTINGS.hallAddress,
           isRegistered: true,
         };
       }
@@ -442,6 +451,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return INITIAL_SETTINGS;
   });
 
+  const skipNextSnapshotEchoRef = useRef(false);
   const latestSettingsRef = useRef<CongregationSettings>(settings);
   useEffect(() => {
     latestSettingsRef.current = settings;
@@ -842,50 +852,78 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (saved) currentLocal = JSON.parse(saved);
       } catch {}
 
-      const localStoredName = localStorage.getItem('kongre_congregation_name');
-      const localName = (currentLocal?.congregationName || localStoredName || settings.congregationName || '').trim();
+      const hasUserSavedLocally = localStorage.getItem('kongre_settings_user_saved') === 'true';
+      const userConfirmedName = localStorage.getItem('kongre_user_confirmed_name');
+      const userConfirmedMidDay = localStorage.getItem('kongre_user_confirmed_midweek_day');
+      const userConfirmedMidTime = localStorage.getItem('kongre_user_confirmed_midweek_time');
+      const userConfirmedFdsDay = localStorage.getItem('kongre_user_confirmed_weekend_day');
+      const userConfirmedFdsTime = localStorage.getItem('kongre_user_confirmed_weekend_time');
+      const userConfirmedAddress = localStorage.getItem('kongre_user_confirmed_address');
+
+      const localStoredName = userConfirmedName || localStorage.getItem('kongre_congregation_name');
+      const localName = (userConfirmedName || currentLocal?.congregationName || localStoredName || settings.congregationName || '').trim();
       const cloudName = (data.settings.congregationName || '').trim();
 
-      const isLocalRealName = Boolean(localName && !isCongregationIdString(localName) && localName !== 'Congregación Central');
-      const isCloudRealName = Boolean(cloudName && !isCongregationIdString(cloudName) && cloudName !== 'Congregación Central');
+      const isLocalRealName = Boolean(localName && !isCongregationIdString(localName));
+      const isCloudRealName = Boolean(cloudName && !isCongregationIdString(cloudName));
 
-      const lastLocalUpdate = localStorage.getItem('kongre_last_local_update') || currentLocal?.updatedAt || currentLocal?.registeredAt || '';
-      const cloudUpdatedAt = data.updatedAt || data.settings?.updatedAt || '';
+      // Comprobar marcas de tiempo ESPECÍFICAS de configuración
+      const lastSettingsUpdate = localStorage.getItem('kongre_last_settings_update') || currentLocal?.updatedAt || '';
+      const cloudSettingsUpdatedAt = data.settings?.updatedAt || '';
 
-      const isLocalNewer = Boolean(!cloudUpdatedAt || (lastLocalUpdate && lastLocalUpdate >= cloudUpdatedAt));
+      // La nube solo tiene prioridad si la configuración de la nube fue guardada explícitamente después del guardado local
+      // Y contiene datos válidos
+      const isCloudSettingsNewer = Boolean(
+        cloudSettingsUpdatedAt &&
+        lastSettingsUpdate &&
+        cloudSettingsUpdatedAt > lastSettingsUpdate &&
+        isCloudRealName
+      );
 
-      // Decidir el nombre oficial: nunca sobreescribir un nombre local válido con valores vacíos o genéricos
+      // Decidir el nombre oficial: Si el usuario guardó localmente mediante "Guardar", protegerlo absolutamente
       let finalCongName = '';
-      if (isLocalRealName && !isCloudRealName) {
+      if (hasUserSavedLocally && (userConfirmedName || isLocalRealName) && !isCloudSettingsNewer) {
+        finalCongName = userConfirmedName || localName;
+      } else if (isLocalRealName && !isCloudRealName) {
         finalCongName = localName;
       } else if (isCloudRealName && !isLocalRealName) {
         finalCongName = cloudName;
       } else if (isLocalRealName && isCloudRealName) {
-        finalCongName = isLocalNewer ? localName : cloudName;
+        finalCongName = isCloudSettingsNewer ? cloudName : (userConfirmedName || localName);
       } else {
-        finalCongName = localName || cloudName || '';
+        finalCongName = userConfirmedName || localName || cloudName || '';
       }
 
-      // Decidir los días y horarios: si local es más reciente o fue personalizado, PRESERVAR local!
-      const finalMidDay = isLocalNewer
-        ? (currentLocal?.midweekMeetingDay || localStorage.getItem('kongre_midweek_day') || data.settings.midweekMeetingDay || 'Miércoles')
-        : (data.settings.midweekMeetingDay || currentLocal?.midweekMeetingDay || localStorage.getItem('kongre_midweek_day') || 'Miércoles');
+      // Decidir los días y horarios: Si el usuario guardó localmente mediante el botón Guardar, PRESERVAR local
+      const finalMidDay = (hasUserSavedLocally && userConfirmedMidDay && !isCloudSettingsNewer)
+        ? userConfirmedMidDay
+        : (isCloudSettingsNewer && data.settings.midweekMeetingDay
+          ? data.settings.midweekMeetingDay
+          : (userConfirmedMidDay || currentLocal?.midweekMeetingDay || localStorage.getItem('kongre_midweek_day') || data.settings.midweekMeetingDay || 'Miércoles'));
 
-      const finalMidTime = isLocalNewer
-        ? (currentLocal?.midweekMeetingTime || localStorage.getItem('kongre_midweek_time') || data.settings.midweekMeetingTime || '19:00')
-        : (data.settings.midweekMeetingTime || currentLocal?.midweekMeetingTime || localStorage.getItem('kongre_midweek_time') || '19:00');
+      const finalMidTime = (hasUserSavedLocally && userConfirmedMidTime && !isCloudSettingsNewer)
+        ? userConfirmedMidTime
+        : (isCloudSettingsNewer && data.settings.midweekMeetingTime
+          ? data.settings.midweekMeetingTime
+          : (userConfirmedMidTime || currentLocal?.midweekMeetingTime || localStorage.getItem('kongre_midweek_time') || data.settings.midweekMeetingTime || '19:00'));
 
-      const finalFdsDay = isLocalNewer
-        ? (currentLocal?.weekendMeetingDay || localStorage.getItem('kongre_weekend_day') || data.settings.weekendMeetingDay || 'Domingo')
-        : (data.settings.weekendMeetingDay || currentLocal?.weekendMeetingDay || localStorage.getItem('kongre_weekend_day') || 'Domingo');
+      const finalFdsDay = (hasUserSavedLocally && userConfirmedFdsDay && !isCloudSettingsNewer)
+        ? userConfirmedFdsDay
+        : (isCloudSettingsNewer && data.settings.weekendMeetingDay
+          ? data.settings.weekendMeetingDay
+          : (userConfirmedFdsDay || currentLocal?.weekendMeetingDay || localStorage.getItem('kongre_weekend_day') || data.settings.weekendMeetingDay || 'Domingo'));
 
-      const finalFdsTime = isLocalNewer
-        ? (currentLocal?.weekendMeetingTime || localStorage.getItem('kongre_weekend_time') || data.settings.weekendMeetingTime || '10:00')
-        : (data.settings.weekendMeetingTime || currentLocal?.weekendMeetingTime || localStorage.getItem('kongre_weekend_time') || '10:00');
+      const finalFdsTime = (hasUserSavedLocally && userConfirmedFdsTime && !isCloudSettingsNewer)
+        ? userConfirmedFdsTime
+        : (isCloudSettingsNewer && data.settings.weekendMeetingTime
+          ? data.settings.weekendMeetingTime
+          : (userConfirmedFdsTime || currentLocal?.weekendMeetingTime || localStorage.getItem('kongre_weekend_time') || data.settings.weekendMeetingTime || '10:00'));
 
-      const finalAddress = isLocalNewer
-        ? (currentLocal?.hallAddress || data.settings.hallAddress || '')
-        : (data.settings.hallAddress || currentLocal?.hallAddress || '');
+      const finalAddress = (hasUserSavedLocally && userConfirmedAddress !== null && userConfirmedAddress !== undefined && !isCloudSettingsNewer)
+        ? (userConfirmedAddress || '')
+        : (isCloudSettingsNewer && data.settings.hallAddress !== undefined
+          ? data.settings.hallAddress
+          : (userConfirmedAddress || currentLocal?.hallAddress || localStorage.getItem('kongre_hall_address') || data.settings.hallAddress || ''));
 
       const isReg = Boolean(
         data.settings.isRegistered ||
@@ -894,6 +932,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         Boolean(finalCongName && finalCongName.trim() !== '') ||
         (data.publishers && data.publishers.length > 0)
       );
+
+      const isLocalNewer = !isCloudSettingsNewer;
 
       const baseMerged = isLocalNewer
         ? { ...INITIAL_SETTINGS, ...data.settings, ...(currentLocal || {}) }
@@ -924,6 +964,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         localStorage.setItem('kongre_midweek_time', finalMidTime);
         localStorage.setItem('kongre_weekend_day', finalFdsDay);
         localStorage.setItem('kongre_weekend_time', finalFdsTime);
+        if (finalAddress) {
+          localStorage.setItem('kongre_hall_address', finalAddress);
+        }
       } catch {}
       if (isReg) {
         localStorage.setItem('kongre_is_registered_congregation', 'true');
@@ -1124,8 +1167,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
 
         // Si acabamos de subir los datos locales a Firestore, ignorar el eco que emite onSnapshot
-        if (skipNextSnapshotEcho) {
+        if (skipNextSnapshotEcho || skipNextSnapshotEchoRef.current) {
           skipNextSnapshotEcho = false;
+          skipNextSnapshotEchoRef.current = false;
           setSyncStatus('synced');
           return;
         }
@@ -1271,20 +1315,45 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const nowISO = new Date().toISOString();
     localStorage.setItem('kongre_last_local_update', nowISO);
 
-    // Asegurar persistencia local inmediata
-    if (newSettings) {
-      try {
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_settings`, JSON.stringify(newSettings));
-        localStorage.setItem('kongre_saved_settings_backup', JSON.stringify(newSettings));
-        if (newSettings.congregationName?.trim() && !isCongregationIdString(newSettings.congregationName)) {
-          localStorage.setItem('kongre_congregation_name', newSettings.congregationName.trim());
-        }
-        if (newSettings.midweekMeetingDay) localStorage.setItem('kongre_midweek_day', newSettings.midweekMeetingDay);
-        if (newSettings.midweekMeetingTime) localStorage.setItem('kongre_midweek_time', newSettings.midweekMeetingTime);
-        if (newSettings.weekendMeetingDay) localStorage.setItem('kongre_weekend_day', newSettings.weekendMeetingDay);
-        if (newSettings.weekendMeetingTime) localStorage.setItem('kongre_weekend_time', newSettings.weekendMeetingTime);
-      } catch {}
+    // Resolver configuración asegurando que nunca se sobreescriba con estados antiguos de clausuras
+    const baseSettings = latestSettingsRef.current;
+    const resolvedSettings: CongregationSettings = {
+      ...baseSettings,
+      ...(newSettings || {}),
+    };
+
+    // Si el usuario guardó explícitamente sus datos mediante "Guardar", protegerlos siempre
+    if (localStorage.getItem('kongre_settings_user_saved') === 'true') {
+      const confirmedName = localStorage.getItem('kongre_user_confirmed_name');
+      const confirmedMidDay = localStorage.getItem('kongre_user_confirmed_midweek_day');
+      const confirmedMidTime = localStorage.getItem('kongre_user_confirmed_midweek_time');
+      const confirmedFdsDay = localStorage.getItem('kongre_user_confirmed_weekend_day');
+      const confirmedFdsTime = localStorage.getItem('kongre_user_confirmed_weekend_time');
+      const confirmedAddress = localStorage.getItem('kongre_user_confirmed_address');
+
+      if (confirmedName && (!resolvedSettings.congregationName || isCongregationIdString(resolvedSettings.congregationName))) {
+        resolvedSettings.congregationName = confirmedName;
+      }
+      if (confirmedMidDay) resolvedSettings.midweekMeetingDay = confirmedMidDay;
+      if (confirmedMidTime) resolvedSettings.midweekMeetingTime = confirmedMidTime;
+      if (confirmedFdsDay) resolvedSettings.weekendMeetingDay = confirmedFdsDay;
+      if (confirmedFdsTime) resolvedSettings.weekendMeetingTime = confirmedFdsTime;
+      if (confirmedAddress !== null && confirmedAddress !== undefined) resolvedSettings.hallAddress = confirmedAddress;
     }
+
+    // Asegurar persistencia local inmediata
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_settings`, JSON.stringify(resolvedSettings));
+      localStorage.setItem('kongre_saved_settings_backup', JSON.stringify(resolvedSettings));
+      if (resolvedSettings.congregationName?.trim() && !isCongregationIdString(resolvedSettings.congregationName)) {
+        localStorage.setItem('kongre_congregation_name', resolvedSettings.congregationName.trim());
+      }
+      if (resolvedSettings.midweekMeetingDay) localStorage.setItem('kongre_midweek_day', resolvedSettings.midweekMeetingDay);
+      if (resolvedSettings.midweekMeetingTime) localStorage.setItem('kongre_midweek_time', resolvedSettings.midweekMeetingTime);
+      if (resolvedSettings.weekendMeetingDay) localStorage.setItem('kongre_weekend_day', resolvedSettings.weekendMeetingDay);
+      if (resolvedSettings.weekendMeetingTime) localStorage.setItem('kongre_weekend_time', resolvedSettings.weekendMeetingTime);
+      if (resolvedSettings.hallAddress) localStorage.setItem('kongre_hall_address', resolvedSettings.hallAddress);
+    } catch {}
 
     // Si la cuota diaria fue superada, guardar de inmediato en local y suspender llamadas cloud
     if (isFirestoreQuotaExceeded()) {
@@ -1293,8 +1362,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     const congDocId = (
-      newSettings.congregationNumber ||
-      newSettings.congregationId ||
+      resolvedSettings.congregationNumber ||
+      resolvedSettings.congregationId ||
       latestSettingsRef.current.congregationNumber ||
       latestSettingsRef.current.congregationId ||
       ''
@@ -1305,7 +1374,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       weeks: newWeeks,
       preachingGroups: newGroups,
       customDuties: newDuties,
-      settings: newSettings,
+      settings: resolvedSettings,
       outgoingSpeakers: newOutgoing,
       fieldServiceMeetings: newFieldService,
       cartLocations: newCartLocs,
@@ -1347,6 +1416,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
 
       try {
+        skipNextSnapshotEchoRef.current = true;
         if (activeUser) {
           const userDocRef = doc(db, 'users', activeUser.uid, 'congregation_data', 'main');
           await setDoc(userDocRef, payload, { merge: true });
@@ -2799,14 +2869,45 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_settings`, JSON.stringify(merged));
       localStorage.setItem('kongre_saved_settings_backup', JSON.stringify(merged));
+      localStorage.setItem('kongre_settings_user_saved', 'true');
+      localStorage.setItem('kongre_last_settings_update', nowISO);
       localStorage.setItem('kongre_last_local_update', nowISO);
       if (merged.congregationName?.trim() && !isCongregationIdString(merged.congregationName)) {
         localStorage.setItem('kongre_congregation_name', merged.congregationName.trim());
+        if (newSettings.congregationName !== undefined) {
+          localStorage.setItem('kongre_user_confirmed_name', merged.congregationName.trim());
+        }
       }
-      if (merged.midweekMeetingDay) localStorage.setItem('kongre_midweek_day', merged.midweekMeetingDay);
-      if (merged.midweekMeetingTime) localStorage.setItem('kongre_midweek_time', merged.midweekMeetingTime);
-      if (merged.weekendMeetingDay) localStorage.setItem('kongre_weekend_day', merged.weekendMeetingDay);
-      if (merged.weekendMeetingTime) localStorage.setItem('kongre_weekend_time', merged.weekendMeetingTime);
+      if (merged.midweekMeetingDay) {
+        localStorage.setItem('kongre_midweek_day', merged.midweekMeetingDay);
+        if (newSettings.midweekMeetingDay) {
+          localStorage.setItem('kongre_user_confirmed_midweek_day', merged.midweekMeetingDay);
+        }
+      }
+      if (merged.midweekMeetingTime) {
+        localStorage.setItem('kongre_midweek_time', merged.midweekMeetingTime);
+        if (newSettings.midweekMeetingTime) {
+          localStorage.setItem('kongre_user_confirmed_midweek_time', merged.midweekMeetingTime);
+        }
+      }
+      if (merged.weekendMeetingDay) {
+        localStorage.setItem('kongre_weekend_day', merged.weekendMeetingDay);
+        if (newSettings.weekendMeetingDay) {
+          localStorage.setItem('kongre_user_confirmed_weekend_day', merged.weekendMeetingDay);
+        }
+      }
+      if (merged.weekendMeetingTime) {
+        localStorage.setItem('kongre_weekend_time', merged.weekendMeetingTime);
+        if (newSettings.weekendMeetingTime) {
+          localStorage.setItem('kongre_user_confirmed_weekend_time', merged.weekendMeetingTime);
+        }
+      }
+      if (merged.hallAddress !== undefined) {
+        localStorage.setItem('kongre_hall_address', merged.hallAddress || '');
+        if (newSettings.hallAddress !== undefined) {
+          localStorage.setItem('kongre_user_confirmed_address', merged.hallAddress || '');
+        }
+      }
       if (merged.isRegistered || (merged.congregationName && merged.congregationName.trim())) {
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
@@ -2815,7 +2916,32 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       console.warn('Error guardando settings localmente:', e);
     }
 
-    await saveToFirestore(publishers, weeks, preachingGroups, customDuties, merged);
+    await saveToFirestore(
+      publishers,
+      weeks,
+      preachingGroups,
+      customDuties,
+      merged,
+      outgoingSpeakers,
+      fieldServiceMeetings,
+      cartLocations,
+      cartShifts,
+      notices,
+      monthlyReports,
+      territories,
+      circuitVisit,
+      transactions,
+      quarterlyAudits,
+      memorialPlans,
+      theocraticAssemblies,
+      literatureItems,
+      specialOrders,
+      groupDistributions,
+      inventoryRecords,
+      accountLinkRequests,
+      clmProgramas,
+      { immediate: true }
+    );
   };
 
   // Carritos de predicación y avisos

@@ -40,10 +40,16 @@ export const ExportPdfTab: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'programa' | 's89' | 'whatsapp'>('programa');
   const [notifiedKeys, setNotifiedKeys] = useState<Record<string, boolean>>({});
   const [copiedSummary, setCopiedSummary] = useState(false);
+  const [pdfCongregationName, setPdfCongregationName] = useState(settings.congregationName || '');
+
+  useEffect(() => {
+    setPdfCongregationName(settings.congregationName || '');
+  }, [settings.congregationName]);
 
   const handleDownloadPdf = () => {
     generateProgramPdf(weeks, publishersMap, {
       ...settings,
+      congregationName: pdfCongregationName.trim() || settings.congregationName || 'Congregación',
       pdfTemplate: activeTemplate,
       pdfPageSize: pageSize,
       pdfSections: {
@@ -56,7 +62,10 @@ export const ExportPdfTab: React.FC = () => {
   };
 
   const handleDownloadExcel = () => {
-    exportScheduleToCsvExcel(weeks, publishersMap, settings);
+    exportScheduleToCsvExcel(weeks, publishersMap, {
+      ...settings,
+      congregationName: pdfCongregationName.trim() || settings.congregationName || 'Congregación',
+    });
   };
 
   const handleDownloadIcs = () => {
@@ -251,8 +260,9 @@ export const ExportPdfTab: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  value={settings.congregationName}
-                  onChange={e => updateSettings({ congregationName: e.target.value })}
+                  value={pdfCongregationName}
+                  onChange={e => setPdfCongregationName(e.target.value)}
+                  placeholder="Ej. Congregación Central"
                   className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200"
                 />
               </div>

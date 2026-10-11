@@ -64,6 +64,7 @@ import {
   UserMinus,
   MoreHorizontal,
   ChevronDown,
+  X,
 } from 'lucide-react';
 
 export const ScheduleTab: React.FC = () => {
@@ -170,6 +171,8 @@ export const ScheduleTab: React.FC = () => {
   const [isClearWeekAssignmentsModalOpen, setIsClearWeekAssignmentsModalOpen] = useState(false);
   const [clearScope, setClearScope] = useState<'all' | 'midweek' | 'weekend' | 'duties'>('all');
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
+  const [isWeekendEditModalOpen, setIsWeekendEditModalOpen] = useState(false);
+  const [weekendEditTab, setWeekendEditTab] = useState<'discurso' | 'atalaya' | 'canciones'>('discurso');
   const [toastNotification, setToastNotification] = useState<string | null>(null);
 
   const handleConfirmClearAssignments = async () => {
@@ -871,557 +874,982 @@ export const ScheduleTab: React.FC = () => {
         </div>
       )}
 
-          {(viewMode === 'all' || viewMode === 'weekend') && (
-            /* REUNIÓN DE FIN DE SEMANA */
-            <div className={`bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs transition-opacity ${
+      {/* REUNIÓN DEL FIN DE SEMANA (DISEÑO UNIFICADO CON VIDA Y MINISTERIO) */}
+      {(viewMode === 'all' || viewMode === 'weekend') && (
+        <div className="space-y-4">
+          <div
+            className={`rounded-3xl border border-slate-200 dark:border-white/10 overflow-hidden bg-white dark:bg-slate-900 shadow-xs transition-opacity ${
               currentWeek.specialEvent?.noMeetingWeekend ? 'opacity-60 pointer-events-none' : ''
-            }`}>
-        <div className="p-4 sm:p-5 bg-linear-to-r from-emerald-950 via-slate-900 to-emerald-950 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300">
-              <CalendarCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">
-                {settings.weekendMeetingDay} • {currentWeek.weekend.date} ({settings.weekendMeetingTime})
-              </span>
-              <h3 className="text-lg font-bold tracking-tight">Reunión del Fin de Semana</h3>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-300">Presidencia:</span>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() =>
-                  openSelector(
-                    'Presidente reunión fin de semana',
-                    'fds_presidente',
-                    'hermano',
-                    currentWeek.weekend.date,
-                    'weekend',
-                    currentWeek.weekend.presidentId,
-                    pid => {
-                      const u = JSON.parse(JSON.stringify(currentWeek));
-                      u.weekend.presidentId = pid;
-                      updateWeek(u);
-                    },
-                    () => {
-                      const u = JSON.parse(JSON.stringify(currentWeek));
-                      u.weekend.presidentId = undefined;
-                      updateWeek(u);
-                    }
-                  )
-                }
-                className="px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold border border-white/20 transition-all cursor-pointer"
-              >
-                {publishersMap.get(currentWeek.weekend.presidentId || '')?.name || 'Seleccionar Presidente'}
-              </button>
-              {currentWeek.weekend.presidentId && !isReadOnly && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const u = JSON.parse(JSON.stringify(currentWeek));
-                    u.weekend.presidentId = undefined;
-                    updateWeek(u);
-                  }}
-                  className="p-1 rounded-lg bg-rose-500/20 hover:bg-rose-600 text-rose-200 hover:text-white border border-rose-400/40 transition cursor-pointer"
-                  title="Quitar presidente asignado (dejar libre)"
-                >
-                  <UserMinus className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 sm:p-6 space-y-6">
-          {/* Weekend Info: Bosquejo y Canciones */}
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-md bg-emerald-600 text-white font-bold text-[10px] uppercase tracking-wider shadow-2xs">
-                Oficial
-              </span>
-              <div className="flex items-center gap-1.5 text-emerald-950 dark:text-emerald-200 font-bold">
-                <Mic className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>
-                  Bosquejo Oficial #{currentWeek.weekend.publicTalkOutlineNumber || 1}: {currentWeek.weekend.publicTalkTheme || '¿Conoce usted bien a Dios?'}
+            }`}
+          >
+            {/* ── ENCABEZADO FDS SUPER MINIMALISTA (MODO EMBEBIDO / UNIFICADO) ── */}
+            <div className="px-5 py-2.5 bg-slate-50/70 dark:bg-slate-800/30 border-b border-slate-200/70 dark:border-white/[0.05] flex items-center justify-between gap-3 flex-wrap text-xs">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-slate-800 dark:text-zinc-200">
+                  Reunión del Fin de Semana
+                </span>
+                <span className="text-slate-300 dark:text-slate-600">•</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
+                  {settings.weekendMeetingDay} • {currentWeek.weekend.date} ({settings.weekendMeetingTime})
                 </span>
               </div>
-            </div>
 
-            <div className="flex flex-wrap items-center gap-3 text-slate-600 dark:text-slate-400 text-[11px]">
-              <span className="flex items-center gap-1">
-                <Music className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span className="font-semibold text-slate-700 dark:text-slate-300">Canciones FDS:</span>
-                <span>{currentWeek.weekend.openingSong || 12} (apertura) • {currentWeek.weekend.middleSong || 68} (intermedia) • {currentWeek.weekend.closingSong || 138} (conclusión)</span>
-              </span>
-
-              {!isReadOnly && (
-                <button
-                  type="button"
-                  onClick={() => handleQuickSyncOrganized('weekend')}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-900 hover:bg-emerald-100 dark:hover:bg-slate-800 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-bold text-[11px] transition shadow-2xs cursor-pointer ml-auto"
-                  title="Traer de Organized el bosquejo oficial de discurso público, estudio de La Atalaya y canciones del fin de semana"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span>Traer de Organized</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Public talk & Watchtower row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Discurso público */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-              <div className="flex items-center justify-between pb-1 border-b border-slate-200">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase text-slate-500">Discurso Público (30 min)</span>
-                  {currentWeek.weekend.publicTalkOutlineNumber && (
-                    <span className="px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300 font-bold text-[10px]">
-                      Bosquejo #{currentWeek.weekend.publicTalkOutlineNumber}
-                    </span>
-                  )}
-                </div>
+              <div className="flex items-center gap-2">
                 {!isReadOnly && (
                   <button
                     type="button"
-                    onClick={() => {
-                      setOrganizedModalTab('bosquejos');
-                      setIsOrganizedModalOpen(true);
-                    }}
-                    className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-bold border border-indigo-200 transition cursor-pointer"
-                    title="Ver catálogo de 194 bosquejos oficiales"
+                    onClick={() => handleQuickSyncOrganized('weekend')}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-medium text-xs transition shadow-2xs cursor-pointer"
+                    title="Traer de Organized el bosquejo oficial y canciones del fin de semana"
                   >
-                    <Sparkles className="w-3 h-3 text-indigo-600" />
-                    <span>Catálogo de Bosquejos (1-194)</span>
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Sincronizar Bosquejo</span>
                   </button>
                 )}
-              </div>
 
-              {/* Selector de Bosquejo Oficial */}
-              <div>
-                <span className="text-[10px] font-semibold text-slate-500 block mb-1">
-                  Seleccionar Bosquejo Oficial (#1 al 194):
-                </span>
-                <select
-                  value={currentWeek.weekend.publicTalkOutlineNumber || ''}
-                  onChange={e => {
-                    const num = parseInt(e.target.value, 10);
-                    const found = findOutlineByNumber(num);
-                    const u = JSON.parse(JSON.stringify(currentWeek));
-                    u.weekend.publicTalkOutlineNumber = isNaN(num) ? undefined : num;
-                    if (found) {
-                      u.weekend.publicTalkTheme = found.title;
-                    }
-                    updateWeek(u);
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOrganizedModalTab('bosquejos');
+                    setIsOrganizedModalOpen(true);
                   }}
-                  className="w-full text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded-lg p-2 focus:ring-1 focus:ring-indigo-500"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-medium text-xs transition shadow-2xs cursor-pointer"
+                  title="Ver catálogo oficial de 194 bosquejos"
                 >
-                  <option value="">-- Seleccionar bosquejo del catálogo oficial --</option>
-                  {OFFICIAL_PUBLIC_TALK_OUTLINES.map(o => (
-                    <option key={o.number} value={o.number}>
-                      #{o.number}: {o.title} {o.category ? `(${o.category})` : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <span className="text-[10px] text-slate-400">Tema del discurso:</span>
-                <input
-                  type="text"
-                  value={currentWeek.weekend.publicTalkTheme || ''}
-                  onChange={e => {
-                    const u = JSON.parse(JSON.stringify(currentWeek));
-                    u.weekend.publicTalkTheme = e.target.value;
-                    updateWeek(u);
-                  }}
-                  placeholder="Ej. ¿Quién es el Dios verdadero?"
-                  className="w-full text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded-lg p-2 focus:ring-1 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <div>
-                  <span className="text-[10px] text-slate-400">Orador (local o visitante):</span>
-                  <input
-                    type="text"
-                    value={currentWeek.weekend.publicTalkSpeaker || ''}
-                    onChange={e => {
-                      const u = JSON.parse(JSON.stringify(currentWeek));
-                      u.weekend.publicTalkSpeaker = e.target.value;
-                      updateWeek(u);
-                    }}
-                    placeholder="Ej. Hno. Juan Pérez"
-                    className="w-full text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded-lg p-2 focus:ring-1 focus:ring-indigo-500"
-                  />
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-400">Congregación del orador:</span>
-                  <input
-                    type="text"
-                    value={currentWeek.weekend.visitingSpeakerCongregation || ''}
-                    onChange={e => {
-                      const u = JSON.parse(JSON.stringify(currentWeek));
-                      u.weekend.visitingSpeakerCongregation = e.target.value;
-                      updateWeek(u);
-                    }}
-                    placeholder="Ej. Los Pinos / Local"
-                    className="w-full text-xs font-semibold text-slate-800 bg-white border border-slate-200 rounded-lg p-2 focus:ring-1 focus:ring-indigo-500"
-                  />
-                </div>
+                  <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Catálogo (#1-194)</span>
+                </button>
               </div>
             </div>
 
-            {/* Estudio de La Atalaya */}
-            <div className="p-4 rounded-2xl bg-emerald-50/40 border border-emerald-200/80 space-y-3">
-              <div className="flex items-center justify-between pb-1 border-b border-emerald-200/80">
-                <span className="text-[10px] font-bold uppercase text-emerald-800">
-                  Estudio de La Atalaya (60 min)
-                </span>
-                <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
-                  Oficial
-                </span>
-              </div>
-
-              <div>
-                <span className="text-[10px] text-slate-500 font-medium">Tema / Artículo de La Atalaya:</span>
-                <input
-                  type="text"
-                  value={currentWeek.weekend.watchtowerTheme || ''}
-                  onChange={e => {
-                    const u = JSON.parse(JSON.stringify(currentWeek));
-                    u.weekend.watchtowerTheme = e.target.value;
-                    updateWeek(u);
-                  }}
-                  placeholder="Ej. Confiemos plenamente en el cuidado amoroso de Jehová"
-                  className="w-full text-xs font-semibold text-slate-800 bg-white border border-emerald-200 rounded-lg p-2 focus:ring-1 focus:ring-emerald-500 mt-0.5"
-                />
-              </div>
-
-              <div>
-                <span className="text-[10px] text-slate-500 font-medium">Texto temático:</span>
-                <input
-                  type="text"
-                  value={currentWeek.weekend.watchtowerScripture || ''}
-                  onChange={e => {
-                    const u = JSON.parse(JSON.stringify(currentWeek));
-                    u.weekend.watchtowerScripture = e.target.value;
-                    updateWeek(u);
-                  }}
-                  placeholder="Ej. Salmo 84:11"
-                  className="w-full text-xs font-semibold text-slate-800 bg-white border border-emerald-200 rounded-lg p-2 focus:ring-1 focus:ring-emerald-500 mt-0.5"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                {/* Conductor */}
-                <div className="p-2.5 rounded-xl bg-white border border-emerald-200 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Conductor</span>
-                    <p className="font-bold text-slate-900 mt-0.5 truncate">
-                      {publishersMap.get(currentWeek.weekend.atalayaConductorId || '')?.name || (
-                        <span className="text-slate-400 font-normal italic">Sin asignar</span>
-                      )}
-                    </p>
+            {/* ── LISTADO OFICIAL DE LA REUNIÓN DEL FIN DE SEMANA ── */}
+            <div className="flex-1 overflow-y-auto">
+              {/* 1. MARCO INICIAL: Presidente, Cántico 1, Oración Inicial */}
+              {/* FILA: Presidente */}
+              <div className="border-b border-slate-100 dark:border-white/[0.04]">
+                <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
+                  <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                    <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">
+                      P.
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                          Presidente de la reunión
+                        </h4>
+                      </div>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                        Preside la reunión, presenta al orador visitante/local y da los anuncios finales
+                      </p>
+                    </div>
                   </div>
-                  <div className="mt-2 flex items-center justify-between pt-1 border-t border-emerald-100">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        openSelector(
-                          'Conductor de La Atalaya',
-                          'fds_presidente',
-                          'hermano',
-                          currentWeek.weekend.date,
-                          'weekend',
-                          currentWeek.weekend.atalayaConductorId,
-                          pid => {
-                            const u = JSON.parse(JSON.stringify(currentWeek));
-                            u.weekend.atalayaConductorId = pid;
-                            updateWeek(u);
-                          },
-                          () => {
-                            const u = JSON.parse(JSON.stringify(currentWeek));
-                            u.weekend.atalayaConductorId = undefined;
-                            updateWeek(u);
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    {currentWeek.weekend.presidentId ? (
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            openSelector(
+                              'Presidente reunión fin de semana',
+                              'fds_presidente',
+                              'hermano',
+                              currentWeek.weekend.date,
+                              'weekend',
+                              currentWeek.weekend.presidentId,
+                              (pid) => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.presidentId = pid;
+                                updateWeek(u);
+                              },
+                              () => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.presidentId = undefined;
+                                updateWeek(u);
+                              }
+                            )
                           }
-                        )
-                      }
-                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer"
-                    >
-                      {currentWeek.weekend.atalayaConductorId ? 'Cambiar' : 'Asignar'}
-                    </button>
-                    {currentWeek.weekend.atalayaConductorId && !isReadOnly && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const u = JSON.parse(JSON.stringify(currentWeek));
-                          u.weekend.atalayaConductorId = undefined;
-                          updateWeek(u);
-                        }}
-                        className="text-[11px] font-bold text-rose-600 hover:text-rose-800 flex items-center gap-0.5 cursor-pointer"
-                        title="Quitar conductor asignado"
-                      >
-                        <UserMinus className="w-3 h-3" />
-                        <span>Quitar</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
+                          className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                          title="Cambiar presidente"
+                        >
+                          <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                          <span>{publishersMap.get(currentWeek.weekend.presidentId)?.name || 'Hno. Asignado'}</span>
+                        </button>
 
-                {/* Lector */}
-                <div className="p-2.5 rounded-xl bg-white border border-emerald-200 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Lector</span>
-                    <p className="font-bold text-slate-900 mt-0.5 truncate">
-                      {publishersMap.get(currentWeek.weekend.atalayaLectorId || '')?.name || (
-                        <span className="text-slate-400 font-normal italic">Sin asignar</span>
-                      )}
-                    </p>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between pt-1 border-t border-emerald-100">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        openSelector(
-                          'Lector de La Atalaya',
-                          'fds_atalaya_lector',
-                          'hermano',
-                          currentWeek.weekend.date,
-                          'weekend',
-                          currentWeek.weekend.atalayaLectorId,
-                          pid => {
-                            const u = JSON.parse(JSON.stringify(currentWeek));
-                            u.weekend.atalayaLectorId = pid;
-                            updateWeek(u);
-                          },
-                          () => {
-                            const u = JSON.parse(JSON.stringify(currentWeek));
-                            u.weekend.atalayaLectorId = undefined;
-                            updateWeek(u);
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleSendWhatsApp(
+                              currentWeek.weekend.presidentId,
+                              'Presidente de la Reunión',
+                              'weekend',
+                              currentWeek.weekend.date
+                            )
                           }
-                        )
-                      }
-                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer"
-                    >
-                      {currentWeek.weekend.atalayaLectorId ? 'Cambiar' : 'Asignar'}
-                    </button>
-                    {currentWeek.weekend.atalayaLectorId && !isReadOnly && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const u = JSON.parse(JSON.stringify(currentWeek));
-                          u.weekend.atalayaLectorId = undefined;
-                          updateWeek(u);
-                        }}
-                        className="text-[11px] font-bold text-rose-600 hover:text-rose-800 flex items-center gap-0.5 cursor-pointer"
-                        title="Quitar lector asignado"
-                      >
-                        <UserMinus className="w-3 h-3" />
-                        <span>Quitar</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
+                          className="p-1 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs"
+                          title="Enviar recordatorio por WhatsApp"
+                        >
+                          <MessageCircle size={13} />
+                        </button>
 
-                {/* Oración Inicial Fin de Semana */}
-                <div className="p-2.5 rounded-xl bg-white border border-emerald-200 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Oración Inicial</span>
-                    <p className="font-bold text-slate-900 mt-0.5 truncate">
-                      {publishersMap.get(currentWeek.weekend.initialPrayerId || '')?.name || (
-                        <span className="text-slate-400 font-normal italic">Sin asignar</span>
-                      )}
-                    </p>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between pt-1 border-t border-emerald-100">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        openSelector(
-                          'Oración inicial reunión fin de semana',
-                          'fds_presidente',
-                          'hermano',
-                          currentWeek.weekend.date,
-                          'weekend',
-                          currentWeek.weekend.initialPrayerId,
-                          pid => {
-                            const u = JSON.parse(JSON.stringify(currentWeek));
-                            u.weekend.initialPrayerId = pid;
-                            updateWeek(u);
-                          },
-                          () => {
-                            const u = JSON.parse(JSON.stringify(currentWeek));
-                            u.weekend.initialPrayerId = undefined;
-                            updateWeek(u);
-                          }
-                        )
-                      }
-                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer"
-                    >
-                      {currentWeek.weekend.initialPrayerId ? 'Cambiar' : 'Asignar'}
-                    </button>
-                    {currentWeek.weekend.initialPrayerId && !isReadOnly && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const u = JSON.parse(JSON.stringify(currentWeek));
-                          u.weekend.initialPrayerId = undefined;
-                          updateWeek(u);
-                        }}
-                        className="text-[11px] font-bold text-rose-600 hover:text-rose-800 flex items-center gap-0.5 cursor-pointer"
-                        title="Quitar oración inicial asignada"
-                      >
-                        <UserMinus className="w-3 h-3" />
-                        <span>Quitar</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Oración Final Fin de Semana */}
-                <div className="p-2.5 rounded-xl bg-white border border-emerald-200 flex flex-col justify-between">
-                  <div>
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block">Oración Final</span>
-                    <p className="font-bold text-slate-900 mt-0.5 truncate">
-                      {publishersMap.get(currentWeek.weekend.finalPrayerId || '')?.name || (
-                        <span className="text-slate-400 font-normal italic">Sin asignar</span>
-                      )}
-                    </p>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between pt-1 border-t border-emerald-100">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        openSelector(
-                          'Oración final reunión fin de semana',
-                          'fds_presidente',
-                          'hermano',
-                          currentWeek.weekend.date,
-                          'weekend',
-                          currentWeek.weekend.finalPrayerId,
-                          pid => {
-                            const u = JSON.parse(JSON.stringify(currentWeek));
-                            u.weekend.finalPrayerId = pid;
-                            updateWeek(u);
-                          },
-                          () => {
-                            const u = JSON.parse(JSON.stringify(currentWeek));
-                            u.weekend.finalPrayerId = undefined;
-                            updateWeek(u);
-                          }
-                        )
-                      }
-                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer"
-                    >
-                      {currentWeek.weekend.finalPrayerId ? 'Cambiar' : 'Asignar'}
-                    </button>
-                    {currentWeek.weekend.finalPrayerId && !isReadOnly && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const u = JSON.parse(JSON.stringify(currentWeek));
-                          u.weekend.finalPrayerId = undefined;
-                          updateWeek(u);
-                        }}
-                        className="text-[11px] font-bold text-rose-600 hover:text-rose-800 flex items-center gap-0.5 cursor-pointer"
-                        title="Quitar oración final asignada"
-                      >
-                        <UserMinus className="w-3 h-3" />
-                        <span>Quitar</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Weekend duties */}
-          <div className="space-y-3 pt-3 border-t border-slate-100">
-            <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
-              Deberes Operativos (Fin de Semana)
-            </h4>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2.5">
-              {customDuties.filter(d => d.weekend).map(duty => {
-                const assignedIds = currentWeek.weekend.duties[duty.key] || [];
-
-                return (
-                  <div
-                    key={duty.id}
-                    className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase text-slate-500 block truncate">
-                          {duty.name}
-                        </span>
-                        {assignedIds.length > 0 && !isReadOnly && (
+                        {!isReadOnly && (
                           <button
                             type="button"
                             onClick={() => {
                               const u = JSON.parse(JSON.stringify(currentWeek));
-                              if (!u.weekend.duties) u.weekend.duties = {};
-                              u.weekend.duties[duty.key] = [];
+                              u.weekend.presidentId = undefined;
                               updateWeek(u);
                             }}
-                            className="text-[10px] text-rose-500 hover:text-rose-700 font-semibold cursor-pointer"
-                            title={`Quitar a todos los asignados a ${duty.name}`}
+                            className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                            title="Quitar presidente asignado"
                           >
-                            Limpiar
+                            <X size={13} />
                           </button>
                         )}
                       </div>
-                      <div className="mt-1 space-y-1">
-                        {assignedIds.length === 0 ? (
-                          <p className="text-xs text-slate-400 italic">Sin asignar</p>
-                        ) : (
-                          assignedIds.map(pid => (
-                            <div key={pid} className="flex items-center justify-between text-xs">
-                              <span className="font-semibold text-slate-800 truncate">
-                                {publishersMap.get(pid)?.name || 'Hno.'}
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          openSelector(
+                            'Presidente reunión fin de semana',
+                            'fds_presidente',
+                            'hermano',
+                            currentWeek.weekend.date,
+                            'weekend',
+                            undefined,
+                            (pid) => {
+                              const u = JSON.parse(JSON.stringify(currentWeek));
+                              u.weekend.presidentId = pid;
+                              updateWeek(u);
+                            },
+                            () => {}
+                          )
+                        }
+                        className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer"
+                      >
+                        + Asignar Presidente
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* FILA: Cántico Inicial */}
+              <div className="border-b border-slate-100 dark:border-white/[0.04]">
+                <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
+                  <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                    <div className="w-6 h-6 flex items-center justify-center shrink-0">
+                      <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                          Cántico {currentWeek.weekend.openingSong || 12}
+                        </h4>
+                      </div>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                        Cántico de apertura de la reunión del fin de semana
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                      Congregación
+                    </span>
+                    {!isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWeekendEditTab('canciones');
+                          setIsWeekendEditModalOpen(true);
+                        }}
+                        className="p-1 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        title="Cambiar número de cántico"
+                      >
+                        <Edit3 size={13} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* FILA: Oración Inicial */}
+              <div className="border-b border-slate-100 dark:border-white/[0.04]">
+                <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
+                  <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                    <div className="w-6 h-6 flex items-center justify-center shrink-0">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                          Oración de apertura
+                        </h4>
+                      </div>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                        Petición y agradecimiento a Jehová antes de la conferencia pública
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    {currentWeek.weekend.initialPrayerId ? (
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            openSelector(
+                              'Oración inicial reunión fin de semana',
+                              'fds_presidente',
+                              'hermano',
+                              currentWeek.weekend.date,
+                              'weekend',
+                              currentWeek.weekend.initialPrayerId,
+                              (pid) => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.initialPrayerId = pid;
+                                updateWeek(u);
+                              },
+                              () => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.initialPrayerId = undefined;
+                                updateWeek(u);
+                              }
+                            )
+                          }
+                          className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                          title="Cambiar hermano asignado"
+                        >
+                          <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                          <span>{publishersMap.get(currentWeek.weekend.initialPrayerId)?.name || 'Hno. Asignado'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleSendWhatsApp(
+                              currentWeek.weekend.initialPrayerId,
+                              'Oración Inicial',
+                              'weekend',
+                              currentWeek.weekend.date
+                            )
+                          }
+                          className="p-1 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs"
+                          title="Enviar recordatorio por WhatsApp"
+                        >
+                          <MessageCircle size={13} />
+                        </button>
+
+                        {!isReadOnly && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const u = JSON.parse(JSON.stringify(currentWeek));
+                              u.weekend.initialPrayerId = undefined;
+                              updateWeek(u);
+                            }}
+                            className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                            title="Quitar asignación"
+                          >
+                            <X size={13} />
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          openSelector(
+                            'Oración inicial reunión fin de semana',
+                            'fds_presidente',
+                            'hermano',
+                            currentWeek.weekend.date,
+                            'weekend',
+                            undefined,
+                            (pid) => {
+                              const u = JSON.parse(JSON.stringify(currentWeek));
+                              u.weekend.initialPrayerId = pid;
+                              updateWeek(u);
+                            },
+                            () => {}
+                          )
+                        }
+                        className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer"
+                      >
+                        + Asignar Oración
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. SECCIÓN: DISCURSO PÚBLICO (30 MIN) */}
+              <div className="mt-2">
+                <div
+                  style={{ backgroundColor: '#204d74' }}
+                  className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
+                >
+                  DISCURSO PÚBLICO (30 MIN)
+                </div>
+
+                <div className="border-b border-slate-100 dark:border-white/[0.04]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-3">
+                    <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                      <div className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                        1.
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {currentWeek.weekend.publicTalkOutlineNumber && (
+                            <span className="px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 font-bold text-[10px] tracking-wide shrink-0">
+                              Bosquejo #{currentWeek.weekend.publicTalkOutlineNumber}
+                            </span>
+                          )}
+                          <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                            {currentWeek.weekend.publicTalkTheme || 'Tema del Discurso Público por definir'}
+                          </h4>
+                          <span className="text-xs text-slate-400 font-normal">
+                            (30 min)
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 mt-1 flex-wrap text-[11px] text-slate-500 dark:text-slate-400">
+                          <span className="font-medium text-slate-700 dark:text-zinc-300">
+                            Orador: <strong>{currentWeek.weekend.publicTalkSpeaker || 'Sin especificar'}</strong>
+                            {currentWeek.weekend.visitingSpeakerCongregation && (
+                              <span className="text-slate-500 ml-1">
+                                ({currentWeek.weekend.visitingSpeakerCongregation})
                               </span>
-                              <button
-                                onClick={() => handleToggleDutyPublisher('weekend', duty.key, pid)}
-                                className="text-rose-500 hover:text-rose-700 ml-1"
-                              >
-                                ×
-                              </button>
-                            </div>
-                          ))
+                            )}
+                          </span>
+
+                          {!isReadOnly && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setWeekendEditTab('discurso');
+                                setIsWeekendEditModalOpen(true);
+                              }}
+                              className="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold cursor-pointer ml-1 inline-flex items-center gap-1"
+                            >
+                              <Edit3 size={11} />
+                              <span>Editar tema u orador</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                      {currentWeek.weekend.publicTalkSpeaker ? (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setWeekendEditTab('discurso');
+                              setIsWeekendEditModalOpen(true);
+                            }}
+                            className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                            title="Modificar orador o congregación"
+                          >
+                            <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                            <span>{currentWeek.weekend.publicTalkSpeaker}</span>
+                          </button>
+
+                          {!isReadOnly && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.publicTalkSpeaker = '';
+                                u.weekend.visitingSpeakerCongregation = '';
+                                updateWeek(u);
+                              }}
+                              className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                              title="Limpiar orador"
+                            >
+                              <X size={13} />
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setWeekendEditTab('discurso');
+                            setIsWeekendEditModalOpen(true);
+                          }}
+                          className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer"
+                        >
+                          + Asignar Orador
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. CÁNTICO INTERMEDIO */}
+              <div className="border-b border-slate-100 dark:border-white/[0.04]">
+                <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
+                  <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                    <div className="w-6 h-6 flex items-center justify-center shrink-0">
+                      <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                          Cántico {currentWeek.weekend.middleSong || 68}
+                        </h4>
+                      </div>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                        Cántico intermedio entre el discurso y el estudio de La Atalaya
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                      Congregación
+                    </span>
+                    {!isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWeekendEditTab('canciones');
+                          setIsWeekendEditModalOpen(true);
+                        }}
+                        className="p-1 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        title="Cambiar número de cántico intermedio"
+                      >
+                        <Edit3 size={13} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. SECCIÓN: ESTUDIO DE LA ATALAYA (60 MIN) */}
+              <div className="mt-2">
+                <div
+                  style={{ backgroundColor: '#1d6349' }}
+                  className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
+                >
+                  ESTUDIO DE LA ATALAYA (60 MIN)
+                </div>
+
+                {/* Sub-fila: Tema del artículo de La Atalaya */}
+                <div className="border-b border-slate-100 dark:border-white/[0.04] bg-emerald-50/20 dark:bg-emerald-950/10">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-3.5 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 transition-colors gap-2">
+                    <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                      <div className="w-6 h-6 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                        <BookOpen className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 font-bold text-[10px] tracking-wide shrink-0">
+                            Artículo Oficial
+                          </span>
+                          <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                            {currentWeek.weekend.watchtowerTheme || 'Tema de La Atalaya por definir'}
+                          </h4>
+                          <span className="text-xs text-slate-400 font-normal">
+                            (60 min)
+                          </span>
+                        </div>
+                        {currentWeek.weekend.watchtowerScripture && (
+                          <p className="text-[11px] text-emerald-800 dark:text-emerald-300/80 mt-0.5 font-medium">
+                            Texto temático: {currentWeek.weekend.watchtowerScripture}
+                          </p>
                         )}
                       </div>
                     </div>
 
-                    <button
-                      onClick={() =>
-                        openSelector(
-                          `Añadir a: ${duty.name} (Fin de Semana)`,
-                          duty.key,
-                          'any',
-                          currentWeek.weekend.date,
-                          'weekend',
-                          undefined,
-                          pid => handleToggleDutyPublisher('weekend', duty.key, pid),
-                          () => {}
-                        )
-                      }
-                      className="mt-2 pt-2 border-t border-slate-200 text-[11px] font-bold text-indigo-600 hover:text-indigo-800 text-left"
-                    >
-                      + Asignar persona
-                    </button>
+                    {!isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWeekendEditTab('atalaya');
+                          setIsWeekendEditModalOpen(true);
+                        }}
+                        className="px-2.5 py-1 rounded-lg text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/40 text-xs font-semibold transition cursor-pointer flex items-center gap-1 shrink-0 self-end sm:self-center"
+                        title="Modificar artículo y texto de La Atalaya"
+                      >
+                        <Edit3 size={12} />
+                        <span>Editar artículo</span>
+                      </button>
+                    )}
                   </div>
-                );
-              })}
+                </div>
+
+                {/* FILA: Conductor de La Atalaya */}
+                <div className="border-b border-slate-100 dark:border-white/[0.04]">
+                  <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
+                    <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                      <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">
+                        2.
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                            Conductor de La Atalaya
+                          </h4>
+                        </div>
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                          Dirige el estudio con la congregación formulando preguntas y comentarios
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {currentWeek.weekend.atalayaConductorId ? (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openSelector(
+                                'Conductor de La Atalaya',
+                                'fds_presidente',
+                                'hermano',
+                                currentWeek.weekend.date,
+                                'weekend',
+                                currentWeek.weekend.atalayaConductorId,
+                                (pid) => {
+                                  const u = JSON.parse(JSON.stringify(currentWeek));
+                                  u.weekend.atalayaConductorId = pid;
+                                  updateWeek(u);
+                                },
+                                () => {
+                                  const u = JSON.parse(JSON.stringify(currentWeek));
+                                  u.weekend.atalayaConductorId = undefined;
+                                  updateWeek(u);
+                                }
+                              )
+                            }
+                            className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                            title="Cambiar conductor"
+                          >
+                            <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                            <span>{publishersMap.get(currentWeek.weekend.atalayaConductorId)?.name || 'Hno. Asignado'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleSendWhatsApp(
+                                currentWeek.weekend.atalayaConductorId,
+                                'Conductor de La Atalaya',
+                                'weekend',
+                                currentWeek.weekend.date
+                              )
+                            }
+                            className="p-1 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs"
+                            title="Enviar recordatorio por WhatsApp"
+                          >
+                            <MessageCircle size={13} />
+                          </button>
+
+                          {!isReadOnly && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.atalayaConductorId = undefined;
+                                updateWeek(u);
+                              }}
+                              className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                              title="Quitar conductor"
+                            >
+                              <X size={13} />
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            openSelector(
+                              'Conductor de La Atalaya',
+                              'fds_presidente',
+                              'hermano',
+                              currentWeek.weekend.date,
+                              'weekend',
+                              undefined,
+                              (pid) => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.atalayaConductorId = pid;
+                                updateWeek(u);
+                              },
+                              () => {}
+                            )
+                          }
+                          className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer"
+                        >
+                          + Asignar Conductor
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* FILA: Lector de La Atalaya */}
+                <div className="border-b border-slate-100 dark:border-white/[0.04]">
+                  <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
+                    <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                      <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">
+                        3.
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                            Lector de La Atalaya
+                          </h4>
+                        </div>
+                        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                          Lectura clara y audible de los párrafos del artículo
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      {currentWeek.weekend.atalayaLectorId ? (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openSelector(
+                                'Lector de La Atalaya',
+                                'fds_atalaya_lector',
+                                'hermano',
+                                currentWeek.weekend.date,
+                                'weekend',
+                                currentWeek.weekend.atalayaLectorId,
+                                (pid) => {
+                                  const u = JSON.parse(JSON.stringify(currentWeek));
+                                  u.weekend.atalayaLectorId = pid;
+                                  updateWeek(u);
+                                },
+                                () => {
+                                  const u = JSON.parse(JSON.stringify(currentWeek));
+                                  u.weekend.atalayaLectorId = undefined;
+                                  updateWeek(u);
+                                }
+                              )
+                            }
+                            className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                            title="Cambiar lector"
+                          >
+                            <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                            <span>{publishersMap.get(currentWeek.weekend.atalayaLectorId)?.name || 'Hno. Asignado'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleSendWhatsApp(
+                                currentWeek.weekend.atalayaLectorId,
+                                'Lector de La Atalaya',
+                                'weekend',
+                                currentWeek.weekend.date
+                              )
+                            }
+                            className="p-1 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs"
+                            title="Enviar recordatorio por WhatsApp"
+                          >
+                            <MessageCircle size={13} />
+                          </button>
+
+                          {!isReadOnly && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.atalayaLectorId = undefined;
+                                updateWeek(u);
+                              }}
+                              className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                              title="Quitar lector"
+                            >
+                              <X size={13} />
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            openSelector(
+                              'Lector de La Atalaya',
+                              'fds_atalaya_lector',
+                              'hermano',
+                              currentWeek.weekend.date,
+                              'weekend',
+                              undefined,
+                              (pid) => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.atalayaLectorId = pid;
+                                updateWeek(u);
+                              },
+                              () => {}
+                            )
+                          }
+                          className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer"
+                        >
+                          + Asignar Lector
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 5. MARCO FINAL: Cántico Final, Oración Final */}
+              {/* FILA: Cántico Final */}
+              <div className="border-b border-slate-100 dark:border-white/[0.04]">
+                <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
+                  <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                    <div className="w-6 h-6 flex items-center justify-center shrink-0">
+                      <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                          Cántico {currentWeek.weekend.closingSong || 138}
+                        </h4>
+                      </div>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                        Cántico de conclusión de la reunión
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                      Congregación
+                    </span>
+                    {!isReadOnly && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWeekendEditTab('canciones');
+                          setIsWeekendEditModalOpen(true);
+                        }}
+                        className="p-1 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        title="Cambiar número de cántico de conclusión"
+                      >
+                        <Edit3 size={13} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* FILA: Oración Final */}
+              <div>
+                <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
+                  <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                    <div className="w-6 h-6 flex items-center justify-center shrink-0">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+                          Oración de conclusión
+                        </h4>
+                      </div>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                        Oración final y bendición para concluir la reunión del fin de semana
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    {currentWeek.weekend.finalPrayerId ? (
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            openSelector(
+                              'Oración final reunión fin de semana',
+                              'fds_presidente',
+                              'hermano',
+                              currentWeek.weekend.date,
+                              'weekend',
+                              currentWeek.weekend.finalPrayerId,
+                              (pid) => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.finalPrayerId = pid;
+                                updateWeek(u);
+                              },
+                              () => {
+                                const u = JSON.parse(JSON.stringify(currentWeek));
+                                u.weekend.finalPrayerId = undefined;
+                                updateWeek(u);
+                              }
+                            )
+                          }
+                          className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                          title="Cambiar hermano asignado"
+                        >
+                          <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                          <span>{publishersMap.get(currentWeek.weekend.finalPrayerId)?.name || 'Hno. Asignado'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleSendWhatsApp(
+                              currentWeek.weekend.finalPrayerId,
+                              'Oración Final',
+                              'weekend',
+                              currentWeek.weekend.date
+                            )
+                          }
+                          className="p-1 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs"
+                          title="Enviar recordatorio por WhatsApp"
+                        >
+                          <MessageCircle size={13} />
+                        </button>
+
+                        {!isReadOnly && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const u = JSON.parse(JSON.stringify(currentWeek));
+                              u.weekend.finalPrayerId = undefined;
+                              updateWeek(u);
+                            }}
+                            className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                            title="Quitar asignación"
+                          >
+                            <X size={13} />
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          openSelector(
+                            'Oración final reunión fin de semana',
+                            'fds_presidente',
+                            'hermano',
+                            currentWeek.weekend.date,
+                            'weekend',
+                            undefined,
+                            (pid) => {
+                              const u = JSON.parse(JSON.stringify(currentWeek));
+                              u.weekend.finalPrayerId = pid;
+                              updateWeek(u);
+                            },
+                            () => {}
+                          )
+                        }
+                        className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer"
+                      >
+                        + Asignar Oración
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+
+          {/* TURNOS Y DEBERES DE FIN DE SEMANA (Audio, Video, Micrófonos, Acomodadores) */}
+          {customDuties.some((d) => d.weekend) && (
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-xs">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    Servicios de la Congregación
+                  </span>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                    Deberes y Turnos de Fin de Semana (Audio y Video, Micrófonos y Acomodadores)
+                  </h4>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+                {customDuties
+                  .filter((d) => d.weekend)
+                  .map((duty) => {
+                    const assignedIds = currentWeek.weekend.duties?.[duty.key] || [];
+                    return (
+                      <div
+                        key={duty.id}
+                        className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-white/10 flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 block truncate">
+                              {duty.name}
+                            </span>
+                            {assignedIds.length > 0 && !isReadOnly && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const u = JSON.parse(JSON.stringify(currentWeek));
+                                  if (!u.weekend.duties) u.weekend.duties = {};
+                                  u.weekend.duties[duty.key] = [];
+                                  updateWeek(u);
+                                }}
+                                className="text-[10px] text-rose-500 hover:text-rose-700 font-semibold cursor-pointer"
+                                title={`Quitar a todos los asignados a ${duty.name}`}
+                              >
+                                Limpiar
+                              </button>
+                            )}
+                          </div>
+                          <div className="mt-1 space-y-1">
+                            {assignedIds.length === 0 ? (
+                              <p className="text-xs text-slate-400 italic">Sin asignar</p>
+                            ) : (
+                              assignedIds.map((pid) => (
+                                <div key={pid} className="flex items-center justify-between text-xs">
+                                  <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                                    {publishersMap.get(pid)?.name || 'Hno.'}
+                                  </span>
+                                  <button
+                                    onClick={() => handleToggleDutyPublisher('weekend', duty.key, pid)}
+                                    className="text-rose-500 hover:text-rose-700 ml-1 cursor-pointer"
+                                    title="Quitar asignación"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() =>
+                            openSelector(
+                              `Añadir a: ${duty.name} (Fin de Semana)`,
+                              duty.key,
+                              'any',
+                              currentWeek.weekend.date,
+                              'weekend',
+                              undefined,
+                              (pid) => handleToggleDutyPublisher('weekend', duty.key, pid),
+                              () => {}
+                            )
+                          }
+                          className="mt-2 pt-2 border-t border-slate-200 dark:border-white/10 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 text-left cursor-pointer"
+                        >
+                          + Asignar persona
+                        </button>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
           )}
+        </div>
+      )}
 
       {/* LIMPIEZA DEL SALÓN DEL REINO */}
       <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -1813,6 +2241,276 @@ export const ScheduleTab: React.FC = () => {
               >
                 <UserMinus className="w-3.5 h-3.5" />
                 <span>Confirmar y Quitar Asignados</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── MODAL EDITAR PROGRAMA DEL FIN DE SEMANA (TEMA, ORADOR, ATALAYA, CÁNTICOS) ── */}
+      {isWeekendEditModalOpen && currentWeek && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            {/* Header del Modal */}
+            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/[0.08] flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                  <CalendarCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    Editar Programa del Fin de Semana
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {settings.weekendMeetingDay} {currentWeek.weekend.date} ({settings.weekendMeetingTime})
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsWeekendEditModalOpen(false)}
+                className="p-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Pestañas de Navegación del Modal */}
+            <div className="px-6 pt-3 pb-1 border-b border-slate-200 dark:border-white/[0.06] flex items-center gap-2 bg-slate-100/50 dark:bg-slate-800/20">
+              <button
+                type="button"
+                onClick={() => setWeekendEditTab('discurso')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  weekendEditTab === 'discurso'
+                    ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-2xs border border-slate-200/80 dark:border-white/10'
+                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                Discurso Público
+              </button>
+              <button
+                type="button"
+                onClick={() => setWeekendEditTab('atalaya')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  weekendEditTab === 'atalaya'
+                    ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-2xs border border-slate-200/80 dark:border-white/10'
+                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                La Atalaya
+              </button>
+              <button
+                type="button"
+                onClick={() => setWeekendEditTab('canciones')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  weekendEditTab === 'canciones'
+                    ? 'bg-white dark:bg-slate-800 text-slate-800 dark:text-white shadow-2xs border border-slate-200/80 dark:border-white/10'
+                    : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                }`}
+              >
+                Cánticos (3)
+              </button>
+            </div>
+
+            {/* Cuerpo del Modal */}
+            <div className="p-6 space-y-4 flex-1 overflow-y-auto">
+              {weekendEditTab === 'discurso' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                      Catálogo Oficial de Bosquejos (#1 al 194):
+                    </label>
+                    <select
+                      value={currentWeek.weekend.publicTalkOutlineNumber || ''}
+                      onChange={(e) => {
+                        const num = parseInt(e.target.value, 10);
+                        const found = findOutlineByNumber(num);
+                        const u = JSON.parse(JSON.stringify(currentWeek));
+                        u.weekend.publicTalkOutlineNumber = isNaN(num) ? undefined : num;
+                        if (found) {
+                          u.weekend.publicTalkTheme = found.title;
+                        }
+                        updateWeek(u);
+                      }}
+                      className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                    >
+                      <option value="">-- Seleccionar bosquejo del catálogo oficial --</option>
+                      {OFFICIAL_PUBLIC_TALK_OUTLINES.map((o) => (
+                        <option key={o.number} value={o.number}>
+                          #{o.number}: {o.title} {o.category ? `(${o.category})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                      Tema del Discurso Público:
+                    </label>
+                    <input
+                      type="text"
+                      value={currentWeek.weekend.publicTalkTheme || ''}
+                      onChange={(e) => {
+                        const u = JSON.parse(JSON.stringify(currentWeek));
+                        u.weekend.publicTalkTheme = e.target.value;
+                        updateWeek(u);
+                      }}
+                      placeholder="Ej. ¿Quién es el Dios verdadero?"
+                      className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                        Nombre del Orador:
+                      </label>
+                      <input
+                        type="text"
+                        value={currentWeek.weekend.publicTalkSpeaker || ''}
+                        onChange={(e) => {
+                          const u = JSON.parse(JSON.stringify(currentWeek));
+                          u.weekend.publicTalkSpeaker = e.target.value;
+                          updateWeek(u);
+                        }}
+                        placeholder="Ej. Hno. Carlos Martínez"
+                        className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                        Congregación de Origen:
+                      </label>
+                      <input
+                        type="text"
+                        value={currentWeek.weekend.visitingSpeakerCongregation || ''}
+                        onChange={(e) => {
+                          const u = JSON.parse(JSON.stringify(currentWeek));
+                          u.weekend.visitingSpeakerCongregation = e.target.value;
+                          updateWeek(u);
+                        }}
+                        placeholder="Ej. Los Pinos / Local"
+                        className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {weekendEditTab === 'atalaya' && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                      Tema / Artículo de La Atalaya:
+                    </label>
+                    <input
+                      type="text"
+                      value={currentWeek.weekend.watchtowerTheme || ''}
+                      onChange={(e) => {
+                        const u = JSON.parse(JSON.stringify(currentWeek));
+                        u.weekend.watchtowerTheme = e.target.value;
+                        updateWeek(u);
+                      }}
+                      placeholder="Ej. Confiemos plenamente en el cuidado amoroso de Jehová"
+                      className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                      Texto Temático del Artículo:
+                    </label>
+                    <input
+                      type="text"
+                      value={currentWeek.weekend.watchtowerScripture || ''}
+                      onChange={(e) => {
+                        const u = JSON.parse(JSON.stringify(currentWeek));
+                        u.weekend.watchtowerScripture = e.target.value;
+                        updateWeek(u);
+                      }}
+                      placeholder="Ej. Salmo 84:11"
+                      className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {weekendEditTab === 'canciones' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                        Cántico Inicial:
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="158"
+                        value={currentWeek.weekend.openingSong || ''}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          const u = JSON.parse(JSON.stringify(currentWeek));
+                          u.weekend.openingSong = isNaN(val) ? undefined : val;
+                          updateWeek(u);
+                        }}
+                        placeholder="Ej. 12"
+                        className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                        Cántico Intermedio:
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="158"
+                        value={currentWeek.weekend.middleSong || ''}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          const u = JSON.parse(JSON.stringify(currentWeek));
+                          u.weekend.middleSong = isNaN(val) ? undefined : val;
+                          updateWeek(u);
+                        }}
+                        placeholder="Ej. 68"
+                        className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                        Cántico de Conclusión:
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="158"
+                        value={currentWeek.weekend.closingSong || ''}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value, 10);
+                          const u = JSON.parse(JSON.stringify(currentWeek));
+                          u.weekend.closingSong = isNaN(val) ? undefined : val;
+                          updateWeek(u);
+                        }}
+                        placeholder="Ej. 138"
+                        className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer del Modal */}
+            <div className="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-white/[0.08] flex items-center justify-end">
+              <button
+                type="button"
+                onClick={() => setIsWeekendEditModalOpen(false)}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+              >
+                Listo y Guardar
               </button>
             </div>
           </div>

@@ -88,15 +88,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   );
   const [congregationPinInput, setCongregationPinInput] = useState('');
   const [personalPinInput, setPersonalPinInput] = useState('');
-  const [brotherNameInput, setBrotherNameInput] = useState(() => {
-    const fromCoord = settings.coordinatorName?.trim();
-    if (fromCoord && !isGenericIdentityName(fromCoord)) return fromCoord;
-    const fromSaved = localStorage.getItem('kongre_coordinator_name')?.trim();
-    if (fromSaved && !isGenericIdentityName(fromSaved)) return fromSaved;
-    const fromIdent = localStorage.getItem('kongre_identified_brother')?.trim();
-    if (fromIdent && !isGenericIdentityName(fromIdent)) return fromIdent;
-    return '';
-  });
   const [isSubmittingCode, setIsSubmittingCode] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [codeSuccess, setCodeSuccess] = useState<string | null>(null);
@@ -115,7 +106,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       const cleanId = congregationIdInput.trim();
       const cleanCongPin = congregationPinInput.trim();
       const cleanPersonalPin = personalPinInput.trim();
-      const cleanInputName = brotherNameInput.trim();
       let nameToUse = '';
       let emailToUse = user?.email || `hermano_${cleanId || 'cong'}@kongre.org`;
 
@@ -165,8 +155,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             (matchingPub.privilege === 'anciano'
               ? 'anciano'
               : matchingPub.privilege === 'siervo_ministerial'
-              ? 'siervo_ministerial'
-              : 'publicador_bautizado');
+              ? 'siervo_territorios'
+              : 'publico');
           identifiedRole = finalRole;
           nameToUse = matchingPub.name;
           if (matchingPub.email) emailToUse = matchingPub.email;
@@ -210,26 +200,28 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
       const roleFinal: TheocraticRole = identifiedRole || 'coordinador';
 
-      // 4. Resolver nombre real (prioridad: entrada escrita > publicador > datos de nube > settings > localStorage)
-      if (cleanInputName && !isGenericIdentityName(cleanInputName)) {
-        nameToUse = cleanInputName;
-      } else if (!nameToUse || isGenericIdentityName(nameToUse)) {
-        const cloudCoord = cloudData?.settings?.coordinatorName;
-        const localCoord = settings.coordinatorName;
-        const savedCoord = localStorage.getItem('kongre_coordinator_name');
-        const savedIdent = localStorage.getItem('kongre_identified_brother');
-        const googleName = user?.displayName;
+      // 4. Resolver nombre real según la identidad identificada o datos de coordinador
+      if (!nameToUse || isGenericIdentityName(nameToUse)) {
+        if (roleFinal === 'coordinador') {
+          const cloudCoord = cloudData?.settings?.coordinatorName;
+          const localCoord = settings.coordinatorName;
+          const savedCoord = localStorage.getItem('kongre_coordinator_name');
+          const savedIdent = localStorage.getItem('kongre_identified_brother');
+          const googleName = user?.displayName;
 
-        if (cloudCoord && !isGenericIdentityName(cloudCoord)) {
-          nameToUse = cloudCoord.trim();
-        } else if (localCoord && !isGenericIdentityName(localCoord)) {
-          nameToUse = localCoord.trim();
-        } else if (savedCoord && !isGenericIdentityName(savedCoord)) {
-          nameToUse = savedCoord.trim();
-        } else if (savedIdent && !isGenericIdentityName(savedIdent)) {
-          nameToUse = savedIdent.trim();
-        } else if (googleName && !isGenericIdentityName(googleName)) {
-          nameToUse = googleName.trim();
+          if (cloudCoord && !isGenericIdentityName(cloudCoord)) {
+            nameToUse = cloudCoord.trim();
+          } else if (localCoord && !isGenericIdentityName(localCoord)) {
+            nameToUse = localCoord.trim();
+          } else if (savedCoord && !isGenericIdentityName(savedCoord)) {
+            nameToUse = savedCoord.trim();
+          } else if (savedIdent && !isGenericIdentityName(savedIdent)) {
+            nameToUse = savedIdent.trim();
+          } else if (googleName && !isGenericIdentityName(googleName)) {
+            nameToUse = googleName.trim();
+          } else {
+            nameToUse = 'Coordinador';
+          }
         } else {
           nameToUse = 'Hermano';
         }
@@ -571,7 +563,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       if (existingCongId) {
         setActiveTab('code_login');
         if (existingCongId) setCongregationIdInput(existingCongId);
-        if (userName) setBrotherNameInput(userName);
         setCodeSuccess(
           `Cuenta de Google iniciada (${userEmail}). Introduce el PIN de tu congregación o tu PIN personal para conectarte.`
         );
@@ -1113,29 +1104,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       />
                       <span className="text-[10px] text-slate-400 block mt-0.5">
                         Número oficial asignado a tu congregación.
-                      </span>
-                    </div>
-
-                    {/* NOMBRE Y APELLIDO DEL HERMANO */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center justify-between">
-                        <span className="flex items-center gap-1.5">
-                          <UserIcon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                          <span>Tu Nombre y Apellido:</span>
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-normal">
-                          (Opcional si ya estás guardado)
-                        </span>
-                      </label>
-                      <input
-                        type="text"
-                        value={brotherNameInput}
-                        onChange={(e) => setBrotherNameInput(e.target.value)}
-                        placeholder="Ej: Héctor Gutiérrez"
-                        className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs"
-                      />
-                      <span className="text-[10px] text-slate-400 block mt-0.5">
-                        Tu nombre oficial para figurar en la lista de publicadores y en la barra superior.
                       </span>
                     </div>
 

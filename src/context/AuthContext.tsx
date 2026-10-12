@@ -4,7 +4,7 @@ import { User, onAuthStateChanged, signInWithPopup, signOut, updateProfile } fro
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { auth, googleProvider, db, isFirestoreQuotaExceeded, markFirestoreQuotaExceeded, isQuotaError } from '../firebase/config';
 import { TheocraticRole, TheocraticRoleInfo, THEOCRATIC_ROLES } from '../utils/rbac';
-import { generateSecurePublisherPin, verifyPasscode, sanitizeForFirestore } from '../utils/theocraticSecurity';
+import { generateSecurePublisherPin, verifyPasscode, sanitizeForFirestore, isGenericIdentityName } from '../utils/theocraticSecurity';
 import { UserProfile, PreferredContactMethod, ContactTimePreference } from '../types';
 
 export interface UserRoleRecord {
@@ -41,6 +41,7 @@ interface AuthContextType {
   effectiveRoleInfo: TheocraticRoleInfo;
   setActiveRole: (role: TheocraticRole) => void;
   currentBrotherName: string | null;
+  setIdentifiedBrother: (name: string) => void;
   userRolesList: UserRoleRecord[];
   rolePinsMap: Record<TheocraticRole, RolePinAssignment>;
   publisherPinsList: PublisherPinRecord[];
@@ -96,6 +97,7 @@ const AuthContext = createContext<AuthContextType>({
   effectiveRoleInfo: THEOCRATIC_ROLES.coordinador,
   setActiveRole: () => {},
   currentBrotherName: null,
+  setIdentifiedBrother: () => {},
   userRolesList: [],
   rolePinsMap: DEFAULT_ROLE_PINS,
   publisherPinsList: DEFAULT_PUBLISHER_PINS,
@@ -344,6 +346,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, message: 'Ingresa tu PIN Personal.' };
     }
 
+    const resolveNonGenericName = (candidate?: string | null, fallbackRole?: TheocraticRole): string => {
+      if (candidate && !isGenericIdentityName(candidate)) return candidate.trim();
+      const savedCoord = localStorage.getItem('kongre_coordinator_name');
+      if (savedCoord && !isGenericIdentityName(savedCoord)) return savedCoord.trim();
+      const googleName = localStorage.getItem('kongre_google_display_name');
+      if (googleName && !isGenericIdentityName(googleName)) return googleName.trim();
+      try {
+        const rawSettings = localStorage.getItem('kongre_saved_settings_backup') || localStorage.getItem('kongre_gestor_settings');
+        if (rawSettings) {
+          const parsed = JSON.parse(rawSettings);
+          if (parsed.coordinatorName && !isGenericIdentityName(parsed.coordinatorName)) {
+            return parsed.coordinatorName.trim();
+          }
+        }
+      } catch {}
+      if (currentBrotherName && !isGenericIdentityName(currentBrotherName)) {
+        return currentBrotherName;
+      }
+      return candidate && !isGenericIdentityName(candidate) ? candidate : '';
+    };
+
     // 1. Search in unique publisher PINs directory (Principal: Por Publicador)
     const foundPublisher = publisherPinsList.find(
       (entry) => entry.pin.trim() === cleanPin
@@ -351,14 +374,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (foundPublisher) {
       setActiveRole(foundPublisher.role);
-      setCurrentBrotherName(foundPublisher.name);
-      localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, foundPublisher.name);
+      const brotherName = resolveNonGenericName(foundPublisher.name, foundPublisher.role) || foundPublisher.name;
+      if (!isGenericIdentityName(brotherName)) {
+        setCurrentBrotherName(brotherName);
+        localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+      }
 
       return {
         success: true,
         role: foundPublisher.role,
-        name: foundPublisher.name,
-        message: `¡Identificación exitosa! Bienvenido, ${foundPublisher.name}. Rol activo: ${THEOCRATIC_ROLES[foundPublisher.role]?.name}.`,
+        name: brotherName,
+        message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[foundPublisher.role]?.name}.`,
       };
     }
 
@@ -369,15 +395,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (foundUserEntry) {
       setActiveRole(foundUserEntry.role);
-      const brotherName = foundUserEntry.name || 'Hermano Autorizado';
-      setCurrentBrotherName(brotherName);
-      localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+      const brotherName = resolveNonGenericName(foundUserEntry.name, foundUserEntry.role);
+      if (brotherName) {
+        setCurrentBrotherName(brotherName);
+        localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+      }
 
       return {
         success: true,
         role: foundUserEntry.role,
-        name: brotherName,
-        message: `¡Identificación exitosa! Bienvenido, ${brotherName} (${THEOCRATIC_ROLES[foundUserEntry.role]?.name}).`,
+        name: brotherName || undefined,
+        message: `¡Identificación exitosa! Bienvenido${brotherName ? `, ${brotherName}` : ''} (${THEOCRATIC_ROLES[foundUserEntry.role]?.name}).`,
       };
     }
 
@@ -388,14 +416,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (foundRoleEntry) {
       setActiveRole(foundRoleEntry.role);
-      setCurrentBrotherName(foundRoleEntry.name);
-      localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, foundRoleEntry.name);
+      const brotherName = resolveNonGenericName(foundRoleEntry.name, foundRoleEntry.role);
+      if (brotherName) {
+        setCurrentBrotherName(brotherName);
+        localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+      }
 
       return {
         success: true,
         role: foundRoleEntry.role,
-        name: foundRoleEntry.name,
-        message: `¡Identificación exitosa! Bienvenido, ${foundRoleEntry.name} (${THEOCRATIC_ROLES[foundRoleEntry.role]?.name}).`,
+        name: brotherName || undefined,
+        message: `¡Identificación exitosa! Bienvenido${brotherName ? `, ${brotherName}` : ''} (${THEOCRATIC_ROLES[foundRoleEntry.role]?.name}).`,
       };
     }
 
@@ -406,14 +437,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const isValid = await verifyPasscode(cleanPin, coordLockPinHash);
         if (isValid) {
           setActiveRole('coordinador');
-          const name = 'Coordinador del Cuerpo de Ancianos';
-          setCurrentBrotherName(name);
-          localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, name);
+          const resolvedName = resolveNonGenericName(null, 'coordinador');
+          if (resolvedName) {
+            setCurrentBrotherName(resolvedName);
+            localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, resolvedName);
+          }
           return {
             success: true,
             role: 'coordinador',
-            name,
-            message: '¡Identificación exitosa con tu PIN de Coordinador registrado previamente!',
+            name: resolvedName || undefined,
+            message: '¡Identificación exitosa con tu PIN de Coordinador!',
           };
         }
       } catch {
@@ -428,14 +461,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const isValid = await verifyPasscode(cleanPin, congPinHash);
         if (isValid) {
           setActiveRole('coordinador');
-          const name = 'Coordinador / Anciano';
-          setCurrentBrotherName(name);
-          localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, name);
+          const resolvedName = resolveNonGenericName(null, 'coordinador');
+          if (resolvedName) {
+            setCurrentBrotherName(resolvedName);
+            localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, resolvedName);
+          }
           return {
             success: true,
             role: 'coordinador',
-            name,
-            message: '¡Identificación exitosa con PIN de Congregación registrado previamente!',
+            name: resolvedName || undefined,
+            message: '¡Identificación exitosa con PIN de Congregación!',
           };
         }
       } catch {
@@ -712,6 +747,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const setIdentifiedBrother = (name: string) => {
+    const clean = (name || '').trim();
+    if (!clean) return;
+    setCurrentBrotherName(clean);
+    try {
+      localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, clean);
+    } catch {}
+  };
+
   const assignRoleToEmail = (email: string, role: TheocraticRole, name?: string, personalPin?: string) => {
     const cleanEmail = email.toLowerCase().trim();
     setUserRolesList((prev) => {
@@ -749,6 +793,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         effectiveRoleInfo,
         setActiveRole,
         currentBrotherName,
+        setIdentifiedBrother,
         userRolesList,
         rolePinsMap,
         publisherPinsList,

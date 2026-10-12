@@ -505,3 +505,26 @@ export function sanitizeForFirestore<T>(data: T): T {
   }
 }
 
+export const GENERIC_IDENTITY_NAMES = new Set([
+  '',
+  'usuario',
+  'hermano',
+  'coordinador',
+  'coordinador / anciano',
+  'coordinador del cuerpo de ancianos',
+  'hermano de la congregación',
+  'hermano autorizado',
+  'hno. usuario',
+  'anciano',
+  'publicador',
+]);
+
+export const isGenericIdentityName = (name?: string | null): boolean => {
+  if (!name) return true;
+  const clean = name.trim().toLowerCase();
+  return (
+    GENERIC_IDENTITY_NAMES.has(clean) ||
+    clean.startsWith('coordinador') ||
+    clean.startsWith('hermano de la')
+  );
+};

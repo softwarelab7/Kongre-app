@@ -6,7 +6,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useSecurity } from '../context/SecurityContext';
 import { PWAInstallButton } from './PWAInstallButton';
 import { KongreLogo } from './KongreLogo';
-import { getFriendlyCongregationName } from '../utils/theocraticSecurity';
+import { getFriendlyCongregationName, isGenericIdentityName } from '../utils/theocraticSecurity';
 import {
   Calendar,
   Users,
@@ -152,7 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenLinkRequestsModal,
   onOpenWelcomeLanding,
 }) => {
-  const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo } = useAuth();
+  const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo, currentBrotherName } = useAuth();
   const {
     settings,
     updateSettings,
@@ -164,7 +164,32 @@ export const Navbar: React.FC<NavbarProps> = ({
     auxPioneerRequests,
     uploadLocalDataToGoogle,
   } = useCongregation();
+  const effectiveDisplayName =
+    currentBrotherName && !isGenericIdentityName(currentBrotherName)
+      ? (currentBrotherName as string)
+      : userProfile?.displayName && !isGenericIdentityName(userProfile.displayName)
+      ? (userProfile!.displayName as string)
+      : settings?.coordinatorName && !isGenericIdentityName(settings.coordinatorName)
+      ? (settings.coordinatorName as string)
+      : user?.displayName && !isGenericIdentityName(user.displayName)
+      ? (user.displayName as string)
+      : '';
   const pendingRequestsCount = accountLinkRequests.filter((r) => r.status === 'pending').length;
+  const handleLogout = async () => {
+    try {
+      await signOutUser();
+    } catch {}
+    try {
+      localStorage.removeItem('kongre_has_entered_app');
+      localStorage.removeItem('kongre_user_profile_guest');
+      localStorage.removeItem('kongre_user_profile_active');
+    } catch {}
+    if (onOpenWelcomeLanding) {
+      onOpenWelcomeLanding();
+    } else {
+      window.location.reload();
+    }
+  };
   const pendingAuxPioneersCount = (auxPioneerRequests || []).filter((r) => (r.status || r.estado || 'pendiente') === 'pendiente').length;
   const { themeMode, toggleTheme, isDark, isCabinaMode } = useTheme();
   const { isPinEnabled, lockSession } = useSecurity();
@@ -955,11 +980,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Lock className="w-4 h-4" />
             </button>
 
-            {/* Cloud Sync Status (Green Cloud) */}
-            <div className="p-1.5 sm:p-2 text-emerald-500" title="Sincronizado con Firebase Firestore">
-              <CloudCheck className="w-4 h-4" />
-            </div>
-
             {/* App Móvil Capsule Pill Button */}
             {onOpenQrModal ? (
               <button
@@ -997,18 +1017,24 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <button
                 type="button"
-                onClick={async () => {
-                  try {
-                    await signInWithGoogle();
-                    await uploadLocalDataToGoogle();
-                  } catch {}
-                }}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 text-[11px] font-bold hover:bg-amber-100 dark:hover:bg-amber-900/40 transition cursor-pointer shadow-2xs"
-                title="Has iniciado con datos de aplicación. Pulsa para respaldar y guardar tus datos en tu cuenta de Google"
+                onClick={() => handleSelectTab('ajustes')}
+                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition cursor-pointer"
+                title="Tus datos se respaldan automáticamente en la nube bajo el ID de la congregación"
               >
-                <CloudUpload className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 animate-bounce" />
-                <span className="hidden md:inline">Respaldar en Google</span>
-                <span className="md:hidden">Respaldar</span>
+                <CloudCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span className="hidden xl:inline">Respaldo automático</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              </button>
+            )}
+
+            {effectiveDisplayName && (
+              <button
+                type="button"
+                onClick={() => handleSelectTab('perfil')}
+                className="hidden md:inline-block max-w-[140px] truncate text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
+                title={effectiveDisplayName}
+              >
+                {effectiveDisplayName}
               </button>
             )}
 
@@ -1022,17 +1048,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            {/* Logout Button */}
-            {user && (
-              <button
-                type="button"
-                onClick={signOutUser}
-                className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer"
-                title="Cerrar sesión"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            )}
+            {/* Logout Button (sesión Google o sesión por PIN personal) */}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer"
+              title="Cerrar sesión"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
 
             {/* User Avatar Circle -> Navigates directly to personal profile */}
             <button
@@ -1041,7 +1065,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${
                 activeTab === 'perfil' ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900' : ''
               } bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-xs cursor-pointer hover:ring-2 hover:ring-indigo-400/50 transition shrink-0 ml-1 overflow-hidden`}
-              title={`Mi Perfil (${userProfile?.displayName || user?.displayName || settings?.coordinatorName || 'Usuario'})`}
+              title={`Mi Perfil (${effectiveDisplayName || 'Usuario'})`}
             >
               {(() => {
                 const effectiveAvatar =
@@ -1069,7 +1093,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                 return (
                   <span>
-                    {((userProfile?.displayName || user?.displayName || settings?.coordinatorName || user?.email || 'H').charAt(0)).toUpperCase()}
+                    {((effectiveDisplayName || user?.email || 'H').charAt(0)).toUpperCase()}
                   </span>
                 );
               })()}

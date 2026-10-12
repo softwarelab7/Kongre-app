@@ -1159,7 +1159,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 flex-wrap gap-2">
           <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <Cloud className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <span>Sincronización en la Nube con tu Cuenta de Google</span>
+            <span>Respaldo Automático en la Nube de la Congregación</span>
           </h3>
           <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
             user
@@ -1167,7 +1167,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
               : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
           }`}>
             <span className={`w-2 h-2 rounded-full ${user ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-            {user ? 'Google Conectado' : 'Modo Datos de Aplicación (Local)'}
+            {user ? 'Google Conectado' : 'Respaldo automático por ID'}
           </span>
         </div>
 
@@ -1210,8 +1210,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl">
               {user
-                ? 'Tus datos teocráticos (publicadores, reuniones, programas CLM, asignaciones y ajustes) se sincronizan en tiempo real con Firestore en la nube de Google. Puedes forzar la subida de datos locales o descargar la copia de la nube en cualquier momento.'
-                : 'Estás conectado con los datos de tu congregación (ID y PIN). Toda tu información y cambios se guardan localmente en este dispositivo. Para que tus datos se guarden en la nube y estén siempre disponibles cuando te conectes con Google, pulsa "Conectar con Google y Respaldar".'}
+                ? 'Tus datos de la congregación (publicadores, reuniones, programas CLM, asignaciones y ajustes) se respaldan automáticamente en la nube bajo el ID de tu congregación, sin importar la cuenta con la que entres. Nada se guarda en cuentas personales.'
+                : 'Tus datos de la congregación (ID y PIN) se respaldan automáticamente en la nube bajo el ID de la congregación en cada cambio, sin necesidad de iniciar sesión con Google.'}
             </p>
           </div>
 
@@ -1251,24 +1251,12 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
             ) : (
               <button
                 type="button"
-                onClick={async () => {
-                  setIsSyncingCloud(true);
-                  setCloudActionStatus(null);
-                  try {
-                    await signInWithGoogle();
-                    const res = await uploadLocalDataToGoogle();
-                    setCloudActionStatus({ type: res.success ? 'success' : 'error', msg: res.message });
-                  } catch (e: any) {
-                    setCloudActionStatus({ type: 'error', msg: e?.message || 'Error al conectar con Google.' });
-                  } finally {
-                    setIsSyncingCloud(false);
-                  }
-                }}
+                onClick={handleUploadToGoogle}
                 disabled={isSyncingCloud}
                 className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95 cursor-pointer"
               >
-                <LogIn className="w-4 h-4" />
-                <span>Conectar con Google y Respaldar Datos</span>
+                <Cloud className="w-4 h-4" />
+                <span>{isSyncingCloud ? 'Guardando...' : 'Guardar ahora en la nube'}</span>
               </button>
             )}
           </div>

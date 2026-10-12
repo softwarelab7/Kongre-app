@@ -4,7 +4,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
-import { verifyPasscode, isCongregationIdString } from '../utils/theocraticSecurity';
+import { verifyPasscode, isCongregationIdString, isGenericIdentityName } from '../utils/theocraticSecurity';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -15,6 +15,7 @@ import {
   KeyRound,
   Lock,
   Hash,
+  User as UserIcon,
 } from 'lucide-react';
 
 interface JoinCongregationModalProps {
@@ -29,11 +30,12 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
   onSuccessRole,
 }) => {
   const { redeemInvitationCode, verifyCongregationPin } = useSecurity();
-  const { user, assignRoleToEmail, setActiveRole, identifyRoleByPersonalPin } = useAuth();
+  const { user, assignRoleToEmail, setActiveRole, identifyRoleByPersonalPin, setIdentifiedBrother } = useAuth();
   const {
     settings,
     updateSettings,
     publishers,
+    addPublisher,
     accountLinkRequests,
     createAccountLinkRequest,
     loadCongregationFromCloud,
@@ -46,6 +48,15 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
   const [congregationIdInput, setCongregationIdInput] = useState(settings.congregationNumber || '');
   const [congregationPinInput, setCongregationPinInput] = useState('');
   const [personalPinInput, setPersonalPinInput] = useState('');
+  const [brotherNameInput, setBrotherNameInput] = useState(() => {
+    const fromCoord = settings.coordinatorName?.trim();
+    if (fromCoord && !isGenericIdentityName(fromCoord)) return fromCoord;
+    const fromSaved = localStorage.getItem('kongre_coordinator_name')?.trim();
+    if (fromSaved && !isGenericIdentityName(fromSaved)) return fromSaved;
+    const fromIdent = localStorage.getItem('kongre_identified_brother')?.trim();
+    if (fromIdent && !isGenericIdentityName(fromIdent)) return fromIdent;
+    return '';
+  });
 
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<{
@@ -119,20 +130,23 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
       // Verificar PIN Personal (Código de Identificación de Rol otorgado por el Coordinador)
       let identifiedRole: TheocraticRole | undefined;
-      let finalBrotherName = user?.displayName || 'Hermano de la Congregación';
+      let finalBrotherName = '';
 
       // A) Buscar en el directorio de PINs de roles de la congregación
       const pinResult = await identifyRoleByPersonalPin(cleanPersonalPin);
       if (pinResult.success && pinResult.role) {
         identifiedRole = pinResult.role;
-        if (pinResult.name) {
+        if (pinResult.name && !isGenericIdentityName(pinResult.name)) {
           finalBrotherName = pinResult.name;
         }
       } else {
         // B) Verificar si es un código de invitación generado por los ancianos
-        const invResult = await redeemInvitationCode(cleanPersonalPin, emailToUse, finalBrotherName);
+        const invResult = await redeemInvitationCode(cleanPersonalPin, emailToUse, brotherNameInput.trim() || 'Hermano');
         if (invResult.success && invResult.role) {
           identifiedRole = invResult.role;
+          if (invResult.targetName && !isGenericIdentityName(invResult.targetName)) {
+            finalBrotherName = invResult.targetName;
+          }
         }
       }
 
@@ -140,6 +154,32 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         setError('El PIN Personal no fue reconocido. Asegúrate de ingresar el PIN de rol que te suministró el Coordinador u otro anciano.');
         setIsSubmitting(false);
         return;
+      }
+
+      // Resolver nombre no genérico con prioridad
+      const cleanInputName = brotherNameInput.trim();
+      if (cleanInputName && !isGenericIdentityName(cleanInputName)) {
+        finalBrotherName = cleanInputName;
+      } else if (!finalBrotherName || isGenericIdentityName(finalBrotherName)) {
+        const cloudCoord = cloudRes?.data?.settings?.coordinatorName;
+        const localCoord = settings.coordinatorName;
+        const savedCoord = localStorage.getItem('kongre_coordinator_name');
+        const savedIdent = localStorage.getItem('kongre_identified_brother');
+        const googleName = user?.displayName;
+
+        if (cloudCoord && !isGenericIdentityName(cloudCoord)) {
+          finalBrotherName = cloudCoord.trim();
+        } else if (localCoord && !isGenericIdentityName(localCoord)) {
+          finalBrotherName = localCoord.trim();
+        } else if (savedCoord && !isGenericIdentityName(savedCoord)) {
+          finalBrotherName = savedCoord.trim();
+        } else if (savedIdent && !isGenericIdentityName(savedIdent)) {
+          finalBrotherName = savedIdent.trim();
+        } else if (googleName && !isGenericIdentityName(googleName)) {
+          finalBrotherName = googleName.trim();
+        } else {
+          finalBrotherName = 'Hermano';
+        }
       }
 
       // Verificar si el correo ya fue registrado por el coordinador o ya está aprobado
@@ -165,12 +205,24 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
         localStorage.setItem('kongre_congregation_number', cleanId);
         localStorage.setItem('kongre_congregation_id', cleanId);
-        updateSettings({
+
+        const newSettingsUpdate: any = {
           isRegistered: true,
           ...(cleanCongName ? { congregationName: cleanCongName } : {}),
           congregationNumber: cleanId,
           congregationId: cleanId,
-        });
+        };
+
+        if (!isGenericIdentityName(finalBrotherName)) {
+          setIdentifiedBrother(finalBrotherName);
+          localStorage.setItem('kongre_identified_brother', finalBrotherName);
+          if (identifiedRole === 'coordinador') {
+            localStorage.setItem('kongre_coordinator_name', finalBrotherName);
+            newSettingsUpdate.coordinatorName = finalBrotherName;
+          }
+        }
+
+        updateSettings(newSettingsUpdate);
 
         const cleanPhoto =
           effectiveSettings.coordinatorPhotoURL ||
@@ -188,6 +240,54 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
         assignRoleToEmail(emailToUse, identifiedRole, finalBrotherName, cleanPersonalPin);
         setActiveRole(identifiedRole);
+
+        // Asegurar que el hermano figure en la lista oficial de publicadores
+        if (!isGenericIdentityName(finalBrotherName)) {
+          const currentPubs = (cloudRes?.data?.publishers || publishers) as any[];
+          const alreadyInList = currentPubs.some(
+            (p) => p.name && p.name.trim().toLowerCase() === finalBrotherName.toLowerCase()
+          );
+          if (!alreadyInList) {
+            const isElder = identifiedRole === 'coordinador' || identifiedRole === 'secretario' || identifiedRole === 'superintendente_vym';
+            const isSM = identifiedRole.startsWith('siervo_');
+            addPublisher({
+              name: finalBrotherName,
+              gender: 'hermano',
+              phone: settings.coordinatorPhone || '',
+              email: emailToUse && !emailToUse.startsWith('hermano_') ? emailToUse : '',
+              personalPin: cleanPersonalPin || undefined,
+              notes: identifiedRole === 'coordinador' ? 'Coordinador del Cuerpo de Ancianos' : (THEOCRATIC_ROLES[identifiedRole]?.name || ''),
+              active: true,
+              groupNumber: 1,
+              privilege: isElder ? 'anciano' : isSM ? 'siervo_ministerial' : undefined,
+              theocraticRole: identifiedRole,
+              hope: 'otras_ovejas',
+              absences: [],
+              roles: {
+                vym_presidente: isElder,
+                vym_oracion: isElder || isSM,
+                vym_tesoros_discurso: isElder,
+                vym_tesoros_perlas: isElder,
+                vym_tesoros_lectura: true,
+                vym_maestros_titular: true,
+                vym_maestros_ayudante: true,
+                vym_vida_partes: isElder || isSM,
+                vym_estudio_conductor: isElder,
+                vym_estudio_lector: true,
+                fds_presidente: isElder,
+                fds_atalaya_lector: isElder || isSM,
+                fds_oracion: isElder || isSM,
+                deber_acomodador: true,
+                deber_seguridad: true,
+                deber_audio: true,
+                deber_video: true,
+                deber_microfonos: true,
+                deber_plataforma: true,
+                deber_zoom: true,
+              },
+            });
+          }
+        }
 
         setSuccessData({
           role: identifiedRole,
@@ -330,6 +430,29 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
               />
               <span className="text-[10px] text-slate-400 block">
                 Número oficial asignado a tu congregación.
+              </span>
+            </div>
+
+            {/* NOMBRE Y APELLIDO DEL HERMANO */}
+            <div className="space-y-1">
+              <label className="block font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <UserIcon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Tu Nombre y Apellido:</span>
+                </span>
+                <span className="text-[10px] text-slate-400 font-normal">
+                  (Opcional si ya estás registrado)
+                </span>
+              </label>
+              <input
+                type="text"
+                value={brotherNameInput}
+                onChange={(e) => setBrotherNameInput(e.target.value)}
+                placeholder="Ej: Héctor Gutiérrez"
+                className="w-full p-2.5 text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+              />
+              <span className="text-[10px] text-slate-400 block">
+                Tu nombre oficial para figurar en la lista de publicadores y en la barra superior.
               </span>
             </div>
 

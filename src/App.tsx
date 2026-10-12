@@ -58,6 +58,7 @@ import { RegisterCongregationWizard } from './components/RegisterCongregationWiz
 import { AppLockPinSuggestionModal } from './components/AppLockPinSuggestionModal';
 import { AccountLinkRequestsModal } from './components/AccountLinkRequestsModal';
 import { PendingApprovalView } from './components/PendingApprovalView';
+import { IdentityNamePrompt } from './components/IdentityNamePrompt';
 import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 
@@ -510,6 +511,9 @@ const AppContent: React.FC = () => {
         isOpen={isLockPinSuggestionOpen}
         onClose={() => setIsLockPinSuggestionOpen(false)}
       />
+
+      {/* Modal para solicitar nombre e identidad si se inició con PIN sin nombre reconocido */}
+      <IdentityNamePrompt />
 
     </div>
   );

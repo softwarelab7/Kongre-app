@@ -5,7 +5,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useTheme } from '../context/ThemeContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
-import { isCongregationIdString, getFriendlyCongregationName, verifyPasscode } from '../utils/theocraticSecurity';
+import { isCongregationIdString, getFriendlyCongregationName, verifyPasscode, isGenericIdentityName } from '../utils/theocraticSecurity';
 import {
   Bell,
   Sun,
@@ -50,6 +50,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     signInWithGoogle,
     signOutUser,
     setActiveRole,
+    setIdentifiedBrother,
     assignRoleToEmail,
     identifyRoleByPersonalPin,
     userRolesList,
@@ -65,6 +66,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     settings,
     updateSettings,
     publishers,
+    addPublisher,
     accountLinkRequests,
     createAccountLinkRequest,
     restorePreviousRegistration,
@@ -86,6 +88,15 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   );
   const [congregationPinInput, setCongregationPinInput] = useState('');
   const [personalPinInput, setPersonalPinInput] = useState('');
+  const [brotherNameInput, setBrotherNameInput] = useState(() => {
+    const fromCoord = settings.coordinatorName?.trim();
+    if (fromCoord && !isGenericIdentityName(fromCoord)) return fromCoord;
+    const fromSaved = localStorage.getItem('kongre_coordinator_name')?.trim();
+    if (fromSaved && !isGenericIdentityName(fromSaved)) return fromSaved;
+    const fromIdent = localStorage.getItem('kongre_identified_brother')?.trim();
+    if (fromIdent && !isGenericIdentityName(fromIdent)) return fromIdent;
+    return '';
+  });
   const [isSubmittingCode, setIsSubmittingCode] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [codeSuccess, setCodeSuccess] = useState<string | null>(null);
@@ -104,7 +115,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       const cleanId = congregationIdInput.trim();
       const cleanCongPin = congregationPinInput.trim();
       const cleanPersonalPin = personalPinInput.trim();
-      let nameToUse = user?.displayName || 'Hermano de la Congregación';
+      const cleanInputName = brotherNameInput.trim();
+      let nameToUse = '';
       let emailToUse = user?.email || `hermano_${cleanId || 'cong'}@kongre.org`;
 
       // 1. Validar ID
@@ -170,12 +182,16 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           const pinResult = await identifyRoleByPersonalPin(pinToIdentify);
           if (pinResult.success && pinResult.role) {
             identifiedRole = pinResult.role;
-            if (pinResult.name) nameToUse = pinResult.name;
+            if (pinResult.name && !isGenericIdentityName(pinResult.name)) {
+              nameToUse = pinResult.name;
+            }
           } else {
-            const invResult = await redeemInvitationCode(pinToIdentify, emailToUse, nameToUse);
+            const invResult = await redeemInvitationCode(pinToIdentify, emailToUse, nameToUse || 'Hermano');
             if (invResult.success && invResult.role) {
               identifiedRole = invResult.role;
-              if (invResult.targetName) nameToUse = invResult.targetName;
+              if (invResult.targetName && !isGenericIdentityName(invResult.targetName)) {
+                nameToUse = invResult.targetName;
+              }
             }
           }
         }
@@ -183,12 +199,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
       // Si el PIN de congregación es válido y no tenía PIN personal identificado:
       if (!identifiedRole && isCongPinValid) {
-        // Si el correo coincide con el coordinador o si no hay otro rol, es coordinador
-        const coordName = cloudData?.settings?.coordinatorName || settings.coordinatorName;
         identifiedRole = 'coordinador';
-        if (coordName && nameToUse === 'Hermano') {
-          nameToUse = coordName;
-        }
       }
 
       if (!identifiedRole && !isCongPinValid) {
@@ -199,7 +210,32 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
       const roleFinal: TheocraticRole = identifiedRole || 'coordinador';
 
-      // 4. Si el PIN de congregación es válido o el PIN personal fue reconocido en el directorio:
+      // 4. Resolver nombre real (prioridad: entrada escrita > publicador > datos de nube > settings > localStorage)
+      if (cleanInputName && !isGenericIdentityName(cleanInputName)) {
+        nameToUse = cleanInputName;
+      } else if (!nameToUse || isGenericIdentityName(nameToUse)) {
+        const cloudCoord = cloudData?.settings?.coordinatorName;
+        const localCoord = settings.coordinatorName;
+        const savedCoord = localStorage.getItem('kongre_coordinator_name');
+        const savedIdent = localStorage.getItem('kongre_identified_brother');
+        const googleName = user?.displayName;
+
+        if (cloudCoord && !isGenericIdentityName(cloudCoord)) {
+          nameToUse = cloudCoord.trim();
+        } else if (localCoord && !isGenericIdentityName(localCoord)) {
+          nameToUse = localCoord.trim();
+        } else if (savedCoord && !isGenericIdentityName(savedCoord)) {
+          nameToUse = savedCoord.trim();
+        } else if (savedIdent && !isGenericIdentityName(savedIdent)) {
+          nameToUse = savedIdent.trim();
+        } else if (googleName && !isGenericIdentityName(googleName)) {
+          nameToUse = googleName.trim();
+        } else {
+          nameToUse = 'Hermano';
+        }
+      }
+
+      // 5. Si el PIN de congregación es válido o el PIN personal fue reconocido en el directorio:
       const isAuthorizedMember =
         isCongPinValid ||
         Boolean(identifiedRole) ||
@@ -217,12 +253,24 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
         localStorage.setItem('kongre_congregation_number', cleanId);
         localStorage.setItem('kongre_congregation_id', cleanId);
-        updateSettings({
+
+        const newSettingsUpdate: any = {
           isRegistered: true,
           ...(cleanCongName ? { congregationName: cleanCongName } : {}),
           congregationNumber: cleanId,
           congregationId: cleanId,
-        });
+        };
+
+        if (!isGenericIdentityName(nameToUse)) {
+          localStorage.setItem('kongre_identified_brother', nameToUse);
+          setIdentifiedBrother(nameToUse);
+          if (roleFinal === 'coordinador') {
+            localStorage.setItem('kongre_coordinator_name', nameToUse);
+            newSettingsUpdate.coordinatorName = nameToUse;
+          }
+        }
+
+        updateSettings(newSettingsUpdate);
 
         const cleanPhoto =
           cloudData?.settings?.coordinatorPhotoURL ||
@@ -240,6 +288,55 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
         assignRoleToEmail(emailToUse, roleFinal, nameToUse, pinToIdentify);
         setActiveRole(roleFinal);
+
+        // Asegurar que el hermano figure en la lista oficial de publicadores de la congregación
+        if (!isGenericIdentityName(nameToUse)) {
+          const currentPubs = (cloudData?.publishers || publishers) as any[];
+          const alreadyInList = currentPubs.some(
+            (p) => p.name && p.name.trim().toLowerCase() === nameToUse.toLowerCase()
+          );
+          if (!alreadyInList) {
+            const isElder = roleFinal === 'coordinador' || roleFinal === 'secretario' || roleFinal === 'superintendente_vym';
+            const isSM = roleFinal.startsWith('siervo_');
+            addPublisher({
+              name: nameToUse,
+              gender: 'hermano',
+              phone: settings.coordinatorPhone || '',
+              email: emailToUse && !emailToUse.startsWith('hermano_') ? emailToUse : '',
+              personalPin: pinToIdentify || undefined,
+              notes: roleFinal === 'coordinador' ? 'Coordinador del Cuerpo de Ancianos' : (THEOCRATIC_ROLES[roleFinal]?.name || ''),
+              active: true,
+              groupNumber: 1,
+              privilege: isElder ? 'anciano' : isSM ? 'siervo_ministerial' : undefined,
+              theocraticRole: roleFinal,
+              hope: 'otras_ovejas',
+              absences: [],
+              roles: {
+                vym_presidente: isElder,
+                vym_oracion: isElder || isSM,
+                vym_tesoros_discurso: isElder,
+                vym_tesoros_perlas: isElder,
+                vym_tesoros_lectura: true,
+                vym_maestros_titular: true,
+                vym_maestros_ayudante: true,
+                vym_vida_partes: isElder || isSM,
+                vym_estudio_conductor: isElder,
+                vym_estudio_lector: true,
+                fds_presidente: isElder,
+                fds_atalaya_lector: isElder || isSM,
+                fds_oracion: isElder || isSM,
+                deber_acomodador: true,
+                deber_seguridad: true,
+                deber_audio: true,
+                deber_video: true,
+                deber_microfonos: true,
+                deber_plataforma: true,
+                deber_zoom: true,
+              },
+            });
+          }
+        }
+
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
         localStorage.setItem('kongre_needs_cloud_upload', 'true');
@@ -899,6 +996,29 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       />
                       <span className="text-[10px] text-slate-400 block mt-0.5">
                         Número oficial asignado a tu congregación.
+                      </span>
+                    </div>
+
+                    {/* NOMBRE Y APELLIDO DEL HERMANO */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <UserIcon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span>Tu Nombre y Apellido:</span>
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-normal">
+                          (Opcional si ya estás guardado)
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        value={brotherNameInput}
+                        onChange={(e) => setBrotherNameInput(e.target.value)}
+                        placeholder="Ej: Héctor Gutiérrez"
+                        className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs"
+                      />
+                      <span className="text-[10px] text-slate-400 block mt-0.5">
+                        Tu nombre oficial para figurar en la lista de publicadores y en la barra superior.
                       </span>
                     </div>
 

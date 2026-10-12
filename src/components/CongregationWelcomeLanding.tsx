@@ -1174,6 +1174,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               {/* VIEW: REGISTRO DE CONGREGACIÓN (Unificado en la misma tarjeta) */}
               {activeTab === 'register' && (
                 <RegisterCongregationWizard
+                  key={activeTab}
                   embedded={true}
                   isMandatory={!settings.isRegistered}
                   onOpenJoinWithCode={() => {

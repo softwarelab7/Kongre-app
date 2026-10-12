@@ -68,72 +68,50 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
 
-  // Step 1: Congregation info
-  const [congregationName, setCongregationName] = useState(() =>
-    isCongregationIdString(settings.congregationName) ? '' : (settings.congregationName || '')
-  );
-  const [congregationNumber, setCongregationNumber] = useState(
-    settings.congregationNumber || settings.congregationId || ''
-  );
+  // Step 1: Congregation info - Inicia 100% vacío para registrar una congregación nueva
+  const [congregationName, setCongregationName] = useState('');
+  const [congregationNumber, setCongregationNumber] = useState('');
   const [copiedId, setCopiedId] = useState(false);
-  const [circuitNumber, setCircuitNumber] = useState(settings.circuitNumber || '');
+  const [circuitNumber, setCircuitNumber] = useState('');
 
   // Country and City (País primero, luego Ciudad)
-  const defaultCountry = settings.country || 'Colombia';
-  const [country, setCountry] = useState(defaultCountry);
-  const defaultCity =
-    settings.city ||
-    (COUNTRIES_WITH_CITIES[defaultCountry] ? COUNTRIES_WITH_CITIES[defaultCountry][0] : 'Bogotá');
-  const [city, setCity] = useState(defaultCity);
+  const [country, setCountry] = useState('');
+  const [city, setCity] = useState('');
 
   const availableCities = country && COUNTRIES_WITH_CITIES[country]
     ? COUNTRIES_WITH_CITIES[country]
     : [];
 
-  const [hallAddress, setHallAddress] = useState(settings.hallAddress || '');
+  const [hallAddress, setHallAddress] = useState('');
 
   // Country change handler
   const handleCountryChange = (selectedCountry: string) => {
     setCountry(selectedCountry);
     const citiesForCountry = COUNTRIES_WITH_CITIES[selectedCountry];
-    if (citiesForCountry && citiesForCountry.length > 0) {
-      if (!citiesForCountry.includes(city)) {
-        setCity(citiesForCountry[0]);
-      }
+    if (city && citiesForCountry && !citiesForCountry.includes(city)) {
+      setCity('');
     }
   };
 
-  // Step 2: Meeting Schedules
-  const [midweekDay, setMidweekDay] = useState(settings.midweekMeetingDay || 'Miércoles');
-  const [midweekTime, setMidweekTime] = useState(settings.midweekMeetingTime || '19:00');
-  const [weekendDay, setWeekendDay] = useState(settings.weekendMeetingDay || 'Domingo');
-  const [weekendTime, setWeekendTime] = useState(settings.weekendMeetingTime || '10:00');
+  // Step 2: Meeting Schedules - Vacíos por defecto
+  const [midweekDay, setMidweekDay] = useState('');
+  const [midweekTime, setMidweekTime] = useState('');
+  const [weekendDay, setWeekendDay] = useState('');
+  const [weekendTime, setWeekendTime] = useState('');
 
-  // Step 3: Coordinator Details
-  const [coordinatorName, setCoordinatorName] = useState(
-    settings.coordinatorName || user?.displayName || ''
-  );
-  const [coordinatorEmail, setCoordinatorEmail] = useState(
-    settings.coordinatorEmail || user?.email || ''
-  );
-  const [coordinatorPhone, setCoordinatorPhone] = useState(settings.coordinatorPhone || '');
+  // Step 3: Coordinator Details - Vacíos por defecto
+  const [coordinatorName, setCoordinatorName] = useState('');
+  const [coordinatorEmail, setCoordinatorEmail] = useState('');
+  const [coordinatorPhone, setCoordinatorPhone] = useState('');
 
-  // Step 4: Security: PIN de Congregación + PIN Personal (generados automáticamente por la app)
-  const initialPinsRef = React.useRef<{ congPin: string; personalPin: string } | null>(null);
-  if (!initialPinsRef.current) {
-    initialPinsRef.current = {
-      congPin: generateSecureCongregationPin(),
-      personalPin: generateSecureRolePin(),
-    };
-  }
+  // Step 4: Security: PIN de Congregación + PIN Personal (vacíos por defecto)
+  const [congregationPin, setCongregationPinInput] = useState('');
+  const [confirmCongregationPin, setConfirmCongregationPin] = useState('');
+  const [showCongregationPin, setShowCongregationPin] = useState(false);
 
-  const [congregationPin, setCongregationPinInput] = useState(initialPinsRef.current.congPin);
-  const [confirmCongregationPin, setConfirmCongregationPin] = useState(initialPinsRef.current.congPin);
-  const [showCongregationPin, setShowCongregationPin] = useState(true);
-
-  const [personalPin, setPersonalPinInput] = useState(initialPinsRef.current.personalPin);
-  const [confirmPersonalPin, setConfirmPersonalPin] = useState(initialPinsRef.current.personalPin);
-  const [showPersonalPin, setShowPersonalPin] = useState(true);
+  const [personalPin, setPersonalPinInput] = useState('');
+  const [confirmPersonalPin, setConfirmPersonalPin] = useState('');
+  const [showPersonalPin, setShowPersonalPin] = useState(false);
 
   const [pinRegeneratedCong, setPinRegeneratedCong] = useState(false);
   const [pinRegeneratedPers, setPinRegeneratedPers] = useState(false);
@@ -143,6 +121,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
     const newPin = generateSecureCongregationPin();
     setCongregationPinInput(newPin);
     setConfirmCongregationPin(newPin);
+    setShowCongregationPin(true);
     setPinRegeneratedCong(true);
     setTimeout(() => setPinRegeneratedCong(false), 2000);
   };
@@ -151,6 +130,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
     const newPin = generateSecureRolePin();
     setPersonalPinInput(newPin);
     setConfirmPersonalPin(newPin);
+    setShowPersonalPin(true);
     setPinRegeneratedPers(true);
     setTimeout(() => setPinRegeneratedPers(false), 2000);
   };
@@ -715,6 +695,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     onChange={(e) => setMidweekDay(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-medium text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs cursor-pointer"
                   >
+                    <option value="">Selecciona un día...</option>
                     <option value="Lunes">Lunes</option>
                     <option value="Martes">Martes</option>
                     <option value="Miércoles">Miércoles</option>
@@ -765,6 +746,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     onChange={(e) => setWeekendDay(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-medium text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs cursor-pointer"
                   >
+                    <option value="">Selecciona un día...</option>
                     <option value="Sábado">Sábado</option>
                     <option value="Domingo">Domingo</option>
                   </select>
@@ -868,11 +850,11 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 </div>
                 <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold">
                   <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span>PINs generados por la app</span>
+                  <span>Seguridad Personalizada</span>
                 </div>
               </div>
               <p className="text-[11px] sm:text-xs text-amber-900/80 dark:text-amber-300/80 leading-relaxed">
-                La app ha <strong>generado automáticamente</strong> claves de seguridad para tu congregación y tu rol de Coordinador. Puedes conservarlas, modificarlas manualmente o pulsar <strong>«Generar nuevo»</strong> si deseas otra combinación.
+                Establece las claves de seguridad para tu congregación y para tu cuenta de Coordinador. Puedes ingresarlas manualmente o pulsar <strong>«Generar PIN»</strong> para crearlas automáticamente con alta seguridad teocrática.
               </p>
             </div>
 
@@ -908,7 +890,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                         title="Generar otro PIN de 6 dígitos aleatorio"
                       >
                         <RefreshCw className={`w-3 h-3 ${pinRegeneratedCong ? 'animate-spin' : ''}`} />
-                        <span>{pinRegeneratedCong ? '¡Generado!' : 'Generar nuevo'}</span>
+                        <span>{pinRegeneratedCong ? '¡Generado!' : congregationPin ? 'Generar nuevo' : 'Generar PIN'}</span>
                       </button>
                       <button
                         type="button"
@@ -1029,7 +1011,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                         title="Generar otro PIN personal de 4 dígitos"
                       >
                         <RefreshCw className={`w-3 h-3 ${pinRegeneratedPers ? 'animate-spin' : ''}`} />
-                        <span>{pinRegeneratedPers ? '¡Generado!' : 'Generar nuevo'}</span>
+                        <span>{pinRegeneratedPers ? '¡Generado!' : personalPin ? 'Generar nuevo' : 'Generar PIN'}</span>
                       </button>
                       <button
                         type="button"

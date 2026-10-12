@@ -387,83 +387,200 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     setEmailError(null);
     setIsSubmittingEmail(true);
     try {
-      await signInWithGoogle();
-      const loggedUser = auth.currentUser;
-      const userEmail = loggedUser?.email?.toLowerCase().trim();
+      const loggedUser = await signInWithGoogle();
+      if (!loggedUser) {
+        setIsSubmittingEmail(false);
+        return;
+      }
+      const userEmail = loggedUser.email?.toLowerCase().trim() || '';
+      const userName = loggedUser.displayName?.trim() || '';
+      const userPhoto = loggedUser.photoURL || '';
 
-      // Caso prioritario: Usuario registrado previamente o creador
-      if (userEmail === 'hectorguti95@gmail.com' || (settings.coordinatorEmail && userEmail === settings.coordinatorEmail.toLowerCase().trim())) {
-        if (!settings.isRegistered || !settings.congregationName) {
-          await restorePreviousRegistration(
-            settings.congregationName || 'Mi Congregación',
-            loggedUser?.displayName || 'Coordinador'
-          );
+      if (!userEmail) {
+        setEmailError('No se pudo obtener el correo de la cuenta de Google.');
+        setIsSubmittingEmail(false);
+        return;
+      }
+
+      // 1. Obtener ID y Nombre de la congregación existente (local o nube)
+      const existingCongId =
+        settings.congregationNumber?.trim() ||
+        settings.congregationId?.trim() ||
+        localStorage.getItem('kongre_congregation_number')?.trim() ||
+        localStorage.getItem('kongre_congregation_id')?.trim() ||
+        '';
+
+      const existingCongName =
+        (settings.congregationName && !isCongregationIdString(settings.congregationName) ? settings.congregationName.trim() : null) ||
+        (localStorage.getItem('kongre_congregation_name') && !isCongregationIdString(localStorage.getItem('kongre_congregation_name')!) ? localStorage.getItem('kongre_congregation_name')!.trim() : null) ||
+        '';
+
+      // 2. Si hay ID de congregación, cargar datos de Firestore
+      let cloudData: any = null;
+      if (existingCongId) {
+        const cloudRes = await loadCongregationFromCloud(existingCongId);
+        cloudData = cloudRes?.data;
+      }
+
+      const allPublishers = (cloudData?.publishers || publishers || []) as any[];
+      const coordEmail = (cloudData?.settings?.coordinatorEmail || settings.coordinatorEmail || '').toLowerCase().trim();
+      const coordName = cloudData?.settings?.coordinatorName || settings.coordinatorName || '';
+
+      // 3. Comprobar si el usuario es Coordinador/Creador o dueño del dispositivo
+      const isKnownCoordinator =
+        userEmail === 'hectorguti95@gmail.com' ||
+        (coordEmail && userEmail === coordEmail) ||
+        !coordEmail || // Si no había correo de coordinador registrado aún en la congregación
+        localStorage.getItem('kongre_is_registered_congregation') === 'true' ||
+        Boolean(existingCongId);
+
+      // 4. Comprobar si el usuario coincide con un publicador registrado por correo o nombre
+      const matchingPub = allPublishers.find(
+        (p) =>
+          (p.email && p.email.toLowerCase().trim() === userEmail) ||
+          (userName && !isGenericIdentityName(userName) && p.name && p.name.trim().toLowerCase() === userName.toLowerCase())
+      );
+
+      const matchingRole = userRolesList.find(
+        (r) => r.email.toLowerCase().trim() === userEmail
+      );
+
+      const approvedReq = accountLinkRequests.find(
+        (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'approved'
+      );
+
+      const pendingReq = accountLinkRequests.find(
+        (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'pending'
+      );
+
+      if (pendingReq) {
+        setPendingApprovalEmail(userEmail);
+        return;
+      }
+
+      // CASO A: Es el coordinador / creador o dueño del dispositivo con congregación existente
+      if (isKnownCoordinator) {
+        const finalCoordName =
+          (userName && !isGenericIdentityName(userName) ? userName : null) ||
+          (coordName && !isGenericIdentityName(coordName) ? coordName : null) ||
+          localStorage.getItem('kongre_coordinator_name') ||
+          'Coordinador';
+
+        await updateSettings({
+          coordinatorEmail: userEmail,
+          coordinatorName: finalCoordName,
+          isRegistered: true,
+          ...(userPhoto ? { coordinatorPhotoURL: userPhoto } : {}),
+          ...(existingCongId ? { congregationNumber: existingCongId, congregationId: existingCongId } : {}),
+          ...(existingCongName ? { congregationName: existingCongName } : {}),
+        });
+
+        if (finalCoordName && !isGenericIdentityName(finalCoordName)) {
+          setIdentifiedBrother(finalCoordName);
+          localStorage.setItem('kongre_identified_brother', finalCoordName);
+          localStorage.setItem('kongre_coordinator_name', finalCoordName);
         }
-        assignRoleToEmail(userEmail, 'coordinador', loggedUser?.displayName || 'Coordinador');
+
+        assignRoleToEmail(userEmail, 'coordinador', finalCoordName);
         setActiveRole('coordinador');
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
-        await uploadLocalDataToGoogle();
+        localStorage.setItem('kongre_needs_cloud_upload', 'true');
+        localStorage.setItem('kongre_last_local_update', new Date().toISOString());
+
+        // Asegurar que el coordinador figure como publicador en la lista
+        if (finalCoordName && !isGenericIdentityName(finalCoordName)) {
+          const alreadyInList = allPublishers.some(
+            (p) => p.name && p.name.trim().toLowerCase() === finalCoordName.toLowerCase()
+          );
+          if (!alreadyInList) {
+            addPublisher({
+              name: finalCoordName,
+              gender: 'hermano',
+              phone: settings.coordinatorPhone || '',
+              email: userEmail,
+              notes: 'Coordinador del Cuerpo de Ancianos',
+              active: true,
+              groupNumber: 1,
+              privilege: 'anciano',
+              theocraticRole: 'coordinador',
+              hope: 'otras_ovejas',
+              absences: [],
+              roles: {
+                vym_presidente: true,
+                vym_oracion: true,
+                vym_tesoros_discurso: true,
+                vym_tesoros_perlas: true,
+                vym_tesoros_lectura: true,
+                vym_maestros_titular: true,
+                vym_maestros_ayudante: true,
+                vym_vida_partes: true,
+                vym_estudio_conductor: true,
+                vym_estudio_lector: true,
+                fds_presidente: true,
+                fds_atalaya_lector: true,
+                fds_oracion: true,
+                deber_acomodador: true,
+                deber_seguridad: true,
+                deber_audio: true,
+                deber_video: true,
+                deber_microfonos: true,
+                deber_plataforma: true,
+                deber_zoom: true,
+              },
+            });
+          }
+        }
+
         onEnterApp();
         return;
       }
 
-      // Si la congregación ya está registrada en este dispositivo o con datos de aplicación:
-      const isDeviceRegistered =
-        Boolean(settings.isRegistered && settings.congregationName) ||
-        localStorage.getItem('kongre_is_registered_congregation') === 'true' ||
-        publishers.length > 0;
+      // CASO B: Es un publicador o rol ya registrado
+      if (matchingPub || matchingRole || approvedReq) {
+        const roleToAssign: TheocraticRole =
+          matchingRole?.role ||
+          matchingPub?.theocraticRole ||
+          (matchingPub?.privilege === 'anciano'
+            ? 'coordinador'
+            : matchingPub?.privilege === 'siervo_ministerial'
+            ? 'siervo_territorios'
+            : 'publico');
 
-      if (isDeviceRegistered && userEmail) {
-        const coordEmail = settings.coordinatorEmail?.toLowerCase().trim();
-        const matchingPub = publishers.find(
-          (p) => p.email && p.email.toLowerCase().trim() === userEmail
-        );
-        const matchingRole = userRolesList.find(
-          (r) => r.email.toLowerCase().trim() === userEmail
-        );
-        const approvedReq = accountLinkRequests.find(
-          (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'approved'
-        );
-        const pendingReq = accountLinkRequests.find(
-          (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'pending'
-        );
+        const brotherName =
+          matchingPub?.name ||
+          matchingRole?.name ||
+          userName ||
+          'Hermano';
 
-        // Si es el dispositivo donde se registró la congregación o un hermano autorizado:
-        const isDeviceOwner =
-          !coordEmail ||
-          coordEmail === userEmail ||
-          localStorage.getItem('kongre_is_registered_congregation') === 'true';
-
-        if (isDeviceOwner || matchingPub || matchingRole || approvedReq) {
-          // Si no había correo registrado o coincide, vincular esta cuenta de Google como coordinador
-          if (!coordEmail || isDeviceOwner) {
-            await updateSettings({
-              coordinatorEmail: userEmail,
-              coordinatorName: loggedUser?.displayName || settings.coordinatorName || 'Coordinador',
-              isRegistered: true,
-            });
-          }
-          assignRoleToEmail(userEmail, 'coordinador', loggedUser?.displayName || 'Coordinador');
-          setActiveRole('coordinador');
-          localStorage.setItem('kongre_is_registered_congregation', 'true');
-          localStorage.setItem('kongre_has_entered_app', 'true');
-          // Guardar y sincronizar automáticamente datos locales a Google
-          await uploadLocalDataToGoogle();
-          onEnterApp();
-          return;
-        } else if (pendingReq) {
-          // Ya tiene solicitud enviada: mostrar pantalla de espera
-          setPendingApprovalEmail(userEmail || null);
-          return;
-        } else {
-          // Asistente de registro o unirse
-          setActiveTab('register');
-          setCodeSuccess('Cuenta de Google verificada. Puedes completar el registro de tu congregación.');
+        if (brotherName && !isGenericIdentityName(brotherName)) {
+          setIdentifiedBrother(brotherName);
+          localStorage.setItem('kongre_identified_brother', brotherName);
         }
-      } else {
-        setActiveTab('register');
+
+        assignRoleToEmail(userEmail, roleToAssign, brotherName);
+        setActiveRole(roleToAssign);
+        localStorage.setItem('kongre_is_registered_congregation', 'true');
+        localStorage.setItem('kongre_has_entered_app', 'true');
+
+        onEnterApp();
+        return;
       }
+
+      // CASO C: La congregación existe pero la cuenta de Google necesita conectarse con el PIN
+      if (existingCongId) {
+        setActiveTab('code_login');
+        if (existingCongId) setCongregationIdInput(existingCongId);
+        if (userName) setBrotherNameInput(userName);
+        setCodeSuccess(
+          `Cuenta de Google iniciada (${userEmail}). Introduce el PIN de tu congregación o tu PIN personal para conectarte.`
+        );
+        return;
+      }
+
+      // CASO D: Es un sistema completamente limpio sin congregación previa
+      setActiveTab('register');
+      setCodeSuccess('Cuenta de Google verificada. Puedes completar el registro de tu congregación.');
     } catch (err: any) {
       setEmailError(err?.message || 'Error al iniciar sesión con Google.');
     } finally {

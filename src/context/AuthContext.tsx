@@ -34,7 +34,7 @@ export interface PublisherPinRecord {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: () => Promise<User | null>;
   signOutUser: () => Promise<void>;
   error: string | null;
   activeRole: TheocraticRole;
@@ -90,7 +90,7 @@ const DEFAULT_INITIAL_ROLES: UserRoleRecord[] = [];
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  signInWithGoogle: async () => {},
+  signInWithGoogle: async () => null,
   signOutUser: async () => {},
   error: null,
   activeRole: 'coordinador',
@@ -713,23 +713,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (): Promise<User | null> => {
     setError(null);
     try {
-      await signInWithPopup(auth, googleProvider);
+      const res = await signInWithPopup(auth, googleProvider);
+      if (res?.user) {
+        setUser(res.user);
+        return res.user;
+      }
+      return auth.currentUser;
     } catch (err: any) {
       if (
         err?.code === 'auth/popup-closed-by-user' ||
         err?.code === 'auth/cancelled-popup-request'
       ) {
-        return;
+        return null;
       }
       if (err?.code === 'auth/popup-blocked') {
         setError('El navegador bloqueó la ventana emergente. Por favor, habilite las ventanas emergentes para iniciar sesión con Google.');
-        return;
+        return null;
       }
       console.warn('Google sign-in status:', err?.code, err?.message);
       setError(err?.message || 'Error al iniciar sesión con Google.');
+      return null;
     }
   };
 

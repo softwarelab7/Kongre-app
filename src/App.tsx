@@ -214,10 +214,12 @@ const AppContent: React.FC = () => {
   // Mandatory Congregation Registration Check:
   // A user MUST register the congregation (or join an existing one) before accessing the platform
   const isCongregationRegistered = Boolean(
-    (settings.isRegistered && settings.congregationName?.trim()) ||
+    (settings.isRegistered && (settings.congregationName?.trim() || settings.congregationNumber || settings.congregationId)) ||
     localStorage.getItem('kongre_is_registered_congregation') === 'true' ||
+    localStorage.getItem('kongre_has_entered_app') === 'true' ||
     Boolean(localStorage.getItem('kongre_congregation_name')?.trim()) ||
-    user?.email === 'hectorguti95@gmail.com'
+    Boolean(localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_congregation_id')) ||
+    Boolean(user?.email)
   );
 
   if (showWelcomeLanding || !isCongregationRegistered) {

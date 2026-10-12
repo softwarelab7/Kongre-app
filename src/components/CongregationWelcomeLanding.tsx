@@ -955,34 +955,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               {/* VIEW: EMAIL LOGIN (Google) */}
               {activeTab === 'email_login' && (
                 <div className="space-y-4 pt-1 animate-fade-in">
-                  {/* Estado de la Congregación en este dispositivo */}
-                  {settings.isRegistered ? (
-                    <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700/70 text-xs text-emerald-900 dark:text-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 shadow-2xs">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                        <div>
-                          <span className="font-bold">Congregación en el sistema: </span>
-                          <span className="font-black text-emerald-950 dark:text-white">
-                            {getFriendlyCongregationName(settings.congregationName)}
-                          </span>
-                        </div>
-                      </div>
-                      <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-lg bg-emerald-200/80 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-200 w-fit">
-                        ID: {settings.congregationNumber || settings.congregationId || 'Oficial'}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700/80 text-xs text-amber-950 dark:text-amber-200 space-y-1.5 shadow-2xs">
-                      <div className="flex items-center gap-2 font-black text-amber-900 dark:text-amber-100">
-                        <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                        <span>Aún no hay ninguna congregación registrada</span>
-                      </div>
-                      <p className="text-[11px] leading-relaxed text-amber-900/90 dark:text-amber-300">
-                        Si eres el Coordinador, debes seleccionar <strong>«Registrar mi Congregación»</strong>. Si eres publicador, espera a que el cuerpo de ancianos configure la congregación primero para que no pierdas tu tiempo.
-                      </p>
-                    </div>
-                  )}
-
                   {/* Tarjeta explicativa con los 3 requisitos y aprobación obligatoria */}
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-xs space-y-2.5">
                     <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-slate-100">

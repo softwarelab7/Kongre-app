@@ -668,7 +668,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           1. SLIM LEFT VERTICAL SIDEBAR (DESKTOP / TABLET - CATEGORIES & FLYOUT)
          ========================================================================= */}
       {isSidebarVisible && (
-        <aside className="hidden md:flex flex-col items-center fixed left-0 top-0 bottom-0 w-16 lg:w-18 z-40 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 py-3 select-none transition-all duration-200 overflow-visible">
+        <aside className="hidden md:flex flex-col items-center fixed left-0 top-0 bottom-0 w-16 z-40 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 py-3 select-none transition-all duration-200 overflow-visible">
           {/* Top Brand Squircle Logo Button */}
           <button
             type="button"
@@ -857,8 +857,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* =========================================================================
           2. TOP HEADER BAR (EXACT REFERENCE DESIGN)
          ========================================================================= */}
-      <header className={`sticky top-0 z-30 w-full ${isSidebarVisible ? 'md:pl-16 lg:pl-18' : 'pl-0'} bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 transition-all duration-200`}>
-        <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6">
+      <header className={`sticky top-0 z-30 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 transition-all duration-200`}>
+        <div className="flex items-center justify-between h-14 sm:h-16 px-4 sm:px-6 lg:px-8 2xl:px-12">
           {/* Left: Panel Toggle & Congregation Name */}
           <div className="flex items-center gap-3 min-w-0">
             {/* Sidebar toggle button (collapses/expands on desktop, opens drawer on mobile) */}

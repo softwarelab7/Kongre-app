@@ -304,8 +304,9 @@ const AppContent: React.FC = () => {
         onOpenWelcomeLanding={() => setShowWelcomeLanding(true)}
       />
 
-      <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16 lg:pl-18' : 'pl-0'} mx-auto px-3 sm:px-6 lg:px-8 2xl:px-12 py-4 sm:py-6 pb-24 md:pb-8 transition-all duration-200`}>
-        {!isTabAllowedForRole(effectiveRoleInfo.id, activeTab) ? (
+      <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200`}>
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 py-4 sm:py-6 pb-24 md:pb-8">
+          {!isTabAllowedForRole(effectiveRoleInfo.id, activeTab) ? (
           <AccessRestrictedView
             requiredRoleName={
               activeTab === 'cuentas'
@@ -400,6 +401,7 @@ const AppContent: React.FC = () => {
             )}
           </>
         )}
+        </div>
       </main>
 
       {/* Global Modals */}

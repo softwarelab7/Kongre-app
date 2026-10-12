@@ -13,6 +13,7 @@ import { generateCounselorSheetPdf } from '../utils/clmCounselorPdf';
 import { useCongregation } from '../context/CongregationContext';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek } from '../utils/organizedSync';
 import { createDefaultPrograma, getMonday } from '../utils/clmDefaultProgram';
+import { formatTheocraticWeekRange, formatTheocraticMeetingDate } from '../utils/dateUtils';
 import { checkPublisherConflictsOnDate } from '../utils/assignmentConflictChecker';
 import { OFFICIAL_STUDENT_LESSONS } from '../utils/theocraticData';
 import {
@@ -1868,7 +1869,7 @@ export default function ClmScheduleView({
 
               <div className="flex items-center gap-2.5 text-xs">
                 <span className="font-bold text-slate-900 dark:text-white">
-                  {programa?.rango_semana || `Semana del ${semanaFechaStr}`}
+                  {programa?.rango_semana || formatTheocraticWeekRange(semanaFechaStr)}
                 </span>
                 <span className="text-slate-300 dark:text-slate-600">|</span>
                 <span className="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
@@ -1938,7 +1939,7 @@ export default function ClmScheduleView({
         /* ── ENCABEZADO VMC SUPER MINIMALISTA (MODO EMBEBIDO / UNIFICADO) ── */
         <div className="px-5 py-2.5 bg-slate-50/70 dark:bg-slate-800/30 border-b border-slate-200/70 dark:border-white/[0.05] flex items-center justify-between gap-3 flex-wrap text-xs">
           {/* Lectura bíblica y semana */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-slate-800 dark:text-zinc-200">
               Reunión Entre Semana (VMC)
             </span>
@@ -1946,6 +1947,15 @@ export default function ClmScheduleView({
             <span className="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">
               {effectivePrograma?.lectura_semana || 'JEREMÍAS 40, 41'}
             </span>
+            {currentWeek?.midweek?.date && (
+              <>
+                <span className="text-slate-300 dark:text-slate-600">•</span>
+                <span className="font-bold text-indigo-600 dark:text-indigo-400">
+                  {formatTheocraticMeetingDate(currentWeek.midweek.date, settings?.midweekMeetingDay)}
+                  {settings?.midweekMeetingTime ? ` (${settings.midweekMeetingTime})` : ''}
+                </span>
+              </>
+            )}
           </div>
 
           {/* Selector de salas y configuración auxiliar compacta */}

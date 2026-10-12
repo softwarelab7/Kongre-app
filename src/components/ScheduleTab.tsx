@@ -28,6 +28,14 @@ import { OFFICIAL_PUBLIC_TALK_OUTLINES, findOutlineByNumber } from '../utils/the
 import { generateS89Pdf as generateS89PdfFillers } from '../utils/pdfFillers';
 import { generateS89Pdf as generateS89PdfLegacy } from '../utils/pdfGenerator';
 import {
+  formatTheocraticWeekRange,
+  formatTheocraticWeekRangeShort,
+  formatTheocraticMeetingDate,
+  getMondayFromDate,
+  isCurrentCalendarWeek,
+  formatMonthYearKey,
+} from '../utils/dateUtils';
+import {
   Calendar,
   ChevronLeft,
   ChevronRight,
@@ -75,6 +83,7 @@ export const ScheduleTab: React.FC = () => {
     setCurrentWeekId,
     updateWeek,
     addNextWeek,
+    addWeekForDate,
     copyWeekStructure,
     syncAllWeeksWithOrganized,
     autoAssignCurrentWeek,
@@ -288,6 +297,58 @@ export const ScheduleTab: React.FC = () => {
   const sortedWeeks = [...weeks].sort((a, b) => a.weekStartDate.localeCompare(b.weekStartDate));
   const currentIndex = sortedWeeks.findIndex(w => w.id === currentWeekId);
 
+  // Selector interactivo de semanas y calendario
+  const [isWeekPickerOpen, setIsWeekPickerOpen] = useState(false);
+  const [weekPickerMonthFilter, setWeekPickerMonthFilter] = useState<string>('all');
+  const [customJumpDate, setCustomJumpDate] = useState<string>('');
+
+  const availableMonths = useMemo(() => {
+    const set = new Set<string>();
+    weeks.forEach((w) => {
+      if (w.weekStartDate) {
+        set.add(w.weekStartDate.substring(0, 7));
+      }
+    });
+    return Array.from(set).sort();
+  }, [weeks]);
+
+  const filteredPickerWeeks = useMemo(() => {
+    if (weekPickerMonthFilter === 'all') return sortedWeeks;
+    return sortedWeeks.filter((w) => w.weekStartDate.startsWith(weekPickerMonthFilter));
+  }, [sortedWeeks, weekPickerMonthFilter]);
+
+  const isCurrentWeekToday = useMemo(() => {
+    if (!currentWeek) return false;
+    return isCurrentCalendarWeek(currentWeek.weekStartDate);
+  }, [currentWeek]);
+
+  const goToToday = () => {
+    const todayMonday = getMondayFromDate(new Date());
+    const existing = weeks.find((w) => w.weekStartDate === todayMonday);
+    if (existing) {
+      setCurrentWeekId(existing.id);
+    } else {
+      addWeekForDate(todayMonday);
+    }
+    setIsWeekPickerOpen(false);
+    setToastNotification('📍 Mostrando la semana en curso (hoy).');
+    setTimeout(() => setToastNotification(null), 3000);
+  };
+
+  const handleJumpToCustomDate = () => {
+    if (!customJumpDate) return;
+    const targetMonday = getMondayFromDate(customJumpDate);
+    const existing = weeks.find((w) => w.weekStartDate === targetMonday);
+    if (existing) {
+      setCurrentWeekId(existing.id);
+    } else {
+      addWeekForDate(targetMonday);
+    }
+    setIsWeekPickerOpen(false);
+    setToastNotification(`Mostrando semana del ${formatTheocraticWeekRange(targetMonday)}`);
+    setTimeout(() => setToastNotification(null), 3000);
+  };
+
   const goToPreviousWeek = () => {
     if (currentIndex > 0) {
       setCurrentWeekId(sortedWeeks[currentIndex - 1].id);
@@ -420,31 +481,206 @@ export const ScheduleTab: React.FC = () => {
         icon={Calendar}
         title="Programa de"
         highlightWord="Reuniones"
-        subtitle={`Semana: ${currentWeek.weekStartDate} al ${currentWeek.weekEndDate} • Semana ${currentIndex + 1} de ${sortedWeeks.length}`}
+        subtitle={`${formatTheocraticWeekRange(currentWeek.weekStartDate, currentWeek.weekEndDate)} • Semana ${currentIndex + 1} de ${sortedWeeks.length}`}
         actions={
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Cápsula de navegación de semana minimalista */}
-            <div className="flex items-center bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] p-1 rounded-xl">
-              <button
-                onClick={goToPreviousWeek}
-                disabled={currentIndex <= 0}
-                className="p-1 rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
-                title="Semana anterior"
-                aria-label="Semana anterior"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="text-xs font-bold px-2.5 text-slate-800 dark:text-white select-none whitespace-nowrap">
-                {currentWeek.weekStartDate} al {currentWeek.weekEndDate}
-              </span>
-              <button
-                onClick={goToNextWeek}
-                className="p-1 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
-                title={currentIndex < sortedWeeks.length - 1 ? 'Semana siguiente' : 'Crear siguiente semana'}
-                aria-label="Semana siguiente"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
+            {/* Cápsula de navegación de semana interactiva con selector rápido */}
+            <div className="relative">
+              <div className="flex items-center bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] p-1 rounded-xl">
+                <button
+                  type="button"
+                  onClick={goToPreviousWeek}
+                  disabled={currentIndex <= 0}
+                  className="p-1 rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
+                  title="Semana anterior"
+                  aria-label="Semana anterior"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsWeekPickerOpen((prev) => !prev)}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-800 dark:text-white hover:bg-white dark:hover:bg-slate-800/80 transition-all cursor-pointer select-none whitespace-nowrap shadow-2xs"
+                  title="Clic para abrir selector de semanas, meses y calendario"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                  <span>
+                    {formatTheocraticWeekRangeShort(currentWeek.weekStartDate, currentWeek.weekEndDate)}
+                  </span>
+                  {isCurrentWeekToday && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" title="Semana en curso (Hoy)" />
+                  )}
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                      isWeekPickerOpen ? 'rotate-180 text-indigo-500' : ''
+                    }`}
+                  />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={goToNextWeek}
+                  className="p-1 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
+                  title={currentIndex < sortedWeeks.length - 1 ? 'Semana siguiente' : 'Crear siguiente semana'}
+                  aria-label="Semana siguiente"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Popover desplegable de semanas y fechas */}
+              {isWeekPickerOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsWeekPickerOpen(false)}
+                  />
+
+                  <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 z-50 w-[320px] sm:w-[380px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/5">
+                      <div className="flex items-center gap-2">
+                        <CalendarDays className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">
+                          Selector de Semanas
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={goToToday}
+                        className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer shadow-2xs border ${
+                          isCurrentWeekToday
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                            : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
+                        }`}
+                        title="Ir directamente a la semana en curso de hoy"
+                      >
+                        <CalendarCheck className="w-3.5 h-3.5" />
+                        <span>{isCurrentWeekToday ? 'Semana de Hoy' : 'Ir a Hoy'}</span>
+                      </button>
+                    </div>
+
+                    {availableMonths.length > 1 && (
+                      <div className="flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar text-[11px]">
+                        <button
+                          type="button"
+                          onClick={() => setWeekPickerMonthFilter('all')}
+                          className={`px-2 py-0.5 rounded-md font-semibold whitespace-nowrap cursor-pointer transition-colors ${
+                            weekPickerMonthFilter === 'all'
+                              ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold'
+                              : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
+                          }`}
+                        >
+                          Todas
+                        </button>
+                        {availableMonths.map((mKey) => (
+                          <button
+                            key={mKey}
+                            type="button"
+                            onClick={() => setWeekPickerMonthFilter(mKey)}
+                            className={`px-2 py-0.5 rounded-md font-semibold whitespace-nowrap cursor-pointer transition-colors ${
+                              weekPickerMonthFilter === mKey
+                                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold'
+                                : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
+                            }`}
+                          >
+                            {formatMonthYearKey(mKey)}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="max-h-56 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+                      {filteredPickerWeeks.map((w, idx) => {
+                        const isSelected = w.id === currentWeek.id;
+                        const isToday = isCurrentCalendarWeek(w.weekStartDate);
+                        const hasEvent = Boolean(w.specialEvent?.isSpecial);
+
+                        return (
+                          <button
+                            key={w.id}
+                            type="button"
+                            onClick={() => {
+                              setCurrentWeekId(w.id);
+                              setIsWeekPickerOpen(false);
+                            }}
+                            className={`w-full text-left p-2 rounded-xl transition-all flex items-center justify-between gap-2 text-xs cursor-pointer border ${
+                              isSelected
+                                ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-800 text-indigo-950 dark:text-indigo-200 shadow-2xs font-semibold'
+                                : 'bg-white dark:bg-slate-800/40 border-transparent hover:border-slate-200 dark:hover:border-white/10 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                            }`}
+                          >
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className={`font-bold ${isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-800 dark:text-white'}`}>
+                                  {formatTheocraticWeekRange(w.weekStartDate, w.weekEndDate)}
+                                </span>
+                                {isToday && (
+                                  <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
+                                    Hoy
+                                  </span>
+                                )}
+                                {hasEvent && (
+                                  <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
+                                    Especial
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                                {w.midweek.bibleReading || w.specialEvent?.title || `Semana ${idx + 1}`}
+                              </p>
+                            </div>
+
+                            {isSelected && (
+                              <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="pt-2 border-t border-slate-100 dark:border-white/5 space-y-2">
+                      <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
+                        Saltar o crear fecha exacta:
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="date"
+                          value={customJumpDate}
+                          onChange={(e) => setCustomJumpDate(e.target.value)}
+                          className="flex-1 text-xs px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleJumpToCustomDate}
+                          disabled={!customJumpDate}
+                          className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-xs font-bold transition cursor-pointer shadow-2xs whitespace-nowrap"
+                        >
+                          Ir a Fecha
+                        </button>
+                      </div>
+                    </div>
+
+                    {!isReadOnly && (
+                      <div className="pt-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            addNextWeek();
+                            setIsWeekPickerOpen(false);
+                            setToastNotification('Siguiente semana agregada al programa.');
+                            setTimeout(() => setToastNotification(null), 3000);
+                          }}
+                          className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Agregar Siguiente Semana (+7 días)</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Selector de tipo de reunión compacto */}
@@ -766,7 +1002,7 @@ export const ScheduleTab: React.FC = () => {
                 </span>
                 <span className="text-slate-300 dark:text-slate-600">•</span>
                 <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
-                  {settings.weekendMeetingDay} • {currentWeek.weekend.date} ({settings.weekendMeetingTime})
+                  {formatTheocraticMeetingDate(currentWeek.weekend.date, settings.weekendMeetingDay)} {settings.weekendMeetingTime ? `(${settings.weekendMeetingTime})` : ''}
                 </span>
               </div>
 
@@ -2010,7 +2246,7 @@ export const ScheduleTab: React.FC = () => {
                     Editar Programa del Fin de Semana
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {settings.weekendMeetingDay} {currentWeek.weekend.date} ({settings.weekendMeetingTime})
+                    {formatTheocraticMeetingDate(currentWeek.weekend.date, settings.weekendMeetingDay)} {settings.weekendMeetingTime ? `(${settings.weekendMeetingTime})` : ''}
                   </p>
                 </div>
               </div>
@@ -2065,6 +2301,34 @@ export const ScheduleTab: React.FC = () => {
             <div className="p-6 space-y-4 flex-1 overflow-y-auto">
               {weekendEditTab === 'discurso' && (
                 <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-3 border-b border-slate-100 dark:border-white/5">
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                        Fecha exacta de esta reunión:
+                      </label>
+                      <input
+                        type="date"
+                        value={currentWeek.weekend.date}
+                        min={currentWeek.weekStartDate}
+                        max={currentWeek.weekEndDate}
+                        onChange={(e) => {
+                          if (!e.target.value) return;
+                          const u = JSON.parse(JSON.stringify(currentWeek));
+                          u.weekend.date = e.target.value;
+                          updateWeek(u);
+                        }}
+                        className="w-full text-xs font-semibold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                        Día y hora de la congregación:
+                      </label>
+                      <div className="text-xs font-semibold py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                        {settings.weekendMeetingDay} {settings.weekendMeetingTime ? `(${settings.weekendMeetingTime})` : ''}
+                      </div>
+                    </div>
+                  </div>
                   <div>
                     <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
                       Catálogo Oficial de Bosquejos (#1 al 194):

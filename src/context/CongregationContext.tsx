@@ -78,6 +78,7 @@ import {
   createEmptyWeek,
   formatDateISO,
 } from '../utils/sampleData';
+import { parseISODateParts, getMeetingDateForWeek, getMondayFromDate } from '../utils/dateUtils';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganizedSync } from '../utils/organizedSync';
 import { detectConflictsInWeek } from '../utils/conflictDetector';
 import { autoAssignWeek } from '../utils/autoAssigner';
@@ -123,6 +124,7 @@ interface CongregationContextType {
   // Week schedule actions
   updateWeek: (week: WeekSchedule) => void;
   addNextWeek: () => void;
+  addWeekForDate: (mondayISO: string) => WeekSchedule;
   copyWeekStructure: (fromWeekId: string, toWeekId: string) => void;
   syncWeekWithOrganized: (weekId: string, scope?: 'all' | 'midweek' | 'weekend') => void;
   syncAllWeeksWithOrganized: () => void;
@@ -2214,28 +2216,51 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     );
   };
 
-  const addNextWeek = () => {
-    const sorted = [...weeks].sort((a, b) => a.weekStartDate.localeCompare(b.weekStartDate));
-    const lastWeek = sorted[sorted.length - 1];
-
-    let nextMonday: Date;
-    if (lastWeek) {
-      const d = new Date(lastWeek.weekStartDate);
-      d.setDate(d.getDate() + 7);
-      nextMonday = d;
-    } else {
-      nextMonday = new Date();
+  const addWeekForDate = (mondayISO: string): WeekSchedule => {
+    const existing = weeks.find((w) => w.weekStartDate === mondayISO);
+    if (existing) {
+      setCurrentWeekId(existing.id);
+      return existing;
     }
 
-    const emptyWeek = createEmptyWeek(nextMonday, weeks.length);
+    const parts = parseISODateParts(mondayISO);
+    const mondayDate = new Date(parts.year, parts.month - 1, parts.day, 12, 0, 0);
+    const emptyWeek = createEmptyWeek(mondayDate, weeks.length);
+
+    // Ajustar fechas exactas de reunión según los días configurados en la congregación
+    if (settings.midweekMeetingDay) {
+      emptyWeek.midweek.date = getMeetingDateForWeek(mondayISO, settings.midweekMeetingDay, 2);
+    }
+    if (settings.weekendMeetingDay) {
+      emptyWeek.weekend.date = getMeetingDateForWeek(mondayISO, settings.weekendMeetingDay, 6);
+    }
+
     const org = getOrganizedScheduleForWeek(emptyWeek.id, emptyWeek.midweek.date);
     const newWeek = org
       ? applyOrganizedToWeek(emptyWeek, org, { applyMidweek: true, applyWeekend: true })
       : emptyWeek;
-    const updated = [...weeks, newWeek];
+    const updated = [...weeks, newWeek].sort((a, b) => a.weekStartDate.localeCompare(b.weekStartDate));
     setWeeks(updated);
     setCurrentWeekId(newWeek.id);
     saveToFirestore(publishers, updated);
+    return newWeek;
+  };
+
+  const addNextWeek = () => {
+    const sorted = [...weeks].sort((a, b) => a.weekStartDate.localeCompare(b.weekStartDate));
+    const lastWeek = sorted[sorted.length - 1];
+
+    let nextMondayStr: string;
+    if (lastWeek) {
+      const parts = parseISODateParts(lastWeek.weekStartDate);
+      const d = new Date(parts.year, parts.month - 1, parts.day, 12, 0, 0);
+      d.setDate(d.getDate() + 7);
+      nextMondayStr = formatDateISO(d);
+    } else {
+      nextMondayStr = getMondayFromDate(new Date());
+    }
+
+    addWeekForDate(nextMondayStr);
   };
 
   const syncWeekWithOrganized = (weekId: string, scope: 'all' | 'midweek' | 'weekend' = 'all') => {
@@ -4529,6 +4554,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         importPublishersFromCSV,
         updateWeek,
         addNextWeek,
+        addWeekForDate,
         copyWeekStructure,
         syncWeekWithOrganized,
         syncAllWeeksWithOrganized,

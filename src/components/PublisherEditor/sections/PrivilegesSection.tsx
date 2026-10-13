@@ -86,17 +86,29 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 pb-10">
-      
-      {/* CABECERA: ZERO CONTAINER (FLOTANTE) */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-6 py-4 px-2">
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-4">
-             <div className="w-11 h-11 bg-[#10b981] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-[#10b981]/20">
-                <Shield size={22} />
-             </div>
-             <span className="text-[15px] font-bold text-zinc-800 dark:text-zinc-200">Estado Espiritual</span>
+    <section className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl p-6 md:p-8 shadow-sm transition-all space-y-6">
+      {/* CABECERA DE LA TARJETA */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-5 border-b border-zinc-100 dark:border-white/[0.04]">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center font-bold shadow-xs shrink-0 ring-4 ring-emerald-500/5">
+            <Shield size={24} />
           </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                Estado Espiritual y Privilegios
+              </h3>
+              {yearsBaptized > 0 && formData.role !== 'unbaptized' && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-200/50">
+                  {yearsBaptized} años bautizado
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              Rol eclesiástico, trayectoria de bautismo, precursorado, grupo de servicio y pastoreo
+            </p>
+          </div>
+        </div>
           
           <div className="flex items-center gap-3">
              {formData.role === 'unbaptized' && (
@@ -122,8 +134,6 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
                </span>
              )}
           </div>
-        </div>
-
         <div className="relative" ref={menuRef}>
           <div className="flex items-center bg-[#f4f4f7] dark:bg-zinc-800/80 p-1 rounded-2xl border border-zinc-200/50 dark:border-white/[0.06]">
             {activeRoles.map(role => {
@@ -494,7 +504,6 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
           })}
         </div>
       </div>
-
-    </div>
+    </section>
   );
 };

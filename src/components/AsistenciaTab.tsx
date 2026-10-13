@@ -14,11 +14,17 @@ import {
   FileSpreadsheet,
   Building2,
   Sparkles,
+  Plus,
+  Minus,
+  RotateCcw,
+  Volume2,
+  X,
+  Smartphone,
 } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 
 export const AsistenciaTab: React.FC = () => {
-  const { weeks, updateMeetingAttendance, settings } = useCongregation();
+  const { weeks, updateMeetingAttendance, settings, currentWeek } = useCongregation();
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     // Current year-month (e.g. 2026-10)
     const now = new Date();
@@ -29,6 +35,18 @@ export const AsistenciaTab: React.FC = () => {
 
   const [copiedSuccess, setCopiedSuccess] = useState(false);
   const [layoutMode, setLayoutMode] = useState<'cards' | 'table'>('cards');
+  
+  // Quick Live Counter Modal State
+  const [isCounterOpen, setIsCounterOpen] = useState(false);
+  const [counterTarget, setCounterTarget] = useState<{
+    weekId: string;
+    meetingType: 'midweek' | 'weekend';
+    channel: 'inPerson' | 'zoom';
+  }>({
+    weekId: currentWeek?.id || '',
+    meetingType: 'midweek',
+    channel: 'inPerson',
+  });
 
   // Group weeks by month
   const availableMonths = useMemo(() => {
@@ -192,6 +210,19 @@ export const AsistenciaTab: React.FC = () => {
                 ))}
               </select>
             </div>
+
+            <button
+              onClick={() => {
+                if (!counterTarget.weekId && monthWeeks.length > 0) {
+                  setCounterTarget((prev) => ({ ...prev, weekId: monthWeeks[0].id }));
+                }
+                setIsCounterOpen(true);
+              }}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all active:scale-95 cursor-pointer"
+            >
+              <Smartphone className="w-4 h-4" />
+              <span>Contador en Vivo</span>
+            </button>
 
             <button
               onClick={handleCopySecretaryReport}
@@ -731,6 +762,171 @@ export const AsistenciaTab: React.FC = () => {
         </div>
         )}
       </div>
+
+      {/* MODAL DE CONTADOR TÁCTIL EN VIVO (Para Acomodadores / Audio en Reunión) */}
+      {isCounterOpen && (() => {
+        const activeW = weeks.find((w) => w.id === counterTarget.weekId) || monthWeeks[0] || weeks[0];
+        const curAtt = activeW?.attendance || {
+          weekId: activeW?.id || '',
+          midweek: { inPerson: 0, zoom: 0, total: 0 },
+          weekend: { inPerson: 0, zoom: 0, total: 0 },
+        };
+        const currentCount = curAtt[counterTarget.meetingType]?.[counterTarget.channel] || 0;
+
+        const handleCountDelta = (delta: number) => {
+          if (!activeW) return;
+          const newVal = Math.max(0, currentCount + delta);
+          handleAttendanceChange(activeW.id, counterTarget.meetingType, counterTarget.channel, newVal);
+        };
+
+        return (
+          <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-[#111827] border border-black/[0.08] dark:border-white/[0.08] w-full max-w-lg rounded-3xl p-6 sm:p-8 shadow-2xl relative space-y-6">
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-black/[0.05] dark:border-white/[0.05] pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <Smartphone size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                      Contador Táctil en Vivo
+                    </h3>
+                    <p className="text-xs text-zinc-400">Diseñado para conteo ágil con una mano en el Salón</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsCounterOpen(false)}
+                  className="p-2 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded-xl hover:bg-black/[0.05] dark:hover:bg-white/[0.05] cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Selectores de Semana, Reunión y Canal */}
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setCounterTarget((prev) => ({ ...prev, meetingType: 'midweek' }))}
+                    className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                      counterTarget.meetingType === 'midweek'
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                        : 'bg-black/[0.04] dark:bg-white/[0.05] text-zinc-600 dark:text-zinc-400'
+                    }`}
+                  >
+                    Entre Semana ({settings.midweekMeetingDay})
+                  </button>
+                  <button
+                    onClick={() => setCounterTarget((prev) => ({ ...prev, meetingType: 'weekend' }))}
+                    className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                      counterTarget.meetingType === 'weekend'
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                        : 'bg-black/[0.04] dark:bg-white/[0.05] text-zinc-600 dark:text-zinc-400'
+                    }`}
+                  >
+                    Fin de Semana ({settings.weekendMeetingDay})
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setCounterTarget((prev) => ({ ...prev, channel: 'inPerson' }))}
+                    className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      counterTarget.channel === 'inPerson'
+                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                        : 'bg-black/[0.04] dark:bg-white/[0.05] text-zinc-600 dark:text-zinc-400'
+                    }`}
+                  >
+                    <Building2 size={14} /> Presencial (Salón)
+                  </button>
+                  <button
+                    onClick={() => setCounterTarget((prev) => ({ ...prev, channel: 'zoom' }))}
+                    className={`py-2 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      counterTarget.channel === 'zoom'
+                        ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                        : 'bg-black/[0.04] dark:bg-white/[0.05] text-zinc-600 dark:text-zinc-400'
+                    }`}
+                  >
+                    <Video size={14} /> Zoom (Conexiones)
+                  </button>
+                </div>
+              </div>
+
+              {/* Pantalla Gigante del Contador */}
+              <div className="bg-slate-50 dark:bg-slate-900/60 rounded-3xl border border-black/[0.06] dark:border-white/[0.06] p-6 text-center space-y-4">
+                <div className="text-xs uppercase tracking-widest text-zinc-400 font-semibold">
+                  {counterTarget.meetingType === 'midweek' ? 'Entre Semana' : 'Fin de Semana'} •{' '}
+                  {counterTarget.channel === 'inPerson' ? 'Presencial' : 'Zoom'}
+                </div>
+                <div className="text-6xl sm:text-7xl font-black text-zinc-900 dark:text-zinc-100 tabular-nums">
+                  {currentCount}
+                </div>
+                <div className="text-xs text-zinc-500 font-medium">
+                  Total de la reunión: {curAtt[counterTarget.meetingType].total}
+                </div>
+              </div>
+
+              {/* Botonera de Toque Rápido */}
+              <div className="space-y-3">
+                {/* Gran Botón +1 y -1 */}
+                <div className="grid grid-cols-3 gap-3">
+                  <button
+                    onClick={() => handleCountDelta(-1)}
+                    className="h-20 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-black text-2xl flex items-center justify-center active:scale-95 transition-all cursor-pointer border border-rose-500/20"
+                    title="Restar 1"
+                  >
+                    <Minus size={28} />
+                  </button>
+
+                  <button
+                    onClick={() => handleCountDelta(1)}
+                    className="col-span-2 h-20 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-3xl flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer shadow-lg shadow-emerald-600/25"
+                    title="Sumar 1"
+                  >
+                    <Plus size={32} />
+                    <span>+1 Persona</span>
+                  </button>
+                </div>
+
+                {/* Botones de Lotes Rápido (+5, +10, Reiniciar) */}
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => handleCountDelta(5)}
+                    className="py-3 rounded-xl bg-black/[0.04] dark:bg-white/[0.05] hover:bg-black/[0.08] dark:hover:bg-white/[0.08] font-bold text-xs text-zinc-800 dark:text-zinc-200 active:scale-95 transition-all cursor-pointer"
+                  >
+                    +5 Filas
+                  </button>
+                  <button
+                    onClick={() => handleCountDelta(10)}
+                    className="py-3 rounded-xl bg-black/[0.04] dark:bg-white/[0.05] hover:bg-black/[0.08] dark:hover:bg-white/[0.08] font-bold text-xs text-zinc-800 dark:text-zinc-200 active:scale-95 transition-all cursor-pointer"
+                  >
+                    +10 Grupo
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (activeW) {
+                        handleAttendanceChange(activeW.id, counterTarget.meetingType, counterTarget.channel, 0);
+                      }
+                    }}
+                    className="py-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 font-bold text-xs text-rose-600 dark:text-rose-400 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <RotateCcw size={12} /> Cero
+                  </button>
+                </div>
+              </div>
+
+              {/* Botón Guardar y Salir */}
+              <button
+                onClick={() => setIsCounterOpen(false)}
+                className="w-full py-3 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-bold text-sm hover:opacity-90 active:scale-98 transition-all cursor-pointer"
+              >
+                Listo / Guardar en el Registro
+              </button>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
+

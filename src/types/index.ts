@@ -162,6 +162,31 @@ export interface Publisher {
   cart_available_days?: number[];
   fixed_cart_partner_nid?: string;
 
+  // Información Personal Extendida & Teocrática
+  marital_status?: 'soltero' | 'casado' | 'viudo' | 'divorciado' | string;
+  spouse_name?: string;
+  spouse_nid?: string;
+  neighborhood?: string;
+  city?: string;
+  postal_code?: string;
+  has_vehicle?: boolean;
+  needs_ride?: boolean;
+  occupation?: string;
+  skills?: string[];
+  languages?: string[];
+  preferred_contact_method?: 'whatsapp' | 'call' | 'email';
+  
+  // Directriz Médica Anticipada (DPA / Asuntos Médicos)
+  has_dpa?: boolean;
+  dpa_date?: string;
+  dpa_expiry_date?: string;
+  healthcare_agent_name?: string;
+  healthcare_agent_phone?: string;
+  healthcare_agent_alternate_name?: string;
+  healthcare_agent_alternate_phone?: string;
+  medical_allergies?: string;
+  medical_conditions?: string;
+
   assignments?: {
     chairman?: boolean;
     prayers?: boolean;

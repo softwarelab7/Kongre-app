@@ -16,6 +16,7 @@ import {
   Volume2,
   Compass,
   Building,
+  Printer,
 } from 'lucide-react';
 
 interface TableroSalonModalProps {
@@ -109,8 +110,17 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
           </div>
 
           <button
+            onClick={() => window.print()}
+            className="p-2 sm:p-2.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center gap-1.5 px-3 font-semibold text-xs cursor-pointer"
+            title="Imprimir Tablero Mural para el Salón"
+          >
+            <Printer className="w-4 h-4" />
+            <span className="hidden sm:inline">Imprimir Tablero</span>
+          </button>
+
+          <button
             onClick={toggleFullscreen}
-            className="p-2 sm:p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
+            className="p-2 sm:p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center cursor-pointer"
             title="Pantalla Completa"
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4 sm:w-5 sm:h-5" /> : <Maximize2 className="w-4 h-4 sm:w-5 sm:h-5" />}
@@ -118,7 +128,7 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
 
           <button
             onClick={onClose}
-            className="p-2 sm:p-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
+            className="p-2 sm:p-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center cursor-pointer"
             title="Cerrar Tablero"
           >
             <X className="w-5 h-5" />

@@ -29,7 +29,7 @@ export const SpecialConditionsSection: React.FC<SpecialConditionsSectionProps> =
   ];
 
   return (
-    <section className="bg-zinc-50 dark:bg-[#0f1623] rounded-3xl p-6 md:p-8 border border-zinc-100 dark:border-white/[0.06] shadow-sm">
+    <section className="bg-zinc-50 dark:bg-[#0f1623] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-zinc-100 dark:border-white/[0.06] shadow-sm">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-2 bg-rose-50 dark:bg-rose-500/10 rounded-xl text-rose-600 dark:text-rose-400">
           <Activity size={18} />

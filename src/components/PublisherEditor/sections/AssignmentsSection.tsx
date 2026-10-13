@@ -71,10 +71,35 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
     return group;
   }).filter(Boolean);
 
+  const totalAssignmentsActive = Object.values(formData.assignments || {}).filter(Boolean).length;
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in fade-in duration-500">
-      <div className="space-y-6">
-        {filteredGroups.filter((g: any) => g.id !== 'tasks' && g.id !== 'cleaning').map((group: any) => (
+    <section className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl p-6 md:p-8 shadow-sm transition-all space-y-6">
+      {/* CABECERA DE LA TARJETA */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-zinc-100 dark:border-white/[0.04]">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center font-bold text-base shadow-xs shrink-0 ring-4 ring-violet-500/5">
+            <CheckCircle size={24} />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                Asignaciones Teocráticas y Tareas
+              </h3>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-violet-50 dark:bg-violet-950/60 text-violet-600 dark:text-violet-300 border border-violet-200/50">
+                {totalAssignmentsActive} {totalAssignmentsActive === 1 ? 'asignación activa' : 'asignaciones activas'}
+              </span>
+            </div>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              Habilitación para partes de la reunión de entre semana, fin de semana, predicación y tareas
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
+          {filteredGroups.filter((g: any) => g.id !== 'tasks' && g.id !== 'cleaning').map((group: any) => (
           <section key={group.id} className="bg-white dark:bg-[#0f1623] border border-zinc-100 dark:border-white/[0.06] rounded-[2.5rem] p-8 shadow-sm">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
@@ -211,6 +236,7 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
           </section>
         ))}
       </div>
-    </div>
+      </div>
+    </section>
   );
 };

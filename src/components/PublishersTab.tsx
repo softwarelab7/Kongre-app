@@ -611,25 +611,23 @@ export const PublishersTab: React.FC = () => {
   // Render Editor Mode
   if (viewMode === 'editor') {
     return (
-      <div className="flex flex-col h-full overflow-hidden animate-in fade-in duration-500">
-        <div className="flex-1 overflow-y-auto px-4 pt-6 pb-6 custom-scrollbar relative">
-          <PublisherEditor
-            key={editingPublisher?.id || 'new'}
-            initialTab={editorInitialTab}
-            publisher={editingPublisher || {}}
-            onSave={handleSave}
-            onCancel={() => {
-              setViewMode('list');
-              setEditingPublisher(null);
-            }}
-          />
-        </div>
+      <div className="animate-in fade-in duration-300">
+        <PublisherEditor
+          key={editingPublisher?.id || 'new'}
+          initialTab={editorInitialTab}
+          publisher={editingPublisher || {}}
+          onSave={handleSave}
+          onCancel={() => {
+            setViewMode('list');
+            setEditingPublisher(null);
+          }}
+        />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500 pb-12">
       <SectionHeader
         icon={Users}
         title="Catálogo de"
@@ -678,9 +676,8 @@ export const PublishersTab: React.FC = () => {
         }
       />
 
-      <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 space-y-5 custom-scrollbar">
-        {/* Panel de Métricas Rápidas Teocráticas */}
-        <div className="flex sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-2.5 overflow-x-auto no-scrollbar pb-1.5 sm:pb-0 touch-pan-x -mx-1 px-1 sm:mx-0 sm:px-0">
+      {/* Panel de Métricas Rápidas Teocráticas */}
+      <div className="flex sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-3 overflow-x-auto no-scrollbar pb-1.5 sm:pb-0 touch-pan-x">
           <div
             onClick={() => {
               setRoleFilter('all');
@@ -1058,7 +1055,16 @@ export const PublishersTab: React.FC = () => {
                     </div>
 
                     {/* Selector de Grupo Rápido y Datos de Contacto */}
-                    <div className="space-y-2 py-2 text-xs border-t border-b border-black/[0.04] dark:border-white/[0.04]">
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingPublisher(p);
+                        setEditorInitialTab('contact');
+                        setViewMode('editor');
+                      }}
+                      title="Abrir tarjeta de Contacto y Ubicación"
+                      className="space-y-2 py-2 text-xs border-t border-b border-black/[0.04] dark:border-white/[0.04] cursor-pointer hover:bg-black/[0.015] dark:hover:bg-white/[0.02] rounded-lg px-1 transition-colors"
+                    >
                       <div className="flex items-center justify-between text-zinc-600 dark:text-zinc-400">
                         <span className="text-[11px] font-medium text-zinc-400">Grupo:</span>
                         <div onClick={(e) => e.stopPropagation()} className="w-36">
@@ -1578,7 +1584,6 @@ export const PublishersTab: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 };

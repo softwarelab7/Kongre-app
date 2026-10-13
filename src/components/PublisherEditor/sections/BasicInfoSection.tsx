@@ -107,7 +107,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
         <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2.5 block">
           Nombres y Apellidos
         </label>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { id: 'first_name', label: 'Primer Nombre', placeholder: 'Ej. Juan' },
             { id: 'middle_name', label: 'Segundo Nombre', placeholder: 'Ej. Carlos' },
@@ -208,7 +208,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
           <label className="text-[11px] font-medium text-zinc-600 dark:text-zinc-400 mb-1.5 block">
             Estado Civil
           </label>
-          <div className="grid grid-cols-4 gap-1.5">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
               { id: 'soltero', label: 'Soltero(a)' },
               { id: 'casado', label: 'Casado(a)' },
@@ -221,9 +221,9 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
                   key={st.id}
                   type="button"
                   onClick={() => handleChange('marital_status', st.id)}
-                  className={`py-2 px-1 text-center rounded-xl text-xs font-semibold transition-all border cursor-pointer ${
+                  className={`py-2 px-2 text-center rounded-xl text-xs font-semibold transition-all border cursor-pointer active:scale-95 ${
                     isSelected
-                      ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800 shadow-2xs'
+                      ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800 shadow-2xs font-bold'
                       : 'bg-zinc-50 dark:bg-white/[0.02] text-zinc-500 border-zinc-200/60 dark:border-white/[0.06] hover:bg-zinc-100 dark:hover:bg-white/[0.06]'
                   }`}
                 >

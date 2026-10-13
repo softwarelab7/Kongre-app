@@ -306,7 +306,7 @@ const AppContent: React.FC = () => {
       />
 
       <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200`}>
-        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 py-4 sm:py-6 pb-24 md:pb-8">
+        <div className="w-full mx-auto px-3 sm:px-6 lg:px-8 2xl:px-12 py-3 sm:py-6 pb-[calc(env(safe-area-inset-bottom,0px)+6rem)] md:pb-8">
           {!isTabAllowedForRole(effectiveRoleInfo.id, activeTab) ? (
           <AccessRestrictedView
             requiredRoleName={

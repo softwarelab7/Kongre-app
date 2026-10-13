@@ -233,7 +233,7 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         {/* Card 5: INFORMES */}
         <div
           onClick={() => setActiveTab('informes_servicio')}
-          className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all cursor-pointer group"
+          className="col-span-2 sm:col-span-1 bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase">

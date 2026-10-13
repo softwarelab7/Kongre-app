@@ -4,7 +4,7 @@ import { User, onAuthStateChanged, signInWithPopup, signOut, updateProfile } fro
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { auth, googleProvider, db, isFirestoreQuotaExceeded, markFirestoreQuotaExceeded, isQuotaError } from '../firebase/config';
 import { TheocraticRole, TheocraticRoleInfo, THEOCRATIC_ROLES } from '../utils/rbac';
-import { generateSecurePublisherPin, verifyPasscode, sanitizeForFirestore, isGenericIdentityName } from '../utils/theocraticSecurity';
+import { generateSecurePublisherPin, verifyPasscode, sanitizeForFirestore, isGenericIdentityName, formatCanonicalCongregationId } from '../utils/theocraticSecurity';
 import { UserProfile, PreferredContactMethod, ContactTimePreference } from '../types';
 
 export interface UserRoleRecord {
@@ -591,11 +591,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             contactTimePreference: data.contactTimePreference || 'anytime',
             notificationsEnabled: data.notificationsEnabled ?? true,
             notes: data.notes || '',
+            congregationId: data.congregationId || data.congregationNumber || '',
+            congregationNumber: data.congregationNumber || data.congregationId || '',
+            congregationName: data.congregationName || '',
             updatedAt: data.updatedAt || new Date().toISOString(),
           };
           setUserProfile(loaded);
           localStorage.setItem('kongre_user_profile_active', JSON.stringify(loaded));
           localStorage.setItem(`kongre_user_profile_${user.uid}`, JSON.stringify(loaded));
+          if (data.congregationId || data.congregationNumber) {
+            const cleanCId = formatCanonicalCongregationId(data.congregationId || data.congregationNumber);
+            if (cleanCId && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(cleanCId)) {
+              localStorage.setItem('kongre_congregation_number', cleanCId);
+              localStorage.setItem('kongre_congregation_id', cleanCId);
+            }
+          }
           if (effectivePhoto) {
             localStorage.setItem('kongre_user_photo', effectivePhoto);
             localStorage.setItem('kongre_coordinator_photo', effectivePhoto);
@@ -662,6 +672,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         contactTimePreference: data.contactTimePreference || userProfile?.contactTimePreference || 'anytime',
         notificationsEnabled: data.notificationsEnabled !== undefined ? data.notificationsEnabled : (userProfile?.notificationsEnabled ?? true),
         notes: data.notes !== undefined ? data.notes.trim() : (userProfile?.notes || ''),
+        congregationId: data.congregationId !== undefined ? data.congregationId : (userProfile?.congregationId || ''),
+        congregationNumber: data.congregationNumber !== undefined ? data.congregationNumber : (userProfile?.congregationNumber || ''),
+        congregationName: data.congregationName !== undefined ? data.congregationName : (userProfile?.congregationName || ''),
         updatedAt: now,
       };
 
@@ -719,6 +732,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await signInWithPopup(auth, googleProvider);
       if (res?.user) {
         setUser(res.user);
+        const localCongId = formatCanonicalCongregationId(
+          localStorage.getItem('kongre_congregation_number') ||
+          localStorage.getItem('kongre_congregation_id') ||
+          ''
+        );
+        const localCongName = localStorage.getItem('kongre_congregation_name') || '';
+        if (localCongId && localCongId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(localCongId)) {
+          try {
+            await setDoc(doc(db, 'users', res.user.uid), {
+              congregationId: localCongId,
+              congregationNumber: localCongId,
+              congregationName: localCongName,
+              updatedAt: new Date().toISOString(),
+            }, { merge: true });
+          } catch {}
+        }
         return res.user;
       }
       return auth.currentUser;

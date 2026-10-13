@@ -276,239 +276,266 @@ export const GruposServicioTab: React.FC = () => {
       </div>
 
       {/* Groups Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredGroups.map((group) => {
-          const overseer = group.overseerId ? publishersMap.get(group.overseerId) : null;
-          const assistant = group.assistantId ? publishersMap.get(group.assistantId) : null;
-          let members = publishers.filter((p) => p.groupNumber === group.number);
-
-          if (searchQuery.trim()) {
-            const q = searchQuery.toLowerCase();
-            members = members.filter(
-              (m) =>
-                m.name.toLowerCase().includes(q) ||
-                (m.phone && m.phone.toLowerCase().includes(q))
-            );
-          }
-
-          const stats = groupStats[group.number] || {
-            total: 0,
-            pioneers: 0,
-            elders: 0,
-            servants: 0,
-          };
-
-          return (
-            <div
-              key={group.number}
-              className="bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between"
+      {filteredGroups.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 text-center space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
+            <Users className="w-7 h-7" />
+          </div>
+          <div className="max-w-md mx-auto space-y-1">
+            <h3 className="text-base font-bold text-slate-900">
+              {searchQuery ? 'No se encontraron resultados' : 'No hay grupos de servicio registrados'}
+            </h3>
+            <p className="text-xs text-slate-500">
+              {searchQuery
+                ? 'Intente buscar con otro nombre o borre el filtro de búsqueda.'
+                : 'Cree los grupos de predicación de su congregación para organizar a los publicadores, asignar superintendentes y coordinar las salidas a predicar.'}
+            </p>
+          </div>
+          {!searchQuery && (
+            <button
+              onClick={handleOpenNewGroup}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-colors cursor-pointer"
             >
-              {/* Group Card Header */}
-              <div className="p-4 sm:p-5 border-b border-slate-100 bg-linear-to-r from-slate-50 to-white">
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-7 h-7 rounded-lg bg-blue-600 text-white font-black text-xs flex items-center justify-center">
-                        {group.number}
-                      </span>
-                      <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                        {group.name}
-                      </h3>
+              <Plus className="w-4 h-4" />
+              <span>Crear Primer Grupo</span>
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filteredGroups.map((group) => {
+            const overseer = group.overseerId ? publishersMap.get(group.overseerId) : null;
+            const assistant = group.assistantId ? publishersMap.get(group.assistantId) : null;
+            let members = publishers.filter((p) => p.groupNumber === group.number);
+
+            if (searchQuery.trim()) {
+              const q = searchQuery.toLowerCase();
+              members = members.filter(
+                (m) =>
+                  m.name.toLowerCase().includes(q) ||
+                  (m.phone && m.phone.toLowerCase().includes(q))
+              );
+            }
+
+            const stats = groupStats[group.number] || {
+              total: 0,
+              pioneers: 0,
+              elders: 0,
+              servants: 0,
+            };
+
+            return (
+              <div
+                key={group.number}
+                className="bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between"
+              >
+                {/* Group Card Header */}
+                <div className="p-4 sm:p-5 border-b border-slate-100 bg-linear-to-r from-slate-50 to-white">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-7 h-7 rounded-lg bg-blue-600 text-white font-black text-xs flex items-center justify-center">
+                          {group.number}
+                        </span>
+                        <h3 className="text-base sm:text-lg font-bold text-slate-900">
+                          {group.name}
+                        </h3>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleShareGroupWhatsApp(group)}
+                        className="p-2 rounded-xl text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
+                        title="Copiar lista de miembros del grupo para WhatsApp"
+                      >
+                        {copiedGroupNumber === group.number ? (
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        ) : (
+                          <Share2 className="w-4 h-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => handleOpenEditGroup(group)}
+                        className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                        title="Editar nombre y encargados del grupo"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteGroup(group.number)}
+                        className="p-2 rounded-xl text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                        title="Eliminar grupo"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => handleShareGroupWhatsApp(group)}
-                      className="p-2 rounded-xl text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
-                      title="Copiar lista de miembros del grupo para WhatsApp"
-                    >
-                      {copiedGroupNumber === group.number ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      ) : (
-                        <Share2 className="w-4 h-4" />
+                  {/* Overseer & Assistant Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div className="bg-white p-2.5 rounded-xl border border-slate-200/80 flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">
+                          Superintendente
+                        </span>
+                        <span className="font-bold text-slate-900 text-xs">
+                          {overseer ? overseer.name : 'Sin asignar'}
+                        </span>
+                      </div>
+                      {overseer?.phone && (
+                        <a
+                          href={`https://wa.me/${overseer.phone.replace(/[^0-9]/g, '')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50"
+                          title="Escribir al superintendente de grupo"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                        </a>
                       )}
-                    </button>
-                    <button
-                      onClick={() => handleOpenEditGroup(group)}
-                      className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                      title="Editar nombre y encargados del grupo"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteGroup(group.number)}
-                      className="p-2 rounded-xl text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors"
-                      title="Eliminar grupo"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Overseer & Assistant Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                  <div className="bg-white p-2.5 rounded-xl border border-slate-200/80 flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">
-                        Superintendente
-                      </span>
-                      <span className="font-bold text-slate-900 text-xs">
-                        {overseer ? overseer.name : 'Sin asignar'}
-                      </span>
                     </div>
-                    {overseer?.phone && (
-                      <a
-                        href={`https://wa.me/${overseer.phone.replace(/[^0-9]/g, '')}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50"
-                        title="Escribir al superintendente de grupo"
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                      </a>
+
+                    <div className="bg-white p-2.5 rounded-xl border border-slate-200/80 flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">
+                          Auxiliar de Grupo
+                        </span>
+                        <span className="font-bold text-slate-800 text-xs">
+                          {assistant ? assistant.name : 'Sin asignar'}
+                        </span>
+                      </div>
+                      {assistant?.phone && (
+                        <a
+                          href={`https://wa.me/${assistant.phone.replace(/[^0-9]/g, '')}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50"
+                          title="Escribir al auxiliar de grupo"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Quick stats pills */}
+                  <div className="flex flex-wrap items-center gap-2 mt-3 pt-2 border-t border-slate-100 text-[11px] font-semibold text-slate-500">
+                    <span className="bg-slate-100 px-2 py-0.5 rounded-md">
+                      Total: <strong className="text-slate-800">{stats.total}</strong>
+                    </span>
+                    {stats.pioneers > 0 && (
+                      <span className="bg-amber-50 text-amber-800 px-2 py-0.5 rounded-md font-bold">
+                        ⭐ {stats.pioneers} precursores
+                      </span>
                     )}
-                  </div>
-
-                  <div className="bg-white p-2.5 rounded-xl border border-slate-200/80 flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">
-                        Auxiliar de Grupo
+                    {stats.elders > 0 && (
+                      <span className="bg-blue-50 text-blue-800 px-2 py-0.5 rounded-md">
+                        {stats.elders} ancianos
                       </span>
-                      <span className="font-bold text-slate-800 text-xs">
-                        {assistant ? assistant.name : 'Sin asignar'}
+                    )}
+                    {stats.servants > 0 && (
+                      <span className="bg-indigo-50 text-indigo-800 px-2 py-0.5 rounded-md">
+                        {stats.servants} siervos
                       </span>
-                    </div>
-                    {assistant?.phone && (
-                      <a
-                        href={`https://wa.me/${assistant.phone.replace(/[^0-9]/g, '')}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50"
-                        title="Escribir al auxiliar de grupo"
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                      </a>
                     )}
                   </div>
                 </div>
 
-                {/* Quick stats pills */}
-                <div className="flex flex-wrap items-center gap-2 mt-3 pt-2 border-t border-slate-100 text-[11px] font-semibold text-slate-500">
-                  <span className="bg-slate-100 px-2 py-0.5 rounded-md">
-                    Total: <strong className="text-slate-800">{stats.total}</strong>
-                  </span>
-                  {stats.pioneers > 0 && (
-                    <span className="bg-amber-50 text-amber-800 px-2 py-0.5 rounded-md font-bold">
-                      ⭐ {stats.pioneers} precursores
-                    </span>
-                  )}
-                  {stats.elders > 0 && (
-                    <span className="bg-blue-50 text-blue-800 px-2 py-0.5 rounded-md">
-                      {stats.elders} ancianos
-                    </span>
-                  )}
-                  {stats.servants > 0 && (
-                    <span className="bg-indigo-50 text-indigo-800 px-2 py-0.5 rounded-md">
-                      {stats.servants} siervos
-                    </span>
-                  )}
-                </div>
-              </div>
+                {/* Members List */}
+                <div className="p-4 sm:p-5 flex-1 divide-y divide-slate-100 max-h-[380px] overflow-y-auto">
+                  {members.length === 0 ? (
+                    <p className="text-xs text-slate-400 italic py-6 text-center">
+                      No hay publicadores asignados a este grupo actualmente.
+                    </p>
+                  ) : (
+                    members.map((member) => {
+                      const isOverseer = member.id === group.overseerId;
+                      const isAssistant = member.id === group.assistantId;
 
-              {/* Members List */}
-              <div className="p-4 sm:p-5 flex-1 divide-y divide-slate-100 max-h-[380px] overflow-y-auto">
-                {members.length === 0 ? (
-                  <p className="text-xs text-slate-400 italic py-6 text-center">
-                    No hay publicadores asignados a este grupo actualmente.
-                  </p>
-                ) : (
-                  members.map((member) => {
-                    const isOverseer = member.id === group.overseerId;
-                    const isAssistant = member.id === group.assistantId;
-
-                    return (
-                      <div
-                        key={member.id}
-                        className="py-2.5 flex items-center justify-between gap-3 text-xs hover:bg-slate-50/80 px-2 rounded-lg transition-colors"
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div
-                            className={`w-2 h-2 rounded-full shrink-0 ${
-                              member.active ? 'bg-emerald-500' : 'bg-slate-300'
-                            }`}
-                          />
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="font-bold text-slate-900 truncate">
-                                {member.name}
-                              </span>
-                              {isOverseer && (
-                                <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-100 text-blue-800">
-                                  Superintendente
+                      return (
+                        <div
+                          key={member.id}
+                          className="py-2.5 flex items-center justify-between gap-3 text-xs hover:bg-slate-50/80 px-2 rounded-lg transition-colors"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div
+                              className={`w-2 h-2 rounded-full shrink-0 ${
+                                member.active ? 'bg-emerald-500' : 'bg-slate-300'
+                              }`}
+                            />
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-bold text-slate-900 truncate">
+                                  {member.name}
                                 </span>
-                              )}
-                              {isAssistant && (
-                                <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800">
-                                  Auxiliar
-                                </span>
-                              )}
-                              {member.privilege === 'precursor_regular' && (
-                                <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
-                                  Precursor/a
+                                {isOverseer && (
+                                  <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-100 text-blue-800">
+                                    Superintendente
+                                  </span>
+                                )}
+                                {isAssistant && (
+                                  <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800">
+                                    Auxiliar
+                                  </span>
+                                )}
+                                {member.privilege === 'precursor_regular' && (
+                                  <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
+                                    Precursor/a
+                                  </span>
+                                )}
+                              </div>
+                              {member.phone && (
+                                <span className="text-[11px] text-slate-400 font-mono">
+                                  {member.phone}
                                 </span>
                               )}
                             </div>
+                          </div>
+
+                          {/* Actions for this member */}
+                          <div className="flex items-center gap-1 shrink-0">
                             {member.phone && (
-                              <span className="text-[11px] text-slate-400 font-mono">
-                                {member.phone}
-                              </span>
+                              <>
+                                <a
+                                  href={`tel:${member.phone.replace(/[^0-9+]/g, '')}`}
+                                  className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                                  title="Llamar"
+                                >
+                                  <Phone className="w-3.5 h-3.5" />
+                                </a>
+                                <a
+                                  href={`https://wa.me/${member.phone.replace(/[^0-9]/g, '')}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                  title="WhatsApp"
+                                >
+                                  <MessageCircle className="w-3.5 h-3.5" />
+                                </a>
+                              </>
                             )}
+                            <button
+                              onClick={() => {
+                                setMovingPublisher(member);
+                                setTargetGroupNumber(member.groupNumber || 1);
+                              }}
+                              className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                              title="Mover a otro grupo de servicio"
+                            >
+                              <ArrowRightLeft className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </div>
-
-                        {/* Actions for this member */}
-                        <div className="flex items-center gap-1 shrink-0">
-                          {member.phone && (
-                            <>
-                              <a
-                                href={`tel:${member.phone.replace(/[^0-9+]/g, '')}`}
-                                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-                                title="Llamar"
-                              >
-                                <Phone className="w-3.5 h-3.5" />
-                              </a>
-                              <a
-                                href={`https://wa.me/${member.phone.replace(/[^0-9]/g, '')}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                title="WhatsApp"
-                              >
-                                <MessageCircle className="w-3.5 h-3.5" />
-                              </a>
-                            </>
-                          )}
-                          <button
-                            onClick={() => {
-                              setMovingPublisher(member);
-                              setTargetGroupNumber(member.groupNumber || 1);
-                            }}
-                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                            title="Mover a otro grupo de servicio"
-                          >
-                            <ArrowRightLeft className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
+                      );
+                    })
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* MODAL 1: EDIT / CREATE GROUP */}
       {isGroupModalOpen && (

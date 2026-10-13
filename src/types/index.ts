@@ -1036,6 +1036,9 @@ export interface UserProfile {
   contactTimePreference: ContactTimePreference;
   notificationsEnabled: boolean;
   notes?: string;
+  congregationId?: string;
+  congregationNumber?: string;
+  congregationName?: string;
   updatedAt?: string;
 }
 

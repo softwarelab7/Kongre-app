@@ -1,11 +1,14 @@
 // src/components/RegisterCongregationWizard.tsx
 import React, { useState } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { useSecurity } from '../context/SecurityContext';
 import {
   hashPasscode,
   generateMilitaryGradeCongregationId,
+  formatCanonicalCongregationId,
   evaluatePinStrength,
   generateSecureCongregationPin,
   generateSecureRolePin,
@@ -323,7 +326,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
     try {
       const congPinHashed = await hashPasscode(congregationPin.trim());
 
-      const finalId = congregationNumber.trim().toUpperCase();
+      const finalId = formatCanonicalCongregationId(congregationNumber.trim()) || congregationNumber.trim().toUpperCase();
 
       // 1. Update Congregation Settings in context and database
       await updateSettings({
@@ -345,6 +348,19 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         isRegistered: true,
         registeredAt: new Date().toISOString(),
       });
+
+      // Si el usuario está autenticado con Google, vincular inmediatamente en /users/{uid}
+      if (user && user.uid) {
+        try {
+          await setDoc(doc(db, 'users', user.uid), {
+            congregationId: finalId,
+            congregationNumber: finalId,
+            congregationName: congregationName.trim(),
+            theocraticRole: 'coordinador',
+            updatedAt: new Date().toISOString(),
+          }, { merge: true });
+        } catch {}
+      }
 
       // 2. Set Congregation App Lock PIN and Personal PIN in security context
       await setCongregationPin(congregationPin.trim());

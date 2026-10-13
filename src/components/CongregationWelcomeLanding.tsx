@@ -1,11 +1,13 @@
 // src/components/CongregationWelcomeLanding.tsx
 import React, { useState } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import { useAuth } from '../context/AuthContext';
 import { useSecurity } from '../context/SecurityContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useTheme } from '../context/ThemeContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
-import { isCongregationIdString, getFriendlyCongregationName, verifyPasscode, isGenericIdentityName } from '../utils/theocraticSecurity';
+import { isCongregationIdString, getFriendlyCongregationName, verifyPasscode, isGenericIdentityName, formatCanonicalCongregationId } from '../utils/theocraticSecurity';
 import {
   Sun,
   Moon,
@@ -70,6 +72,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     restorePreviousRegistration,
     uploadLocalDataToGoogle,
     loadCongregationFromCloud,
+    findUserCongregationId,
   } = useCongregation();
   const { isDark, toggleTheme } = useTheme();
 
@@ -100,7 +103,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     setIsSubmittingCode(true);
 
     try {
-      const cleanId = congregationIdInput.trim();
+      const rawInput = congregationIdInput.trim();
+      const cleanId = formatCanonicalCongregationId(rawInput);
       const cleanCongPin = congregationPinInput.trim();
       const cleanPersonalPin = personalPinInput.trim();
       let nameToUse = '';
@@ -122,6 +126,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       // 1. Cargar datos actualizados de la congregación desde la nube en Firestore primero si existen
       const cloudRes = await loadCongregationFromCloud(cleanId);
       const cloudData = cloudRes?.data;
+      const effectiveId = formatCanonicalCongregationId(cloudData?.congregationId || cloudData?.settings?.congregationId || cleanId);
 
       // 2. Validar coincidencia de PIN de Congregación
       const effectivePinHash = cloudData?.settings?.congregationPinHash || settings.congregationPinHash;
@@ -240,14 +245,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             ? settings.congregationName
             : (localStorage.getItem('kongre_congregation_name') || ''));
 
-        localStorage.setItem('kongre_congregation_number', cleanId);
-        localStorage.setItem('kongre_congregation_id', cleanId);
+        localStorage.setItem('kongre_congregation_number', effectiveId);
+        localStorage.setItem('kongre_congregation_id', effectiveId);
 
         const newSettingsUpdate: any = {
           isRegistered: true,
           ...(cleanCongName ? { congregationName: cleanCongName } : {}),
-          congregationNumber: cleanId,
-          congregationId: cleanId,
+          congregationNumber: effectiveId,
+          congregationId: effectiveId,
         };
 
         if (!isGenericIdentityName(nameToUse)) {
@@ -259,7 +264,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           }
         }
 
-        updateSettings(newSettingsUpdate);
+        // Actualizar configuración local sin sobreescribir la nube recién descargada
+        updateSettings(newSettingsUpdate, { skipCloudWrite: true });
 
         const cleanPhoto =
           cloudData?.settings?.coordinatorPhotoURL ||
@@ -328,8 +334,22 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
-        localStorage.setItem('kongre_needs_cloud_upload', 'true');
-        localStorage.setItem('kongre_last_local_update', new Date().toISOString());
+        localStorage.removeItem('kongre_needs_cloud_upload');
+        localStorage.setItem('kongre_last_local_update', cloudData?.updatedAt || new Date().toISOString());
+
+        // Vincular de forma persistente en /users/{uid} si el usuario tiene sesión de Google activa
+        const uidToLink = user?.uid || auth.currentUser?.uid;
+        if (uidToLink) {
+          try {
+            await setDoc(doc(db, 'users', uidToLink), {
+              congregationId: effectiveId,
+              congregationNumber: effectiveId,
+              congregationName: cleanCongName,
+              theocraticRole: roleFinal,
+              updatedAt: new Date().toISOString(),
+            }, { merge: true });
+          } catch {}
+        }
 
         setCodeSuccess(`¡Conexión exitosa a ${cleanCongName}! Bienvenido, ${nameToUse} (${THEOCRATIC_ROLES[roleFinal]?.name || roleFinal}).`);
         setTimeout(() => {
@@ -392,12 +412,27 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       }
 
       // 1. Obtener ID y Nombre de la congregación existente (local o nube)
-      const existingCongId =
+      let existingCongId = formatCanonicalCongregationId(
         settings.congregationNumber?.trim() ||
         settings.congregationId?.trim() ||
         localStorage.getItem('kongre_congregation_number')?.trim() ||
         localStorage.getItem('kongre_congregation_id')?.trim() ||
-        '';
+        ''
+      );
+
+      // Si no está en local, buscar ID de congregación para este usuario por su cuenta de Google
+      if (!existingCongId) {
+        try {
+          const foundId = await findUserCongregationId(userEmail, loggedUser.uid);
+          if (foundId) {
+            existingCongId = formatCanonicalCongregationId(foundId);
+            localStorage.setItem('kongre_congregation_number', existingCongId);
+            localStorage.setItem('kongre_congregation_id', existingCongId);
+          }
+        } catch (err) {
+          console.warn('Aviso buscando ID de congregación por Google auth:', err);
+        }
+      }
 
       const existingCongName =
         (settings.congregationName && !isCongregationIdString(settings.congregationName) ? settings.congregationName.trim() : null) ||
@@ -416,34 +451,49 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       const coordName = cloudData?.settings?.coordinatorName || settings.coordinatorName || '';
 
       // 3. Comprobar si el usuario es Coordinador/Creador o dueño del dispositivo
-      const isKnownCoordinator =
+      const isKnownCoordinator = Boolean(existingCongId) && (
         userEmail === 'hectorguti95@gmail.com' ||
         (coordEmail && userEmail === coordEmail) ||
         !coordEmail || // Si no había correo de coordinador registrado aún en la congregación
-        localStorage.getItem('kongre_is_registered_congregation') === 'true' ||
-        Boolean(existingCongId);
+        localStorage.getItem('kongre_is_registered_congregation') === 'true'
+      );
 
       // 4. Comprobar si el usuario coincide con un publicador registrado por correo o nombre
-      const matchingPub = allPublishers.find(
-        (p) =>
-          (p.email && p.email.toLowerCase().trim() === userEmail) ||
-          (userName && !isGenericIdentityName(userName) && p.name && p.name.trim().toLowerCase() === userName.toLowerCase())
-      );
+      const matchingPub = existingCongId
+        ? allPublishers.find(
+            (p) =>
+              (p.email && p.email.toLowerCase().trim() === userEmail) ||
+              (userName && !isGenericIdentityName(userName) && p.name && p.name.trim().toLowerCase() === userName.toLowerCase())
+          )
+        : undefined;
 
-      const matchingRole = userRolesList.find(
-        (r) => r.email.toLowerCase().trim() === userEmail
-      );
+      const matchingRole = existingCongId
+        ? userRolesList.find((r) => r.email.toLowerCase().trim() === userEmail)
+        : undefined;
 
-      const approvedReq = accountLinkRequests.find(
-        (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'approved'
-      );
+      const approvedReq = existingCongId
+        ? accountLinkRequests.find(
+            (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'approved'
+          )
+        : undefined;
 
-      const pendingReq = accountLinkRequests.find(
-        (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'pending'
-      );
+      const pendingReq = existingCongId
+        ? accountLinkRequests.find(
+            (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'pending'
+          )
+        : undefined;
 
       if (pendingReq) {
         setPendingApprovalEmail(userEmail);
+        return;
+      }
+
+      // Si no hay congregación existente vinculada a este correo o dispositivo, solicitar ID y PIN para vincularla
+      if (!existingCongId) {
+        setActiveTab('code_login');
+        setCodeSuccess(
+          `Sesión de Google iniciada (${userEmail}). No encontramos una congregación vinculada a esta cuenta. Introduce el ID y PIN de tu congregación para vincularla, o selecciona "Registrar mi Congregación".`
+        );
         return;
       }
 
@@ -462,7 +512,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           ...(userPhoto ? { coordinatorPhotoURL: userPhoto } : {}),
           ...(existingCongId ? { congregationNumber: existingCongId, congregationId: existingCongId } : {}),
           ...(existingCongName ? { congregationName: existingCongName } : {}),
-        });
+        }, { skipCloudWrite: true });
 
         if (finalCoordName && !isGenericIdentityName(finalCoordName)) {
           setIdentifiedBrother(finalCoordName);
@@ -474,8 +524,22 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         setActiveRole('coordinador');
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
-        localStorage.setItem('kongre_needs_cloud_upload', 'true');
-        localStorage.setItem('kongre_last_local_update', new Date().toISOString());
+        localStorage.removeItem('kongre_needs_cloud_upload');
+        localStorage.setItem('kongre_last_local_update', cloudData?.updatedAt || new Date().toISOString());
+
+        // Vincular de forma persistente su perfil en /users/{uid}
+        const activeUid = loggedUser.uid || user?.uid || auth.currentUser?.uid;
+        if (activeUid && existingCongId) {
+          try {
+            await setDoc(doc(db, 'users', activeUid), {
+              congregationId: existingCongId,
+              congregationNumber: existingCongId,
+              congregationName: existingCongName || cloudData?.settings?.congregationName || '',
+              theocraticRole: 'coordinador',
+              updatedAt: new Date().toISOString(),
+            }, { merge: true });
+          } catch {}
+        }
 
         // Asegurar que el coordinador figure como publicador en la lista
         if (finalCoordName && !isGenericIdentityName(finalCoordName)) {
@@ -551,6 +615,30 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         setActiveRole(roleToAssign);
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
+
+        const canonicalCongId = formatCanonicalCongregationId(existingCongId);
+        if (canonicalCongId) {
+          await updateSettings({
+            isRegistered: true,
+            congregationNumber: canonicalCongId,
+            congregationId: canonicalCongId,
+            ...(existingCongName ? { congregationName: existingCongName } : {}),
+          }, { skipCloudWrite: true });
+        }
+
+        // Vincular de forma persistente su perfil en /users/{uid}
+        const activeUid = loggedUser.uid || user?.uid || auth.currentUser?.uid;
+        if (activeUid && canonicalCongId) {
+          try {
+            await setDoc(doc(db, 'users', activeUid), {
+              congregationId: canonicalCongId,
+              congregationNumber: canonicalCongId,
+              congregationName: existingCongName || cloudData?.settings?.congregationName || '',
+              theocraticRole: roleToAssign,
+              updatedAt: new Date().toISOString(),
+            }, { merge: true });
+          } catch {}
+        }
 
         onEnterApp();
         return;

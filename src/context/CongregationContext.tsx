@@ -85,7 +85,7 @@ import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganiz
 import { detectConflictsInWeek } from '../utils/conflictDetector';
 import { autoAssignWeek } from '../utils/autoAssigner';
 import { OFFICIAL_STUDENT_LESSONS } from '../utils/theocraticData';
-import { isCongregationIdString, getFriendlyCongregationName, sanitizeForFirestore, isGenericIdentityName } from '../utils/theocraticSecurity';
+import { isCongregationIdString, getFriendlyCongregationName, sanitizeForFirestore, isGenericIdentityName, formatCanonicalCongregationId } from '../utils/theocraticSecurity';
 
 interface CongregationContextType {
   publishers: Publisher[];
@@ -283,7 +283,8 @@ interface CongregationContextType {
   deleteCustomDuty: (id: string) => void;
 
   // Settings & Backup
-  updateSettings: (newSettings: Partial<CongregationSettings>) => Promise<void> | void;
+  updateSettings: (newSettings: Partial<CongregationSettings>, options?: { skipCloudWrite?: boolean }) => Promise<void> | void;
+  findUserCongregationId: (email?: string, uid?: string) => Promise<string | null>;
   exportBackupJSON: () => void;
   getBackupJSON: () => string;
   importBackupJSON: (jsonString: string) => boolean;
@@ -1838,6 +1839,27 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
+  const findUserCongregationId = async (email?: string, uid?: string): Promise<string | null> => {
+    try {
+      if (uid) {
+        const userDocRef = doc(db, 'users', uid);
+        const userSnap = await getDoc(userDocRef);
+        if (userSnap.exists()) {
+          const uData = userSnap.data();
+          const cid = uData.congregationId || uData.congregationNumber;
+          if (cid) return formatCanonicalCongregationId(cid);
+        }
+      }
+      const localCId =
+        localStorage.getItem('kongre_congregation_number') ||
+        localStorage.getItem('kongre_congregation_id');
+      if (localCId) return formatCanonicalCongregationId(localCId);
+    } catch (e) {
+      console.warn('Aviso buscando ID de congregación de usuario:', e);
+    }
+    return null;
+  };
+
   // Auto-sync pending local changes when internet connection is restored
   useEffect(() => {
     const handleReconnected = () => {
@@ -3154,7 +3176,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     saveToFirestore(publishers, weeks, preachingGroups, updated);
   };
 
-  const updateSettings = async (newSettings: Partial<CongregationSettings>) => {
+  const updateSettings = async (
+    newSettings: Partial<CongregationSettings>,
+    options?: { skipCloudWrite?: boolean }
+  ) => {
     const cleanCongName =
       newSettings.congregationName !== undefined
         ? isCongregationIdString(newSettings.congregationName)
@@ -3266,36 +3291,38 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
     }
 
-    // Ejecutar guardado en la nube en segundo plano sin bloquear ni congelar la interfaz
-    saveToFirestore(
-      publishers,
-      updatedWeeks,
-      preachingGroups,
-      customDuties,
-      merged,
-      outgoingSpeakers,
-      fieldServiceMeetings,
-      cartLocations,
-      cartShifts,
-      notices,
-      monthlyReports,
-      territories,
-      circuitVisit,
-      transactions,
-      quarterlyAudits,
-      memorialPlans,
-      theocraticAssemblies,
-      literatureItems,
-      specialOrders,
-      groupDistributions,
-      inventoryRecords,
-      accountLinkRequests,
-      clmProgramas,
-      latestCongregationEventsRef.current,
-      { immediate: true }
-    ).catch((err) => {
-      console.warn('Aviso guardando en nube tras updateSettings:', err);
-    });
+    // Ejecutar guardado en la nube en segundo plano si no se especificó skipCloudWrite
+    if (!options?.skipCloudWrite) {
+      saveToFirestore(
+        publishers,
+        updatedWeeks,
+        preachingGroups,
+        customDuties,
+        merged,
+        outgoingSpeakers,
+        fieldServiceMeetings,
+        cartLocations,
+        cartShifts,
+        notices,
+        monthlyReports,
+        territories,
+        circuitVisit,
+        transactions,
+        quarterlyAudits,
+        memorialPlans,
+        theocraticAssemblies,
+        literatureItems,
+        specialOrders,
+        groupDistributions,
+        inventoryRecords,
+        accountLinkRequests,
+        clmProgramas,
+        latestCongregationEventsRef.current,
+        { immediate: true }
+      ).catch((err) => {
+        console.warn('Aviso guardando en nube tras updateSettings:', err);
+      });
+    }
   };
 
   // Carritos de predicación y avisos
@@ -4879,6 +4906,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         uploadLocalDataToGoogle,
         downloadDataFromGoogle,
         loadCongregationFromCloud,
+        findUserCongregationId,
         accountLinkRequests,
         createAccountLinkRequest,
         approveAccountLinkRequest,

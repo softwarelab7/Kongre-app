@@ -44,12 +44,20 @@
   }
 }
 
+/* Mobile Safe Area Padding */
+.pb-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+}
+.pt-safe {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
+}
+
 /* Hide scrollbars while allowing swipeable lists on mobile */
-.scrollbar-none {
+.scrollbar-none, .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-.scrollbar-none::-webkit-scrollbar {
+.scrollbar-none::-webkit-scrollbar, .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 

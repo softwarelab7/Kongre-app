@@ -568,33 +568,33 @@ export const PersonalViewTab: React.FC = () => {
   };
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-4 sm:space-y-6">
       {/* Header with publisher switcher */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+      <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3 sm:space-y-4">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 px-2.5 py-0.5 rounded-full">
             Portal del Publicador
           </span>
-          <h2 className="text-xl font-bold text-slate-900 mt-1">Mis Próximas Asignaciones</h2>
-          <p className="text-xs text-slate-500">
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mt-1">Mis Próximas Asignaciones</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Vista individual limpia y privada para consultar fechas, confirmar asistencia o avisar oportunamente.
           </p>
         </div>
 
         {/* Selector */}
-        <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200">
-          <User className="w-5 h-5 text-indigo-600 shrink-0" />
-          <div className="flex-1">
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">
+        <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+          <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-0.5">
               Consultar asignaciones de:
             </label>
             <select
               value={selectedPublisherId}
               onChange={e => setSelectedPublisherId(e.target.value)}
-              className="w-full text-sm font-bold text-slate-900 bg-transparent border-none focus:outline-hidden cursor-pointer"
+              className="w-full text-xs sm:text-sm font-bold text-slate-900 dark:text-white bg-transparent border-none focus:outline-hidden cursor-pointer"
             >
               {publishers.map(p => (
-                <option key={p.id} value={p.id}>
+                <option key={p.id} value={p.id} className="dark:bg-slate-900 dark:text-white">
                   {p.name} {p.active ? '' : '(Inactivo)'}
                 </option>
               ))}
@@ -605,14 +605,14 @@ export const PersonalViewTab: React.FC = () => {
 
       {/* Assignment cards */}
       {myAssignments.length === 0 ? (
-        <div className="p-12 text-center bg-white rounded-3xl border border-slate-200 shadow-xs space-y-3">
-          <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+        <div className="p-8 sm:p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
+          <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-6 h-6 text-emerald-500" />
           </div>
-          <h3 className="text-base font-bold text-slate-800">
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">
             {selectedPublisher?.name} no tiene asignaciones próximas
           </h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
             Todas las semanas registradas están al día y no figuran tareas asignadas para este publicador.
           </p>
         </div>
@@ -622,7 +622,7 @@ export const PersonalViewTab: React.FC = () => {
             {myAssignments.length} {myAssignments.length === 1 ? 'asignación programada' : 'asignaciones programadas'}
           </p>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4">
             {myAssignments.map(item => {
             const isConfirmed = item.status === 'confirmada';
             const isRejected = item.status === 'rechazada';
@@ -630,36 +630,36 @@ export const PersonalViewTab: React.FC = () => {
             return (
               <div
                 key={item.id}
-                className="p-5 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-3 sm:gap-4"
               >
                 <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="flex items-center gap-1 text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-lg border border-indigo-100">
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                    <span className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/70 px-2 sm:px-2.5 py-0.5 rounded-lg border border-indigo-100 dark:border-indigo-800/60">
                       <Calendar className="w-3.5 h-3.5" />
                       {item.date}
                     </span>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
                       {item.meetingName}
                     </span>
                     {item.room && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
                         {item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}
                       </span>
                     )}
                   </div>
 
-                  <h3 className="text-base font-bold text-slate-900 leading-tight">
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight">
                     {item.assignmentTitle}
                   </h3>
 
                   {item.assistantName && (
-                    <p className="text-xs font-medium text-slate-600">
+                    <p className="text-xs font-medium text-slate-600 dark:text-slate-300">
                       👥 {item.assistantName}
                     </p>
                   )}
 
                   {item.timeMinutes && (
-                    <p className="text-[11px] text-slate-500 flex items-center gap-1">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
                       <Clock className="w-3 h-3 text-slate-400" />
                       Tiempo asignado: {item.timeMinutes} minutos
                     </p>
@@ -667,16 +667,16 @@ export const PersonalViewTab: React.FC = () => {
                 </div>
 
                 {/* Status & Confirmation buttons */}
-                <div className="flex flex-col sm:items-end gap-2.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs text-slate-500">Estado:</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">Estado:</span>
                     <span
-                      className={`px-2.5 py-0.5 rounded-full text-xs font-bold capitalize ${
+                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold capitalize ${
                         isConfirmed
-                          ? 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300'
                           : isRejected
-                          ? 'bg-rose-100 text-rose-800'
-                          : 'bg-amber-100 text-amber-800'
+                          ? 'bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300'
+                          : 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300'
                       }`}
                     >
                       {item.status}
@@ -684,7 +684,7 @@ export const PersonalViewTab: React.FC = () => {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
                     <button
                       onClick={() => {
                         const meetingTime = item.meetingType === 'midweek' ? settings.midweekMeetingTime : settings.weekendMeetingTime;
@@ -698,10 +698,10 @@ export const PersonalViewTab: React.FC = () => {
                         );
                         window.open(gUrl, '_blank');
                       }}
-                      className="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all min-h-[40px]"
+                      className="px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all min-h-[44px]"
                       title="Añadir a Google Calendar"
                     >
-                      <CalendarDays className="w-4 h-4 text-indigo-600" />
+                      <CalendarDays className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                       <span>Google Cal</span>
                     </button>
 
@@ -717,28 +717,20 @@ export const PersonalViewTab: React.FC = () => {
                           item.timeMinutes || 105
                         );
                       }}
-                      className="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold flex items-center justify-center gap-1 transition-all min-h-[40px]"
+                      className="px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold flex items-center justify-center gap-1 transition-all min-h-[44px]"
                       title="Descargar archivo .ics para Apple Calendar o Outlook"
                     >
                       <span>.ICS</span>
                     </button>
 
                     <button
-                      onClick={() => copyAssignmentDetails(item)}
-                      className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 text-xs transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
-                      title="Copiar detalles de la asignación"
-                    >
-                      {copiedId === item.id ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                    </button>
-
-                    <button
                       onClick={() =>
                         handleUpdateStatus(item.weekId, item.meetingType, item.assignmentPath, 'confirmada')
                       }
-                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 min-h-[40px] ${
+                      className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 min-h-[44px] ${
                         isConfirmed
                           ? 'bg-emerald-600 text-white shadow-xs'
-                          : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+                          : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800'
                       }`}
                     >
                       <CheckCircle2 className="w-4 h-4" />
@@ -749,14 +741,23 @@ export const PersonalViewTab: React.FC = () => {
                       onClick={() =>
                         handleUpdateStatus(item.weekId, item.meetingType, item.assignmentPath, 'rechazada')
                       }
-                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 min-h-[40px] ${
+                      className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 min-h-[44px] ${
                         isRejected
                           ? 'bg-rose-600 text-white shadow-xs'
-                          : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200'
+                          : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 hover:bg-rose-100 border border-rose-200 dark:border-rose-800'
                       }`}
                     >
                       <XCircle className="w-4 h-4" />
-                      <span>Avisar Reemplazo</span>
+                      <span>Reemplazo</span>
+                    </button>
+
+                    <button
+                      onClick={() => copyAssignmentDetails(item)}
+                      className="col-span-2 sm:col-span-1 p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs transition-colors min-h-[44px] flex items-center justify-center gap-1.5"
+                      title="Copiar detalles de la asignación"
+                    >
+                      {copiedId === item.id ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                      <span className="sm:hidden text-xs font-medium">Copiar Detalles</span>
                     </button>
                   </div>
                 </div>

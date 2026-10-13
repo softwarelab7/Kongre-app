@@ -118,16 +118,16 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
-      <div className="bg-white rounded-3xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-100">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+      <div className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-lg w-full max-h-[92dvh] sm:max-h-[85vh] flex flex-col shadow-2xl border border-slate-100 dark:border-slate-800 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] sm:pb-0">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
+          <div className="min-w-0 pr-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 px-2 py-0.5 rounded-full">
               Asignar Participante
             </span>
-            <h3 className="text-base font-bold text-slate-900 mt-1">{title}</h3>
-            <p className="text-xs text-slate-500">
+            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mt-1 truncate">{title}</h3>
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 truncate">
               {isStudentRole
                 ? 'Sugiere automáticamente la lección del folleto Maestros pendiente de trabajar.'
                 : 'Solo se muestran personas activas, sin ausencias y con el rol habilitado.'}
@@ -135,14 +135,14 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+            className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Search & Actions */}
-        <div className="p-4 border-b border-slate-100 flex items-center gap-2">
+        <div className="p-3 sm:p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center gap-2 shrink-0">
           <div className="relative flex-1">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
@@ -151,7 +151,7 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Buscar entre candidatos disponibles..."
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+              className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           {onClearAssignment && (
@@ -161,7 +161,7 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
                 onClearAssignment();
                 onClose();
               }}
-              className="px-3.5 py-2 text-xs font-bold rounded-xl text-rose-600 hover:text-white hover:bg-rose-600 bg-rose-50 border border-rose-200 transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="px-3.5 py-2 text-xs font-bold rounded-xl text-rose-600 dark:text-rose-400 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 transition-colors shrink-0 flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs min-h-[40px]"
               title="Quitar asignación actual y dejar libre"
             >
               <UserMinus className="w-3.5 h-3.5" />
@@ -191,27 +191,27 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
                     onSelectPublisher(c.publisher.id, currentLessonNum);
                     onClose();
                   }}
-                  className={`w-full text-left p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
+                  className={`w-full text-left p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 min-h-[48px] ${
                     isSelected
-                      ? 'border-indigo-500 bg-indigo-50/70 shadow-xs ring-1 ring-indigo-500'
+                      ? 'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/60 shadow-xs ring-1 ring-indigo-500'
                       : c.hasConflictWarning
-                      ? 'border-amber-200 bg-amber-50/30 hover:bg-amber-50'
-                      : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'
+                      ? 'border-amber-200 dark:border-amber-800 bg-amber-50/30 dark:bg-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-950/40'
+                      : 'border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
                       className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
                         c.publisher.gender === 'hermana'
-                          ? 'bg-rose-100 text-rose-700'
-                          : 'bg-indigo-100 text-indigo-700'
+                          ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300'
+                          : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300'
                       }`}
                     >
                       {c.publisher.name.charAt(0)}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-bold text-slate-900 text-xs sm:text-sm truncate">
+                        <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm truncate">
                           {c.publisher.name}
                         </span>
 

@@ -242,6 +242,22 @@ export function generateMilitaryGradeCongregationId(name?: string): string {
 }
 
 /**
+ * Normaliza y formatea cualquier ID de congregación a su formato canónico estandarizado.
+ * Si el usuario introduce 'kgr8p2m7x4w', 'KGR8P2M7X4W', 'kgr-8p2m-7x4w' o con espacios,
+ * devuelve siempre el estándar unificado: 'KGR-8P2M-7X4W'.
+ * Garantiza total sincronización entre usuarios de Google y usuarios de ID/PIN.
+ */
+export function formatCanonicalCongregationId(id: string | null | undefined): string {
+  if (!id) return '';
+  const clean = id.trim().toUpperCase().replace(/[\s_]/g, '-');
+  const unhyphenated = clean.replace(/-/g, '');
+  if (unhyphenated.startsWith('KGR') && unhyphenated.length === 11) {
+    return `${unhyphenated.slice(0, 3)}-${unhyphenated.slice(3, 7)}-${unhyphenated.slice(7)}`;
+  }
+  return clean;
+}
+
+/**
  * Genera un PIN numérico seguro de 6 dígitos no trivial para bloqueo de app de la congregación
  */
 export function generateSecureCongregationPin(): string {

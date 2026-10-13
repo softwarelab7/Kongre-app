@@ -1,5 +1,7 @@
 // src/components/JoinCongregationModal.tsx
 import React, { useState } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import { useSecurity } from '../context/SecurityContext';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
@@ -203,6 +205,8 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         // Los 3 datos teocráticos son válidos y reconocidos
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
+        localStorage.removeItem('kongre_needs_cloud_upload');
+        localStorage.setItem('kongre_last_local_update', cloudRes?.data?.updatedAt || new Date().toISOString());
 
         const cleanCongName =
           settings.congregationName && !isCongregationIdString(settings.congregationName)
@@ -228,7 +232,20 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
           }
         }
 
-        updateSettings(newSettingsUpdate);
+        updateSettings(newSettingsUpdate, { skipCloudWrite: true });
+
+        // Si hay una cuenta de Google conectada, vincular en Firestore en /users/{uid}
+        if (user && user.uid) {
+          try {
+            setDoc(doc(db, 'users', user.uid), {
+              congregationId: cleanId,
+              congregationNumber: cleanId,
+              congregationName: cleanCongName,
+              theocraticRole: identifiedRole,
+              updatedAt: new Date().toISOString(),
+            }, { merge: true });
+          } catch {}
+        }
 
         const cleanPhoto =
           effectiveSettings.coordinatorPhotoURL ||

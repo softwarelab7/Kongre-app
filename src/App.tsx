@@ -9,6 +9,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CongregationProvider, useCongregation } from './context/CongregationContext';
 import { Navbar, ActiveTab } from './components/Navbar';
 import { isTabAllowedForRole } from './utils/rbac';
+import { CongregationCalendar } from './components/CongregationCalendar';
 import { ScheduleTab } from './components/ScheduleTab';
 import ClmScheduleView from './components/ClmScheduleView';
 import { S89SlipsTab } from './components/S89SlipsTab';
@@ -362,6 +363,9 @@ const AppContent: React.FC = () => {
                 onOpenConflictsModal={() => setIsConflictsModalOpen(true)}
               />
             )}
+            {activeTab === 'calendario' && (
+              <CongregationCalendar onNavigateToWeek={handleNavigateToWeek} />
+            )}
             {activeTab === 'programacion' && <ScheduleTab />}
             {activeTab === 'clm_vmc' && (
               <ClmScheduleView
@@ -523,16 +527,24 @@ const AppContent: React.FC = () => {
   );
 };
 
+import { ToastProvider } from './context/ToastContext';
+import { ModalProvider } from './context/ModalContext';
+
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <CongregationProvider>
           <SecurityProvider>
-            <AppContent />
+            <ToastProvider>
+              <ModalProvider>
+                <AppContent />
+              </ModalProvider>
+            </ToastProvider>
           </SecurityProvider>
         </CongregationProvider>
       </AuthProvider>
     </ThemeProvider>
   );
 }
+

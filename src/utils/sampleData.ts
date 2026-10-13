@@ -26,8 +26,11 @@ import {
   MaintenanceSheet,
   AuxPioneerRequest,
   BranchReportS1,
+  CongregationEvent,
 } from '../types';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek } from './organizedSync';
+
+export const INITIAL_CONGREGATION_EVENTS: CongregationEvent[] = [];
 
 // Clean initial settings for a brand new congregation
 export const INITIAL_SETTINGS: CongregationSettings = {

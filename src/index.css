@@ -69,3 +69,150 @@
     break-after: page;
   }
 }
+
+/* React Big Calendar Overrides & Dark Mode */
+.rbc-custom-theme .rbc-calendar {
+  min-height: 520px;
+}
+
+.rbc-custom-theme .rbc-month-view {
+  border-radius: 1rem;
+  border-color: rgba(226, 232, 240, 0.8);
+  overflow: hidden;
+}
+
+.rbc-custom-theme .rbc-header {
+  padding: 8px 4px;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .rbc-custom-theme .rbc-month-view {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: transparent !important;
+}
+
+.dark .rbc-custom-theme .rbc-header {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.dark .rbc-custom-theme .rbc-header + .rbc-header {
+  border-left-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dark .rbc-custom-theme .rbc-day-bg + .rbc-day-bg {
+  border-left-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dark .rbc-custom-theme .rbc-month-row + .rbc-month-row {
+  border-top-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dark .rbc-custom-theme .rbc-today {
+  background-color: rgba(99, 102, 241, 0.1) !important;
+}
+
+.dark .rbc-custom-theme .rbc-off-range-bg {
+  background-color: rgba(0, 0, 0, 0.28) !important;
+}
+
+.dark .rbc-custom-theme .rbc-off-range .rbc-button-link,
+.dark .rbc-custom-theme .rbc-off-range a {
+  color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Kongre Design System Components */
+.kf-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.75rem;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  color: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.dark .kf-input {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.kf-input:focus {
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.kf-input-icon {
+  padding-left: 2.25rem;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  background: rgba(99, 102, 241, 0.04);
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.dark .data-table th {
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  font-size: 0.85rem;
+}
+
+.dark .data-table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.data-table tr:hover td {
+  background: rgba(99, 102, 241, 0.03);
+}
+
+.dark .data-table tr:hover td {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.badge-active {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.dark .badge-active {
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+.badge-inactive {
+  background-color: rgba(244, 63, 94, 0.1);
+  color: #e11d48;
+  border: 1px solid rgba(244, 63, 94, 0.2);
+}
+
+.dark .badge-inactive {
+  color: #fb7185;
+  border-color: rgba(251, 113, 133, 0.2);
+}
+

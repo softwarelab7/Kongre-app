@@ -1,1946 +1,710 @@
 // src/components/PublishersTab.tsx
 import React, { useState, useMemo } from 'react';
-import { useCongregation } from '../context/CongregationContext';
-import { Publisher, Gender, Absence, TheocraticPrivilege } from '../types';
-import { useAuth } from '../context/AuthContext';
-import { TheocraticRole, THEOCRATIC_ROLES } from '../utils/rbac';
-import { generateSecurePublisherPin } from '../utils/theocraticSecurity';
+import { Publisher } from '../types';
 import {
-  Search,
   UserPlus,
-  FileSpreadsheet,
-  Download,
+  Search,
   Trash2,
   Edit2,
-  Calendar,
-  History,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  Info,
-  Phone,
-  Filter,
-  Check,
-  X,
-  AlertCircle,
-  Lock,
-  UserCheck,
-  KeyRound,
-  Sparkles,
-  Copy,
-  Eye,
-  EyeOff,
-  ShieldCheck,
   Users,
-  CheckSquare,
-  Square,
-  UserMinus,
+  RefreshCcw,
+  ChevronUp,
+  ChevronDown,
+  Upload,
 } from 'lucide-react';
-import { computePublisherAssignmentStats } from '../utils/autoAssigner';
-import { useSecurity } from '../context/SecurityContext';
-import { maskPhoneNumber } from '../utils/theocraticSecurity';
-import { AccountLinkRequestsModal } from './AccountLinkRequestsModal';
 import { SectionHeader } from './SectionHeader';
+import { Select } from './Select';
+import { PublisherEditor, ASSIGNMENT_GROUPS } from './PublisherEditor';
+import { useCongregation } from '../context/CongregationContext';
+import { usePermissions } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { useModal } from '../context/ModalContext';
+
+type ViewMode = 'list' | 'editor';
 
 export const PublishersTab: React.FC = () => {
+  const { canEditPublishers } = usePermissions();
   const {
     publishers,
     addPublisher,
     updatePublisher,
     deletePublisher,
-    deletePublishersBatch,
-    clearAllPublishers,
-    importPublishersFromCSV,
-    weeks,
-    customDuties,
-    accountLinkRequests,
-    settings,
+    preachingGroups,
   } = useCongregation();
 
-  const { assignPersonalPinToPublisher } = useAuth();
-  const { privacyModeEnabled } = useSecurity();
-  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
-  const pendingLinkCount = accountLinkRequests.filter((r) => r.status === 'pending').length;
+  const { showToast } = useToast();
+  const { confirm } = useModal();
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterGender, setFilterGender] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [visiblePins, setVisiblePins] = useState<Record<string, boolean>>({});
-  const [copiedPinId, setCopiedPinId] = useState<string | null>(null);
-  const [pinActionFeedback, setPinActionFeedback] = useState<string | null>(null);
+  const [roleFilter, setRoleFilter] = useState<'all' | 'elder' | 'servant' | 'publisher' | 'trash'>('all');
+  const [groupFilter, setGroupFilter] = useState<string>('all');
+  const [sortField, setSortField] = useState<'name' | 'group' | null>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [editingPublisher, setEditingPublisher] = useState<Publisher | null>(null);
 
-  // Modals state
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isCsvModalOpen, setIsCsvModalOpen] = useState(false);
-  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-  const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
-  const [publisherToDelete, setPublisherToDelete] = useState<Publisher | null>(null);
-  const [selectedPubIds, setSelectedPubIds] = useState<string[]>([]);
-  const [isConfirmBatchDeleteOpen, setIsConfirmBatchDeleteOpen] = useState(false);
-  const [isConfirmClearAllOpen, setIsConfirmClearAllOpen] = useState(false);
-  const [actionFeedbackToast, setActionFeedbackToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-
-  const handleToggleSelectPub = (id: string) => {
-    setSelectedPubIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  };
-
-  const handleSelectAllFiltered = () => {
-    const allFilteredIds = filteredPublishers.map(p => p.id);
-    const allSelected = allFilteredIds.length > 0 && allFilteredIds.every(id => selectedPubIds.includes(id));
-    if (allSelected) {
-      setSelectedPubIds(prev => prev.filter(id => !allFilteredIds.includes(id)));
-    } else {
-      setSelectedPubIds(prev => Array.from(new Set([...prev, ...allFilteredIds])));
-    }
-  };
-
-  const handleConfirmSingleDelete = async () => {
-    if (!publisherToDelete) return;
-    const name = publisherToDelete.name;
-    const pubId = publisherToDelete.id;
-    setPublisherToDelete(null);
-    try {
-      await deletePublisher(pubId);
-      setSelectedPubIds(prev => prev.filter(id => id !== pubId));
-      setActionFeedbackToast({ message: `Publicador "${name}" eliminado correctamente.`, type: 'success' });
-      setTimeout(() => setActionFeedbackToast(null), 3500);
-    } catch {
-      setActionFeedbackToast({ message: `Error al eliminar "${name}".`, type: 'error' });
-      setTimeout(() => setActionFeedbackToast(null), 3500);
-    }
-  };
-
-  const handleConfirmBatchDelete = async () => {
-    if (selectedPubIds.length === 0) return;
-    const count = selectedPubIds.length;
-    try {
-      await deletePublishersBatch(selectedPubIds);
-      setSelectedPubIds([]);
-      setIsConfirmBatchDeleteOpen(false);
-      setActionFeedbackToast({ message: `Se eliminaron ${count} publicadores correctamente.`, type: 'success' });
-      setTimeout(() => setActionFeedbackToast(null), 3500);
-    } catch {
-      setActionFeedbackToast({ message: `Error al eliminar los publicadores seleccionados.`, type: 'error' });
-      setTimeout(() => setActionFeedbackToast(null), 3500);
-    }
-  };
-
-  const handleConfirmClearAllPublishers = async () => {
-    try {
-      await clearAllPublishers();
-      setIsConfirmClearAllOpen(false);
-      setSelectedPubIds([]);
-      setActionFeedbackToast({ message: 'Se eliminaron todos los publicadores correctamente.', type: 'success' });
-      setTimeout(() => setActionFeedbackToast(null), 3500);
-    } catch {
-      setActionFeedbackToast({ message: 'Error al vaciar los publicadores.', type: 'error' });
-      setTimeout(() => setActionFeedbackToast(null), 3500);
-    }
-  };
-
-  // Form state for creating / editing publisher
-  const [formName, setFormName] = useState('');
-  const [formGender, setFormGender] = useState<Gender>('hermano');
-  const [formPhone, setFormPhone] = useState('');
-  const [formNotes, setFormNotes] = useState('');
-  const [formGroup, setFormGroup] = useState<number>(1);
-  const [formActive, setFormActive] = useState<boolean>(true);
-  const [formAbsences, setFormAbsences] = useState<Absence[]>([]);
-  const [formRoles, setFormRoles] = useState<Record<string, boolean>>({});
-
-  // Publisher Privileges & Personal PIN
-  const [formPrivilege, setFormPrivilege] = useState<TheocraticPrivilege>('publicador_bautizado');
-  const [formTheocraticRole, setFormTheocraticRole] = useState<TheocraticRole>('publico');
-  const [formPersonalPin, setFormPersonalPin] = useState<string>('');
-  const [formPinError, setFormPinError] = useState<string | null>(null);
-
-  // New absence fields
-  const [newAbsStart, setNewAbsStart] = useState('');
-  const [newAbsEnd, setNewAbsEnd] = useState('');
-  const [newAbsReason, setNewAbsReason] = useState('');
-
-  // CSV modal state
-  const [csvText, setCsvText] = useState('');
-  const [csvFeedback, setCsvFeedback] = useState<string | null>(null);
-
-  // Assignment stats
-  const stats = useMemo(() => computePublisherAssignmentStats(weeks, publishers), [weeks, publishers]);
-
-  // Filtered publishers
-  const filteredPublishers = useMemo(() => {
-    return publishers.filter(pub => {
-      const matchesSearch =
-        pub.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pub.phone.includes(searchTerm) ||
-        (pub.notes && pub.notes.toLowerCase().includes(searchTerm.toLowerCase()));
-
-      const matchesGender = filterGender === 'all' || pub.gender === filterGender;
-
-      let matchesStatus = true;
-      if (filterStatus === 'active') matchesStatus = pub.active;
-      else if (filterStatus === 'inactive') matchesStatus = !pub.active;
-      else if (filterStatus === 'absent') {
-        const today = new Date().toISOString().split('T')[0];
-        matchesStatus = pub.absences.some(a => a.startDate <= today && a.endDate >= today);
-      }
-
-      return matchesSearch && matchesGender && matchesStatus;
-    });
-  }, [publishers, searchTerm, filterGender, filterStatus]);
-
-  const openNewModal = () => {
-    setSelectedPublisher(null);
-    setFormName('');
-    setFormGender('hermano');
-    setFormPhone('');
-    setFormNotes('');
-    setFormGroup(1);
-    setFormActive(true);
-    setFormAbsences([]);
-    setFormPrivilege('publicador_bautizado');
-    setFormTheocraticRole('publico');
-    // Generar automáticamente un PIN numérico seguro de 4 dígitos no repetido
-    const existingPins = publishers.map((p) => p.personalPin?.trim()).filter(Boolean) as string[];
-    setFormPersonalPin(generateSecurePublisherPin(existingPins));
-    setFormPinError(null);
-    // Default roles
-    setFormRoles({
-      vym_presidente: false,
-      vym_oracion: true,
-      vym_tesoros_discurso: false,
-      vym_tesoros_perlas: true,
-      vym_tesoros_lectura: true,
-      vym_maestros_titular: true,
-      vym_maestros_ayudante: true,
-      vym_vida_partes: false,
-      vym_estudio_conductor: false,
-      vym_estudio_lector: true,
-      fds_presidente: false,
-      fds_atalaya_lector: true,
-      fds_oracion: true,
-      deber_acomodador: true,
-      deber_seguridad: true,
-      deber_audio: true,
-      deber_video: true,
-      deber_microfonos: true,
-      deber_plataforma: true,
-      deber_zoom: true,
-    });
-    setIsEditModalOpen(true);
-  };
-
-  const openEditModal = (pub: Publisher) => {
-    setSelectedPublisher(pub);
-    setFormName(pub.name);
-    setFormGender(pub.gender);
-    setFormPhone(pub.phone || '');
-    setFormNotes(pub.notes || '');
-    setFormGroup(pub.groupNumber || 1);
-    setFormActive(pub.active);
-    setFormAbsences([...pub.absences]);
-    setFormRoles({ ...pub.roles });
-    setFormPrivilege(pub.privilege || 'publicador_bautizado');
-    setFormTheocraticRole(pub.theocraticRole || 'publico');
-    setFormPersonalPin(pub.personalPin || '');
-    setFormPinError(null);
-    setIsEditModalOpen(true);
-  };
-
-  const handleGeneratePinInModal = () => {
-    const existingPins = publishers
-      .filter((p) => !selectedPublisher || p.id !== selectedPublisher.id)
-      .map((p) => p.personalPin?.trim())
-      .filter(Boolean) as string[];
-    const newPin = generateSecurePublisherPin(existingPins);
-    setFormPersonalPin(newPin);
-    setFormPinError(null);
-  };
-
-  const handleSavePublisher = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formName.trim()) return;
-
-    const cleanPin = formPersonalPin.trim();
-    if (cleanPin) {
-      if (cleanPin.length < 4) {
-        setFormPinError('El PIN debe tener al menos 4 dígitos numéricos.');
-        return;
-      }
-      // Validar unicidad estricta: ningún otro publicador puede tener este mismo PIN
-      const duplicate = publishers.find(
-        (p) =>
-          p.personalPin?.trim() === cleanPin &&
-          (!selectedPublisher || p.id !== selectedPublisher.id)
-      );
-      if (duplicate) {
-        setFormPinError(
-          `El PIN ${cleanPin} ya pertenece al hermano "${duplicate.name}". Los PINs deben ser únicos por publicador.`
-        );
-        return;
-      }
-    }
-
-    if (selectedPublisher) {
-      const updated: Publisher = {
-        ...selectedPublisher,
-        name: formName.trim(),
-        gender: formGender,
-        phone: formPhone.trim(),
-        notes: formNotes.trim(),
-        groupNumber: Number(formGroup) || 1,
-        active: formActive,
-        absences: formAbsences,
-        roles: formRoles as any,
-        privilege: formPrivilege,
-        theocraticRole: formTheocraticRole,
-        personalPin: cleanPin || undefined,
-      };
-      updatePublisher(updated);
-
-      if (cleanPin) {
-        assignPersonalPinToPublisher(
-          selectedPublisher.id,
-          cleanPin,
-          formTheocraticRole,
-          formName.trim(),
-          selectedPublisher.email,
-          formPrivilege
-        );
-      }
-      setPinActionFeedback(`¡Publicador ${formName.trim()} actualizado correctamente!`);
-      setTimeout(() => setPinActionFeedback(null), 2500);
-    } else {
-      const newPubId = `pub-${Date.now()}`;
-      const newPub: Publisher = {
-        id: newPubId,
-        name: formName.trim(),
-        gender: formGender,
-        phone: formPhone.trim(),
-        notes: formNotes.trim(),
-        groupNumber: Number(formGroup) || 1,
-        active: formActive,
-        absences: formAbsences,
-        roles: formRoles as any,
-        privilege: formPrivilege,
-        theocraticRole: formTheocraticRole,
-        personalPin: cleanPin || undefined,
-      };
-      addPublisher(newPub);
-
-      if (cleanPin) {
-        assignPersonalPinToPublisher(
-          newPubId,
-          cleanPin,
-          formTheocraticRole,
-          formName.trim(),
-          undefined,
-          formPrivilege
-        );
-      }
-      setPinActionFeedback(`¡Publicador ${formName.trim()} registrado con su PIN único!`);
-      setTimeout(() => setPinActionFeedback(null), 2500);
-    }
-    setIsEditModalOpen(false);
-  };
-
-  const handleAssignPinToSinglePub = (pub: Publisher) => {
-    const existingPins = publishers
-      .filter((p) => p.id !== pub.id)
-      .map((p) => p.personalPin?.trim())
-      .filter(Boolean) as string[];
-    const newPin = generateSecurePublisherPin(existingPins);
-    const role = pub.theocraticRole || 'publico';
-    const updated: Publisher = {
-      ...pub,
-      personalPin: newPin,
-      theocraticRole: role,
-    };
-    updatePublisher(updated);
-    assignPersonalPinToPublisher(pub.id, newPin, role, pub.name, pub.email, pub.privilege);
-    setPinActionFeedback(`¡PIN único ${newPin} asignado a ${pub.name}!`);
-    setTimeout(() => setPinActionFeedback(null), 3000);
-  };
-
-  const handleBatchGeneratePins = () => {
-    const missing = publishers.filter((p) => !p.personalPin);
-    if (missing.length === 0) {
-      setPinActionFeedback('Todos los publicadores ya cuentan con un PIN personal único asignado.');
-      setTimeout(() => setPinActionFeedback(null), 3000);
-      return;
-    }
-    const takenPins = publishers.map((p) => p.personalPin?.trim()).filter(Boolean) as string[];
-    missing.forEach((pub) => {
-      const pin = generateSecurePublisherPin(takenPins);
-      takenPins.push(pin);
-      const role = pub.theocraticRole || 'publico';
-      updatePublisher({
-        ...pub,
-        personalPin: pin,
-        theocraticRole: role,
-      });
-      assignPersonalPinToPublisher(pub.id, pin, role, pub.name, pub.email, pub.privilege);
-    });
-    setPinActionFeedback(`¡Se asignó un PIN único a ${missing.length} publicadores!`);
-    setTimeout(() => setPinActionFeedback(null), 3500);
-  };
-
-  const handleCopyCredentials = (pub: Publisher) => {
-    if (!pub.personalPin) return;
-    const roleTitle = pub.theocraticRole ? THEOCRATIC_ROLES[pub.theocraticRole]?.name : 'Publicador';
-    const privilegeTitle = pub.privilege
-      ? pub.privilege.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-      : 'Publicador';
-    const text = `🔐 ACCESO KONGRE - CREDENCIALES TEOCRÁTICAS\n━━━━━━━━━━━━━━━━━━━━\n👤 Publicador: ${pub.name}\n📜 Privilegio: ${privilegeTitle}\n🏛️ Rol Asignado: ${roleTitle}\n🔑 Tu PIN Personal Único: ${pub.personalPin}\n━━━━━━━━━━━━━━━━━━━━\nIntroduce tu PIN Personal en la app Kongre para identificarte y acceder a tus funciones teocráticas.`;
-    navigator.clipboard.writeText(text);
-    setCopiedPinId(pub.id);
-    setTimeout(() => setCopiedPinId(null), 2500);
-  };
-
-  const handleAddAbsence = () => {
-    if (!newAbsStart || !newAbsEnd) return;
-    const newAbs: Absence = {
-      id: `abs-${Date.now()}`,
-      startDate: newAbsStart,
-      endDate: newAbsEnd,
-      reason: newAbsReason.trim(),
-    };
-    setFormAbsences([...formAbsences, newAbs]);
-    setNewAbsStart('');
-    setNewAbsEnd('');
-    setNewAbsReason('');
-  };
-
-  const handleRemoveAbsence = (id: string) => {
-    setFormAbsences(formAbsences.filter(a => a.id !== id));
-  };
-
-  const handleToggleRole = (roleKey: string) => {
-    setFormRoles(prev => ({
-      ...prev,
-      [roleKey]: !prev[roleKey],
+  // Normalizar grupos de predicación
+  const groups = useMemo(() => {
+    return (preachingGroups || []).map((g) => ({
+      id: String(g.number),
+      name: g.name || `Grupo ${g.number}`,
+      number: g.number,
     }));
+  }, [preachingGroups]);
+
+  const groupOptions = useMemo(() => {
+    return [
+      { label: 'Todos los grupos', value: 'all' },
+      ...groups.map((g) => ({ label: g.name, value: g.id })),
+      { label: 'Sin asignar', value: 'unassigned' },
+    ];
+  }, [groups]);
+
+  const getBadgeLabel = (roleOrPrivilege?: string) => {
+    if (!roleOrPrivilege) return 'Publicador';
+    const labels: Record<string, string> = {
+      super_admin: 'Administrador',
+      elder: 'Anciano',
+      anciano: 'Anciano',
+      servant: 'Siervo Ministerial',
+      siervo_ministerial: 'Siervo Ministerial',
+      publisher: 'Publicador',
+      publicador_bautizado: 'Publicador Bautizado',
+      publicador_no_bautizado: 'No Bautizado',
+      unbaptized: 'No Bautizado',
+      special_pioneer: 'Precursor Especial',
+      precursor_especial: 'Precursor Especial',
+      regular_pioneer: 'Precursor Regular',
+      precursor_regular: 'Precursor Regular',
+      auxiliary_pioneer: 'Precursor Auxiliar',
+      precursor_auxiliar: 'Precursor Auxiliar',
+    };
+    return labels[roleOrPrivilege] || roleOrPrivilege;
   };
 
-  const handleImportCsv = () => {
-    if (!csvText.trim()) return;
-    const count = importPublishersFromCSV(csvText);
-    setCsvFeedback(`¡Se importaron ${count} publicadores correctamente!`);
-    setTimeout(() => {
-      setIsCsvModalOpen(false);
-      setCsvText('');
-      setCsvFeedback(null);
-    }, 1200);
+  const getBadgeColor = (roleOrPrivilege?: string) => {
+    const key = (roleOrPrivilege || '').toLowerCase();
+    if (key.includes('admin')) {
+      return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
+    }
+    if (key === 'elder' || key === 'anciano') {
+      return 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20';
+    }
+    if (key === 'servant' || key === 'siervo_ministerial') {
+      return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+    }
+    if (key.includes('regular') || key.includes('especial')) {
+      return 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20';
+    }
+    if (key === 'publisher' || key === 'publicador_bautizado') {
+      return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+    }
+    return 'bg-zinc-100 text-zinc-500 dark:bg-white/5 dark:text-zinc-400 border-zinc-200 dark:border-white/10';
   };
 
-  const exportPublishersCsv = () => {
-    const header = 'Nombre,Género,Teléfono,Grupo,Notas,Activo\n';
-    const rows = publishers
-      .map(
-        p =>
-          `"${p.name}","${p.gender}","${p.phone}","${p.groupNumber || 1}","${p.notes || ''}","${p.active ? 'Sí' : 'No'}"`
-      )
-      .join('\n');
-    const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Publicadores_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
+  // Helper para nombre y estado de publicador
+  const getPublisherDisplayName = (p: Publisher) => {
+    return p.full_name || p.name || [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Sin nombre';
   };
 
-  const downloadExampleCsv = () => {
-    const sample = `Nombre,Género,Teléfono,Grupo,Notas\n"Carlos Mendoza","hermano","+34 612 345 678",1,"Anciano"\n"Ana García","hermana","+34 655 778 899",1,"Precursora regular"\n"David Silva","hermano","+34 622 987 654",2,"Siervo ministerial"`;
-    const blob = new Blob([sample], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Ejemplo_Importacion_Publicadores.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
+  const isPublisherFemale = (p: Publisher) => {
+    return p.gender === 'female' || p.gender === 'hermana';
   };
 
-  // Publisher History
-  const publisherHistoryRecords = useMemo(() => {
-    if (!selectedPublisher) return [];
-    const list: Array<{
-      date: string;
-      meetingType: string;
-      partTitle: string;
-      role: string;
-      assistantName?: string;
-      status: string;
-    }> = [];
+  const getPublisherGroupId = (p: Publisher) => {
+    if (p.id_grupo) return String(p.id_grupo);
+    if (p.groupNumber !== undefined && p.groupNumber !== null) return String(p.groupNumber);
+    return null;
+  };
 
-    weeks.forEach(w => {
-      const pid = selectedPublisher.id;
-      // Midweek
-      if (w.midweek.presidentId === pid) {
-        list.push({ date: w.midweek.date, meetingType: 'Entre Semana', partTitle: 'Presidente', role: 'Presidente', status: 'confirmada' });
-      }
-      if (w.midweek.initialPrayerId === pid) {
-        list.push({ date: w.midweek.date, meetingType: 'Entre Semana', partTitle: 'Oración inicial', role: 'Oración', status: 'confirmada' });
-      }
-      if (w.midweek.finalPrayerId === pid) {
-        list.push({ date: w.midweek.date, meetingType: 'Entre Semana', partTitle: 'Oración final', role: 'Oración', status: 'confirmada' });
-      }
-      if (w.midweek.tesoros.discurso.publisherId === pid) {
-        list.push({ date: w.midweek.date, meetingType: 'Entre Semana', partTitle: w.midweek.tesoros.discurso.title, role: 'Tesoros Discurso', status: w.midweek.tesoros.discurso.status });
-      }
-      if (w.midweek.tesoros.perlas.publisherId === pid) {
-        list.push({ date: w.midweek.date, meetingType: 'Entre Semana', partTitle: w.midweek.tesoros.perlas.title, role: 'Perlas', status: w.midweek.tesoros.perlas.status });
-      }
-      if (w.midweek.tesoros.lecturaBiblia.publisherId === pid) {
-        list.push({ date: w.midweek.date, meetingType: 'Entre Semana', partTitle: 'Lectura de la Biblia', role: 'Lectura', status: w.midweek.tesoros.lecturaBiblia.status });
-      }
-      w.midweek.maestros.items.forEach(m => {
-        if (m.publisherId === pid) {
-          const asst = publishers.find(p => p.id === m.assistantId)?.name;
-          list.push({ date: w.midweek.date, meetingType: 'Entre Semana', partTitle: m.title, role: 'Demostración (Titular)', assistantName: asst, status: m.status });
-        }
-        if (m.assistantId === pid) {
-          const tit = publishers.find(p => p.id === m.publisherId)?.name;
-          list.push({ date: w.midweek.date, meetingType: 'Entre Semana', partTitle: m.title, role: 'Ayudante', assistantName: `Con: ${tit}`, status: m.status });
-        }
-      });
-      w.midweek.vidaCristiana.items.forEach(v => {
-        if (v.publisherId === pid) {
-          list.push({ date: w.midweek.date, meetingType: 'Entre Semana', partTitle: v.title, role: 'Vida Cristiana', status: v.status });
-        }
-      });
-      if (w.midweek.vidaCristiana.estudioBiblico.conductorId === pid) {
-        list.push({ date: w.midweek.date, meetingType: 'Entre Semana', partTitle: 'Conductor Estudio Bíblico', role: 'Conductor', status: 'confirmada' });
-      }
-      if (w.midweek.vidaCristiana.estudioBiblico.lectorId === pid) {
-        list.push({ date: w.midweek.date, meetingType: 'Entre Semana', partTitle: 'Lector Estudio Bíblico', role: 'Lector', status: 'confirmada' });
-      }
-      Object.entries(w.midweek.duties).forEach(([dKey, ids]) => {
-        if (ids.includes(pid)) {
-          list.push({ date: w.midweek.date, meetingType: 'Entre Semana', partTitle: dKey.replace('deber_', '').toUpperCase(), role: 'Deber', status: 'confirmada' });
-        }
-      });
+  const getPublisherGroupName = (p: Publisher) => {
+    const gid = getPublisherGroupId(p);
+    if (!gid) return '—';
+    const found = groups.find((g) => g.id === gid || String(g.number) === gid);
+    return found ? found.name : `Grupo ${gid}`;
+  };
 
-      // Weekend
-      if (w.weekend.presidentId === pid) {
-        list.push({ date: w.weekend.date, meetingType: 'Fin de Semana', partTitle: 'Presidente Fin de Semana', role: 'Presidente', status: 'confirmada' });
-      }
-      if (w.weekend.atalayaConductorId === pid) {
-        list.push({ date: w.weekend.date, meetingType: 'Fin de Semana', partTitle: 'Conductor Atalaya', role: 'Conductor', status: 'confirmada' });
-      }
-      if (w.weekend.atalayaLectorId === pid) {
-        list.push({ date: w.weekend.date, meetingType: 'Fin de Semana', partTitle: 'Lector Atalaya', role: 'Lector', status: 'confirmada' });
-      }
-      if (w.weekend.initialPrayerId === pid || w.weekend.finalPrayerId === pid) {
-        list.push({ date: w.weekend.date, meetingType: 'Fin de Semana', partTitle: 'Oración Fin de Semana', role: 'Oración', status: 'confirmada' });
-      }
-      Object.entries(w.weekend.duties).forEach(([dKey, ids]) => {
-        if (ids.includes(pid)) {
-          list.push({ date: w.weekend.date, meetingType: 'Fin de Semana', partTitle: dKey.replace('deber_', '').toUpperCase(), role: 'Deber', status: 'confirmada' });
+  // Filtrado y orden
+  const sortedAndFilteredPublishers = useMemo(() => {
+    return publishers
+      .filter((p) => {
+        const displayName = getPublisherDisplayName(p).toLowerCase();
+        const matchesSearch =
+          displayName.includes(searchTerm.toLowerCase()) ||
+          (p.phone && p.phone.includes(searchTerm)) ||
+          (p.email && p.email.toLowerCase().includes(searchTerm.toLowerCase()));
+
+        // Manejo de papelera
+        const isDeleted = p.status === 'deleted';
+        if (roleFilter === 'trash') {
+          return isDeleted && matchesSearch;
         }
+        if (isDeleted) return false;
+
+        // Rol filter
+        const roleKey = (p.role || p.privilege || '').toLowerCase();
+        let matchesRole = true;
+        if (roleFilter === 'elder') {
+          matchesRole = roleKey === 'elder' || roleKey === 'anciano' || roleKey === 'super_admin';
+        } else if (roleFilter === 'servant') {
+          matchesRole = roleKey === 'servant' || roleKey === 'siervo_ministerial';
+        } else if (roleFilter === 'publisher') {
+          matchesRole =
+            roleKey === 'publisher' ||
+            roleKey === 'publicador_bautizado' ||
+            roleKey === 'publicador_no_bautizado' ||
+            roleKey === 'unbaptized' ||
+            !roleKey;
+        }
+
+        // Grupo filter
+        const pGid = getPublisherGroupId(p);
+        let matchesGroup = true;
+        if (groupFilter === 'unassigned') {
+          matchesGroup = !pGid;
+        } else if (groupFilter !== 'all') {
+          matchesGroup = pGid === groupFilter;
+        }
+
+        return matchesSearch && matchesRole && matchesGroup;
+      })
+      .sort((a, b) => {
+        if (!sortField) return 0;
+        let aVal = '';
+        let bVal = '';
+
+        if (sortField === 'name') {
+          aVal = getPublisherDisplayName(a).toLowerCase();
+          bVal = getPublisherDisplayName(b).toLowerCase();
+        } else if (sortField === 'group') {
+          aVal = getPublisherGroupName(a).toLowerCase();
+          bVal = getPublisherGroupName(b).toLowerCase();
+        }
+
+        if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
       });
+  }, [publishers, searchTerm, roleFilter, groupFilter, sortField, sortDirection, groups]);
+
+  const handleSort = (field: 'name' | 'group') => {
+    if (sortField === field) {
+      if (sortDirection === 'asc') setSortDirection('desc');
+      else setSortField(null);
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const handleSave = async (data: Partial<Publisher>) => {
+    const fullName = data.full_name || [data.first_name, data.last_name].filter(Boolean).join(' ') || data.name || '';
+    const nid = data.nid || data.id || `pub-${Date.now()}`;
+    const groupNum = data.id_grupo ? parseInt(data.id_grupo, 10) : (data.groupNumber || 1);
+
+    const isFemale = data.gender === 'female' || data.gender === 'hermana';
+
+    // Mapeo sincronizado de roles booleano para compatibilidad con las demás pestañas de Kongre 2
+    const currentAssignments = data.assignments || {};
+    const rolesSynced = {
+      vym_presidente: !!currentAssignments.chairman,
+      vym_oracion: !!currentAssignments.prayers,
+      vym_tesoros_discurso: !!currentAssignments.talk,
+      vym_tesoros_perlas: !!currentAssignments.gems,
+      vym_tesoros_lectura: !!currentAssignments.reading,
+      vym_maestros_titular: !!currentAssignments.student,
+      vym_maestros_ayudante: !!currentAssignments.assistant_student,
+      vym_vida_partes: !!currentAssignments.living_parts,
+      vym_estudio_conductor: !!currentAssignments.bible_study,
+      vym_estudio_lector: !!currentAssignments.reader_living,
+      fds_presidente: !!currentAssignments.weekend_chairman,
+      fds_atalaya_lector: !!currentAssignments.watchtower_reader,
+      fds_oracion: !!currentAssignments.final_prayer,
+      deber_acomodador: !!currentAssignments.attendants_midweek || !!currentAssignments.attendants_weekend,
+      deber_seguridad: false,
+      deber_audio: !!currentAssignments.audio_video_midweek || !!currentAssignments.audio_video_weekend,
+      deber_video: !!currentAssignments.audio_video_midweek || !!currentAssignments.audio_video_weekend,
+      deber_microfonos: !!currentAssignments.microphones_midweek || !!currentAssignments.microphones_weekend,
+      deber_plataforma: !!currentAssignments.platform_task_midweek || !!currentAssignments.platform_task_weekend,
+      deber_zoom: false,
+      ...(data.roles || {}),
+    };
+
+    const targetPayload: Publisher = {
+      id: data.id || nid,
+      name: fullName,
+      full_name: fullName,
+      first_name: data.first_name,
+      middle_name: data.middle_name,
+      last_name: data.last_name,
+      second_last_name: data.second_last_name,
+      nid: nid,
+      gender: isFemale ? 'hermana' : 'hermano',
+      phone: data.phone || '',
+      email: data.email || '',
+      address: data.address || '',
+      birth_date: data.birth_date || data.birthDate || '',
+      birthDate: data.birth_date || data.birthDate || '',
+      baptism_date: data.baptism_date || data.baptismDate || '',
+      baptismDate: data.baptism_date || data.baptismDate || '',
+      role: data.role || 'publisher',
+      privilege: (data.privilege as any) || (data.role === 'elder' ? 'anciano' : data.role === 'servant' ? 'siervo_ministerial' : 'publicador_bautizado'),
+      groupNumber: groupNum,
+      id_grupo: data.id_grupo || String(groupNum),
+      active: data.status !== 'inactive' && data.status !== 'deleted' && data.is_active !== false,
+      status: data.status || 'active',
+      is_active: data.status !== 'inactive' && data.status !== 'deleted' && data.is_active !== false,
+      notes: data.notes || '',
+      spiritual_notes: data.spiritual_notes || '',
+      absences: (data.absences || []),
+      ausencias: (data.ausencias || []),
+      assignments: currentAssignments,
+      assignment_metadata: data.assignment_metadata || {},
+      s21_records: data.s21_records || {},
+      emergency_contacts: data.emergency_contacts || [],
+      roles: rolesSynced,
+      is_elderly: !!data.is_elderly,
+      is_infirm: !!data.is_infirm,
+      is_deaf: !!data.is_deaf,
+      is_blind: !!data.is_blind,
+      is_imprisoned: !!data.is_imprisoned,
+      is_head_of_household: !!data.is_head_of_household,
+      is_child: !!data.is_child,
+      is_moved: !!data.is_moved,
+      pioneer_type: data.pioneer_type || 'none',
+      has_key: !!data.has_key,
+      reports_to_branch: !!data.reports_to_branch,
+      is_disfellowshipped: !!data.is_disfellowshipped,
+      is_reinstated: !!data.is_reinstated,
+      group_responsibility: data.group_responsibility || 'none',
+      printed_guide: !!data.printed_guide,
+    };
+
+    try {
+      const existing = publishers.find((p) => p.id === targetPayload.id);
+      if (existing) {
+        updatePublisher(targetPayload);
+        showToast('¡Cambios guardados con éxito!', 'success');
+      } else {
+        addPublisher(targetPayload);
+        showToast('¡Nuevo publicador creado con éxito!', 'success');
+      }
+      setViewMode('list');
+      setEditingPublisher(null);
+    } catch (err: any) {
+      showToast(`Error al guardar: ${err.message}`, 'error');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    const pub = publishers.find((p) => p.id === id);
+    if (!pub) return;
+
+    if (roleFilter === 'trash') {
+      const confirmed = await confirm({
+        title: 'Eliminar Permanentemente',
+        message: `¿Borrar definitivamente a ${getPublisherDisplayName(pub)}? Esta acción no se puede deshacer.`,
+        confirmText: 'Borrar Definitivamente',
+        type: 'danger',
+      });
+      if (confirmed) {
+        await deletePublisher(id);
+        showToast('Publicador eliminado definitivamente', 'success');
+      }
+    } else {
+      const confirmed = await confirm({
+        title: 'Mover a Papelera',
+        message: `¿Mover a ${getPublisherDisplayName(pub)} a la papelera? Podrás restaurarlo en cualquier momento.`,
+        confirmText: 'Mover a Papelera',
+        type: 'danger',
+      });
+      if (confirmed) {
+        updatePublisher({
+          ...pub,
+          status: 'deleted',
+          active: false,
+          is_active: false,
+        });
+        showToast('Publicador movido a la papelera', 'success');
+      }
+    }
+  };
+
+  const handleRestore = (id: string) => {
+    const pub = publishers.find((p) => p.id === id);
+    if (!pub) return;
+    updatePublisher({
+      ...pub,
+      status: 'active',
+      active: true,
+      is_active: true,
     });
+    showToast('Publicador restaurado correctamente', 'success');
+  };
 
-    return list.sort((a, b) => b.date.localeCompare(a.date));
-  }, [selectedPublisher, weeks, publishers]);
+  // Render Editor Mode
+  if (viewMode === 'editor') {
+    return (
+      <div className="flex flex-col h-full overflow-hidden animate-in fade-in duration-500">
+        <div className="flex-1 overflow-y-auto px-4 pt-6 pb-6 custom-scrollbar relative">
+          <PublisherEditor
+            key={editingPublisher?.id || 'new'}
+            publisher={editingPublisher || {}}
+            onSave={handleSave}
+            onCancel={() => {
+              setViewMode('list');
+              setEditingPublisher(null);
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  const activePublishersCount = publishers.filter((p) => p.status === 'active' || (p.active && p.status !== 'deleted')).length;
+  const trashCount = publishers.filter((p) => p.status === 'deleted').length;
 
   return (
-    <div className="space-y-6">
-      {/* Pending Account Link Requests Banner */}
-      {pendingLinkCount > 0 && (
-        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
-              <UserCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-amber-900 dark:text-amber-200">
-                {pendingLinkCount} solicitud{pendingLinkCount > 1 ? 'es' : ''} de vinculación de correo pendiente{pendingLinkCount > 1 ? 's' : ''}
-              </h4>
-              <p className="text-xs text-amber-700 dark:text-amber-300">
-                Publicadores han verificado el PIN de la congregación y esperan aprobación para usar su cuenta de Google.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => setIsLinkModalOpen(true)}
-            className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition-all shrink-0 cursor-pointer text-center"
-          >
-            Revisar y Aprobar
-          </button>
-        </div>
-      )}
-
-      {/* Action Feedback Toast */}
-      {actionFeedbackToast && (
-        <div
-          className={`p-3.5 rounded-2xl text-xs font-bold text-center shadow-xs animate-in fade-in flex items-center justify-center gap-2 ${
-            actionFeedbackToast.type === 'success'
-              ? 'bg-emerald-600 text-white'
-              : 'bg-rose-600 text-white'
-          }`}
-        >
-          {actionFeedbackToast.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 text-emerald-200" />
-          ) : (
-            <AlertCircle className="w-4 h-4 text-rose-200" />
-          )}
-          <span>{actionFeedbackToast.message}</span>
-        </div>
-      )}
-
-      {/* PIN Action Feedback Banner */}
-      {pinActionFeedback && (
-        <div className="p-3.5 rounded-2xl bg-emerald-600 text-white text-xs font-bold text-center shadow-xs animate-in fade-in flex items-center justify-center gap-2">
-          <Sparkles className="w-4 h-4 text-emerald-200" />
-          <span>{pinActionFeedback}</span>
-        </div>
-      )}
-
-      {/* SectionHeader Kongre 1 Style */}
+    <div className="flex flex-col h-full overflow-hidden animate-in fade-in duration-500">
       <SectionHeader
         icon={Users}
         title="Directorio de"
         highlightWord="Publicadores"
-        subtitle={`${publishers.length} publicadores registrados • ${publishers.filter(p => p.active).length} activos`}
+        subtitle={`${activePublishersCount} miembros activos`}
+        colorTheme="indigo"
         actions={
-          <div className="flex flex-wrap items-center gap-2">
-            {publishers.some(p => !p.personalPin) && (
-              <button
-                onClick={handleBatchGeneratePins}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs sm:text-sm font-semibold transition-all shadow-xs cursor-pointer active:scale-95"
-                title="Asignar automáticamente un PIN único a cada publicador que aún no tenga uno"
-              >
-                <Sparkles className="w-4 h-4 text-emerald-500" />
-                <span>Auto-asignar PINs ({publishers.filter(p => !p.personalPin).length})</span>
-              </button>
-            )}
-
-            <button
-              onClick={() => setIsCsvModalOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-slate-700 dark:text-white/80 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold transition-all cursor-pointer"
-            >
-              <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>Importar CSV</span>
-            </button>
-
-            <button
-              onClick={exportPublishersCsv}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-slate-700 dark:text-white/80 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold transition-all cursor-pointer"
-              title="Exportar a CSV"
-            >
-              <Download className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-              <span className="hidden sm:inline">Exportar</span>
-            </button>
-
-            {publishers.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setIsConfirmClearAllOpen(true)}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs sm:text-sm font-semibold transition-all cursor-pointer"
-                title="Vaciar todos los publicadores"
-              >
-                <Trash2 className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                <span className="hidden sm:inline">Vaciar Lista</span>
-              </button>
-            )}
-
-            <button
-              onClick={openNewModal}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>Nuevo Publicador</span>
-            </button>
-          </div>
+          <button
+            disabled={!canEditPublishers}
+            onClick={() => {
+              setEditingPublisher(null);
+              setViewMode('editor');
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-500/90 hover:bg-indigo-500 dark:bg-indigo-500/20 dark:hover:bg-indigo-500/30 dark:text-indigo-300 text-white rounded-xl text-sm font-semibold transition-colors shadow-md dark:shadow-indigo-500/10 dark:border dark:border-indigo-500/20 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <UserPlus size={16} /> Nuevo Publicador
+          </button>
         }
       />
 
-      {/* KPI Stats Ribbon */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <div className="bg-white dark:bg-[#131d2e] border border-slate-200/70 dark:border-white/[0.06] rounded-2xl p-4 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-            <Users className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">{publishers.length}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Total Publicadores</div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-[#131d2e] border border-slate-200/70 dark:border-white/[0.06] rounded-2xl p-4 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">{publishers.filter(p => p.active).length}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Activos</div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-[#131d2e] border border-slate-200/70 dark:border-white/[0.06] rounded-2xl p-4 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">
-              {publishers.filter(p => p.spiritualStatus === 'elder' || p.spiritualStatus === 'ministerial_servant' || p.spiritualStatus === 'anciano' || p.spiritualStatus === 'siervo_ministerial').length}
-            </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Ancianos / Siervos</div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-[#131d2e] border border-slate-200/70 dark:border-white/[0.06] rounded-2xl p-4 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">
-              {publishers.filter(p => p.serviceRole === 'regular_pioneer' || p.serviceRole === 'special_pioneer' || p.serviceRole === 'precursor_regular').length}
-            </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Precursores Reg.</div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-[#131d2e] border border-slate-200/70 dark:border-white/[0.06] rounded-2xl p-4 shadow-xs flex items-center gap-3 col-span-2 sm:col-span-1">
-          <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
-            <KeyRound className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">
-              {publishers.filter(p => !!p.personalPin).length} <span className="text-xs font-normal text-slate-400">/ {publishers.length}</span>
-            </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Con PIN Asignado</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filter and search bar */}
-      <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs flex flex-col sm:flex-row gap-3 items-center justify-between">
-        <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Buscar por nombre, teléfono, notas..."
-            className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/40 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
-          />
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-          <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
-            <Filter className="w-3.5 h-3.5" />
-            <span>Filtros:</span>
+      <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6 custom-scrollbar">
+        {/* Barra de Filtros y Búsqueda */}
+        <div className="flex flex-col md:flex-row md:items-center gap-3 mb-5">
+          <div className="relative flex-1">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-black/30 dark:text-white/30" />
+            <input
+              className="kf-input kf-input-icon"
+              placeholder="Buscar publicadores..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
 
-          <select
-            value={filterGender}
-            onChange={e => setFilterGender(e.target.value)}
-            className="text-xs py-1.5 px-3 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/60 text-slate-700 dark:text-white/80 focus:ring-1 focus:ring-indigo-500"
-          >
-            <option value="all">Todos los géneros</option>
-            <option value="hermano">Hermanos</option>
-            <option value="hermana">Hermanas</option>
-          </select>
+          <div className="w-full md:w-56 shrink-0">
+            <Select
+              options={groupOptions}
+              value={groupFilter}
+              onChange={setGroupFilter}
+              buttonClassName="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-black/[0.04] text-black/60 hover:bg-black/[0.07] dark:bg-white/[0.05] dark:text-white/60 dark:hover:bg-white/[0.08] outline-none border-none cursor-pointer transition-colors"
+            />
+          </div>
 
-          <select
-            value={filterStatus}
-            onChange={e => setFilterStatus(e.target.value)}
-            className="text-xs py-1.5 px-3 rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-slate-800/60 text-slate-700 dark:text-white/80 focus:ring-1 focus:ring-indigo-500"
-          >
-            <option value="all">Todos los estados</option>
-            <option value="active">Solo Activos</option>
-            <option value="inactive">Solo Inactivos</option>
-            <option value="absent">Con Ausencia Actual</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Batch selection and action bar */}
-      {selectedPubIds.length > 0 ? (
-        <div className="bg-indigo-50/90 dark:bg-indigo-950/60 p-3.5 rounded-2xl border border-indigo-200 dark:border-indigo-800 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs animate-in fade-in">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">
-                {selectedPubIds.length}
-              </span>
-              <span className="text-xs font-bold text-indigo-950 dark:text-indigo-200">
-                publicador{selectedPubIds.length > 1 ? 'es' : ''} seleccionado{selectedPubIds.length > 1 ? 's' : ''}
-              </span>
-            </div>
+          <div className="flex gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-hide shrink-0 items-center">
             <button
-              type="button"
-              onClick={handleSelectAllFiltered}
-              className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
-            >
-              {filteredPublishers.length > 0 && filteredPublishers.every(p => selectedPubIds.includes(p.id))
-                ? 'Deseleccionar todos'
-                : 'Seleccionar todos los visibles'}
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setSelectedPubIds([])}
-              className="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsConfirmBatchDeleteOpen(true)}
-              className="px-4 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Eliminar seleccionados ({selectedPubIds.length})</span>
-            </button>
-          </div>
-        </div>
-      ) : (
-        publishers.length > 0 && (
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-zinc-400 px-1">
-            <span>
-              Mostrando {filteredPublishers.length} de {publishers.length} publicadores
-            </span>
-            <button
-              type="button"
-              onClick={handleSelectAllFiltered}
-              className="flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
-            >
-              <CheckSquare className="w-3.5 h-3.5" />
-              <span>Seleccionar múltiples para borrar</span>
-            </button>
-          </div>
-        )
-      )}
-
-      {/* Publishers grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-        {filteredPublishers.map(pub => {
-          const pubStat = stats.get(pub.id);
-          const today = new Date().toISOString().split('T')[0];
-          const currentAbsence = pub.absences.find(a => a.startDate <= today && a.endDate >= today);
-          const isSelected = selectedPubIds.includes(pub.id);
-
-          return (
-            <div
-              key={pub.id}
-              className={`bg-white rounded-2xl border p-4 sm:p-5 flex flex-col justify-between transition-all hover:shadow-md ${
-                isSelected
-                  ? 'border-indigo-500 ring-2 ring-indigo-500/30 bg-indigo-50/20'
-                  : !pub.active
-                  ? 'border-slate-200 bg-slate-50/70 opacity-80'
-                  : currentAbsence
-                  ? 'border-amber-200 bg-amber-50/20'
-                  : 'border-slate-200'
+              onClick={() => setRoleFilter('all')}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                roleFilter === 'all'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'bg-black/[0.04] text-black/50 hover:bg-black/[0.07] dark:bg-white/[0.05] dark:text-white/50 dark:hover:bg-white/[0.08]'
               }`}
             >
-              <div>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleSelectPub(pub.id)}
-                      className="p-1 -ml-1 text-slate-300 hover:text-indigo-600 transition-colors cursor-pointer"
-                      title={isSelected ? 'Deseleccionar' : 'Seleccionar'}
-                    >
-                      {isSelected ? (
-                        <CheckSquare className="w-4 h-4 text-indigo-600" />
-                      ) : (
-                        <Square className="w-4 h-4 text-slate-300 hover:text-slate-500" />
-                      )}
-                    </button>
-                    <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
-                        pub.gender === 'hermana'
-                          ? 'bg-rose-100 text-rose-700'
-                          : 'bg-indigo-100 text-indigo-700'
-                      }`}
-                    >
-                      {pub.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-tight">
-                          {pub.name}
-                        </h3>
-                        {!pub.active && (
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-600">
-                            Inactivo
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                        <span className="capitalize">{pub.gender}</span> • Grupo {pub.groupNumber || 1}
-                      </span>
-
-                      {/* Spiritual Privilege & Theocratic Role Badges */}
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {((settings.coordinatorName && pub.name.toLowerCase().trim() === settings.coordinatorName.toLowerCase().trim()) ||
-                          (settings.coordinatorEmail && pub.email && pub.email.toLowerCase().trim() === settings.coordinatorEmail.toLowerCase().trim()) ||
-                          pub.notes?.toLowerCase().includes('coordinador')) && (
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-purple-100 text-purple-900 border border-purple-200 flex items-center gap-1">
-                            <span>👑</span> Coordinador
-                          </span>
-                        )}
-                        {pub.privilege && pub.privilege !== 'publicador_bautizado' && (
-                          <span
-                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold capitalize ${
-                              pub.privilege === 'anciano'
-                                ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300'
-                                : pub.privilege === 'siervo_ministerial'
-                                ? 'bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-300'
-                                : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
-                            }`}
-                          >
-                            {pub.privilege.replace(/_/g, ' ')}
-                          </span>
-                        )}
-                        {pub.theocraticRole && pub.theocraticRole !== 'publico' && (
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-blue-100 text-blue-900 border border-blue-200">
-                            {THEOCRATIC_ROLES[pub.theocraticRole]?.shortName || pub.theocraticRole}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button
-                      onClick={() => {
-                        setSelectedPublisher(pub);
-                        setIsHistoryModalOpen(true);
-                      }}
-                      className="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
-                      title="Ver historial de asignaciones"
-                    >
-                      <History className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => openEditModal(pub)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
-                      title="Editar publicador"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPublisherToDelete(pub)}
-                      className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center cursor-pointer"
-                      title="Eliminar publicador"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* PIN Personal Único del Publicador */}
-                <div className="mt-3 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <KeyRound className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                    <span className="text-[11px] font-semibold text-slate-500 shrink-0">PIN:</span>
-                    {pub.personalPin ? (
-                      <span className="font-mono font-bold text-xs text-indigo-700 tracking-wider">
-                        {visiblePins[pub.id] ? pub.personalPin : '••••'}
-                      </span>
-                    ) : (
-                      <span className="text-[11px] text-amber-700 italic">Sin PIN asignado</span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-1 shrink-0">
-                    {pub.personalPin ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => setVisiblePins((prev) => ({ ...prev, [pub.id]: !prev[pub.id] }))}
-                          className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-white transition-colors cursor-pointer"
-                          title={visiblePins[pub.id] ? 'Ocultar PIN' : 'Ver PIN'}
-                        >
-                          {visiblePins[pub.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleCopyCredentials(pub)}
-                          className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-white transition-colors cursor-pointer"
-                          title="Copiar credenciales teocráticas para WhatsApp"
-                        >
-                          {copiedPinId === pub.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleAssignPinToSinglePub(pub)}
-                          className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 px-1 py-0.5 rounded hover:bg-white transition-colors cursor-pointer"
-                          title="Regenerar nuevo PIN único"
-                        >
-                          Regenerar
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => handleAssignPinToSinglePub(pub)}
-                        className="px-2 py-0.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
-                        title="Generar PIN personal único"
-                      >
-                        <Sparkles className="w-3 h-3" />
-                        <span>Generar PIN</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Absence Badge if present */}
-                {currentAbsence && (
-                  <div className="mt-3 px-3 py-1.5 rounded-lg bg-amber-100/80 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span className="truncate">
-                      Ausente: {currentAbsence.startDate} al {currentAbsence.endDate} {currentAbsence.reason ? `(${currentAbsence.reason})` : ''}
-                    </span>
-                  </div>
-                )}
-
-                {/* Notes or phone */}
-                <div className="mt-3 space-y-1.5 text-xs text-slate-600">
-                  {pub.phone && (
-                    <div className="flex items-center justify-between text-slate-500 bg-slate-50 p-2 rounded-xl border border-slate-100">
-                      {privacyModeEnabled ? (
-                        <div
-                          className="flex items-center gap-1.5 font-semibold text-slate-500"
-                          title="Protección de privacidad teocrática activa"
-                        >
-                          <Lock className="w-3.5 h-3.5 text-slate-400" />
-                          <span>{maskPhoneNumber(pub.phone)}</span>
-                        </div>
-                      ) : (
-                        <a
-                          href={`tel:${pub.phone}`}
-                          className="flex items-center gap-1.5 hover:text-indigo-600 font-semibold"
-                          title="Llamar"
-                        >
-                          <Phone className="w-3.5 h-3.5 text-slate-400" />
-                          <span>{pub.phone}</span>
-                        </a>
-                      )}
-                      {!privacyModeEnabled && (
-                        <a
-                          href={`https://wa.me/${pub.phone.replace(/[^0-9]/g, '')}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-bold text-[11px] hover:bg-emerald-100 transition-colors"
-                          title="Abrir chat de WhatsApp"
-                        >
-                          WhatsApp
-                        </a>
-                      )}
-                    </div>
-                  )}
-                  {pub.notes && (
-                    <p className="italic text-slate-500 text-[11px] line-clamp-2">"{pub.notes}"</p>
-                  )}
-                </div>
-
-                {/* Enabled roles summary badges */}
-                <div className="mt-3 pt-3 border-t border-slate-100 flex flex-wrap gap-1">
-                  {pub.roles.vym_presidente && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-700">
-                      Pres. VYM
-                    </span>
-                  )}
-                  {pub.roles.vym_tesoros_discurso && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700">
-                      Tesoros
-                    </span>
-                  )}
-                  {pub.roles.vym_maestros_titular && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-700">
-                      Estudiante
-                    </span>
-                  )}
-                  {pub.roles.vym_estudio_conductor && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-50 text-purple-700">
-                      Cond. Estudio
-                    </span>
-                  )}
-                  {pub.roles.fds_presidente && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700">
-                      Pres. FDS
-                    </span>
-                  )}
-                  {(pub.roles.deber_audio || pub.roles.deber_video) && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700">
-                      Audio y Video
-                    </span>
-                  )}
-                  {pub.roles.deber_microfonos && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700">
-                      Micrófonos
-                    </span>
-                  )}
-                  {pub.roles.deber_acomodador && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700">
-                      Acomodador
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Bottom stats pill */}
-              <div className="mt-4 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span>Participaciones: <strong className="text-slate-800">{pubStat?.total || 0}</strong></span>
-                <span className="text-[11px]">
-                  {pubStat?.lastDate ? `Última: ${pubStat.lastDate}` : 'Sin participaciones'}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* MODAL: ADD / EDIT PUBLISHER */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-100">
-            {/* Modal header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">
-                  {selectedPublisher ? 'Editar Publicador' : 'Registrar Nuevo Publicador'}
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Configura roles habilitados y fechas de ausencia para evitar cruces.
-                </p>
-              </div>
-              <button
-                onClick={() => setIsEditModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Modal form body */}
-            <form onSubmit={handleSavePublisher} className="flex-1 overflow-y-auto p-6 space-y-6">
-              {/* Basic Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Nombre Completo *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formName}
-                    onChange={e => setFormName(e.target.value)}
-                    placeholder="Ej. Carlos Mendoza"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Género *
-                  </label>
-                  <select
-                    value={formGender}
-                    onChange={e => setFormGender(e.target.value as Gender)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden bg-white"
-                  >
-                    <option value="hermano">Hermano (Varón)</option>
-                    <option value="hermana">Hermana (Mujer)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Teléfono / WhatsApp
-                  </label>
-                  <input
-                    type="tel"
-                    value={formPhone}
-                    onChange={e => setFormPhone(e.target.value)}
-                    placeholder="+34 600 000 000"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Grupo de Predicación
-                  </label>
-                  <select
-                    value={formGroup}
-                    onChange={e => setFormGroup(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden bg-white"
-                  >
-                    {[1, 2, 3, 4, 5, 6].map(num => (
-                      <option key={num} value={num}>
-                        Grupo #{num}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Status active/inactive switch */}
-              <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                <div>
-                  <p className="text-sm font-bold text-slate-800">Estado de Publicador</p>
-                  <p className="text-xs text-slate-500">
-                    Si está inactivo, el sistema alertará y evitará que sea asignado.
-                  </p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formActive}
-                    onChange={e => setFormActive(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-slate-300 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                </label>
-              </div>
-
-              {/* Privilegios Teocráticos y PIN Personal Único */}
-              <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/60 space-y-4">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-950 dark:text-indigo-200">
-                    Seguridad y Privilegios Teocráticos (PIN Único)
-                  </h4>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                      Privilegio Espiritual
-                    </label>
-                    <select
-                      value={formPrivilege}
-                      onChange={e => setFormPrivilege(e.target.value as TheocraticPrivilege)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium"
-                    >
-                      <option value="publicador_bautizado">Publicador Bautizado</option>
-                      <option value="anciano">Anciano</option>
-                      <option value="siervo_ministerial">Siervo Ministerial</option>
-                      <option value="precursor_regular">Precursor Regular</option>
-                      <option value="precursor_auxiliar">Precursor Auxiliar</option>
-                      <option value="precursor_especial">Precursor Especial</option>
-                      <option value="publicador_no_bautizado">Publicador No Bautizado</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                      Rol Asignado en Kongre
-                    </label>
-                    <select
-                      value={formTheocraticRole}
-                      onChange={e => setFormTheocraticRole(e.target.value as TheocraticRole)}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium"
-                    >
-                      <option value="publico">Publicador (Sin rol administrativo)</option>
-                      <option value="coordinador">Coordinador del Cuerpo de Ancianos</option>
-                      <option value="secretario">Secretario</option>
-                      <option value="superintendente_vym">Superintendente de Vida y Ministerio</option>
-                      <option value="siervo_territorios">Siervo de Territorios</option>
-                      <option value="siervo_literatura">Siervo de Literatura</option>
-                      <option value="siervo_cuentas">Siervo de Cuentas</option>
-                      <option value="siervo_discursos">Siervo de Discursos Públicos</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* PIN Personal Único del Publicador */}
-                <div className="pt-2 border-t border-indigo-100/80 dark:border-indigo-900/60">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                      <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                      <span>PIN Personal Único del Publicador:</span>
-                    </label>
-                    <button
-                      type="button"
-                      onClick={handleGeneratePinInModal}
-                      className="text-xs text-indigo-600 dark:text-indigo-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Generar nuevo PIN único</span>
-                    </button>
-                  </div>
-
-                  <input
-                    type="text"
-                    maxLength={6}
-                    value={formPersonalPin}
-                    onChange={e => {
-                      setFormPersonalPin(e.target.value.replace(/\D/g, ''));
-                      setFormPinError(null);
-                    }}
-                    placeholder="Ej. 4821 (4 dígitos numéricos)"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-base focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
-                  />
-
-                  {formPinError ? (
-                    <p className="text-xs font-bold text-rose-600 mt-1.5">{formPinError}</p>
-                  ) : (
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
-                      💡 El PIN es <strong>exclusivo e intransferible</strong> de este publicador. Al ingresar su PIN, el sistema reconoce quién es y activa sus permisos correspondientes.
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Notas adicionales
-                </label>
-                <input
-                  type="text"
-                  value={formNotes}
-                  onChange={e => setFormNotes(e.target.value)}
-                  placeholder="Ej. Conductor de grupo, precursor auxiliar en marzo, etc."
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
-                />
-              </div>
-
-              {/* AUSENCIAS TEMPORALES */}
-              <div className="space-y-3 pt-2 border-t border-slate-100">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                    <Calendar className="w-4 h-4 text-indigo-600" />
-                    <span>Ausencias Temporales (Bloqueo de asignaciones)</span>
-                  </h4>
-                </div>
-
-                {formAbsences.length > 0 && (
-                  <div className="space-y-2">
-                    {formAbsences.map(abs => (
-                      <div
-                        key={abs.id}
-                        className="flex items-center justify-between p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900"
-                      >
-                        <div>
-                          <strong className="font-semibold">
-                            {abs.startDate} al {abs.endDate}
-                          </strong>
-                          {abs.reason && <span className="ml-2 text-amber-700 italic">({abs.reason})</span>}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveAbsence(abs.id)}
-                          className="text-amber-700 hover:text-rose-600 p-1"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Add absence inputs */}
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                  <p className="text-xs font-semibold text-slate-600">Añadir nueva ausencia:</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <div>
-                      <span className="text-[10px] text-slate-500">Desde:</span>
-                      <input
-                        type="date"
-                        value={newAbsStart}
-                        onChange={e => setNewAbsStart(e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white"
-                      />
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500">Hasta:</span>
-                      <input
-                        type="date"
-                        value={newAbsEnd}
-                        onChange={e => setNewAbsEnd(e.target.value)}
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white"
-                      />
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-slate-500">Motivo (opcional):</span>
-                      <input
-                        type="text"
-                        value={newAbsReason}
-                        onChange={e => setNewAbsReason(e.target.value)}
-                        placeholder="Ej. Vacaciones"
-                        className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-white"
-                      />
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleAddAbsence}
-                    disabled={!newAbsStart || !newAbsEnd}
-                    className="w-full py-1.5 px-3 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-bold transition-all disabled:opacity-50"
-                  >
-                    + Registrar Ausencia
-                  </button>
-                </div>
-              </div>
-
-              {/* ROLES HABILITADOS (Casillas de verificación) */}
-              <div className="space-y-4 pt-2 border-t border-slate-100">
-                <h4 className="text-sm font-bold text-slate-900">
-                  Roles y Asignaciones Habilitadas
-                </h4>
-
-                {/* Vida y ministerio */}
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                  <p className="text-xs font-bold text-indigo-800 uppercase tracking-wider">
-                    Reunión Entre Semana (Vida y Ministerio)
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.vym_presidente)}
-                        onChange={() => handleToggleRole('vym_presidente')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Presidente de la reunión</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.vym_oracion)}
-                        onChange={() => handleToggleRole('vym_oracion')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Oraciones (Inicial / Final)</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.vym_tesoros_discurso)}
-                        onChange={() => handleToggleRole('vym_tesoros_discurso')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Tesoros: Discurso (10 mins)</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.vym_tesoros_perlas)}
-                        onChange={() => handleToggleRole('vym_tesoros_perlas')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Tesoros: Perlas escondidas</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.vym_tesoros_lectura)}
-                        onChange={() => handleToggleRole('vym_tesoros_lectura')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Tesoros: Lectura de la Biblia</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.vym_maestros_titular)}
-                        onChange={() => handleToggleRole('vym_maestros_titular')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Maestros: Titular (Demostraciones)</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.vym_maestros_ayudante)}
-                        onChange={() => handleToggleRole('vym_maestros_ayudante')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Maestros: Ayudante</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.vym_vida_partes)}
-                        onChange={() => handleToggleRole('vym_vida_partes')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Vida Cristiana: Partes</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.vym_estudio_conductor)}
-                        onChange={() => handleToggleRole('vym_estudio_conductor')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Estudio Bíblico: Conductor</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.vym_estudio_lector)}
-                        onChange={() => handleToggleRole('vym_estudio_lector')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Estudio Bíblico: Lector</span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Fin de semana */}
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                  <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                    Reunión de Fin de Semana
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.fds_presidente)}
-                        onChange={() => handleToggleRole('fds_presidente')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Presidente Fin de Semana</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.fds_atalaya_lector)}
-                        onChange={() => handleToggleRole('fds_atalaya_lector')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Lector de La Atalaya</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.fds_oracion)}
-                        onChange={() => handleToggleRole('fds_oracion')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Oraciones</span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Deberes operativos */}
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                  <p className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                    Deberes y Logística
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    <label className="flex items-center gap-2 cursor-pointer col-span-1 sm:col-span-2 bg-white/70 p-1.5 rounded-lg border border-slate-200/60">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.deber_audio || formRoles.deber_video)}
-                        onChange={() => {
-                          const nextVal = !(formRoles.deber_audio || formRoles.deber_video);
-                          setFormRoles(prev => ({
-                            ...prev,
-                            deber_audio: nextVal,
-                            deber_video: nextVal,
-                          }));
-                        }}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span className="font-semibold text-slate-800">Operador de Audio y Video</span>
-                      <span className="text-[10px] text-slate-400 font-normal ml-auto">Cabina / Pantallas</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.deber_microfonos)}
-                        onChange={() => handleToggleRole('deber_microfonos')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Micrófonos</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.deber_plataforma)}
-                        onChange={() => handleToggleRole('deber_plataforma')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Plataforma</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.deber_acomodador)}
-                        onChange={() => handleToggleRole('deber_acomodador')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Acomodador Auditorio / Puerta</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.deber_seguridad)}
-                        onChange={() => handleToggleRole('deber_seguridad')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Seguridad / Estacionamiento</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={Boolean(formRoles.deber_zoom)}
-                        onChange={() => handleToggleRole('deber_zoom')}
-                        className="rounded text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <span>Anfitrión de Zoom</span>
-                    </label>
-
-                    {/* Custom duties */}
-                    {customDuties.map(d => (
-                      <label key={d.id} className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={Boolean(formRoles[d.key])}
-                          onChange={() => handleToggleRole(d.key)}
-                          className="rounded text-indigo-600 focus:ring-indigo-500"
-                        />
-                        <span>{d.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal buttons */}
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
-                {selectedPublisher ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const pubToDel = selectedPublisher;
-                      setIsEditModalOpen(false);
-                      setPublisherToDelete(pubToDel);
-                    }}
-                    className="px-3.5 py-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-all"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Eliminar</span>
-                  </button>
-                ) : (
-                  <div />
-                )}
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditModalOpen(false)}
-                    className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-sm font-semibold cursor-pointer"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-sm cursor-pointer"
-                  >
-                    {selectedPublisher ? 'Guardar Cambios' : 'Registrar Publicador'}
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: CSV IMPORT */}
-      {isCsvModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
-                <span>Importar Publicadores desde CSV</span>
-              </h3>
-              <button
-                onClick={() => setIsCsvModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <p className="text-xs text-slate-500">
-              Pega el contenido de tu hoja de cálculo o archivo CSV con las columnas: <br />
-              <code className="text-[11px] bg-slate-100 px-1 py-0.5 rounded text-slate-800">
-                Nombre, Género, Teléfono, Grupo, Notas
-              </code>
-            </p>
-
+              Todos
+            </button>
             <button
-              onClick={downloadExampleCsv}
-              className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold underline flex items-center gap-1"
+              onClick={() => setRoleFilter('elder')}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                roleFilter === 'elder'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'bg-black/[0.04] text-black/50 hover:bg-black/[0.07] dark:bg-white/[0.05] dark:text-white/50 dark:hover:bg-white/[0.08]'
+              }`}
             >
-              <Download className="w-3.5 h-3.5" /> Descargar plantilla CSV de ejemplo
+              Anciano
+            </button>
+            <button
+              onClick={() => setRoleFilter('servant')}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                roleFilter === 'servant'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'bg-black/[0.04] text-black/50 hover:bg-black/[0.07] dark:bg-white/[0.05] dark:text-white/50 dark:hover:bg-white/[0.08]'
+              }`}
+            >
+              Siervos Min.
+            </button>
+            <button
+              onClick={() => setRoleFilter('publisher')}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                roleFilter === 'publisher'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'bg-black/[0.04] text-black/50 hover:bg-black/[0.07] dark:bg-white/[0.05] dark:text-white/50 dark:hover:bg-white/[0.08]'
+              }`}
+            >
+              Publicador
             </button>
 
-            <textarea
-              rows={6}
-              value={csvText}
-              onChange={e => setCsvText(e.target.value)}
-              placeholder={`"Carlos Mendoza","hermano","+34 612 345 678",1,"Anciano"\n"Ana García","hermana","+34 655 778 899",1,"Precursora"`}
-              className="w-full p-3 text-xs font-mono rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
-            />
+            <div className="w-px h-6 bg-black/10 dark:bg-white/10 mx-1 self-center" />
 
-            {csvFeedback && (
-              <p className="text-xs font-bold text-emerald-600 text-center animate-fade-in">
-                {csvFeedback}
-              </p>
-            )}
-
-            <div className="flex items-center justify-end gap-3 pt-2">
-              <button
-                onClick={() => setIsCsvModalOpen(false)}
-                className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-xs font-semibold"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleImportCsv}
-                disabled={!csvText.trim()}
-                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all disabled:opacity-50"
-              >
-                Procesar e Importar
-              </button>
-            </div>
+            <button
+              onClick={() => setRoleFilter('trash')}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                roleFilter === 'trash'
+                  ? 'bg-rose-500 text-white shadow-md'
+                  : 'bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20'
+              }`}
+            >
+              <Trash2 size={12} />
+              Papelera {trashCount > 0 && `(${trashCount})`}
+            </button>
           </div>
         </div>
-      )}
 
-      {/* MODAL: PUBLISHER HISTORY */}
-      {isHistoryModalOpen && selectedPublisher && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-xl w-full max-h-[85vh] flex flex-col p-6 shadow-2xl">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">{selectedPublisher.name}</h3>
-                <p className="text-xs text-slate-500">Historial de participaciones pasadas y programadas</p>
-              </div>
-              <button
-                onClick={() => setIsHistoryModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto py-4 space-y-3">
-              {publisherHistoryRecords.length === 0 ? (
-                <div className="text-center py-8 text-slate-400 text-sm">
-                  No hay participaciones registradas para este publicador en el programa actual.
-                </div>
-              ) : (
-                publisherHistoryRecords.map((rec, i) => (
-                  <div
-                    key={i}
-                    className="p-3 rounded-xl border border-slate-100 bg-slate-50 flex items-start justify-between gap-3 text-xs"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-slate-800">{rec.partTitle}</span>
-                        <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-indigo-50 text-indigo-700">
-                          {rec.role}
-                        </span>
+        {/* Tabla de Publicadores estilo Kongre */}
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-12 rounded-2xl overflow-hidden border border-black/[0.06] dark:border-white/[0.06] bg-white dark:bg-white/[0.03] shadow-sm shadow-indigo-100/50 dark:shadow-none">
+            <div className="overflow-x-auto">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th
+                      onClick={() => handleSort('name')}
+                      className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors select-none"
+                    >
+                      <div className="flex items-center gap-1">
+                        Publicador
+                        {sortField === 'name' &&
+                          (sortDirection === 'asc' ? <ChevronUp size={12} /> : <ChevronDown size={12} />)}
                       </div>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
-                        {rec.meetingType} • 📅 {rec.date}
-                      </p>
-                      {rec.assistantName && (
-                        <p className="text-[11px] text-slate-600 font-medium mt-1">
-                          Ayudante / Pareja: {rec.assistantName}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold capitalize ${
-                          rec.status === 'confirmada'
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : rec.status === 'rechazada'
-                            ? 'bg-rose-100 text-rose-800'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}
+                    </th>
+                    <th>Privilegio</th>
+                    <th>Contacto</th>
+                    <th
+                      onClick={() => handleSort('group')}
+                      className="cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors select-none"
+                    >
+                      <div className="flex items-center gap-1">
+                        Grupo
+                        {sortField === 'group' &&
+                          (sortDirection === 'asc' ? <ChevronUp size={12} /> : <ChevronDown size={12} />)}
+                      </div>
+                    </th>
+                    <th>Asignaciones</th>
+                    <th>Estado</th>
+                    <th style={{ width: 90, textAlign: 'center' }}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedAndFilteredPublishers.map((p) => {
+                    const isFemale = isPublisherFemale(p);
+                    const displayName = getPublisherDisplayName(p);
+                    const privilegeOrRole = p.role || p.privilege;
+                    const groupName = getPublisherGroupName(p);
+                    const isDeleted = p.status === 'deleted';
+                    const isActive = p.status === 'active' || (p.active && !isDeleted);
+
+                    // Mapeo de asignaciones para preview rápido
+                    const assignmentKeys = Object.entries(p.assignments || {})
+                      .filter(([_, val]) => !!val)
+                      .map(([k]) => k);
+
+                    return (
+                      <tr
+                        key={p.id}
+                        className="hover:bg-indigo-50/20 dark:hover:bg-white/[0.02] transition-colors cursor-pointer"
+                        onClick={() => {
+                          if (canEditPublishers) {
+                            setEditingPublisher(p);
+                            setViewMode('editor');
+                          }
+                        }}
                       >
-                        {rec.status}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+                        <td>
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center border border-white/10 shadow-sm"
+                              style={{
+                                background: isFemale
+                                  ? 'linear-gradient(135deg, #ec4899, #8b5cf6)'
+                                  : 'linear-gradient(135deg, #6366f1, #3b82f6)',
+                              }}
+                            >
+                              <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="white"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <circle cx="12" cy="8" r="4" />
+                                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                              </svg>
+                            </div>
+                            <div>
+                              <div className="font-semibold text-sm text-black/90 dark:text-white/90">
+                                {displayName}
+                              </div>
+                              {p.email && (
+                                <div className="text-[10px] text-black/40 dark:text-white/40">{p.email}</div>
+                              )}
+                            </div>
+                          </div>
+                        </td>
 
-            <div className="pt-4 border-t border-slate-100 flex justify-end">
-              <button
-                onClick={() => setIsHistoryModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
-              >
-                Cerrar
-              </button>
+                        <td>
+                          <span
+                            className={`inline-block whitespace-nowrap px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${getBadgeColor(
+                              privilegeOrRole
+                            )}`}
+                          >
+                            {getBadgeLabel(privilegeOrRole)}
+                          </span>
+                        </td>
+
+                        <td>
+                          <div className="text-xs text-black/60 dark:text-white/60">
+                            {p.phone || '—'}
+                          </div>
+                        </td>
+
+                        <td>
+                          <div className="text-xs font-medium text-black/70 dark:text-white/70">
+                            {groupName}
+                          </div>
+                        </td>
+
+                        <td>
+                          <div className="flex flex-wrap gap-1">
+                            {assignmentKeys.length > 0 ? (
+                              <>
+                                {assignmentKeys.slice(0, 2).map((a) => {
+                                  let label = a;
+                                  for (const group of ASSIGNMENT_GROUPS) {
+                                    const item = group.items.find((i) => i.id === a);
+                                    if (item) {
+                                      label = (item as any).shortLabel || item.label;
+                                      break;
+                                    }
+                                  }
+                                  // Legacy fallbacks
+                                  if (label === 'chairman') label = 'Presidente';
+                                  if (label === 'prayers') label = 'Oraciones';
+                                  if (label === 'talk') label = 'Tesoros';
+                                  if (label === 'reading') label = 'Lectura';
+                                  if (label === 'student') label = 'Estudiante';
+                                  if (label === 'attendants_midweek' || label === 'attendants_weekend') label = 'Acomodador';
+                                  if (label === 'audio_video_midweek' || label === 'audio_video_weekend') label = 'Audio/Video';
+                                  if (label === 'microphones_midweek' || label === 'microphones_weekend') label = 'Micrófonos';
+
+                                  return (
+                                    <span
+                                      key={a}
+                                      className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-black/[0.04] text-black/60 dark:bg-white/[0.06] dark:text-white/60"
+                                    >
+                                      {label}
+                                    </span>
+                                  );
+                                })}
+                                {assignmentKeys.length > 2 && (
+                                  <span className="text-[10px] font-semibold text-black/40 dark:text-white/40 self-center">
+                                    +{assignmentKeys.length - 2}
+                                  </span>
+                                )}
+                              </>
+                            ) : (
+                              <span className="text-[10px] text-black/30 dark:text-white/30">—</span>
+                            )}
+                          </div>
+                        </td>
+
+                        <td>
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${
+                              isActive ? 'badge-active' : 'badge-inactive'
+                            }`}
+                          >
+                            {isActive ? 'Activo' : 'Inactivo'}
+                          </span>
+                        </td>
+
+                        <td onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-center gap-1.5">
+                            {isDeleted ? (
+                              <>
+                                <button
+                                  disabled={!canEditPublishers}
+                                  onClick={() => handleRestore(p.id)}
+                                  title="Restaurar publicador"
+                                  className="p-1.5 rounded-lg transition-colors hover:bg-emerald-50 text-emerald-600 dark:hover:bg-emerald-500/10 dark:text-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                                >
+                                  <RefreshCcw size={14} />
+                                </button>
+                                <button
+                                  disabled={!canEditPublishers}
+                                  onClick={() => handleDelete(p.id)}
+                                  title="Eliminar definitivamente"
+                                  className="p-1.5 rounded-lg transition-colors hover:bg-rose-50 text-rose-600 dark:hover:bg-rose-500/10 dark:text-rose-400 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  disabled={!canEditPublishers}
+                                  onClick={() => {
+                                    setEditingPublisher(p);
+                                    setViewMode('editor');
+                                  }}
+                                  title="Editar publicador"
+                                  className="p-1.5 rounded-lg transition-colors hover:bg-black/[0.06] text-black/40 hover:text-indigo-600 dark:hover:bg-white/[0.08] dark:text-white/40 dark:hover:text-indigo-400 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                                >
+                                  <Edit2 size={14} />
+                                </button>
+                                <button
+                                  disabled={!canEditPublishers}
+                                  onClick={() => handleDelete(p.id)}
+                                  title="Mover a papelera"
+                                  className="p-1.5 rounded-lg transition-colors hover:bg-rose-50 text-black/40 hover:text-rose-500 dark:hover:bg-rose-500/10 dark:text-white/40 dark:hover:text-rose-400 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  {sortedAndFilteredPublishers.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="text-center py-12">
+                        <div className="flex flex-col items-center justify-center text-black/40 dark:text-white/40">
+                          <Users size={32} className="mb-2 opacity-50" />
+                          <p className="text-sm font-semibold">No se encontraron publicadores</p>
+                          <p className="text-xs text-black/30 dark:text-white/30 mt-0.5">
+                            {searchTerm ? 'Prueba con otro término de búsqueda' : 'Comienza creando un nuevo publicador'}
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
-      )}
-
-      {/* MODAL: CONFIRMAR ELIMINACIÓN DE PUBLICADOR */}
-      {publisherToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
-                  <Trash2 className="w-4 h-4" />
-                </div>
-                <h3 className="font-bold text-base text-slate-900">
-                  Eliminar Publicador
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setPublisherToDelete(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <p className="text-sm text-slate-600 leading-relaxed">
-              ¿Estás seguro de que deseas eliminar a <strong>{publisherToDelete.name}</strong> del directorio de publicadores?
-            </p>
-            <p className="text-xs text-slate-400">
-              Se eliminará de la lista y se liberarán automáticamente todas las asignaciones o tareas de reunión que tenga programadas.
-            </p>
-
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setPublisherToDelete(null)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold cursor-pointer"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmSingleDelete}
-                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>Sí, Eliminar Publicador</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: CONFIRMAR ELIMINACIÓN POR LOTE */}
-      {isConfirmBatchDeleteOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600">
-                  <Trash2 className="w-4 h-4" />
-                </div>
-                <h3 className="font-bold text-base text-slate-900">
-                  Eliminar {selectedPubIds.length} Publicadores
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsConfirmBatchDeleteOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <p className="text-sm text-slate-600 leading-relaxed">
-              ¿Estás seguro de que deseas eliminar permanentemente a los <strong>{selectedPubIds.length} publicadores</strong> seleccionados?
-            </p>
-            <p className="text-xs text-rose-500 font-medium">
-              Esta acción limpiará sus asignaciones programadas en todas las reuniones y grupos.
-            </p>
-
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setIsConfirmBatchDeleteOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold cursor-pointer"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmBatchDelete}
-                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>Sí, Eliminar {selectedPubIds.length} Publicadores</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: CONFIRMAR VACIAR TODOS LOS PUBLICADORES */}
-      {isConfirmClearAllOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center text-rose-700">
-                  <Trash2 className="w-4 h-4" />
-                </div>
-                <h3 className="font-bold text-base text-rose-950">
-                  Vaciar Todo el Directorio
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsConfirmClearAllOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <p className="text-sm text-slate-600 leading-relaxed">
-              ¿Estás seguro de que deseas eliminar <strong>todos los {publishers.length} publicadores</strong> de la congregación?
-            </p>
-            <p className="text-xs text-amber-600 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
-              Esta opción es útil si importaste datos de demostración o deseas reiniciar el padrón desde cero. La configuración del Salón y las fechas de reuniones se mantendrán.
-            </p>
-
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setIsConfirmClearAllOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-semibold cursor-pointer"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmClearAllPublishers}
-                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>Sí, Vaciar Todos los Publicadores</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Account Link Requests Modal */}
-      <AccountLinkRequestsModal
-        isOpen={isLinkModalOpen}
-        onClose={() => setIsLinkModalOpen(false)}
-      />
+      </div>
     </div>
   );
 };

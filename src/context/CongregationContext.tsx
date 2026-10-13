@@ -45,6 +45,7 @@ import {
   BranchReportS1,
   S1SubmissionStatus,
   ClmPrograma,
+  CongregationEvent,
 } from '../types';
 import { bridgeClmToWeek, bridgeWeekToClm } from '../utils/clmBridge';
 import { TheocraticRole } from '../utils/rbac';
@@ -65,6 +66,7 @@ import {
   INITIAL_QUARTERLY_AUDITS,
   INITIAL_MEMORIAL_PLANS,
   INITIAL_ASSEMBLIES,
+  INITIAL_CONGREGATION_EVENTS,
   INITIAL_LITERATURE_ITEMS,
   INITIAL_SPECIAL_ORDERS,
   INITIAL_GROUP_DISTRIBUTIONS,
@@ -109,6 +111,7 @@ interface CongregationContextType {
   quarterlyAudits: QuarterlyAudit[];
   memorialPlans: MemorialPlan[];
   theocraticAssemblies: TheocraticAssembly[];
+  congregationEvents: CongregationEvent[];
   literatureItems: LiteratureItem[];
   specialOrders: LiteratureSpecialOrder[];
   groupDistributions: LiteratureGroupDistribution[];
@@ -253,6 +256,11 @@ interface CongregationContextType {
   updateTheocraticAssembly: (assembly: TheocraticAssembly) => void;
   deleteTheocraticAssembly: (id: string) => void;
 
+  // Calendario de Eventos de la Congregación
+  addCongregationEvent: (event: Omit<CongregationEvent, 'id'>) => void;
+  updateCongregationEvent: (event: CongregationEvent) => void;
+  deleteCongregationEvent: (id: string) => void;
+
   // Literatura y Publicaciones (Formulario S-14)
   addLiteratureItem: (item: Omit<LiteratureItem, 'id'>) => void;
   updateLiteratureItem: (item: LiteratureItem) => void;
@@ -371,12 +379,33 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [weeks, setWeeks] = useState<WeekSchedule[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_weeks`);
     const initialRaw: WeekSchedule[] = saved ? JSON.parse(saved) : generateInitialWeeks();
+    const storedMidDay = typeof window !== 'undefined'
+      ? (localStorage.getItem('kongre_user_confirmed_midweek_day') || localStorage.getItem('kongre_midweek_day'))
+      : null;
+    const storedFdsDay = typeof window !== 'undefined'
+      ? (localStorage.getItem('kongre_user_confirmed_weekend_day') || localStorage.getItem('kongre_weekend_day'))
+      : null;
+
     const mapped = initialRaw.map(w => {
+      let base = w;
       if (isWeekNeedingOrganizedSync(w)) {
         const org = getOrganizedScheduleForWeek(w.id, w.weekStartDate);
-        return org ? applyOrganizedToWeek(w, org) : w;
+        base = org ? applyOrganizedToWeek(w, org) : w;
       }
-      return w;
+      if (storedMidDay || storedFdsDay) {
+        base = {
+          ...base,
+          midweek: {
+            ...base.midweek,
+            date: getMeetingDateForWeek(base.weekStartDate, storedMidDay || undefined, 2),
+          },
+          weekend: {
+            ...base.weekend,
+            date: getMeetingDateForWeek(base.weekStartDate, storedFdsDay || undefined, 6),
+          },
+        };
+      }
+      return base;
     });
     return unifyWeeksDuties(mapped);
   });
@@ -604,6 +633,16 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return saved ? JSON.parse(saved) : INITIAL_ASSEMBLIES;
   });
 
+  const [congregationEvents, setCongregationEvents] = useState<CongregationEvent[]>(() => {
+    const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_congregation_events`);
+    return saved ? JSON.parse(saved) : INITIAL_CONGREGATION_EVENTS;
+  });
+
+  const latestCongregationEventsRef = useRef<CongregationEvent[]>(congregationEvents);
+  useEffect(() => {
+    latestCongregationEventsRef.current = congregationEvents;
+  }, [congregationEvents]);
+
   const [literatureItems, setLiteratureItems] = useState<LiteratureItem[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_literature_items`);
     return saved ? JSON.parse(saved) : INITIAL_LITERATURE_ITEMS;
@@ -780,6 +819,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const savedAudits = parseKey<QuarterlyAudit[]>('quarterly_audits', quarterlyAudits);
     const savedMemorial = parseKey<MemorialPlan[]>('memorial_plans', memorialPlans);
     const savedAssemblies = parseKey<TheocraticAssembly[]>('assemblies', theocraticAssemblies);
+    const savedEvents = parseKey<CongregationEvent[]>('congregation_events', congregationEvents);
     const savedLitItems = parseKey<LiteratureItem[]>('literature_items', literatureItems);
     const savedSpecialOrders = parseKey<LiteratureSpecialOrder[]>('special_orders', specialOrders);
     const savedGroupDist = parseKey<LiteratureGroupDistribution[]>('group_distributions', groupDistributions);
@@ -821,6 +861,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       maintenanceSheets: Array.isArray(savedMaintenance) ? savedMaintenance : maintenanceSheets,
       auxPioneerRequests: Array.isArray(savedAuxPioneer) ? savedAuxPioneer : auxPioneerRequests,
       branchReportsS1: Array.isArray(savedBranchS1) ? savedBranchS1 : branchReportsS1,
+      congregationEvents: Array.isArray(savedEvents) ? savedEvents : congregationEvents,
     };
   };
 
@@ -1096,6 +1137,21 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
       }
+      if (finalMidDay || finalFdsDay) {
+        setWeeks((prevWeeks) =>
+          prevWeeks.map((w) => ({
+            ...w,
+            midweek: {
+              ...w.midweek,
+              date: getMeetingDateForWeek(w.weekStartDate, finalMidDay, 2),
+            },
+            weekend: {
+              ...w.weekend,
+              date: getMeetingDateForWeek(w.weekStartDate, finalFdsDay, 6),
+            },
+          }))
+        );
+      }
     }
     if (data.outgoingSpeakers && Array.isArray(data.outgoingSpeakers)) {
       setOutgoingSpeakers(data.outgoingSpeakers);
@@ -1204,6 +1260,11 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (data.branchReportsS1 && Array.isArray(data.branchReportsS1)) {
       setBranchReportsS1(data.branchReportsS1);
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_branch_reports_s1`, JSON.stringify(data.branchReportsS1));
+    }
+    if (data.congregationEvents && Array.isArray(data.congregationEvents)) {
+      setCongregationEvents(data.congregationEvents);
+      latestCongregationEventsRef.current = data.congregationEvents;
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_congregation_events`, JSON.stringify(data.congregationEvents));
     }
   };
 
@@ -1428,8 +1489,17 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     newInventoryRecords = inventoryRecords,
     newAccountLinkRequests = accountLinkRequests,
     newClm = clmProgramas,
+    newEventsOrOptions?: CongregationEvent[] | { immediate?: boolean },
     options?: { immediate?: boolean }
   ) => {
+    let resolvedEvents = latestCongregationEventsRef.current;
+    let resolvedOptions = options;
+    if (Array.isArray(newEventsOrOptions)) {
+      resolvedEvents = newEventsOrOptions;
+    } else if (newEventsOrOptions && typeof newEventsOrOptions === 'object') {
+      resolvedOptions = newEventsOrOptions;
+    }
+
     const nowISO = new Date().toISOString();
     localStorage.setItem('kongre_last_local_update', nowISO);
 
@@ -1531,6 +1601,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       maintenanceSheets,
       auxPioneerRequests,
       branchReportsS1,
+      congregationEvents: resolvedEvents,
       congregationId: congDocId,
       updatedAt: nowISO,
     });
@@ -1580,7 +1651,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
     };
 
-    if (options?.immediate) {
+    if (resolvedOptions?.immediate) {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
         saveTimeoutRef.current = null;
@@ -3169,10 +3240,36 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       console.warn('Error guardando settings localmente:', e);
     }
 
+    // Sincronizar fechas calculadas de reuniones en todas las semanas si se definen los días
+    let updatedWeeks = weeks;
+    if (merged.midweekMeetingDay || merged.weekendMeetingDay) {
+      updatedWeeks = weeks.map((w) => {
+        const mwDate = getMeetingDateForWeek(w.weekStartDate, merged.midweekMeetingDay, 2);
+        const weDate = getMeetingDateForWeek(w.weekStartDate, merged.weekendMeetingDay, 6);
+        return {
+          ...w,
+          midweek: {
+            ...w.midweek,
+            date: mwDate,
+          },
+          weekend: {
+            ...w.weekend,
+            date: weDate,
+          },
+        };
+      });
+      setWeeks(updatedWeeks);
+      try {
+        localStorage.setItem(`${LOCAL_STORAGE_KEY}_weeks`, JSON.stringify(updatedWeeks));
+      } catch (err) {
+        console.warn('Error guardando semanas actualizadas:', err);
+      }
+    }
+
     // Ejecutar guardado en la nube en segundo plano sin bloquear ni congelar la interfaz
     saveToFirestore(
       publishers,
-      weeks,
+      updatedWeeks,
       preachingGroups,
       customDuties,
       merged,
@@ -3194,6 +3291,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       inventoryRecords,
       accountLinkRequests,
       clmProgramas,
+      latestCongregationEventsRef.current,
       { immediate: true }
     ).catch((err) => {
       console.warn('Aviso guardando en nube tras updateSettings:', err);
@@ -3642,6 +3740,123 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     );
   };
 
+  // Calendario de Eventos de la Congregación
+  const addCongregationEvent = (eventData: Omit<CongregationEvent, 'id'>) => {
+    const newEvent: CongregationEvent = {
+      ...eventData,
+      id: `evt-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`,
+      congregation_id: settings.congregationId || settings.congregationName || 'default',
+    };
+    const updated = [newEvent, ...congregationEvents];
+    latestCongregationEventsRef.current = updated;
+    setCongregationEvents(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_congregation_events`, JSON.stringify(updated));
+    } catch (err) {
+      console.error('Error saving congregation events:', err);
+    }
+    saveToFirestore(
+      publishers,
+      weeks,
+      preachingGroups,
+      customDuties,
+      settings,
+      outgoingSpeakers,
+      fieldServiceMeetings,
+      cartLocations,
+      cartShifts,
+      notices,
+      monthlyReports,
+      territories,
+      circuitVisit,
+      transactions,
+      quarterlyAudits,
+      memorialPlans,
+      theocraticAssemblies,
+      literatureItems,
+      specialOrders,
+      groupDistributions,
+      inventoryRecords,
+      accountLinkRequests,
+      clmProgramas,
+      updated
+    );
+  };
+
+  const updateCongregationEvent = (event: CongregationEvent) => {
+    const updated = congregationEvents.map(e => (e.id === event.id ? event : e));
+    latestCongregationEventsRef.current = updated;
+    setCongregationEvents(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_congregation_events`, JSON.stringify(updated));
+    } catch (err) {
+      console.error('Error updating congregation event:', err);
+    }
+    saveToFirestore(
+      publishers,
+      weeks,
+      preachingGroups,
+      customDuties,
+      settings,
+      outgoingSpeakers,
+      fieldServiceMeetings,
+      cartLocations,
+      cartShifts,
+      notices,
+      monthlyReports,
+      territories,
+      circuitVisit,
+      transactions,
+      quarterlyAudits,
+      memorialPlans,
+      theocraticAssemblies,
+      literatureItems,
+      specialOrders,
+      groupDistributions,
+      inventoryRecords,
+      accountLinkRequests,
+      clmProgramas,
+      updated
+    );
+  };
+
+  const deleteCongregationEvent = (id: string) => {
+    const updated = congregationEvents.filter(e => e.id !== id);
+    latestCongregationEventsRef.current = updated;
+    setCongregationEvents(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_congregation_events`, JSON.stringify(updated));
+    } catch (err) {
+      console.error('Error deleting congregation event:', err);
+    }
+    saveToFirestore(
+      publishers,
+      weeks,
+      preachingGroups,
+      customDuties,
+      settings,
+      outgoingSpeakers,
+      fieldServiceMeetings,
+      cartLocations,
+      cartShifts,
+      notices,
+      monthlyReports,
+      territories,
+      circuitVisit,
+      transactions,
+      quarterlyAudits,
+      memorialPlans,
+      theocraticAssemblies,
+      literatureItems,
+      specialOrders,
+      groupDistributions,
+      inventoryRecords,
+      accountLinkRequests,
+      clmProgramas,
+      updated
+    );
+  };
+
   // Literatura y Publicaciones (Formulario S-14)
   const addLiteratureItem = (itemData: Omit<LiteratureItem, 'id'>) => {
     const newItem: LiteratureItem = {
@@ -4023,6 +4238,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if (Array.isArray(data.quarterlyAudits)) setQuarterlyAudits(data.quarterlyAudits);
       if (Array.isArray(data.memorialPlans)) setMemorialPlans(data.memorialPlans);
       if (Array.isArray(data.theocraticAssemblies)) setTheocraticAssemblies(data.theocraticAssemblies);
+      if (Array.isArray(data.congregationEvents)) setCongregationEvents(data.congregationEvents);
       if (Array.isArray(data.literatureItems)) setLiteratureItems(data.literatureItems);
       if (Array.isArray(data.specialOrders)) setSpecialOrders(data.specialOrders);
       if (Array.isArray(data.groupDistributions)) setGroupDistributions(data.groupDistributions);
@@ -4634,6 +4850,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         addTheocraticAssembly,
         updateTheocraticAssembly,
         deleteTheocraticAssembly,
+        congregationEvents,
+        addCongregationEvent,
+        updateCongregationEvent,
+        deleteCongregationEvent,
         addLiteratureItem,
         updateLiteratureItem,
         deleteLiteratureItem,

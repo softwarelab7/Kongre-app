@@ -102,6 +102,15 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   // System navigation modules index
   const navigationModules: SearchResultItem[] = useMemo(() => [
     {
+      id: 'mod-calendario',
+      category: 'modulos',
+      categoryLabel: 'Reuniones',
+      title: 'Calendario de la Congregación',
+      subtitle: 'Agenda mensual, visitas del SC, asambleas y eventos teocráticos',
+      icon: Calendar,
+      action: () => onNavigate('calendario'),
+    },
+    {
       id: 'mod-programa',
       category: 'modulos',
       categoryLabel: 'Reuniones',

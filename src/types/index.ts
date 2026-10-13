@@ -1,7 +1,7 @@
 // src/types/index.ts
 import type { TheocraticRole } from '../utils/rbac';
 
-export type Gender = 'hermano' | 'hermana';
+export type Gender = 'hermano' | 'hermana' | 'male' | 'female';
 
 export type AssignmentStatus = 'pendiente' | 'confirmada' | 'rechazada';
 
@@ -19,6 +19,24 @@ export interface Absence {
   startDate: string; // YYYY-MM-DD
   endDate: string;   // YYYY-MM-DD
   reason?: string;
+}
+
+export interface PublisherAbsence {
+  id: string;
+  start_date: string;
+  end_date: string;
+  reason?: string;
+}
+
+export interface PublisherChangeLog {
+  id: string;
+  nid: string;
+  campo: string;
+  valor_ant: string | null;
+  valor_new: string | null;
+  cambiado_por: string;
+  fecha: string;
+  nombre_publicador?: string;
 }
 
 export interface StudentLessonRecord {
@@ -91,13 +109,59 @@ export interface Publisher {
   pioneerStatus?: 'ninguno' | 'auxiliar_continuo' | 'regular' | 'especial';
   pioneerStartDate?: string; // YYYY-MM-DD
 
-  // Extensiones de compatibilidad CLM (Vida y Ministerio)
+  // Extensiones de compatibilidad CLM y Kongre Directorio
   nid?: string;
   full_name?: string;
-  status?: 'active' | 'inactive';
-  role?: 'elder' | 'servant' | 'publisher' | string;
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
+  second_last_name?: string;
+  nip?: string;
+  is_admin?: boolean;
+  role?: 'super_admin' | 'elder' | 'servant' | 'publisher' | 'unbaptized' | string;
+  status?: 'active' | 'irregular' | 'inactive' | 'removed' | 'deleted' | string;
+  is_approved?: boolean;
   spiritualStatus?: 'elder' | 'ministerial_servant' | 'anciano' | 'siervo_ministerial' | 'publicador' | 'publisher' | string;
   serviceRole?: 'regular_pioneer' | 'special_pioneer' | 'precursor_regular' | 'precursor_auxiliar' | 'publicador' | string;
+  privileges?: string[];
+  privilegios?: string[];
+  home_phone?: string;
+  birth_date?: string;
+  roles_array?: string[];
+  admin_permissions?: string[];
+  emergency_contacts?: any[];
+  assignment_metadata?: Record<string, any>;
+  s21_records?: Record<string, any[]>;
+  id_grupo?: string | null;
+  ausencias?: PublisherAbsence[];
+  is_elderly?: boolean;
+  is_infirm?: boolean;
+  is_deaf?: boolean;
+  is_blind?: boolean;
+  is_imprisoned?: boolean;
+  is_head_of_household?: boolean;
+  is_child?: boolean;
+  is_moved?: boolean;
+  baptism_date?: string;
+  publisher_date?: string;
+  last_visit_date?: string;
+  pioneer_type?: 'none' | 'auxiliary_continuous' | 'regular' | 'special' | 'missionary' | string;
+  is_active?: boolean;
+  is_regular?: boolean;
+  is_anointed?: boolean;
+  has_key?: boolean;
+  reports_to_branch?: boolean;
+  is_disfellowshipped?: boolean;
+  is_reinstated?: boolean;
+  spiritual_notes?: string;
+  group_responsibility?: 'none' | 'overseer' | 'assistant' | string;
+  is_inactive?: boolean;
+  printed_watchtower?: boolean;
+  printed_guide?: boolean;
+  is_cart_approved?: boolean;
+  cart_available_days?: number[];
+  fixed_cart_partner_nid?: string;
+
   assignments?: {
     chairman?: boolean;
     prayers?: boolean;
@@ -1033,6 +1097,17 @@ export interface ClmPrograma {
   lectura_semana?: string;
   rango_semana?: string;
   sala_auxiliar_habilitada?: boolean;
+}
+
+export interface CongregationEvent {
+  id: string;
+  congregation_id?: string;
+  title: string;
+  description?: string;
+  start_date: string;
+  end_date?: string;
+  horarios_diarios?: string; // JSON string with per-day schedules
+  type: 'visit' | 'assembly' | 'no_meeting' | 'memorial' | 'special' | 'meeting';
 }
 
 declare global {

@@ -69,6 +69,7 @@ import {
 
 export type ActiveTab =
   | 'inicio'
+  | 'calendario'
   | 'programacion'
   | 'clm_vmc'
   | 's89'
@@ -325,16 +326,22 @@ export const Navbar: React.FC<NavbarProps> = ({
   const departments: Department[] = [
     {
       id: 'reuniones',
-      title: 'Reuniones',
+      title: 'Reuniones y Calendario',
       shortTitle: 'Reuniones',
       icon: Calendar,
-      tabIds: ['programacion', 's89', 'discursos', 'hospitalidad'],
+      tabIds: ['calendario', 'programacion', 's89', 'discursos', 'hospitalidad'],
       items: [
+        {
+          id: 'calendario',
+          label: 'Calendario de la Congregación',
+          description: 'Visitas del SC, asambleas, conmemoración y agenda mensual interactiva',
+          icon: Calendar,
+        },
         {
           id: 'programacion',
           label: 'Reunión Entre Semana y Fin de Semana',
           description: 'Vida y Ministerio Cristianos y Fin de Semana en un solo programa',
-          icon: Calendar,
+          icon: ClipboardList,
         },
         {
           id: 's89',
@@ -555,10 +562,10 @@ export const Navbar: React.FC<NavbarProps> = ({
     },
     {
       id: 'reuniones',
-      title: 'Reuniones',
+      title: 'Reuniones y Calendario',
       icon: Calendar,
-      primaryTab: 'programacion' as ActiveTab,
-      tabIds: ['programacion', 's89', 'discursos'] as ActiveTab[],
+      primaryTab: 'calendario' as ActiveTab,
+      tabIds: ['calendario', 'programacion', 's89', 'discursos', 'hospitalidad'] as ActiveTab[],
       badge: undefined,
       badgeColor: undefined,
       colorClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400',
@@ -623,8 +630,10 @@ export const Navbar: React.FC<NavbarProps> = ({
     switch (tab) {
       case 'inicio':
         return 'Resumen';
+      case 'calendario':
+        return 'Calendario de la Congregación';
       case 'programacion':
-        return 'Calendario';
+        return 'Programa de Reuniones';
       case 'asistencia':
         return 'Estadísticas';
       case 'informe_s1':
@@ -900,96 +909,41 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Center: Segmented Capsule Switcher ([ Resumen ] [ Calendario ] [ Estadísticas ]) */}
-          <div className="hidden sm:inline-flex items-center p-1 rounded-full bg-slate-100/90 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 shadow-2xs">
-            <button
-              type="button"
-              onClick={() => handleSelectTab('inicio')}
-              className={`px-4 py-1 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                activeTab === 'inicio'
-                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold'
-                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
-              }`}
-            >
-              Resumen
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectTab('programacion')}
-              className={`px-4 py-1 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                activeTab === 'programacion'
-                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold'
-                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
-              }`}
-            >
-              Calendario
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSelectTab('asistencia')}
-              className={`px-4 py-1 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                activeTab === 'asistencia'
-                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold'
-                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
-              }`}
-            >
-              Estadísticas
-            </button>
-          </div>
-
-          {/* Right: Quick Utility Icons */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          {/* Right: Clean, Organized Utility Icons & User Menu */}
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             {/* Search Icon */}
             <button
               type="button"
               onClick={onOpenSearchModal}
-              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               title="Buscar (Ctrl+K)"
             >
               <Search className="w-4 h-4" />
             </button>
 
-            {/* Settings Icon */}
+            {/* Calendar Quick Access */}
             <button
               type="button"
-              onClick={() => handleSelectTab('ajustes')}
-              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-              title="Ajustes de la Congregación"
+              onClick={() => handleSelectTab('calendario')}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                activeTab === 'calendario'
+                  ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60 shadow-2xs font-bold'
+                  : 'text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+              }`}
+              title="Calendario de la Congregación"
             >
-              <Settings className="w-4 h-4" />
+              <Calendar className="w-4 h-4" />
             </button>
 
-            {/* Bell Notifications with orange dot */}
-            <button
-              type="button"
-              onClick={onOpenConflictsModal}
-              className="relative p-1.5 sm:p-2 rounded-xl text-amber-500 hover:text-amber-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-              title="Notificaciones & Cruces"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
-            </button>
-
-            {/* Session Lock Button (Green Lock) */}
-            <button
-              type="button"
-              onClick={lockSession}
-              className="p-1.5 sm:p-2 rounded-xl text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition cursor-pointer"
-              title="Bloquear sesión del Salón"
-            >
-              <Lock className="w-4 h-4" />
-            </button>
-
-            {/* App Móvil Capsule Pill Button */}
+            {/* App Móvil / QR Icon */}
             {onOpenQrModal ? (
               <button
                 type="button"
                 onClick={onOpenQrModal}
-                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-indigo-200 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 text-xs font-semibold hover:bg-indigo-100 transition cursor-pointer"
-                title="Abrir código QR y acceso App Móvil"
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                title="App Móvil y Código QR"
               >
-                <Smartphone className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>App Móvil</span>
+                <Smartphone className="w-4 h-4" />
               </button>
             ) : (
               <div className="hidden lg:flex items-center">
@@ -997,107 +951,167 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
-            {/* Google Cloud Status / Quick Connect Button */}
-            {user ? (
-              <button
-                type="button"
-                onClick={async () => {
+            {/* Bell Notifications with amber dot */}
+            <button
+              type="button"
+              onClick={onOpenConflictsModal}
+              className="relative w-9 h-9 rounded-xl flex items-center justify-center text-amber-500 hover:text-amber-600 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer"
+              title="Notificaciones & Cruces"
+            >
+              <Bell className="w-4 h-4" />
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
+            </button>
+
+            {/* Cloud Sync Status Icon */}
+            <button
+              type="button"
+              onClick={async () => {
+                if (user) {
                   try {
                     await uploadLocalDataToGoogle();
                   } catch {}
-                  handleSelectTab('ajustes');
-                }}
-                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition cursor-pointer"
-                title={`Sincronizado con Google (${user.email}). Pulsa para sincronizar o ver ajustes`}
-              >
-                <CloudCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                <span className="hidden xl:inline">Google Conectado</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => handleSelectTab('ajustes')}
-                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition cursor-pointer"
-                title="Tus datos se respaldan automáticamente en la nube bajo el ID de la congregación"
-              >
-                <CloudCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                <span className="hidden xl:inline">Respaldo automático</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              </button>
-            )}
+                }
+                handleSelectTab('ajustes');
+              }}
+              className="relative w-9 h-9 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/30 transition cursor-pointer"
+              title={
+                user
+                  ? `Sincronizado con Google (${user.email}). Pulsa para sincronizar o ver ajustes`
+                  : 'Respaldo automático activo en la nube. Pulsa para ver ajustes'
+              }
+            >
+              <CloudCheck className="w-4 h-4" />
+              <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-1.5 ring-white dark:ring-slate-900" />
+            </button>
 
-            {effectiveDisplayName && (
-              <button
-                type="button"
-                onClick={() => handleSelectTab('perfil')}
-                className="hidden md:inline-block max-w-[140px] truncate text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
-                title={effectiveDisplayName}
-              >
-                {effectiveDisplayName}
-              </button>
-            )}
+            {/* Divider */}
+            <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 hidden sm:block" />
 
             {/* Dark Mode Moon / Sun Toggle */}
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               title={isDark ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
             >
               {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            {/* Logout Button (sesión Google o sesión por PIN personal) */}
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer"
-              title="Cerrar sesión"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
+            {/* Divider */}
+            <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 hidden sm:block" />
 
-            {/* User Avatar Circle -> Navigates directly to personal profile */}
-            <button
-              type="button"
-              onClick={() => handleSelectTab('perfil')}
-              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full ${
-                activeTab === 'perfil' ? 'ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-900' : ''
-              } bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-xs cursor-pointer hover:ring-2 hover:ring-indigo-400/50 transition shrink-0 ml-1 overflow-hidden`}
-              title={`Mi Perfil (${effectiveDisplayName || 'Usuario'})`}
-            >
-              {(() => {
-                const effectiveAvatar =
-                  userProfile?.photoURL ||
-                  user?.photoURL ||
-                  settings?.coordinatorPhotoURL ||
-                  (typeof window !== 'undefined'
-                    ? (localStorage.getItem('kongre_user_photo') ||
-                       localStorage.getItem('kongre_google_photo') ||
-                       localStorage.getItem('kongre_coordinator_photo'))
-                    : null);
+            {/* User Profile Capsule & Dropdown Menu */}
+            <div className="relative ml-0.5" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setOpenDropdown((prev) => (prev === 'user' ? null : 'user'))}
+                className="flex items-center gap-2 p-1 pl-1 pr-1.5 sm:pr-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700/60 transition cursor-pointer"
+                title="Menú de cuenta y perfil"
+              >
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold flex items-center justify-center text-xs shadow-xs overflow-hidden ring-2 ring-indigo-500/20">
+                  {(() => {
+                    const effectiveAvatar =
+                      userProfile?.photoURL ||
+                      user?.photoURL ||
+                      settings?.coordinatorPhotoURL ||
+                      (typeof window !== 'undefined'
+                        ? localStorage.getItem('kongre_user_photo') ||
+                          localStorage.getItem('kongre_google_photo') ||
+                          localStorage.getItem('kongre_coordinator_photo')
+                        : null);
 
-                if (effectiveAvatar) {
-                  return (
-                    <img
-                      src={effectiveAvatar}
-                      alt="Usuario"
-                      className="w-full h-full rounded-full object-cover"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLElement).style.display = 'none';
+                    if (effectiveAvatar) {
+                      return (
+                        <img
+                          src={effectiveAvatar}
+                          alt="Usuario"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                      );
+                    }
+
+                    return (
+                      <span>
+                        {(effectiveDisplayName || user?.email || 'H').charAt(0).toUpperCase()}
+                      </span>
+                    );
+                  })()}
+                </div>
+                <span className="hidden xl:inline-block max-w-[100px] truncate text-xs font-semibold text-slate-700 dark:text-slate-200 text-left">
+                  {effectiveDisplayName?.split(' ')[0] || 'Mi Cuenta'}
+                </span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:inline-block" />
+              </button>
+
+              {/* Dropdown Menu Modal */}
+              {openDropdown === 'user' && (
+                <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                      {effectiveDisplayName || 'Usuario'}
+                    </p>
+                    <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                      {user?.email || (settings?.coordinatorName ? 'Coordinador' : 'Usuario')}
+                    </p>
+                  </div>
+
+                  <div className="p-1 space-y-0.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenDropdown(null);
+                        handleSelectTab('perfil');
                       }}
-                    />
-                  );
-                }
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
+                    >
+                      <User className="w-4 h-4 text-indigo-500" />
+                      <span>Mi Perfil</span>
+                    </button>
 
-                return (
-                  <span>
-                    {((effectiveDisplayName || user?.email || 'H').charAt(0)).toUpperCase()}
-                  </span>
-                );
-              })()}
-            </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenDropdown(null);
+                        handleSelectTab('ajustes');
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
+                    >
+                      <Settings className="w-4 h-4 text-indigo-500" />
+                      <span>Ajustes de la Congregación</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenDropdown(null);
+                        lockSession();
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
+                    >
+                      <Lock className="w-4 h-4 text-emerald-500" />
+                      <span>Bloquear Sesión con PIN</span>
+                    </button>
+                  </div>
+
+                  <div className="border-t border-slate-100 dark:border-slate-800 my-1 p-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenDropdown(null);
+                        handleLogout();
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition cursor-pointer text-left"
+                    >
+                      <LogOut className="w-4 h-4 text-rose-500" />
+                      <span>Cerrar Sesión</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>

@@ -821,3 +821,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+export const usePermissions = () => {
+  const { effectiveRoleInfo } = useAuth();
+  return {
+    canEditPublishers: effectiveRoleInfo?.canEditPublishers ?? true,
+    canViewS21: effectiveRoleInfo?.canViewS21 ?? true,
+    canEditS21: effectiveRoleInfo?.canEditS21 ?? true,
+    canEditSchedule: effectiveRoleInfo?.canEditSchedule ?? true,
+    canManageTerritories: effectiveRoleInfo?.canManageTerritories ?? true,
+    canManageLiterature: effectiveRoleInfo?.canManageLiterature ?? true,
+    canManageAccounts: effectiveRoleInfo?.canManageAccounts ?? true,
+  };
+};

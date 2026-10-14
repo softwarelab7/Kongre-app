@@ -1134,6 +1134,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <span>Ajustes de la Congregación</span>
                     </button>
 
+                    {onOpenRoleModal && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          onOpenRoleModal();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/50 rounded-xl transition cursor-pointer text-left"
+                      >
+                        <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        <span>Directorio de Roles y PINs</span>
+                      </button>
+                    )}
+
                     <button
                       type="button"
                       onClick={() => {
@@ -1246,9 +1260,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {effectiveDisplayName || 'Hermano'}
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-md bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 truncate">
-                      {effectiveRoleInfo?.name || 'Publicador'}
-                    </span>
+                    {onOpenRoleModal ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          onOpenRoleModal();
+                        }}
+                        className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 transition cursor-pointer flex items-center gap-1 truncate"
+                        title="Toca para ver o cambiar Roles y PINs"
+                      >
+                        <Shield className="w-2.5 h-2.5 shrink-0" />
+                        <span className="truncate">{effectiveRoleInfo?.name || 'Publicador'}</span>
+                      </button>
+                    ) : (
+                      <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-md bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 truncate">
+                        {effectiveRoleInfo?.name || 'Publicador'}
+                      </span>
+                    )}
                     {user?.email && (
                       <span className="text-[10px] text-slate-400 truncate">
                         • {user.email.split('@')[0]}

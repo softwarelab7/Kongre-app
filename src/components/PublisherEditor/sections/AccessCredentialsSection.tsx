@@ -26,18 +26,23 @@ import {
   X,
   Smartphone,
   Lock,
+  Save,
 } from 'lucide-react';
 
 interface AccessCredentialsSectionProps {
   formData: any;
   handleChange: (field: any, value: any) => void;
   showToast?: (message: string, type?: 'success' | 'error' | 'info') => void;
+  onSavePublisher?: () => void;
+  isSaving?: boolean;
 }
 
 export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> = ({
   formData,
   handleChange,
   showToast,
+  onSavePublisher,
+  isSaving = false,
 }) => {
   const {
     assignPersonalPinToPublisher,
@@ -46,11 +51,13 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
     publisherPinsList,
   } = useAuth();
 
-  const { settings } = useCongregation();
+  const { settings, updatePublisher, publishers } = useCongregation();
 
   const [showPin, setShowPin] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
   const [showSlipModal, setShowSlipModal] = useState(false);
+  const [isSavingLocal, setIsSavingLocal] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const publisherId = formData.id || formData.nid || 'nuevo_publicador';
@@ -62,6 +69,66 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
 
   const currentPin = formData.personalPin || (formData as any).pin || '';
   const currentRole: TheocraticRole = formData.theocraticRole || 'publico';
+
+  // Explicit Save PIN handler
+  const handleSavePin = async () => {
+    if (!currentPin || currentPin.trim().length < 4) {
+      if (showToast) {
+        showToast('El PIN debe tener al menos 4 dígitos para poder guardarlo', 'error');
+      }
+      return;
+    }
+
+    setIsSavingLocal(true);
+    try {
+      const cleanPin = currentPin.trim();
+
+      // 1. Asignar en AuthContext (lista reactiva de PINs de publicadores)
+      assignPersonalPinToPublisher(
+        publisherId,
+        cleanPin,
+        currentRole,
+        publisherName,
+        formData.email,
+        formData.privilege || formData.role
+      );
+
+      // 2. Actualizar el estado local de formData
+      handleChange('personalPin', cleanPin);
+      handleChange('theocraticRole', currentRole);
+
+      // 3. Persistir en la congregación (Firestore y LocalStorage)
+      const existingPub = publishers.find(
+        (p) => p.id === publisherId || (p as any).nid === publisherId
+      );
+      if (existingPub) {
+        updatePublisher({
+          ...existingPub,
+          personalPin: cleanPin,
+          theocraticRole: currentRole,
+        });
+      }
+
+      // 4. Si el formulario padre tiene un callback onSavePublisher, ejecutarlo
+      if (onSavePublisher) {
+        onSavePublisher();
+      }
+
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+
+      if (showToast) {
+        showToast(`¡PIN personal (${cleanPin}) guardado con éxito para ${publisherName}!`, 'success');
+      }
+    } catch (err) {
+      console.error('Error guardando PIN:', err);
+      if (showToast) {
+        showToast('Error al guardar el PIN. Inténtalo de nuevo.', 'error');
+      }
+    } finally {
+      setIsSavingLocal(false);
+    }
+  };
 
   const pinEvaluation = useMemo(() => {
     return evaluatePinStrength(currentPin);
@@ -243,6 +310,27 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
         <div className="flex items-center gap-2 flex-wrap">
           <button
             type="button"
+            onClick={handleSavePin}
+            disabled={!currentPin || currentPin.length < 4 || isSavingLocal}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${
+              saveSuccess
+                ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20'
+                : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/20'
+            }`}
+            title="Guardar PIN personal inmediatamente"
+          >
+            {isSavingLocal ? (
+              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : saveSuccess ? (
+              <Check size={14} className="text-white" />
+            ) : (
+              <Save size={14} />
+            )}
+            <span>{saveSuccess ? '¡Guardado!' : 'Guardar PIN'}</span>
+          </button>
+
+          <button
+            type="button"
             onClick={handleCopyCredentials}
             disabled={!currentPin}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-zinc-200 border border-slate-200/60 dark:border-white/[0.06] text-xs font-semibold transition-all cursor-pointer disabled:opacity-50 active:scale-95"
@@ -351,18 +439,47 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
             <div className="flex items-center gap-2 pt-3 flex-wrap">
               <button
                 type="button"
+                onClick={handleSavePin}
+                disabled={!currentPin || currentPin.length < 4 || isSavingLocal}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-xs sm:text-sm font-bold transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                  saveSuccess
+                    ? 'bg-emerald-600 shadow-emerald-600/20'
+                    : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/20'
+                }`}
+                title="Guardar PIN personal en el sistema"
+              >
+                {isSavingLocal ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Guardando PIN...</span>
+                  </>
+                ) : saveSuccess ? (
+                  <>
+                    <CheckCircle2 size={16} />
+                    <span>¡PIN Guardado Exitosamente!</span>
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    <span>Guardar PIN Personal</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
                 onClick={handleGenerateNewPin}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-bold transition-all cursor-pointer active:scale-95"
+                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-bold transition-all cursor-pointer active:scale-95"
               >
                 <Sparkles size={14} className="text-purple-600 dark:text-purple-400" />
-                <span>Generar PIN Seguro Aleatorio</span>
+                <span>Generar PIN Seguro</span>
               </button>
 
               {currentPin && (
                 <button
                   type="button"
                   onClick={handleRevokePin}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all cursor-pointer active:scale-95"
+                  className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all cursor-pointer active:scale-95"
                   title="Revocar PIN"
                 >
                   <Trash2 size={14} />
@@ -453,7 +570,53 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
         </div>
       </div>
 
-      {/* 4. MODAL: PAPELETA DE ACCESO TEOCRÁTICO (SLIP / QR NW SCHEDULER) */}
+      {/* 4. Barra Inferior de Confirmación y Guardado de Credenciales */}
+      <div className="bg-white dark:bg-[#0f1623] p-5 rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+            <ShieldCheck size={20} />
+          </div>
+          <div>
+            <h5 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+              Guardar Credenciales y Rol del Publicador
+            </h5>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              {currentPin ? `PIN listo (${currentPin}) con rol ${THEOCRATIC_ROLES[currentRole]?.shortName}. Pulsa para guardar.` : 'Asigna un PIN de al menos 4 dígitos para guardar.'}
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleSavePin}
+          disabled={!currentPin || currentPin.length < 4 || isSavingLocal}
+          className={`w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-white text-xs sm:text-sm font-bold transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+            saveSuccess
+              ? 'bg-emerald-600 shadow-emerald-600/20'
+              : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/20'
+          }`}
+          title="Guardar PIN y credenciales en el sistema"
+        >
+          {isSavingLocal ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span>Guardando...</span>
+            </>
+          ) : saveSuccess ? (
+            <>
+              <CheckCircle2 size={16} />
+              <span>¡Credenciales Guardadas!</span>
+            </>
+          ) : (
+            <>
+              <Save size={16} />
+              <span>Guardar Credenciales y PIN</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* 5. MODAL: PAPELETA DE ACCESO TEOCRÁTICO (SLIP / QR NW SCHEDULER) */}
       {showSlipModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-fade-in">
           <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-5">

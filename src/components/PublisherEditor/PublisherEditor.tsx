@@ -1007,7 +1007,9 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
               <AccessCredentialsSection 
                 formData={formData} 
                 handleChange={handleChange} 
-                showToast={showToast} 
+                showToast={showToast}
+                onSavePublisher={handleSaveClick}
+                isSaving={loading}
               />
             )}
 

@@ -45,7 +45,9 @@ interface AuthContextType {
   userRolesList: UserRoleRecord[];
   rolePinsMap: Record<TheocraticRole, RolePinAssignment>;
   publisherPinsList: PublisherPinRecord[];
-  identifyRoleByPersonalPin: (pin: string) => Promise<{ success: boolean; role?: TheocraticRole; name?: string; message: string }>;
+  currentPublisherId: string | null;
+  setIdentifiedPublisher: (publisherId: string | null, name?: string) => void;
+  identifyRoleByPersonalPin: (pin: string) => Promise<{ success: boolean; role?: TheocraticRole; name?: string; publisherId?: string; message: string }>;
   assignPersonalPinToPublisher: (
     publisherId: string,
     pin: string,
@@ -69,6 +71,7 @@ const LOCAL_STORAGE_ACTIVE_ROLE_KEY = 'kongre_active_role_v1';
 const LOCAL_STORAGE_ROLE_PINS_KEY = 'kongre_role_personal_pins_v2';
 const LOCAL_STORAGE_PUBLISHER_PINS_KEY = 'kongre_publisher_personal_pins_v4';
 const LOCAL_STORAGE_BROTHER_NAME_KEY = 'kongre_current_brother_name_v1';
+const LOCAL_STORAGE_PUBLISHER_ID_KEY = 'kongre_current_publisher_id_v2';
 
 // Default initial role pin assignments (vacíos por defecto: los PINs pertenecen a publicadores)
 const DEFAULT_ROLE_PINS: Record<TheocraticRole, RolePinAssignment> = {
@@ -101,6 +104,8 @@ const AuthContext = createContext<AuthContextType>({
   userRolesList: [],
   rolePinsMap: DEFAULT_ROLE_PINS,
   publisherPinsList: DEFAULT_PUBLISHER_PINS,
+  currentPublisherId: null,
+  setIdentifiedPublisher: () => {},
   identifyRoleByPersonalPin: async () => ({ success: false, message: '' }),
   assignPersonalPinToPublisher: () => ({ success: false, message: '' }),
   removePublisherPin: () => {},
@@ -207,6 +212,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentBrotherName, setCurrentBrotherName] = useState<string | null>(() => {
     return localStorage.getItem(LOCAL_STORAGE_BROTHER_NAME_KEY);
   });
+
+  // Current identified publisher ID (NW Scheduler personal access)
+  const [currentPublisherId, setCurrentPublisherId] = useState<string | null>(() => {
+    return localStorage.getItem(LOCAL_STORAGE_PUBLISHER_ID_KEY);
+  });
+
+  const setIdentifiedPublisher = (publisherId: string | null, name?: string) => {
+    setCurrentPublisherId(publisherId);
+    if (publisherId) {
+      localStorage.setItem(LOCAL_STORAGE_PUBLISHER_ID_KEY, publisherId);
+    } else {
+      localStorage.removeItem(LOCAL_STORAGE_PUBLISHER_ID_KEY);
+    }
+    if (name && !isGenericIdentityName(name)) {
+      setCurrentBrotherName(name);
+      localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, name);
+    }
+  };
 
   // User roles directory
   const [userRolesList, setUserRolesList] = useState<UserRoleRecord[]>(() => {
@@ -340,7 +363,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    */
   const identifyRoleByPersonalPin = async (
     pin: string
-  ): Promise<{ success: boolean; role?: TheocraticRole; name?: string; message: string }> => {
+  ): Promise<{ success: boolean; role?: TheocraticRole; name?: string; publisherId?: string; message: string }> => {
     const cleanPin = pin.trim();
     if (!cleanPin) {
       return { success: false, message: 'Ingresa tu PIN Personal.' };
@@ -379,11 +402,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCurrentBrotherName(brotherName);
         localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
       }
+      if (foundPublisher.publisherId) {
+        setIdentifiedPublisher(foundPublisher.publisherId, brotherName);
+      }
 
       return {
         success: true,
         role: foundPublisher.role,
         name: brotherName,
+        publisherId: foundPublisher.publisherId,
         message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[foundPublisher.role]?.name}.`,
       };
     }
@@ -773,6 +800,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await signOut(auth);
       setActiveRole('publico');
       setCurrentBrotherName(null);
+      setIdentifiedPublisher(null);
       setUserProfile(null);
       localStorage.removeItem(LOCAL_STORAGE_BROTHER_NAME_KEY);
       localStorage.removeItem('kongre_user_profile_active');
@@ -832,6 +860,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         userRolesList,
         rolePinsMap,
         publisherPinsList,
+        currentPublisherId,
+        setIdentifiedPublisher,
         identifyRoleByPersonalPin,
         assignPersonalPinToPublisher,
         removePublisherPin,

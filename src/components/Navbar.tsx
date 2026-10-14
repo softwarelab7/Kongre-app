@@ -529,8 +529,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         },
         {
           id: 'mi_vista',
-          label: 'Mi Portal de Publicador',
-          description: 'Ver mis próximas asignaciones y tareas asignadas',
+          label: 'NW Publisher (Mi Portal)',
+          description: 'Asignaciones, informe mensual S-4 y ausencias con PIN personal',
           icon: UserCheck,
         },
         {

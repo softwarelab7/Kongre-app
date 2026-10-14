@@ -29,6 +29,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Layers,
+  KeyRound,
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { useModal } from '../../context/ModalContext';
@@ -49,12 +50,14 @@ import { AssignmentsSection } from './sections/AssignmentsSection';
 import { S21RecordsSection } from './sections/S21RecordsSection';
 import { PrivilegesSection } from './sections/PrivilegesSection';
 import { MedicalDpaSection } from './sections/MedicalDpaSection';
+import { AccessCredentialsSection } from './sections/AccessCredentialsSection';
 import { PublisherHistoryPanel } from './PublisherHistoryPanel';
 
 export type Tab = 
   | 'all' 
   | 'personal' 
   | 'contact' 
+  | 'access'
   | 'medical' 
   | 'spiritual' 
   | 'assignments' 
@@ -76,6 +79,7 @@ export const TAB_CONFIG: Record<Tab, {
   all:         { label: 'Panel de Tarjetas',   icon: Layers,      color: 'text-indigo-600 dark:text-indigo-400',   gradient: 'from-indigo-600 via-indigo-600 to-violet-600', shadow: 'shadow-indigo-600/30', badge: 'Hub', desc: 'Panel de categorías teocráticas independientes' },
   personal:    { label: 'Información Personal', icon: User,        color: 'text-blue-600 dark:text-blue-400',       gradient: 'from-blue-600 to-indigo-600', shadow: 'shadow-blue-600/30', desc: 'Datos civiles, filiación y registro básico' },
   contact:     { label: 'Contacto y Ubicación', icon: MapPin,     color: 'text-cyan-600 dark:text-cyan-400',       gradient: 'from-cyan-600 to-blue-600', shadow: 'shadow-cyan-600/30', desc: 'Teléfono, móvil, dirección y mapas' },
+  access:      { label: 'Acceso y PIN',        icon: KeyRound,    color: 'text-purple-600 dark:text-purple-400',   gradient: 'from-purple-600 to-indigo-600', shadow: 'shadow-purple-600/30', desc: 'PIN personal, rol de sistema y credenciales estilo NW Scheduler' },
   medical:     { label: 'DPA & Salud',        icon: Stethoscope, color: 'text-rose-600 dark:text-rose-400',       gradient: 'from-rose-600 to-pink-600', shadow: 'shadow-rose-600/30', desc: 'Directriz médica anticipada y salud' },
   spiritual:   { label: 'Estado Espiritual',   icon: Shield,      color: 'text-emerald-600 dark:text-emerald-400', gradient: 'from-emerald-600 to-teal-600', shadow: 'shadow-emerald-600/30', desc: 'Bautismo, privilegios y rol eclesiástico' },
   assignments: { label: 'Asignaciones',       icon: CheckCircle, color: 'text-violet-600 dark:text-violet-400',   gradient: 'from-violet-600 to-purple-600', shadow: 'shadow-violet-600/30', desc: 'Partes de reunión, tareas y servicio' },
@@ -425,12 +429,18 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
             <button
               type="button"
-              onClick={handleBack}
+              onClick={() => {
+                if (activeTab !== 'all') {
+                  setActiveTab('all');
+                } else {
+                  handleBack();
+                }
+              }}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-zinc-200 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold transition-all cursor-pointer active:scale-95"
-              title="Volver a la lista de publicadores"
+              title={activeTab !== 'all' ? 'Volver al panel de tarjetas' : 'Volver a la lista de publicadores'}
             >
               <ArrowLeft size={16} />
-              <span>Volver</span>
+              <span>{activeTab !== 'all' ? 'Tarjetas' : 'Volver'}</span>
             </button>
 
             <button
@@ -608,6 +618,53 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
                 <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-cyan-600 dark:text-cyan-400 group-hover:translate-x-1 transition-transform">
                   <span>Abrir tarjeta de contacto</span>
+                  <ChevronRight size={16} />
+                </div>
+              </div>
+
+              {/* Contenedor: Acceso Teocrático y PIN (NW Scheduler) */}
+              <div 
+                onClick={() => setActiveTab('access')}
+                className="bg-white dark:bg-[#0f1623] hover:bg-purple-50/[0.3] dark:hover:bg-purple-500/[0.04] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-purple-400/50 dark:hover:border-purple-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="p-3 bg-purple-50 dark:bg-purple-500/10 rounded-2xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
+                      <KeyRound size={22} />
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-xl text-[10px] font-bold border ${
+                      formData.personalPin || (formData as any).pin
+                        ? 'bg-emerald-50 text-emerald-600 border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400'
+                        : 'bg-zinc-100 text-zinc-500 border-zinc-200/60 dark:bg-zinc-800 dark:text-zinc-400'
+                    }`}>
+                      {formData.personalPin || (formData as any).pin ? 'PIN Asignado ✓' : 'Sin PIN'}
+                    </span>
+                  </div>
+                  <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                    Acceso Teocrático y PIN
+                  </h4>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                    PIN personal para la app móvil / portal, credenciales, código QR y permisos estilo NW Scheduler.
+                  </p>
+
+                  <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400">PIN Personal:</span>
+                      <span className="font-semibold font-mono text-purple-600 dark:text-purple-400">
+                        {formData.personalPin || (formData as any).pin ? '•••• (Configurado)' : 'Sin asignar'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-400">Rol del Sistema:</span>
+                      <span className="font-semibold truncate ml-2">
+                        {formData.theocraticRole ? (formData.theocraticRole.charAt(0).toUpperCase() + formData.theocraticRole.slice(1).replace('_', ' ')) : 'Publicador general'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform">
+                  <span>Abrir tarjeta de acceso y PIN</span>
                   <ChevronRight size={16} />
                 </div>
               </div>
@@ -944,6 +1001,14 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
             {activeTab === 'contact' && (
               <ContactSection formData={formData} handleChange={handleChange} />
+            )}
+
+            {activeTab === 'access' && (
+              <AccessCredentialsSection 
+                formData={formData} 
+                handleChange={handleChange} 
+                showToast={showToast} 
+              />
             )}
 
             {activeTab === 'medical' && (

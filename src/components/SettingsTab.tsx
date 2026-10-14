@@ -1,9 +1,13 @@
 // src/components/SettingsTab.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { useSecurity } from '../context/SecurityContext';
-import { encryptTheocraticData, decryptTheocraticData, getFriendlyCongregationName, isCongregationIdString } from '../utils/theocraticSecurity';
+import {
+  encryptTheocraticData,
+  decryptTheocraticData,
+  isCongregationIdString,
+} from '../utils/theocraticSecurity';
 import {
   Settings,
   Shield,
@@ -13,15 +17,8 @@ import {
   Upload,
   CheckCircle2,
   AlertTriangle,
-  LogIn,
-  LogOut,
   Save,
-  Sliders,
   Calendar,
-  Sun,
-  Moon,
-  Tv,
-  Sparkles,
   Lock,
   Unlock,
   KeyRound,
@@ -39,14 +36,144 @@ import {
   Check,
   Trash2,
   Loader2,
+  ChevronRight,
+  ChevronLeft,
+  Layers,
+  ShieldAlert,
+  LogOut,
+  Sliders,
 } from 'lucide-react';
+import { SectionHeader } from './SectionHeader';
 import { JoinCongregationModal } from './JoinCongregationModal';
 import { InvitationManagerModal } from './InvitationManagerModal';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 
+export type SettingsCategoryTab =
+  | 'all'
+  | 'general'
+  | 'reglas'
+  | 'invitaciones'
+  | 'seguridad'
+  | 'nube'
+  | 'respaldos'
+  | 'mantenimiento';
+
 interface SettingsTabProps {
   onNavigateToProfile?: () => void;
 }
+
+export const SETTINGS_TABS_CONFIG: Record<
+  SettingsCategoryTab,
+  {
+    label: string;
+    icon: any;
+    desc: string;
+    badge?: string;
+    color: string;
+    borderColor: string;
+    hoverBorder: string;
+    bgLight: string;
+    bgHover: string;
+    pillBg: string;
+  }
+> = {
+  all: {
+    label: 'Panel de Tarjetas',
+    icon: Layers,
+    desc: 'Centro principal con todas las áreas de configuración en tarjetas independientes',
+    badge: 'HUB',
+    color: 'text-indigo-600 dark:text-indigo-400',
+    borderColor: 'border-indigo-200/60 dark:border-indigo-800/40',
+    hoverBorder: 'hover:border-indigo-500/50',
+    bgLight: 'bg-indigo-50 dark:bg-indigo-950/40',
+    bgHover: 'hover:bg-indigo-50/[0.3] dark:hover:bg-indigo-500/[0.04]',
+    pillBg: 'bg-indigo-600 text-white',
+  },
+  general: {
+    label: 'Horarios y Salón',
+    icon: Calendar,
+    desc: 'Nombre oficial de la congregación, Salón del Reino y horarios de Entre Semana y Fin de Semana',
+    badge: 'Reuniones',
+    color: 'text-blue-600 dark:text-blue-400',
+    borderColor: 'border-blue-200/60 dark:border-blue-800/40',
+    hoverBorder: 'hover:border-blue-500/50',
+    bgLight: 'bg-blue-50 dark:bg-blue-950/40',
+    bgHover: 'hover:bg-blue-50/[0.3] dark:hover:bg-blue-500/[0.04]',
+    pillBg: 'bg-blue-600 text-white',
+  },
+  reglas: {
+    label: 'Reglas y Conflictos',
+    icon: ShieldAlert,
+    desc: 'Motor anticolisión para evitar cruces entre partes y deberes, límites de semanas y bosquejos',
+    badge: 'Anticolisión',
+    color: 'text-amber-600 dark:text-amber-400',
+    borderColor: 'border-amber-200/60 dark:border-amber-800/40',
+    hoverBorder: 'hover:border-amber-500/50',
+    bgLight: 'bg-amber-50 dark:bg-amber-950/40',
+    bgHover: 'hover:bg-amber-50/[0.3] dark:hover:bg-amber-500/[0.04]',
+    pillBg: 'bg-amber-600 text-white',
+  },
+  invitaciones: {
+    label: 'Invitaciones y QR',
+    icon: QrCode,
+    desc: 'Códigos de acceso cerrado, escaneo QR y credenciales teocráticas de congregación',
+    badge: 'Zero-Knowledge',
+    color: 'text-purple-600 dark:text-purple-400',
+    borderColor: 'border-purple-200/60 dark:border-purple-800/40',
+    hoverBorder: 'hover:border-purple-500/50',
+    bgLight: 'bg-purple-50 dark:bg-purple-950/40',
+    bgHover: 'hover:bg-purple-50/[0.3] dark:hover:bg-purple-500/[0.04]',
+    pillBg: 'bg-purple-600 text-white',
+  },
+  seguridad: {
+    label: 'Seguridad y PINs',
+    icon: Lock,
+    desc: 'PIN de bloqueo de pantalla en el Salón, auto-bloqueo por inactividad y privacidad PII',
+    badge: 'AES-256',
+    color: 'text-emerald-600 dark:text-emerald-400',
+    borderColor: 'border-emerald-200/60 dark:border-emerald-800/40',
+    hoverBorder: 'hover:border-emerald-500/50',
+    bgLight: 'bg-emerald-50 dark:bg-emerald-950/40',
+    bgHover: 'hover:bg-emerald-50/[0.3] dark:hover:bg-emerald-500/[0.04]',
+    pillBg: 'bg-emerald-600 text-white',
+  },
+  nube: {
+    label: 'Nube y Sincronización',
+    icon: Cloud,
+    desc: 'Sincronización multi-dispositivo y respaldo en Google Firestore para todos los hermanos',
+    badge: 'Nube en vivo',
+    color: 'text-sky-600 dark:text-sky-400',
+    borderColor: 'border-sky-200/60 dark:border-sky-800/40',
+    hoverBorder: 'hover:border-sky-500/50',
+    bgLight: 'bg-sky-50 dark:bg-sky-950/40',
+    bgHover: 'hover:bg-sky-50/[0.3] dark:hover:bg-sky-500/[0.04]',
+    pillBg: 'bg-sky-600 text-white',
+  },
+  respaldos: {
+    label: 'Copias y Cifrado',
+    icon: Database,
+    desc: 'Descargas JSON de la congregación, exportación cifrada grado militar y restauración',
+    badge: 'Respaldos',
+    color: 'text-indigo-600 dark:text-indigo-400',
+    borderColor: 'border-indigo-200/60 dark:border-indigo-800/40',
+    hoverBorder: 'hover:border-indigo-500/50',
+    bgLight: 'bg-indigo-50 dark:bg-indigo-950/40',
+    bgHover: 'hover:bg-indigo-50/[0.3] dark:hover:bg-indigo-500/[0.04]',
+    pillBg: 'bg-indigo-600 text-white',
+  },
+  mantenimiento: {
+    label: 'Mantenimiento y Datos',
+    icon: Trash2,
+    desc: 'Limpieza de datos de prueba / demo, vaciado de publicadores o reinicio total teocrático',
+    badge: 'Herramientas',
+    color: 'text-rose-600 dark:text-rose-400',
+    borderColor: 'border-rose-200/60 dark:border-rose-800/40',
+    hoverBorder: 'hover:border-rose-500/50',
+    bgLight: 'bg-rose-50 dark:bg-rose-950/40',
+    bgHover: 'hover:bg-rose-50/[0.3] dark:hover:bg-rose-500/[0.04]',
+    pillBg: 'bg-rose-600 text-white',
+  },
+};
 
 export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile }) => {
   const {
@@ -57,17 +184,25 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
     importBackupJSON,
     uploadLocalDataToGoogle,
     downloadDataFromGoogle,
-    syncStatus,
     cleanSampleData,
     clearAllPublishers,
     resetAllCongregationData,
   } = useCongregation();
-  const { user, signInWithGoogle, signOutUser } = useAuth();
+
+  const { user, signOutUser } = useAuth();
+
+  const [activeTab, setActiveTab] = useState<SettingsCategoryTab>('all');
 
   const [isSyncingCloud, setIsSyncingCloud] = useState(false);
-  const [cloudActionStatus, setCloudActionStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+  const [cloudActionStatus, setCloudActionStatus] = useState<{
+    type: 'success' | 'error';
+    msg: string;
+  } | null>(null);
 
-  const [cleanActionStatus, setCleanActionStatus] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+  const [cleanActionStatus, setCleanActionStatus] = useState<{
+    type: 'success' | 'error';
+    msg: string;
+  } | null>(null);
   const [showCleanSampleModal, setShowCleanSampleModal] = useState(false);
   const [showClearPublishersModal, setShowClearPublishersModal] = useState(false);
   const [showResetAllModal, setShowResetAllModal] = useState(false);
@@ -81,14 +216,21 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
       const res = await uploadLocalDataToGoogle();
       setCloudActionStatus({ type: res.success ? 'success' : 'error', msg: res.message });
     } catch (e: any) {
-      setCloudActionStatus({ type: 'error', msg: e?.message || 'Error al guardar en la nube de Google.' });
+      setCloudActionStatus({
+        type: 'error',
+        msg: e?.message || 'Error al guardar en la nube de Google.',
+      });
     } finally {
       setIsSyncingCloud(false);
     }
   };
 
   const handleDownloadFromGoogle = async () => {
-    if (!window.confirm('¿Deseas descargar y reemplazar los datos locales con la copia guardada en tu cuenta de Google?')) {
+    if (
+      !window.confirm(
+        '¿Deseas descargar y reemplazar los datos locales con la copia guardada en tu cuenta de Google?'
+      )
+    ) {
       return;
     }
     setIsSyncingCloud(true);
@@ -97,11 +239,15 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
       const res = await downloadDataFromGoogle();
       setCloudActionStatus({ type: res.success ? 'success' : 'error', msg: res.message });
     } catch (e: any) {
-      setCloudActionStatus({ type: 'error', msg: e?.message || 'Error al descargar datos desde Google.' });
+      setCloudActionStatus({
+        type: 'error',
+        msg: e?.message || 'Error al descargar datos desde Google.',
+      });
     } finally {
       setIsSyncingCloud(false);
     }
   };
+
   const {
     isPinEnabled,
     lockSession,
@@ -112,17 +258,15 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
     setPasscodePin,
     verifyCurrentPin,
     invitations,
-    activeSessions,
-    isMasterPassphraseSet,
     isCongregationPinSet,
   } = useSecurity();
 
   const [isSettingsInviteModalOpen, setIsSettingsInviteModalOpen] = useState(false);
   const [isSettingsJoinModalOpen, setIsSettingsJoinModalOpen] = useState(false);
   const [isSettingsWizardOpen, setIsSettingsWizardOpen] = useState(false);
-  const [settingsSubView, setSettingsSubView] = useState<'general' | 'seguridad' | 'respaldos'>('general');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
 
   const [congName, setCongName] = useState(() => {
     const raw =
@@ -135,54 +279,155 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
     if (raw && !isCongregationIdString(raw) && raw !== 'Congregación Central') return raw;
     return raw && !isCongregationIdString(raw) ? raw : '';
   });
-  const [midDay, setMidDay] = useState(() => settings.midweekMeetingDay || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_midweek_day') || localStorage.getItem('kongre_midweek_day') : null) || 'Miércoles');
-  const [midTime, setMidTime] = useState(() => settings.midweekMeetingTime || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_midweek_time') || localStorage.getItem('kongre_midweek_time') : null) || '19:00');
-  const [fdsDay, setFdsDay] = useState(() => settings.weekendMeetingDay || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_weekend_day') || localStorage.getItem('kongre_weekend_day') : null) || 'Domingo');
-  const [fdsTime, setFdsTime] = useState(() => settings.weekendMeetingTime || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_weekend_time') || localStorage.getItem('kongre_weekend_time') : null) || '10:00');
-  const [hallAddress, setHallAddress] = useState(() => settings.hallAddress || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_address') || localStorage.getItem('kongre_hall_address') : null) || '');
+
+  const [midDay, setMidDay] = useState(
+    () =>
+      settings.midweekMeetingDay ||
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_user_confirmed_midweek_day') ||
+          localStorage.getItem('kongre_midweek_day')
+        : null) ||
+      'Miércoles'
+  );
+  const [midTime, setMidTime] = useState(
+    () =>
+      settings.midweekMeetingTime ||
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_user_confirmed_midweek_time') ||
+          localStorage.getItem('kongre_midweek_time')
+        : null) ||
+      '19:00'
+  );
+  const [fdsDay, setFdsDay] = useState(
+    () =>
+      settings.weekendMeetingDay ||
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_user_confirmed_weekend_day') ||
+          localStorage.getItem('kongre_weekend_day')
+        : null) ||
+      'Domingo'
+  );
+  const [fdsTime, setFdsTime] = useState(
+    () =>
+      settings.weekendMeetingTime ||
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_user_confirmed_weekend_time') ||
+          localStorage.getItem('kongre_weekend_time')
+        : null) ||
+      '10:00'
+  );
+  const [hallAddress, setHallAddress] = useState(
+    () =>
+      settings.hallAddress ||
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_user_confirmed_address') ||
+          localStorage.getItem('kongre_hall_address')
+        : null) ||
+      ''
+  );
 
   const userHasEditedRef = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccessMsg, setSaveSuccessMsg] = useState<string | null>(null);
 
+  // Rules state with safe defaults
+  const rules = settings.conflictRules || {
+    allowPartAndDutySameMeeting: false,
+    allowAudioAndMicrophones: false,
+    allowPresidentAndOtherPart: false,
+    maxConsecutiveWeeksWithDuty: 2,
+    maxConsecutiveWeeksWithPart: 2,
+    enforceSisterDemonstrationRules: true,
+    warnOutlineRepeatedWithinMonths: 12,
+  };
+
+  const [allowPartAndDuty, setAllowPartAndDuty] = useState(rules.allowPartAndDutySameMeeting);
+  const [allowAudioAndMics, setAllowAudioAndMics] = useState(rules.allowAudioAndMicrophones);
+  const [allowPresAndPart, setAllowPresAndPart] = useState(rules.allowPresidentAndOtherPart);
+  const [maxConsecutiveDuty, setMaxConsecutiveDuty] = useState(rules.maxConsecutiveWeeksWithDuty);
+  const [maxConsecutivePart, setMaxConsecutivePart] = useState(rules.maxConsecutiveWeeksWithPart);
+  const [enforceSisters, setEnforceSisters] = useState(rules.enforceSisterDemonstrationRules);
+  const [warnOutlineMonths, setWarnOutlineMonths] = useState(rules.warnOutlineRepeatedWithinMonths || 12);
+
   const isFormDirty = Boolean(
-    (congName.trim() !== (settings.congregationName || '').trim()) ||
-    (midDay !== (settings.midweekMeetingDay || 'Miércoles')) ||
-    (midTime !== (settings.midweekMeetingTime || '19:00')) ||
-    (fdsDay !== (settings.weekendMeetingDay || 'Domingo')) ||
-    (fdsTime !== (settings.weekendMeetingTime || '10:00')) ||
-    (hallAddress.trim() !== (settings.hallAddress || '').trim())
+    congName.trim() !== (settings.congregationName || '').trim() ||
+      midDay !== (settings.midweekMeetingDay || 'Miércoles') ||
+      midTime !== (settings.midweekMeetingTime || '19:00') ||
+      fdsDay !== (settings.weekendMeetingDay || 'Domingo') ||
+      fdsTime !== (settings.weekendMeetingTime || '10:00') ||
+      hallAddress.trim() !== (settings.hallAddress || '').trim() ||
+      allowPartAndDuty !== Boolean(settings.conflictRules?.allowPartAndDutySameMeeting) ||
+      allowAudioAndMics !== Boolean(settings.conflictRules?.allowAudioAndMicrophones) ||
+      allowPresAndPart !== Boolean(settings.conflictRules?.allowPresidentAndOtherPart) ||
+      maxConsecutiveDuty !== (settings.conflictRules?.maxConsecutiveWeeksWithDuty ?? 2) ||
+      maxConsecutivePart !== (settings.conflictRules?.maxConsecutiveWeeksWithPart ?? 2) ||
+      enforceSisters !== (settings.conflictRules?.enforceSisterDemonstrationRules ?? true) ||
+      warnOutlineMonths !== (settings.conflictRules?.warnOutlineRepeatedWithinMonths ?? 12)
   );
 
-  // Sincronizar campos cuando settings cambie (solo si el usuario NO está editando activamente)
+  // Sync state if settings update remotely
   useEffect(() => {
     if (userHasEditedRef.current) return;
 
     if (settings) {
-      const storedName = typeof window !== 'undefined'
-        ? localStorage.getItem('kongre_user_confirmed_name')?.trim() ||
-          localStorage.getItem('kongre_congregation_name')?.trim()
-        : '';
-      const cleanName = settings.congregationName && !isCongregationIdString(settings.congregationName) && settings.congregationName !== 'Congregación Central'
-        ? settings.congregationName.trim()
-        : (storedName && !isCongregationIdString(storedName) && storedName !== 'Congregación Central' ? storedName : (settings.congregationName?.trim() || ''));
+      const storedName =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('kongre_user_confirmed_name')?.trim() ||
+            localStorage.getItem('kongre_congregation_name')?.trim()
+          : '';
+      const cleanName =
+        settings.congregationName &&
+        !isCongregationIdString(settings.congregationName) &&
+        settings.congregationName !== 'Congregación Central'
+          ? settings.congregationName.trim()
+          : storedName &&
+            !isCongregationIdString(storedName) &&
+            storedName !== 'Congregación Central'
+          ? storedName
+          : settings.congregationName?.trim() || '';
 
       if (cleanName) {
         setCongName(cleanName);
       }
-      const resolvedMidDay = settings.midweekMeetingDay || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_midweek_day') || localStorage.getItem('kongre_midweek_day') : null);
+      const resolvedMidDay =
+        settings.midweekMeetingDay ||
+        (typeof window !== 'undefined'
+          ? localStorage.getItem('kongre_user_confirmed_midweek_day') ||
+            localStorage.getItem('kongre_midweek_day')
+          : null);
       if (resolvedMidDay) setMidDay(resolvedMidDay);
 
-      const resolvedMidTime = settings.midweekMeetingTime || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_midweek_time') || localStorage.getItem('kongre_midweek_time') : null);
+      const resolvedMidTime =
+        settings.midweekMeetingTime ||
+        (typeof window !== 'undefined'
+          ? localStorage.getItem('kongre_user_confirmed_midweek_time') ||
+            localStorage.getItem('kongre_midweek_time')
+          : null);
       if (resolvedMidTime) setMidTime(resolvedMidTime);
 
-      const resolvedFdsDay = settings.weekendMeetingDay || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_weekend_day') || localStorage.getItem('kongre_weekend_day') : null);
+      const resolvedFdsDay =
+        settings.weekendMeetingDay ||
+        (typeof window !== 'undefined'
+          ? localStorage.getItem('kongre_user_confirmed_weekend_day') ||
+            localStorage.getItem('kongre_weekend_day')
+          : null);
       if (resolvedFdsDay) setFdsDay(resolvedFdsDay);
 
-      const resolvedFdsTime = settings.weekendMeetingTime || (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_weekend_time') || localStorage.getItem('kongre_weekend_time') : null);
+      const resolvedFdsTime =
+        settings.weekendMeetingTime ||
+        (typeof window !== 'undefined'
+          ? localStorage.getItem('kongre_user_confirmed_weekend_time') ||
+            localStorage.getItem('kongre_weekend_time')
+          : null);
       if (resolvedFdsTime) setFdsTime(resolvedFdsTime);
 
-      const resolvedAddress = settings.hallAddress ?? (typeof window !== 'undefined' ? localStorage.getItem('kongre_user_confirmed_address') || localStorage.getItem('kongre_hall_address') || '' : '');
+      const resolvedAddress =
+        settings.hallAddress ??
+        (typeof window !== 'undefined'
+          ? localStorage.getItem('kongre_user_confirmed_address') ||
+            localStorage.getItem('kongre_hall_address') ||
+            ''
+          : '');
       if (resolvedAddress !== undefined) setHallAddress(resolvedAddress);
 
       if (settings.conflictRules) {
@@ -204,24 +449,15 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
     settings.hallAddress,
   ]);
 
-  // Rules state with safe defaults
-  const rules = settings.conflictRules || {
-    allowPartAndDutySameMeeting: false,
-    allowAudioAndMicrophones: false,
-    allowPresidentAndOtherPart: false,
-    maxConsecutiveWeeksWithDuty: 2,
-    maxConsecutiveWeeksWithPart: 2,
-    enforceSisterDemonstrationRules: true,
-    warnOutlineRepeatedWithinMonths: 12,
-  };
-
-  const [allowPartAndDuty, setAllowPartAndDuty] = useState(rules.allowPartAndDutySameMeeting);
-  const [allowAudioAndMics, setAllowAudioAndMics] = useState(rules.allowAudioAndMicrophones);
-  const [allowPresAndPart, setAllowPresAndPart] = useState(rules.allowPresidentAndOtherPart);
-  const [maxConsecutiveDuty, setMaxConsecutiveDuty] = useState(rules.maxConsecutiveWeeksWithDuty);
-  const [maxConsecutivePart, setMaxConsecutivePart] = useState(rules.maxConsecutiveWeeksWithPart);
-  const [enforceSisters, setEnforceSisters] = useState(rules.enforceSisterDemonstrationRules);
-  const [warnOutlineMonths, setWarnOutlineMonths] = useState(rules.warnOutlineRepeatedWithinMonths || 12);
+  // Tab auto-scroll
+  useEffect(() => {
+    if (tabsRef.current) {
+      const activeEl = tabsRef.current.querySelector<HTMLElement>('[data-active="true"]');
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      }
+    }
+  }, [activeTab]);
 
   const [savedFeedback, setSavedFeedback] = useState(false);
   const [copiedCongId, setCopiedCongId] = useState(false);
@@ -250,8 +486,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
   const [decryptModalError, setDecryptModalError] = useState<string | null>(null);
   const [isDecrypting, setIsDecrypting] = useState(false);
 
-  const handleSaveSettings = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveSettings = async (e?: React.FormEvent) => {
+    if (e && e.preventDefault) e.preventDefault();
     setIsSaving(true);
     setSaveSuccessMsg(null);
     userHasEditedRef.current = false;
@@ -259,7 +495,6 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
     const trimmedName = congName.trim();
     const trimmedAddress = hallAddress.trim();
 
-    // 1. Guardado síncrono ultra-robusto en localStorage de inmediato
     try {
       if (trimmedName && !isCongregationIdString(trimmedName)) {
         localStorage.setItem('kongre_congregation_name', trimmedName);
@@ -288,7 +523,9 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
       (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_number') : null) ||
       (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_id') : null) ||
       ''
-    ).trim().toUpperCase();
+    )
+      .trim()
+      .toUpperCase();
 
     if (preservedCongId) {
       try {
@@ -319,7 +556,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
       });
 
       setSavedFeedback(true);
-      setSaveSuccessMsg('¡Configuración guardada correctamente en el dispositivo y sincronizada!');
+      setSaveSuccessMsg('¡Ajustes guardados correctamente y sincronizados!');
       setTimeout(() => {
         setSavedFeedback(false);
         setSaveSuccessMsg(null);
@@ -327,7 +564,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
     } catch (saveErr) {
       console.error('Error al guardar ajustes:', saveErr);
       setSavedFeedback(true);
-      setSaveSuccessMsg('¡Configuración guardada localmente en tu dispositivo!');
+      setSaveSuccessMsg('¡Ajustes guardados en el almacenamiento local!');
       setTimeout(() => {
         setSavedFeedback(false);
         setSaveSuccessMsg(null);
@@ -350,7 +587,6 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
     }
 
     if (!pinNew) {
-      // Remove PIN
       await setPasscodePin(null);
       setShowPinSetupModal(false);
       setPinCurrent('');
@@ -390,7 +626,6 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
       try {
         const parsed = JSON.parse(content);
         if (parsed.version === 'kongre_v1' && parsed.ciphertext) {
-          // Encrypted backup detected!
           setPendingEncryptedJson(content);
           setDecryptPassphrase('');
           setDecryptModalError(null);
@@ -489,947 +724,1350 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
     );
   }
 
+  const tabKeys = Object.keys(SETTINGS_TABS_CONFIG) as SettingsCategoryTab[];
+
   return (
-    <div className="w-full space-y-8">
-      {/* Header */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <span>Configuración de la Congregación</span>
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Parámetros del Salón del Reino, circuito, horarios de reuniones, seguridad y copias de seguridad de la congregación.
-          </p>
-        </div>
-
-        {onNavigateToProfile && (
-          <button
-            type="button"
-            onClick={onNavigateToProfile}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer self-start sm:self-auto shadow-2xs"
-            title="Ir a configurar foto de perfil, teléfono y canales de contacto"
-          >
-            <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            <span>Mi Perfil Personal</span>
-          </button>
-        )}
-      </div>
-
-      {/* Sub-navigation Tabs */}
-      <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 overflow-x-auto">
-        <button
-          type="button"
-          onClick={() => setSettingsSubView('general')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            settingsSubView === 'general'
-              ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs ring-1 ring-slate-200/50 dark:ring-slate-700'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          <Calendar className="w-4 h-4" />
-          <span>Congregación y Horarios</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setSettingsSubView('seguridad')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            settingsSubView === 'seguridad'
-              ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs ring-1 ring-slate-200/50 dark:ring-slate-700'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          <Shield className="w-4 h-4" />
-          <span>Seguridad y PINs</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setSettingsSubView('respaldos')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            settingsSubView === 'respaldos'
-              ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs ring-1 ring-slate-200/50 dark:ring-slate-700'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          <Cloud className="w-4 h-4" />
-          <span>Respaldos y Nube</span>
-        </button>
-      </div>
-
-      {/* VISTA 1: CONGREGACIÓN Y HORARIOS */}
-      {settingsSubView === 'general' && (
-        <div className="space-y-8 animate-fade-in">
-          <form onSubmit={handleSaveSettings} className="space-y-8">
-            {/* 1. INFORMACIÓN DE LA CONGREGACIÓN */}
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <span>Información y Horarios de Reunión</span>
-              </h3>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                Nombre de la Congregación
-              </label>
-              <input
-                type="text"
-                required
-                value={congName}
-                onChange={e => {
-                  setCongName(e.target.value);
-                  userHasEditedRef.current = true;
-                }}
-                placeholder="Ej. Congregación Central"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden font-semibold"
-              />
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
-                Este nombre oficial es el que se mostrará en el banner superior, programas y hojas S-89 (el ID de conexión es independiente).
-              </span>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
-                Dirección del Salón del Reino
-              </label>
-              <input
-                type="text"
-                value={hallAddress}
-                onChange={e => {
-                  setHallAddress(e.target.value);
-                  userHasEditedRef.current = true;
-                }}
-                placeholder="Ej. Av. Las Palmeras 450"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
-              />
-            </div>
-
-            {/* Midweek meeting day & time */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-                  Día Entre Semana
-                </label>
-                <select
-                  value={midDay}
-                  onChange={e => {
-                    setMidDay(e.target.value);
-                    userHasEditedRef.current = true;
-                  }}
-                  className="w-full p-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
-                >
-                  <option value="Lunes">Lunes</option>
-                  <option value="Martes">Martes</option>
-                  <option value="Miércoles">Miércoles</option>
-                  <option value="Jueves">Jueves</option>
-                  <option value="Viernes">Viernes</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-                  Hora de Inicio
-                </label>
-                <input
-                  type="time"
-                  value={midTime}
-                  onChange={e => {
-                    setMidTime(e.target.value);
-                    userHasEditedRef.current = true;
-                  }}
-                  className="w-full p-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
-                />
-              </div>
-            </div>
-
-            {/* Weekend meeting day & time */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-                  Día Fin de Semana
-                </label>
-                <select
-                  value={fdsDay}
-                  onChange={e => {
-                    setFdsDay(e.target.value);
-                    userHasEditedRef.current = true;
-                  }}
-                  className="w-full p-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
-                >
-                  <option value="Sábado">Sábado</option>
-                  <option value="Domingo">Domingo</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
-                  Hora de Inicio
-                </label>
-                <input
-                  type="time"
-                  value={fdsTime}
-                  onChange={e => {
-                    setFdsTime(e.target.value);
-                    userHasEditedRef.current = true;
-                  }}
-                  className="w-full p-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 2. REGLAS DE DETECCIÓN DE CONFLICTOS */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-5">
-          <h3 className="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-            <Shield className="w-4 h-4 text-amber-600" />
-            <span>Reglas de Detección de Cruces y Conflictos</span>
-          </h3>
-
-          <p className="text-xs text-slate-500">
-            Define qué asignaciones simultáneas están prohibidas para que el sistema emita alertas en tiempo real y el autoasignador evite cometer errores.
-          </p>
-
-          <div className="space-y-3 text-xs">
-            {/* Rule 1: Part + Duty clash */}
-            <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100/70 transition-colors">
-              <input
-                type="checkbox"
-                checked={allowPartAndDuty}
-                onChange={e => setAllowPartAndDuty(e.target.checked)}
-                className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
-              />
-              <div>
-                <p className="font-bold text-slate-800 text-sm">
-                  Permitir que quien tenga una parte en el programa tenga también un deber
-                </p>
-                <p className="text-slate-500 mt-0.5">
-                  Si se desmarca (recomendado), el sistema generará un error crítico si alguien con parte en plataforma es asignado simultáneamente a Audio, Video, Micrófonos o Acomodador.
-                </p>
-              </div>
-            </label>
-
-            {/* Rule 2: Audio + Mic clash */}
-            <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100/70 transition-colors">
-              <input
-                type="checkbox"
-                checked={allowAudioAndMics}
-                onChange={e => setAllowAudioAndMics(e.target.checked)}
-                className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
-              />
-              <div>
-                <p className="font-bold text-slate-800 text-sm">
-                  Permitir que el operador de Audio/Video haga micrófonos al mismo tiempo
-                </p>
-                <p className="text-slate-500 mt-0.5">
-                  Si se desmarca, evitará que una persona que debe estar en cabina técnica sea asignada a correr micrófonos o estar en la puerta.
-                </p>
-              </div>
-            </label>
-
-            {/* Rule 3: President clash */}
-            <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100/70 transition-colors">
-              <input
-                type="checkbox"
-                checked={allowPresAndPart}
-                onChange={e => setAllowPresAndPart(e.target.checked)}
-                className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
-              />
-              <div>
-                <p className="font-bold text-slate-800 text-sm">
-                  Permitir que el Presidente de la reunión tenga otra parte o deber
-                </p>
-                <p className="text-slate-500 mt-0.5">
-                  Si se desmarca, alertará para que el presidente se enfoque exclusivamente en dirigir la reunión.
-                </p>
-              </div>
-            </label>
-
-            {/* Rule 4: Sister demonstrations */}
-            <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100/70 transition-colors">
-              <input
-                type="checkbox"
-                checked={enforceSisters}
-                onChange={e => setEnforceSisters(e.target.checked)}
-                className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
-              />
-              <div>
-                <p className="font-bold text-slate-800 text-sm">
-                  Exigir que la ayudante de una hermana titular sea siempre otra hermana
-                </p>
-                <p className="text-slate-500 mt-0.5">
-                  Alineado con las directrices de la Escuela del Ministerio Teocrático / Vida y Ministerio.
-                </p>
-              </div>
-            </label>
-
-            {/* Consecutive weeks control */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">
-                  Límite de semanas seguidas con deberes:
-                </label>
-                <select
-                  value={maxConsecutiveDuty}
-                  onChange={e => setMaxConsecutiveDuty(Number(e.target.value))}
-                  className="w-full p-2 rounded-xl border border-slate-200 bg-white"
-                >
-                  <option value={1}>1 semana (Rotación semanal estricta)</option>
-                  <option value={2}>2 semanas seguidas (Recomendado)</option>
-                  <option value={3}>3 semanas seguidas</option>
-                  <option value={4}>4 semanas seguidas</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">
-                  Límite de semanas seguidas con partes:
-                </label>
-                <select
-                  value={maxConsecutivePart}
-                  onChange={e => setMaxConsecutivePart(Number(e.target.value))}
-                  className="w-full p-2 rounded-xl border border-slate-200 bg-white"
-                >
-                  <option value={1}>1 semana</option>
-                  <option value={2}>2 semanas seguidas (Recomendado)</option>
-                  <option value={3}>3 semanas seguidas</option>
-                </select>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block font-bold text-slate-800 mb-1">
-                  Alerta de repetición de Bosquejos Públicos:
-                </label>
-                <select
-                  value={warnOutlineMonths}
-                  onChange={e => setWarnOutlineMonths(Number(e.target.value))}
-                  className="w-full p-2 rounded-xl border border-slate-200 bg-white"
-                >
-                  <option value={6}>No repetir el mismo bosquejo antes de 6 meses</option>
-                  <option value={9}>No repetir el mismo bosquejo antes de 9 meses</option>
-                  <option value={12}>No repetir antes de 12 meses (Recomendación Teocrática)</option>
-                  <option value={18}>No repetir antes de 18 meses</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Save button bar */}
-        <div className="flex flex-col sm:flex-row items-end sm:items-center justify-between gap-3 pt-2">
-          <div className="text-xs">
-            {saveSuccessMsg ? (
-              <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 animate-fade-in bg-emerald-50 dark:bg-emerald-950/50 px-3.5 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>{saveSuccessMsg}</span>
-              </span>
-            ) : isFormDirty ? (
-              <span className="text-amber-600 dark:text-amber-400 font-medium flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                Tienes cambios sin guardar en los ajustes
-              </span>
-            ) : null}
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSaving}
-            className={`px-6 py-2.5 rounded-xl text-white text-sm font-bold shadow-md transition-all flex items-center gap-2 cursor-pointer ${
-              isSaving
-                ? 'bg-indigo-400 cursor-not-allowed opacity-80'
-                : savedFeedback
-                ? 'bg-emerald-600 hover:bg-emerald-700'
-                : 'bg-indigo-600 hover:bg-indigo-700 active:scale-98'
-            }`}
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Guardando...</span>
-              </>
-            ) : savedFeedback ? (
-              <>
-                <CheckCircle2 className="w-4 h-4" />
-                <span>¡Guardado con éxito!</span>
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                <span>Guardar Configuración</span>
-              </>
+    <div className="w-full space-y-6 animate-in fade-in duration-300 pb-12">
+      {/* 1. Cabecera Oficial y Moderna de Kongre con SectionHeader */}
+      <SectionHeader
+        icon={Building2}
+        title="Ajustes de la"
+        highlightWord={congName.trim() || settings.congregationName || 'Congregación'}
+        subtitle={`ID: ${settings.congregationNumber || settings.congregationId || 'Configurado'} • ${midDay} ${midTime} y ${fdsDay} ${fdsTime}${isFormDirty ? ' • ⚠️ Cambios sin guardar' : ' • ✓ Sincronizado'}`}
+        badgeText={user ? 'Google Sincronizado' : 'Modo Seguro'}
+        colorTheme="indigo"
+        actions={
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            {onNavigateToProfile && (
+              <button
+                type="button"
+                onClick={onNavigateToProfile}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-zinc-200 border border-slate-200/60 dark:border-white/[0.06] text-xs font-semibold transition-all cursor-pointer"
+                title="Configurar foto, teléfono y contacto personal"
+              >
+                <User size={14} />
+                <span className="hidden sm:inline">Mi Perfil</span>
+              </button>
             )}
-          </button>
-        </div>
-      </form>
-    </div>
-  )}
 
-  {/* VISTA 3: SEGURIDAD Y PINS */}
-  {settingsSubView === 'seguridad' && (
-    <div className="space-y-8 animate-fade-in">
-      {/* 4. REGISTRO TEOCRÁTICO E INVITACIONES CON QR */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
-              <QrCode className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Registro Teocrático e Invitaciones con QR
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Acceso cerrado por invitación y clave de congregación
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setIsSettingsWizardOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+              onClick={() => handleSaveSettings()}
+              disabled={isSaving}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer ${
+                savedFeedback
+                  ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
+                  : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/20'
+              }`}
+              title="Guardar todos los cambios de configuración"
             >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Asistente de Registro</span>
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Guardando...</span>
+                </>
+              ) : savedFeedback ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>¡Guardado!</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span>Guardar Ajustes</span>
+                </>
+              )}
             </button>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Zero-Knowledge E2EE</span>
+          </div>
+        }
+      />
+
+      {/* 2. Barra de Pestañas con el Diseño Estándar de Kongre (Pill Bar Container) */}
+      <div
+        ref={tabsRef}
+        className="p-1.5 bg-slate-100/90 dark:bg-slate-900/60 rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] backdrop-blur-md flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-2xs"
+      >
+        {tabKeys.map((tabKey) => {
+          const config = SETTINGS_TABS_CONFIG[tabKey];
+          const isActive = activeTab === tabKey;
+          const Icon = config.icon;
+
+          return (
+            <button
+              key={tabKey}
+              type="button"
+              data-active={isActive}
+              onClick={() => setActiveTab(tabKey)}
+              className={`flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                isActive
+                  ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold border border-slate-200/60 dark:border-transparent'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/[0.04]'
+              }`}
+            >
+              <Icon
+                size={14}
+                className={isActive ? 'text-indigo-600 dark:text-white' : 'text-slate-500 dark:text-slate-400'}
+              />
+              <span>{config.label}</span>
+              {tabKey === 'all' && (
+                <span
+                  className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
+                    isActive
+                      ? 'bg-indigo-50 text-indigo-600 dark:bg-white/20 dark:text-white'
+                      : 'bg-slate-200/80 text-slate-600 dark:bg-white/10 dark:text-slate-300'
+                  }`}
+                >
+                  HUB
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 3. VISTA PRINCIPAL: PANEL DE TARJETAS (HUB) */}
+      {activeTab === 'all' && (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {/* Tarjeta 1: Información y Horarios */}
+            <div
+              onClick={() => setActiveTab('general')}
+              className="bg-white dark:bg-[#0f1623] hover:bg-blue-50/[0.3] dark:hover:bg-blue-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-blue-400/50 dark:hover:border-blue-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-500/10 rounded-2xl text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                    <Calendar size={22} />
+                  </div>
+                  <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/40">
+                    {midDay} y {fdsDay}
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  Información y Horarios
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                  Nombre oficial de la congregación, dirección física del Salón del Reino y horarios de reuniones semanales.
+                </p>
+
+                <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Congregación:</span>
+                    <span className="font-semibold truncate max-w-[170px]">
+                      {congName || 'Sin asignar'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Horarios:</span>
+                    <span className="font-semibold">
+                      {midDay} {midTime} • {fdsDay} {fdsTime}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-blue-600 dark:text-blue-400 group-hover:translate-x-1 transition-transform">
+                <span>Abrir ajustes de horarios</span>
+                <ChevronRight size={16} />
+              </div>
+            </div>
+
+            {/* Tarjeta 2: Reglas y Conflictos */}
+            <div
+              onClick={() => setActiveTab('reglas')}
+              className="bg-white dark:bg-[#0f1623] hover:bg-amber-50/[0.3] dark:hover:bg-amber-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-amber-400/50 dark:hover:border-amber-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="p-3 bg-amber-50 dark:bg-amber-500/10 rounded-2xl text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
+                    <ShieldAlert size={22} />
+                  </div>
+                  <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/60 dark:border-amber-800/40">
+                    Motor Anticolisión
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  Reglas de Cruces y Conflictos
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                  Detección inteligente de asignaciones simultáneas, rotación de hermanos y prevención de bosquejos repetidos.
+                </p>
+
+                <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Parte y Deber:</span>
+                    <span className="font-semibold">
+                      {!allowPartAndDuty ? 'Bloqueado (Recomendado)' : 'Permitido'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Rotación máxima:</span>
+                    <span className="font-semibold">
+                      {maxConsecutiveDuty} sem. deberes • {maxConsecutivePart} sem. partes
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-amber-600 dark:text-amber-400 group-hover:translate-x-1 transition-transform">
+                <span>Abrir reglas de asignación</span>
+                <ChevronRight size={16} />
+              </div>
+            </div>
+
+            {/* Tarjeta 3: Invitaciones y Acceso QR */}
+            <div
+              onClick={() => setActiveTab('invitaciones')}
+              className="bg-white dark:bg-[#0f1623] hover:bg-purple-50/[0.3] dark:hover:bg-purple-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-purple-400/50 dark:hover:border-purple-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="p-3 bg-purple-50 dark:bg-purple-500/10 rounded-2xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
+                    <QrCode size={22} />
+                  </div>
+                  <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200/60 dark:border-purple-800/40">
+                    {invitations.filter((i) => i.status === 'active').length} vigentes
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                  Registro Teocrático e Invitaciones
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                  Códigos cerrados y códigos QR de un solo toque para vincular ancianos, siervos y publicadores con seguridad E2EE.
+                </p>
+
+                <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">ID Congregación:</span>
+                    <span className="font-semibold font-mono text-xs">
+                      {settings.congregationNumber || settings.congregationId || 'Configurado'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Seguridad:</span>
+                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                      Zero-Knowledge E2EE
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform">
+                <span>Gestionar invitaciones y QR</span>
+                <ChevronRight size={16} />
+              </div>
+            </div>
+
+            {/* Tarjeta 4: Seguridad y Bloqueo */}
+            <div
+              onClick={() => setActiveTab('seguridad')}
+              className="bg-white dark:bg-[#0f1623] hover:bg-emerald-50/[0.3] dark:hover:bg-emerald-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-emerald-400/50 dark:hover:border-emerald-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+                    <Lock size={22} />
+                  </div>
+                  <span
+                    className={`px-2.5 py-1 rounded-xl text-[10px] font-bold ${
+                      isPinEnabled
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                    }`}
+                  >
+                    {isPinEnabled ? 'PIN Activo' : 'Sin PIN'}
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  Seguridad y Bloqueo de Sesión
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                  Protección con PIN numérico para el Salón del Reino, bloqueo por inactividad y modo privacidad RGPD/PII.
+                </p>
+
+                <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Auto-Bloqueo:</span>
+                    <span className="font-semibold">
+                      {autoLockMinutes > 0 ? `${autoLockMinutes} min inactividad` : 'Manual'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Modo Privacidad:</span>
+                    <span className="font-semibold">
+                      {privacyModeEnabled ? 'Activado (Protegido)' : 'Desactivado'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:translate-x-1 transition-transform">
+                <span>Configurar seguridad y PIN</span>
+                <ChevronRight size={16} />
+              </div>
+            </div>
+
+            {/* Tarjeta 5: Nube y Sincronización */}
+            <div
+              onClick={() => setActiveTab('nube')}
+              className="bg-white dark:bg-[#0f1623] hover:bg-sky-50/[0.3] dark:hover:bg-sky-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-sky-400/50 dark:hover:border-sky-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="p-3 bg-sky-50 dark:bg-sky-500/10 rounded-2xl text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform">
+                    <Cloud size={22} />
+                  </div>
+                  <span
+                    className={`px-2.5 py-1 rounded-xl text-[10px] font-bold ${
+                      user
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40'
+                        : 'bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200/60 dark:border-sky-800/40'
+                    }`}
+                  >
+                    {user ? 'Google Conectado' : 'Nube por ID'}
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                  Respaldo en la Nube
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                  Sincronización multi-dispositivo y respaldo en Google Firestore para todos los hermanos autorizados.
+                </p>
+
+                <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Cuenta:</span>
+                    <span className="font-semibold truncate max-w-[170px]">
+                      {user ? user.email : 'Conexión por ID teocrático'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Guardado:</span>
+                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                      Automático en cada cambio
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-sky-600 dark:text-sky-400 group-hover:translate-x-1 transition-transform">
+                <span>Abrir sincronización en la nube</span>
+                <ChevronRight size={16} />
+              </div>
+            </div>
+
+            {/* Tarjeta 6: Copias de Respaldo y Cifrado */}
+            <div
+              onClick={() => setActiveTab('respaldos')}
+              className="bg-white dark:bg-[#0f1623] hover:bg-indigo-50/[0.3] dark:hover:bg-indigo-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-indigo-400/50 dark:hover:border-indigo-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+                    <Database size={22} />
+                  </div>
+                  <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40">
+                    AES-256 Militar
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  Copias y Respaldo Cifrado
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                  Descarga copias de seguridad de toda la congregación o restaura archivos protegidos por contraseña.
+                </p>
+
+                <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Formatos:</span>
+                    <span className="font-semibold">.json y .orgenc.json</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Cifrado:</span>
+                    <span className="font-semibold">AES-256-GCM + PBKDF2</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform">
+                <span>Abrir copias y archivos</span>
+                <ChevronRight size={16} />
+              </div>
+            </div>
+
+            {/* Tarjeta 7: Mantenimiento y Datos */}
+            <div
+              onClick={() => setActiveTab('mantenimiento')}
+              className="bg-white dark:bg-[#0f1623] hover:bg-rose-50/[0.3] dark:hover:bg-rose-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-rose-400/50 dark:hover:border-rose-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="p-3 bg-rose-50 dark:bg-rose-500/10 rounded-2xl text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
+                    <Trash2 size={22} />
+                  </div>
+                  <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-800/40">
+                    Herramientas
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                  Mantenimiento y Datos
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                  Eliminación de datos de demostración para iniciar en limpio, vaciado de publicadores o reinicio total.
+                </p>
+
+                <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Acciones:</span>
+                    <span className="font-semibold">Limpieza y reseteo</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Protección:</span>
+                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                      Nombre y horarios seguros
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-rose-600 dark:text-rose-400 group-hover:translate-x-1 transition-transform">
+                <span>Abrir herramientas de mantenimiento</span>
+                <ChevronRight size={16} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. VISTAS EXCLUSIVAS: CADA CATEGORÍA DENTRO DE SU PROPIO CONTENEDOR */}
+      {activeTab !== 'all' && (
+        <div className="space-y-4 animate-in fade-in duration-300">
+          {/* Navegación sutil y directa al Panel de Tarjetas (Único botón, sin duplicados) */}
+          <div className="flex items-center justify-between gap-3 pb-1">
+            <button
+              type="button"
+              onClick={() => setActiveTab('all')}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-zinc-200 border border-slate-200/60 dark:border-white/[0.06] text-xs font-bold transition-all cursor-pointer active:scale-95"
+            >
+              <ChevronLeft size={16} className="text-indigo-600 dark:text-indigo-400" />
+              <span>Volver al Panel de Tarjetas</span>
+            </button>
+            <span className="text-xs text-slate-400 font-medium hidden sm:inline">
+              Ajustes • {SETTINGS_TABS_CONFIG[activeTab]?.label}
             </span>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Card 1: Invitaciones Activas */}
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <KeyRound className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                  Invitaciones Activas
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-200">
-                  {invitations.filter((i) => i.status === 'active').length} vigentes
-                </span>
+          {/* CONTENEDOR 1: HORARIOS Y SALÓN */}
+          {activeTab === 'general' && (
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+              <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold">
+                    <Calendar className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                      Información y Horarios de Reunión
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Parámetros oficiales del Salón del Reino y agenda semanal
+                    </p>
+                  </div>
+                </div>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Genera códigos alfanuméricos o códigos QR para invitar a ancianos, siervos y publicadores sin registros públicos.
-              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                    Nombre de la Congregación
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={congName}
+                    onChange={(e) => {
+                      setCongName(e.target.value);
+                      userHasEditedRef.current = true;
+                    }}
+                    placeholder="Ej. Congregación Central"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden font-semibold"
+                  />
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
+                    Este nombre oficial es el que se mostrará en el banner superior, programas y hojas S-89.
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                    Dirección del Salón del Reino
+                  </label>
+                  <input
+                    type="text"
+                    value={hallAddress}
+                    onChange={(e) => {
+                      setHallAddress(e.target.value);
+                      userHasEditedRef.current = true;
+                    }}
+                    placeholder="Ej. Av. Las Palmeras 450"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  />
+                </div>
+
+                {/* Reunión Entre Semana */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      Día Entre Semana
+                    </label>
+                    <select
+                      value={midDay}
+                      onChange={(e) => {
+                        setMidDay(e.target.value);
+                        userHasEditedRef.current = true;
+                      }}
+                      className="w-full p-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
+                    >
+                      <option value="Lunes">Lunes</option>
+                      <option value="Martes">Martes</option>
+                      <option value="Miércoles">Miércoles</option>
+                      <option value="Jueves">Jueves</option>
+                      <option value="Viernes">Viernes</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      Hora de Inicio
+                    </label>
+                    <input
+                      type="time"
+                      value={midTime}
+                      onChange={(e) => {
+                        setMidTime(e.target.value);
+                        userHasEditedRef.current = true;
+                      }}
+                      className="w-full p-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
+                    />
+                  </div>
+                </div>
+
+                {/* Reunión Fin de Semana */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      Día Fin de Semana
+                    </label>
+                    <select
+                      value={fdsDay}
+                      onChange={(e) => {
+                        setFdsDay(e.target.value);
+                        userHasEditedRef.current = true;
+                      }}
+                      className="w-full p-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
+                    >
+                      <option value="Sábado">Sábado</option>
+                      <option value="Domingo">Domingo</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      Hora de Inicio
+                    </label>
+                    <input
+                      type="time"
+                      value={fdsTime}
+                      onChange={(e) => {
+                        setFdsTime(e.target.value);
+                        userHasEditedRef.current = true;
+                      }}
+                      className="w-full p-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Botón de Guardado dentro del contenedor */}
+              <div className="flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => handleSaveSettings()}
+                  disabled={isSaving}
+                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md active:scale-95 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{isSaving ? 'Guardando...' : 'Guardar Horarios'}</span>
+                </button>
+              </div>
             </div>
+          )}
 
-            <button
-              type="button"
-              onClick={() => setIsSettingsInviteModalOpen(true)}
-              className="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
-            >
-              <QrCode className="w-3.5 h-3.5" />
-              <span>Gestionar Invitaciones y QR</span>
-            </button>
-          </div>
-
-          {/* Card 2: Unirse a la Congregación */}
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <UserPlus className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  Unirse con Código
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
-                  Hermano o Dispositivo
-                </span>
+          {/* CONTENEDOR 2: REGLAS Y CONFLICTOS */}
+          {activeTab === 'reglas' && (
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+              <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center text-amber-600 dark:text-amber-400 font-bold">
+                    <ShieldAlert className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                      Reglas de Detección de Cruces y Conflictos
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Define qué asignaciones simultáneas están prohibidas para que el sistema emita alertas en tiempo real
+                    </p>
+                  </div>
+                </div>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Introduce un código de invitación recibido para vincular este dispositivo con el rol correspondiente en la congregación.
-              </p>
+
+              <div className="space-y-3 text-xs">
+                {/* Rule 1: Part + Duty clash */}
+                <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={allowPartAndDuty}
+                    onChange={(e) => setAllowPartAndDuty(e.target.checked)}
+                    className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <div>
+                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                      Permitir que quien tenga una parte en el programa tenga también un deber
+                    </p>
+                    <p className="text-slate-500 dark:text-slate-400 mt-0.5">
+                      Si se desmarca (recomendado), el sistema generará un error crítico si alguien con parte en plataforma es asignado simultáneamente a Audio, Video, Micrófonos o Acomodador.
+                    </p>
+                  </div>
+                </label>
+
+                {/* Rule 2: Audio + Mic clash */}
+                <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={allowAudioAndMics}
+                    onChange={(e) => setAllowAudioAndMics(e.target.checked)}
+                    className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <div>
+                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                      Permitir que el operador de Audio/Video haga micrófonos al mismo tiempo
+                    </p>
+                    <p className="text-slate-500 dark:text-slate-400 mt-0.5">
+                      Si se desmarca, evitará que una persona que debe estar en cabina técnica sea asignada a correr micrófonos o estar en la puerta.
+                    </p>
+                  </div>
+                </label>
+
+                {/* Rule 3: President clash */}
+                <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={allowPresAndPart}
+                    onChange={(e) => setAllowPresAndPart(e.target.checked)}
+                    className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <div>
+                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                      Permitir que el Presidente de la reunión tenga otra parte o deber
+                    </p>
+                    <p className="text-slate-500 dark:text-slate-400 mt-0.5">
+                      Si se desmarca, alertará para que el presidente se enfoque exclusivamente en dirigir la reunión.
+                    </p>
+                  </div>
+                </label>
+
+                {/* Rule 4: Sister demonstrations */}
+                <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={enforceSisters}
+                    onChange={(e) => setEnforceSisters(e.target.checked)}
+                    className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <div>
+                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                      Exigir que la ayudante de una hermana titular sea siempre otra hermana
+                    </p>
+                    <p className="text-slate-500 dark:text-slate-400 mt-0.5">
+                      Alineado con las directrices de la Escuela del Ministerio Teocrático / Vida y Ministerio.
+                    </p>
+                  </div>
+                </label>
+
+                {/* Consecutive weeks control */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">
+                      Límite de semanas seguidas con deberes:
+                    </label>
+                    <select
+                      value={maxConsecutiveDuty}
+                      onChange={(e) => setMaxConsecutiveDuty(Number(e.target.value))}
+                      className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                    >
+                      <option value={1}>1 semana (Rotación semanal estricta)</option>
+                      <option value={2}>2 semanas seguidas (Recomendado)</option>
+                      <option value={3}>3 semanas seguidas</option>
+                      <option value={4}>4 semanas seguidas</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">
+                      Límite de semanas seguidas con partes:
+                    </label>
+                    <select
+                      value={maxConsecutivePart}
+                      onChange={(e) => setMaxConsecutivePart(Number(e.target.value))}
+                      className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                    >
+                      <option value={1}>1 semana</option>
+                      <option value={2}>2 semanas seguidas (Recomendado)</option>
+                      <option value={3}>3 semanas seguidas</option>
+                    </select>
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">
+                      Alerta de repetición de Bosquejos Públicos:
+                    </label>
+                    <select
+                      value={warnOutlineMonths}
+                      onChange={(e) => setWarnOutlineMonths(Number(e.target.value))}
+                      className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                    >
+                      <option value={6}>No repetir el mismo bosquejo antes de 6 meses</option>
+                      <option value={9}>No repetir el mismo bosquejo antes de 9 meses</option>
+                      <option value={12}>No repetir antes de 12 meses (Recomendación Teocrática)</option>
+                      <option value={18}>No repetir antes de 18 meses</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-3 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => handleSaveSettings()}
+                  disabled={isSaving}
+                  className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md active:scale-95 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{isSaving ? 'Guardando...' : 'Guardar Reglas'}</span>
+                </button>
+              </div>
             </div>
+          )}
 
-            <button
-              type="button"
-              onClick={() => setIsSettingsJoinModalOpen(true)}
-              className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <KeyRound className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Canjear Código de Invitación</span>
-            </button>
-          </div>
+          {/* CONTENEDOR 3: INVITACIONES Y ACCESO QR */}
+          {activeTab === 'invitaciones' && (
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center text-purple-600 dark:text-purple-400 font-bold">
+                    <QrCode className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                      Registro Teocrático e Invitaciones con QR
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Acceso cerrado por invitación y clave de congregación
+                    </p>
+                  </div>
+                </div>
 
-          {/* Card 3: Credenciales Teocráticas */}
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                  Credenciales de la Congregación
-                </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200">
-                  {isCongregationPinSet ? 'Protegido' : 'Activo'}
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setIsSettingsWizardOpen(true)}
+                    className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>Asistente de Registro</span>
+                  </button>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Zero-Knowledge E2EE</span>
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Card 1: Invitaciones Activas */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <KeyRound className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        Invitaciones Activas
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200">
+                        {invitations.filter((i) => i.status === 'active').length} vigentes
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Genera códigos alfanuméricos o códigos QR para invitar a ancianos, siervos y publicadores sin registros públicos.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsSettingsInviteModalOpen(true)}
+                    className="px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <QrCode className="w-3.5 h-3.5" />
+                    <span>Gestionar Invitaciones y QR</span>
+                  </button>
+                </div>
+
+                {/* Card 2: Unirse a la Congregación */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <UserPlus className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        Unirse con Código
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
+                        Hermano o Dispositivo
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Introduce un código de invitación recibido para vincular este dispositivo con el rol correspondiente en la congregación.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsSettingsJoinModalOpen(true)}
+                    className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <KeyRound className="w-3.5 h-3.5 text-purple-600" />
+                    <span>Canjear Código de Invitación</span>
+                  </button>
+                </div>
+
+                {/* Card 3: Credenciales Teocráticas */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                        Credenciales de Congregación
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200">
+                        {isCongregationPinSet ? 'Protegido' : 'Activo'}
+                      </span>
+                    </div>
+                    <div className="space-y-1.5 text-xs mt-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-500 dark:text-slate-400">ID Congregación:</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-bold text-slate-900 dark:text-white">
+                            {settings.congregationNumber || settings.congregationId || 'No asignado'}
+                          </span>
+                          {(settings.congregationNumber || settings.congregationId) && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const id = settings.congregationNumber || settings.congregationId || '';
+                                navigator.clipboard.writeText(id);
+                                setCopiedCongId(true);
+                                setTimeout(() => setCopiedCongId(false), 2000);
+                              }}
+                              className="p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-all cursor-pointer"
+                              title="Copiar ID de la Congregación"
+                            >
+                              {copiedCongId ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">PIN Congregación:</span>
+                        <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">•••• (Configurado)</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">Tu PIN Personal:</span>
+                        <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                          {isPinEnabled ? '•••• (Activo)' : 'Sin configurar'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsSettingsWizardOpen(true)}
+                    className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Building2 className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Ver Asistente de Registro</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* CONTENEDOR 4: SEGURIDAD Y PINS */}
+          {activeTab === 'seguridad' && (
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                      Seguridad y Privacidad Teocrática
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Protección de datos y bloqueo de pantalla teocrática
+                    </p>
+                  </div>
+                </div>
+
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 self-start sm:self-auto">
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Cifrado Local AES-256</span>
                 </span>
               </div>
-              <div className="space-y-1.5 text-xs mt-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-500 dark:text-slate-400">ID de la Congregación:</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono font-bold text-slate-900 dark:text-white">
-                      {settings.congregationNumber || settings.congregationId || 'No asignado'}
-                    </span>
-                    {(settings.congregationNumber || settings.congregationId) && (
+
+              {/* PIN Security Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Card: PIN de Bloqueo */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <KeyRound className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        PIN de Bloqueo de Sesión
+                      </span>
+                      {isPinEnabled ? (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200">
+                          PIN Activado
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
+                          Sin PIN
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Bloquea la aplicación con un código numérico para proteger la confidencialidad en computadoras compartidas del Salón del Reino o cabina de audio.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
+                    {isPinEnabled && (
                       <button
                         type="button"
-                        onClick={() => {
-                          const id = settings.congregationNumber || settings.congregationId || '';
-                          navigator.clipboard.writeText(id);
-                          setCopiedCongId(true);
-                          setTimeout(() => setCopiedCongId(false), 2000);
-                        }}
-                        className="p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-all cursor-pointer"
-                        title="Copiar ID de la Congregación"
+                        onClick={lockSession}
+                        className="px-3 py-1.5 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
                       >
-                        {copiedCongId ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                        <Lock className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Bloquear Ahora</span>
                       </button>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPinCurrent('');
+                        setPinNew('');
+                        setPinConfirm('');
+                        setPinModalError(null);
+                        setShowPinSetupModal(true);
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer"
+                    >
+                      {isPinEnabled ? 'Cambiar o Quitar PIN' : 'Configurar PIN de Seguridad'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Card: Auto-Bloqueo por Inactividad */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
+                  <div>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white block mb-1.5 flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                      Bloqueo Automático por Inactividad
+                    </span>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Bloquea la pantalla automáticamente si no se detecta actividad del mouse o teclado durante el tiempo seleccionado.
+                    </p>
+                  </div>
+
+                  <div>
+                    <select
+                      value={autoLockMinutes}
+                      onChange={(e) => setAutoLockMinutes(Number(e.target.value))}
+                      disabled={!isPinEnabled}
+                      className="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-semibold disabled:opacity-50"
+                    >
+                      <option value={2}>Bloquear tras 2 minutos de inactividad</option>
+                      <option value={5}>Bloquear tras 5 minutos de inactividad (Recomendado)</option>
+                      <option value={10}>Bloquear tras 10 minutos de inactividad</option>
+                      <option value={15}>Bloquear tras 15 minutos de inactividad</option>
+                      <option value={0}>Desactivado (Solo bloqueo manual)</option>
+                    </select>
+                    {!isPinEnabled && (
+                      <span className="text-[10px] text-slate-400 mt-1 block">
+                        * Requiere configurar un PIN primero
+                      </span>
                     )}
                   </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">PIN de la Congregación:</span>
-                  <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">•••• (Configurado)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500 dark:text-slate-400">Tu PIN Personal:</span>
-                  <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{isPinEnabled ? '•••• (Activo)' : 'Sin configurar'}</span>
-                </div>
               </div>
-            </div>
 
-            <button
-              type="button"
-              onClick={() => setIsSettingsWizardOpen(true)}
-              className="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <Building2 className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Ver Asistente de Registro</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* 5. SEGURIDAD TEOCRÁTICA Y BLOQUEO DE SESIÓN */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-2">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Seguridad y Privacidad Teocrática
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Protección de datos y bloqueo de pantalla teocrática
-              </p>
-            </div>
-          </div>
-
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 self-start sm:self-auto">
-            <Lock className="w-3.5 h-3.5" />
-            <span>Cifrado Local AES-256</span>
-          </span>
-        </div>
-
-        {/* PIN Security Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Card: PIN de Bloqueo */}
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <KeyRound className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                  PIN de Bloqueo de Sesión
-                </span>
-                {isPinEnabled ? (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200">
-                    PIN Activado
+              {/* Privacy Mode (PII Masking) */}
+              <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 flex items-center justify-between gap-4">
+                <div>
+                  <span className="text-xs font-bold text-indigo-950 dark:text-indigo-200 block mb-0.5">
+                    Modo Privacidad Teocrática de Publicadores (RGPD / PII)
                   </span>
-                ) : (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
-                    Sin PIN
-                  </span>
-                )}
+                  <p className="text-xs text-indigo-900/70 dark:text-indigo-300/70">
+                    Enmascara los números de teléfono, direcciones y notas de publicadores para evitar que queden expuestos en pantallas públicas o proyectores.
+                  </p>
+                </div>
+
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={privacyModeEnabled}
+                    onChange={(e) => setPrivacyModeEnabled(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Bloquea la aplicación con un código numérico para proteger la confidencialidad en computadoras compartidas del Salón del Reino o cabina de audio.
-              </p>
             </div>
+          )}
 
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
-              {isPinEnabled && (
-                <button
-                  type="button"
-                  onClick={lockSession}
-                  className="px-3 py-1.5 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+          {/* CONTENEDOR 5: NUBE Y SINCRONIZACIÓN */}
+          {activeTab === 'nube' && (
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 flex-wrap gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950 flex items-center justify-center text-sky-600 dark:text-sky-400 font-bold">
+                    <Cloud className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                      Respaldo Automático en la Nube
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Sincronización segura de la congregación con Firebase Firestore
+                    </p>
+                  </div>
+                </div>
+
+                <span
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                    user
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                      : 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800'
+                  }`}
                 >
-                  <Lock className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Bloquear Ahora</span>
-                </button>
-              )}
-
-              <button
-                type="button"
-                onClick={() => {
-                  setPinCurrent('');
-                  setPinNew('');
-                  setPinConfirm('');
-                  setPinModalError(null);
-                  setShowPinSetupModal(true);
-                }}
-                className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer"
-              >
-                {isPinEnabled ? 'Cambiar o Quitar PIN' : 'Configurar PIN de Seguridad'}
-              </button>
-            </div>
-          </div>
-
-          {/* Card: Auto-Bloqueo por Inactividad */}
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
-            <div>
-              <span className="text-xs font-bold text-slate-900 dark:text-white block mb-1.5 flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                Bloqueo Automático por Inactividad
-              </span>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Bloquea la pantalla automáticamente si no se detecta actividad del mouse o teclado durante el tiempo seleccionado.
-              </p>
-            </div>
-
-            <div>
-              <select
-                value={autoLockMinutes}
-                onChange={(e) => setAutoLockMinutes(Number(e.target.value))}
-                disabled={!isPinEnabled}
-                className="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-semibold disabled:opacity-50"
-              >
-                <option value={2}>Bloquear tras 2 minutos de inactividad</option>
-                <option value={5}>Bloquear tras 5 minutos de inactividad (Recomendado)</option>
-                <option value={10}>Bloquear tras 10 minutos de inactividad</option>
-                <option value={15}>Bloquear tras 15 minutos de inactividad</option>
-                <option value={0}>Desactivado (Solo bloqueo manual)</option>
-              </select>
-              {!isPinEnabled && (
-                <span className="text-[10px] text-slate-400 mt-1 block">
-                  * Requiere configurar un PIN primero
+                  <span
+                    className={`w-2 h-2 rounded-full ${user ? 'bg-emerald-500 animate-pulse' : 'bg-sky-500'}`}
+                  />
+                  {user ? 'Google Conectado' : 'Respaldo automático por ID'}
                 </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Privacy Mode (PII Masking) */}
-        <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 flex items-center justify-between gap-4">
-          <div>
-            <span className="text-xs font-bold text-indigo-950 dark:text-indigo-200 block mb-0.5">
-              Modo Privacidad Teocrática de Publicadores (RGPD / PII)
-            </span>
-            <p className="text-xs text-indigo-900/70 dark:text-indigo-300/70">
-              Enmascara los números de teléfono, direcciones y notas de publicadores para evitar que queden expuestos en pantallas públicas o proyectores.
-            </p>
-          </div>
-
-          <label className="relative inline-flex items-center cursor-pointer shrink-0">
-            <input
-              type="checkbox"
-              checked={privacyModeEnabled}
-              onChange={(e) => setPrivacyModeEnabled(e.target.checked)}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-          </label>
-        </div>
-      </div>
-    </div>
-  )}
-
-  {/* VISTA 4: RESPALDOS Y NUBE */}
-  {settingsSubView === 'respaldos' && (
-    <div className="space-y-8 animate-fade-in">
-      {/* SINCRONIZACIÓN EN LA NUBE Y GOOGLE AUTH */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 flex-wrap gap-2">
-          <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Cloud className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-            <span>Respaldo Automático en la Nube de la Congregación</span>
-          </h3>
-          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-            user
-              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-              : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
-          }`}>
-            <span className={`w-2 h-2 rounded-full ${user ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-            {user ? 'Google Conectado' : 'Respaldo automático por ID'}
-          </span>
-        </div>
-
-        {/* Sync message alert if any */}
-        {cloudActionStatus && (
-          <div className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between gap-2.5 animate-fade-in ${
-            cloudActionStatus.type === 'success'
-              ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
-              : 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
-          }`}>
-            <div className="flex items-center gap-2.5">
-              {cloudActionStatus.type === 'success' ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              ) : (
-                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-              )}
-              <span>{cloudActionStatus.msg}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setCloudActionStatus(null)}
-              className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-xs cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
-        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <p className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
-              {user ? (
-                <>
-                  <span>Conectado como:</span>
-                  <span className="text-indigo-600 dark:text-indigo-400 font-mono text-xs">{user.email}</span>
-                </>
-              ) : (
-                <span>Modo Local / Credenciales de Aplicación</span>
-              )}
-            </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl">
-              {user
-                ? 'Tus datos de la congregación (publicadores, reuniones, programas CLM, asignaciones y ajustes) se respaldan automáticamente en la nube bajo el ID de tu congregación, sin importar la cuenta con la que entres. Nada se guarda en cuentas personales.'
-                : 'Tus datos de la congregación (ID y PIN) se respaldan automáticamente en la nube bajo el ID de la congregación en cada cambio, sin necesidad de iniciar sesión con Google.'}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap shrink-0">
-            {user ? (
-              <>
-                <button
-                  type="button"
-                  onClick={handleUploadToGoogle}
-                  disabled={isSyncingCloud}
-                  className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer disabled:opacity-60"
-                  title="Subir y guardar todos los datos locales actuales en tu cuenta de Google Firestore"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>{isSyncingCloud ? 'Guardando...' : 'Subir datos a Google'}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDownloadFromGoogle}
-                  disabled={isSyncingCloud}
-                  className="px-3.5 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer disabled:opacity-60"
-                  title="Descargar y restaurar datos teocráticos desde tu cuenta de Google Firestore"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Restaurar de Google</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={signOutUser}
-                  className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-600 hover:text-rose-600 dark:text-slate-400 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
-                  title="Desconectar cuenta de Google"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Desconectar</span>
-                </button>
-              </>
-            ) : (
-              <button
-                type="button"
-                onClick={handleUploadToGoogle}
-                disabled={isSyncingCloud}
-                className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95 cursor-pointer"
-              >
-                <Cloud className="w-4 h-4" />
-                <span>{isSyncingCloud ? 'Guardando...' : 'Guardar ahora en la nube'}</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* COPIAS DE SEGURIDAD Y CIFRADO MILITAR E2EE */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-        <h3 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
-          <Database className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-          <span>Copias de Seguridad y Respaldo Cifrado</span>
-        </h3>
-
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          Exporta todos los datos teocráticos de la congregación. Puedes proteger tu copia con una clave de cifrado militar AES-256 para que nadie sin la contraseña pueda leer el archivo ni acceder a los registros.
-        </p>
-
-        {importStatus && (
-          <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-indigo-800 dark:text-indigo-200 text-xs font-bold animate-fade-in">
-            {importStatus}
-          </div>
-        )}
-
-        <div className="flex flex-wrap items-center gap-3 pt-2">
-          {/* Encrypted Export Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setExportPassphrase('');
-              setConfirmExportPassphrase('');
-              setEncryptExportError(null);
-              setShowEncryptExportModal(true);
-            }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
-          >
-            <Lock className="w-4 h-4 text-indigo-200" />
-            <span>Exportar Respaldo Cifrado (.orgenc.json)</span>
-          </button>
-
-          {/* Standard JSON Export */}
-          <button
-            type="button"
-            onClick={exportBackupJSON}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
-          >
-            <Download className="w-4 h-4" />
-            <span>Descargar JSON Estándar</span>
-          </button>
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            accept=".json,.orgenc.json"
-            className="hidden"
-          />
-
-          {/* Restore Button (Auto-detects plain or encrypted) */}
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all active:scale-95 cursor-pointer border border-slate-200 dark:border-slate-700"
-          >
-            <Upload className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-            <span>Restaurar Copia de Seguridad</span>
-          </button>
-        </div>
-      </div>
-
-      {/* GESTIÓN DE DATOS Y LIMPIEZA DE PRUEBAS */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-        <h3 className="text-base font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
-          <Trash2 className="w-4 h-4 text-amber-500" />
-          <span>Gestión de Datos y Limpieza de Pruebas</span>
-        </h3>
-
-        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-          Herramientas para eliminar los datos de prueba o demostración cargados en la aplicación, o reiniciar la información para comenzar desde cero con tu congregación real.
-        </p>
-
-        {cleanActionStatus && (
-          <div className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between gap-2.5 animate-fade-in ${
-            cleanActionStatus.type === 'success'
-              ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
-              : 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
-          }`}>
-            <div className="flex items-center gap-2.5">
-              {cleanActionStatus.type === 'success' ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              ) : (
-                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-              )}
-              <span>{cleanActionStatus.msg}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setCleanActionStatus(null)}
-              className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-          {/* Opción 1: Eliminar datos de prueba del Salón */}
-          <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 flex flex-col justify-between space-y-3">
-            <div>
-              <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-xs mb-1">
-                <Trash2 className="w-4 h-4 text-amber-600" />
-                <span>Eliminar Datos de Prueba</span>
               </div>
-              <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                Limpia los circuitos de muestra del tablero eléctrico, fichas de mantenimiento de prueba, registros y asignaciones ficticias. <strong>Conserva el nombre de tu congregación y los horarios de reunión intactos.</strong>
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowCleanSampleModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Eliminar Datos de Prueba</span>
-            </button>
-          </div>
 
-          {/* Opción 2: Vaciar publicadores de prueba */}
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
-            <div>
-              <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 font-bold text-xs mb-1">
-                <User className="w-4 h-4 text-slate-500" />
-                <span>Vaciar Publicadores de Prueba</span>
+              {cloudActionStatus && (
+                <div
+                  className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between gap-2.5 animate-fade-in ${
+                    cloudActionStatus.type === 'success'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                      : 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    {cloudActionStatus.type === 'success' ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                    )}
+                    <span>{cloudActionStatus.msg}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setCloudActionStatus(null)}
+                    className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-xs cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    {user ? (
+                      <>
+                        <span>Conectado como:</span>
+                        <span className="text-indigo-600 dark:text-indigo-400 font-mono text-xs">
+                          {user.email}
+                        </span>
+                      </>
+                    ) : (
+                      <span>Modo Local / Sincronización por ID de Congregación</span>
+                    )}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-xl">
+                    {user
+                      ? 'Tus datos de la congregación (publicadores, reuniones, programas CLM, asignaciones y ajustes) se respaldan automáticamente en la nube bajo el ID de tu congregación, sin importar la cuenta con la que entres.'
+                      : 'Tus datos de la congregación (ID y PIN) se respaldan automáticamente en la nube bajo el ID de la congregación en cada cambio guardado.'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap shrink-0">
+                  {user ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleUploadToGoogle}
+                        disabled={isSyncingCloud}
+                        className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer disabled:opacity-60"
+                        title="Subir y guardar todos los datos locales actuales en tu cuenta de Google Firestore"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>{isSyncingCloud ? 'Guardando...' : 'Subir datos a Google'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDownloadFromGoogle}
+                        disabled={isSyncingCloud}
+                        className="px-3.5 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer disabled:opacity-60"
+                        title="Descargar y restaurar datos teocráticos desde Google Firestore"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>Restaurar de Google</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={signOutUser}
+                        className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-600 hover:text-rose-600 dark:text-slate-400 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                        title="Desconectar cuenta de Google"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        <span>Desconectar</span>
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleUploadToGoogle}
+                      disabled={isSyncingCloud}
+                      className="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-all flex items-center gap-2 shadow-xs active:scale-95 cursor-pointer"
+                    >
+                      <Cloud className="w-4 h-4" />
+                      <span>{isSyncingCloud ? 'Guardando...' : 'Guardar ahora en la nube'}</span>
+                    </button>
+                  )}
+                </div>
               </div>
-              <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                Elimina todos los publicadores de prueba agregados previamente si necesitas importar o escribir tu lista de hermanos real desde cero.
-              </p>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowClearPublishersModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>Vaciar Lista de Publicadores</span>
-            </button>
-          </div>
-        </div>
+          )}
 
-        {/* Zona de peligro: Restablecer congregación */}
-        <div className="pt-4 mt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h4 className="text-xs font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
-              <AlertTriangle className="w-3.5 h-3.5" />
-              <span>Zona de Peligro: Restablecer a Valores de Fábrica</span>
-            </h4>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Borra absolutamente todos los datos locales y en la nube y vuelve a la pantalla inicial de bienvenida.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              setResetConfirmationText('');
-              setShowResetAllModal(true);
-            }}
-            className="px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-600 hover:text-white text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all active:scale-95 cursor-pointer shrink-0"
-          >
-            Restablecer Todo a Cero
-          </button>
+          {/* CONTENEDOR 6: COPIAS Y RESGUARDOS CIFRADOS */}
+          {activeTab === 'respaldos' && (
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+              <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
+                    <Database className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                      Copias de Seguridad y Respaldo Cifrado
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Descargas locales y protección con cifrado militar AES-256
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Exporta todos los datos teocráticos de la congregación. Puedes proteger tu copia con una clave de cifrado militar AES-256 para que nadie sin la contraseña pueda leer el archivo ni acceder a los registros.
+              </p>
+
+              {importStatus && (
+                <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-indigo-800 dark:text-indigo-200 text-xs font-bold animate-fade-in">
+                  {importStatus}
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                {/* Encrypted Export Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setExportPassphrase('');
+                    setConfirmExportPassphrase('');
+                    setEncryptExportError(null);
+                    setShowEncryptExportModal(true);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+                >
+                  <Lock className="w-4 h-4 text-indigo-200" />
+                  <span>Exportar Respaldo Cifrado (.enc.json)</span>
+                </button>
+
+                {/* Standard JSON Export */}
+                <button
+                  type="button"
+                  onClick={exportBackupJSON}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Descargar JSON Estándar</span>
+                </button>
+
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  accept=".json,.orgenc.json,.enc.json"
+                  className="hidden"
+                />
+
+                {/* Restore Button */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all active:scale-95 cursor-pointer border border-slate-200 dark:border-slate-700"
+                >
+                  <Upload className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                  <span>Restaurar Copia de Seguridad</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* CONTENEDOR 7: MANTENIMIENTO Y DATOS */}
+          {activeTab === 'mantenimiento' && (
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+              <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950 flex items-center justify-center text-rose-600 dark:text-rose-400 font-bold">
+                    <Trash2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                      Gestión de Datos y Limpieza de Pruebas
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Herramientas administrativas para restablecer la información de la congregación
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Herramientas para eliminar los datos de prueba o demostración cargados en la aplicación, o reiniciar la información para comenzar desde cero con tu congregación real.
+              </p>
+
+              {cleanActionStatus && (
+                <div
+                  className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between gap-2.5 animate-fade-in ${
+                    cleanActionStatus.type === 'success'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                      : 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    {cleanActionStatus.type === 'success' ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                    )}
+                    <span>{cleanActionStatus.msg}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setCleanActionStatus(null)}
+                    className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                {/* Opción 1: Eliminar datos de prueba del Salón */}
+                <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 flex flex-col justify-between space-y-3">
+                  <div>
+                    <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-xs mb-1">
+                      <Trash2 className="w-4 h-4 text-amber-600" />
+                      <span>Eliminar Datos de Prueba</span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                      Limpia los circuitos de muestra del tablero eléctrico, fichas de mantenimiento de prueba, registros y asignaciones ficticias. <strong>Conserva el nombre de tu congregación y los horarios de reunión intactos.</strong>
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowCleanSampleModal(true)}
+                    className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Eliminar Datos de Prueba</span>
+                  </button>
+                </div>
+
+                {/* Opción 2: Vaciar publicadores de prueba */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
+                  <div>
+                    <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 font-bold text-xs mb-1">
+                      <User className="w-4 h-4 text-slate-500" />
+                      <span>Vaciar Publicadores de Prueba</span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                      Elimina todos los publicadores de prueba agregados previamente si necesitas importar o escribir tu lista de hermanos real desde cero.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowClearPublishersModal(true)}
+                    className="px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    <span>Vaciar Lista de Publicadores</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Zona de peligro */}
+              <div className="pt-4 mt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h4 className="text-xs font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span>Zona de Peligro: Restablecer a Valores de Fábrica</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Borra absolutamente todos los datos locales y en la nube y vuelve a la pantalla inicial de bienvenida.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setResetConfirmationText('');
+                    setShowResetAllModal(true);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-600 hover:text-white text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all active:scale-95 cursor-pointer shrink-0"
+                >
+                  Restablecer Todo a Cero
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
-    </div>
-  )}
+      )}
 
       {/* MODAL 1: SETUP PIN MODAL */}
       {showPinSetupModal && (
@@ -1437,7 +2075,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
           <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                   <KeyRound className="w-4 h-4" />
                 </div>
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm">

@@ -1,7 +1,8 @@
 // src/components/PersonalViewTab.tsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useCongregation } from '../context/CongregationContext';
-import { AssignmentStatus } from '../types';
+import { useAuth } from '../context/AuthContext';
+import { AssignmentStatus, MonthlyServiceReport, PublisherAbsence } from '../types';
 import { generateGoogleCalendarUrl, downloadSingleIcsEvent } from '../utils/calendarExport';
 import {
   UserCheck,
@@ -26,7 +27,28 @@ import {
   Flame,
   Building,
   Package,
+  KeyRound,
+  FileText,
+  Send,
+  Plane,
+  Users,
+  LogOut,
+  HelpCircle,
+  MessageCircle,
+  Smartphone,
+  ChevronRight,
+  Plus,
+  Trash2,
+  Sparkles,
+  Shield,
+  Eye,
+  EyeOff,
+  Bell,
+  ArrowRight,
+  Info,
 } from 'lucide-react';
+
+export type NWPublisherTab = 'asignaciones' | 'informe' | 'ausencias' | 'grupo' | 'avisos';
 
 export const PersonalViewTab: React.FC = () => {
   const {
@@ -43,199 +65,294 @@ export const PersonalViewTab: React.FC = () => {
     memorialPlans,
     theocraticAssemblies,
     specialOrders,
+    preachingGroups,
+    monthlyReports,
+    updateMonthlyReport,
+    updatePublisher,
   } = useCongregation();
+
+  const {
+    currentPublisherId,
+    setIdentifiedPublisher,
+    currentBrotherName,
+    activeRole,
+    effectiveRoleInfo,
+    identifyRoleByPersonalPin,
+    publisherPinsList,
+  } = useAuth();
+
+  // Active module within NW Publisher
+  const [activeModule, setActiveModule] = useState<NWPublisherTab>('asignaciones');
+
+  // Selected publisher state
   const [selectedPublisherId, setSelectedPublisherId] = useState<string>(() => {
+    if (currentPublisherId && publishersMap.has(currentPublisherId)) {
+      return currentPublisherId;
+    }
+    // Check local storage for quick access
+    const saved = localStorage.getItem('kongre_current_publisher_id_v2');
+    if (saved && publishersMap.has(saved)) return saved;
     return publishers[0]?.id || '';
   });
+
+  // PIN login state when not authenticated
+  const [enteredPin, setEnteredPin] = useState('');
+  const [pinError, setPinError] = useState<string | null>(null);
+  const [isVerifyingPin, setIsVerifyingPin] = useState(false);
+  const [showSupervisorSelect, setShowSupervisorSelect] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [reportSuccessMsg, setReportSuccessMsg] = useState<string | null>(null);
+
+  // Absence modal / form
+  const [showAddAbsenceModal, setShowAddAbsenceModal] = useState(false);
+  const [absenceStartDate, setAbsenceStartDate] = useState('');
+  const [absenceEndDate, setAbsenceEndDate] = useState('');
+  const [absenceReason, setAbsenceReason] = useState('Vacaciones familiares');
+
+  // Replacement / decline assignment modal
+  const [declineModalState, setDeclineModalState] = useState<{
+    isOpen: boolean;
+    assignment: any | null;
+    reason: string;
+  }>({
+    isOpen: false,
+    assignment: null,
+    reason: '',
+  });
+
+  // Current selected month for S-4 report (YYYY-MM)
+  const currentMonthKey = useMemo(() => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    return `${y}-${m}`;
+  }, []);
+
+  const [selectedReportMonth, setSelectedReportMonth] = useState<string>(currentMonthKey);
+
+  // Sync selected publisher when currentPublisherId changes
+  useEffect(() => {
+    if (currentPublisherId && publishersMap.has(currentPublisherId)) {
+      setSelectedPublisherId(currentPublisherId);
+    }
+  }, [currentPublisherId, publishersMap]);
 
   const selectedPublisher = publishersMap.get(selectedPublisherId);
 
-  // My assigned territories
-  const myTerritories = useMemo(() => {
-    if (!selectedPublisherId) return [];
-    return territories.filter(t => t.currentAssigneeId === selectedPublisherId);
-  }, [territories, selectedPublisherId]);
-
-  // My meals for Circuit Overseer visit
-  const myVisitMeals = useMemo(() => {
-    if (!selectedPublisherId || !circuitVisit) return [];
-    return circuitVisit.meals.filter(m => m.hostPublisherId === selectedPublisherId);
-  }, [circuitVisit, selectedPublisherId]);
-
-  // My ministry accompaniment for Circuit Overseer visit
-  const myVisitMinistry = useMemo(() => {
-    if (!selectedPublisherId || !circuitVisit) return [];
-    return circuitVisit.ministry.filter(
-      m => m.coCompanionPublisherId === selectedPublisherId || m.wifeCompanionPublisherId === selectedPublisherId
+  // Is user in supervisor / elder mode?
+  const canSupervise = useMemo(() => {
+    return (
+      activeRole === 'coordinador' ||
+      activeRole === 'secretario' ||
+      activeRole === 'superintendente_vym' ||
+      effectiveRoleInfo?.canEditSchedule ||
+      effectiveRoleInfo?.canEditPublishers
     );
-  }, [circuitVisit, selectedPublisherId]);
+  }, [activeRole, effectiveRoleInfo]);
 
-  // My cart shifts
-  const myCartShifts = useMemo(() => {
-    if (!selectedPublisherId) return [];
-    return cartShifts.filter(
-      (s) => s.publisher1Id === selectedPublisherId || s.publisher2Id === selectedPublisherId
+  // Is authenticated as a publisher or admin
+  const isAuthenticatedPublisher = Boolean(
+    (currentPublisherId && publishersMap.has(currentPublisherId)) || canSupervise
+  );
+
+  // S-4 Report for selected publisher and month
+  const existingReport = useMemo(() => {
+    if (!selectedPublisherId) return null;
+    return (
+      monthlyReports.find(
+        (r) => r.publisherId === selectedPublisherId && r.month === selectedReportMonth
+      ) || null
     );
-  }, [cartShifts, selectedPublisherId]);
+  }, [monthlyReports, selectedPublisherId, selectedReportMonth]);
 
-  // My Memorial Assignments
-  const myMemorialAssignments = useMemo(() => {
-    if (!selectedPublisherId || !memorialPlans.length) return [];
-    const list: Array<{
-      planId: string;
-      year: number;
-      date: string;
-      time: string;
-      location: string;
-      roleTitle: string;
-      description?: string;
-    }> = [];
+  // Local state for the S-4 form
+  const [reportForm, setReportForm] = useState<{
+    participated: boolean;
+    hours: number;
+    bibleStudies: number;
+    notes: string;
+  }>({
+    participated: true,
+    hours: 0,
+    bibleStudies: 0,
+    notes: '',
+  });
 
-    memorialPlans.forEach(plan => {
-      if (plan.chairmanPublisherId === selectedPublisherId) {
-        list.push({
-          planId: plan.id,
-          year: plan.serviceYear,
-          date: plan.date,
-          time: plan.time,
-          location: plan.location,
-          roleTitle: 'Presidente de la Conmemoración',
-          description: 'Presidirá la reunión sagrada, cánticos y bienvenida',
-        });
-      }
-      if (plan.speakerPublisherId === selectedPublisherId) {
-        list.push({
-          planId: plan.id,
-          year: plan.serviceYear,
-          date: plan.date,
-          time: plan.time,
-          location: plan.location,
-          roleTitle: 'Orador del Discurso del Memorial',
-          description: `Discurso: "${plan.speakerTheme}"`,
-        });
-      }
-      if (plan.breadPrayerPublisherId === selectedPublisherId) {
-        list.push({
-          planId: plan.id,
-          year: plan.serviceYear,
-          date: plan.date,
-          time: plan.time,
-          location: plan.location,
-          roleTitle: 'Oración por el Pan Ácimo',
-          description: 'Agradecimiento por el cuerpo de Cristo',
-        });
-      }
-      if (plan.winePrayerPublisherId === selectedPublisherId) {
-        list.push({
-          planId: plan.id,
-          year: plan.serviceYear,
-          date: plan.date,
-          time: plan.time,
-          location: plan.location,
-          roleTitle: 'Oración por el Vino Tinto',
-          description: 'Agradecimiento por la sangre del pacto',
-        });
-      }
-      plan.emblemServers.forEach(server => {
-        if (server.breadServerPublisherId === selectedPublisherId) {
-          list.push({
-            planId: plan.id,
-            year: plan.serviceYear,
-            date: plan.date,
-            time: plan.time,
-            location: plan.location,
-            roleTitle: `Servidor del Pan (${server.sectionName})`,
-            description: server.notes,
-          });
-        }
-        if (server.wineServerPublisherId === selectedPublisherId) {
-          list.push({
-            planId: plan.id,
-            year: plan.serviceYear,
-            date: plan.date,
-            time: plan.time,
-            location: plan.location,
-            roleTitle: `Servidor del Vino (${server.sectionName})`,
-            description: server.notes,
-          });
-        }
+  // Sync form when month or publisher changes
+  useEffect(() => {
+    if (existingReport) {
+      setReportForm({
+        participated: existingReport.participated,
+        hours: existingReport.hours || 0,
+        bibleStudies: existingReport.bibleStudies || 0,
+        notes: existingReport.notes || '',
       });
-      plan.attendants.forEach(att => {
-        if (att.publisherId === selectedPublisherId) {
-          list.push({
-            planId: plan.id,
-            year: plan.serviceYear,
-            date: plan.date,
-            time: plan.time,
-            location: plan.location,
-            roleTitle: `Acomodador del Memorial (${att.role.replace('_', ' ').toUpperCase()})`,
-            description: att.notes,
-          });
-        }
+    } else {
+      setReportForm({
+        participated: true,
+        hours: 0,
+        bibleStudies: 0,
+        notes: '',
       });
-      if (plan.preparation.breadPreparationPublisherId === selectedPublisherId) {
-        list.push({
-          planId: plan.id,
-          year: plan.serviceYear,
-          date: plan.date,
-          time: plan.time,
-          location: plan.location,
-          roleTitle: 'Preparación del Pan Ácimo',
-          description: plan.preparation.emblemBreadType,
-        });
+    }
+  }, [existingReport, selectedPublisherId, selectedReportMonth]);
+
+  // Handle PIN login directly
+  const handlePinSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!enteredPin || enteredPin.length < 4) {
+      setPinError('Introduce tu PIN de 4 dígitos asignado.');
+      return;
+    }
+
+    setIsVerifyingPin(true);
+    setPinError(null);
+
+    try {
+      const res = await identifyRoleByPersonalPin(enteredPin);
+      if (res.success) {
+        if (res.publisherId && publishersMap.has(res.publisherId)) {
+          setSelectedPublisherId(res.publisherId);
+          setIdentifiedPublisher(res.publisherId, res.name);
+        } else {
+          // If no specific publisherId was linked to the pin, search in publisher list
+          const matchPub = publishers.find(
+            (p) =>
+              (p as any).personalPin === enteredPin ||
+              (p as any).pin === enteredPin ||
+              p.name.toLowerCase() === (res.name || '').toLowerCase()
+          );
+          if (matchPub) {
+            setSelectedPublisherId(matchPub.id);
+            setIdentifiedPublisher(matchPub.id, matchPub.name);
+          }
+        }
+        setEnteredPin('');
+      } else {
+        setPinError(res.message || 'PIN Personal no reconocido.');
       }
-      if (plan.preparation.wineProviderPublisherId === selectedPublisherId) {
-        list.push({
-          planId: plan.id,
-          year: plan.serviceYear,
-          date: plan.date,
-          time: plan.time,
-          location: plan.location,
-          roleTitle: 'Provisión del Vino Tinto No Adulterado',
-          description: plan.preparation.emblemWineType,
-        });
-      }
+    } catch (err: any) {
+      setPinError(err.message || 'Error al validar el PIN.');
+    } finally {
+      setIsVerifyingPin(false);
+    }
+  };
+
+  // Exit / switch publisher
+  const handleExitPortal = () => {
+    setIdentifiedPublisher(null);
+    setEnteredPin('');
+    setShowSupervisorSelect(false);
+  };
+
+  // Submit S-4 monthly report
+  const handleSaveMonthlyReport = () => {
+    if (!selectedPublisherId) return;
+
+    const isPioneer =
+      selectedPublisher?.pioneerStatus === 'regular' ||
+      selectedPublisher?.pioneerStatus === 'especial' ||
+      (selectedPublisher as any)?.serviceRole === 'regular_pioneer';
+
+    const isAuxiliary =
+      selectedPublisher?.pioneerStatus === 'auxiliar_continuo' ||
+      (selectedPublisher as any)?.serviceRole === 'precursor_auxiliar';
+
+    const newReport: MonthlyServiceReport = {
+      id: existingReport?.id || `rep-${selectedPublisherId}-${selectedReportMonth}`,
+      publisherId: selectedPublisherId,
+      month: selectedReportMonth,
+      participated: reportForm.participated,
+      hours: reportForm.hours,
+      bibleStudies: reportForm.bibleStudies,
+      notes: reportForm.notes.trim() || undefined,
+      reportedAt: new Date().toISOString(),
+      isPioneer: Boolean(isPioneer),
+      isAuxiliaryPioneer: Boolean(isAuxiliary),
+    };
+
+    updateMonthlyReport(newReport);
+    setReportSuccessMsg('¡Informe mensual guardado y transmitido con éxito a la secretaría!');
+    setTimeout(() => setReportSuccessMsg(null), 4000);
+  };
+
+  // Share S-4 report by WhatsApp
+  const handleShareReportWhatsApp = () => {
+    if (!selectedPublisher) return;
+
+    const [y, m] = selectedReportMonth.split('-');
+    const monthNames = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+    ];
+    const monthName = monthNames[parseInt(m, 10) - 1] || selectedReportMonth;
+
+    const text =
+      `*Informe de Servicio del Campo (S-4)* 📋\n` +
+      `👤 *Publicador:* ${selectedPublisher.name}\n` +
+      `🏛 *Congregación:* ${settings.congregationName || 'Central'}\n` +
+      `📅 *Mes:* ${monthName} ${y}\n` +
+      `✅ *Participación:* ${reportForm.participated ? 'Sí participué' : 'Sin participación'}\n` +
+      (reportForm.hours > 0 ? `⏱️ *Horas:* ${reportForm.hours}\n` : '') +
+      (reportForm.bibleStudies > 0 ? `📖 *Cursos Bíblicos:* ${reportForm.bibleStudies}\n` : '') +
+      (reportForm.notes ? `📝 *Notas:* ${reportForm.notes}\n` : '') +
+      `\n_Enviado desde el Portal Teocrático Kongre (NW Publisher)_`;
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  // Add planned absence
+  const handleAddAbsence = () => {
+    if (!selectedPublisher || !absenceStartDate || !absenceEndDate) return;
+
+    const newAbsence: PublisherAbsence = {
+      id: `abs-${Date.now()}`,
+      start_date: absenceStartDate,
+      end_date: absenceEndDate,
+      reason: absenceReason.trim() || 'Ausencia planificada',
+    };
+
+    const currentAbsences = selectedPublisher.ausencias || [];
+    const updated = [...currentAbsences, newAbsence];
+
+    updatePublisher({
+      ...selectedPublisher,
+      ausencias: updated,
     });
 
-    return list;
-  }, [memorialPlans, selectedPublisherId]);
+    setAbsenceStartDate('');
+    setAbsenceEndDate('');
+    setShowAddAbsenceModal(false);
+  };
 
-  // My Assembly volunteering
-  const myAssemblyVolunteering = useMemo(() => {
-    if (!selectedPublisherId || !theocraticAssemblies.length) return [];
-    const list: Array<{
-      assemblyTheme: string;
-      dates: string;
-      venue: string;
-      department: string;
-      roleOrShift: string;
-      shiftTime?: string;
-    }> = [];
-
-    theocraticAssemblies.forEach(ass => {
-      ass.volunteers.forEach(v => {
-        if (v.publisherId === selectedPublisherId) {
-          list.push({
-            assemblyTheme: ass.theme,
-            dates: ass.dates,
-            venue: ass.venue,
-            department: v.department,
-            roleOrShift: v.roleOrShift,
-            shiftTime: v.shiftTime,
-          });
-        }
-      });
+  // Delete absence
+  const handleDeleteAbsence = (absId: string) => {
+    if (!selectedPublisher) return;
+    const currentAbsences = selectedPublisher.ausencias || [];
+    const updated = currentAbsences.filter((a) => a.id !== absId);
+    updatePublisher({
+      ...selectedPublisher,
+      ausencias: updated,
     });
+  };
 
-    return list;
-  }, [theocraticAssemblies, selectedPublisherId]);
+  // My Preaching Group
+  const myPreachingGroup = useMemo(() => {
+    if (!selectedPublisherId) return null;
+    return preachingGroups.find(
+      (g) =>
+        g.memberIds.includes(selectedPublisherId) ||
+        g.overseerId === selectedPublisherId ||
+        g.assistantId === selectedPublisherId
+    );
+  }, [preachingGroups, selectedPublisherId]);
 
-  // My special literature orders
-  const mySpecialOrders = useMemo(() => {
-    if (!selectedPublisherId) return [];
-    return specialOrders.filter(o => o.publisherId === selectedPublisherId);
-  }, [specialOrders, selectedPublisherId]);
+  const groupOverseer = myPreachingGroup?.overseerId
+    ? publishersMap.get(myPreachingGroup.overseerId)
+    : null;
+  const groupAssistant = myPreachingGroup?.assistantId
+    ? publishersMap.get(myPreachingGroup.assistantId)
+    : null;
 
   // Extract all future assignments for this publisher
   const myAssignments = useMemo(() => {
@@ -256,17 +373,15 @@ export const PersonalViewTab: React.FC = () => {
       status: AssignmentStatus;
     }> = [];
 
-    const sortedWeeks = [...weeks].sort((a, b) => a.weekStartDate.localeCompare(b.weekStartDate));
+    const pid = selectedPublisherId;
 
-    sortedWeeks.forEach(w => {
-      const pid = selectedPublisherId;
-
-      // Skip blocked meetings
+    weeks.forEach((w) => {
+      // Midweek
       if (!w.specialEvent?.noMeetingMidweek) {
-        // Midweek President
+        // President
         if (w.midweek.presidentId === pid) {
           list.push({
-            id: `pres-${w.id}`,
+            id: `mid-pres-${w.id}`,
             weekId: w.id,
             date: w.midweek.date,
             meetingType: 'midweek',
@@ -277,38 +392,50 @@ export const PersonalViewTab: React.FC = () => {
             status: 'confirmada',
           });
         }
-
-        // Initial Prayer
-        if (w.midweek.initialPrayerId === pid) {
+        // Auxiliary Counselor
+        if (w.midweek.auxiliaryCounselorId === pid) {
           list.push({
-            id: `pr-init-${w.id}`,
+            id: `mid-auxc-${w.id}`,
             weekId: w.id,
             date: w.midweek.date,
             meetingType: 'midweek',
             meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: 'Oración inicial',
-            roleKey: 'vym_oracion',
+            assignmentTitle: 'Consejero de la Sala Auxiliar',
+            roleKey: 'vym_consejero_aux',
+            assignmentPath: 'auxiliaryCounselorId',
+            room: 'auxiliar',
+            status: 'confirmada',
+          });
+        }
+        // Initial Prayer
+        if (w.midweek.initialPrayerId === pid) {
+          list.push({
+            id: `mid-inip-${w.id}`,
+            weekId: w.id,
+            date: w.midweek.date,
+            meetingType: 'midweek',
+            meetingName: 'Vida y Ministerio Cristianos',
+            assignmentTitle: 'Oración de apertura',
+            roleKey: 'vym_oracion_inicial',
             assignmentPath: 'initialPrayerId',
             status: 'confirmada',
           });
         }
-
         // Final Prayer
         if (w.midweek.finalPrayerId === pid) {
           list.push({
-            id: `pr-fin-${w.id}`,
+            id: `mid-finp-${w.id}`,
             weekId: w.id,
             date: w.midweek.date,
             meetingType: 'midweek',
             meetingName: 'Vida y Ministerio Cristianos',
             assignmentTitle: 'Oración final',
-            roleKey: 'vym_oracion',
+            roleKey: 'vym_oracion_final',
             assignmentPath: 'finalPrayerId',
             status: 'confirmada',
           });
         }
-
-        // Tesoros Discurso
+        // Treasures Talk
         if (w.midweek.tesoros.discurso.publisherId === pid) {
           list.push({
             id: `tes-disc-${w.id}`,
@@ -316,15 +443,14 @@ export const PersonalViewTab: React.FC = () => {
             date: w.midweek.date,
             meetingType: 'midweek',
             meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: `Tesoros: ${w.midweek.tesoros.discurso.title}`,
+            assignmentTitle: `Discurso: ${w.midweek.tesoros.discurso.title}`,
             roleKey: 'vym_tesoros_discurso',
             assignmentPath: 'tesoros.discurso',
             timeMinutes: 10,
             status: w.midweek.tesoros.discurso.status,
           });
         }
-
-        // Perlas
+        // Treasures Gems
         if (w.midweek.tesoros.perlas.publisherId === pid) {
           list.push({
             id: `tes-perl-${w.id}`,
@@ -332,15 +458,14 @@ export const PersonalViewTab: React.FC = () => {
             date: w.midweek.date,
             meetingType: 'midweek',
             meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: `Perlas: ${w.midweek.tesoros.perlas.title}`,
+            assignmentTitle: 'Busquemos perlas escondidas',
             roleKey: 'vym_tesoros_perlas',
             assignmentPath: 'tesoros.perlas',
             timeMinutes: 10,
             status: w.midweek.tesoros.perlas.status,
           });
         }
-
-        // Lectura de la Biblia
+        // Bible Reading Main
         if (w.midweek.tesoros.lecturaBiblia.publisherId === pid) {
           list.push({
             id: `tes-lect-${w.id}`,
@@ -348,7 +473,7 @@ export const PersonalViewTab: React.FC = () => {
             date: w.midweek.date,
             meetingType: 'midweek',
             meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: 'Lectura de la Biblia (Estudiante)',
+            assignmentTitle: 'Lectura de la Biblia (Sala Principal)',
             roleKey: 'vym_tesoros_lectura',
             assignmentPath: 'tesoros.lecturaBiblia',
             room: 'principal',
@@ -356,27 +481,44 @@ export const PersonalViewTab: React.FC = () => {
             status: w.midweek.tesoros.lecturaBiblia.status,
           });
         }
+        // Bible Reading Aux
+        if (w.midweek.tesoros.lecturaBibliaAux?.publisherId === pid) {
+          list.push({
+            id: `tes-lectaux-${w.id}`,
+            weekId: w.id,
+            date: w.midweek.date,
+            meetingType: 'midweek',
+            meetingName: 'Vida y Ministerio Cristianos',
+            assignmentTitle: 'Lectura de la Biblia (Sala Auxiliar)',
+            roleKey: 'vym_tesoros_lectura',
+            assignmentPath: 'tesoros.lecturaBibliaAux',
+            room: 'auxiliar',
+            timeMinutes: 4,
+            status: w.midweek.tesoros.lecturaBibliaAux.status,
+          });
+        }
 
-        // Demonstrations
+        // Apply Yourself (Seamos mejores maestros)
         w.midweek.maestros.items.forEach((item, idx) => {
           if (item.publisherId === pid) {
-            const assistantName = item.assistantId ? publishersMap.get(item.assistantId)?.name : undefined;
+            const assistant = item.assistantId ? publishersMap.get(item.assistantId)?.name : undefined;
             list.push({
               id: `maes-tit-${item.id}`,
               weekId: w.id,
               date: w.midweek.date,
               meetingType: 'midweek',
               meetingName: 'Vida y Ministerio Cristianos',
-              assignmentTitle: `Seamos mejores maestros: ${item.title}`,
+              assignmentTitle: `Titular en: ${item.title}`,
               roleKey: 'vym_maestros_titular',
               assignmentPath: `maestros.${idx}`,
               room: item.room,
-              assistantName,
+              assistantName: assistant ? `Ayudante: ${assistant}` : undefined,
               timeMinutes: item.timeMinutes,
               status: item.status,
             });
-          } else if (item.assistantId === pid) {
-            const titularName = item.publisherId ? publishersMap.get(item.publisherId)?.name : 'Estudiante';
+          }
+          if (item.assistantId === pid) {
+            const titularName = item.publisherId ? publishersMap.get(item.publisherId)?.name : 'Titular';
             list.push({
               id: `maes-asst-${item.id}`,
               weekId: w.id,
@@ -394,7 +536,7 @@ export const PersonalViewTab: React.FC = () => {
           }
         });
 
-        // Vida Cristiana parts
+        // Living as Christians
         w.midweek.vidaCristiana.items.forEach((item, idx) => {
           if (item.publisherId === pid) {
             list.push({
@@ -412,7 +554,7 @@ export const PersonalViewTab: React.FC = () => {
           }
         });
 
-        // CBS Conductor & Reader
+        // Congregation Bible Study Conductor & Reader
         if (w.midweek.vidaCristiana.estudioBiblico.conductorId === pid) {
           list.push({
             id: `cbs-cond-${w.id}`,
@@ -483,8 +625,9 @@ export const PersonalViewTab: React.FC = () => {
             meetingType: 'weekend',
             meetingName: 'Reunión del Fin de Semana',
             assignmentTitle: 'Conductor del Estudio de La Atalaya',
-            roleKey: 'fds_presidente',
+            roleKey: 'fds_atalaya_conductor',
             assignmentPath: 'atalayaConductorId',
+            timeMinutes: 60,
             status: 'confirmada',
           });
         }
@@ -495,28 +638,16 @@ export const PersonalViewTab: React.FC = () => {
             date: w.weekend.date,
             meetingType: 'weekend',
             meetingName: 'Reunión del Fin de Semana',
-            assignmentTitle: 'Lector del Estudio de La Atalaya',
+            assignmentTitle: 'Lector de La Atalaya',
             roleKey: 'fds_atalaya_lector',
             assignmentPath: 'atalayaLectorId',
-            status: 'confirmada',
-          });
-        }
-        if (w.weekend.initialPrayerId === pid) {
-          list.push({
-            id: `fds-pr-init-${w.id}`,
-            weekId: w.id,
-            date: w.weekend.date,
-            meetingType: 'weekend',
-            meetingName: 'Reunión del Fin de Semana',
-            assignmentTitle: 'Oración inicial (Fin de semana)',
-            roleKey: 'fds_oracion',
-            assignmentPath: 'initialPrayerId',
+            timeMinutes: 60,
             status: 'confirmada',
           });
         }
         if (w.weekend.finalPrayerId === pid) {
           list.push({
-            id: `fds-pr-fin-${w.id}`,
+            id: `fds-finp-${w.id}`,
             weekId: w.id,
             date: w.weekend.date,
             meetingType: 'weekend',
@@ -550,6 +681,7 @@ export const PersonalViewTab: React.FC = () => {
     return list.sort((a, b) => a.date.localeCompare(b.date));
   }, [selectedPublisherId, weeks, publishersMap]);
 
+  // Handle assignment status confirmation
   const handleUpdateStatus = (
     weekId: string,
     meetingType: 'midweek' | 'weekend',
@@ -560,587 +692,1180 @@ export const PersonalViewTab: React.FC = () => {
     replaceAssignment(weekId, meetingType, assignmentPath, selectedPublisherId, newStatus);
   };
 
+  // Copy assignment text
   const copyAssignmentDetails = (item: any) => {
-    const text = `Asignación teocrática:\n📅 Fecha: ${item.date}\n🏛 Reunión: ${item.meetingName}\n📌 Tarea: ${item.assignmentTitle}${item.room ? `\nSala: ${item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}` : ''}${item.assistantName ? `\n${item.assistantName}` : ''}`;
+    const text =
+      `Asignación teocrática:\n` +
+      `📅 Fecha: ${item.date}\n` +
+      `🏛 Reunión: ${item.meetingName}\n` +
+      `📌 Tarea: ${item.assignmentTitle}` +
+      (item.room ? `\nSala: ${item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}` : '') +
+      (item.assistantName ? `\n${item.assistantName}` : '');
+
     navigator.clipboard.writeText(text);
     setCopiedId(item.id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  return (
-    <div className="w-full space-y-4 sm:space-y-6">
-      {/* Header with publisher switcher */}
-      <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3 sm:space-y-4">
-        <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 px-2.5 py-0.5 rounded-full">
-            Portal del Publicador
-          </span>
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mt-1">Mis Próximas Asignaciones</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Vista individual limpia y privada para consultar fechas, confirmar asistencia o avisar oportunamente.
-          </p>
-        </div>
+  // Google Calendar URL generator
+  const getGoogleCalLink = (item: any) => {
+    const time =
+      item.meetingType === 'midweek'
+        ? settings.midweekMeetingTime || '19:00'
+        : settings.weekendMeetingTime || '10:00';
+    const loc = settings.hallAddress || 'Salón del Reino de los Testigos de Jehová';
+    const desc = `${item.assignmentTitle} - ${item.meetingName}. Asignado a ${selectedPublisher?.name || 'Publicador'}.`;
 
-        {/* Selector */}
-        <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-          <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-          <div className="flex-1 min-w-0">
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-0.5">
-              Consultar asignaciones de:
-            </label>
-            <select
-              value={selectedPublisherId}
-              onChange={e => setSelectedPublisherId(e.target.value)}
-              className="w-full text-xs sm:text-sm font-bold text-slate-900 dark:text-white bg-transparent border-none focus:outline-hidden cursor-pointer"
-            >
-              {publishers.map(p => (
-                <option key={p.id} value={p.id} className="dark:bg-slate-900 dark:text-white">
-                  {p.name} {p.active ? '' : '(Inactivo)'}
-                </option>
+    return generateGoogleCalendarUrl(
+      item.assignmentTitle,
+      desc,
+      loc,
+      item.date,
+      time,
+      item.timeMinutes || 105
+    );
+  };
+
+  // Download .ics
+  const handleDownloadIcs = (item: any) => {
+    const time =
+      item.meetingType === 'midweek'
+        ? settings.midweekMeetingTime || '19:00'
+        : settings.weekendMeetingTime || '10:00';
+    const loc = settings.hallAddress || 'Salón del Reino de los Testigos de Jehová';
+    const desc = `${item.assignmentTitle} - ${item.meetingName}.`;
+
+    downloadSingleIcsEvent(
+      item.assignmentTitle,
+      desc,
+      loc,
+      item.date,
+      time,
+      item.timeMinutes || 105
+    );
+  };
+
+  // Share by WhatsApp
+  const handleShareAssignmentWhatsApp = (item: any) => {
+    const text =
+      `*Mi Asignación Teocrática* 🏛\n` +
+      `📅 *Fecha:* ${item.date}\n` +
+      `📖 *Reunión:* ${item.meetingName}\n` +
+      `📌 *Parte:* ${item.assignmentTitle}` +
+      (item.room ? `\n🏛 *Sala:* ${item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}` : '') +
+      (item.assistantName ? `\n👥 ${item.assistantName}` : '') +
+      `\n\n_Kongre NW Publisher_`;
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  // 1. PIN LOGIN SCREEN (If not authenticated as publisher and not supervisor)
+  if (!isAuthenticatedPublisher) {
+    return (
+      <div className="w-full max-w-lg mx-auto py-8 sm:py-14 px-4 animate-in fade-in zoom-in-95 duration-300">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl space-y-6 text-center">
+          {/* Logo / Badge */}
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/25">
+            <KeyRound size={32} />
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 px-3 py-1 rounded-full border border-purple-200/60 dark:border-purple-800/60">
+              NW PUBLISHER APP • PORTAL DEL PUBLICADOR
+            </span>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white pt-1">
+              Bienvenido a tu Portal Teocrático
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
+              Introduce tu PIN Personal único de 4 dígitos para consultar tus partes, enviar tu informe de servicio y reportar ausencias.
+            </p>
+          </div>
+
+          {/* Formulario de PIN */}
+          <form onSubmit={handlePinSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                PIN Personal del Publicador
+              </label>
+              <div className="relative max-w-xs mx-auto">
+                <input
+                  type="password"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  placeholder="••••"
+                  value={enteredPin}
+                  onChange={(e) => {
+                    const clean = e.target.value.replace(/\D/g, '').slice(0, 6);
+                    setEnteredPin(clean);
+                    setPinError(null);
+                  }}
+                  className="w-full text-center text-3xl font-mono tracking-widest py-3 px-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border-2 border-slate-200 dark:border-slate-700 focus:border-purple-600 dark:focus:border-purple-500 focus:outline-hidden text-slate-900 dark:text-white transition-all shadow-inner"
+                  autoFocus
+                />
+              </div>
+
+              {pinError && (
+                <div className="flex items-center justify-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 font-semibold animate-in fade-in">
+                  <AlertCircle size={14} />
+                  <span>{pinError}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Teclado rápido numérico en pantalla para táctil */}
+            <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto pt-1">
+              {['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '✓'].map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => {
+                    if (k === 'C') {
+                      setEnteredPin('');
+                      setPinError(null);
+                    } else if (k === '✓') {
+                      handlePinSubmit();
+                    } else {
+                      if (enteredPin.length < 6) {
+                        setEnteredPin((prev) => prev + k);
+                        setPinError(null);
+                      }
+                    }
+                  }}
+                  className={`py-3 rounded-xl font-bold text-base transition-all cursor-pointer ${
+                    k === '✓'
+                      ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-xs'
+                      : k === 'C'
+                      ? 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300'
+                      : 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-white border border-slate-200/60 dark:border-slate-700/60'
+                  }`}
+                >
+                  {k}
+                </button>
               ))}
-            </select>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isVerifyingPin || enteredPin.length < 4}
+              className="w-full max-w-xs mx-auto py-3 px-6 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm shadow-md shadow-purple-600/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              {isVerifyingPin ? (
+                <span>Validando credencial...</span>
+              ) : (
+                <>
+                  <span>Ingresar a Mi Portal</span>
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Ayuda o modo supervisor */}
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 space-y-2">
+            <p className="italic">
+              ¿No tienes tu PIN? Solicita a los ancianos tu <strong>papeleta de credenciales</strong> con tu código QR de acceso.
+            </p>
+            {publishers.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedPublisherId(publishers[0].id);
+                  setIdentifiedPublisher(publishers[0].id, publishers[0].name);
+                }}
+                className="text-purple-600 dark:text-purple-400 hover:underline font-semibold block mx-auto text-[11px] pt-1"
+              >
+                (Acceso rápido de prueba / Modo Demostración)
+              </button>
+            )}
           </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Assignment cards */}
-      {myAssignments.length === 0 ? (
-        <div className="p-8 sm:p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
-          <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
-            <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+  // 2. MAIN NW PUBLISHER PORTAL
+  return (
+    <div className="w-full space-y-5 animate-in fade-in duration-300">
+      {/* 2.1 BARRA SUPERIOR DE IDENTIDAD DEL PUBLICADOR (NW PUBLISHER HEADER) */}
+      <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+            {selectedPublisher?.name ? selectedPublisher.name[0].toUpperCase() : 'P'}
           </div>
-          <h3 className="text-base font-bold text-slate-900 dark:text-white">
-            {selectedPublisher?.name} no tiene asignaciones próximas
-          </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-            Todas las semanas registradas están al día y no figuran tareas asignadas para este publicador.
-          </p>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/70 px-2.5 py-0.5 rounded-full border border-purple-200/60 dark:border-purple-800/60">
+                NW Publisher • Portal Oficial
+              </span>
+              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/40 flex items-center gap-1">
+                <CheckCircle2 size={10} /> PIN Verificado
+              </span>
+            </div>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mt-0.5">
+              {selectedPublisher?.name || 'Publicador'}
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Congregación: <strong className="text-slate-700 dark:text-slate-300">{settings.congregationName || 'Central'}</strong>
+              {myPreachingGroup && ` • Grupo ${myPreachingGroup.number}`}
+            </p>
+          </div>
         </div>
-      ) : (
+
+        {/* Acciones de la barra superior */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {canSupervise && (
+            <button
+              type="button"
+              onClick={() => setShowSupervisorSelect(!showSupervisorSelect)}
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <Users size={14} className="text-indigo-600 dark:text-indigo-400" />
+              <span>{showSupervisorSelect ? 'Ocultar Selector' : 'Consultar otro hermano'}</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={handleExitPortal}
+            className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border border-rose-200/60 dark:border-rose-800/40"
+            title="Salir o cambiar de PIN"
+          >
+            <LogOut size={14} />
+            <span>Salir</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Selector supervisor desplegable para ancianos */}
+      {canSupervise && showSupervisorSelect && (
+        <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800/60 space-y-2 animate-in fade-in">
+          <div className="flex items-center gap-2 text-xs font-bold text-indigo-900 dark:text-indigo-300">
+            <Shield size={16} />
+            <span>Modo Supervisor / Anciano: Selecciona cualquier publicador para revisar sus asignaciones</span>
+          </div>
+          <select
+            value={selectedPublisherId}
+            onChange={(e) => {
+              setSelectedPublisherId(e.target.value);
+              setIdentifiedPublisher(e.target.value);
+            }}
+            className="w-full text-xs font-semibold p-2.5 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-indigo-200 dark:border-indigo-800 focus:outline-hidden"
+          >
+            {publishers.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name} {p.active ? '' : '(Inactivo)'}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* 2.2 PESTAÑAS PRINCIPALES DEL PORTAL (NW PUBLISHER TABS) */}
+      <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 overflow-x-auto scrollbar-none border border-slate-200/80 dark:border-slate-700/80">
+        <button
+          type="button"
+          onClick={() => setActiveModule('asignaciones')}
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+            activeModule === 'asignaciones'
+              ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Calendar size={16} />
+          <span>Mis Asignaciones</span>
+          {myAssignments.length > 0 && (
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300">
+              {myAssignments.length}
+            </span>
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveModule('informe')}
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+            activeModule === 'informe'
+              ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <FileText size={16} />
+          <span>Mi Informe (S-4)</span>
+          {existingReport && (
+            <span className="w-2 h-2 rounded-full bg-emerald-500" title="Informe del mes registrado" />
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveModule('ausencias')}
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+            activeModule === 'ausencias'
+              ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Plane size={16} />
+          <span>Mis Ausencias</span>
+          {(selectedPublisher?.ausencias || []).length > 0 && (
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300">
+              {(selectedPublisher?.ausencias || []).length}
+            </span>
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveModule('grupo')}
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+            activeModule === 'grupo'
+              ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Users size={16} />
+          <span>Mi Grupo de Servicio</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveModule('avisos')}
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+            activeModule === 'avisos'
+              ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Bell size={16} />
+          <span>Avisos & Literatura</span>
+          {notices.length > 0 && (
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-300">
+              {notices.length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* 2.3 CONTENIDO DEL MÓDULO SELECCIONADO */}
+
+      {/* MÓDULO 1: MIS ASIGNACIONES */}
+      {activeModule === 'asignaciones' && (
         <div className="space-y-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 px-2">
-            {myAssignments.length} {myAssignments.length === 1 ? 'asignación programada' : 'asignaciones programadas'}
-          </p>
+          {myAssignments.length === 0 ? (
+            <div className="p-8 sm:p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
+              <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-7 h-7" />
+              </div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                No tienes asignaciones pendientes en el programa
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                Todas las semanas registradas están al día y no figuran tareas asignadas para tu perfil.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between px-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  {myAssignments.length} {myAssignments.length === 1 ? 'asignación programada' : 'asignaciones programadas'}
+                </p>
+                <span className="text-[11px] text-slate-400">
+                  Haz clic en Google Calendar o WhatsApp para sincronizar o avisar
+                </span>
+              </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4">
-            {myAssignments.map(item => {
-            const isConfirmed = item.status === 'confirmada';
-            const isRejected = item.status === 'rechazada';
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4">
+                {myAssignments.map((item) => {
+                  const isConfirmed = item.status === 'confirmada';
+                  const isRejected = item.status === 'rechazada';
 
-            return (
-              <div
-                key={item.id}
-                className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-3 sm:gap-4"
-              >
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                    <span className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/70 px-2 sm:px-2.5 py-0.5 rounded-lg border border-indigo-100 dark:border-indigo-800/60">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {item.date}
-                    </span>
-                    <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">
-                      {item.meetingName}
-                    </span>
-                    {item.room && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
-                        {item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}
-                      </span>
-                    )}
-                  </div>
+                  return (
+                    <div
+                      key={item.id}
+                      className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-3 sm:gap-4"
+                    >
+                      <div className="space-y-2">
+                        {/* Cabecera de la tarjeta */}
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <span className="flex items-center gap-1.5 text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/70 px-2.5 py-1 rounded-xl border border-purple-100 dark:border-purple-800/60">
+                            <Calendar className="w-3.5 h-3.5" />
+                            {item.date}
+                          </span>
+                          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
+                            {item.meetingName}
+                          </span>
+                          {item.room && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                              {item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}
+                            </span>
+                          )}
+                        </div>
 
-                  <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight">
-                    {item.assignmentTitle}
-                  </h3>
+                        {/* Título de la parte */}
+                        <div>
+                          <h4 className="text-base font-bold text-slate-900 dark:text-white leading-snug">
+                            {item.assignmentTitle}
+                          </h4>
+                          {item.assistantName && (
+                            <p className="text-xs font-semibold text-purple-700 dark:text-purple-300 mt-1 flex items-center gap-1">
+                              <Users size={12} />
+                              <span>{item.assistantName}</span>
+                            </p>
+                          )}
+                          {item.timeMinutes && (
+                            <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+                              <Clock size={12} />
+                              <span>Tiempo estimado: {item.timeMinutes} minutos</span>
+                            </p>
+                          )}
+                        </div>
 
-                  {item.assistantName && (
-                    <p className="text-xs font-medium text-slate-600 dark:text-slate-300">
-                      👥 {item.assistantName}
-                    </p>
-                  )}
+                        {/* Estado actual */}
+                        <div className="pt-1 flex items-center gap-2">
+                          <span
+                            className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
+                              isConfirmed
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-400'
+                                : isRejected
+                                ? 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-400'
+                                : 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-400'
+                            }`}
+                          >
+                            {isConfirmed ? (
+                              <>
+                                <Check size={10} /> Asistencia Confirmada
+                              </>
+                            ) : isRejected ? (
+                              <>
+                                <XCircle size={10} /> Solicitud de sustituto enviada
+                              </>
+                            ) : (
+                              <>
+                                <Clock size={10} /> Pendiente de confirmación
+                              </>
+                            )}
+                          </span>
+                        </div>
+                      </div>
 
-                  {item.timeMinutes && (
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-slate-400" />
-                      Tiempo asignado: {item.timeMinutes} minutos
-                    </p>
-                  )}
+                      {/* Botones de acción estilo NW Scheduler */}
+                      <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap">
+                        {/* Confirmar / Rechazar */}
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleUpdateStatus(
+                                item.weekId,
+                                item.meetingType,
+                                item.assignmentPath,
+                                'confirmada'
+                              )
+                            }
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                              isConfirmed
+                                ? 'bg-emerald-600 text-white shadow-xs'
+                                : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                            }`}
+                          >
+                            <Check size={12} />
+                            <span>Confirmar</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setDeclineModalState({
+                                isOpen: true,
+                                assignment: item,
+                                reason: '',
+                              })
+                            }
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                              isRejected
+                                ? 'bg-rose-600 text-white shadow-xs'
+                                : 'bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-600 hover:text-rose-600 dark:text-slate-400'
+                            }`}
+                          >
+                            <XCircle size={12} />
+                            <span>No podré</span>
+                          </button>
+                        </div>
+
+                        {/* Exportar / Compartir */}
+                        <div className="flex items-center gap-1">
+                          <a
+                            href={getGoogleCalLink(item)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all"
+                            title="Añadir a Google Calendar"
+                          >
+                            <Calendar size={14} />
+                          </a>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadIcs(item)}
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all cursor-pointer"
+                            title="Descargar archivo .ics para iCal/Outlook"
+                          >
+                            <ExternalLink size={14} />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleShareAssignmentWhatsApp(item)}
+                            className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 transition-all cursor-pointer"
+                            title="Compartir por WhatsApp"
+                          >
+                            <Share2 size={14} />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => copyAssignmentDetails(item)}
+                            className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 transition-all cursor-pointer"
+                            title="Copiar detalles"
+                          >
+                            {copiedId === item.id ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* MÓDULO 2: MI INFORME MENSUAL (S-4) */}
+      {activeModule === 'informe' && (
+        <div className="max-w-2xl mx-auto space-y-4">
+          <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+            {/* Header del informe */}
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 px-2.5 py-0.5 rounded-full">
+                  FORMULARIO S-4
+                </span>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">
+                  Informe del Ministerio del Campo
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Envía mensualmente tu informe a la secretaría y superintendente de grupo.
+                </p>
+              </div>
+
+              {/* Selector de Mes */}
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  Mes de servicio:
+                </label>
+                <input
+                  type="month"
+                  value={selectedReportMonth}
+                  onChange={(e) => setSelectedReportMonth(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* Mensaje de éxito */}
+            {reportSuccessMsg && (
+              <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
+                <CheckCircle2 size={16} className="shrink-0" />
+                <span>{reportSuccessMsg}</span>
+              </div>
+            )}
+
+            {/* Estado de envío */}
+            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80">
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-3 h-3 rounded-full ${
+                    existingReport ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'
+                  }`}
+                />
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  {existingReport
+                    ? `Informe de ${selectedReportMonth} Registrado`
+                    : `Informe de ${selectedReportMonth} Pendiente de Envío`}
+                </span>
+              </div>
+              {existingReport?.reportedAt && (
+                <span className="text-[10px] text-slate-400">
+                  Actualizado: {new Date(existingReport.reportedAt).toLocaleDateString()}
+                </span>
+              )}
+            </div>
+
+            {/* Campos del Formulario S-4 */}
+            <div className="space-y-5">
+              {/* 1. Casilla de Participación */}
+              <label className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={reportForm.participated}
+                  onChange={(e) =>
+                    setReportForm({ ...reportForm, participated: e.target.checked })
+                  }
+                  className="w-5 h-5 rounded-lg text-purple-600 focus:ring-purple-500 cursor-pointer"
+                />
+                <div>
+                  <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white block">
+                    He participado en el ministerio durante este mes
+                  </span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">
+                    Requisito de participación activa en el ministerio para publicadores de congregación.
+                  </span>
                 </div>
+              </label>
 
-                {/* Status & Confirmation buttons */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs text-slate-500 dark:text-slate-400">Estado:</span>
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold capitalize ${
-                        isConfirmed
-                          ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300'
-                          : isRejected
-                          ? 'bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300'
-                          : 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300'
-                      }`}
-                    >
-                      {item.status}
+              {/* 2. Horas */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white block">
+                      Horas dedicadas al ministerio
+                    </label>
+                    <span className="text-[11px] text-slate-500">
+                      Obligatorio para precursores auxiliares (15/30 hrs) y regulares (50 hrs).
                     </span>
                   </div>
-
-                  {/* Actions */}
-                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+                  <div className="flex items-center gap-2">
                     <button
-                      onClick={() => {
-                        const meetingTime = item.meetingType === 'midweek' ? settings.midweekMeetingTime : settings.weekendMeetingTime;
-                        const gUrl = generateGoogleCalendarUrl(
-                          `${item.assignmentTitle} - ${settings.congregationName}`,
-                          `Asignación teocrática: ${item.assignmentTitle}${item.assistantName ? `\n${item.assistantName}` : ''}${item.room ? `\nSala: ${item.room}` : ''}`,
-                          settings.hallAddress || 'Salón del Reino',
-                          item.date,
-                          meetingTime || '19:30',
-                          item.timeMinutes || 105
-                        );
-                        window.open(gUrl, '_blank');
-                      }}
-                      className="px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all min-h-[44px]"
-                      title="Añadir a Google Calendar"
-                    >
-                      <CalendarDays className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                      <span>Google Cal</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        const meetingTime = item.meetingType === 'midweek' ? settings.midweekMeetingTime : settings.weekendMeetingTime;
-                        downloadSingleIcsEvent(
-                          `${item.assignmentTitle} - ${settings.congregationName}`,
-                          `Asignación teocrática: ${item.assignmentTitle}${item.assistantName ? `\n${item.assistantName}` : ''}${item.room ? `\nSala: ${item.room}` : ''}`,
-                          settings.hallAddress || 'Salón del Reino',
-                          item.date,
-                          meetingTime || '19:30',
-                          item.timeMinutes || 105
-                        );
-                      }}
-                      className="px-2.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold flex items-center justify-center gap-1 transition-all min-h-[44px]"
-                      title="Descargar archivo .ics para Apple Calendar o Outlook"
-                    >
-                      <span>.ICS</span>
-                    </button>
-
-                    <button
+                      type="button"
                       onClick={() =>
-                        handleUpdateStatus(item.weekId, item.meetingType, item.assignmentPath, 'confirmada')
+                        setReportForm({
+                          ...reportForm,
+                          hours: Math.max(0, reportForm.hours - 1),
+                        })
                       }
-                      className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 min-h-[44px] ${
-                        isConfirmed
-                          ? 'bg-emerald-600 text-white shadow-xs'
-                          : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800'
-                      }`}
+                      className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-base hover:bg-slate-300 transition-colors"
                     >
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Confirmar</span>
+                      -
                     </button>
-
+                    <input
+                      type="number"
+                      min={0}
+                      max={200}
+                      value={reportForm.hours}
+                      onChange={(e) =>
+                        setReportForm({
+                          ...reportForm,
+                          hours: parseInt(e.target.value, 10) || 0,
+                        })
+                      }
+                      className="w-16 text-center text-lg font-bold py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
+                    />
                     <button
+                      type="button"
                       onClick={() =>
-                        handleUpdateStatus(item.weekId, item.meetingType, item.assignmentPath, 'rechazada')
+                        setReportForm({
+                          ...reportForm,
+                          hours: reportForm.hours + 1,
+                        })
                       }
-                      className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 min-h-[44px] ${
-                        isRejected
-                          ? 'bg-rose-600 text-white shadow-xs'
-                          : 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 hover:bg-rose-100 border border-rose-200 dark:border-rose-800'
-                      }`}
+                      className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-base hover:bg-slate-300 transition-colors"
                     >
-                      <XCircle className="w-4 h-4" />
-                      <span>Reemplazo</span>
-                    </button>
-
-                    <button
-                      onClick={() => copyAssignmentDetails(item)}
-                      className="col-span-2 sm:col-span-1 p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs transition-colors min-h-[44px] flex items-center justify-center gap-1.5"
-                      title="Copiar detalles de la asignación"
-                    >
-                      {copiedId === item.id ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                      <span className="sm:hidden text-xs font-medium">Copiar Detalles</span>
+                      +
                     </button>
                   </div>
                 </div>
               </div>
-            );
-          })}
+
+              {/* 3. Cursos Bíblicos */}
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white block">
+                      Cursos bíblicos diferentes dirigidos
+                    </label>
+                    <span className="text-[11px] text-slate-500">
+                      Número de personas diferentes con las que estudiaste la Biblia este mes.
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setReportForm({
+                          ...reportForm,
+                          bibleStudies: Math.max(0, reportForm.bibleStudies - 1),
+                        })
+                      }
+                      className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-base hover:bg-slate-300 transition-colors"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min={0}
+                      max={50}
+                      value={reportForm.bibleStudies}
+                      onChange={(e) =>
+                        setReportForm({
+                          ...reportForm,
+                          bibleStudies: parseInt(e.target.value, 10) || 0,
+                        })
+                      }
+                      className="w-16 text-center text-lg font-bold py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setReportForm({
+                          ...reportForm,
+                          bibleStudies: reportForm.bibleStudies + 1,
+                        })
+                      }
+                      className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-base hover:bg-slate-300 transition-colors"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. Notas / Observaciones */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
+                  Notas u Observaciones (Opcional)
+                </label>
+                <textarea
+                  rows={2}
+                  value={reportForm.notes}
+                  onChange={(e) => setReportForm({ ...reportForm, notes: e.target.value })}
+                  placeholder="Ej. Precursor auxiliar este mes con meta de 15 horas, crédito LDC..."
+                  className="w-full text-xs p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 focus:outline-hidden text-slate-900 dark:text-white placeholder:text-slate-400"
+                />
+              </div>
+            </div>
+
+            {/* Acciones de envío */}
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 flex-wrap">
+              <button
+                type="button"
+                onClick={handleShareReportWhatsApp}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all cursor-pointer shadow-xs"
+              >
+                <Share2 size={14} />
+                <span>Enviar copia por WhatsApp</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveMonthlyReport}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all cursor-pointer shadow-sm shadow-purple-600/30"
+              >
+                <Send size={14} />
+                <span>Guardar y Transmitir Informe</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Assigned Territories for this Publisher (S-13) */}
-      {myTerritories.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Map className="w-5 h-5 text-blue-600" />
-              <span>Mi Territorio de Predicación Asignado (S-13)</span>
-            </h3>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-              {myTerritories.length} {myTerritories.length === 1 ? 'territorio' : 'territorios'}
-            </span>
-          </div>
+      {/* MÓDULO 3: MIS AUSENCIAS PLANIFICADAS */}
+      {activeModule === 'ausencias' && (
+        <div className="max-w-2xl mx-auto space-y-4">
+          <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-full">
+                  DISPONIBILIDAD TEOCRÁTICA
+                </span>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">
+                  Mis Ausencias Planificadas
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Notifica con antelación viajes, vacaciones o convalecencias para no ser asignado en reuniones.
+                </p>
+              </div>
 
-          <div className="space-y-4">
-            {myTerritories.map((terr) => {
-              const isOverdue =
-                terr.status === 'vencido' ||
-                (terr.dueDate && new Date(terr.dueDate) < new Date());
-              const mapLink =
-                terr.mapUrl ||
-                `https://maps.google.com/?q=${encodeURIComponent(
-                  `${terr.name} ${settings.congregationName}`
-                )}`;
+              <button
+                type="button"
+                onClick={() => setShowAddAbsenceModal(true)}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all cursor-pointer shadow-xs"
+              >
+                <Plus size={14} />
+                <span>Notificar Ausencia</span>
+              </button>
+            </div>
 
-              return (
-                <div
-                  key={terr.id}
-                  className={`p-4 rounded-xl border ${
-                    isOverdue
-                      ? 'border-rose-300 bg-rose-50/30'
-                      : 'border-slate-200 bg-slate-50/70'
-                  } space-y-3 text-xs`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-lg bg-slate-900 text-white font-bold flex items-center justify-center text-sm shadow-xs">
-                        {terr.number}
+            {/* Listado de ausencias */}
+            {(!selectedPublisher?.ausencias || selectedPublisher.ausencias.length === 0) ? (
+              <div className="p-8 text-center rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 space-y-2">
+                <Plane className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto" />
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  No tienes ausencias registradas actualmente
+                </p>
+                <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
+                  Estás marcado como disponible para asignaciones de entre semana y fin de semana.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {selectedPublisher.ausencias.map((abs) => (
+                  <div
+                    key={abs.id}
+                    className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3"
+                  >
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">
+                          📅 {abs.start_date} al {abs.end_date}
+                        </span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 font-semibold">
+                          Ausente
+                        </span>
                       </div>
-                      <div>
-                        <h4 className="font-bold text-slate-800 text-sm">{terr.name}</h4>
-                        <p className="text-slate-500 text-[11px]">
-                          {terr.zone} • ~{terr.estimatedHomes} hogares • Tipo {terr.type}
-                        </p>
-                      </div>
+                      <p className="text-xs text-slate-500">{abs.reason || 'Sin motivo especificado'}</p>
                     </div>
 
-                    <a
-                      href={mapLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs flex items-center gap-1 transition shadow-xs"
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteAbsence(abs.id)}
+                      className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                      title="Eliminar ausencia"
                     >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      <span>Abrir Mapa</span>
-                    </a>
+                      <Trash2 size={16} />
+                    </button>
                   </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
-                  {terr.boundsDescription && (
-                    <div className="bg-white p-2.5 rounded-lg border border-slate-200 text-slate-700">
-                      <strong className="text-slate-800">Límites: </strong>
-                      {terr.boundsDescription}
-                    </div>
-                  )}
+      {/* MÓDULO 4: MI GRUPO DE SERVICIO */}
+      {activeModule === 'grupo' && (
+        <div className="max-w-2xl mx-auto space-y-4">
+          <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full">
+                MINISTERIO DEL CAMPO
+              </span>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">
+                {myPreachingGroup ? `Grupo de Servicio #${myPreachingGroup.number}: ${myPreachingGroup.name}` : 'Mi Grupo de Predicación'}
+              </h3>
+              <p className="text-xs text-slate-500">
+                Información de contacto de los encargados de tu grupo y compañeros de servicio.
+              </p>
+            </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200 text-slate-600">
-                    <div>
-                      <span>Asignado: </span>
-                      <strong className="text-slate-800">{terr.assignedDate || 'Reciente'}</strong>
-                    </div>
-                    <div>
-                      <span>Plazo de entrega (4 meses): </span>
-                      <strong
-                        className={isOverdue ? 'text-rose-600 font-bold' : 'text-slate-800'}
+            {myPreachingGroup ? (
+              <div className="space-y-4">
+                {/* Encargados */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Superintendente */}
+                  <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 space-y-2">
+                    <span className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400">
+                      Superintendente de Grupo
+                    </span>
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">
+                      {groupOverseer?.name || 'No asignado'}
+                    </p>
+                    {groupOverseer?.phone && (
+                      <p className="text-xs text-slate-600 dark:text-slate-300">
+                        📞 {groupOverseer.phone}
+                      </p>
+                    )}
+                    {groupOverseer?.phone && (
+                      <a
+                        href={`https://wa.me/${groupOverseer.phone.replace(/\D/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline pt-1"
                       >
-                        {terr.dueDate || 'Sin fecha'}
-                        {isOverdue && ' (¡Vencido!)'}
-                      </strong>
-                    </div>
-                  </div>
-
-                  {/* No-visit houses for this territory */}
-                  {terr.noVisits && terr.noVisits.length > 0 && (
-                    <div className="bg-rose-50 border border-rose-200 p-3 rounded-lg space-y-1.5 text-rose-900">
-                      <div className="font-bold flex items-center gap-1.5 text-rose-800">
-                        <ShieldAlert className="w-4 h-4 text-rose-600" />
-                        <span>¡Atención! Domicilios NO VISITAR en este territorio:</span>
-                      </div>
-                      <ul className="list-disc list-inside space-y-0.5 text-[11px] text-rose-800 pl-1">
-                        {terr.noVisits.map((nv) => (
-                          <li key={nv.id}>
-                            <strong>{nv.address}</strong>
-                            {nv.residentName ? ` (${nv.residentName})` : ''} - {nv.reason}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Circuit Overseer Visit Arrangements (Meals & Ministry) */}
-      {(myVisitMeals.length > 0 || myVisitMinistry.length > 0) && circuitVisit && (
-        <div className="bg-linear-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-2xl p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-blue-300" />
-              <span>Mis Asignaciones para la Visita del SC ({circuitVisit.startDate.slice(5)} al {circuitVisit.endDate.slice(5)})</span>
-            </h3>
-            <span className="text-xs bg-white/20 text-white px-2.5 py-0.5 rounded-full font-semibold">
-              Hno. {circuitVisit.overseerName}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            {/* Hospitalidad / Comidas asignadas */}
-            {myVisitMeals.map((meal) => (
-              <div key={meal.id} className="bg-white/10 backdrop-blur-xs p-3.5 rounded-xl border border-white/15 space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-amber-300 flex items-center gap-1">
-                    <Utensils className="w-3.5 h-3.5" />
-                    <span>Hospitalidad: {meal.day} ({meal.mealType === 'almuerzo' ? 'Almuerzo' : 'Cena'})</span>
-                  </span>
-                  <span className={`text-[11px] px-2 py-0.5 rounded-full font-semibold ${
-                    meal.isConfirmed ? 'bg-emerald-500/30 text-emerald-200' : 'bg-amber-500/30 text-amber-200'
-                  }`}>
-                    {meal.isConfirmed ? 'Confirmada' : 'Por confirmar'}
-                  </span>
-                </div>
-                <p className="text-slate-200">
-                  Lugar: <strong>{meal.location || 'Su hogar'}</strong>
-                </p>
-                {circuitVisit.dietaryPreferences && (
-                  <p className="text-[11px] text-blue-200/90 italic">
-                    Dietas/Sugerencias: {circuitVisit.dietaryPreferences}
-                  </p>
-                )}
-              </div>
-            ))}
-
-            {/* Predicación / Acompañamiento asignado */}
-            {myVisitMinistry.map((min) => {
-              const isAccompanyingOverseer = min.coCompanionPublisherId === selectedPublisherId;
-              return (
-                <div key={min.id} className="bg-white/10 backdrop-blur-xs p-3.5 rounded-xl border border-white/15 space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-blue-200 flex items-center gap-1">
-                      <Compass className="w-3.5 h-3.5" />
-                      <span>Predicación: {min.day} • {min.time}</span>
-                    </span>
-                    {min.territoryNumber && (
-                      <span className="text-[11px] px-2 py-0.5 rounded bg-blue-500/30 text-blue-100 font-medium">
-                        Territorio #{min.territoryNumber}
-                      </span>
+                        <MessageCircle size={14} />
+                        <span>Escribir por WhatsApp</span>
+                      </a>
                     )}
                   </div>
-                  <p className="text-slate-200">
-                    Punto de salida: <strong>{min.meetingPoint}</strong>
-                  </p>
-                  <p className="text-emerald-300 font-semibold text-[11px]">
-                    {isAccompanyingOverseer
-                      ? `Asignado/a para acompañar al Hno. ${circuitVisit.overseerName}`
-                      : `Asignada para acompañar a la Hna. ${circuitVisit.wifeName || 'Esposa del SC'}`}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
-      {/* Cart Witnessing Shifts for this Publisher */}
-      {myCartShifts.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
-          <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-amber-600" />
-            <span>Mis Turnos de Testimonio Público con Carrito</span>
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {myCartShifts.map((shift) => {
-              const loc = cartLocations.find((l) => l.id === shift.locationId);
-              const partnerId =
-                shift.publisher1Id === selectedPublisherId
-                  ? shift.publisher2Id
-                  : shift.publisher1Id;
-              const partner = partnerId ? publishersMap.get(partnerId) : null;
-
-              return (
-                <div
-                  key={shift.id}
-                  className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-1.5 text-xs"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-extrabold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md">
-                      {shift.dayOfWeek} {shift.startTime} - {shift.endTime}
+                  {/* Auxiliar */}
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
+                    <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400">
+                      Auxiliar de Grupo
                     </span>
-                    <span className="font-bold text-slate-900">{loc?.name}</span>
-                  </div>
-                  {loc?.address && <p className="text-[11px] text-slate-400">{loc.address}</p>}
-                  <p className="text-slate-600">
-                    Compañero/a:{' '}
-                    <strong className="text-slate-900 font-bold">
-                      {partner ? partner.name : 'Por asignar'}
-                    </strong>
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Mis Asignaciones para la Conmemoración del Memorial */}
-      {myMemorialAssignments.length > 0 && (
-        <div className="bg-linear-to-r from-red-950 via-slate-900 to-red-900 text-white rounded-2xl p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold flex items-center gap-2">
-              <Flame className="w-5 h-5 text-red-400" />
-              <span>Mi Asignación para la Conmemoración del Memorial (14 de Nisán)</span>
-            </h3>
-            <span className="text-xs bg-red-500/30 text-red-200 border border-red-500/30 px-2.5 py-0.5 rounded-full font-semibold">
-              Reunión Sagrada
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            {myMemorialAssignments.map((item, idx) => (
-              <div
-                key={`${item.planId}-${idx}`}
-                className="bg-white/10 backdrop-blur-xs p-3.5 rounded-xl border border-white/15 space-y-1.5"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-amber-300 flex items-center gap-1.5 text-sm">
-                    <Wine className="w-4 h-4 text-red-400" />
-                    <span>{item.roleTitle}</span>
-                  </span>
-                  <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full font-bold">
-                    Año {item.year}
-                  </span>
-                </div>
-                <p className="text-slate-200">
-                  🗓️ <strong>{item.date}</strong> a las <strong>{item.time} hrs</strong>
-                </p>
-                <p className="text-slate-300 text-[11px]">📍 {item.location}</p>
-                {item.description && (
-                  <p className="text-[11px] text-amber-200/90 italic pt-1 border-t border-white/10">
-                    {item.description}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Mis Turnos de Voluntario en Asambleas */}
-      {myAssemblyVolunteering.length > 0 && (
-        <div className="bg-linear-to-r from-indigo-950 via-slate-900 to-indigo-900 text-white rounded-2xl p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold flex items-center gap-2">
-              <Building className="w-5 h-5 text-indigo-400" />
-              <span>Mis Voluntariados en Asambleas Teocráticas</span>
-            </h3>
-            <span className="text-xs bg-indigo-500/30 text-indigo-200 border border-indigo-500/30 px-2.5 py-0.5 rounded-full font-semibold">
-              Servicio Voluntario
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            {myAssemblyVolunteering.map((v, idx) => (
-              <div
-                key={idx}
-                className="bg-white/10 backdrop-blur-xs p-3.5 rounded-xl border border-white/15 space-y-1.5"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-indigo-200 uppercase tracking-wider text-[11px]">
-                    Departamento: {v.department}
-                  </span>
-                  {v.shiftTime && (
-                    <span className="text-[10px] bg-indigo-400/20 text-indigo-200 px-2 py-0.5 rounded font-medium">
-                      {v.shiftTime}
-                    </span>
-                  )}
-                </div>
-                <h4 className="font-bold text-white text-xs">{v.assemblyTheme}</h4>
-                <p className="text-slate-200">
-                  🗓️ {v.dates} • 📍 {v.venue}
-                </p>
-                <p className="text-amber-200 text-[11px] pt-1 border-t border-white/10">
-                  Asignación: <strong>{v.roleOrShift}</strong>
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Mis Pedidos Especiales de Literatura */}
-      {mySpecialOrders.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Package className="w-5 h-5 text-blue-600" />
-              <span>Mis Pedidos Especiales de Literatura</span>
-            </h3>
-            <span className="text-xs bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full font-bold">
-              {mySpecialOrders.length} pedido(s)
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            {mySpecialOrders.map(order => {
-              const statusLabels: Record<string, { label: string; badge: string }> = {
-                solicitado: { label: 'Solicitado a la congregación', badge: 'bg-slate-100 text-slate-700' },
-                pedido_a_betel: { label: 'Tramitado a Betel', badge: 'bg-blue-100 text-blue-800' },
-                recibido_en_salon: { label: '¡Listo para recoger en el Salón!', badge: 'bg-amber-100 text-amber-900 font-bold border border-amber-300' },
-                entregado: { label: 'Entregado', badge: 'bg-emerald-100 text-emerald-800' },
-              };
-              const s = statusLabels[order.status] || { label: order.status, badge: 'bg-slate-100 text-slate-700' };
-
-              return (
-                <div key={order.id} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-900 text-xs truncate max-w-[200px]">
-                      {order.itemTitle}
-                    </span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${s.badge}`}>
-                      {s.label}
-                    </span>
-                  </div>
-                  <p className="text-slate-500 text-[11px]">
-                    Cantidad: <strong>{order.quantity}</strong> {order.language && `• Idioma: ${order.language}`} • Pedido: {order.requestDate}
-                  </p>
-                  {order.status === 'recibido_en_salon' && (
-                    <p className="text-[11px] text-amber-800 font-semibold bg-amber-50 p-2 rounded-lg border border-amber-200">
-                      📦 Puedes pasar a recoger tu publicación en el mostrador de literatura al concluir la reunión.
+                    <p className="text-sm font-bold text-slate-900 dark:text-white">
+                      {groupAssistant?.name || 'No asignado'}
                     </p>
-                  )}
+                    {groupAssistant?.phone && (
+                      <p className="text-xs text-slate-600 dark:text-slate-300">
+                        📞 {groupAssistant.phone}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              );
-            })}
+
+                {/* Integrantes del grupo */}
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    Integrantes del Grupo ({myPreachingGroup.memberIds.length})
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {myPreachingGroup.memberIds.map((mId) => {
+                      const pub = publishersMap.get(mId);
+                      if (!pub) return null;
+                      const isMe = pub.id === selectedPublisherId;
+
+                      return (
+                        <div
+                          key={pub.id}
+                          className={`p-3 rounded-xl border text-xs flex items-center justify-between ${
+                            isMe
+                              ? 'bg-purple-50 dark:bg-purple-950/40 border-purple-200 dark:border-purple-800 font-bold text-purple-900 dark:text-purple-200'
+                              : 'bg-white dark:bg-slate-800/60 border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          <span className="truncate">{pub.name}</span>
+                          {isMe && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-purple-200 dark:bg-purple-900 text-purple-800 dark:text-purple-200 shrink-0">
+                              Tú
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-8 text-center rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 space-y-2">
+                <Users className="w-8 h-8 text-slate-300 mx-auto" />
+                <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Aún no estás asignado a un grupo de servicio
+                </p>
+                <p className="text-[11px] text-slate-500">
+                  Consulta al superintendente de servicio para tu asignación de grupo.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* Congregation Notices */}
-      {notices.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-3">
-          <h3 className="text-base font-bold text-slate-900 flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <CalendarDays className="w-5 h-5 text-indigo-600" />
-              <span>Avisos Importantes de la Congregación</span>
-            </span>
-            <span className="text-xs text-slate-400 font-medium">Tablero Oficial</span>
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {notices.slice(0, 4).map((notice) => (
-              <div
-                key={notice.id}
-                className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/70 space-y-1 text-xs"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-slate-900 text-xs">{notice.title}</span>
-                  <span className="text-[10px] text-slate-400">{notice.date}</span>
-                </div>
-                <p className="text-slate-600 leading-relaxed text-[11px] line-clamp-3">
-                  {notice.content}
+      {/* MÓDULO 5: AVISOS Y LITERATURA */}
+      {activeModule === 'avisos' && (
+        <div className="space-y-4">
+          {/* Tablero de anuncios */}
+          {notices.length > 0 && (
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs space-y-4">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <CalendarDays className="w-5 h-5 text-purple-600" />
+                <span>Tablero Oficial de Anuncios</span>
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {notices.map((n) => (
+                  <div
+                    key={n.id}
+                    className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-1.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-slate-900 dark:text-white text-xs">{n.title}</h4>
+                      <span className="text-[10px] text-slate-400">{n.date}</span>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                      {n.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Pedidos especiales de literatura */}
+          {specialOrders.filter((o) => o.publisherId === selectedPublisherId).length > 0 && (
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs space-y-4">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Package className="w-5 h-5 text-blue-600" />
+                <span>Mis Pedidos Especiales de Literatura</span>
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {specialOrders
+                  .filter((o) => o.publisherId === selectedPublisherId)
+                  .map((order) => (
+                    <div
+                      key={order.id}
+                      className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-900 dark:text-white text-xs">
+                          {order.itemTitle}
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300">
+                          {order.status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500">
+                        Cantidad: {order.quantity} • Solicitado: {order.requestDate}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* MODAL: NOTIFICAR AUSENCIA */}
+      {showAddAbsenceModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                <Plane size={20} />
+              </div>
+              <div>
+                <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                  Notificar Próxima Ausencia
+                </h4>
+                <p className="text-xs text-slate-500">
+                  Informa las fechas en las que no estarás disponible.
                 </p>
               </div>
-            ))}
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Fecha de Inicio:
+                </label>
+                <input
+                  type="date"
+                  value={absenceStartDate}
+                  onChange={(e) => setAbsenceStartDate(e.target.value)}
+                  className="w-full text-xs font-semibold p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Fecha de Término:
+                </label>
+                <input
+                  type="date"
+                  value={absenceEndDate}
+                  onChange={(e) => setAbsenceEndDate(e.target.value)}
+                  className="w-full text-xs font-semibold p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Motivo:
+                </label>
+                <select
+                  value={absenceReason}
+                  onChange={(e) => setAbsenceReason(e.target.value)}
+                  className="w-full text-xs font-semibold p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden"
+                >
+                  <option value="Vacaciones familiares">Vacaciones familiares</option>
+                  <option value="Viaje de trabajo">Viaje de trabajo</option>
+                  <option value="Salud o convalecencia">Salud o convalecencia</option>
+                  <option value="Compromiso familiar">Compromiso familiar</option>
+                  <option value="Asamblea en otra congregación">Asamblea en otra congregación</option>
+                  <option value="Otro motivo">Otro motivo</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowAddAbsenceModal(false)}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={!absenceStartDate || !absenceEndDate}
+                onClick={handleAddAbsence}
+                className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-bold text-xs transition-colors shadow-xs"
+              >
+                Guardar Ausencia
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: NO PODRÉ ASISTIR / SOLICITAR SUSTITUTO */}
+      {declineModalState.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-in fade-in">
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950 flex items-center justify-center text-rose-600 dark:text-rose-400">
+                <AlertCircle size={20} />
+              </div>
+              <div>
+                <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                  Solicitud de Sustituto
+                </h4>
+                <p className="text-xs text-slate-500">
+                  {declineModalState.assignment?.assignmentTitle}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+              ¿Confirmas que no podrás atender esta parte el <strong>{declineModalState.assignment?.date}</strong>? Se notificará al coordinador y hermanos encargados del programa para coordinar un reemplazo.
+            </p>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Motivo para los hermanos encargados (Opcional):
+              </label>
+              <textarea
+                rows={2}
+                value={declineModalState.reason}
+                onChange={(e) =>
+                  setDeclineModalState({
+                    ...declineModalState,
+                    reason: e.target.value,
+                  })
+                }
+                placeholder="Ej. Fiebre, turno imprevisto de trabajo..."
+                className="w-full text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-hidden text-slate-900 dark:text-white placeholder:text-slate-400"
+              />
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  setDeclineModalState({ isOpen: false, assignment: null, reason: '' })
+                }
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              >
+                Volver
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (declineModalState.assignment) {
+                    handleUpdateStatus(
+                      declineModalState.assignment.weekId,
+                      declineModalState.assignment.meetingType,
+                      declineModalState.assignment.assignmentPath,
+                      'rechazada'
+                    );
+                  }
+                  setDeclineModalState({ isOpen: false, assignment: null, reason: '' });
+                }}
+                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition-colors shadow-xs"
+              >
+                Confirmar que no podré
+              </button>
+            </div>
           </div>
         </div>
       )}

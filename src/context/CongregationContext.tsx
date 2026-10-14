@@ -1,6 +1,6 @@
 // src/context/CongregationContext.tsx
 import React, { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot, collection, getDocs } from 'firebase/firestore';
 import { db, auth, isFirestoreQuotaExceeded, markFirestoreQuotaExceeded, isQuotaError } from '../firebase/config';
 import { useAuth } from './AuthContext';
 import {
@@ -933,6 +933,27 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (data.publishers && Array.isArray(data.publishers)) {
       setPublishers(data.publishers);
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(data.publishers));
+
+      // Sincronizar PINs personales únicos para que cualquier navegador o sesión los reconozca
+      try {
+        const pinRecords = data.publishers
+          .filter((p: any) => p.personalPin && String(p.personalPin).trim().length >= 4)
+          .map((p: any) => ({
+            publisherId: p.id || p.nid,
+            name: p.name || p.full_name || 'Publicador',
+            role: p.theocraticRole || (p.privilege === 'anciano' ? 'anciano' : p.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico'),
+            pin: String(p.personalPin).trim(),
+            email: p.email,
+            privilege: p.privilege,
+          }));
+        if (pinRecords.length > 0) {
+          localStorage.setItem('kongre_publisher_unique_pins_v1', JSON.stringify(pinRecords));
+          localStorage.setItem('kongre_publisher_personal_pins_v4', JSON.stringify(pinRecords));
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('kongre_publisher_pins_updated', { detail: pinRecords }));
+          }
+        }
+      } catch {}
     }
     if (data.weeks && Array.isArray(data.weeks)) {
       const enrichedWeeks = data.weeks.map((w: WeekSchedule) => {
@@ -957,82 +978,11 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (data.settings) {
       let currentLocal: CongregationSettings | null = null;
       try {
-        const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_settings`) || localStorage.getItem('kongre_saved_settings_backup');
+        const saved =
+          localStorage.getItem(`${LOCAL_STORAGE_KEY}_settings`) ||
+          localStorage.getItem('kongre_saved_settings_backup');
         if (saved) currentLocal = JSON.parse(saved);
       } catch {}
-
-      const hasUserSavedLocally = localStorage.getItem('kongre_settings_user_saved') === 'true';
-      const userConfirmedName = localStorage.getItem('kongre_user_confirmed_name');
-      const userConfirmedMidDay = localStorage.getItem('kongre_user_confirmed_midweek_day');
-      const userConfirmedMidTime = localStorage.getItem('kongre_user_confirmed_midweek_time');
-      const userConfirmedFdsDay = localStorage.getItem('kongre_user_confirmed_weekend_day');
-      const userConfirmedFdsTime = localStorage.getItem('kongre_user_confirmed_weekend_time');
-      const userConfirmedAddress = localStorage.getItem('kongre_user_confirmed_address');
-
-      const localStoredName = userConfirmedName || localStorage.getItem('kongre_congregation_name');
-      const localName = (userConfirmedName || currentLocal?.congregationName || localStoredName || settings.congregationName || '').trim();
-      const cloudName = (data.settings.congregationName || '').trim();
-
-      const isLocalRealName = Boolean(localName && !isCongregationIdString(localName));
-      const isCloudRealName = Boolean(cloudName && !isCongregationIdString(cloudName));
-
-      // Comprobar marcas de tiempo ESPECÍFICAS de configuración
-      const lastSettingsUpdate = localStorage.getItem('kongre_last_settings_update') || currentLocal?.updatedAt || '';
-      const cloudSettingsUpdatedAt = data.settings?.updatedAt || '';
-
-      // La nube solo tiene prioridad si la configuración de la nube fue guardada explícitamente después del guardado local
-      // Y contiene datos válidos
-      const isCloudSettingsNewer = Boolean(
-        cloudSettingsUpdatedAt &&
-        lastSettingsUpdate &&
-        cloudSettingsUpdatedAt > lastSettingsUpdate &&
-        isCloudRealName
-      );
-
-      // Decidir el nombre oficial: Si el usuario guardó localmente mediante "Guardar", protegerlo absolutamente
-      let finalCongName = '';
-      if (hasUserSavedLocally && (userConfirmedName || isLocalRealName) && !isCloudSettingsNewer) {
-        finalCongName = userConfirmedName || localName;
-      } else if (isLocalRealName && !isCloudRealName) {
-        finalCongName = localName;
-      } else if (isCloudRealName && !isLocalRealName) {
-        finalCongName = cloudName;
-      } else if (isLocalRealName && isCloudRealName) {
-        finalCongName = isCloudSettingsNewer ? cloudName : (userConfirmedName || localName);
-      } else {
-        finalCongName = userConfirmedName || localName || cloudName || '';
-      }
-
-      // Decidir los días y horarios: Si el usuario guardó localmente mediante el botón Guardar, PRESERVAR local
-      const finalMidDay = (hasUserSavedLocally && userConfirmedMidDay && !isCloudSettingsNewer)
-        ? userConfirmedMidDay
-        : (isCloudSettingsNewer && data.settings.midweekMeetingDay
-          ? data.settings.midweekMeetingDay
-          : (userConfirmedMidDay || currentLocal?.midweekMeetingDay || localStorage.getItem('kongre_midweek_day') || data.settings.midweekMeetingDay || 'Miércoles'));
-
-      const finalMidTime = (hasUserSavedLocally && userConfirmedMidTime && !isCloudSettingsNewer)
-        ? userConfirmedMidTime
-        : (isCloudSettingsNewer && data.settings.midweekMeetingTime
-          ? data.settings.midweekMeetingTime
-          : (userConfirmedMidTime || currentLocal?.midweekMeetingTime || localStorage.getItem('kongre_midweek_time') || data.settings.midweekMeetingTime || '19:00'));
-
-      const finalFdsDay = (hasUserSavedLocally && userConfirmedFdsDay && !isCloudSettingsNewer)
-        ? userConfirmedFdsDay
-        : (isCloudSettingsNewer && data.settings.weekendMeetingDay
-          ? data.settings.weekendMeetingDay
-          : (userConfirmedFdsDay || currentLocal?.weekendMeetingDay || localStorage.getItem('kongre_weekend_day') || data.settings.weekendMeetingDay || 'Domingo'));
-
-      const finalFdsTime = (hasUserSavedLocally && userConfirmedFdsTime && !isCloudSettingsNewer)
-        ? userConfirmedFdsTime
-        : (isCloudSettingsNewer && data.settings.weekendMeetingTime
-          ? data.settings.weekendMeetingTime
-          : (userConfirmedFdsTime || currentLocal?.weekendMeetingTime || localStorage.getItem('kongre_weekend_time') || data.settings.weekendMeetingTime || '10:00'));
-
-      const finalAddress = (hasUserSavedLocally && userConfirmedAddress !== null && userConfirmedAddress !== undefined && !isCloudSettingsNewer)
-        ? (userConfirmedAddress || '')
-        : (isCloudSettingsNewer && data.settings.hallAddress !== undefined
-          ? data.settings.hallAddress
-          : (userConfirmedAddress || currentLocal?.hallAddress || localStorage.getItem('kongre_hall_address') || data.settings.hallAddress || ''));
 
       // Resolver ID canónico asegurando que nunca se pierda
       const resolvedCongId = (
@@ -1052,6 +1002,35 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         ensureCongregationIdPersisted(resolvedCongId);
       }
 
+      // El documento en la nube de Firestore es la fuente canónica de la congregación
+      const cloudName = (data.settings.congregationName || '').trim();
+      const localName = (currentLocal?.congregationName || localStorage.getItem('kongre_congregation_name') || '').trim();
+      const finalCongName = cloudName && !isCongregationIdString(cloudName)
+        ? cloudName
+        : localName && !isCongregationIdString(localName)
+        ? localName
+        : cloudName || localName || '';
+
+      const finalMidDay = data.settings.midweekMeetingDay || currentLocal?.midweekMeetingDay || 'Miércoles';
+      const finalMidTime = data.settings.midweekMeetingTime || currentLocal?.midweekMeetingTime || '19:00';
+      const finalFdsDay = data.settings.weekendMeetingDay || currentLocal?.weekendMeetingDay || 'Domingo';
+      const finalFdsTime = data.settings.weekendMeetingTime || currentLocal?.weekendMeetingTime || '10:00';
+      const finalAddress =
+        data.settings.hallAddress !== undefined
+          ? data.settings.hallAddress
+          : currentLocal?.hallAddress || '';
+
+      const cloudCoordPhoto =
+        data.settings?.coordinatorPhotoURL ||
+        data.coordinatorPhotoURL ||
+        currentLocal?.coordinatorPhotoURL ||
+        (typeof window !== 'undefined'
+          ? localStorage.getItem('kongre_coordinator_photo') ||
+            localStorage.getItem('kongre_user_photo') ||
+            localStorage.getItem('kongre_google_photo')
+          : '') ||
+        '';
+
       const isReg = Boolean(
         data.settings.isRegistered ||
         currentLocal?.isRegistered ||
@@ -1061,33 +1040,36 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         (data.publishers && data.publishers.length > 0)
       );
 
-      const isLocalNewer = !isCloudSettingsNewer;
-
-      const baseMerged = isLocalNewer
-        ? { ...INITIAL_SETTINGS, ...data.settings, ...(currentLocal || {}) }
-        : { ...INITIAL_SETTINGS, ...(currentLocal || {}), ...data.settings };
-
-      const cloudCoordPhoto =
-        data.settings?.coordinatorPhotoURL ||
-        data.coordinatorPhotoURL ||
-        currentLocal?.coordinatorPhotoURL ||
-        (typeof window !== 'undefined' ? (localStorage.getItem('kongre_coordinator_photo') || localStorage.getItem('kongre_user_photo') || localStorage.getItem('kongre_google_photo')) : '') ||
-        '';
-
       const enrichedSettings: CongregationSettings = {
-        ...baseMerged,
+        ...INITIAL_SETTINGS,
+        ...(currentLocal || {}),
+        ...data.settings,
         congregationName: finalCongName,
-        congregationNumber: resolvedCongId || baseMerged.congregationNumber || '',
-        congregationId: resolvedCongId || baseMerged.congregationId || '',
+        congregationNumber: resolvedCongId || data.settings.congregationNumber || '',
+        congregationId: resolvedCongId || data.settings.congregationId || '',
         midweekMeetingDay: finalMidDay,
         midweekMeetingTime: finalMidTime,
         weekendMeetingDay: finalFdsDay,
         weekendMeetingTime: finalFdsTime,
         hallAddress: finalAddress,
         isRegistered: isReg,
-        coordinatorEmail: (isLocalNewer ? currentLocal?.coordinatorEmail : data.settings.coordinatorEmail) || currentLocal?.coordinatorEmail || data.settings.coordinatorEmail || user?.email || '',
-        coordinatorName: (isLocalNewer ? currentLocal?.coordinatorName : data.settings.coordinatorName) || currentLocal?.coordinatorName || data.settings.coordinatorName || user?.displayName || 'Coordinador',
+        coordinatorEmail:
+          data.settings.coordinatorEmail ||
+          currentLocal?.coordinatorEmail ||
+          user?.email ||
+          '',
+        coordinatorName:
+          data.settings.coordinatorName ||
+          currentLocal?.coordinatorName ||
+          user?.displayName ||
+          'Coordinador',
         coordinatorPhotoURL: cloudCoordPhoto,
+        conflictRules: {
+          ...INITIAL_SETTINGS.conflictRules,
+          ...(currentLocal?.conflictRules || {}),
+          ...(data.settings.conflictRules || {}),
+        },
+        updatedAt: data.settings.updatedAt || data.updatedAt || new Date().toISOString(),
       };
 
       if (cloudCoordPhoto) {
@@ -1101,6 +1083,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       setSettings(enrichedSettings);
       latestSettingsRef.current = enrichedSettings;
+
       try {
         localStorage.setItem(`${LOCAL_STORAGE_KEY}_settings`, JSON.stringify(enrichedSettings));
         localStorage.setItem('kongre_saved_settings_backup', JSON.stringify(enrichedSettings));
@@ -1108,7 +1091,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           localStorage.setItem('kongre_congregation_number', resolvedCongId);
           localStorage.setItem('kongre_congregation_id', resolvedCongId);
         }
-        if (finalCongName && finalCongName !== 'Congregación Central' && !isCongregationIdString(finalCongName)) {
+        if (finalCongName && !isCongregationIdString(finalCongName)) {
           localStorage.setItem('kongre_congregation_name', finalCongName);
           localStorage.setItem('kongre_user_confirmed_name', finalCongName);
         }
@@ -1132,12 +1115,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           localStorage.setItem('kongre_hall_address', finalAddress);
           localStorage.setItem('kongre_user_confirmed_address', finalAddress);
         }
-        localStorage.setItem('kongre_settings_user_saved', 'true');
-      } catch {}
-      if (isReg) {
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
-      }
+      } catch {}
       if (finalMidDay || finalFdsDay) {
         setWeeks((prevWeeks) =>
           prevWeeks.map((w) => ({
@@ -1274,145 +1254,80 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // Firestore Sync: Load, listen and smart-merge SIEMPRE contra el documento global de la congregación (por ID),
   // sin depender de que haya una sesión de Google. Nada se guarda en la cuenta personal.
   useEffect(() => {
-    const syncCongId = resolveCongregationDocId();
-    if (!syncCongId || syncCongId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(syncCongId)) {
-      setSyncStatus('offline');
-      return;
-    }
+    let unsubscribeSnapshot: (() => void) | null = null;
+    let isCancelled = false;
 
-    if (isFirestoreQuotaExceeded()) {
-      setSyncStatus('offline');
-      return;
-    }
+    const setupSync = async () => {
+      let syncCongId = resolveCongregationDocId();
 
-    setSyncStatus('saving');
-    const congMainRef = doc(db, 'congregations', syncCongId);
+      // Si este navegador no tiene ID de congregación (ej. Browser 2 con PIN personal),
+      // auto-descubrir la congregación activa registrada en Firestore para sincronizar de inmediato
+      if (!syncCongId || syncCongId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(syncCongId)) {
+        try {
+          const congSnap = await getDocs(collection(db, 'congregations'));
+          if (!congSnap.empty && !isCancelled) {
+            const realDocs = congSnap.docs.filter((d) => {
+              const idUpper = d.id.toUpperCase();
+              return !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(idUpper);
+            });
 
-    let isInitialSnapshot = true;
-    let skipNextSnapshotEcho = false;
-
-    const unsubscribe = onSnapshot(
-      congMainRef,
-      async (docSnap) => {
-        const nowISO = new Date().toISOString();
-
-        if (!docSnap.exists()) {
-          isInitialSnapshot = false;
-          skipNextSnapshotEcho = true;
-          // Primera vez que este usuario de Google se conecta y no tiene documento en la nube:
-          if (isFirestoreQuotaExceeded()) {
-            setSyncStatus('offline');
-            return;
-          }
-          const fresh = getFreshLocalCongregationData();
-          const cleanId = resolveCongregationDocId(fresh.settings);
-          if (cleanId) ensureCongregationIdPersisted(cleanId);
-
-          const initialPayload = sanitizeForFirestore({
-            ...fresh,
-            settings: {
-              ...fresh.settings,
-              ...(cleanId ? { congregationNumber: cleanId, congregationId: cleanId } : {}),
-              isRegistered: true,
-              coordinatorEmail: fresh.settings.coordinatorEmail || user?.email || '',
-              coordinatorName: fresh.settings.coordinatorName || user?.displayName || 'Coordinador',
-            },
-            congregationId: cleanId,
-            updatedAt: nowISO,
-          });
-
-          try {
-            await setDoc(congMainRef, initialPayload, { merge: true });
-            const unhyphenated = syncCongId.replace(/-/g, '');
-            if (unhyphenated !== syncCongId && unhyphenated.length >= 3) {
-              await setDoc(doc(db, 'congregations', unhyphenated), initialPayload, { merge: true });
-            }
-            localStorage.removeItem('kongre_needs_cloud_upload');
-            localStorage.setItem('kongre_last_local_update', nowISO);
-            localStorage.setItem('kongre_is_registered_congregation', 'true');
-            setSyncStatus('synced');
-          } catch (err) {
-            if (isQuotaError(err)) {
-              await markFirestoreQuotaExceeded();
-              setSyncStatus('offline');
-            } else {
-              console.warn('Aviso guardando estado inicial en Firestore:', err);
-              setSyncStatus('error');
+            // Preferir el ID canónico con guiones si existe
+            const targetDoc = realDocs.find((d) => d.id.includes('-')) || realDocs[0];
+            if (targetDoc) {
+              syncCongId = targetDoc.id.toUpperCase();
+              ensureCongregationIdPersisted(syncCongId);
+              const data = targetDoc.data();
+              hydrateAllFromData(data);
+              setSettings((prev) => ({
+                ...prev,
+                ...(data.settings || {}),
+                congregationNumber: syncCongId,
+                congregationId: syncCongId,
+                isRegistered: true,
+              }));
+              localStorage.setItem('kongre_is_registered_congregation', 'true');
+              localStorage.setItem('kongre_has_entered_app', 'true');
             }
           }
-          return;
+        } catch (discoverErr) {
+          console.warn('Aviso auto-descubriendo congregación en Firestore:', discoverErr);
         }
+      }
 
-        const data = docSnap.data();
+      if (!syncCongId || syncCongId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(syncCongId)) {
+        setSyncStatus('offline');
+        return;
+      }
 
-        // Ignorar snapshots emitidos por escrituras locales pendientes
-        if (docSnap.metadata?.hasPendingWrites) {
-          return;
-        }
+      if (isFirestoreQuotaExceeded()) {
+        setSyncStatus('offline');
+        return;
+      }
 
-        // Si acabamos de subir los datos locales a Firestore, ignorar el eco que emite onSnapshot
-        if (skipNextSnapshotEcho || skipNextSnapshotEchoRef.current) {
-          skipNextSnapshotEcho = false;
-          skipNextSnapshotEchoRef.current = false;
-          setSyncStatus('synced');
-          return;
-        }
+      setSyncStatus('saving');
+      const congMainRef = doc(db, 'congregations', syncCongId);
 
-        // Si hay una operación de guardado local pendiente (debounce activo), no sobreescribir con datos desactualizados de la nube
-        if (saveTimeoutRef.current) {
-          return;
-        }
+      let isInitialSnapshot = true;
+      let skipNextSnapshotEcho = false;
 
-        // Comprobar marcas temporales: si la versión local es más reciente que los datos de Firestore, no revertir el estado local
-        const lastLocalTs = localStorage.getItem('kongre_last_local_update');
-        const cloudTs = data?.updatedAt || data?.settings?.updatedAt;
-        if (lastLocalTs && cloudTs && lastLocalTs > cloudTs) {
-          return;
-        }
+      unsubscribeSnapshot = onSnapshot(
+        congMainRef,
+        async (docSnap) => {
+          if (isCancelled) return;
+          const nowISO = new Date().toISOString();
 
-        // En la primera conexión tras iniciar sesión con Google:
-        if (isInitialSnapshot) {
-          isInitialSnapshot = false;
-
-          const fresh = getFreshLocalCongregationData();
-          const needsCloudUpload = localStorage.getItem('kongre_needs_cloud_upload') === 'true';
-          const lastLocalUpdate = localStorage.getItem('kongre_last_local_update');
-          const isRegisteredLocally = localStorage.getItem('kongre_is_registered_congregation') === 'true';
-          const cloudUpdatedAt = data?.updatedAt;
-
-          const localHasRealCong = Boolean(
-            fresh.publishers.length > 0 ||
-            (fresh.settings && fresh.settings.isRegistered && fresh.settings.congregationName &&
-              fresh.settings.congregationName !== 'Congregación Central' &&
-              fresh.settings.congregationName !== 'Congregación El Olivar')
-          );
-
-          const cloudHasRealCong = Boolean(
-            data.publishers && data.publishers.length > 0 &&
-            data.settings?.congregationName &&
-            data.settings.congregationName !== 'Congregación Central' &&
-            data.settings.congregationName !== 'Congregación El Olivar'
-          );
-
-          // Si el usuario configuró datos localmente con credenciales de aplicación
-          // o tiene cambios locales pendientes de sincronizar:
-          const shouldUploadLocalToCloud = Boolean(
-            needsCloudUpload ||
-            (localHasRealCong && !cloudHasRealCong) ||
-            (localHasRealCong && isRegisteredLocally && (!cloudUpdatedAt || (lastLocalUpdate && lastLocalUpdate >= cloudUpdatedAt))) ||
-            (localHasRealCong && fresh.settings.congregationName && data.settings?.congregationName && fresh.settings.congregationName !== data.settings.congregationName && isRegisteredLocally)
-          );
-
-          if (shouldUploadLocalToCloud) {
+          if (!docSnap.exists()) {
+            isInitialSnapshot = false;
+            skipNextSnapshotEcho = true;
             if (isFirestoreQuotaExceeded()) {
               setSyncStatus('offline');
               return;
             }
-            skipNextSnapshotEcho = true;
+            const fresh = getFreshLocalCongregationData();
             const cleanId = resolveCongregationDocId(fresh.settings);
             if (cleanId) ensureCongregationIdPersisted(cleanId);
 
-            const uploadPayload = sanitizeForFirestore({
+            const initialPayload = sanitizeForFirestore({
               ...fresh,
               settings: {
                 ...fresh.settings,
@@ -1426,10 +1341,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             });
 
             try {
-              await setDoc(congMainRef, uploadPayload, { merge: true });
+              await setDoc(congMainRef, initialPayload, { merge: true });
               const unhyphenated = syncCongId.replace(/-/g, '');
               if (unhyphenated !== syncCongId && unhyphenated.length >= 3) {
-                await setDoc(doc(db, 'congregations', unhyphenated), uploadPayload, { merge: true });
+                await setDoc(doc(db, 'congregations', unhyphenated), initialPayload, { merge: true });
               }
               localStorage.removeItem('kongre_needs_cloud_upload');
               localStorage.setItem('kongre_last_local_update', nowISO);
@@ -1440,30 +1355,129 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 await markFirestoreQuotaExceeded();
                 setSyncStatus('offline');
               } else {
-                console.warn('Aviso actualizando Firestore con datos locales:', err);
+                console.warn('Aviso guardando estado inicial en Firestore:', err);
+                setSyncStatus('error');
               }
             }
             return;
           }
-        }
 
-        // Hidratar estado y localStorage desde Firestore
-        hydrateAllFromData(data);
-        setSyncStatus('synced');
-      },
-      (err) => {
-        if (isQuotaError(err)) {
-          markFirestoreQuotaExceeded();
-          setSyncStatus('offline');
-          return;
+          const data = docSnap.data();
+
+          // Ignorar snapshots emitidos por escrituras locales pendientes en esta misma pestaña
+          if (docSnap.metadata?.hasPendingWrites) {
+            return;
+          }
+
+          // Si acabamos de subir los datos locales a Firestore, ignorar el eco que emite onSnapshot
+          if (skipNextSnapshotEcho || skipNextSnapshotEchoRef.current) {
+            skipNextSnapshotEcho = false;
+            skipNextSnapshotEchoRef.current = false;
+            setSyncStatus('synced');
+            return;
+          }
+
+          // Si hay una operación de guardado local pendiente (debounce activo), no sobreescribir con datos desactualizados de la nube
+          if (saveTimeoutRef.current) {
+            return;
+          }
+
+          // En la primera conexión, si la nube ya tiene datos de la congregación, hidratar de inmediato
+          if (isInitialSnapshot) {
+            isInitialSnapshot = false;
+
+            const cloudHasRealCong = Boolean(
+              data.publishers && data.publishers.length > 0 &&
+              data.settings?.congregationName &&
+              data.settings.congregationName !== 'Congregación Central' &&
+              data.settings.congregationName !== 'Congregación El Olivar'
+            );
+
+            const needsCloudUpload = localStorage.getItem('kongre_needs_cloud_upload') === 'true';
+
+            // Solo subir local si la nube está completamente vacía y tenemos cambios locales pendientes
+            if (needsCloudUpload && !cloudHasRealCong) {
+              const fresh = getFreshLocalCongregationData();
+              const cleanId = resolveCongregationDocId(fresh.settings);
+              if (cleanId) ensureCongregationIdPersisted(cleanId);
+
+              const uploadPayload = sanitizeForFirestore({
+                ...fresh,
+                settings: {
+                  ...fresh.settings,
+                  ...(cleanId ? { congregationNumber: cleanId, congregationId: cleanId } : {}),
+                  isRegistered: true,
+                  coordinatorEmail: fresh.settings.coordinatorEmail || user?.email || '',
+                  coordinatorName: fresh.settings.coordinatorName || user?.displayName || 'Coordinador',
+                },
+                congregationId: cleanId,
+                updatedAt: nowISO,
+              });
+
+              try {
+                await setDoc(congMainRef, uploadPayload, { merge: true });
+                const unhyphenated = syncCongId.replace(/-/g, '');
+                if (unhyphenated !== syncCongId && unhyphenated.length >= 3) {
+                  await setDoc(doc(db, 'congregations', unhyphenated), uploadPayload, { merge: true });
+                }
+                localStorage.removeItem('kongre_needs_cloud_upload');
+                localStorage.setItem('kongre_last_local_update', nowISO);
+                localStorage.setItem('kongre_is_registered_congregation', 'true');
+                setSyncStatus('synced');
+              } catch (err) {
+                console.warn('Aviso sincronizando datos iniciales pendientes:', err);
+              }
+              return;
+            }
+          }
+
+          // Hidratar estado y localStorage desde Firestore en TIEMPO REAL sin bloquear por diferencias de reloj
+          hydrateAllFromData(data);
+          localStorage.setItem('kongre_last_local_update', data?.updatedAt || nowISO);
+          setSyncStatus('synced');
+        },
+        (err) => {
+          if (isQuotaError(err)) {
+            markFirestoreQuotaExceeded();
+            setSyncStatus('offline');
+            return;
+          }
+          console.warn('Aviso de listener Firestore:', err);
+          setSyncStatus('error');
         }
-        console.warn('Aviso de listener Firestore:', err);
-        setSyncStatus('error');
+      );
+    };
+
+    let broadcastChannel: any = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        broadcastChannel = new BroadcastChannel('kongre_cross_tab_sync');
+        broadcastChannel.onmessage = async (event: any) => {
+          if (event.data?.type === 'CONGREGATION_UPDATED') {
+            const targetId = resolveCongregationDocId();
+            if (targetId) {
+              try {
+                const snap = await getDoc(doc(db, 'congregations', targetId));
+                if (snap.exists()) {
+                  hydrateAllFromData(snap.data());
+                }
+              } catch {}
+            }
+          }
+        };
       }
-    );
+    } catch {}
 
-    return () => unsubscribe();
-  }, [settings.congregationNumber, settings.congregationId]);
+    setupSync();
+
+    return () => {
+      isCancelled = true;
+      if (unsubscribeSnapshot) unsubscribeSnapshot();
+      if (broadcastChannel) {
+        try { broadcastChannel.close(); } catch {}
+      }
+    };
+  }, [settings.congregationNumber, settings.congregationId, user?.email]);
 
   // Helper to sync changes to Firestore whenever state updates (with debounce & quota guard)
   const saveToFirestore = async (
@@ -1509,26 +1523,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const resolvedSettings: CongregationSettings = {
       ...baseSettings,
       ...(newSettings || {}),
+      updatedAt: nowISO,
     };
-
-    // Si el usuario guardó explícitamente sus datos mediante "Guardar" o hidratación previa
-    if (localStorage.getItem('kongre_settings_user_saved') === 'true') {
-      const confirmedName = localStorage.getItem('kongre_user_confirmed_name');
-      const confirmedMidDay = localStorage.getItem('kongre_user_confirmed_midweek_day');
-      const confirmedMidTime = localStorage.getItem('kongre_user_confirmed_midweek_time');
-      const confirmedFdsDay = localStorage.getItem('kongre_user_confirmed_weekend_day');
-      const confirmedFdsTime = localStorage.getItem('kongre_user_confirmed_weekend_time');
-      const confirmedAddress = localStorage.getItem('kongre_user_confirmed_address');
-
-      if (confirmedName && (!resolvedSettings.congregationName || isCongregationIdString(resolvedSettings.congregationName) || resolvedSettings.congregationName === 'Congregación Central')) {
-        resolvedSettings.congregationName = confirmedName;
-      }
-      if (confirmedMidDay && !resolvedSettings.midweekMeetingDay) resolvedSettings.midweekMeetingDay = confirmedMidDay;
-      if (confirmedMidTime && !resolvedSettings.midweekMeetingTime) resolvedSettings.midweekMeetingTime = confirmedMidTime;
-      if (confirmedFdsDay && !resolvedSettings.weekendMeetingDay) resolvedSettings.weekendMeetingDay = confirmedFdsDay;
-      if (confirmedFdsTime && !resolvedSettings.weekendMeetingTime) resolvedSettings.weekendMeetingTime = confirmedFdsTime;
-      if (confirmedAddress !== null && confirmedAddress !== undefined && !resolvedSettings.hallAddress) resolvedSettings.hallAddress = confirmedAddress;
-    }
 
     // Asegurar persistencia local inmediata
     try {
@@ -1629,6 +1625,15 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             await setDoc(congDocRef, payload, { merge: true });
             localStorage.removeItem('kongre_needs_cloud_upload');
 
+            // Notificar a otras pestañas en el mismo navegador instantáneamente
+            try {
+              if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+                const bc = new BroadcastChannel('kongre_cross_tab_sync');
+                bc.postMessage({ type: 'CONGREGATION_UPDATED', congregationId: congDocId, timestamp: nowISO });
+                bc.close();
+              }
+            } catch {}
+
             // Alias sin guiones
             const unhyphenated = congDocId.replace(/-/g, '');
             if (unhyphenated !== congDocId && unhyphenated.length >= 3) {
@@ -1662,7 +1667,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return;
     }
 
-    // Debounce de guardado en la nube para ahorrar cuota de escrituras (2.5 segundos)
+    // Debounce ágil (350ms) para respuesta casi instantánea entre navegadores
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
@@ -1671,7 +1676,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     saveTimeoutRef.current = setTimeout(async () => {
       saveTimeoutRef.current = null;
       await executeCloudWrite();
-    }, 2500);
+    }, 350);
   };
 
   // Función explícita para forzar subida de datos locales a la congregación (por ID, sin requerir Google)
@@ -1874,9 +1879,17 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const coordName = settings.coordinatorName?.trim();
     if (!coordName || isGenericIdentityName(coordName) || !settings.isRegistered) return;
 
-    const alreadyExists = publishers.some(
-      (p) => p.name && p.name.trim().toLowerCase() === coordName.toLowerCase()
-    );
+    const alreadyExists = publishers.some((p) => {
+      const pName = (p.name || (p as any).full_name || '').trim().toLowerCase();
+      const cName = coordName.toLowerCase();
+      return (
+        pName === cName ||
+        pName.startsWith(cName) ||
+        cName.startsWith(pName) ||
+        (p.id && p.id.startsWith('pub-coord')) ||
+        (settings.coordinatorEmail && p.email && p.email.toLowerCase() === settings.coordinatorEmail.toLowerCase())
+      );
+    });
 
     if (!alreadyExists) {
       const coordPub: Publisher = {

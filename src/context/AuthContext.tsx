@@ -1,7 +1,7 @@
 // src/context/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { User, onAuthStateChanged, signInWithPopup, signOut, updateProfile } from 'firebase/auth';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { auth, googleProvider, db, isFirestoreQuotaExceeded, markFirestoreQuotaExceeded, isQuotaError } from '../firebase/config';
 import { TheocraticRole, TheocraticRoleInfo, THEOCRATIC_ROLES } from '../utils/rbac';
 import { generateSecurePublisherPin, verifyPasscode, sanitizeForFirestore, isGenericIdentityName, formatCanonicalCongregationId } from '../utils/theocraticSecurity';
@@ -191,7 +191,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_PUBLISHER_PINS_KEY, JSON.stringify(publisherPinsList));
+    localStorage.setItem('kongre_publisher_unique_pins_v1', JSON.stringify(publisherPinsList));
   }, [publisherPinsList]);
+
+  // Sincronización en tiempo real de PINs de publicadores entre ventanas, pestañas y Firestore
+  useEffect(() => {
+    const handlePinsUpdated = (e: Event) => {
+      try {
+        const detail = (e as CustomEvent)?.detail;
+        if (Array.isArray(detail) && detail.length > 0) {
+          setPublisherPinsList(detail);
+          return;
+        }
+        const saved =
+          localStorage.getItem(LOCAL_STORAGE_PUBLISHER_PINS_KEY) ||
+          localStorage.getItem('kongre_publisher_unique_pins_v1');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setPublisherPinsList(parsed);
+          }
+        }
+      } catch {}
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (
+        e.key === LOCAL_STORAGE_PUBLISHER_PINS_KEY ||
+        e.key === 'kongre_publisher_unique_pins_v1' ||
+        e.key === 'teocratic_app_data_v1_publishers'
+      ) {
+        handlePinsUpdated(e as any);
+      }
+    };
+
+    window.addEventListener('kongre_publisher_pins_updated', handlePinsUpdated);
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('kongre_publisher_pins_updated', handlePinsUpdated);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   // Role Personal PINs directory (legacy fallback)
   const [rolePinsMap, setRolePinsMap] = useState<Record<TheocraticRole, RolePinAssignment>>(() => {
@@ -455,6 +495,115 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name: brotherName || undefined,
         message: `¡Identificación exitosa! Bienvenido${brotherName ? `, ${brotherName}` : ''} (${THEOCRATIC_ROLES[foundRoleEntry.role]?.name}).`,
       };
+    }
+
+    // 3b. Search directly in localStorage publishers or Firestore if this browser doesn't have the PIN yet (e.g. Browser 2)
+    try {
+      const rawPubs = localStorage.getItem('teocratic_app_data_v1_publishers');
+      if (rawPubs) {
+        const parsedPubs = JSON.parse(rawPubs);
+        if (Array.isArray(parsedPubs)) {
+          const matchPub = parsedPubs.find((p: any) => p.personalPin && String(p.personalPin).trim() === cleanPin);
+          if (matchPub) {
+            const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : matchPub.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+            const brotherName = resolveNonGenericName(matchPub.name, role) || matchPub.name;
+            setActiveRole(role);
+            if (!isGenericIdentityName(brotherName)) {
+              setCurrentBrotherName(brotherName);
+              localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+            }
+            if (matchPub.id) {
+              setIdentifiedPublisher(matchPub.id, brotherName);
+            }
+            assignPersonalPinToPublisher(matchPub.id, cleanPin, role, brotherName, matchPub.email, matchPub.privilege);
+            return {
+              success: true,
+              role,
+              name: brotherName,
+              publisherId: matchPub.id,
+              message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[role]?.name || role}.`,
+            };
+          }
+        }
+      }
+
+      // Check Firestore directly if not found locally
+      const congId = (
+        localStorage.getItem('kongre_congregation_number') ||
+        localStorage.getItem('kongre_congregation_id') ||
+        ''
+      ).trim().toUpperCase();
+
+      if (congId && congId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congId)) {
+        const congSnap = await getDoc(doc(db, 'congregations', congId));
+        if (congSnap.exists()) {
+          const cloudData = congSnap.data();
+          const cloudPubs = cloudData.publishers;
+          if (Array.isArray(cloudPubs)) {
+            const matchPub = cloudPubs.find((p: any) => p.personalPin && String(p.personalPin).trim() === cleanPin);
+            if (matchPub) {
+              const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : matchPub.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+              const brotherName = resolveNonGenericName(matchPub.name, role) || matchPub.name;
+              setActiveRole(role);
+              if (!isGenericIdentityName(brotherName)) {
+                setCurrentBrotherName(brotherName);
+                localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+              }
+              if (matchPub.id) {
+                setIdentifiedPublisher(matchPub.id, brotherName);
+              }
+              assignPersonalPinToPublisher(matchPub.id, cleanPin, role, brotherName, matchPub.email, matchPub.privilege);
+              localStorage.setItem('kongre_is_registered_congregation', 'true');
+              localStorage.setItem('kongre_has_entered_app', 'true');
+              return {
+                success: true,
+                role,
+                name: brotherName,
+                publisherId: matchPub.id,
+                message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[role]?.name || role}.`,
+              };
+            }
+          }
+        }
+      } else {
+        // Auto-discover congregations in Firestore if Browser 2 doesn't have congregation ID set yet
+        const congSnap = await getDocs(collection(db, 'congregations'));
+        for (const cDoc of congSnap.docs) {
+          if (['1001', 'CENTRAL', 'MAIN', 'ID'].includes(cDoc.id.toUpperCase())) continue;
+          const cData = cDoc.data();
+          const cloudPubs = cData.publishers;
+          if (Array.isArray(cloudPubs)) {
+            const matchPub = cloudPubs.find((p: any) => p.personalPin && String(p.personalPin).trim() === cleanPin);
+            if (matchPub) {
+              const matchedCongId = cDoc.id.toUpperCase();
+              localStorage.setItem('kongre_congregation_number', matchedCongId);
+              localStorage.setItem('kongre_congregation_id', matchedCongId);
+              localStorage.setItem('kongre_is_registered_congregation', 'true');
+              localStorage.setItem('kongre_has_entered_app', 'true');
+              const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : matchPub.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+              const brotherName = resolveNonGenericName(matchPub.name, role) || matchPub.name;
+              setActiveRole(role);
+              if (!isGenericIdentityName(brotherName)) {
+                setCurrentBrotherName(brotherName);
+                localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+              }
+              if (matchPub.id) {
+                setIdentifiedPublisher(matchPub.id, brotherName);
+              }
+              assignPersonalPinToPublisher(matchPub.id, cleanPin, role, brotherName, matchPub.email, matchPub.privilege);
+              return {
+                success: true,
+                role,
+                name: brotherName,
+                publisherId: matchPub.id,
+                message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[role]?.name || role}.`,
+              };
+            }
+          }
+        }
+      }
+    } catch (searchErr) {
+      console.warn('Aviso buscando PIN en Firestore:', searchErr);
     }
 
     // 4. Backward-compatibility: Check if PIN matches previously registered Coordinator App Lock PIN

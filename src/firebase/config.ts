@@ -69,13 +69,26 @@ export const isFirestoreQuotaExceeded = (): boolean => {
     const saved = localStorage.getItem('kongre_firestore_quota_cooldown');
     if (!saved) return false;
     const until = parseInt(saved, 10);
-    return !isNaN(until) && Date.now() < until;
+    const isExceeded = !isNaN(until) && Date.now() < until;
+    if (!isExceeded) {
+      localStorage.removeItem('kongre_firestore_quota_cooldown');
+    }
+    return isExceeded;
   } catch {
     return false;
   }
 };
 
-export const markFirestoreQuotaExceeded = async (durationMinutes = 720): Promise<void> => {
+export const clearFirestoreQuotaCooldown = async (): Promise<void> => {
+  try {
+    localStorage.removeItem('kongre_firestore_quota_cooldown');
+    await resumeFirestoreNetwork();
+  } catch {
+    // ignore
+  }
+};
+
+export const markFirestoreQuotaExceeded = async (durationMinutes = 5): Promise<void> => {
   try {
     const until = Date.now() + durationMinutes * 60 * 1000;
     localStorage.setItem('kongre_firestore_quota_cooldown', String(until));
@@ -85,17 +98,21 @@ export const markFirestoreQuotaExceeded = async (durationMinutes = 720): Promise
   }
 };
 
-// Check on boot if quota was already exceeded and pause network if so
+// Check on boot: if previous quota was stored, reset it to give fresh network attempt
 if (typeof window !== 'undefined') {
-  if (isFirestoreQuotaExceeded()) {
-    pauseFirestoreNetwork();
+  try {
+    // Clear legacy stale 12-hour cooldowns to ensure real-time sync is always active
+    localStorage.removeItem('kongre_firestore_quota_cooldown');
+    resumeFirestoreNetwork();
+  } catch {
+    // ignore
   }
 
-  // Intercept unhandled Firestore quota rejections from background workers
+  // Intercept unhandled Firestore quota rejections from background workers (brief 3 minute backoff only)
   window.addEventListener('unhandledrejection', (event) => {
     if (isQuotaError(event.reason)) {
       event.preventDefault();
-      markFirestoreQuotaExceeded(720);
+      markFirestoreQuotaExceeded(3);
     }
   });
 }

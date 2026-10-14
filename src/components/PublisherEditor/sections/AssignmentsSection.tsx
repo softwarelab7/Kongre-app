@@ -40,7 +40,7 @@ export const AssignmentsSection: React.FC<AssignmentsSectionProps> = ({
   ASSIGNMENT_GROUPS
 }) => {
   // Filtrar grupos y asignaciones según el género
-  const isFemale = formData.gender === 'female';
+  const isFemale = formData.gender === 'female' || formData.gender === 'hermana';
 
   const filteredGroups = ASSIGNMENT_GROUPS.map(group => {
     if (isFemale) {

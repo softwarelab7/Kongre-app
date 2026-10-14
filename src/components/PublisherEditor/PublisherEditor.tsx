@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { Publisher, PublisherAbsence } from '../../types';
 import {
   LayoutGrid,
@@ -26,6 +26,7 @@ import {
   Edit2,
   Trash2,
   History,
+  ChevronLeft,
   ChevronRight,
   Layers,
 } from 'lucide-react';
@@ -38,6 +39,7 @@ import { usePermissions } from '../../context/AuthContext';
 
 // Sections
 import { BasicInfoSection } from './sections/BasicInfoSection';
+import { SectionHeader } from '../SectionHeader';
 import { ContactSection } from './sections/ContactSection';
 // import { IdentitySection } from './sections/IdentitySection'; // REMOVED: obsolete
 import { SpecialConditionsSection } from './sections/SpecialConditionsSection';
@@ -62,18 +64,26 @@ export type Tab =
   | 'absences' 
   | 'history';
 
-export const TAB_CONFIG: Record<Tab, { label: string; icon: any; color: string; activeBg: string; activeDark: string; badge?: string; desc: string }> = {
-  all:         { label: 'Panel de Tarjetas',   icon: Layers,      color: 'text-indigo-600 dark:text-indigo-400',   activeBg: 'bg-indigo-500/10 border-indigo-500/30',   activeDark: 'dark:bg-indigo-500/15 dark:border-indigo-500/30', badge: 'Hub', desc: 'Panel de categorías teocráticas independientes' },
-  personal:    { label: 'Información Personal', icon: User,        color: 'text-blue-600 dark:text-blue-400',       activeBg: 'bg-blue-500/10 border-blue-500/30',       activeDark: 'dark:bg-blue-500/15 dark:border-blue-500/30', desc: 'Datos civiles, filiación y registro básico' },
-  contact:     { label: 'Contacto y Ubicación', icon: MapPin,     color: 'text-cyan-600 dark:text-cyan-400',       activeBg: 'bg-cyan-500/10 border-cyan-500/30',       activeDark: 'dark:bg-cyan-500/15 dark:border-cyan-500/30', desc: 'Teléfono, móvil, dirección y mapas' },
-  medical:     { label: 'DPA & Salud',        icon: Stethoscope, color: 'text-rose-600 dark:text-rose-400',       activeBg: 'bg-rose-500/10 border-rose-500/30',       activeDark: 'dark:bg-rose-500/15 dark:border-rose-500/30', desc: 'Directriz médica anticipada y salud' },
-  spiritual:   { label: 'Estado Espiritual',   icon: Shield,      color: 'text-emerald-600 dark:text-emerald-400', activeBg: 'bg-emerald-500/10 border-emerald-500/30', activeDark: 'dark:bg-emerald-500/15 dark:border-emerald-500/30', desc: 'Bautismo, privilegios y rol eclesiástico' },
-  assignments: { label: 'Asignaciones',       icon: CheckCircle, color: 'text-violet-600 dark:text-violet-400',   activeBg: 'bg-violet-500/10 border-violet-500/30',   activeDark: 'dark:bg-violet-500/15 dark:border-violet-500/30', desc: 'Partes de reunión, tareas y servicio' },
-  record:      { label: 'Registro S-21',       icon: FileText,    color: 'text-amber-600 dark:text-amber-400',     activeBg: 'bg-amber-500/10 border-amber-500/30',     activeDark: 'dark:bg-amber-500/15 dark:border-amber-500/30', desc: 'Tarjeta de registro de publicador' },
-  emergency:   { label: 'Contacto Emergencia', icon: Phone,       color: 'text-red-600 dark:text-red-400',         activeBg: 'bg-red-500/10 border-red-500/30',         activeDark: 'dark:bg-red-500/15 dark:border-red-500/30', desc: 'Familiares o hermanos para emergencias' },
-  conditions:  { label: 'Condiciones Especiales', icon: Diamond,  color: 'text-teal-600 dark:text-teal-400',       activeBg: 'bg-teal-500/10 border-teal-500/30',       activeDark: 'dark:bg-teal-500/15 dark:border-teal-500/30', desc: 'Edad avanzada, salud y movilidad' },
-  absences:    { label: 'Ausencias y Notas',   icon: Calendar,    color: 'text-orange-600 dark:text-orange-400',   activeBg: 'bg-orange-500/10 border-orange-500/30',   activeDark: 'dark:bg-orange-500/15 dark:border-orange-500/30', desc: 'Seguimiento de ausencias y notas pastorales' },
-  history:     { label: 'Historial',          icon: History,     color: 'text-slate-600 dark:text-slate-400',     activeBg: 'bg-slate-500/10 border-slate-500/30',     activeDark: 'dark:bg-slate-500/15 dark:border-slate-500/30', desc: 'Auditoría y reversión de cambios' }
+export const TAB_CONFIG: Record<Tab, { 
+  label: string; 
+  icon: any; 
+  color: string; 
+  gradient: string; 
+  shadow: string; 
+  badge?: string; 
+  desc: string; 
+}> = {
+  all:         { label: 'Panel de Tarjetas',   icon: Layers,      color: 'text-indigo-600 dark:text-indigo-400',   gradient: 'from-indigo-600 via-indigo-600 to-violet-600', shadow: 'shadow-indigo-600/30', badge: 'Hub', desc: 'Panel de categorías teocráticas independientes' },
+  personal:    { label: 'Información Personal', icon: User,        color: 'text-blue-600 dark:text-blue-400',       gradient: 'from-blue-600 to-indigo-600', shadow: 'shadow-blue-600/30', desc: 'Datos civiles, filiación y registro básico' },
+  contact:     { label: 'Contacto y Ubicación', icon: MapPin,     color: 'text-cyan-600 dark:text-cyan-400',       gradient: 'from-cyan-600 to-blue-600', shadow: 'shadow-cyan-600/30', desc: 'Teléfono, móvil, dirección y mapas' },
+  medical:     { label: 'DPA & Salud',        icon: Stethoscope, color: 'text-rose-600 dark:text-rose-400',       gradient: 'from-rose-600 to-pink-600', shadow: 'shadow-rose-600/30', desc: 'Directriz médica anticipada y salud' },
+  spiritual:   { label: 'Estado Espiritual',   icon: Shield,      color: 'text-emerald-600 dark:text-emerald-400', gradient: 'from-emerald-600 to-teal-600', shadow: 'shadow-emerald-600/30', desc: 'Bautismo, privilegios y rol eclesiástico' },
+  assignments: { label: 'Asignaciones',       icon: CheckCircle, color: 'text-violet-600 dark:text-violet-400',   gradient: 'from-violet-600 to-purple-600', shadow: 'shadow-violet-600/30', desc: 'Partes de reunión, tareas y servicio' },
+  record:      { label: 'Registro S-21',       icon: FileText,    color: 'text-amber-600 dark:text-amber-400',     gradient: 'from-amber-600 to-orange-600', shadow: 'shadow-amber-600/30', desc: 'Tarjeta de registro de publicador' },
+  emergency:   { label: 'Contacto Emergencia', icon: Phone,       color: 'text-red-600 dark:text-red-400',         gradient: 'from-red-600 to-rose-600', shadow: 'shadow-red-600/30', desc: 'Familiares o hermanos para emergencias' },
+  conditions:  { label: 'Condiciones Especiales', icon: Diamond,  color: 'text-teal-600 dark:text-teal-400',       gradient: 'from-teal-600 to-emerald-600', shadow: 'shadow-teal-600/30', desc: 'Edad avanzada, salud y movilidad' },
+  absences:    { label: 'Ausencias y Notas',   icon: Calendar,    color: 'text-orange-600 dark:text-orange-400',   gradient: 'from-orange-600 to-amber-600', shadow: 'shadow-orange-600/30', desc: 'Seguimiento de ausencias y notas pastorales' },
+  history:     { label: 'Historial',          icon: History,     color: 'text-slate-600 dark:text-slate-400',     gradient: 'from-slate-700 to-zinc-800', shadow: 'shadow-slate-700/30', desc: 'Auditoría y reversión de cambios' }
 };
 
 export const ASSIGNMENT_GROUPS = [
@@ -275,7 +285,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
   const publisherRoleLabel = useMemo(() => {
     if (formData.role === 'elder') return 'Anciano';
-    if (formData.role === 'ministerial_servant') return 'Siervo Ministerial';
+    if (formData.role === 'ministerial_servant' || formData.role === 'servant') return 'Siervo Ministerial';
     if (formData.role === 'unbaptized') return 'Publicador no bautizado';
     return 'Publicador';
   }, [formData.role]);
@@ -307,116 +317,217 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
     });
   }, [handleAssignmentChange]);
 
-  const handleTopBack = useCallback(() => {
-    if (activeTab !== 'all') {
-      setActiveTab('all');
-    } else {
-      handleBack();
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    if (tabsRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsRef.current;
+      setCanScrollLeft(scrollLeft > 6);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 6);
     }
-  }, [activeTab, handleBack]);
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    const handleResize = () => checkScroll();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [checkScroll]);
+
+  useEffect(() => {
+    if (tabsRef.current) {
+      const activeEl = tabsRef.current.querySelector<HTMLElement>('[data-active="true"]');
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      }
+      checkScroll();
+    }
+  }, [activeTab, checkScroll]);
+
+  const scrollTabs = useCallback((direction: 'left' | 'right') => {
+    if (tabsRef.current) {
+      tabsRef.current.scrollBy({
+        left: direction === 'left' ? -220 : 220,
+        behavior: 'smooth'
+      });
+    }
+  }, []);
+
+  const filteredTabs = useMemo(() => {
+    return (Object.keys(TAB_CONFIG) as Tab[]).filter(tabKey => {
+      if (tabKey === 'record' && !canViewS21) return false;
+      return true;
+    });
+  }, [canViewS21]);
+
+  const publisherInitials = useMemo(() => {
+    const name = formData.full_name || formData.name || '';
+    if (!name.trim()) return 'P';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }, [formData.full_name, formData.name]);
+
+  const groupNumber = formData.id_grupo || formData.groupNumber;
+  const groupObj = useMemo(() => {
+    return groups.find((g: any) => String(g.number) === String(groupNumber) || String(g.id) === String(groupNumber));
+  }, [groups, groupNumber]);
+  const groupName = groupObj ? groupObj.name : groupNumber ? `Grupo ${groupNumber}` : null;
+
+  const handleSaveClick = useCallback(() => {
+    const effectiveName = (
+      formData.full_name ||
+      formData.name ||
+      [formData.first_name, formData.last_name].filter(Boolean).join(' ')
+    )?.trim();
+
+    if (!effectiveName) {
+      showToast('Por favor, ingresa el nombre del publicador antes de guardar', 'error');
+      setIsEditingName(true);
+      return;
+    }
+
+    if (!canEditPublishers) {
+      showToast('No tienes permisos para modificar publicadores', 'error');
+      return;
+    }
+
+    onSave({
+      ...formData,
+      name: effectiveName,
+      full_name: effectiveName,
+    });
+  }, [formData, canEditPublishers, onSave, showToast]);
 
   return (
-    <div className="flex flex-col animate-in fade-in slide-in-from-right-4 duration-300">
-      <div className="sticky top-[-16px] sm:top-[-24px] z-20 bg-white/95 dark:bg-[#0d0d18]/95 backdrop-blur-xl pt-2.5 sm:pt-4 pb-2 -mt-4 sm:-mt-6 -mx-2 sm:-mx-4 px-3 sm:px-4 border-b border-black/[0.06] dark:border-white/[0.06]">
-        <header className="mb-2 sm:mb-3 flex items-center justify-between gap-2 sm:gap-4">
-          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-            <button 
+    <div className="space-y-6 animate-in fade-in duration-300">
+      {/* 1. Header con el componente oficial de Kongre (SectionHeader) */}
+      <SectionHeader
+        icon={User}
+        title="Ficha de"
+        highlightWord={formData.full_name || formData.name || 'Nuevo Publicador'}
+        subtitle={`${publisherRoleLabel} • ${groupName || 'Congregación'}${isDirty ? ' • ⚠️ Cambios sin guardar' : ' • ✓ Sincronizado'}`}
+        badgeText={publisherRoleLabel}
+        colorTheme="indigo"
+        actions={
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
               type="button"
-              onClick={handleTopBack} 
-              className="p-2 sm:p-2.5 min-w-[38px] min-h-[38px] flex items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-300 transition-all shrink-0 active:scale-95 cursor-pointer" 
-              title={activeTab !== 'all' ? "Volver al panel de tarjetas" : "Volver a la lista"}
+              onClick={() => setIsEditingName((prev) => !prev)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-zinc-200 border border-slate-200/60 dark:border-white/[0.06] text-xs font-semibold transition-all cursor-pointer"
+              title="Cambiar nombre del publicador"
             >
-              <ArrowLeft size={18} className="text-zinc-500 group-hover:text-zinc-800 dark:group-hover:text-zinc-200" />
+              <Edit2 size={14} />
+              <span className="hidden sm:inline">Renombrar</span>
             </button>
-            <div className="flex-1 min-w-0 flex flex-col relative group">
-              {isEditingName ? (
-                <div className="flex items-center gap-2 max-w-md animate-in fade-in zoom-in-95 duration-200">
-                  <div className="relative w-full flex items-center">
-                    <input 
-                      ref={nameInputRef}
-                      type="text"
-                      value={formData.full_name || ''}
-                      onChange={e => handleChange('full_name', e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') setIsEditingName(false);
-                        if (e.key === 'Escape') setIsEditingName(false);
-                      }}
-                      onBlur={() => setIsEditingName(false)}
-                      className="bg-white dark:bg-[#1a1a24] border border-indigo-500/50 shadow-[0_0_0_4px_rgba(99,102,241,0.1)] focus:outline-none px-3 py-1.5 text-base sm:text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100 w-full transition-all truncate rounded-xl cursor-text"
-                      placeholder="Nombre del Publicador"
-                      autoFocus
-                    />
-                    <button
-                      type="button"
-                      onMouseDown={(e) => { e.preventDefault(); setIsEditingName(false); }}
-                      className="absolute right-2 p-1 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-500/30 transition-colors"
-                      title="Confirmar"
-                    >
-                      <Check size={14} />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div 
-                  className="flex items-center gap-2 max-w-md cursor-pointer animate-in fade-in duration-200 group/title min-w-0"
-                  onClick={() => setIsEditingName(true)}
-                >
-                  <h2 className="px-2 sm:px-3 py-1 sm:py-1.5 -ml-2 sm:-ml-3 text-base sm:text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100 truncate rounded-xl transition-all group-hover/title:bg-zinc-100/80 dark:group-hover/title:bg-white/[0.04]">
-                    {formData.full_name || 'Nuevo Publicador'}
-                  </h2>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shrink-0">
-                    {publisherRoleLabel}
-                  </span>
-                  <div className="p-1 sm:p-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg text-zinc-400 shrink-0">
-                    <Edit2 size={12} />
-                  </div>
-                </div>
-              )}
-              {!isEditingName && (
-                <p className="text-[10px] sm:text-[11px] font-medium text-zinc-400 dark:text-zinc-500 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity pl-1 absolute -bottom-4 left-0 hidden sm:block">
-                  Haz clic para editar el nombre
-                </p>
-              )}
-            </div>
-          </div>
-          <button 
-            type="button"
-            onClick={() => onSave(formData)}
-            disabled={loading || !formData.full_name || !canEditPublishers}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 sm:px-5 py-2 min-h-[38px] rounded-xl font-bold text-xs flex items-center gap-1.5 sm:gap-2 shadow-md shadow-indigo-600/20 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0 cursor-pointer"
-          >
-            {loading ? '...' : <><Save size={15} /> <span>Guardar</span></>}
-          </button>
-        </header>
 
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth px-0.5 py-1 -mx-0.5 touch-pan-x">
-          {(Object.keys(TAB_CONFIG) as Tab[]).filter(tabKey => {
-            if (tabKey === 'record' && !canViewS21) return false;
-            return true;
-          }).map(tabKey => {
-            const config = TAB_CONFIG[tabKey];
-            const isActive = activeTab === tabKey;
-            
-            return (
+            <button
+              type="button"
+              onClick={handleBack}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-zinc-200 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold transition-all cursor-pointer active:scale-95"
+              title="Volver a la lista de publicadores"
+            >
+              <ArrowLeft size={16} />
+              <span>Volver</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSaveClick}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all shadow-md shadow-indigo-600/20 disabled:opacity-50 cursor-pointer"
+              title="Guardar cambios del publicador"
+            >
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Guardando...</span>
+                </>
+              ) : (
+                <>
+                  <Save size={16} />
+                  <span>Guardar</span>
+                </>
+              )}
+            </button>
+          </div>
+        }
+      />
+
+      {/* Editor de nombre inline cuando el usuario presiona "Renombrar" */}
+      {isEditingName && (
+        <div className="p-3 bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-500/40 rounded-2xl shadow-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+          <span className="text-xs font-semibold text-slate-500 shrink-0">Nombre completo:</span>
+          <input
+            ref={nameInputRef}
+            type="text"
+            value={formData.full_name || formData.name || ''}
+            onChange={(e) => handleChange('full_name', e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') setIsEditingName(false);
+              if (e.key === 'Escape') setIsEditingName(false);
+            }}
+            className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-sm font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Nombre y apellidos"
+            autoFocus
+          />
+          <button
+            type="button"
+            onClick={() => setIsEditingName(false)}
+            className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold cursor-pointer shadow-xs"
+          >
+            Aceptar
+          </button>
+        </div>
+      )}
+
+      {/* 2. Barra de Pestañas con el Diseño Estándar de Kongre (Pill Bar Container) */}
+      <div 
+        ref={tabsRef}
+        className="p-1.5 bg-slate-100/90 dark:bg-slate-900/60 rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] backdrop-blur-md flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-2xs"
+      >
+        {filteredTabs.map((tabKey) => {
+          const config = TAB_CONFIG[tabKey];
+          const isActive = activeTab === tabKey;
+          const Icon = config.icon;
+
+          return (
+            <React.Fragment key={tabKey}>
               <button
-                key={tabKey}
                 type="button"
+                data-active={isActive}
                 onClick={() => setActiveTab(tabKey)}
-                className={`flex items-center gap-1.5 sm:gap-2 py-1.5 sm:py-2 px-2.5 sm:px-3.5 rounded-xl text-xs font-semibold tracking-wide transition-all whitespace-nowrap border shrink-0 cursor-pointer active:scale-95 ${
+                className={`flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
                   isActive
-                    ? `${config.activeBg} ${config.activeDark} ${config.color} border-current/20 shadow-xs ring-1 ring-black/5 dark:ring-white/10 font-bold`
-                    : `text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] border-transparent`
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold border border-slate-200/60 dark:border-transparent'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/[0.04]'
                 }`}
               >
-                <config.icon size={14} strokeWidth={isActive ? 2.5 : 2} />
+                <Icon size={14} className={isActive ? 'text-indigo-600 dark:text-white' : 'text-slate-500 dark:text-slate-400'} />
                 <span>{config.label}</span>
+                {tabKey === 'all' && (
+                  <span
+                    className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
+                      isActive
+                        ? 'bg-indigo-50 text-indigo-600 dark:bg-white/20 dark:text-white'
+                        : 'bg-slate-200/80 text-slate-600 dark:bg-white/10 dark:text-slate-300'
+                    }`}
+                  >
+                    HUB
+                  </span>
+                )}
               </button>
-            );
-          })}
-        </div>
+              {tabKey === 'all' && (
+                <div className="h-5 w-px bg-slate-200 dark:bg-white/10 mx-0.5 shrink-0" aria-hidden="true" />
+              )}
+            </React.Fragment>
+          );
+        })}
       </div>
 
-      <div className="flex-1 pt-4 sm:pt-6 pb-12 px-1 sm:px-2">
+      <div className="flex-1 pb-12">
         {/* VISTA 1: PANEL / HUB DE TARJETAS (Cada categoría en su propio contenedor) */}
         {activeTab === 'all' && (
           <div className="space-y-4 animate-in fade-in duration-300">
@@ -826,22 +937,6 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
         {/* VISTAS EXCLUSIVAS: CADA CATEGORÍA DENTRO DE SU PROPIO CONTENEDOR */}
         {activeTab !== 'all' && (
           <div className="space-y-4 animate-in fade-in duration-300">
-            {/* Navegación sutil y directa al Panel de Tarjetas */}
-            <div className="flex items-center justify-between gap-3 pb-1">
-              <button
-                type="button"
-                onClick={() => setActiveTab('all')}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors cursor-pointer active:scale-95 py-1.5 px-3 rounded-xl bg-indigo-50/80 hover:bg-indigo-100/80 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 shadow-2xs"
-              >
-                <ArrowLeft size={14} />
-                <span>Volver al Panel de Tarjetas</span>
-              </button>
-              <div className="flex items-center gap-2 text-xs font-bold text-zinc-500 dark:text-zinc-400">
-                <span className={`w-2 h-2 rounded-full bg-indigo-500`}></span>
-                <span>{TAB_CONFIG[activeTab].label}</span>
-              </div>
-            </div>
-
             {/* Renderizado Exclusivo del Contenedor de la Tarjeta Seleccionada */}
             {activeTab === 'personal' && (
               <BasicInfoSection formData={formData} handleChange={handleChange} />

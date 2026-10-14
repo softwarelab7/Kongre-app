@@ -234,9 +234,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   const calculateFlyoutPos = (triggerEl: HTMLElement, itemCount: number = 4) => {
     const rect = triggerEl.getBoundingClientRect();
     const vh = window.innerHeight;
-    const padding = 12;
-    // Estimated height: header ~54px, each module ~54px, margins ~16px
-    const estimatedHeight = 60 + itemCount * 54;
+    const padding = 16;
+    // Estimated height: header ~64px, cards in 2 columns ~95px per row, margins ~24px
+    const rowCount = Math.ceil(itemCount / 2);
+    const estimatedHeight = 64 + rowCount * 95;
 
     let top = rect.top;
     if (top + estimatedHeight > vh - padding) {
@@ -248,7 +249,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
     return {
       top: Math.round(top),
-      left: Math.round(rect.right + 8),
+      left: Math.round(rect.right + 10),
     };
   };
 
@@ -278,7 +279,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     const rect = activeTriggerRef.current.getBoundingClientRect();
     const menuHeight = flyoutRef.current.offsetHeight;
     const vh = window.innerHeight;
-    const padding = 12;
+    const padding = 16;
 
     let top = rect.top;
     if (top + menuHeight > vh - padding) {
@@ -290,7 +291,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
     setFlyoutStyle({
       top: Math.round(top),
-      left: Math.round(rect.right + 8),
+      left: Math.round(rect.right + 10),
     });
   }, [hoveredCategory]);
 
@@ -301,7 +302,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       const rect = activeTriggerRef.current.getBoundingClientRect();
       const menuHeight = flyoutRef.current.offsetHeight;
       const vh = window.innerHeight;
-      const padding = 12;
+      const padding = 16;
 
       let top = rect.top;
       if (top + menuHeight > vh - padding) {
@@ -313,7 +314,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       setFlyoutStyle({
         top: Math.round(top),
-        left: Math.round(rect.right + 8),
+        left: Math.round(rect.right + 10),
       });
     };
 
@@ -333,17 +334,11 @@ export const Navbar: React.FC<NavbarProps> = ({
   const departments: Department[] = [
     {
       id: 'reuniones',
-      title: 'Reuniones y Calendario',
+      title: 'Reuniones',
       shortTitle: 'Reuniones',
-      icon: Calendar,
-      tabIds: ['calendario', 'programacion', 's89', 'discursos', 'hospitalidad'],
+      icon: ClipboardList,
+      tabIds: ['programacion', 's89', 'discursos', 'hospitalidad'],
       items: [
-        {
-          id: 'calendario',
-          label: 'Calendario de la Congregación',
-          description: 'Visitas del SC, asambleas, conmemoración y agenda mensual interactiva',
-          icon: Calendar,
-        },
         {
           id: 'programacion',
           label: 'Reunión Entre Semana y Fin de Semana',
@@ -569,10 +564,10 @@ export const Navbar: React.FC<NavbarProps> = ({
     },
     {
       id: 'reuniones',
-      title: 'Reuniones y Calendario',
-      icon: Calendar,
-      primaryTab: 'calendario' as ActiveTab,
-      tabIds: ['calendario', 'programacion', 's89', 'discursos', 'hospitalidad'] as ActiveTab[],
+      title: 'Reuniones',
+      icon: ClipboardList,
+      primaryTab: 'programacion' as ActiveTab,
+      tabIds: ['programacion', 's89', 'discursos', 'hospitalidad'] as ActiveTab[],
       badge: undefined,
       badgeColor: undefined,
       colorClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400',
@@ -747,41 +742,43 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onMouseLeave={handleMouseLeaveCategory}
                       style={{
                         top: flyoutStyle ? `${flyoutStyle.top}px` : '12px',
-                        left: flyoutStyle ? `${flyoutStyle.left}px` : '72px',
+                        left: flyoutStyle ? `${flyoutStyle.left}px` : '74px',
                         maxHeight: 'calc(100vh - 24px)',
                       }}
-                      className="fixed w-80 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 p-2 z-50 animate-in fade-in zoom-in-95 duration-100 flex flex-col"
+                      className="fixed w-[520px] max-w-[calc(100vw-88px)] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800/90 p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150 flex flex-col"
                     >
                       {/* Invisible hover bridge to prevent pointer exit */}
-                      <div className="absolute -left-3 top-0 bottom-0 w-3 bg-transparent" />
+                      <div className="absolute -left-4 top-0 bottom-0 w-4 bg-transparent" />
 
                       {/* Header */}
-                      <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between shrink-0">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-7 h-7 rounded-lg ${cat.colorClass} flex items-center justify-center font-bold`}>
-                            <Icon className="w-4 h-4" />
+                      <div className="px-3.5 py-2.5 mb-2.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 flex items-center justify-between shrink-0">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`w-8 h-8 rounded-xl ${cat.colorClass} flex items-center justify-center font-bold shadow-2xs`}>
+                            <Icon className="w-4 h-4 stroke-[2]" />
                           </div>
                           <div>
-                            <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                            <h4 className="text-xs font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
                               {cat.title}
                             </h4>
-                            <span className="text-[10px] text-slate-400 font-medium">
-                              {cat.items.length} módulos
+                            <span className="text-[11px] text-slate-400 font-medium">
+                              {cat.items.length} módulos disponibles
                             </span>
                           </div>
                         </div>
                         {cat.badge && (
-                          <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${cat.badgeColor || 'bg-amber-500 text-white'} animate-pulse`}>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${cat.badgeColor || 'bg-amber-500 text-white'} animate-pulse`}>
                             {cat.badge}
                           </span>
                         )}
                       </div>
 
-                      {/* Modules list */}
-                      <div className="p-1 space-y-1 mt-1 overflow-y-auto flex-1 min-h-0">
-                        {cat.items.map((sub) => {
+                      {/* Cards Grid */}
+                      <div className="grid grid-cols-2 gap-2.5 p-0.5 overflow-y-auto max-h-[calc(100vh-140px)] no-scrollbar">
+                        {cat.items.map((sub, itemIdx) => {
                           const SubIcon = sub.icon;
                           const isSubActive = activeTab === sub.id;
+                          const isLastOdd = cat.items.length % 2 !== 0 && itemIdx === cat.items.length - 1;
+
                           return (
                             <button
                               key={sub.id}
@@ -790,35 +787,61 @@ export const Navbar: React.FC<NavbarProps> = ({
                                 handleSelectTab(sub.id);
                                 setHoveredCategory(null);
                               }}
-                              className={`w-full flex items-start gap-2.5 p-2.5 rounded-xl text-left transition-all cursor-pointer ${
+                              className={`group relative p-3 rounded-2xl text-left transition-all duration-200 cursor-pointer flex flex-col justify-between border ${
+                                isLastOdd ? 'col-span-2' : ''
+                              } ${
                                 isSubActive
-                                  ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-900 dark:text-indigo-200 font-bold border border-indigo-200/60 dark:border-indigo-800/60 shadow-2xs'
-                                  : 'hover:bg-slate-50 dark:hover:bg-slate-800/70 text-slate-700 dark:text-slate-200'
+                                  ? 'bg-gradient-to-br from-indigo-50/90 to-violet-50/60 dark:from-indigo-950/70 dark:to-violet-950/40 border-indigo-500/80 dark:border-indigo-500 shadow-md ring-2 ring-indigo-500/20'
+                                  : 'bg-slate-50/70 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border-slate-200/70 dark:border-slate-700/60 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-md hover:-translate-y-0.5'
                               }`}
                             >
-                              <div
-                                className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
-                                  isSubActive
-                                    ? 'bg-indigo-600 text-white shadow-2xs'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                                }`}
-                              >
-                                <SubIcon className="w-3.5 h-3.5" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between gap-1">
-                                  <span className="text-xs font-bold truncate">{sub.label}</span>
-                                  {sub.badge && (
+                              <div className="flex items-start justify-between gap-2 w-full">
+                                <div
+                                  className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 group-hover:scale-105 ${
+                                    isSubActive
+                                      ? 'bg-indigo-600 text-white shadow-xs'
+                                      : 'bg-white dark:bg-slate-700/70 text-slate-600 dark:text-slate-300 group-hover:bg-indigo-50 group-hover:text-indigo-600 dark:group-hover:bg-indigo-950/70 dark:group-hover:text-indigo-400 border border-slate-200/60 dark:border-slate-600/40 shadow-2xs'
+                                  }`}
+                                >
+                                  <SubIcon className="w-4 h-4 stroke-[2]" />
+                                </div>
+
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  {isSubActive && (
+                                    <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-indigo-600 text-white shadow-2xs">
+                                      Activo
+                                    </span>
+                                  )}
+                                  {Boolean(sub.badge) && (
                                     <span
-                                      className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold shrink-0 ${
-                                        sub.badgeColor || 'bg-indigo-600 text-white'
+                                      className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
+                                        sub.badgeColor || 'bg-amber-500 text-white'
                                       }`}
                                     >
                                       {sub.badge}
                                     </span>
                                   )}
+                                  <ChevronRight
+                                    className={`w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 ${
+                                      isSubActive
+                                        ? 'text-indigo-600 dark:text-indigo-400'
+                                        : 'text-slate-300 dark:text-slate-600 group-hover:text-indigo-500'
+                                    }`}
+                                  />
                                 </div>
-                                <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5 font-normal">
+                              </div>
+
+                              <div className="mt-2.5 w-full">
+                                <h5
+                                  className={`text-xs font-bold leading-snug line-clamp-1 transition-colors ${
+                                    isSubActive
+                                      ? 'text-indigo-950 dark:text-indigo-200'
+                                      : 'text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+                                  }`}
+                                >
+                                  {sub.label}
+                                </h5>
+                                <p className="text-[11px] text-slate-400 dark:text-slate-400 mt-0.5 line-clamp-2 leading-relaxed">
                                   {sub.description}
                                 </p>
                               </div>
@@ -948,18 +971,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Users className="w-4 h-4" />
             </button>
 
-            {/* Calendar Quick Access (desktop / tablet) */}
+            {/* Calendario Fijo en Barra Superior (PC / Desktop) */}
             <button
               type="button"
               onClick={() => handleSelectTab('calendario')}
-              className={`w-9 h-9 rounded-xl hidden sm:flex items-center justify-center transition-all cursor-pointer ${
+              className={`h-9 px-2.5 rounded-xl hidden md:flex items-center gap-1.5 transition-all cursor-pointer text-xs font-semibold ${
                 activeTab === 'calendario'
-                  ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60 shadow-2xs font-bold'
-                  : 'text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-indigo-600 text-white shadow-xs font-bold'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 border border-slate-200/60 dark:border-slate-700/60'
               }`}
-              title="Calendario de la Congregación"
+              title="Calendario de la Congregación (Fijo)"
             >
               <Calendar className="w-4 h-4" />
+              <span>Calendario</span>
             </button>
 
             {/* App Móvil / QR Icon (desktop / tablet) */}
@@ -1243,8 +1267,32 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             {/* Quick Theocratic Tools Strip */}
-            <div className="p-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30 shrink-0">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2 px-1">
+            <div className="p-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30 shrink-0 space-y-2.5">
+              {/* Acceso Directo al Calendario en Móvil */}
+              <button
+                type="button"
+                onClick={() => {
+                  handleSelectTab('calendario');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  activeTab === 'calendario'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/70 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+                    activeTab === 'calendario' ? 'bg-white/20 text-white' : 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400'
+                  }`}>
+                    <Calendar className="w-3.5 h-3.5" />
+                  </div>
+                  <span>Calendario de la Congregación</span>
+                </div>
+                <ChevronRight className={`w-3.5 h-3.5 ${activeTab === 'calendario' ? 'text-white/80' : 'text-slate-400'}`} />
+              </button>
+
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block px-1">
                 Herramientas Rápidas
               </span>
               <div className="grid grid-cols-5 gap-1.5 text-center">
@@ -1581,32 +1629,32 @@ export const Navbar: React.FC<NavbarProps> = ({
             type="button"
             onClick={() => handleSelectTab('programacion')}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[44px] ${
-              activeTab === 'programacion' || activeTab === 'clm_vmc' || activeTab === 's89' || activeTab === 'discursos' || activeTab === 'calendario'
+              activeTab === 'programacion' || activeTab === 'clm_vmc' || activeTab === 's89' || activeTab === 'discursos' || activeTab === 'hospitalidad'
                 ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/50'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
-            <Calendar className="w-5 h-5 stroke-[2]" />
+            <ClipboardList className="w-5 h-5 stroke-[2]" />
             <span className="text-[10px] mt-0.5 leading-tight font-semibold">Reuniones</span>
           </button>
 
-          {/* 3. Mi Vista (Vista personal del publicador) */}
+          {/* 3. Calendario (Ubicación fija en móvil en barra inferior) */}
           <button
             type="button"
-            onClick={() => handleSelectTab('mi_vista')}
+            onClick={() => handleSelectTab('calendario')}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[44px] ${
-              activeTab === 'mi_vista'
+              activeTab === 'calendario'
                 ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/50'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
           >
             <div className="relative">
-              <UserCheck className="w-5 h-5 stroke-[2]" />
-              {activeTab === 'mi_vista' && (
+              <Calendar className="w-5 h-5 stroke-[2]" />
+              {activeTab === 'calendario' && (
                 <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-indigo-600 dark:bg-indigo-400" />
               )}
             </div>
-            <span className="text-[10px] mt-0.5 leading-tight font-semibold">Mi Vista</span>
+            <span className="text-[10px] mt-0.5 leading-tight font-semibold">Calendario</span>
           </button>
 
           {/* 4. Hermanos (Publicadores & Grupos) */}

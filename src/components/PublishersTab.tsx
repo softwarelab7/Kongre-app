@@ -491,6 +491,7 @@ export const PublishersTab: React.FC = () => {
     };
 
     const targetPayload: Publisher = {
+      ...(data as any),
       id: data.id || nid,
       name: fullName,
       full_name: fullName,
@@ -509,12 +510,13 @@ export const PublishersTab: React.FC = () => {
       baptismDate: data.baptism_date || data.baptismDate || '',
       role: data.role || 'publisher',
       privilege:
-        (data.privilege as any) ||
-        (data.role === 'elder'
+        data.role === 'elder'
           ? 'anciano'
           : data.role === 'servant'
           ? 'siervo_ministerial'
-          : 'publicador_bautizado'),
+          : data.role === 'unbaptized'
+          ? 'publicador_no_bautizado'
+          : (data.privilege as any) || 'publicador_bautizado',
       groupNumber: groupNum,
       id_grupo: data.id_grupo || String(groupNum),
       active: data.status !== 'inactive' && data.status !== 'deleted' && data.is_active !== false,

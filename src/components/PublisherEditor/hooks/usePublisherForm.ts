@@ -8,33 +8,207 @@ const deterministicStringify = (obj: any): string => {
   return `{${keys.map(k => `"${k}":${deterministicStringify(obj[k])}`).join(',')}}`;
 };
 
+const mapRolesToAssignments = (roles: any = {}, existingAssignments: any = {}): Record<string, boolean> => {
+  const assignments: Record<string, boolean> = { ...(existingAssignments || {}) };
+  if (!roles || typeof roles !== 'object') return assignments;
+
+  // Vida y Ministerio Cristianos (Entre semana)
+  if (roles.vym_presidente && assignments.chairman === undefined) assignments.chairman = true;
+  if (roles.vym_oracion && assignments.prayers === undefined) assignments.prayers = true;
+  if (roles.vym_tesoros_discurso && assignments.talk === undefined) assignments.talk = true;
+  if (roles.vym_tesoros_perlas && assignments.gems === undefined) assignments.gems = true;
+  if (roles.vym_tesoros_lectura && assignments.reading === undefined) assignments.reading = true;
+  if (roles.vym_maestros_titular && assignments.student === undefined) assignments.student = true;
+  if (roles.vym_maestros_ayudante && assignments.assistant_student === undefined) assignments.assistant_student = true;
+  if (roles.vym_vida_partes && assignments.living_parts === undefined) assignments.living_parts = true;
+  if (roles.vym_estudio_conductor && assignments.bible_study === undefined) assignments.bible_study = true;
+  if (roles.vym_estudio_lector && assignments.reader_living === undefined) assignments.reader_living = true;
+
+  // Fin de semana
+  if (roles.fds_presidente && assignments.weekend_chairman === undefined) assignments.weekend_chairman = true;
+  if (roles.fds_atalaya_lector && assignments.watchtower_reader === undefined) assignments.watchtower_reader = true;
+  if (roles.fds_oracion && assignments.final_prayer === undefined) assignments.final_prayer = true;
+
+  // Deberes y tareas
+  if (roles.deber_acomodador) {
+    if (assignments.attendants_midweek === undefined) assignments.attendants_midweek = true;
+    if (assignments.attendants_weekend === undefined) assignments.attendants_weekend = true;
+  }
+  if (roles.deber_audio) {
+    if (assignments.audio_video_midweek === undefined) assignments.audio_video_midweek = true;
+    if (assignments.audio_video_weekend === undefined) assignments.audio_video_weekend = true;
+  }
+  if (roles.deber_video) {
+    if (assignments.audio_video_midweek === undefined) assignments.audio_video_midweek = true;
+    if (assignments.audio_video_weekend === undefined) assignments.audio_video_weekend = true;
+  }
+  if (roles.deber_microfonos) {
+    if (assignments.microphones_midweek === undefined) assignments.microphones_midweek = true;
+    if (assignments.microphones_weekend === undefined) assignments.microphones_weekend = true;
+  }
+  if (roles.deber_plataforma) {
+    if (assignments.platform_task_midweek === undefined) assignments.platform_task_midweek = true;
+    if (assignments.platform_task_weekend === undefined) assignments.platform_task_weekend = true;
+  }
+  if (roles.deber_mantenimiento || roles.mantenimiento) {
+    if (assignments.maintenance === undefined) assignments.maintenance = true;
+  }
+  if (roles.predicacion_publica || roles.carritos) {
+    if (assignments.public_witnessing === undefined) assignments.public_witnessing = true;
+  }
+
+  return assignments;
+};
+
 const normalizePublisher = (initial: any): Publisher => {
+  if (!initial || typeof initial !== 'object') initial = {};
+
+  // 1. Resolver nombre completo
+  const resolvedFullName = (
+    initial.full_name ||
+    initial.name ||
+    [initial.first_name, initial.middle_name, initial.last_name, initial.second_last_name].filter(Boolean).join(' ') ||
+    ''
+  ).trim();
+
+  // 2. Extraer primer y segundo nombre / apellidos si faltan
+  let firstName = initial.first_name || '';
+  let middleName = initial.middle_name || '';
+  let lastName = initial.last_name || '';
+  let secondLastName = initial.second_last_name || '';
+
+  if (!firstName && !lastName && resolvedFullName) {
+    const parts = resolvedFullName.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) {
+      firstName = parts[0];
+    } else if (parts.length === 2) {
+      firstName = parts[0];
+      lastName = parts[1];
+    } else if (parts.length === 3) {
+      firstName = parts[0];
+      lastName = parts[1];
+      secondLastName = parts[2];
+    } else if (parts.length >= 4) {
+      firstName = parts[0];
+      middleName = parts[1];
+      lastName = parts[2];
+      secondLastName = parts.slice(3).join(' ');
+    }
+  }
+
+  // 3. Normalizar Género ('hermano' / 'male' -> 'male', 'hermana' / 'female' -> 'female')
+  const rawGender = String(initial.gender || '').toLowerCase();
+  const normalizedGender: 'male' | 'female' = 
+    (rawGender === 'female' || rawGender === 'hermana') ? 'female' : 'male';
+
+  // 4. Normalizar Rol y Privilegio Teocrático
+  const rawPriv = String(initial.privilege || '').toLowerCase();
+  let resolvedRole = initial.role;
+  if (!resolvedRole || resolvedRole === 'publisher') {
+    if (rawPriv === 'anciano' || rawPriv === 'elder' || rawPriv === 'super_admin') {
+      resolvedRole = 'elder';
+    } else if (rawPriv === 'siervo_ministerial' || rawPriv === 'servant') {
+      resolvedRole = 'servant';
+    } else if (rawPriv === 'publicador_no_bautizado' || rawPriv === 'unbaptized') {
+      resolvedRole = 'unbaptized';
+    } else if (!resolvedRole) {
+      resolvedRole = 'publisher';
+    }
+  }
+
+  const resolvedPrivilege =
+    resolvedRole === 'elder'
+      ? 'anciano'
+      : resolvedRole === 'servant'
+      ? 'siervo_ministerial'
+      : resolvedRole === 'unbaptized'
+      ? 'publicador_no_bautizado'
+      : (initial.privilege || 'publicador_bautizado');
+
+  // 5. Precursorado
+  let resolvedPioneerType = initial.pioneer_type || 'none';
+  if (resolvedPioneerType === 'none' && initial.pioneerStatus) {
+    const pStat = String(initial.pioneerStatus).toLowerCase();
+    if (pStat === 'regular') resolvedPioneerType = 'regular';
+    else if (pStat === 'auxiliar_continuo') resolvedPioneerType = 'auxiliary_continuous';
+    else if (pStat === 'especial') resolvedPioneerType = 'special';
+  }
+
+  // 6. Fechas
+  const resolvedBirthDate = initial.birth_date || initial.birthDate || '';
+  const resolvedBaptismDate = initial.baptism_date || initial.baptismDate || '';
+
+  // 7. Grupo
+  const groupNum = initial.groupNumber !== undefined && initial.groupNumber !== null 
+    ? initial.groupNumber 
+    : (initial.id_grupo ? parseInt(initial.id_grupo, 10) : 1);
+  const idGrupo = initial.id_grupo || String(groupNum);
+
+  // 8. Asignaciones y Privilegios
+  const resolvedAssignments = mapRolesToAssignments(initial.roles, initial.assignments);
+
+  // 9. Contactos de emergencia
+  let emergencyContacts = initial.emergency_contacts || [];
+  if (emergencyContacts.length === 0 && (initial.emergencyContactName || initial.emergencyContactPhone)) {
+    emergencyContacts = [{
+      id: 'em-1',
+      name: initial.emergencyContactName || 'Contacto Principal',
+      relationship: 'Familiar',
+      phone: initial.emergencyContactPhone || '',
+      alt_phone: '',
+      email: ''
+    }];
+  }
+
+  // 10. Estados y actividad
+  const isActive = initial.is_active !== undefined 
+    ? initial.is_active 
+    : (initial.active !== undefined ? initial.active : true);
+  const status = initial.status || (isActive ? 'active' : 'inactive');
+
   return {
+    ...initial,
     id: initial.id || '',
-    nid: initial.nid || '',
-    full_name: initial.full_name || '',
-    role: initial.role || 'publisher',
-    gender: initial.gender || 'male',
-    status: initial.status || 'active',
+    nid: initial.nid || initial.id || '',
+    name: initial.name || resolvedFullName,
+    full_name: resolvedFullName,
+    first_name: firstName,
+    middle_name: middleName,
+    last_name: lastName,
+    second_last_name: secondLastName,
+    gender: normalizedGender,
+    role: resolvedRole,
+    privilege: resolvedPrivilege,
+    status: status,
+    active: isActive,
+    is_active: isActive,
+    is_regular: initial.is_regular !== undefined ? initial.is_regular : true,
     is_approved: initial.is_approved !== undefined ? initial.is_approved : true,
-    assignments: initial.assignments || {},
-    ausencias: initial.ausencias || [],
-    pioneer_type: initial.pioneer_type || 'none',
+    groupNumber: groupNum,
+    id_grupo: idGrupo,
+    birth_date: resolvedBirthDate,
+    birthDate: resolvedBirthDate,
+    baptism_date: resolvedBaptismDate,
+    baptismDate: resolvedBaptismDate,
+    pioneer_type: resolvedPioneerType,
+    pioneerStatus: initial.pioneerStatus || (resolvedPioneerType === 'regular' ? 'regular' : resolvedPioneerType === 'auxiliary_continuous' ? 'auxiliar_continuo' : 'ninguno'),
     group_responsibility: initial.group_responsibility || 'none',
-    baptism_date: initial.baptism_date || '',
     publisher_date: initial.publisher_date || '',
     last_visit_date: initial.last_visit_date || '',
-    is_active: initial.is_active !== undefined ? initial.is_active : true,
-    is_regular: initial.is_regular !== undefined ? initial.is_regular : true,
-    is_anointed: !!initial.is_anointed,
+    is_anointed: initial.is_anointed !== undefined ? !!initial.is_anointed : initial.hope === 'ungido',
+    hope: initial.hope || (initial.is_anointed ? 'ungido' : 'otras_ovejas'),
     has_key: !!initial.has_key,
     reports_to_branch: !!initial.reports_to_branch,
     is_disfellowshipped: !!initial.is_disfellowshipped,
     is_reinstated: !!initial.is_reinstated,
-    spiritual_notes: initial.spiritual_notes || '',
-    emergency_contacts: initial.emergency_contacts || [],
+    spiritual_notes: initial.spiritual_notes || initial.notes || '',
+    notes: initial.notes || initial.spiritual_notes || '',
+    marital_status: initial.marital_status || 'soltero',
+    emergency_contacts: emergencyContacts,
     s21_records: initial.s21_records || {},
-    ...initial
+    ausencias: initial.ausencias || initial.absences || [],
+    absences: initial.absences || initial.ausencias || [],
+    assignments: resolvedAssignments,
   } as Publisher;
 };
 
@@ -71,7 +245,15 @@ export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
           next.last_name || '',
           next.second_last_name || ''
         ].filter(Boolean);
-        next.full_name = parts.join(' ');
+        const joined = parts.join(' ');
+        next.full_name = joined;
+        next.name = joined;
+      }
+      if (field === 'full_name') {
+        next.name = value;
+      }
+      if (field === 'name') {
+        next.full_name = value;
       }
 
       // Mutually exclusive flags for Active / Inactive

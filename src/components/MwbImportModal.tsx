@@ -2,8 +2,19 @@
 import React, { useState } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { parseMwbText, PRESET_SAMPLE_MWB_WEEKS, ParsedMwbWeek } from '../utils/mwbParser';
+import { parseMwbWithGemini, isGeminiConfigured, setGeminiApiKey, getGeminiApiKey } from '../services/geminiService';
 import { WeekSchedule } from '../types';
-import { X, Sparkles, BookOpen, FileText, Check, ArrowRight } from 'lucide-react';
+import {
+  X,
+  Sparkles,
+  BookOpen,
+  Check,
+  Loader2,
+  AlertCircle,
+  Key,
+  ExternalLink,
+  Music,
+} from 'lucide-react';
 
 interface MwbImportModalProps {
   isOpen: boolean;
@@ -13,16 +24,32 @@ interface MwbImportModalProps {
 export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose }) => {
   const { currentWeek, updateWeek } = useCongregation();
   const [inputText, setInputText] = useState('');
+  const [isProcessingAi, setIsProcessingAi] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [showKeyInput, setShowKeyInput] = useState(false);
+  const [tempApiKey, setTempApiKey] = useState(() => getGeminiApiKey());
+  const [isAiExtracted, setIsAiExtracted] = useState(false);
+
   const [parsedData, setParsedData] = useState<ParsedMwbWeek | null>(() => {
     return PRESET_SAMPLE_MWB_WEEKS['salmos_80'];
   });
 
+  const [songsData, setSongsData] = useState<{
+    initial?: string;
+    middle?: string;
+    final?: string;
+  }>({});
+
   if (!isOpen || !currentWeek) return null;
 
-  const handleParse = (textToParse: string) => {
+  const handleLocalParse = (textToParse: string) => {
     setInputText(textToParse);
-    const result = parseMwbText(textToParse);
-    setParsedData(result);
+    setIsAiExtracted(false);
+    setAiError(null);
+    if (textToParse.trim().length > 10) {
+      const result = parseMwbText(textToParse);
+      setParsedData(result);
+    }
   };
 
   const handleApplyPreset = (presetKey: string) => {
@@ -30,6 +57,61 @@ export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose 
     if (preset) {
       setParsedData(preset);
       setInputText('');
+      setIsAiExtracted(false);
+      setAiError(null);
+      setSongsData({});
+    }
+  };
+
+  const handleParseWithGemini = async () => {
+    if (!inputText.trim()) {
+      setAiError('Por favor pega primero el texto de la reunión para analizarlo.');
+      return;
+    }
+
+    if (!isGeminiConfigured() && !tempApiKey.trim()) {
+      setShowKeyInput(true);
+      setAiError('Ingresa tu clave de API de Gemini para procesar el programa con IA.');
+      return;
+    }
+
+    setIsProcessingAi(true);
+    setAiError(null);
+
+    try {
+      if (tempApiKey.trim()) {
+        setGeminiApiKey(tempApiKey.trim());
+      }
+
+      const geminiRes = await parseMwbWithGemini(inputText, tempApiKey.trim() || undefined);
+
+      const adapted: ParsedMwbWeek = {
+        discursoTitle: geminiRes.tesoros.discursoTitle || 'Discurso de Tesoros',
+        perlasTitle: geminiRes.tesoros.perlasTitle || 'Busquemos perlas escondidas',
+        lecturaBibliaTitle: geminiRes.tesoros.lecturaBibliaTitle || 'Lectura de la Biblia',
+        demonstrations: geminiRes.demonstrations.map((d) => ({
+          title: d.title + (d.lessonNumber ? ` (Lección ${d.lessonNumber})` : ''),
+          timeMinutes: d.timeMinutes || 3,
+        })),
+        vidaPartes: geminiRes.vidaPartes.map((v) => ({
+          title: v.title,
+          timeMinutes: v.timeMinutes || 15,
+        })),
+        estudioBiblicoTitle: geminiRes.estudioBiblicoTitle || '',
+        atalayaTheme: geminiRes.atalayaTheme,
+      };
+
+      setParsedData(adapted);
+      setIsAiExtracted(true);
+      setSongsData({
+        initial: geminiRes.initialSong,
+        middle: geminiRes.middleSong,
+        final: geminiRes.finalSong,
+      });
+    } catch (err: any) {
+      setAiError(err?.message || 'Error al procesar el texto con Gemini.');
+    } finally {
+      setIsProcessingAi(false);
     }
   };
 
@@ -42,6 +124,20 @@ export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose 
     clone.midweek.tesoros.discurso.title = parsedData.discursoTitle;
     clone.midweek.tesoros.perlas.title = parsedData.perlasTitle;
     clone.midweek.tesoros.lecturaBiblia.title = parsedData.lecturaBibliaTitle;
+
+    // Canciones si fueron extraídas
+    if (songsData.initial) {
+      const s1 = parseInt(songsData.initial.replace(/\D/g, ''), 10);
+      if (!isNaN(s1)) clone.midweek.songFirst = s1;
+    }
+    if (songsData.middle) {
+      const s2 = parseInt(songsData.middle.replace(/\D/g, ''), 10);
+      if (!isNaN(s2)) clone.midweek.songMiddle = s2;
+    }
+    if (songsData.final) {
+      const s3 = parseInt(songsData.final.replace(/\D/g, ''), 10);
+      if (!isNaN(s3)) clone.midweek.songConclude = s3;
+    }
 
     // Maestros
     clone.midweek.maestros.items = parsedData.demonstrations.map((d, idx) => ({
@@ -82,109 +178,220 @@ export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
-      <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-slate-100 dark:border-slate-800">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 flex items-center justify-center shadow-xs">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
-                Guía de Actividades (MWB)
-              </span>
-              <h3 className="text-base font-bold text-slate-900 mt-0.5">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 px-2 py-0.5 rounded-full">
+                  Guía de Actividades (MWB)
+                </span>
+                {isAiExtracted && (
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-fuchsia-700 dark:text-fuchsia-300 bg-fuchsia-100 dark:bg-fuchsia-950/80 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-fuchsia-600 dark:text-fuchsia-400" />
+                    <span>Gemini AI</span>
+                  </span>
+                )}
+              </div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white mt-0.5">
                 Importador Inteligente del Programa
               </h3>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Presets and text input */}
+        {/* Content */}
         <div className="p-6 overflow-y-auto space-y-4 flex-1">
           {/* Quick presets */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-              Seleccionar plantilla oficial de ejemplo:
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+              Plantillas oficiales de ejemplo:
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => handleApplyPreset('salmos_80')}
-                className="p-2.5 rounded-xl border border-slate-200 hover:border-amber-400 text-left text-xs bg-slate-50 hover:bg-amber-50/50 transition-all"
+                className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-400 dark:hover:border-amber-500 text-left text-xs bg-slate-50 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/30 transition-all cursor-pointer"
               >
-                <strong className="block font-bold text-slate-900">Salmos 80 a 82</strong>
-                <span className="text-[10px] text-slate-500">Oraciones / Demostraciones</span>
+                <strong className="block font-bold text-slate-900 dark:text-white">Salmos 80 a 82</strong>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">Oraciones / Demostraciones</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleApplyPreset('proverbios_1')}
-                className="p-2.5 rounded-xl border border-slate-200 hover:border-amber-400 text-left text-xs bg-slate-50 hover:bg-amber-50/50 transition-all"
+                className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-400 dark:hover:border-amber-500 text-left text-xs bg-slate-50 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/30 transition-all cursor-pointer"
               >
-                <strong className="block font-bold text-slate-900">Proverbios 1 a 3</strong>
-                <span className="text-[10px] text-slate-500">Sabiduría / Necesidades</span>
+                <strong className="block font-bold text-slate-900 dark:text-white">Proverbios 1 a 3</strong>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">Sabiduría / Necesidades</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleApplyPreset('mateo_5')}
-                className="p-2.5 rounded-xl border border-slate-200 hover:border-amber-400 text-left text-xs bg-slate-50 hover:bg-amber-50/50 transition-all"
+                className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-400 dark:hover:border-amber-500 text-left text-xs bg-slate-50 dark:bg-slate-800/50 hover:bg-amber-50/50 dark:hover:bg-amber-950/30 transition-all cursor-pointer"
               >
-                <strong className="block font-bold text-slate-900">Mateo 5 a 7</strong>
-                <span className="text-[10px] text-slate-500">Sermón del Monte</span>
+                <strong className="block font-bold text-slate-900 dark:text-white">Mateo 5 a 7</strong>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">Sermón del Monte</span>
               </button>
             </div>
           </div>
 
           {/* Paste area */}
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">
-              O pega el texto copiado de JW.ORG / Guía de Actividades:
-            </label>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Pega el texto copiado de JW.ORG / Guía de Actividades:
+              </label>
+              <button
+                type="button"
+                onClick={handleParseWithGemini}
+                disabled={isProcessingAi || !inputText.trim()}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-linear-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-700 hover:to-indigo-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              >
+                {isProcessingAi ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Analizando con IA...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Procesar con Gemini IA</span>
+                  </>
+                )}
+              </button>
+            </div>
+
             <textarea
               rows={4}
               value={inputText}
-              onChange={e => handleParse(e.target.value)}
-              placeholder={`Lectura semanal de la Biblia: Salmos 80 a 82\nTESOROS DE LA BIBLIA\n"El Dios que escucha nuestras oraciones" (10 min.)\nBusquemos perlas escondidas (10 min.)\nSEAMOS MEJORES MAESTROS\nEmpiece conversaciones (3 min.)`}
-              className="w-full p-3 text-xs font-mono rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
+              onChange={(e) => handleLocalParse(e.target.value)}
+              placeholder={`Lectura semanal de la Biblia: Salmos 80 a 82\nTESOROS DE LA BIBLIA\n"El Dios que escucha nuestras oraciones" (10 min.)\nBusquemos perlas escondidas (10 min.)\nSEAMOS MEJORES MAESTROS\nEmpiece conversaciones (3 min.) (th lecc. 1)\nHaga revisitas (4 min.) (th lecc. 6)`}
+              className="w-full p-3 text-xs font-mono rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
             />
           </div>
 
+          {/* Inline Gemini Key prompt if not configured */}
+          {showKeyInput && (
+            <div className="p-3.5 rounded-2xl bg-fuchsia-50/80 dark:bg-fuchsia-950/40 border border-fuchsia-200 dark:border-fuchsia-800/60 space-y-2 text-xs animate-fade-in">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 font-bold text-fuchsia-900 dark:text-fuchsia-200">
+                  <Key className="w-4 h-4 text-fuchsia-600" />
+                  <span>Configurar Clave de Gemini AI</span>
+                </div>
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-fuchsia-600 dark:text-fuchsia-400 hover:underline inline-flex items-center gap-1 font-semibold text-[11px]"
+                >
+                  <span>Obtener clave gratis</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  value={tempApiKey}
+                  onChange={(e) => setTempApiKey(e.target.value)}
+                  placeholder="AIzaSy..."
+                  className="flex-1 p-2 rounded-xl border border-fuchsia-200 dark:border-fuchsia-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (tempApiKey.trim()) {
+                      setGeminiApiKey(tempApiKey.trim());
+                      setShowKeyInput(false);
+                      handleParseWithGemini();
+                    }
+                  }}
+                  className="px-3 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold text-xs"
+                >
+                  Guardar y Continuar
+                </button>
+              </div>
+            </div>
+          )}
+
+          {aiError && (
+            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+              <span>{aiError}</span>
+            </div>
+          )}
+
           {/* Extracted preview */}
           {parsedData && (
-            <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200 space-y-2 text-xs">
-              <div className="flex items-center gap-1 font-bold text-amber-900">
-                <Sparkles className="w-4 h-4 text-amber-600" />
-                <span>Estructura extraída para la reunión:</span>
+            <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 space-y-2.5 text-xs">
+              <div className="flex items-center justify-between font-bold text-amber-900 dark:text-amber-200">
+                <div className="flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  <span>Estructura extraída para la reunión:</span>
+                </div>
+                {isAiExtracted && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-fuchsia-100 dark:bg-fuchsia-900/60 text-fuchsia-800 dark:text-fuchsia-200">
+                    Procesado con IA
+                  </span>
+                )}
               </div>
 
-              <div className="space-y-1 text-slate-700">
-                <p><strong>Discurso Tesoros:</strong> {parsedData.discursoTitle}</p>
-                <p><strong>Perlas:</strong> {parsedData.perlasTitle}</p>
-                <p><strong>Lectura Biblia:</strong> {parsedData.lecturaBibliaTitle}</p>
+              {(songsData.initial || songsData.middle || songsData.final) && (
+                <div className="p-2.5 rounded-xl bg-white dark:bg-slate-800/70 border border-amber-100 dark:border-slate-700 flex items-center gap-3 text-[11px] text-slate-600 dark:text-slate-300">
+                  <Music className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>
+                    Canciones: {songsData.initial ? `Inicial (${songsData.initial})` : ''}
+                    {songsData.middle ? ` • Intermedia (${songsData.middle})` : ''}
+                    {songsData.final ? ` • Final (${songsData.final})` : ''}
+                  </span>
+                </div>
+              )}
+
+              <div className="space-y-1.5 text-slate-700 dark:text-slate-300">
+                <p>
+                  <strong>Discurso Tesoros:</strong> {parsedData.discursoTitle}
+                </p>
+                <p>
+                  <strong>Perlas:</strong> {parsedData.perlasTitle}
+                </p>
+                <p>
+                  <strong>Lectura Biblia:</strong> {parsedData.lecturaBibliaTitle}
+                </p>
                 <div>
                   <strong>Demostraciones ({parsedData.demonstrations.length}):</strong>
-                  <ul className="list-disc pl-5 mt-0.5 space-y-0.5 text-[11px] text-slate-600">
+                  <ul className="list-disc pl-5 mt-0.5 space-y-0.5 text-[11px] text-slate-600 dark:text-slate-400">
                     {parsedData.demonstrations.map((d, i) => (
-                      <li key={i}>{d.title} ({d.timeMinutes} min)</li>
+                      <li key={i}>
+                        {d.title} ({d.timeMinutes} min)
+                      </li>
                     ))}
                   </ul>
                 </div>
                 <div>
                   <strong>Vida Cristiana:</strong>
-                  <ul className="list-disc pl-5 mt-0.5 space-y-0.5 text-[11px] text-slate-600">
+                  <ul className="list-disc pl-5 mt-0.5 space-y-0.5 text-[11px] text-slate-600 dark:text-slate-400">
                     {parsedData.vidaPartes.map((v, i) => (
-                      <li key={i}>{v.title}</li>
+                      <li key={i}>
+                        {v.title} ({v.timeMinutes} min)
+                      </li>
                     ))}
-                    {parsedData.estudioBiblicoTitle && <li>{parsedData.estudioBiblicoTitle}</li>}
+                    {parsedData.estudioBiblicoTitle && (
+                      <li>
+                        <strong>Estudio Bíblico:</strong> {parsedData.estudioBiblicoTitle}
+                      </li>
+                    )}
                   </ul>
                 </div>
               </div>
@@ -193,20 +400,20 @@ export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose 
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50 rounded-b-3xl">
-          <p className="text-xs text-slate-500">
-            Se aplicará a la semana: <strong>{currentWeek.weekStartDate}</strong>
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/60 rounded-b-3xl">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Se aplicará a la semana: <strong className="text-slate-700 dark:text-slate-200">{currentWeek.weekStartDate}</strong>
           </p>
           <div className="flex gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-200 text-xs font-semibold"
+              className="px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 text-xs font-semibold cursor-pointer"
             >
               Cancelar
             </button>
             <button
               onClick={handleApplyToCurrentWeek}
-              className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md transition-all flex items-center gap-1.5"
+              className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
             >
               <Check className="w-4 h-4" />
               <span>Aplicar al Programa</span>

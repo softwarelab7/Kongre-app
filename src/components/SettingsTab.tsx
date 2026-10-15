@@ -42,16 +42,36 @@ import {
   ShieldAlert,
   LogOut,
   Sliders,
+  Sparkles,
+  Bot,
+  Key,
+  ExternalLink,
+  Users,
+  MapPin,
+  Bell,
+  CreditCard,
+  BookOpen,
+  RefreshCw,
 } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
 import { JoinCongregationModal } from './JoinCongregationModal';
 import { InvitationManagerModal } from './InvitationManagerModal';
+import {
+  getGeminiApiKey,
+  setGeminiApiKey,
+  testGeminiConnection,
+  getGeminiModel,
+  setGeminiModel,
+  DEFAULT_GEMINI_MODEL,
+  isGeminiConfigured,
+} from '../services/geminiService';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 
 export type SettingsCategoryTab =
   | 'all'
   | 'general'
   | 'reglas'
+  | 'ia'
   | 'invitaciones'
   | 'seguridad'
   | 'nube'
@@ -112,6 +132,18 @@ export const SETTINGS_TABS_CONFIG: Record<
     bgLight: 'bg-amber-50 dark:bg-amber-950/40',
     bgHover: 'hover:bg-amber-50/[0.3] dark:hover:bg-amber-500/[0.04]',
     pillBg: 'bg-amber-600 text-white',
+  },
+  ia: {
+    label: 'Inteligencia Artificial',
+    icon: Sparkles,
+    desc: 'Asistente teocrático con Google Gemini: extracción de Guía de Actividades, sugerencias y redacción',
+    badge: 'Gemini AI',
+    color: 'text-fuchsia-600 dark:text-fuchsia-400',
+    borderColor: 'border-fuchsia-200/60 dark:border-fuchsia-800/40',
+    hoverBorder: 'hover:border-fuchsia-500/50',
+    bgLight: 'bg-fuchsia-50 dark:bg-fuchsia-950/40',
+    bgHover: 'hover:bg-fuchsia-50/[0.3] dark:hover:bg-fuchsia-500/[0.04]',
+    pillBg: 'bg-fuchsia-600 text-white',
   },
   invitaciones: {
     label: 'Invitaciones y QR',
@@ -187,6 +219,17 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
     cleanSampleData,
     clearAllPublishers,
     resetAllCongregationData,
+    publishers,
+    weeks,
+    territories,
+    notices,
+    transactions,
+    quarterlyAudits,
+    literatureItems,
+    isGranularSyncActive,
+    granularSyncStats,
+    checkGranularStatus,
+    forceSubcollectionsMigration,
   } = useCongregation();
 
   const { user, signOutUser } = useAuth();
@@ -199,6 +242,59 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
     msg: string;
   } | null>(null);
 
+  // Fase 4: Estados y acciones de subcolecciones granulares
+  const [isCheckingGranular, setIsCheckingGranular] = useState(false);
+  const [isMigratingSubcollections, setIsMigratingSubcollections] = useState(false);
+  const [granularStatusMessage, setGranularStatusMessage] = useState<{
+    type: 'success' | 'info' | 'error';
+    text: string;
+  } | null>(null);
+
+  const handleCheckGranular = async () => {
+    setIsCheckingGranular(true);
+    setGranularStatusMessage(null);
+    try {
+      const stats = await checkGranularStatus();
+      setGranularStatusMessage({
+        type: 'success',
+        text: `Verificación completada: ${stats.publishersCount} publicadores, ${stats.weeksCount} semanas, ${stats.territoriesCount} territorios y ${stats.noticesCount} anuncios activos en subcolecciones de Firestore.`,
+      });
+    } catch (err: any) {
+      setGranularStatusMessage({
+        type: 'error',
+        text: 'Error diagnosticando subcolecciones: ' + (err?.message || 'Error de conexión'),
+      });
+    } finally {
+      setIsCheckingGranular(false);
+    }
+  };
+
+  const handleMigrateSubcollections = async () => {
+    setIsMigratingSubcollections(true);
+    setGranularStatusMessage(null);
+    try {
+      const res = await forceSubcollectionsMigration();
+      if (res.success) {
+        setGranularStatusMessage({
+          type: 'success',
+          text: `¡Migración a subcolecciones completada con éxito! ${res.message}`,
+        });
+      } else {
+        setGranularStatusMessage({
+          type: 'error',
+          text: res.message,
+        });
+      }
+    } catch (err: any) {
+      setGranularStatusMessage({
+        type: 'error',
+        text: 'Error durante la migración: ' + (err?.message || 'Error desconocido'),
+      });
+    } finally {
+      setIsMigratingSubcollections(false);
+    }
+  };
+
   const [cleanActionStatus, setCleanActionStatus] = useState<{
     type: 'success' | 'error';
     msg: string;
@@ -208,6 +304,44 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
   const [showResetAllModal, setShowResetAllModal] = useState(false);
   const [resetConfirmationText, setResetConfirmationText] = useState('');
   const [isCleaning, setIsCleaning] = useState(false);
+
+  // Gemini AI State
+  const [geminiApiKeyInput, setGeminiApiKeyInput] = useState<string>(() => getGeminiApiKey());
+  const [geminiModelSelect, setGeminiModelSelect] = useState<string>(() => getGeminiModel());
+  const [isTestingGemini, setIsTestingGemini] = useState(false);
+  const [showGeminiKey, setShowGeminiKey] = useState(false);
+  const [geminiStatus, setGeminiStatus] = useState<{
+    type: 'success' | 'error';
+    msg: string;
+  } | null>(null);
+
+  const handleSaveGeminiKey = () => {
+    setGeminiApiKey(geminiApiKeyInput);
+    setGeminiModel(geminiModelSelect);
+    setGeminiStatus({
+      type: 'success',
+      msg: geminiApiKeyInput.trim() ? 'Clave de Gemini guardada correctamente.' : 'Clave de Gemini removida.',
+    });
+  };
+
+  const handleTestGemini = async () => {
+    setIsTestingGemini(true);
+    setGeminiStatus(null);
+    try {
+      const res = await testGeminiConnection(geminiApiKeyInput);
+      setGeminiStatus({
+        type: res.success ? 'success' : 'error',
+        msg: res.message,
+      });
+    } catch (err: any) {
+      setGeminiStatus({
+        type: 'error',
+        msg: err?.message || 'Error probando la conexión con Gemini.',
+      });
+    } finally {
+      setIsTestingGemini(false);
+    }
+  };
 
   const handleUploadToGoogle = async () => {
     setIsSyncingCloud(true);
@@ -1135,6 +1269,49 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
                 <ChevronRight size={16} />
               </div>
             </div>
+
+            {/* Tarjeta 8: Inteligencia Artificial Gemini */}
+            <div
+              onClick={() => setActiveTab('ia')}
+              className="bg-white dark:bg-[#0f1623] hover:bg-fuchsia-50/[0.3] dark:hover:bg-fuchsia-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-fuchsia-400/50 dark:hover:border-fuchsia-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="p-3 bg-fuchsia-50 dark:bg-fuchsia-500/10 rounded-2xl text-fuchsia-600 dark:text-fuchsia-400 group-hover:scale-110 transition-transform">
+                    <Sparkles size={22} />
+                  </div>
+                  <span className={`px-2.5 py-1 rounded-xl text-[10px] font-bold border ${
+                    isGeminiConfigured()
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
+                      : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
+                  }`}>
+                    {isGeminiConfigured() ? 'Activo' : 'Por Configurar'}
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-fuchsia-600 dark:group-hover:text-fuchsia-400 transition-colors">
+                  Inteligencia Artificial
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                  Asistente inteligente con Google Gemini para importar la Guía de Actividades y redactar avisos.
+                </p>
+
+                <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Modelo:</span>
+                    <span className="font-semibold text-fuchsia-600 dark:text-fuchsia-400 font-mono text-[11px]">{getGeminiModel()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Funciones:</span>
+                    <span className="font-semibold">MWB, Asignaciones, Avisos</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-fuchsia-600 dark:text-fuchsia-400 group-hover:translate-x-1 transition-transform">
+                <span>Configurar Gemini AI</span>
+                <ChevronRight size={16} />
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -1870,6 +2047,206 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
                   )}
                 </div>
               </div>
+
+              {/* PANEL FASE 4: SINCRONIZACIÓN GRANULAR COLABORATIVA POR SUBCOLECCIONES */}
+              <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 space-y-5">
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
+                      <Layers className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                          Fase 4: Sincronización Granular Colaborativa
+                        </h4>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Subcolecciones en Vivo
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Cada departamento teocrático sincroniza su propia subcolección en Firestore sin sobreescribir el trabajo de otros hermanos.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={handleCheckGranular}
+                      disabled={isCheckingGranular || isMigratingSubcollections}
+                      className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      title="Verifica el número de documentos reales sincronizados en cada subcolección de Firestore"
+                    >
+                      {isCheckingGranular ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                      <span>Diagnosticar</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleMigrateSubcollections}
+                      disabled={isCheckingGranular || isMigratingSubcollections}
+                      className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer disabled:opacity-50"
+                      title="Migra o verifica todos los registros hacia subcolecciones granulares en Firestore"
+                    >
+                      {isMigratingSubcollections ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                      <span>{isMigratingSubcollections ? 'Sincronizando...' : 'Migrar a Subcolecciones'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {granularStatusMessage && (
+                  <div
+                    className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between gap-2.5 animate-fade-in ${
+                      granularStatusMessage.type === 'success'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                        : granularStatusMessage.type === 'info'
+                        ? 'bg-sky-50 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800 text-sky-800 dark:text-sky-200'
+                        : 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {granularStatusMessage.type === 'success' ? (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      ) : (
+                        <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                      )}
+                      <span>{granularStatusMessage.text}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setGranularStatusMessage(null)}
+                      className="text-slate-400 hover:text-slate-600 text-xs cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Grid con las 6 subcolecciones modulares */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {/* Subcolección 1: Publicadores */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold text-xs">
+                        <Users className="w-4 h-4" />
+                        <span>/publishers</span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+                        {granularSyncStats?.publishersCount ?? publishers.length} docs
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+                      Publicadores y Tarjetas S-21
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      Coordinador & Secretario • Escucha y guarda independientemente.
+                    </p>
+                  </div>
+
+                  {/* Subcolección 2: Semanas VyM */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
+                        <Calendar className="w-4 h-4" />
+                        <span>/weeks</span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                        {granularSyncStats?.weeksCount ?? weeks.length} semanas
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+                      Vida y Ministerio & Deberes
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      Supt. VyM & Coordinador • Cada semana es un documento aislado.
+                    </p>
+                  </div>
+
+                  {/* Subcolección 3: Territorios */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-xs">
+                        <MapPin className="w-4 h-4" />
+                        <span>/territories</span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
+                        {granularSyncStats?.territoriesCount ?? territories.length} territorios
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+                      Territorios y Manzanas S-13
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      Siervo de Territorios • Actualizaciones sin bloqueo concurrente.
+                    </p>
+                  </div>
+
+                  {/* Subcolección 4: Tablero de Anuncios */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sky-600 dark:text-sky-400 font-bold text-xs">
+                        <Bell className="w-4 h-4" />
+                        <span>/notices</span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300">
+                        {granularSyncStats?.noticesCount ?? notices.length} anuncios
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+                      Tablero de Anuncios Oficial
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      Lectura congregacional y redacción exclusiva de ancianos.
+                    </p>
+                  </div>
+
+                  {/* Subcolección 5: Cuentas */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-bold text-xs">
+                        <CreditCard className="w-4 h-4" />
+                        <span>/accounts</span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300">
+                        {transactions.length} txs
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+                      Libro de Cuentas S-26 y Auditorías
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      Siervo de Cuentas • Privacidad garantizada por reglas de seguridad.
+                    </p>
+                  </div>
+
+                  {/* Subcolección 6: Literatura */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-violet-600 dark:text-violet-400 font-bold text-xs">
+                        <BookOpen className="w-4 h-4" />
+                        <span>/literature</span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-300">
+                        {literatureItems.length} items
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 font-medium">
+                      Almacén de Literatura e Inventario
+                    </p>
+                    <p className="text-[10px] text-slate-400">
+                      Siervo de Literatura • Pedidos y recuentos físicos aislados.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 text-[11px] text-indigo-900 dark:text-indigo-200 flex items-start gap-2.5 leading-relaxed">
+                  <ShieldCheck className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold">Colaboración Concurrente Segura:</span> Gracias a la Fase 4, si varios hermanos (coordinador, secretario, siervos) editan el sistema simultáneamente desde distintas computadoras o teléfonos, no hay riesgo de sobreescribir el trabajo ajeno.
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -2063,6 +2440,180 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
                 >
                   Restablecer Todo a Cero
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* CONTENEDOR 8: INTELIGENCIA ARTIFICIAL GEMINI */}
+          {activeTab === 'ia' && (
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6 animate-fade-in">
+              <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-fuchsia-50 dark:bg-fuchsia-950 flex items-center justify-center text-fuchsia-600 dark:text-fuchsia-400 font-bold">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                      Asistente Teocrático con Google Gemini
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Potencia tu gestión con inteligencia artificial respetando las directrices teocráticas
+                    </p>
+                  </div>
+                </div>
+
+                <span
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                    isGeminiConfigured()
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                      : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                  }`}
+                >
+                  <span className={`w-2 h-2 rounded-full ${isGeminiConfigured() ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                  {isGeminiConfigured() ? 'API Key Configurada' : 'Sin Configurar'}
+                </span>
+              </div>
+
+              {geminiStatus && (
+                <div
+                  className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between gap-2.5 animate-fade-in ${
+                    geminiStatus.type === 'success'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                      : 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    {geminiStatus.type === 'success' ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                    )}
+                    <span>{geminiStatus.msg}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setGeminiStatus(null)}
+                    className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Formulario de configuración de API Key */}
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                    <span>Clave de API de Gemini (Google AI Studio)</span>
+                    <a
+                      href="https://aistudio.google.com/app/apikey"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-fuchsia-600 dark:text-fuchsia-400 hover:underline inline-flex items-center gap-1 font-semibold normal-case text-[11px]"
+                    >
+                      <span>Obtener API Key Gratis</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                      <Key className="w-4 h-4" />
+                    </div>
+                    <input
+                      type={showGeminiKey ? 'text' : 'password'}
+                      value={geminiApiKeyInput}
+                      onChange={(e) => setGeminiApiKeyInput(e.target.value)}
+                      placeholder="AIzaSy..."
+                      className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono focus:ring-2 focus:ring-fuchsia-500 focus:outline-hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowGeminiKey((prev) => !prev)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                    >
+                      {showGeminiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Tu clave se guarda de manera segura en tu navegador y nunca se comparte con terceros.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                      Modelo Recomendado
+                    </label>
+                    <select
+                      value={geminiModelSelect}
+                      onChange={(e) => setGeminiModelSelect(e.target.value)}
+                      className="w-full py-2.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-fuchsia-500 focus:outline-hidden"
+                    >
+                      <option value="gemini-2.5-flash">Gemini 2.5 Flash (Ultrarrápido y Preciso - Recomendado)</option>
+                      <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                      <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-end gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSaveGeminiKey}
+                      className="flex-1 py-2.5 px-4 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Guardar Configuración</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleTestGemini}
+                      disabled={isTestingGemini || !geminiApiKeyInput.trim()}
+                      className="py-2.5 px-4 rounded-xl border border-fuchsia-200 dark:border-fuchsia-800 hover:bg-fuchsia-50 dark:hover:bg-fuchsia-950/40 text-fuchsia-700 dark:text-fuchsia-300 text-xs font-bold transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      {isTestingGemini ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                      <span>Probar Conexión</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tarjetas informativas de funcionalidades disponibles */}
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  Capacidades habilitadas con Gemini AI
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
+                    <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-400 flex items-center justify-center">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <h5 className="text-xs font-bold text-slate-900 dark:text-white">Importador MWB</h5>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                      Pega cualquier texto de JW.ORG y Gemini estructurará canciones, tesoros, lecciones y partes en un clic.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
+                    <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-400 flex items-center justify-center">
+                      <Bot className="w-4 h-4" />
+                    </div>
+                    <h5 className="text-xs font-bold text-slate-900 dark:text-white">Asignaciones Sabias</h5>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                      Sugerencias de publicadores basadas en equidad, privilegios teocráticos y lecciones pendientes del folleto.
+                    </p>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
+                      <FileKey className="w-4 h-4" />
+                    </div>
+                    <h5 className="text-xs font-bold text-slate-900 dark:text-white">Redactor de Avisos</h5>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                      Redacción con tono teocrático, respetuoso y formal para el Tablero de Anuncios del Salón del Reino.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

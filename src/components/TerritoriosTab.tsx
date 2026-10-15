@@ -37,6 +37,10 @@ import {
 } from 'lucide-react';
 import { DigitalTerritoryModal } from './DigitalTerritoryModal';
 import { SectionHeader } from './SectionHeader';
+import { TerritoryMapView } from './territories/TerritoryMapView';
+import { TerritoryPolygonEditorModal } from './territories/TerritoryPolygonEditorModal';
+import { TerritoryCardMap } from './territories/TerritoryCardMap';
+import { SAMPLE_TERRITORIES_WITH_POLYGONS } from './territories/sampleTerritoriesWithMaps';
 
 export const TerritoriosTab: React.FC = () => {
   const {
@@ -55,7 +59,7 @@ export const TerritoriosTab: React.FC = () => {
   } = useCongregation();
 
   // View state
-  const [viewMode, setViewMode] = useState<'cards' | 'table' | 's13'>('cards');
+  const [viewMode, setViewMode] = useState<'cards' | 'table' | 'map' | 's13'>('cards');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'todos' | 'disponible' | 'asignado' | 'vencido' | 'por_vencer'>('todos');
   const [typeFilter, setTypeFilter] = useState<string>('todos');
@@ -81,6 +85,7 @@ export const TerritoriosTab: React.FC = () => {
 
   const [detailModalTerritory, setDetailModalTerritory] = useState<Territory | null>(null);
   const [digitalCardTerritory, setDigitalCardTerritory] = useState<Territory | null>(null);
+  const [polygonEditorTerritory, setPolygonEditorTerritory] = useState<Territory | null>(null);
 
   const [editTerritoryModal, setEditTerritoryModal] = useState<Territory | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
@@ -116,6 +121,28 @@ export const TerritoriosTab: React.FC = () => {
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  // Seed handler for demo map polygons
+  const handleSeedSamplePolygons = () => {
+    if (window.confirm('¿Deseas cargar 4 territorios de muestra con mapas y polígonos delimitados para probar el mapa interactivo?')) {
+      SAMPLE_TERRITORIES_WITH_POLYGONS.forEach((sample) => {
+        const exists = territories.find(t => t.number === sample.number);
+        if (exists) {
+          updateTerritory({
+            ...exists,
+            polygon: sample.polygon,
+            center: sample.center,
+            color: sample.color,
+            zoom: sample.zoom,
+            noVisits: sample.noVisits,
+          });
+        } else {
+          addTerritory(sample);
+        }
+      });
+      showToast('Territorios de muestra con polígonos cargados exitosamente.');
+    }
   };
 
   // Distinct Zones
@@ -514,6 +541,17 @@ ${mapLink}${noVisitsText}
                 Tabla
               </button>
               <button
+                onClick={() => setViewMode('map')}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                  viewMode === 'map'
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Map className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-300" />
+                <span>Mapa Interactivo</span>
+              </button>
+              <button
                 onClick={() => setViewMode('s13')}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                   viewMode === 's13'
@@ -840,6 +878,17 @@ ${mapLink}${noVisitsText}
                     >
                       <Share2 className="w-4 h-4" />
                     </button>
+                    <button
+                      onClick={() => setPolygonEditorTerritory(terr)}
+                      className={`p-1.5 rounded-md transition cursor-pointer ${
+                        terr.polygon && terr.polygon.length >= 3
+                          ? 'text-indigo-600 hover:text-indigo-700 hover:bg-indigo-100/70 bg-indigo-50'
+                          : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
+                      }`}
+                      title={terr.polygon && terr.polygon.length >= 3 ? "Editar polígono perimetral en el mapa" : "Delimitar polígono en el mapa"}
+                    >
+                      <Map className="w-4 h-4" />
+                    </button>
                     {terr.mapUrl ? (
                       <a
                         href={terr.mapUrl}
@@ -967,6 +1016,17 @@ ${mapLink}${noVisitsText}
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
                           <button
+                            onClick={() => setPolygonEditorTerritory(terr)}
+                            className={`p-1 rounded cursor-pointer ${
+                              terr.polygon && terr.polygon.length >= 3
+                                ? 'text-indigo-600 hover:text-indigo-800 bg-indigo-50'
+                                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
+                            }`}
+                            title="Delimitar Polígono en Mapa"
+                          >
+                            <Map className="w-4 h-4" />
+                          </button>
+                          <button
                             onClick={() => handleShareWhatsApp(terr)}
                             className="p-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded"
                             title="WhatsApp"
@@ -1004,6 +1064,20 @@ ${mapLink}${noVisitsText}
             </table>
           </div>
         </div>
+      ) : viewMode === 'map' ? (
+        /* FASE 5: MAPA INTERACTIVO OPENSTREETMAP / LEAFLET */
+        <TerritoryMapView
+          territories={territories}
+          publishersMap={publishersMap}
+          settings={settings}
+          onSelectTerritory={(t) => setDetailModalTerritory(t)}
+          onEditPolygon={(t) => setPolygonEditorTerritory(t)}
+          onOpenDigitalCard={(t) => setDigitalCardTerritory(t)}
+          onAssignTerritory={(t) => openAssignModal(t)}
+          onReturnTerritory={(t) => openReturnModal(t)}
+          onCreateTerritory={() => openCreateModal()}
+          onSeedSamplePolygons={handleSeedSamplePolygons}
+        />
       ) : (
         /* OFFICIAL S-13 BATCH FICHERO VIEW */
         <div className="space-y-4">
@@ -1415,6 +1489,12 @@ ${mapLink}${noVisitsText}
                 >
                   <Share2 className="w-3.5 h-3.5" /> Enviar por WhatsApp
                 </button>
+                <button
+                  onClick={() => setPolygonEditorTerritory(detailModalTerritory)}
+                  className="px-3 py-1 bg-indigo-600 text-white rounded-md font-medium hover:bg-indigo-700 transition flex items-center gap-1 cursor-pointer"
+                >
+                  <Map className="w-3.5 h-3.5" /> Delimitar Polígono
+                </button>
                 {detailModalTerritory.mapUrl ? (
                   <a
                     href={detailModalTerritory.mapUrl}
@@ -1446,6 +1526,11 @@ ${mapLink}${noVisitsText}
                 <p className="bg-slate-50 p-3 rounded-lg text-slate-700 text-xs border border-slate-200/80 leading-relaxed">
                   {detailModalTerritory.boundsDescription || 'No se han especificado límites exactos.'}
                 </p>
+              </div>
+
+              {/* Vista Previa de Mapa Interactivo Leaflet */}
+              <div className="pt-1">
+                <TerritoryCardMap territory={detailModalTerritory} heightClass="h-56" />
               </div>
 
               {detailModalTerritory.notes && (
@@ -1779,6 +1864,32 @@ ${mapLink}${noVisitsText}
           isOpen={true}
           onClose={() => setDigitalCardTerritory(null)}
           territory={digitalCardTerritory}
+        />
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL: EDITOR DE POLÍGONOS DE TERRITORIOS (FASE 5)        */}
+      {/* ========================================================= */}
+      {polygonEditorTerritory && (
+        <TerritoryPolygonEditorModal
+          isOpen={true}
+          onClose={() => setPolygonEditorTerritory(null)}
+          territory={polygonEditorTerritory}
+          defaultCenter={settings.hallCoordinates || settings.territoryMapCenter}
+          onSave={(polygon, center, color) => {
+            const updated: Territory = {
+              ...polygonEditorTerritory,
+              polygon,
+              center,
+              color,
+            };
+            updateTerritory(updated);
+            showToast(`Límites y polígono del Territorio #${updated.number} guardados con éxito.`);
+            setPolygonEditorTerritory(null);
+            if (detailModalTerritory && detailModalTerritory.id === updated.id) {
+              setDetailModalTerritory(updated);
+            }
+          }}
         />
       )}
     </div>

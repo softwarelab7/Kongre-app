@@ -510,6 +510,9 @@ export interface CongregationSettings {
   weekendMeetingDay: string;  // e.g. 'Domingo'
   weekendMeetingTime: string; // e.g. '10:00'
   hallAddress?: string;
+  hallCoordinates?: [number, number]; // [lat, lng] Ubicación del Salón del Reino
+  territoryMapCenter?: [number, number]; // [lat, lng] Centro predeterminado del mapa
+  territoryMapZoom?: number; // Zoom predeterminado (ej. 14)
   conflictRules: ConflictRuleSettings;
   pdfTemplate: 'clasica' | 'moderna' | 'minimalista' | 'color' | 'oficial' | 'nw_scheduler';
   pdfPageSize: 'letter' | 'a4';
@@ -640,6 +643,16 @@ export interface NoVisitAddress {
   residentName?: string;
   dateAdded: string; // YYYY-MM-DD
   reason?: string;
+  coordinates?: [number, number]; // [lat, lng] para geolocalización en mapa
+}
+
+export interface TerritoryBlock {
+  id: string;
+  number: number;
+  name?: string;
+  status: 'pendiente' | 'trabajando' | 'completado';
+  coordinates?: [number, number][]; // Polígono perimetral de la manzana
+  completedAt?: string;
 }
 
 export interface TerritoryAssignmentRecord {
@@ -670,6 +683,14 @@ export interface Territory {
   notes?: string;
   noVisits: NoVisitAddress[];
   history: TerritoryAssignmentRecord[];
+
+  // FASE 5: Mapas Interactivos (OpenStreetMap / Leaflet)
+  polygon?: [number, number][]; // Polígono perimetral [[lat, lng], [lat, lng], ...]
+  center?: [number, number];    // Coordenadas centrales del territorio [lat, lng]
+  zoom?: number;                // Nivel de zoom recomendado (14-18)
+  blocks?: TerritoryBlock[];    // Manzanas/cuadras individuales
+  color?: string;               // Color temático personalizado para el polígono (hex)
+  geoJson?: any;                // Objeto GeoJSON opcional
 }
 
 // ==========================================

@@ -46,7 +46,16 @@ import {
   Bell,
   ArrowRight,
   Info,
+  BellRing,
+  X,
 } from 'lucide-react';
+import {
+  isNotificationSupported,
+  getNotificationPermission,
+  requestNotificationPermission,
+  sendTestNotification,
+  checkUpcomingAssignmentsAndNotify,
+} from '../services/notificationService';
 
 export type NWPublisherTab = 'asignaciones' | 'informe' | 'ausencias' | 'grupo' | 'avisos';
 
@@ -119,6 +128,63 @@ export const PersonalViewTab: React.FC = () => {
     assignment: null,
     reason: '',
   });
+
+  // Notification permission and testing state
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>(() =>
+    getNotificationPermission()
+  );
+  const [isActivatingNotif, setIsActivatingNotif] = useState(false);
+  const [isSendingTestNotif, setIsSendingTestNotif] = useState(false);
+  const [notifBannerDismissed, setNotifBannerDismissed] = useState(() => {
+    try {
+      return sessionStorage.getItem('kongre_notif_banner_dismissed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [notifSuccessToast, setNotifSuccessToast] = useState<string | null>(null);
+
+  const handleEnableNotifications = async () => {
+    setIsActivatingNotif(true);
+    try {
+      const perm = await requestNotificationPermission();
+      setNotifPermission(perm);
+      if (perm === 'granted') {
+        setNotifSuccessToast('¡Recordatorios activos! Te avisaremos antes de tus asignaciones.');
+        setTimeout(() => setNotifSuccessToast(null), 4000);
+        await sendTestNotification();
+        if (selectedPublisher) {
+          await checkUpcomingAssignmentsAndNotify({
+            publisherName: selectedPublisher.name,
+            publisherId: selectedPublisher.id,
+            weeks,
+          });
+        }
+      }
+    } finally {
+      setIsActivatingNotif(false);
+    }
+  };
+
+  const handleSendTestNotification = async () => {
+    setIsSendingTestNotif(true);
+    try {
+      const ok = await sendTestNotification();
+      if (ok) {
+        setNotifSuccessToast('Notificación enviada a tu dispositivo.');
+        setTimeout(() => setNotifSuccessToast(null), 3000);
+      }
+    } finally {
+      setIsSendingTestNotif(false);
+    }
+  };
+
+  const handleDismissBanner = () => {
+    setNotifBannerDismissed(true);
+    try {
+      sessionStorage.setItem('kongre_notif_banner_dismissed', 'true');
+    } catch {}
+  };
 
   // Current selected month for S-4 report (YYYY-MM)
   const currentMonthKey = useMemo(() => {
@@ -925,6 +991,19 @@ export const PersonalViewTab: React.FC = () => {
             </button>
           )}
 
+          {isNotificationSupported() && notifPermission === 'granted' && (
+            <button
+              type="button"
+              onClick={handleSendTestNotification}
+              disabled={isSendingTestNotif}
+              className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border border-purple-200/60 dark:border-purple-800/40"
+              title="Probar notificación en este dispositivo"
+            >
+              <BellRing size={14} className={isSendingTestNotif ? 'animate-bounce' : 'text-purple-600 dark:text-purple-400'} />
+              <span>{isSendingTestNotif ? 'Enviando...' : 'Avisos Activos'}</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={handleExitPortal}
@@ -936,6 +1015,70 @@ export const PersonalViewTab: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Toast de confirmación de notificación */}
+      {notifSuccessToast && (
+        <div className="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold flex items-center justify-between gap-2 shadow-xs animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>{notifSuccessToast}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setNotifSuccessToast(null)}
+            className="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400 cursor-pointer"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
+      {/* Banner de Solicitud de Notificaciones Web Push / Nativas */}
+      {isNotificationSupported() && notifPermission !== 'granted' && !notifBannerDismissed && (
+        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-blue-500/10 border border-purple-200/80 dark:border-purple-800/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm animate-in fade-in">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-500/20">
+              <Bell className="animate-pulse" size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full">
+                  Recordatorios Teocráticos
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                  {notifPermission === 'denied' ? 'Permiso bloqueado en navegador' : 'Web Push & Notificaciones'}
+                </span>
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mt-0.5">
+                ¿Deseas recibir avisos oportunos antes de tus asignaciones?
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xl">
+                Kongre te recordará automáticamente 24h a 48h antes de tus partes en la reunión del fin de semana, entre semana o tus turnos de audio, micrófonos y aseo.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 w-full md:w-auto self-end md:self-center">
+            <button
+              type="button"
+              onClick={handleEnableNotifications}
+              disabled={isActivatingNotif}
+              className="flex-1 md:flex-initial px-4 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-md shadow-purple-600/25 flex items-center justify-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50"
+            >
+              <Sparkles size={15} />
+              <span>{isActivatingNotif ? 'Activando...' : 'Activar Recordatorios'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleDismissBanner}
+              className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-700 dark:text-slate-400 transition-all cursor-pointer"
+              title="Cerrar por ahora"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Selector supervisor desplegable para ancianos */}
       {canSupervise && showSupervisorSelect && (

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import QRCode from 'qrcode';
 import { Territory, NoVisitAddress, Publisher } from '../types';
 import { useCongregation } from '../context/CongregationContext';
+import { TerritoryCardMap } from './territories/TerritoryCardMap';
 import {
   X,
   MapPin,
@@ -267,6 +268,9 @@ export const DigitalTerritoryModal: React.FC<DigitalTerritoryModalProps> = ({
         <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4">
           {activeTab === 'card' && (
             <div className="space-y-4">
+              {/* FASE 5: MAPA INTERACTIVO OPENSTREETMAP / LEAFLET */}
+              <TerritoryCardMap territory={territory} />
+
               {/* PRIMARY ACTION: OPEN IN GOOGLE MAPS */}
               <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center gap-3">

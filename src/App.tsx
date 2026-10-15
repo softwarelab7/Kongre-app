@@ -62,9 +62,10 @@ import { PendingApprovalView } from './components/PendingApprovalView';
 import { IdentityNamePrompt } from './components/IdentityNamePrompt';
 import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
+import { checkUpcomingAssignmentsAndNotify } from './services/notificationService';
 
 const AppContent: React.FC = () => {
-  const { user, effectiveRoleInfo, signOutUser } = useAuth();
+  const { user, effectiveRoleInfo, signOutUser, currentBrotherName, currentPublisherId } = useAuth();
   const [isLockPinSuggestionOpen, setIsLockPinSuggestionOpen] = useState(false);
   const prevUserRef = useRef(user);
 
@@ -122,7 +123,20 @@ const AppContent: React.FC = () => {
     }
     return false;
   });
-  const { setCurrentWeekId, territories, settings, accountLinkRequests, publishers } = useCongregation();
+  const { setCurrentWeekId, territories, settings, accountLinkRequests, publishers, weeks } = useCongregation();
+
+  // Escaneo automático de asignaciones teocráticas próximas para notificaciones nativas/push
+  useEffect(() => {
+    if (!weeks || weeks.length === 0) return;
+    const brotherName = currentBrotherName || user?.displayName;
+    if (!brotherName && !currentPublisherId) return;
+
+    checkUpcomingAssignmentsAndNotify({
+      publisherName: brotherName || '',
+      publisherId: currentPublisherId || undefined,
+      weeks,
+    }).catch((err) => console.warn('Error al verificar recordatorios de asignaciones:', err));
+  }, [weeks, currentBrotherName, currentPublisherId, user?.displayName]);
   const [isRegisterWizardOpen, setIsRegisterWizardOpen] = useState(false);
   const [isLinkRequestsModalOpen, setIsLinkRequestsModalOpen] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState<boolean>(() => {

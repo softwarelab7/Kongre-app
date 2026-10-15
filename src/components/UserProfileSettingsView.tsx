@@ -24,7 +24,16 @@ import {
   Sliders,
   Check,
   Info,
+  Send,
 } from 'lucide-react';
+import {
+  isNotificationSupported,
+  getNotificationPermission,
+  requestNotificationPermission,
+  sendTestNotification,
+  getNotificationPreferences,
+  saveNotificationPreferences,
+} from '../services/notificationService';
 
 // Preset avatar styles with clean SVG iconography and theocratic themes
 const AVATAR_PRESETS = [
@@ -101,6 +110,42 @@ export const UserProfileSettingsView: React.FC = () => {
   const [contactTimePreference, setContactTimePreference] = useState<ContactTimePreference>('anytime');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [notes, setNotes] = useState('');
+
+  // Web Push Notification State
+  const [browserPermission, setBrowserPermission] = useState<NotificationPermission>(() => getNotificationPermission());
+  const [notifPrefs, setNotifPrefs] = useState(() => getNotificationPreferences());
+  const [isSendingTestNotif, setIsSendingTestNotif] = useState(false);
+  const [testNotifResult, setTestNotifResult] = useState<{ success: boolean; msg: string } | null>(null);
+
+  const handleRequestBrowserPermission = async () => {
+    const perm = await requestNotificationPermission();
+    setBrowserPermission(perm);
+    if (perm === 'granted') {
+      saveNotificationPreferences({ enabled: true });
+      setNotifPrefs((prev) => ({ ...prev, enabled: true }));
+    }
+  };
+
+  const handleSendTestNotification = async () => {
+    setIsSendingTestNotif(true);
+    setTestNotifResult(null);
+    try {
+      const ok = await sendTestNotification();
+      setTestNotifResult({
+        success: ok,
+        msg: ok
+          ? '¡Notificación de prueba enviada con éxito! Revisa la esquina de tu pantalla o barra de avisos.'
+          : 'No se pudo enviar la notificación. Verifica que los permisos estén habilitados en tu navegador.',
+      });
+    } catch (e: any) {
+      setTestNotifResult({
+        success: false,
+        msg: e?.message || 'Error al enviar notificación de prueba.',
+      });
+    } finally {
+      setIsSendingTestNotif(false);
+    }
+  };
 
   // UI state
   const [isSaving, setIsSaving] = useState(false);
@@ -773,27 +818,130 @@ export const UserProfileSettingsView: React.FC = () => {
             </div>
           </div>
 
-          {/* Notificaciones y Avisos Toggle */}
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                <Bell className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>Avisos de Asignaciones y Recordatorios Semanales</span>
-              </p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                Permitir que los hermanos organizadores te envíen recordatorios de tus partes y deberes por tu canal preferido.
-              </p>
+          {/* Notificaciones y Avisos Web Push */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <Bell className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Notificaciones Web Push y Recordatorios Automáticos</span>
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Recibe avisos nativos en tu navegador o móvil antes de tus asignaciones (partes estudiantiles, discursos, audio, micro y aseo).
+                </p>
+              </div>
+
+              <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                <input
+                  type="checkbox"
+                  checked={notificationsEnabled}
+                  onChange={(e) => {
+                    setNotificationsEnabled(e.target.checked);
+                    saveNotificationPreferences({ enabled: e.target.checked });
+                    setNotifPrefs((prev) => ({ ...prev, enabled: e.target.checked }));
+                  }}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600"></div>
+              </label>
             </div>
 
-            <label className="relative inline-flex items-center cursor-pointer shrink-0">
-              <input
-                type="checkbox"
-                checked={notificationsEnabled}
-                onChange={(e) => setNotificationsEnabled(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600"></div>
-            </label>
+            {/* Estado de Permiso del Navegador */}
+            <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    browserPermission === 'granted'
+                      ? 'bg-emerald-500 animate-pulse'
+                      : browserPermission === 'denied'
+                      ? 'bg-rose-500'
+                      : 'bg-amber-500'
+                  }`}
+                />
+                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Permiso del navegador:{' '}
+                  <strong className="text-slate-900 dark:text-white">
+                    {browserPermission === 'granted'
+                      ? 'Concedido (Activo)'
+                      : browserPermission === 'denied'
+                      ? 'Bloqueado en el navegador'
+                      : 'Pendiente de autorización'}
+                  </strong>
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {browserPermission !== 'granted' && isNotificationSupported() && (
+                  <button
+                    type="button"
+                    onClick={handleRequestBrowserPermission}
+                    className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer"
+                  >
+                    Activar en este Navegador
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleSendTestNotification}
+                  disabled={isSendingTestNotif}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Send className="w-3 h-3 text-indigo-500" />
+                  <span>{isSendingTestNotif ? 'Enviando...' : 'Enviar Prueba'}</span>
+                </button>
+              </div>
+            </div>
+
+            {testNotifResult && (
+              <div
+                className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 animate-fade-in ${
+                  testNotifResult.success
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800'
+                    : 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-800'
+                }`}
+              >
+                {testNotifResult.success ? (
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                )}
+                <span>{testNotifResult.msg}</span>
+              </div>
+            )}
+
+            {/* Ajustes avanzados de anticipación */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-slate-200 dark:border-slate-700/60 text-xs">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-slate-600 dark:text-slate-400">Anticipación de aviso:</span>
+                <select
+                  value={notifPrefs.notifyDaysBefore}
+                  onChange={(e) => {
+                    const days = parseInt(e.target.value, 10);
+                    saveNotificationPreferences({ notifyDaysBefore: days });
+                    setNotifPrefs((prev) => ({ ...prev, notifyDaysBefore: days }));
+                  }}
+                  className="py-1 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold text-slate-800 dark:text-slate-200"
+                >
+                  <option value={1}>1 día antes (24h)</option>
+                  <option value={2}>2 días antes (48h)</option>
+                  <option value={3}>3 días antes (72h)</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-slate-600 dark:text-slate-400">Incluir turnos y aseo:</span>
+                <input
+                  type="checkbox"
+                  checked={notifPrefs.notifyDuties}
+                  onChange={(e) => {
+                    saveNotificationPreferences({ notifyDuties: e.target.checked });
+                    setNotifPrefs((prev) => ({ ...prev, notifyDuties: e.target.checked }));
+                  }}
+                  className="w-4 h-4 rounded text-indigo-600 cursor-pointer"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Notas de Disponibilidad */}

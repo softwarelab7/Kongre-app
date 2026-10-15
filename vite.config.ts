@@ -76,6 +76,49 @@ export default defineConfig(() => {
                 },
               },
             },
+            // FASE 6: Caching Offline para Mosaicos de Mapas (OpenStreetMap / CartoDB / Esri)
+            {
+              urlPattern: /^https:\/\/[a-d]\.basemaps\.cartocdn\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'cartodb-tiles-cache',
+                expiration: {
+                  maxEntries: 600,
+                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 días
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: /^https:\/\/[a-c]\.tile\.openstreetmap\.org\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'osm-tiles-cache',
+                expiration: {
+                  maxEntries: 600,
+                  maxAgeSeconds: 60 * 60 * 24 * 30,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: /^https:\/\/server\.arcgisonline\.com\/ArcGIS\/rest\/services\/World_Imagery\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'esri-satellite-tiles-cache',
+                expiration: {
+                  maxEntries: 300,
+                  maxAgeSeconds: 60 * 60 * 24 * 30,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
           ],
         },
         devOptions: {
@@ -86,7 +129,37 @@ export default defineConfig(() => {
     ],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(import.meta.dirname || '.', '.'),
+      },
+    },
+    build: {
+      chunkSizeWarningLimit: 1200,
+      rollupOptions: {
+        output: {
+          manualChunks(id: string) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
+                return 'vendor-react';
+              }
+              if (id.includes('firebase')) {
+                return 'vendor-firebase';
+              }
+              if (id.includes('jspdf') || id.includes('html2canvas') || id.includes('purify')) {
+                return 'vendor-pdf';
+              }
+              if (id.includes('leaflet')) {
+                return 'vendor-maps';
+              }
+              if (id.includes('react-big-calendar') || id.includes('date-fns')) {
+                return 'vendor-calendar';
+              }
+              if (id.includes('lucide-react')) {
+                return 'vendor-lucide';
+              }
+              return 'vendor-utils';
+            }
+          },
+        },
       },
     },
     server: {

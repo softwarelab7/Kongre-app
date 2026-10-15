@@ -14,6 +14,7 @@ import {
   generateSecureRolePin,
   isCongregationIdString,
 } from '../utils/theocraticSecurity';
+import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import { COUNTRIES_WITH_CITIES, COUNTRIES_LIST } from '../data/countriesAndCities';
 import { SearchableCombobox } from './SearchableCombobox';
 import { KongreLogo } from './KongreLogo';
@@ -385,7 +386,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       // 4. Add Coordinator to publishers list if not already present
       const alreadyHasCoord = publishers.some(
         (p) =>
-          (p.name && coordinatorName.trim() && p.name.trim().toLowerCase() === coordinatorName.trim().toLowerCase()) ||
+          areNamesEquivalent(p.name, coordinatorName.trim()) ||
           (p.email && coordinatorEmail.trim() && p.email.trim().toLowerCase() === coordinatorEmail.trim().toLowerCase())
       );
       if (!alreadyHasCoord && coordinatorName.trim()) {

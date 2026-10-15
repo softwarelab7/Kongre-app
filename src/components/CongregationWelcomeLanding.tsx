@@ -8,6 +8,7 @@ import { useCongregation } from '../context/CongregationContext';
 import { useTheme } from '../context/ThemeContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
 import { isCongregationIdString, getFriendlyCongregationName, verifyPasscode, isGenericIdentityName, formatCanonicalCongregationId } from '../utils/theocraticSecurity';
+import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import {
   Sun,
   Moon,
@@ -288,7 +289,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         if (!isGenericIdentityName(nameToUse)) {
           const currentPubs = (cloudData?.publishers || publishers) as any[];
           const alreadyInList = currentPubs.some(
-            (p) => p.name && p.name.trim().toLowerCase() === nameToUse.toLowerCase()
+            (p) => p.name && areNamesEquivalent(p.name, nameToUse)
           );
           if (!alreadyInList) {
             const isElder = roleFinal === 'coordinador' || roleFinal === 'secretario' || roleFinal === 'superintendente_vym';
@@ -463,7 +464,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         ? allPublishers.find(
             (p) =>
               (p.email && p.email.toLowerCase().trim() === userEmail) ||
-              (userName && !isGenericIdentityName(userName) && p.name && p.name.trim().toLowerCase() === userName.toLowerCase())
+              (userName && !isGenericIdentityName(userName) && p.name && areNamesEquivalent(p.name, userName))
           )
         : undefined;
 
@@ -544,7 +545,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         // Asegurar que el coordinador figure como publicador en la lista
         if (finalCoordName && !isGenericIdentityName(finalCoordName)) {
           const alreadyInList = allPublishers.some(
-            (p) => p.name && p.name.trim().toLowerCase() === finalCoordName.toLowerCase()
+            (p) => p.name && areNamesEquivalent(p.name, finalCoordName)
           );
           if (!alreadyInList) {
             addPublisher({

@@ -86,6 +86,14 @@ import { detectConflictsInWeek } from '../utils/conflictDetector';
 import { autoAssignWeek } from '../utils/autoAssigner';
 import { OFFICIAL_STUDENT_LESSONS } from '../utils/theocraticData';
 import { isCongregationIdString, getFriendlyCongregationName, sanitizeForFirestore, isGenericIdentityName, formatCanonicalCongregationId } from '../utils/theocraticSecurity';
+import {
+  normalizePersonName,
+  areNamesEquivalent,
+  isSamePublisher,
+  mergePublisherData,
+  deduplicatePublishersList,
+  reassignWeeksForDeduplicatedPublishers,
+} from '../utils/publisherDeduplication';
 
 interface CongregationContextType {
   publishers: Publisher[];
@@ -123,6 +131,8 @@ interface CongregationContextType {
   deletePublisher: (id: string) => Promise<void> | void;
   deletePublishersBatch: (ids: string[]) => Promise<void> | void;
   importPublishersFromCSV: (csvText: string) => number;
+  importPublishersBatch: (batch: Partial<Publisher>[]) => number;
+  cleanDuplicatePublishers: () => { mergedCount: number; remainingCount: number };
 
   // Week schedule actions
   updateWeek: (week: WeekSchedule) => void;
@@ -275,7 +285,7 @@ interface CongregationContextType {
   getS89SlipsForWeek: (week: WeekSchedule) => S89Slip[];
 
   // Cleaning & Groups
-  updatePreachingGroups: (groups: PreachingGroup[]) => void;
+  updatePreachingGroups: (groups: PreachingGroup[]) => Promise<void> | void;
 
   // Custom Duties
   addCustomDuty: (duty: Omit<CustomDuty, 'id'>) => void;
@@ -489,6 +499,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const skipNextSnapshotEchoRef = useRef(false);
   const latestSettingsRef = useRef<CongregationSettings>(settings);
+  const latestPreachingGroupsRef = useRef<PreachingGroup[]>(preachingGroups);
   useEffect(() => {
     latestSettingsRef.current = settings;
     try {
@@ -715,7 +726,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [weeks]);
 
   useEffect(() => {
-    localStorage.setItem(`${LOCAL_STORAGE_KEY}_groups`, JSON.stringify(preachingGroups));
+    latestPreachingGroupsRef.current = preachingGroups;
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_groups`, JSON.stringify(preachingGroups));
+    } catch {}
   }, [preachingGroups]);
 
   useEffect(() => {
@@ -923,6 +937,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         latestSettingsRef.current.congregationNumber = clean;
         latestSettingsRef.current.congregationId = clean;
       }
+      setSettings((prev) => {
+        if (prev.congregationNumber === clean && prev.congregationId === clean) return prev;
+        return {
+          ...prev,
+          congregationNumber: clean,
+          congregationId: clean,
+        };
+      });
     } catch {}
   };
 
@@ -930,13 +952,20 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const hydrateAllFromData = (data: any) => {
     if (!data) return;
 
+    let idMapFromPubs: Record<string, string> = {};
+
     if (data.publishers && Array.isArray(data.publishers)) {
-      setPublishers(data.publishers);
-      localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(data.publishers));
+      // Depuración automática de duplicados al hidratar datos desde la nube o caché
+      const { cleanList, mergedCount, idMap } = deduplicatePublishersList(data.publishers);
+      idMapFromPubs = idMap;
+      const pubsToUse = mergedCount > 0 ? cleanList : data.publishers;
+
+      setPublishers(pubsToUse);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(pubsToUse));
 
       // Sincronizar PINs personales únicos para que cualquier navegador o sesión los reconozca
       try {
-        const pinRecords = data.publishers
+        const pinRecords = pubsToUse
           .filter((p: any) => p.personalPin && String(p.personalPin).trim().length >= 4)
           .map((p: any) => ({
             publisherId: p.id || p.nid,
@@ -954,9 +983,33 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           }
         }
       } catch {}
+
+      // Si se encontraron duplicados en la base de datos, guardar únicamente la lista depurada de publicadores
+      // sin sobreescribir ni tocar los grupos de predicación u otras colecciones
+      if (mergedCount > 0) {
+        const congDocId = resolveCongregationDocId();
+        if (congDocId && congDocId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId)) {
+          const canonical = formatCanonicalCongregationId(congDocId);
+          const unhyphenated = canonical.replace(/-/g, '');
+          const cleanPubs = sanitizeForFirestore(pubsToUse);
+          const pubsPayload = {
+            publishers: cleanPubs,
+            updatedAt: new Date().toISOString(),
+          };
+          setDoc(doc(db, 'congregations', canonical), pubsPayload, { merge: true }).catch(() => {});
+          if (unhyphenated !== canonical && unhyphenated.length >= 3) {
+            setDoc(doc(db, 'congregations', unhyphenated), pubsPayload, { merge: true }).catch(() => {});
+          }
+        }
+      }
     }
     if (data.weeks && Array.isArray(data.weeks)) {
-      const enrichedWeeks = data.weeks.map((w: WeekSchedule) => {
+      let weeksSource = data.weeks;
+      if (Object.keys(idMapFromPubs).length > 0) {
+        const { updatedWeeks } = reassignWeeksForDeduplicatedPublishers(weeksSource, idMapFromPubs);
+        weeksSource = updatedWeeks;
+      }
+      const enrichedWeeks = weeksSource.map((w: WeekSchedule) => {
         if (isWeekNeedingOrganizedSync(w)) {
           const org = getOrganizedScheduleForWeek(w.id, w.weekStartDate);
           return org ? applyOrganizedToWeek(w, org) : w;
@@ -967,8 +1020,37 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_weeks`, JSON.stringify(enrichedWeeks));
     }
     if (data.preachingGroups && Array.isArray(data.preachingGroups)) {
-      setPreachingGroups(data.preachingGroups);
-      localStorage.setItem(`${LOCAL_STORAGE_KEY}_groups`, JSON.stringify(data.preachingGroups));
+      if (data.preachingGroups.length > 0) {
+        setPreachingGroups(data.preachingGroups);
+        latestPreachingGroupsRef.current = data.preachingGroups;
+        localStorage.setItem(`${LOCAL_STORAGE_KEY}_groups`, JSON.stringify(data.preachingGroups));
+      } else {
+        // La nube vino con grupos vacíos ([]). Verificar si localmente en este dispositivo o memoria
+        // ya existen grupos creados para preservarlos y subirlos a la nube inmediatamente.
+        const localGroups = (latestPreachingGroupsRef.current && latestPreachingGroupsRef.current.length > 0)
+          ? latestPreachingGroupsRef.current
+          : (() => {
+              try {
+                const s = localStorage.getItem(`${LOCAL_STORAGE_KEY}_groups`);
+                const parsed = s ? JSON.parse(s) : [];
+                return Array.isArray(parsed) && parsed.length > 0 ? parsed : [];
+              } catch {
+                return [];
+              }
+            })();
+
+        if (localGroups.length > 0) {
+          setPreachingGroups(localGroups);
+          latestPreachingGroupsRef.current = localGroups;
+          localStorage.setItem(`${LOCAL_STORAGE_KEY}_groups`, JSON.stringify(localGroups));
+          // Subir los grupos locales a Firestore para que no se pierdan
+          updatePreachingGroups(localGroups);
+        } else {
+          setPreachingGroups([]);
+          latestPreachingGroupsRef.current = [];
+          localStorage.setItem(`${LOCAL_STORAGE_KEY}_groups`, JSON.stringify([]));
+        }
+      }
     }
     if (data.customDuties && Array.isArray(data.customDuties)) {
       const unifiedDuties = unifyAudioVideoDuties(data.customDuties);
@@ -1568,10 +1650,33 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       } catch {}
     }
 
+    // Resolver grupos asegurando que jamás se sobreescriban con un array vacío si existen grupos en ref o localStorage
+    let resolvedGroups: PreachingGroup[] | null = null;
+    if (Array.isArray(newGroups) && newGroups.length > 0) {
+      resolvedGroups = newGroups;
+    } else if (latestPreachingGroupsRef.current && latestPreachingGroupsRef.current.length > 0) {
+      resolvedGroups = latestPreachingGroupsRef.current;
+    } else {
+      try {
+        const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_groups`);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            resolvedGroups = parsed;
+          }
+        }
+      } catch {}
+    }
+
+    // Permitir guardar [] sólo si el llamador pasó explícitamente newGroups = [] y la referencia en memoria también está vacía
+    if (newGroups !== undefined && Array.isArray(newGroups) && newGroups.length === 0 && (!latestPreachingGroupsRef.current || latestPreachingGroupsRef.current.length === 0)) {
+      resolvedGroups = [];
+    }
+
     const payload = sanitizeForFirestore({
       publishers: newPubs,
       weeks: newWeeks,
-      preachingGroups: newGroups,
+      ...(resolvedGroups !== null ? { preachingGroups: resolvedGroups } : {}),
       customDuties: newDuties,
       settings: resolvedSettings,
       coordinatorPhotoURL: activeCoordPhoto,
@@ -1621,24 +1726,26 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         // Guardar en la colección global de congregaciones por ID para sincronizar todos los dispositivos y usuarios
         if (congDocId && congDocId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId)) {
           try {
-            const congDocRef = doc(db, 'congregations', congDocId);
+            const canonicalDocId = formatCanonicalCongregationId(congDocId);
+            const unhyphenated = canonicalDocId.replace(/-/g, '');
+
+            const congDocRef = doc(db, 'congregations', canonicalDocId);
             await setDoc(congDocRef, payload, { merge: true });
             localStorage.removeItem('kongre_needs_cloud_upload');
+
+            // Mantener el alias sin guiones sincronizado en tiempo real
+            if (unhyphenated !== canonicalDocId && unhyphenated.length >= 3) {
+              await setDoc(doc(db, 'congregations', unhyphenated), payload, { merge: true });
+            }
 
             // Notificar a otras pestañas en el mismo navegador instantáneamente
             try {
               if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
                 const bc = new BroadcastChannel('kongre_cross_tab_sync');
-                bc.postMessage({ type: 'CONGREGATION_UPDATED', congregationId: congDocId, timestamp: nowISO });
+                bc.postMessage({ type: 'CONGREGATION_UPDATED', congregationId: canonicalDocId, timestamp: nowISO });
                 bc.close();
               }
             } catch {}
-
-            // Alias sin guiones
-            const unhyphenated = congDocId.replace(/-/g, '');
-            if (unhyphenated !== congDocId && unhyphenated.length >= 3) {
-              await setDoc(doc(db, 'congregations', unhyphenated), payload, { merge: true });
-            }
           } catch (congErr: any) {
             if (isQuotaError(congErr)) throw congErr;
             console.warn('Aviso guardando en congregación:', congErr);
@@ -1792,26 +1899,44 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (!rawClean) return { success: false, message: 'ID de congregación no válido.' };
 
     try {
-      // 1. Probar con el ID introducido directamente
-      let snap = await getDoc(doc(db, 'congregations', rawClean));
+      const canonical = formatCanonicalCongregationId(rawClean);
+      const unhyphenated = canonical.replace(/-/g, '');
 
-      // 2. Si no existe y no tiene guiones, probar formato con guiones KGR-XXXX-XXXX
-      if (!snap.exists() && !rawClean.includes('-') && rawClean.startsWith('KGR') && rawClean.length === 11) {
-        const hyphenated = `${rawClean.slice(0, 3)}-${rawClean.slice(3, 7)}-${rawClean.slice(7)}`;
-        snap = await getDoc(doc(db, 'congregations', hyphenated));
+      // 1. Probar primero con el ID canónico con guiones
+      let snap = await getDoc(doc(db, 'congregations', canonical));
+
+      // 2. Si no existe, probar con el sin guiones
+      if (!snap.exists()) {
+        snap = await getDoc(doc(db, 'congregations', unhyphenated));
       }
 
-      // 3. Si no existe y tiene guiones, probar sin guiones
-      if (!snap.exists() && rawClean.includes('-')) {
-        const unhyphenated = rawClean.replace(/-/g, '');
-        snap = await getDoc(doc(db, 'congregations', unhyphenated));
+      // 3. Si aún no existe, probar con rawClean directamente
+      if (!snap.exists() && rawClean !== canonical && rawClean !== unhyphenated) {
+        snap = await getDoc(doc(db, 'congregations', rawClean));
       }
 
       if (!snap.exists()) {
         return { success: false, message: 'No se encontraron datos en la nube para este ID de congregación.' };
       }
 
-      const data = snap.data();
+      let data = snap.data();
+
+      // Si este documento no tenía grupos de predicación pero el alias sí los tenía, rescatarlos
+      if (!data.preachingGroups || (Array.isArray(data.preachingGroups) && data.preachingGroups.length === 0)) {
+        try {
+          const altId = snap.id === canonical ? unhyphenated : canonical;
+          const altSnap = await getDoc(doc(db, 'congregations', altId));
+          if (altSnap.exists()) {
+            const altData = altSnap.data();
+            if (altData.preachingGroups && Array.isArray(altData.preachingGroups) && altData.preachingGroups.length > 0) {
+              data = { ...data, preachingGroups: altData.preachingGroups };
+              // Sincronizar el documento actual con los grupos del alias
+              setDoc(doc(db, 'congregations', snap.id), { preachingGroups: altData.preachingGroups }, { merge: true }).catch(() => {});
+            }
+          }
+        } catch {}
+      }
+
       hydrateAllFromData(data);
       const effectiveId = data.congregationId || rawClean;
       ensureCongregationIdPersisted(effectiveId);
@@ -1874,68 +1999,92 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return () => window.removeEventListener('online', handleReconnected);
   }, [publishers, weeks, territories]);
 
-  // Garantizar que el Coordinador siempre exista en la lista de publicadores de la congregación
+  // Garantizar que el Coordinador siempre exista en la lista de publicadores de la congregación sin duplicarlo
   useEffect(() => {
     const coordName = settings.coordinatorName?.trim();
     if (!coordName || isGenericIdentityName(coordName) || !settings.isRegistered) return;
 
-    const alreadyExists = publishers.some((p) => {
-      const pName = (p.name || (p as any).full_name || '').trim().toLowerCase();
-      const cName = coordName.toLowerCase();
+    // Verificar si ya existe en publishers con coincidencia fonética/tildes o correo
+    const existingIndex = publishers.findIndex((p) => {
+      const pName = p.name || (p as any).full_name || '';
       return (
-        pName === cName ||
-        pName.startsWith(cName) ||
-        cName.startsWith(pName) ||
+        areNamesEquivalent(pName, coordName) ||
         (p.id && p.id.startsWith('pub-coord')) ||
         (settings.coordinatorEmail && p.email && p.email.toLowerCase() === settings.coordinatorEmail.toLowerCase())
       );
     });
 
-    if (!alreadyExists) {
-      const coordPub: Publisher = {
-        id: `pub-coord-${Date.now()}`,
-        name: coordName,
-        gender: 'hermano',
-        phone: settings.coordinatorPhone || '',
-        email: settings.coordinatorEmail || '',
-        notes: 'Coordinador del Cuerpo de Ancianos',
-        active: true,
-        groupNumber: 1,
-        privilege: 'anciano',
-        hope: 'otras_ovejas',
-        absences: [],
-        roles: {
-          vym_presidente: true,
-          vym_oracion: true,
-          vym_tesoros_discurso: true,
-          vym_tesoros_perlas: true,
-          vym_tesoros_lectura: true,
-          vym_maestros_titular: true,
-          vym_maestros_ayudante: true,
-          vym_vida_partes: true,
-          vym_estudio_conductor: true,
-          vym_estudio_lector: true,
-          fds_presidente: true,
-          fds_atalaya_lector: true,
-          fds_oracion: true,
-          deber_acomodador: true,
-          deber_seguridad: true,
-          deber_audio: true,
-          deber_video: true,
-          deber_microfonos: true,
-          deber_plataforma: true,
-          deber_zoom: true,
-        },
-      };
-      setPublishers((prev) => {
-        const next = [...prev, coordPub];
+    if (existingIndex !== -1) {
+      // Ya existe. Si no tenía rol de coordinador o faltaban datos de contacto, enriquecer el existente sin duplicar
+      const existing = publishers[existingIndex];
+      const needsCoordRole = existing.theocraticRole !== 'coordinador' || existing.privilege !== 'anciano';
+      const needsPhone = !existing.phone && !!settings.coordinatorPhone;
+      const needsEmail = !existing.email && !!settings.coordinatorEmail;
+
+      if (needsCoordRole || needsPhone || needsEmail) {
+        const updatedCoord: Publisher = {
+          ...existing,
+          theocraticRole: 'coordinador',
+          privilege: 'anciano',
+          phone: existing.phone || settings.coordinatorPhone || '',
+          email: existing.email || settings.coordinatorEmail || '',
+          notes: existing.notes || 'Coordinador del Cuerpo de Ancianos',
+        };
+        const updatedList = [...publishers];
+        updatedList[existingIndex] = updatedCoord;
+        setPublishers(updatedList);
         try {
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(next));
+          localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(updatedList));
         } catch {}
-        return next;
-      });
-      saveToFirestore([...publishers, coordPub]);
+        saveToFirestore(updatedList);
+      }
+      return;
     }
+
+    const coordPub: Publisher = {
+      id: `pub-coord-${Date.now()}`,
+      name: coordName,
+      gender: 'hermano',
+      phone: settings.coordinatorPhone || '',
+      email: settings.coordinatorEmail || '',
+      notes: 'Coordinador del Cuerpo de Ancianos',
+      active: true,
+      groupNumber: 1,
+      privilege: 'anciano',
+      theocraticRole: 'coordinador',
+      hope: 'otras_ovejas',
+      absences: [],
+      roles: {
+        vym_presidente: true,
+        vym_oracion: true,
+        vym_tesoros_discurso: true,
+        vym_tesoros_perlas: true,
+        vym_tesoros_lectura: true,
+        vym_maestros_titular: true,
+        vym_maestros_ayudante: true,
+        vym_vida_partes: true,
+        vym_estudio_conductor: true,
+        vym_estudio_lector: true,
+        fds_presidente: true,
+        fds_atalaya_lector: true,
+        fds_oracion: true,
+        deber_acomodador: true,
+        deber_seguridad: true,
+        deber_audio: true,
+        deber_video: true,
+        deber_microfonos: true,
+        deber_plataforma: true,
+        deber_zoom: true,
+      },
+    };
+    setPublishers((prev) => {
+      const next = [...prev, coordPub];
+      try {
+        localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+    saveToFirestore([...publishers, coordPub]);
   }, [settings.coordinatorName, settings.isRegistered, publishers.length]);
 
   // Conflict detection for current week
@@ -1956,6 +2105,26 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // PUBLISHER ACTIONS
   const addPublisher = (pubData: Omit<Publisher, 'id'>) => {
+    // 1. Prevenir duplicados: verificar si ya existe un publicador equivalente por nombre, email o PIN
+    const existingIndex = publishers.findIndex(
+      (p) =>
+        isSamePublisher(p, pubData) ||
+        (pubData.name && areNamesEquivalent(p.name || (p as any).full_name, pubData.name))
+    );
+
+    if (existingIndex !== -1) {
+      const existing = publishers[existingIndex];
+      const merged = mergePublisherData(existing, pubData);
+      const updated = [...publishers];
+      updated[existingIndex] = merged;
+      setPublishers(updated);
+      try {
+        localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(updated));
+      } catch {}
+      saveToFirestore(updated);
+      return;
+    }
+
     const newPub: Publisher = {
       ...pubData,
       id: `pub-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -1963,6 +2132,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [...publishers, newPub];
     setPublishers(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(updated));
+    } catch {}
     saveToFirestore(updated);
   };
 
@@ -2207,13 +2379,81 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     await deletePublishersBatch([id]);
   };
 
+  const importPublishersBatch = (batch: Partial<Publisher>[]): number => {
+    if (!batch || batch.length === 0) return 0;
+
+    let importedCount = 0;
+    const currentPubs = [...publishers];
+
+    for (const item of batch) {
+      const name = item.name || (item as any).full_name;
+      if (!name) continue;
+
+      const existingIndex = currentPubs.findIndex(
+        (p) => isSamePublisher(p, item) || areNamesEquivalent(p.name || (p as any).full_name, name)
+      );
+
+      if (existingIndex !== -1) {
+        currentPubs[existingIndex] = mergePublisherData(currentPubs[existingIndex], item);
+      } else {
+        const isFemale = item.gender === 'hermana' || item.gender === 'female';
+        const newPub: Publisher = {
+          name,
+          full_name: name,
+          gender: isFemale ? 'hermana' : 'hermano',
+          phone: item.phone || '',
+          email: item.email || '',
+          address: item.address || '',
+          groupNumber: item.groupNumber || 1,
+          privilege: item.privilege || 'publicador_bautizado',
+          theocraticRole: item.theocraticRole,
+          pioneer_type: item.pioneer_type || 'none',
+          active: item.active !== false,
+          notes: item.notes || '',
+          absences: [],
+          roles: item.roles || {
+            vym_presidente: false,
+            vym_oracion: !isFemale,
+            vym_tesoros_discurso: false,
+            vym_tesoros_perlas: !isFemale,
+            vym_tesoros_lectura: !isFemale,
+            vym_maestros_titular: true,
+            vym_maestros_ayudante: true,
+            vym_vida_partes: false,
+            vym_estudio_conductor: false,
+            vym_estudio_lector: !isFemale,
+            fds_presidente: false,
+            fds_atalaya_lector: !isFemale,
+            fds_oracion: !isFemale,
+            deber_acomodador: !isFemale,
+            deber_seguridad: !isFemale,
+            deber_audio: !isFemale,
+            deber_video: !isFemale,
+            deber_microfonos: !isFemale,
+            deber_plataforma: !isFemale,
+            deber_zoom: true,
+          },
+          id: item.id || `pub-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+          createdAt: new Date().toISOString(),
+        };
+        currentPubs.push(newPub);
+        importedCount++;
+      }
+    }
+
+    setPublishers(currentPubs);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(currentPubs));
+    } catch {}
+    saveToFirestore(currentPubs);
+    return importedCount;
+  };
+
   const importPublishersFromCSV = (csvText: string): number => {
     const lines = csvText.trim().split(/\r?\n/);
     if (lines.length <= 1) return 0;
 
-    let importedCount = 0;
-    const newPublishers: Publisher[] = [...publishers];
-
+    const parsedBatch: Partial<Publisher>[] = [];
     // Check header or parse lines: Name, Gender, Phone, Group, Notes
     const startIndex = lines[0].toLowerCase().includes('nombre') ? 1 : 0;
 
@@ -2233,50 +2473,39 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const groupNum = parseInt(parts[3], 10) || 1;
       const notes = parts[4] || '';
 
-      // Default reasonable roles
-      const isMale = gender === 'hermano';
-      const roles: any = {
-        vym_presidente: false,
-        vym_oracion: isMale,
-        vym_tesoros_discurso: false,
-        vym_tesoros_perlas: isMale,
-        vym_tesoros_lectura: isMale,
-        vym_maestros_titular: true,
-        vym_maestros_ayudante: true,
-        vym_vida_partes: false,
-        vym_estudio_conductor: false,
-        vym_estudio_lector: isMale,
-        fds_presidente: false,
-        fds_atalaya_lector: isMale,
-        fds_oracion: isMale,
-        deber_acomodador: isMale,
-        deber_seguridad: isMale,
-        deber_audio: isMale,
-        deber_video: isMale,
-        deber_microfonos: isMale,
-        deber_plataforma: isMale,
-        deber_zoom: true,
-      };
-
-      const newP: Publisher = {
-        id: `pub-import-${Date.now()}-${i}`,
+      parsedBatch.push({
         name,
         gender,
         phone,
         groupNumber: groupNum,
         notes,
-        active: true,
-        absences: [],
-        roles,
-      };
-
-      newPublishers.push(newP);
-      importedCount++;
+      });
     }
 
-    setPublishers(newPublishers);
-    saveToFirestore(newPublishers);
-    return importedCount;
+    return importPublishersBatch(parsedBatch);
+  };
+
+  const cleanDuplicatePublishers = (): { mergedCount: number; remainingCount: number } => {
+    const { cleanList, mergedCount, idMap } = deduplicatePublishersList(publishers);
+    if (mergedCount > 0) {
+      setPublishers(cleanList);
+      try {
+        localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(cleanList));
+      } catch {}
+
+      // Reasignar semanas si hubo cambio de IDs
+      const { updatedWeeks, hasChanges } = reassignWeeksForDeduplicatedPublishers(weeks, idMap);
+      if (hasChanges) {
+        setWeeks(updatedWeeks);
+        try {
+          localStorage.setItem(`${LOCAL_STORAGE_KEY}_weeks`, JSON.stringify(updatedWeeks));
+        } catch {}
+        saveToFirestore(cleanList, updatedWeeks);
+      } else {
+        saveToFirestore(cleanList);
+      }
+    }
+    return { mergedCount, remainingCount: cleanList.length };
   };
 
   // WEEKS ACTIONS
@@ -3162,9 +3391,81 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, updated);
   };
 
-  const updatePreachingGroups = (groups: PreachingGroup[]) => {
+  const updatePreachingGroups = async (groups: PreachingGroup[]): Promise<void> => {
+    latestPreachingGroupsRef.current = groups;
     setPreachingGroups(groups);
-    saveToFirestore(publishers, weeks, groups);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_groups`, JSON.stringify(groups));
+    } catch {}
+
+    const nowISO = new Date().toISOString();
+    const congDocId = resolveCongregationDocId();
+
+    if (congDocId && congDocId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId)) {
+      try {
+        const canonical = formatCanonicalCongregationId(congDocId);
+        const unhyphenated = canonical.replace(/-/g, '');
+        const sanitizedGroups = sanitizeForFirestore(groups);
+
+        const groupPayload = {
+          preachingGroups: sanitizedGroups,
+          updatedAt: nowISO,
+        };
+
+        const canonicalRef = doc(db, 'congregations', canonical);
+        await setDoc(canonicalRef, groupPayload, { merge: true });
+
+        if (unhyphenated !== canonical && unhyphenated.length >= 3) {
+          await setDoc(doc(db, 'congregations', unhyphenated), groupPayload, { merge: true });
+        }
+
+        // Notificar en tiempo real a otras pestañas
+        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+          try {
+            const bc = new BroadcastChannel('kongre_cross_tab_sync');
+            bc.postMessage({ type: 'CONGREGATION_UPDATED', congregationId: canonical, timestamp: nowISO });
+            bc.close();
+          } catch {}
+        }
+        setSyncStatus('synced');
+      } catch (err: any) {
+        if (isQuotaError(err)) {
+          await markFirestoreQuotaExceeded();
+          setSyncStatus('offline');
+        } else {
+          console.warn('Error guardando grupos de predicación en Firestore:', err);
+        }
+      }
+    }
+
+    // Sincronizar también con el pipeline de guardado general inmediato
+    await saveToFirestore(
+      publishers,
+      weeks,
+      groups,
+      customDuties,
+      latestSettingsRef.current,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      { immediate: true }
+    );
   };
 
   const addCustomDuty = (dutyData: Omit<CustomDuty, 'id'>) => {
@@ -4808,6 +5109,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         deletePublisher,
         deletePublishersBatch,
         importPublishersFromCSV,
+        importPublishersBatch,
+        cleanDuplicatePublishers,
         updateWeek,
         addNextWeek,
         addWeekForDate,

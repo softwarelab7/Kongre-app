@@ -5,6 +5,7 @@ import { useCongregation } from '../context/CongregationContext';
 import type { Publisher, TheocraticPrivilege } from '../types';
 
 import { isGenericIdentityName } from '../utils/theocraticSecurity';
+import { areNamesEquivalent } from '../utils/publisherDeduplication';
 
 /**
  * Se muestra una sola vez cuando alguien entró con PIN pero el sistema aún no sabe su nombre.
@@ -42,7 +43,7 @@ export const IdentityNamePrompt: React.FC = () => {
 
     setIdentifiedBrother(clean);
 
-    const existing = publishers.find((p) => p.name.trim().toLowerCase() === clean.toLowerCase());
+    const existing = publishers.find((p) => areNamesEquivalent(p.name, clean));
     const isElder = activeRole === 'coordinador' || activeRole === 'secretario' || activeRole === 'superintendente_vym';
     const isSM = activeRole.startsWith('siervo_');
     const privilege: TheocraticPrivilege | undefined =
@@ -54,7 +55,10 @@ export const IdentityNamePrompt: React.FC = () => {
 
     let publisherId = existing?.id || '';
     if (existing) {
-      if (pin && existing.personalPin !== pin) updatePublisher({ ...existing, personalPin: pin });
+      const updated: Publisher = { ...existing };
+      if (pin && existing.personalPin !== pin) updated.personalPin = pin;
+      if (clean && clean !== existing.name) updated.name = clean;
+      updatePublisher(updated);
     } else {
       addPublisher({
         name: clean,

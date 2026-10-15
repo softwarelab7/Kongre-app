@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
 import { verifyPasscode, isCongregationIdString, isGenericIdentityName } from '../utils/theocraticSecurity';
+import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -268,7 +269,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         if (!isGenericIdentityName(finalBrotherName)) {
           const currentPubs = (cloudRes?.data?.publishers || publishers) as any[];
           const alreadyInList = currentPubs.some(
-            (p) => p.name && p.name.trim().toLowerCase() === finalBrotherName.toLowerCase()
+            (p) => p.name && areNamesEquivalent(p.name, finalBrotherName)
           );
           if (!alreadyInList) {
             const isElder = identifiedRole === 'coordinador' || identifiedRole === 'secretario' || identifiedRole === 'superintendente_vym';

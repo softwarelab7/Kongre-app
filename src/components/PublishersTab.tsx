@@ -35,6 +35,11 @@ import { usePermissions } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useModal } from '../context/ModalContext';
 import { exportPublishersToCsv, parsePublishersCsv } from '../utils/publisherExportImport';
+import {
+  areNamesEquivalent,
+  mergePublisherData,
+  deduplicatePublishersList,
+} from '../utils/publisherDeduplication';
 
 type ViewMode = 'list' | 'editor';
 type DisplayLayout = 'cards' | 'table';
@@ -51,6 +56,8 @@ export const PublishersTab: React.FC = () => {
     deletePublisher,
     preachingGroups,
     settings,
+    importPublishersBatch,
+    cleanDuplicatePublishers,
   } = useCongregation();
 
   const { showToast } = useToast();
@@ -70,6 +77,10 @@ export const PublishersTab: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [editingPublisher, setEditingPublisher] = useState<Publisher | null>(null);
   const [editorInitialTab, setEditorInitialTab] = useState<Tab>('all');
+
+  // Detección automática de publicadores duplicados
+  const duplicateInfo = useMemo(() => deduplicatePublishersList(publishers), [publishers]);
+  const duplicateCount = duplicateInfo.mergedCount;
 
   // Normalizar grupos de predicación
   const groups = useMemo(() => {
@@ -445,12 +456,8 @@ export const PublishersTab: React.FC = () => {
       });
 
       if (confirmed) {
-        let count = 0;
-        parsed.forEach((p) => {
-          addPublisher(p as any);
-          count++;
-        });
-        showToast(`¡Se importaron ${count} publicadores correctamente!`, 'success');
+        const count = importPublishersBatch(parsed);
+        showToast(`¡Se procesaron ${count} publicadores sin duplicados!`, 'success');
       }
     } catch (err: any) {
       showToast(`Error al procesar el archivo: ${err.message}`, 'error');
@@ -554,8 +561,14 @@ export const PublishersTab: React.FC = () => {
         updatePublisher(targetPayload);
         showToast('¡Cambios guardados con éxito!', 'success');
       } else {
-        addPublisher(targetPayload);
-        showToast('¡Nuevo publicador creado con éxito!', 'success');
+        const nameMatch = publishers.find((p) => areNamesEquivalent(p.name || (p as any).full_name, targetPayload.name));
+        if (nameMatch) {
+          updatePublisher(mergePublisherData(nameMatch, targetPayload));
+          showToast(`¡Se actualizaron los datos existentes de ${targetPayload.name || 'publicador'}!`, 'success');
+        } else {
+          addPublisher(targetPayload);
+          showToast('¡Nuevo publicador creado con éxito!', 'success');
+        }
       }
       setViewMode('list');
       setEditingPublisher(null);
@@ -664,6 +677,19 @@ export const PublishersTab: React.FC = () => {
               <Download size={14} /> <span className="hidden sm:inline">Exportar Excel</span>
             </button>
 
+            {duplicateCount > 0 && canEditPublishers && (
+              <button
+                onClick={() => {
+                  const { mergedCount } = cleanDuplicatePublishers();
+                  showToast(`¡Se fusionaron ${mergedCount} publicador(es) duplicado(s) exitosamente!`, 'success');
+                }}
+                title="Fusionar publicadores duplicados detectados"
+                className="flex items-center gap-1.5 px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 rounded-xl text-xs font-semibold transition-colors border border-amber-500/30 cursor-pointer animate-pulse"
+              >
+                <Sparkles size={14} /> <span>Fusionar ({duplicateCount})</span>
+              </button>
+            )}
+
             <button
               disabled={!canEditPublishers}
               onClick={() => {
@@ -677,6 +703,34 @@ export const PublishersTab: React.FC = () => {
           </div>
         }
       />
+
+      {/* Banner de alerta de duplicados detectados */}
+      {duplicateCount > 0 && canEditPublishers && (
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-800 dark:text-amber-200">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-amber-500/20 rounded-xl text-amber-600 dark:text-amber-400">
+              <Sparkles size={18} />
+            </div>
+            <div>
+              <p className="text-sm font-bold">
+                Se {duplicateCount === 1 ? 'ha detectado 1 publicador duplicado' : `han detectado ${duplicateCount} publicadores duplicados`} o con variantes de tildes
+              </p>
+              <p className="text-xs text-amber-700/80 dark:text-amber-300/80">
+                Puedes fusionar y unificar los registros sin perder las asignaciones de reuniones ni privilegios.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              const { mergedCount } = cleanDuplicatePublishers();
+              showToast(`¡Se fusionaron ${mergedCount} registro(s) duplicado(s) exitosamente!`, 'success');
+            }}
+            className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-xl transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
+          >
+            <Sparkles size={14} /> Unificar Duplicados Ahora
+          </button>
+        </div>
+      )}
 
       {/* Panel de Métricas Rápidas Teocráticas */}
       <div className="flex sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-3 overflow-x-auto no-scrollbar pb-1.5 sm:pb-0 touch-pan-x">

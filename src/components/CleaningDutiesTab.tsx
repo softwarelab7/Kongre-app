@@ -190,7 +190,7 @@ export const CleaningDutiesTab: React.FC = () => {
     setIsGroupModalOpen(true);
   };
 
-  const handleSaveGroup = (e: React.FormEvent) => {
+  const handleSaveGroup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!groupName.trim()) return;
 
@@ -206,7 +206,7 @@ export const CleaningDutiesTab: React.FC = () => {
             }
           : g
       );
-      updatePreachingGroups(updated);
+      await updatePreachingGroups(updated);
     } else {
       const newGroup: PreachingGroup = {
         number: groupNumber,
@@ -215,14 +215,14 @@ export const CleaningDutiesTab: React.FC = () => {
         assistantId: groupAssistant || undefined,
         memberIds: groupMembers,
       };
-      updatePreachingGroups([...preachingGroups, newGroup]);
+      await updatePreachingGroups([...preachingGroups, newGroup]);
     }
     setIsGroupModalOpen(false);
   };
 
-  const handleDeleteGroup = (num: number) => {
+  const handleDeleteGroup = async (num: number) => {
     if (confirm(`¿Eliminar el Grupo #${num}?`)) {
-      updatePreachingGroups(preachingGroups.filter(g => g.number !== num));
+      await updatePreachingGroups(preachingGroups.filter(g => g.number !== num));
     }
   };
 

@@ -20,8 +20,10 @@ import {
   X,
   Compass,
 } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 export const GruposServicioTab: React.FC = () => {
+  const { showToast } = useToast();
   const {
     preachingGroups,
     updatePreachingGroups,
@@ -37,6 +39,7 @@ export const GruposServicioTab: React.FC = () => {
 
   // Group edit / create modal
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [editingGroup, setEditingGroup] = useState<PreachingGroup | null>(null);
   const [groupFormData, setGroupFormData] = useState({
     number: 1,
@@ -125,46 +128,86 @@ export const GruposServicioTab: React.FC = () => {
     setIsGroupModalOpen(true);
   };
 
-  const handleSaveGroup = (e: React.FormEvent) => {
+  const handleSaveGroup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!groupFormData.name.trim()) return;
+    const groupName = groupFormData.name.trim();
+    if (!groupName || isSaving) return;
 
-    if (editingGroup) {
-      const updated = preachingGroups.map((g) =>
-        g.number === editingGroup.number
-          ? {
-              ...g,
-              name: groupFormData.name.trim(),
-              overseerId: groupFormData.overseerId || undefined,
-              assistantId: groupFormData.assistantId || undefined,
-            }
-          : g
-      );
-      updatePreachingGroups(updated);
-    } else {
-      const newGroup: PreachingGroup = {
-        number: groupFormData.number,
-        name: groupFormData.name.trim(),
-        overseerId: groupFormData.overseerId || undefined,
-        assistantId: groupFormData.assistantId || undefined,
-        memberIds: [],
-      };
-      updatePreachingGroups([...preachingGroups, newGroup]);
+    const groupNum = editingGroup ? editingGroup.number : (Number(groupFormData.number) || 1);
+    const existingMembers = publishers.filter((p) => p.groupNumber === groupNum).map((p) => p.id);
+
+    setIsSaving(true);
+    try {
+      if (editingGroup) {
+        const updated = preachingGroups.map((g) =>
+          g.number === editingGroup.number
+            ? {
+                ...g,
+                name: groupName,
+                overseerId: groupFormData.overseerId || undefined,
+                assistantId: groupFormData.assistantId || undefined,
+                memberIds: existingMembers,
+              }
+            : g
+        );
+        await updatePreachingGroups(updated);
+        showToast('¡Grupo actualizado y sincronizado en la nube!', 'success');
+      } else {
+        const newGroup: PreachingGroup = {
+          number: groupNum,
+          name: groupName,
+          overseerId: groupFormData.overseerId || undefined,
+          assistantId: groupFormData.assistantId || undefined,
+          memberIds: existingMembers,
+        };
+        await updatePreachingGroups([...preachingGroups, newGroup]);
+        showToast(`¡${groupName} creado y sincronizado en la nube!`, 'success');
+      }
+      setIsGroupModalOpen(false);
+    } catch (err: any) {
+      showToast('Error al guardar el grupo en la nube. Se guardó localmente.', 'error');
+    } finally {
+      setIsSaving(false);
     }
-
-    setIsGroupModalOpen(false);
   };
 
-  const handleDeleteGroup = (groupNumber: number) => {
+  const handleAutoCreateFirstGroup = async () => {
+    if (isSaving) return;
+    const coord = publishers.find((p) => p.theocraticRole === 'coordinador' || p.privilege === 'anciano');
+    const existingMembers = publishers.filter((p) => !p.groupNumber || p.groupNumber === 1).map((p) => p.id);
+    const g1: PreachingGroup = {
+      number: 1,
+      name: 'Grupo 1',
+      overseerId: coord?.id,
+      memberIds: existingMembers,
+    };
+    setIsSaving(true);
+    try {
+      await updatePreachingGroups([g1]);
+      showToast('¡Grupo 1 inicial creado y sincronizado en la nube!', 'success');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteGroup = async (groupNumber: number) => {
+    if (isSaving) return;
     const count = publishers.filter((p) => p.groupNumber === groupNumber).length;
     if (count > 0) {
-      alert(
-        `No se puede eliminar el Grupo ${groupNumber} porque tiene ${count} publicadores asignados. Primero reasígnelos a otro grupo.`
+      showToast(
+        `No se puede eliminar el Grupo ${groupNumber} porque tiene ${count} publicadores asignados. Primero reasígnelos a otro grupo.`,
+        'error'
       );
       return;
     }
     if (confirm(`¿Está seguro de eliminar el Grupo ${groupNumber}?`)) {
-      updatePreachingGroups(preachingGroups.filter((g) => g.number !== groupNumber));
+      setIsSaving(true);
+      try {
+        await updatePreachingGroups(preachingGroups.filter((g) => g.number !== groupNumber));
+        showToast(`Grupo ${groupNumber} eliminado de la nube`, 'success');
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -174,6 +217,7 @@ export const GruposServicioTab: React.FC = () => {
       ...movingPublisher,
       groupNumber: targetGroupNumber,
     });
+    showToast(`Se reasignó a ${movingPublisher.name} al Grupo ${targetGroupNumber}`, 'success');
     setMovingPublisher(null);
   };
 
@@ -638,9 +682,17 @@ export const GruposServicioTab: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
+                  disabled={isSaving}
+                  className="px-5 py-2 text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white shadow-xs flex items-center gap-1.5"
                 >
-                  Guardar Grupo
+                  {isSaving ? (
+                    <>
+                      <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
+                      <span>Guardando en la nube...</span>
+                    </>
+                  ) : (
+                    <span>Guardar Grupo</span>
+                  )}
                 </button>
               </div>
             </form>

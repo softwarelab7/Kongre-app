@@ -6,6 +6,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useSecurity } from '../context/SecurityContext';
 import { PWAInstallButton } from './PWAInstallButton';
 import { KongreLogo } from './KongreLogo';
+import Logo from '../Logo';
 import { getFriendlyCongregationName, isGenericIdentityName } from '../utils/theocraticSecurity';
 import { isTabAllowedForRole } from '../utils/rbac';
 import {
@@ -726,7 +727,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="w-10 h-10 flex items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95 mb-4 shrink-0 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 rounded-2xl"
             title="Kongre - Panorama General"
           >
-            <KongreLogo size="lg" className="w-10 h-10 rounded-2xl shadow-sm hover:shadow-md transition-shadow" />
+            <Logo variant="isotipo" className="w-10 h-10 object-contain shadow-xs hover:shadow-md transition-shadow" />
           </button>
 
           {/* Vertical Categories Stack */}
@@ -1247,7 +1248,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Drawer Header */}
             <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-slate-50/50 dark:bg-slate-800/40">
               <div className="flex items-center gap-2.5 min-w-0">
-                <KongreLogo size="lg" className="w-9 h-9 shadow-xs shrink-0" />
+                <Logo variant="isotipo" className="w-8 h-8 object-contain shrink-0" />
                 <div className="min-w-0">
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">
                     {displayCongregationName}

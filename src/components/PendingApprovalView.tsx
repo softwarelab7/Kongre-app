@@ -4,6 +4,7 @@ import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
 import { KongreLogo } from './KongreLogo';
+import Logo from '../Logo';
 import {
   Clock,
   ShieldCheck,
@@ -84,11 +85,8 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col justify-center items-center p-4">
       <div className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center">
         {/* Brand Emblem */}
-        <div className="flex items-center gap-2 mb-6">
-          <KongreLogo size="lg" />
-          <span className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
-            Kongre
-          </span>
+        <div className="flex items-center justify-center mb-6">
+          <Logo variant="horizontal" className="h-9 w-auto object-contain" />
         </div>
 
         {/* Status Icon */}

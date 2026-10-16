@@ -1,0 +1,83 @@
+/* Kongre - tema para Tailwind CSS v4
+   Pegar en tu CSS principal (por ejemplo src/index.css), despues de:
+   @import "tailwindcss";
+   Activar un tema:  document.documentElement.dataset.theme = 'light' | 'dark' | 'cabina'
+*/
+
+/* "dark:" aplica en Oscuro y en Cabina A/V (compatible con data-theme y clase .dark) */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, [data-theme="cabina"], [data-theme="cabina"] *, .dark, .dark *));
+@custom-variant cabina (&:where([data-theme="cabina"], [data-theme="cabina"] *, .theme-cabina, .theme-cabina *));
+
+/* Conecta las variables con clases: bg-brand, text-muted, border-line, etc. */
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-soft: var(--brand-soft);
+  --color-on-brand: var(--on-brand);
+  --color-app: var(--bg);
+  --color-surface: var(--surface);
+  --color-line: var(--border);
+  --color-ink: var(--text);
+  --color-muted: var(--text-muted);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--error);
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ---------- Claro (por defecto) ---------- */
+:root,
+[data-theme="light"] {
+  --brand: #4F46E5;
+  --brand-hover: #4338CA;
+  --brand-soft: #EEF2FF;
+  --on-brand: #FFFFFF;
+  --bg: #FFFFFF;
+  --surface: #F3F4F6;
+  --border: #E5E7EB;
+  --text: #111827;
+  --text-muted: #4B5563;
+  --success: #16A34A;
+  --warning: #F59E0B;
+  --error: #DC2626;
+  color-scheme: light;
+}
+
+/* ---------- Oscuro ---------- */
+[data-theme="dark"] {
+  --brand: #818CF8;
+  --brand-hover: #A5B4FC;
+  --brand-soft: #312E81;
+  --on-brand: #111827;
+  --bg: #111827;
+  --surface: #1F2937;
+  --border: #374151;
+  --text: #F9FAFB;
+  --text-muted: #9CA3AF;
+  --success: #22C55E;
+  --warning: #FBBF24;
+  --error: #F87171;
+  color-scheme: dark;
+}
+
+/* ---------- Cabina A/V ----------
+   Pensado para luz baja: negro puro y texto un poco atenuado
+   para que no deslumbre ni se vea desde la sala. Ajusta a tu gusto. */
+[data-theme="cabina"] {
+  --brand: #818CF8;
+  --brand-hover: #A5B4FC;
+  --brand-soft: #1E1B4B;
+  --on-brand: #000000;
+  --bg: #000000;
+  --surface: #0A0A0F;
+  --border: #27272A;
+  --text: #E5E7EB;
+  --text-muted: #9CA3AF;
+  --success: #22C55E;
+  --warning: #FBBF24;
+  --error: #F87171;
+  color-scheme: dark;
+}
+
+/* Evita el parpadeo blanco al cargar */
+html { background: var(--bg); color: var(--text); }

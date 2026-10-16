@@ -1,5 +1,5 @@
-// src/context/ThemeContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { applyTheme, Theme as BrandTheme } from '../theme';
 
 export type ThemeMode = 'light' | 'dark' | 'cabina';
 
@@ -16,7 +16,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [themeMode, setThemeModeState] = useState<ThemeMode>(() => {
     try {
-      const saved = localStorage.getItem('kongre_theme') as ThemeMode;
+      const saved = (localStorage.getItem('kongre-theme') || localStorage.getItem('kongre_theme')) as ThemeMode;
       if (saved && (saved === 'light' || saved === 'dark' || saved === 'cabina')) {
         return saved;
       }
@@ -30,23 +30,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
 
   const applyThemeToDOM = (mode: ThemeMode) => {
-    if (typeof document === 'undefined') return;
-    const root = document.documentElement;
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
-
-    if (mode === 'light') {
-      root.classList.remove('dark');
-      root.classList.remove('theme-cabina');
-      if (metaTheme) metaTheme.setAttribute('content', '#4f46e5');
-    } else if (mode === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('theme-cabina');
-      if (metaTheme) metaTheme.setAttribute('content', '#0f172a');
-    } else if (mode === 'cabina') {
-      root.classList.add('dark');
-      root.classList.add('theme-cabina');
-      if (metaTheme) metaTheme.setAttribute('content', '#000000');
-    }
+    applyTheme(mode as BrandTheme);
   };
 
   useEffect(() => {

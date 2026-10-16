@@ -18,6 +18,7 @@ import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import { COUNTRIES_WITH_CITIES, COUNTRIES_LIST } from '../data/countriesAndCities';
 import { SearchableCombobox } from './SearchableCombobox';
 import { KongreLogo } from './KongreLogo';
+import Logo from '../Logo';
 import {
   Building2,
   Calendar,
@@ -1476,7 +1477,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
           </button>
 
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <KongreLogo size="xs" />
+            <Logo variant="isotipo" className="w-5 h-5 object-contain" />
             <span className="hidden sm:inline">Kongre • Registro de Congregación</span>
           </div>
         </div>

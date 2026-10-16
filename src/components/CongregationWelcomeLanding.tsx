@@ -35,6 +35,7 @@ import {
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 import { PendingApprovalView } from './PendingApprovalView';
 import { KongreLogo } from './KongreLogo';
+import Logo from '../Logo';
 import { auth } from '../firebase/config';
 
 interface CongregationWelcomeLandingProps {
@@ -678,11 +679,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       <header className="w-full bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
         {/* Logo and Brand */}
         <div className="flex items-center gap-2.5">
-          {/* Kongre Official 4-square panel Logo */}
-          <KongreLogo size="md" />
-          <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
-            Kongre
-          </span>
+          <Logo variant="horizontal" className="h-7 w-auto object-contain" />
         </div>
 
         {/* Right Actions: Theme Switch */}
@@ -790,7 +787,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 {/* Top utility row: Logo, Section Badge & Back Button */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <KongreLogo size="xs" />
+                    <Logo variant="isotipo" className="w-5 h-5 object-contain" />
                     <span className="text-[11px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                       Kongre • {
                         activeTab === 'home'

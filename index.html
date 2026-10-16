@@ -11,21 +11,48 @@
     <meta name="twitter:card" content="summary_large_image" />
 
     <!-- PWA & Mobile Web App Meta Tags -->
-    <meta name="theme-color" content="#4f46e5" />
+    <meta name="theme-color" content="#4F46E5" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Kongre" />
-    <!-- Favicon & App Icons -->
-    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="shortcut icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <!-- Kongre Web Pack Head Snippet -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta property="og:image" content="https://kongre.ai.studio/og-image-1200x630.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:image" content="https://kongre.ai.studio/og-image-1200x630.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Aplica el tema guardado ANTES de pintar (evita parpadeo). Debe ir antes del script de la app. -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('kongre-theme') || localStorage.getItem('kongre_theme');
+          if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          document.documentElement.dataset.theme = t;
+          if (t === 'dark' || t === 'cabina') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+          if (t === 'cabina') {
+            document.documentElement.classList.add('theme-cabina');
+          } else {
+            document.documentElement.classList.remove('theme-cabina');
+          }
+          var c = { light: '#4F46E5', dark: '#111827', cabina: '#000000' }[t] || '#4F46E5';
+          var m = document.querySelector('meta[name="theme-color"]');
+          if (m) m.setAttribute('content', c);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body class="bg-slate-50 text-slate-900 antialiased selection:bg-indigo-500 selection:text-white">
     <div id="root"></div>

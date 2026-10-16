@@ -4,6 +4,7 @@ import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { PreachingGroup, CustomDuty, FieldServiceMeeting, Gender, WeekSchedule } from '../types';
 import { AssignmentSelectorModal } from './AssignmentSelectorModal';
+import { SplashCheckbox } from './SplashCheckbox';
 import { openWhatsAppLink } from '../utils/whatsapp';
 import {
   Brush,
@@ -1517,24 +1518,20 @@ export const CleaningDutiesTab: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <span className="text-xs font-bold text-slate-700 block mb-1">Aplica en:</span>
-                  <label className="flex items-center gap-2 text-xs cursor-pointer">
-                    <input
-                      type="checkbox"
+                  <div className="flex flex-col gap-2 pt-1">
+                    <SplashCheckbox
+                      size="sm"
                       checked={dutyMidweek}
                       onChange={e => setDutyMidweek(e.target.checked)}
-                      className="rounded text-indigo-600"
+                      label="Entre semana"
                     />
-                    <span>Entre semana</span>
-                  </label>
-                  <label className="flex items-center gap-2 text-xs cursor-pointer">
-                    <input
-                      type="checkbox"
+                    <SplashCheckbox
+                      size="sm"
                       checked={dutyWeekend}
                       onChange={e => setDutyWeekend(e.target.checked)}
-                      className="rounded text-indigo-600"
+                      label="Fin de semana"
                     />
-                    <span>Fin de semana</span>
-                  </label>
+                  </div>
                 </div>
 
                 <div>

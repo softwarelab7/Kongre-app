@@ -5,6 +5,7 @@ import { generateProgramPdf, generateS89Pdf } from '../utils/pdfGenerator';
 import { createAssignmentWhatsAppMessage, openWhatsAppLink } from '../utils/whatsapp';
 import { exportScheduleToCsvExcel } from '../utils/excelExport';
 import { downloadMonthIcsSchedule } from '../utils/calendarExport';
+import { SplashCheckbox } from './SplashCheckbox';
 import {
   FileText,
   Printer,
@@ -273,42 +274,32 @@ export const ExportPdfTab: React.FC = () => {
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
                 3. Secciones a Incluir
               </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
+              <div className="flex flex-col gap-2 pt-1">
+                <SplashCheckbox
+                  size="sm"
                   checked={showMidweek}
                   onChange={e => setShowMidweek(e.target.checked)}
-                  className="rounded text-indigo-600"
+                  label="Reunión de Entre Semana (Vida y Ministerio)"
                 />
-                <span>Reunión de Entre Semana (Vida y Ministerio)</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
+                <SplashCheckbox
+                  size="sm"
                   checked={showWeekend}
                   onChange={e => setShowWeekend(e.target.checked)}
-                  className="rounded text-indigo-600"
+                  label="Reunión de Fin de Semana (Discurso / Atalaya)"
                 />
-                <span>Reunión de Fin de Semana (Discurso / Atalaya)</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
+                <SplashCheckbox
+                  size="sm"
                   checked={showDuties}
                   onChange={e => setShowDuties(e.target.checked)}
-                  className="rounded text-indigo-600"
+                  label="Deberes Operativos (Audio, Video, Mics, Acomodadores)"
                 />
-                <span>Deberes Operativos (Audio, Video, Mics, Acomodadores)</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
+                <SplashCheckbox
+                  size="sm"
                   checked={showCleaning}
                   onChange={e => setShowCleaning(e.target.checked)}
-                  className="rounded text-indigo-600"
+                  label="Limpieza del Salón del Reino"
                 />
-                <span>Limpieza del Salón del Reino</span>
-              </label>
+              </div>
             </div>
 
             {/* Print and Download buttons */}
@@ -695,11 +686,10 @@ export const ExportPdfTab: React.FC = () => {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
+                      <SplashCheckbox
+                        size="sm"
                         checked={isNotified}
                         onChange={() => toggleNotified(item.id)}
-                        className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                         title="Marcar como ya notificado"
                       />
                       <div>

@@ -41,6 +41,7 @@ import {
   Flame,
   ArrowUpDown,
 } from 'lucide-react';
+import { SplashCheckbox } from './SplashCheckbox';
 
 export const LiteraturaTab: React.FC = () => {
   const {
@@ -473,17 +474,16 @@ export const LiteraturaTab: React.FC = () => {
               </select>
 
               {/* Low stock toggle */}
-              <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={onlyLowStock}
-                  onChange={e => setOnlyLowStock(e.target.checked)}
-                  className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500"
-                />
-                <span className={onlyLowStock ? 'text-amber-800 font-bold' : ''}>
-                  Solo Stock Bajo / Agotado
-                </span>
-              </label>
+              <SplashCheckbox
+                size="sm"
+                checked={onlyLowStock}
+                onChange={e => setOnlyLowStock(e.target.checked)}
+                label={
+                  <span className={onlyLowStock ? 'text-amber-800 dark:text-amber-400 font-bold' : ''}>
+                    Solo Stock Bajo / Agotado
+                  </span>
+                }
+              />
             </div>
 
             <button

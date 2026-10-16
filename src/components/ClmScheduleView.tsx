@@ -10,6 +10,7 @@ import { ClmWeeklyConflictsModal } from './ClmWeeklyConflictsModal';
 import { ClmMonthlyBillboardModal } from './ClmMonthlyBillboardModal';
 import { ClmAuxiliaryCounselorModal } from './ClmAuxiliaryCounselorModal';
 import { ClmAiSuggestionsModal } from './ClmAiSuggestionsModal';
+import { SplashCheckbox } from './SplashCheckbox';
 import { generateCounselorSheetPdf } from '../utils/clmCounselorPdf';
 import { useCongregation } from '../context/CongregationContext';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek } from '../utils/organizedSync';
@@ -1904,15 +1905,14 @@ export default function ClmScheduleView({
             </div>
 
             {/* Checkbox de Sala Auxiliar */}
-            <label className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-700 dark:text-zinc-200 shadow-2xs cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors select-none">
-              <input
-                type="checkbox"
+            <div className="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 shadow-2xs hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors select-none">
+              <SplashCheckbox
+                size="sm"
                 checked={showAuxRoom}
                 onChange={(e) => handleToggleAuxRoom(e.target.checked)}
-                className="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 border-slate-300 cursor-pointer"
+                label="Sala Auxiliar"
               />
-              <span>Sala Auxiliar</span>
-            </label>
+            </div>
           </div>
 
           {/* Selector de sala standalone */}
@@ -2004,18 +2004,17 @@ export default function ClmScheduleView({
             </div>
 
             {/* Checkbox discreto para activar Sala Auxiliar */}
-            <label
-              className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white text-xs font-medium cursor-pointer transition-colors select-none"
+            <div
+              className="px-2 py-1 rounded-lg text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white transition-colors select-none"
               title="Activar o desactivar Sala Auxiliar"
             >
-              <input
-                type="checkbox"
+              <SplashCheckbox
+                size="sm"
                 checked={showAuxRoom}
                 onChange={(e) => handleToggleAuxRoom(e.target.checked)}
-                className="rounded text-indigo-600 focus:ring-indigo-500 w-3.5 h-3.5 border-slate-300 cursor-pointer"
+                label="Sala Auxiliar"
               />
-              <span className="text-[11px] font-semibold">Sala Auxiliar</span>
-            </label>
+            </div>
 
             {/* Acceso a Consejero si la sala auxiliar está activa */}
             {showAuxRoom && (

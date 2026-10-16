@@ -22,6 +22,7 @@ import {
   Bot,
 } from 'lucide-react';
 import { generateNoticeWithGemini, isGeminiConfigured } from '../services/geminiService';
+import { SplashCheckbox } from './SplashCheckbox';
 
 export const TableroAnunciosTab: React.FC = () => {
   const { notices, addNotice, updateNotice, deleteNotice, settings } = useCongregation();
@@ -515,15 +516,12 @@ export const TableroAnunciosTab: React.FC = () => {
               </div>
 
               <div className="pt-1">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={formData.pinned}
-                    onChange={(e) => setFormData({ ...formData, pinned: e.target.checked })}
-                    className="w-4 h-4 rounded text-indigo-600"
-                  />
-                  <span>Fijar este anuncio al inicio del tablero</span>
-                </label>
+                <SplashCheckbox
+                  size="sm"
+                  checked={formData.pinned}
+                  onChange={(e) => setFormData({ ...formData, pinned: e.target.checked })}
+                  label="Fijar este anuncio al inicio del tablero"
+                />
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">

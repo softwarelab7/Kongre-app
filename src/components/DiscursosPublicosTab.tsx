@@ -32,6 +32,7 @@ import {
   Clock,
   Sparkles,
 } from 'lucide-react';
+import { SplashCheckbox } from './SplashCheckbox';
 
 export const DiscursosPublicosTab: React.FC = () => {
   const {
@@ -1321,13 +1322,12 @@ export const DiscursosPublicosTab: React.FC = () => {
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <input
-                        type="checkbox"
+                      <SplashCheckbox
+                        size="sm"
                         checked={Boolean(isPrepared)}
                         onChange={() =>
                           handleToggleOutlinePrepared(pub.id, selectedOutlineForBrothers.number)
                         }
-                        className="w-4 h-4 rounded-md text-indigo-600 focus:ring-indigo-500"
                       />
                       <div>
                         <span className="font-semibold text-slate-900 text-xs">{pub.name}</span>

@@ -36,6 +36,7 @@ import {
   X,
   ExternalLink,
 } from 'lucide-react';
+import { SplashCheckbox } from './SplashCheckbox';
 
 export const VisitaSuperintendenteTab: React.FC = () => {
   const {
@@ -899,12 +900,12 @@ ${ministryList}`;
                       : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700'
                   }`}
                 >
-                  <div className="mt-0.5">
-                    {item.completed ? (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                    ) : (
-                      <Square className="w-5 h-5 text-slate-300 shrink-0" />
-                    )}
+                  <div className="mt-0.5 pointer-events-none">
+                    <SplashCheckbox
+                      size="sm"
+                      checked={item.completed}
+                      readOnly
+                    />
                   </div>
 
                   <div className="flex-1 space-y-1">
@@ -1165,17 +1166,13 @@ ${ministryList}`;
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="confirmCheck"
+              <div className="pt-2">
+                <SplashCheckbox
+                  size="sm"
                   checked={mealFormData.isConfirmed}
                   onChange={e => setMealFormData({ ...mealFormData, isConfirmed: e.target.checked })}
-                  className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                  label="Comida confirmada con los anfitriones"
                 />
-                <label htmlFor="confirmCheck" className="text-slate-700 font-medium">
-                  Comida confirmada con los anfitriones
-                </label>
               </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t">

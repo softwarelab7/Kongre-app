@@ -21,6 +21,7 @@ import { StudentS38HistoryModal } from './StudentS38HistoryModal';
 import { ConflictsModal } from './ConflictsModal';
 import ClmScheduleView from './ClmScheduleView';
 import { SectionHeader } from './SectionHeader';
+import { SplashCheckbox } from './SplashCheckbox';
 import { createAssignmentWhatsAppMessage, openWhatsAppLink } from '../utils/whatsapp';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganizedSync } from '../utils/organizedSync';
 import { createDefaultPrograma } from '../utils/clmDefaultProgram';
@@ -1999,25 +2000,19 @@ export const ScheduleTab: React.FC = () => {
 
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
                 <span className="text-xs font-bold text-slate-800">Bloqueo de reuniones ordinarias:</span>
-                <div className="space-y-1 text-xs">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={noMidweek}
-                      onChange={e => setNoMidweek(e.target.checked)}
-                      className="rounded text-indigo-600"
-                    />
-                    <span>NO hay reunión de entre semana</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={noWeekend}
-                      onChange={e => setNoWeekend(e.target.checked)}
-                      className="rounded text-indigo-600"
-                    />
-                    <span>NO hay reunión de fin de semana</span>
-                  </label>
+                <div className="flex flex-col gap-2 pt-1">
+                  <SplashCheckbox
+                    size="sm"
+                    checked={noMidweek}
+                    onChange={e => setNoMidweek(e.target.checked)}
+                    label="NO hay reunión de entre semana"
+                  />
+                  <SplashCheckbox
+                    size="sm"
+                    checked={noWeekend}
+                    onChange={e => setNoWeekend(e.target.checked)}
+                    label="NO hay reunión de fin de semana"
+                  />
                 </div>
               </div>
 

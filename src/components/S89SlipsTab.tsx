@@ -5,6 +5,7 @@ import { S89Slip, Publisher } from '../types';
 import { OFFICIAL_STUDENT_LESSONS } from '../utils/theocraticData';
 import { generateConfirmationUrl } from '../utils/whatsapp';
 import { BatchWhatsAppModal } from './BatchWhatsAppModal';
+import { SplashCheckbox } from './SplashCheckbox';
 import {
   FileText,
   Printer,
@@ -362,24 +363,18 @@ export const S89SlipsTab: React.FC = () => {
                   <div className="pt-1">
                     <span className="font-bold text-slate-700 block mb-1">Se presentará en:</span>
                     <div className="flex items-center gap-4 text-xs font-semibold">
-                      <label className="flex items-center gap-1.5">
-                        <input
-                          type="checkbox"
-                          readOnly
-                          checked={slip.room === 'principal'}
-                          className="rounded text-indigo-600"
-                        />
-                        <span>Sala Principal</span>
-                      </label>
-                      <label className="flex items-center gap-1.5">
-                        <input
-                          type="checkbox"
-                          readOnly
-                          checked={slip.room === 'auxiliar'}
-                          className="rounded text-indigo-600"
-                        />
-                        <span>Sala Auxiliar</span>
-                      </label>
+                      <SplashCheckbox
+                        size="sm"
+                        readOnly
+                        checked={slip.room === 'principal'}
+                        label="Sala Principal"
+                      />
+                      <SplashCheckbox
+                        size="sm"
+                        readOnly
+                        checked={slip.room === 'auxiliar'}
+                        label="Sala Auxiliar"
+                      />
                     </div>
                   </div>
 

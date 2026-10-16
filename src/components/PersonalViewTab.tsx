@@ -4,6 +4,7 @@ import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { AssignmentStatus, MonthlyServiceReport, PublisherAbsence } from '../types';
 import { generateGoogleCalendarUrl, downloadSingleIcsEvent } from '../utils/calendarExport';
+import { SplashCheckbox } from './SplashCheckbox';
 import {
   UserCheck,
   Calendar,
@@ -1449,24 +1450,16 @@ export const PersonalViewTab: React.FC = () => {
             {/* Campos del Formulario S-4 */}
             <div className="space-y-5">
               {/* 1. Casilla de Participación */}
-              <label className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                <input
-                  type="checkbox"
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <SplashCheckbox
                   checked={reportForm.participated}
                   onChange={(e) =>
                     setReportForm({ ...reportForm, participated: e.target.checked })
                   }
-                  className="w-5 h-5 rounded-lg text-purple-600 focus:ring-purple-500 cursor-pointer"
+                  label="He participado en el ministerio durante este mes"
+                  description="Requisito de participación activa en el ministerio para publicadores de congregación."
                 />
-                <div>
-                  <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white block">
-                    He participado en el ministerio durante este mes
-                  </span>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">
-                    Requisito de participación activa en el ministerio para publicadores de congregación.
-                  </span>
-                </div>
-              </label>
+              </div>
 
               {/* 2. Horas */}
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">

@@ -33,6 +33,7 @@ import {
   Sparkles,
   ExternalLink,
 } from 'lucide-react';
+import { SplashCheckbox } from './SplashCheckbox';
 
 export const TarjetasS21Tab: React.FC = () => {
   const {
@@ -976,15 +977,14 @@ export const TarjetasS21Tab: React.FC = () => {
             </div>
 
             <div className="space-y-3.5 text-xs">
-              <label className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer">
-                <input
-                  type="checkbox"
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+                <SplashCheckbox
+                  size="sm"
                   checked={editingMonth.participated}
                   onChange={(e) => setEditingMonth({ ...editingMonth, participated: e.target.checked })}
-                  className="w-4 h-4 text-emerald-600 rounded"
+                  label="¿Participó en el ministerio este mes?"
                 />
-                <span className="font-bold text-slate-800">¿Participó en el ministerio este mes?</span>
-              </label>
+              </div>
 
               {editingMonth.participated && (
                 <>
@@ -1013,15 +1013,14 @@ export const TarjetasS21Tab: React.FC = () => {
                     </div>
                   </div>
 
-                  <label className="flex items-center gap-2 p-2 rounded-xl bg-indigo-50 border border-indigo-200 cursor-pointer">
-                    <input
-                      type="checkbox"
+                  <div className="p-2 rounded-xl bg-indigo-50 border border-indigo-200">
+                    <SplashCheckbox
+                      size="sm"
                       checked={!!editingMonth.isAuxiliaryPioneer}
                       onChange={(e) => setEditingMonth({ ...editingMonth, isAuxiliaryPioneer: e.target.checked })}
-                      className="w-4 h-4 text-indigo-600 rounded"
+                      label="Sirvió como Precursor Auxiliar"
                     />
-                    <span className="font-bold text-indigo-900">Sirvió como Precursor Auxiliar</span>
-                  </label>
+                  </div>
                 </>
               )}
 

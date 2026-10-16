@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { HospitalityHost, Publisher } from '../types';
 import { SectionHeader } from './SectionHeader';
+import { SplashCheckbox } from './SplashCheckbox';
 import {
   Coffee,
   Plus,
@@ -595,17 +596,14 @@ export const HospitalidadTab: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col justify-end">
-                  <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                    <input
-                      type="checkbox"
+                  <div className="p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <SplashCheckbox
+                      size="sm"
                       checked={isActive}
                       onChange={e => setIsActive(e.target.checked)}
-                      className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500"
+                      label="Disponible para recibir oradores"
                     />
-                    <span className="text-xs font-bold text-slate-800 dark:text-white">
-                      Disponible para recibir oradores
-                    </span>
-                  </label>
+                  </div>
                 </div>
               </div>
 

@@ -56,6 +56,7 @@ import {
 import { SectionHeader } from './SectionHeader';
 import { JoinCongregationModal } from './JoinCongregationModal';
 import { InvitationManagerModal } from './InvitationManagerModal';
+import { SplashCheckbox } from './SplashCheckbox';
 import {
   getGeminiApiKey,
   setGeminiApiKey,
@@ -1500,76 +1501,44 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
 
               <div className="space-y-3 text-xs">
                 {/* Rule 1: Part + Duty clash */}
-                <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
-                  <input
-                    type="checkbox"
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+                  <SplashCheckbox
                     checked={allowPartAndDuty}
                     onChange={(e) => setAllowPartAndDuty(e.target.checked)}
-                    className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
+                    label="Permitir que quien tenga una parte en el programa tenga también un deber"
+                    description="Si se desmarca (recomendado), el sistema generará un error crítico si alguien con parte en plataforma es asignado simultáneamente a Audio, Video, Micrófonos o Acomodador."
                   />
-                  <div>
-                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">
-                      Permitir que quien tenga una parte en el programa tenga también un deber
-                    </p>
-                    <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                      Si se desmarca (recomendado), el sistema generará un error crítico si alguien con parte en plataforma es asignado simultáneamente a Audio, Video, Micrófonos o Acomodador.
-                    </p>
-                  </div>
-                </label>
+                </div>
 
                 {/* Rule 2: Audio + Mic clash */}
-                <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
-                  <input
-                    type="checkbox"
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+                  <SplashCheckbox
                     checked={allowAudioAndMics}
                     onChange={(e) => setAllowAudioAndMics(e.target.checked)}
-                    className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
+                    label="Permitir que el operador de Audio/Video haga micrófonos al mismo tiempo"
+                    description="Si se desmarca, evitará que una persona que debe estar en cabina técnica sea asignada a correr micrófonos o estar en la puerta."
                   />
-                  <div>
-                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">
-                      Permitir que el operador de Audio/Video haga micrófonos al mismo tiempo
-                    </p>
-                    <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                      Si se desmarca, evitará que una persona que debe estar en cabina técnica sea asignada a correr micrófonos o estar en la puerta.
-                    </p>
-                  </div>
-                </label>
+                </div>
 
                 {/* Rule 3: President clash */}
-                <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
-                  <input
-                    type="checkbox"
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+                  <SplashCheckbox
                     checked={allowPresAndPart}
                     onChange={(e) => setAllowPresAndPart(e.target.checked)}
-                    className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
+                    label="Permitir que el Presidente de la reunión tenga otra parte o deber"
+                    description="Si se desmarca, alertará para que el presidente se enfoque exclusivamente en dirigir la reunión."
                   />
-                  <div>
-                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">
-                      Permitir que el Presidente de la reunión tenga otra parte o deber
-                    </p>
-                    <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                      Si se desmarca, alertará para que el presidente se enfoque exclusivamente en dirigir la reunión.
-                    </p>
-                  </div>
-                </label>
+                </div>
 
                 {/* Rule 4: Sister demonstrations */}
-                <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
-                  <input
-                    type="checkbox"
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors">
+                  <SplashCheckbox
                     checked={enforceSisters}
                     onChange={(e) => setEnforceSisters(e.target.checked)}
-                    className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
+                    label="Exigir que la ayudante de una hermana titular sea siempre otra hermana"
+                    description="Alineado con las directrices de la Escuela del Ministerio Teocrático / Vida y Ministerio."
                   />
-                  <div>
-                    <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">
-                      Exigir que la ayudante de una hermana titular sea siempre otra hermana
-                    </p>
-                    <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                      Alineado con las directrices de la Escuela del Ministerio Teocrático / Vida y Ministerio.
-                    </p>
-                  </div>
-                </label>
+                </div>
 
                 {/* Consecutive weeks control */}
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-4">

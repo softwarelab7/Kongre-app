@@ -39,6 +39,7 @@ import {
   ShieldCheck,
   PieChart,
 } from 'lucide-react';
+import { SplashCheckbox } from './SplashCheckbox';
 
 export const CuentasTab: React.FC = () => {
   const {
@@ -810,42 +811,33 @@ export const CuentasTab: React.FC = () => {
                 </div>
 
                 {/* Audit Checklist Items */}
-                <div className="space-y-1.5 text-xs">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={audit.reviewedReceipts}
-                      onChange={(e) =>
-                        updateQuarterlyAudit({ ...audit, reviewedReceipts: e.target.checked })
-                      }
-                      className="w-4 h-4 text-indigo-600 rounded"
-                    />
-                    <span className="text-slate-800">Facturas y recibos de gastos comprobados</span>
-                  </label>
+                <div className="flex flex-col gap-2 pt-1 text-xs">
+                  <SplashCheckbox
+                    size="sm"
+                    checked={audit.reviewedReceipts}
+                    onChange={(e) =>
+                      updateQuarterlyAudit({ ...audit, reviewedReceipts: e.target.checked })
+                    }
+                    label="Facturas y recibos de gastos comprobados"
+                  />
 
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={audit.verifiedBankStatements}
-                      onChange={(e) =>
-                        updateQuarterlyAudit({ ...audit, verifiedBankStatements: e.target.checked })
-                      }
-                      className="w-4 h-4 text-indigo-600 rounded"
-                    />
-                    <span className="text-slate-800">Extractos bancarios y conciliación cotejados</span>
-                  </label>
+                  <SplashCheckbox
+                    size="sm"
+                    checked={audit.verifiedBankStatements}
+                    onChange={(e) =>
+                      updateQuarterlyAudit({ ...audit, verifiedBankStatements: e.target.checked })
+                    }
+                    label="Extractos bancarios y conciliación cotejados"
+                  />
 
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={audit.checkedS30Announcements}
-                      onChange={(e) =>
-                        updateQuarterlyAudit({ ...audit, checkedS30Announcements: e.target.checked })
-                      }
-                      className="w-4 h-4 text-indigo-600 rounded"
-                    />
-                    <span className="text-slate-800">Informes S-30 leídos a la congregación verificados</span>
-                  </label>
+                  <SplashCheckbox
+                    size="sm"
+                    checked={audit.checkedS30Announcements}
+                    onChange={(e) =>
+                      updateQuarterlyAudit({ ...audit, checkedS30Announcements: e.target.checked })
+                    }
+                    label="Informes S-30 leídos a la congregación verificados"
+                  />
                 </div>
 
                 {audit.findingsNotes && (

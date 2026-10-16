@@ -1,6 +1,6 @@
-// src/components/maintenance/MaintenanceSheetCard.tsx
 import React, { useState } from 'react';
 import { MaintenanceSheet, Publisher } from '../../types';
+import { SplashCheckbox } from '../SplashCheckbox';
 import {
   Wrench,
   ShieldAlert,
@@ -193,26 +193,27 @@ export const MaintenanceSheetCard: React.FC<MaintenanceSheetCardProps> = ({
             {isChecklistExpanded && (
               <div className="mt-2 space-y-1 bg-zinc-50 dark:bg-black/20 p-2.5 rounded-xl border border-zinc-200/80 dark:border-white/[0.06]">
                 {sheet.checklist.map((item) => (
-                  <label
+                  <div
                     key={item.id}
-                    className="flex items-start gap-2 text-xs cursor-pointer p-1 rounded hover:bg-white dark:hover:bg-white/[0.04] transition-colors"
+                    className="p-1 rounded hover:bg-white dark:hover:bg-white/[0.04] transition-colors"
                   >
-                    <input
-                      type="checkbox"
+                    <SplashCheckbox
+                      size="sm"
                       checked={item.completed}
                       onChange={() => onToggleChecklistItem(sheet.id, item.id)}
-                      className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500 border-zinc-300 dark:border-white/[0.2]"
+                      label={
+                        <span
+                          className={`leading-snug text-xs ${
+                            item.completed
+                              ? 'line-through text-zinc-400 dark:text-zinc-500'
+                              : 'text-zinc-700 dark:text-zinc-300'
+                          }`}
+                        >
+                          {item.text}
+                        </span>
+                      }
                     />
-                    <span
-                      className={`leading-snug ${
-                        item.completed
-                          ? 'line-through text-zinc-400 dark:text-zinc-500'
-                          : 'text-zinc-700 dark:text-zinc-300'
-                      }`}
-                    >
-                      {item.text}
-                    </span>
-                  </label>
+                  </div>
                 ))}
               </div>
             )}

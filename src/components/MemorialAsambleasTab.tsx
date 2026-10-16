@@ -46,6 +46,7 @@ import {
   BookOpen,
   Volume2,
 } from 'lucide-react';
+import { SplashCheckbox } from './SplashCheckbox';
 
 export const MemorialAsambleasTab: React.FC = () => {
   const {
@@ -1884,17 +1885,14 @@ export const MemorialAsambleasTab: React.FC = () => {
 
             {/* Reported Checkbox */}
             <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
-              <label className="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={currentPlan.report.reportedToBranch}
-                  onChange={e =>
-                    handleUpdatePlanField('report.reportedToBranch', e.target.checked)
-                  }
-                  className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500"
-                />
-                <span>Marcar como Enviado a la Sucursal (jw.org / Hub Betel)</span>
-              </label>
+              <SplashCheckbox
+                size="sm"
+                checked={currentPlan.report.reportedToBranch}
+                onChange={e =>
+                  handleUpdatePlanField('report.reportedToBranch', e.target.checked)
+                }
+                label="Marcar como Enviado a la Sucursal (jw.org / Hub Betel)"
+              />
 
               {currentPlan.report.reportedToBranch && (
                 <div className="flex items-center gap-2 text-xs text-slate-600">
@@ -2247,15 +2245,12 @@ export const MemorialAsambleasTab: React.FC = () => {
 
               {/* Bus toggle */}
               <div className="p-3 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
-                <label className="flex items-center gap-2 font-bold text-slate-800 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={newAssembly.hasBus}
-                    onChange={e => setNewAssembly({ ...newAssembly, hasBus: e.target.checked })}
-                    className="w-4 h-4 rounded text-indigo-600"
-                  />
-                  <span>Contratar Autobús de la Congregación</span>
-                </label>
+                <SplashCheckbox
+                  size="sm"
+                  checked={newAssembly.hasBus}
+                  onChange={e => setNewAssembly({ ...newAssembly, hasBus: e.target.checked })}
+                  label="Contratar Autobús de la Congregación"
+                />
 
                 {newAssembly.hasBus && (
                   <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200">

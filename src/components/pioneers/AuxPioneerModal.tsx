@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   FileText,
 } from 'lucide-react';
+import { SplashCheckbox } from '../SplashCheckbox';
 
 interface AuxPioneerModalProps {
   isOpen: boolean;
@@ -259,42 +260,22 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
             <label className="block text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
               Requisitos Teocráticos de Elegibilidad (Formulario S-205)
             </label>
-            <div className="space-y-2 p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-200/60 dark:border-indigo-500/20 text-xs">
-              <label className="flex items-start gap-2.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={checkBaptized}
-                  onChange={(e) => setCheckBaptized(e.target.checked)}
-                  className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
-                />
-                <span className="text-zinc-700 dark:text-zinc-300 leading-snug">
-                  He estado bautizado por al menos 6 meses y soy publicador ejemplar en la congregación.
-                </span>
-              </label>
-
-              <label className="flex items-start gap-2.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={checkMoralStanding}
-                  onChange={(e) => setCheckMoralStanding(e.target.checked)}
-                  className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
-                />
-                <span className="text-zinc-700 dark:text-zinc-300 leading-snug">
-                  Mi conducta moral y reputación en la congregación y la comunidad son intachables.
-                </span>
-              </label>
-
-              <label className="flex items-start gap-2.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={checkCircumstances}
-                  onChange={(e) => setCheckCircumstances(e.target.checked)}
-                  className="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500"
-                />
-                <span className="text-zinc-700 dark:text-zinc-300 leading-snug">
-                  He organizado mis circunstancias personales para dedicar las {targetHours} horas requeridas.
-                </span>
-              </label>
+            <div className="space-y-3 p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-200/60 dark:border-indigo-500/20 text-xs">
+              <SplashCheckbox
+                checked={checkBaptized}
+                onChange={(e) => setCheckBaptized(e.target.checked)}
+                label="He estado bautizado por al menos 6 meses y soy publicador ejemplar en la congregación."
+              />
+              <SplashCheckbox
+                checked={checkMoralStanding}
+                onChange={(e) => setCheckMoralStanding(e.target.checked)}
+                label="Mi conducta moral y reputación en la congregación y la comunidad son intachables."
+              />
+              <SplashCheckbox
+                checked={checkCircumstances}
+                onChange={(e) => setCheckCircumstances(e.target.checked)}
+                label={`He organizado mis circunstancias personales para dedicar las ${targetHours} horas requeridas.`}
+              />
             </div>
           </div>
 

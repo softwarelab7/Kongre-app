@@ -52,6 +52,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     signOutUser,
     setActiveRole,
     setIdentifiedBrother,
+    setIdentifiedPublisher,
     assignRoleToEmail,
     identifyRoleByPersonalPin,
     userRolesList,
@@ -146,9 +147,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
       // 3. Probar PIN personal en el directorio de la congregación (nube y local)
       const pinToIdentify = cleanPersonalPin || cleanCongPin;
+      let matchingPub: any = null;
       if (pinToIdentify) {
         const congPubs = (cloudData?.publishers || publishers) as any[];
-        const matchingPub = congPubs.find(
+        matchingPub = congPubs.find(
           (p) => p.personalPin && p.personalPin.trim() === pinToIdentify.trim()
         );
 
@@ -163,6 +165,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           identifiedRole = finalRole;
           nameToUse = matchingPub.name;
           if (matchingPub.email) emailToUse = matchingPub.email;
+          setIdentifiedPublisher(matchingPub.id, matchingPub.name);
+          setIdentifiedBrother(matchingPub.name);
           assignPersonalPinToPublisher(
             matchingPub.id,
             pinToIdentify.trim(),
@@ -177,6 +181,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             identifiedRole = pinResult.role;
             if (pinResult.name && !isGenericIdentityName(pinResult.name)) {
               nameToUse = pinResult.name;
+            }
+            if (pinResult.publisherId) {
+              setIdentifiedPublisher(pinResult.publisherId, pinResult.name);
+              setIdentifiedBrother(pinResult.name);
             }
           } else {
             const invResult = await redeemInvitationCode(pinToIdentify, emailToUse, nameToUse || 'Hermano');
@@ -201,7 +209,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
 
-      const roleFinal: TheocraticRole = identifiedRole || 'coordinador';
+      const roleFinal: TheocraticRole = identifiedRole || (isCongPinValid ? 'coordinador' : 'publico');
 
       // 4. Resolver nombre real según la identidad identificada o datos de coordinador
       if (!nameToUse || isGenericIdentityName(nameToUse)) {
@@ -285,14 +293,16 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         assignRoleToEmail(emailToUse, roleFinal, nameToUse, pinToIdentify);
         setActiveRole(roleFinal);
 
-        // Asegurar que el hermano figure en la lista oficial de publicadores de la congregación
-        if (!isGenericIdentityName(nameToUse)) {
+        // Asegurar que el hermano figure en la lista oficial de publicadores de la congregación SOLO si no existía
+        if (!matchingPub && !isGenericIdentityName(nameToUse)) {
           const currentPubs = (cloudData?.publishers || publishers) as any[];
           const alreadyInList = currentPubs.some(
-            (p) => p.name && areNamesEquivalent(p.name, nameToUse)
+            (p) =>
+              (p.personalPin && pinToIdentify && String(p.personalPin).trim() === pinToIdentify.trim()) ||
+              (p.name && areNamesEquivalent(p.name, nameToUse))
           );
           if (!alreadyInList) {
-            const isElder = roleFinal === 'coordinador' || roleFinal === 'secretario' || roleFinal === 'superintendente_vym';
+            const isElder = roleFinal === 'coordinador' || roleFinal === 'secretario' || roleFinal === 'superintendente_vym' || roleFinal === 'anciano';
             const isSM = roleFinal.startsWith('siervo_');
             addPublisher({
               name: nameToUse,
@@ -451,12 +461,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       const coordEmail = (cloudData?.settings?.coordinatorEmail || settings.coordinatorEmail || '').toLowerCase().trim();
       const coordName = cloudData?.settings?.coordinatorName || settings.coordinatorName || '';
 
-      // 3. Comprobar si el usuario es Coordinador/Creador o dueño del dispositivo
+      // 3. Comprobar si el usuario es Coordinador/Creador
       const isKnownCoordinator = Boolean(existingCongId) && (
         userEmail === 'hectorguti95@gmail.com' ||
-        (coordEmail && userEmail === coordEmail) ||
-        !coordEmail || // Si no había correo de coordinador registrado aún en la congregación
-        localStorage.getItem('kongre_is_registered_congregation') === 'true'
+        userEmail === 'hectorguti95@outlook.com' ||
+        (Boolean(coordEmail) && userEmail === coordEmail)
       );
 
       // 4. Comprobar si el usuario coincide con un publicador registrado por correo o nombre
@@ -596,7 +605,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           matchingRole?.role ||
           matchingPub?.theocraticRole ||
           (matchingPub?.privilege === 'anciano'
-            ? 'coordinador'
+            ? 'anciano'
             : matchingPub?.privilege === 'siervo_ministerial'
             ? 'siervo_territorios'
             : 'publico');

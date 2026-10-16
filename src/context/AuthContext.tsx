@@ -76,6 +76,7 @@ const LOCAL_STORAGE_PUBLISHER_ID_KEY = 'kongre_current_publisher_id_v2';
 // Default initial role pin assignments (vacíos por defecto: los PINs pertenecen a publicadores)
 const DEFAULT_ROLE_PINS: Record<TheocraticRole, RolePinAssignment> = {
   coordinador: { role: 'coordinador', pin: '', name: 'Coordinador del Cuerpo de Ancianos' },
+  anciano: { role: 'anciano', pin: '', name: 'Anciano de Congregación' },
   secretario: { role: 'secretario', pin: '', name: 'Secretario' },
   superintendente_vym: { role: 'superintendente_vym', pin: '', name: 'Superintendente de VyM' },
   siervo_territorios: { role: 'siervo_territorios', pin: '', name: 'Siervo de Territorios' },
@@ -96,8 +97,8 @@ const AuthContext = createContext<AuthContextType>({
   signInWithGoogle: async () => null,
   signOutUser: async () => {},
   error: null,
-  activeRole: 'coordinador',
-  effectiveRoleInfo: THEOCRATIC_ROLES.coordinador,
+  activeRole: 'publico',
+  effectiveRoleInfo: THEOCRATIC_ROLES.publico,
   setActiveRole: () => {},
   currentBrotherName: null,
   setIdentifiedBrother: () => {},
@@ -113,7 +114,7 @@ const AuthContext = createContext<AuthContextType>({
   assignPersonalPinToRole: () => {},
   assignRoleToEmail: () => {},
   removeRoleFromEmail: () => {},
-  isCoordinator: true,
+  isCoordinator: false,
   userProfile: null,
   updateUserProfile: async () => ({ success: true }),
 });
@@ -295,7 +296,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch {
       // fallback
     }
-    return 'coordinador';
+    return 'publico';
   });
 
   const setActiveRole = (role: TheocraticRole) => {
@@ -565,42 +566,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           }
         }
-      } else {
-        // Auto-discover congregations in Firestore if Browser 2 doesn't have congregation ID set yet
-        const congSnap = await getDocs(collection(db, 'congregations'));
-        for (const cDoc of congSnap.docs) {
-          if (['1001', 'CENTRAL', 'MAIN', 'ID'].includes(cDoc.id.toUpperCase())) continue;
-          const cData = cDoc.data();
-          const cloudPubs = cData.publishers;
-          if (Array.isArray(cloudPubs)) {
-            const matchPub = cloudPubs.find((p: any) => p.personalPin && String(p.personalPin).trim() === cleanPin);
-            if (matchPub) {
-              const matchedCongId = cDoc.id.toUpperCase();
-              localStorage.setItem('kongre_congregation_number', matchedCongId);
-              localStorage.setItem('kongre_congregation_id', matchedCongId);
-              localStorage.setItem('kongre_is_registered_congregation', 'true');
-              localStorage.setItem('kongre_has_entered_app', 'true');
-              const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : matchPub.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
-              const brotherName = resolveNonGenericName(matchPub.name, role) || matchPub.name;
-              setActiveRole(role);
-              if (!isGenericIdentityName(brotherName)) {
-                setCurrentBrotherName(brotherName);
-                localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
-              }
-              if (matchPub.id) {
-                setIdentifiedPublisher(matchPub.id, brotherName);
-              }
-              assignPersonalPinToPublisher(matchPub.id, cleanPin, role, brotherName, matchPub.email, matchPub.privilege);
-              return {
-                success: true,
-                role,
-                name: brotherName,
-                publisherId: matchPub.id,
-                message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[role]?.name || role}.`,
-              };
-            }
-          }
-        }
       }
     } catch (searchErr) {
       console.warn('Aviso buscando PIN en Firestore:', searchErr);
@@ -683,12 +648,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (found) {
           setActiveRole(found.role);
           if (found.name) setCurrentBrotherName(found.name);
-        } else if (email === 'hectorguti95@gmail.com') {
+        } else if (email === 'hectorguti95@gmail.com' || email === 'hectorguti95@outlook.com') {
           // Automatic owner/coordinator recognition for registered user
           setActiveRole('coordinador');
           const broName = currentUser.displayName || 'Coordinador';
           setCurrentBrotherName(broName);
+        } else {
+          setActiveRole('publico');
         }
+      } else {
+        setActiveRole('publico');
       }
     });
     return () => unsubscribe();
@@ -908,22 +877,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await signInWithPopup(auth, googleProvider);
       if (res?.user) {
         setUser(res.user);
-        const localCongId = formatCanonicalCongregationId(
-          localStorage.getItem('kongre_congregation_number') ||
-          localStorage.getItem('kongre_congregation_id') ||
-          ''
-        );
-        const localCongName = localStorage.getItem('kongre_congregation_name') || '';
-        if (localCongId && localCongId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(localCongId)) {
-          try {
-            await setDoc(doc(db, 'users', res.user.uid), {
-              congregationId: localCongId,
-              congregationNumber: localCongId,
-              congregationName: localCongName,
-              updatedAt: new Date().toISOString(),
-            }, { merge: true });
-          } catch {}
-        }
         return res.user;
       }
       return auth.currentUser;
@@ -990,7 +943,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserRolesList((prev) => prev.filter((r) => r.email.toLowerCase() !== cleanEmail));
   };
 
-  const effectiveRoleInfo = THEOCRATIC_ROLES[activeRole] || THEOCRATIC_ROLES.coordinador;
+  const effectiveRoleInfo = THEOCRATIC_ROLES[activeRole] || THEOCRATIC_ROLES.publico;
   const isCoordinator = activeRole === 'coordinador';
 
   return (
@@ -1033,12 +986,12 @@ export const useAuth = () => useContext(AuthContext);
 export const usePermissions = () => {
   const { effectiveRoleInfo } = useAuth();
   return {
-    canEditPublishers: effectiveRoleInfo?.canEditPublishers ?? true,
-    canViewS21: effectiveRoleInfo?.canViewS21 ?? true,
-    canEditS21: effectiveRoleInfo?.canEditS21 ?? true,
-    canEditSchedule: effectiveRoleInfo?.canEditSchedule ?? true,
-    canManageTerritories: effectiveRoleInfo?.canManageTerritories ?? true,
-    canManageLiterature: effectiveRoleInfo?.canManageLiterature ?? true,
-    canManageAccounts: effectiveRoleInfo?.canManageAccounts ?? true,
+    canEditPublishers: effectiveRoleInfo?.canEditPublishers ?? false,
+    canViewS21: effectiveRoleInfo?.canViewS21 ?? false,
+    canEditS21: effectiveRoleInfo?.canEditS21 ?? false,
+    canEditSchedule: effectiveRoleInfo?.canEditSchedule ?? false,
+    canManageTerritories: effectiveRoleInfo?.canManageTerritories ?? false,
+    canManageLiterature: effectiveRoleInfo?.canManageLiterature ?? false,
+    canManageAccounts: effectiveRoleInfo?.canManageAccounts ?? false,
   };
 };

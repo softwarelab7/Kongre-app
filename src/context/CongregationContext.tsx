@@ -1376,40 +1376,6 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const setupSync = async () => {
       let syncCongId = resolveCongregationDocId();
 
-      // Si este navegador no tiene ID de congregación (ej. Browser 2 con PIN personal),
-      // auto-descubrir la congregación activa registrada en Firestore para sincronizar de inmediato
-      if (!syncCongId || syncCongId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(syncCongId)) {
-        try {
-          const congSnap = await getDocs(collection(db, 'congregations'));
-          if (!congSnap.empty && !isCancelled) {
-            const realDocs = congSnap.docs.filter((d) => {
-              const idUpper = d.id.toUpperCase();
-              return !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(idUpper);
-            });
-
-            // Preferir el ID canónico con guiones si existe
-            const targetDoc = realDocs.find((d) => d.id.includes('-')) || realDocs[0];
-            if (targetDoc) {
-              syncCongId = targetDoc.id.toUpperCase();
-              ensureCongregationIdPersisted(syncCongId);
-              const data = targetDoc.data();
-              hydrateAllFromData(data);
-              setSettings((prev) => ({
-                ...prev,
-                ...(data.settings || {}),
-                congregationNumber: syncCongId,
-                congregationId: syncCongId,
-                isRegistered: true,
-              }));
-              localStorage.setItem('kongre_is_registered_congregation', 'true');
-              localStorage.setItem('kongre_has_entered_app', 'true');
-            }
-          }
-        } catch (discoverErr) {
-          console.warn('Aviso auto-descubriendo congregación en Firestore:', discoverErr);
-        }
-      }
-
       if (!syncCongId || syncCongId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(syncCongId)) {
         setSyncStatus('offline');
         return;
@@ -2025,6 +1991,21 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         } catch {}
       }
 
+      // Rescatar publicadores desde la subcolección modular de Firestore si el documento raíz no los tiene
+      if (!data.publishers || (Array.isArray(data.publishers) && data.publishers.length === 0)) {
+        try {
+          const pubSnap = await getDocs(collection(db, 'congregations', snap.id, 'publishers'));
+          if (!pubSnap.empty) {
+            const subPubs = pubSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+            if (subPubs.length > 0) {
+              data = { ...data, publishers: subPubs };
+            }
+          }
+        } catch (subErr) {
+          console.warn('Aviso cargando subcolección publishers:', subErr);
+        }
+      }
+
       hydrateAllFromData(data);
       const effectiveId = data.congregationId || rawClean;
       ensureCongregationIdPersisted(effectiveId);
@@ -2068,10 +2049,6 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           if (cid) return formatCanonicalCongregationId(cid);
         }
       }
-      const localCId =
-        localStorage.getItem('kongre_congregation_number') ||
-        localStorage.getItem('kongre_congregation_id');
-      if (localCId) return formatCanonicalCongregationId(localCId);
     } catch (e) {
       console.warn('Aviso buscando ID de congregación de usuario:', e);
     }
@@ -2197,6 +2174,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const existingIndex = publishers.findIndex(
       (p) =>
         isSamePublisher(p, pubData) ||
+        (pubData.personalPin && p.personalPin && String(p.personalPin).trim().length >= 4 && String(p.personalPin).trim() === String(pubData.personalPin).trim()) ||
         (pubData.name && areNamesEquivalent(p.name || (p as any).full_name, pubData.name))
     );
 

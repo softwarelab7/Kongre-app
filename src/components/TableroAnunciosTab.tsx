@@ -1,6 +1,6 @@
-// src/components/TableroAnunciosTab.tsx
 import React, { useState } from 'react';
 import { useCongregation } from '../context/CongregationContext';
+import { useAuth } from '../context/AuthContext';
 import { CongregationNotice } from '../types';
 import {
   Bell,
@@ -25,6 +25,14 @@ import { generateNoticeWithGemini, isGeminiConfigured } from '../services/gemini
 
 export const TableroAnunciosTab: React.FC = () => {
   const { notices, addNotice, updateNotice, deleteNotice, settings } = useCongregation();
+  const { activeRole, isCoordinator } = useAuth();
+
+  const canManageNotices =
+    isCoordinator ||
+    activeRole === 'coordinador' ||
+    activeRole === 'anciano' ||
+    activeRole === 'secretario' ||
+    activeRole === 'superintendente_vym';
 
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
   const [copiedNoticeId, setCopiedNoticeId] = useState<string | null>(null);
@@ -98,6 +106,7 @@ export const TableroAnunciosTab: React.FC = () => {
   });
 
   const handleOpenNew = () => {
+    if (!canManageNotices) return;
     setEditingNotice(null);
     setFormData({
       title: '',
@@ -112,6 +121,7 @@ export const TableroAnunciosTab: React.FC = () => {
   };
 
   const handleOpenEdit = (notice: CongregationNotice) => {
+    if (!canManageNotices) return;
     setEditingNotice(notice);
     setFormData({
       title: notice.title,
@@ -204,13 +214,15 @@ export const TableroAnunciosTab: React.FC = () => {
           </p>
         </div>
 
-        <button
-          onClick={handleOpenNew}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Publicar Anuncio</span>
-        </button>
+        {canManageNotices && (
+          <button
+            onClick={handleOpenNew}
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Publicar Anuncio</span>
+          </button>
+        )}
       </div>
 
       {/* Categories Filter Bar */}
@@ -291,24 +303,28 @@ export const TableroAnunciosTab: React.FC = () => {
                           <Share2 className="w-4 h-4" />
                         )}
                       </button>
-                      <button
-                        onClick={() => handleOpenEdit(notice)}
-                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        title="Editar anuncio"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (confirm(`¿Eliminar el anuncio "${notice.title}"?`)) {
-                            deleteNotice(notice.id);
-                          }
-                        }}
-                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Eliminar anuncio"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {canManageNotices && (
+                        <>
+                          <button
+                            onClick={() => handleOpenEdit(notice)}
+                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Editar anuncio"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm(`¿Eliminar el anuncio "${notice.title}"?`)) {
+                                deleteNotice(notice.id);
+                              }
+                            }}
+                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Eliminar anuncio"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
 

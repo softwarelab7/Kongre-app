@@ -1,4 +1,4 @@
-import { Publisher, WeekSchedule } from '../types';
+import { Publisher, PublisherRoles, WeekSchedule } from '../types';
 
 /**
  * Normaliza nombres de personas quitando tildes, signos diacríticos, mayúsculas
@@ -82,12 +82,7 @@ export function isSamePublisher(p1: Partial<Publisher>, p2: Partial<Publisher>):
   const pin1 = String(p1.personalPin || '').trim();
   const pin2 = String(p2.personalPin || '').trim();
   if (pin1.length >= 4 && pin2.length >= 4 && pin1 === pin2) {
-    // Si tienen el mismo PIN personal y alguno de los nombres coincide mínimamente
-    const n1 = normalizePersonName(p1.name || (p1 as any).full_name);
-    const n2 = normalizePersonName(p2.name || (p2 as any).full_name);
-    if (!n1 || !n2 || areNamesEquivalent(n1, n2)) {
-      return true;
-    }
+    return true;
   }
 
   // 5. Nombres equivalentes (con o sin tildes)
@@ -110,15 +105,22 @@ function countAccents(str: string): number {
 export function mergePublisherData(target: Publisher, incoming: Partial<Publisher>): Publisher {
   const merged: Publisher = { ...target };
 
-  // Nombre: preferir el que tenga más tildes / mejor ortografía, o el más completo
+  // Nombre: preferir el que tenga más tildes / mejor ortografía, o el no genérico
   const tName = target.name || '';
   const iName = incoming.name || (incoming as any).full_name || '';
-  if (iName) {
-    const iAccents = countAccents(iName);
-    const tAccents = countAccents(tName);
-    if (iAccents > tAccents || (!tAccents && iAccents) || iName.length > tName.length) {
+  const isGeneric = (n: string) => !n || ['hermano', 'coordinador', 'usuario', 'publicador'].includes(n.toLowerCase().trim());
+
+  if (iName && !isGeneric(iName)) {
+    if (isGeneric(tName)) {
       merged.name = iName;
       merged.full_name = iName;
+    } else {
+      const iAccents = countAccents(iName);
+      const tAccents = countAccents(tName);
+      if (iAccents > tAccents || (!tAccents && iAccents) || iName.length > tName.length) {
+        merged.name = iName;
+        merged.full_name = iName;
+      }
     }
   }
 
@@ -158,17 +160,18 @@ export function mergePublisherData(target: Publisher, incoming: Partial<Publishe
 
   // Fusión de Roles booleanos (unión lógica)
   if (incoming.roles) {
-    merged.roles = {
+    const combinedRoles: PublisherRoles = {
       ...(merged.roles || {}),
       ...(incoming.roles || {}),
-    };
+    } as PublisherRoles;
+
     // Asegurar que si en alguno era true, se mantenga true
     Object.keys(incoming.roles).forEach((key) => {
-      const k = key as keyof typeof merged.roles;
-      if (incoming.roles && incoming.roles[k]) {
-        (merged.roles as any)[k] = true;
+      if (incoming.roles && (incoming.roles as any)[key]) {
+        combinedRoles[key] = true;
       }
     });
+    merged.roles = combinedRoles;
   }
 
   // Notas

@@ -3,6 +3,7 @@ import { ActiveTab } from '../components/Navbar';
 
 export type TheocraticRole =
   | 'coordinador'
+  | 'anciano'
   | 'superintendente_vym'
   | 'secretario'
   | 'siervo_discursos'
@@ -77,6 +78,45 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     canManageAccounts: true,
     canSuperviseConflicts: true,
     canModifySettings: true,
+    isReadOnly: false,
+  },
+
+  anciano: {
+    id: 'anciano',
+    name: 'Anciano de Congregación',
+    shortName: 'Anciano',
+    badgeColor: 'bg-purple-600 text-white shadow-xs',
+    description: 'Miembro del Cuerpo de Ancianos. Supervisión teocrática, reuniones, oradores y visitas.',
+    allowedTabs: [
+      'inicio',
+      'programacion',
+      's89',
+      'discursos',
+      'publicadores',
+      'grupos_servicio',
+      'asistencia',
+      'limpieza_deberes',
+      'visita_sc',
+      'memorial_asambleas',
+      'tablero_anuncios',
+      'conflictos',
+      'equidad',
+      'exportar_pdf',
+      'mi_vista',
+      'perfil',
+    ],
+    canEditSchedule: true,
+    canEditMidweekOnly: false,
+    canEditPublishers: false,
+    canViewS21: true,
+    canEditS21: false,
+    canEditAttendance: true,
+    canEditPublicTalks: true,
+    canManageTerritories: false,
+    canManageLiterature: false,
+    canManageAccounts: false,
+    canSuperviseConflicts: true,
+    canModifySettings: false,
     isReadOnly: false,
   },
 

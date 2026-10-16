@@ -43,8 +43,12 @@ export const IdentityNamePrompt: React.FC = () => {
 
     setIdentifiedBrother(clean);
 
-    const existing = publishers.find((p) => areNamesEquivalent(p.name, clean));
-    const isElder = activeRole === 'coordinador' || activeRole === 'secretario' || activeRole === 'superintendente_vym';
+    const existing = publishers.find(
+      (p) =>
+        areNamesEquivalent(p.name, clean) ||
+        (pin && p.personalPin && String(p.personalPin).trim() === pin.trim())
+    );
+    const isElder = activeRole === 'coordinador' || activeRole === 'secretario' || activeRole === 'superintendente_vym' || activeRole === 'anciano';
     const isSM = activeRole.startsWith('siervo_');
     const privilege: TheocraticPrivilege | undefined =
       isElder

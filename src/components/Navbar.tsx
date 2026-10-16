@@ -7,6 +7,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { PWAInstallButton } from './PWAInstallButton';
 import { KongreLogo } from './KongreLogo';
 import { getFriendlyCongregationName, isGenericIdentityName } from '../utils/theocraticSecurity';
+import { isTabAllowedForRole } from '../utils/rbac';
 import {
   Calendar,
   Users,
@@ -330,8 +331,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     };
   }, []);
 
-  // Full departments for the mobile drawer
-  const departments: Department[] = [
+  // Full raw departments catalogue
+  const allDepartments: Department[] = [
     {
       id: 'reuniones',
       title: 'Reuniones',
@@ -549,8 +550,25 @@ export const Navbar: React.FC<NavbarProps> = ({
     },
   ];
 
+  // Dynamic role-filtered departments (hide unauthorized tabs and empty departments)
+  const departments: Department[] = allDepartments
+    .map((dept) => {
+      const allowedItems = dept.items.filter((item) =>
+        isTabAllowedForRole(effectiveRoleInfo.id, item.id)
+      );
+      const allowedTabIds = dept.tabIds.filter((tid) =>
+        isTabAllowedForRole(effectiveRoleInfo.id, tid)
+      );
+      return {
+        ...dept,
+        tabIds: allowedTabIds,
+        items: allowedItems,
+      };
+    })
+    .filter((dept) => dept.items.length > 0);
+
   // Categorías principales teocráticas integradas en la barra lateral con flyout al pasar el puntero
-  const categoriesList = [
+  const rawCategoriesList = [
     {
       id: 'inicio',
       title: 'Panorama General',
@@ -571,7 +589,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       badge: undefined,
       badgeColor: undefined,
       colorClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400',
-      items: departments[0].items,
+      items: allDepartments[0]?.items || [],
     },
     {
       id: 'secretaria',
@@ -582,7 +600,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       badge: undefined,
       badgeColor: undefined,
       colorClass: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/80 dark:text-emerald-400',
-      items: departments[1].items,
+      items: allDepartments[1]?.items || [],
     },
     {
       id: 'predicacion',
@@ -593,7 +611,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       badge: overdueTerritoriesCount || undefined,
       badgeColor: 'bg-rose-500 text-white',
       colorClass: 'bg-sky-50 text-sky-600 dark:bg-sky-950/80 dark:text-sky-400',
-      items: departments[2].items,
+      items: allDepartments[2]?.items || [],
     },
     {
       id: 'salon',
@@ -604,7 +622,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       badge: pinnedNoticesCount || undefined,
       badgeColor: 'bg-indigo-600 text-white',
       colorClass: 'bg-amber-50 text-amber-600 dark:bg-amber-950/80 dark:text-amber-400',
-      items: departments[3].items,
+      items: allDepartments[3]?.items || [],
     },
     {
       id: 'supervision',
@@ -615,9 +633,29 @@ export const Navbar: React.FC<NavbarProps> = ({
       badge: conflicts.length || undefined,
       badgeColor: 'bg-amber-500 text-white',
       colorClass: 'bg-rose-50 text-rose-600 dark:bg-rose-950/80 dark:text-rose-400',
-      items: departments[4].items,
+      items: allDepartments[4]?.items || [],
     },
   ];
+
+  const categoriesList = rawCategoriesList
+    .map((cat) => {
+      const allowedItems = (cat.items || []).filter((item) =>
+        isTabAllowedForRole(effectiveRoleInfo.id, item.id)
+      );
+      const allowedTabIds = cat.tabIds.filter((tid) =>
+        isTabAllowedForRole(effectiveRoleInfo.id, tid)
+      );
+      const primaryTab = isTabAllowedForRole(effectiveRoleInfo.id, cat.primaryTab)
+        ? cat.primaryTab
+        : (allowedItems[0]?.id || allowedTabIds[0] || 'inicio');
+      return {
+        ...cat,
+        primaryTab,
+        tabIds: allowedTabIds,
+        items: allowedItems,
+      };
+    })
+    .filter((cat) => cat.id === 'inicio' || cat.items.length > 0);
 
   const handleSelectTab = (tabId: ActiveTab) => {
     setActiveTab(tabId);
@@ -877,18 +915,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <User className="w-4 h-4 stroke-[1.8]" />
             </button>
-            <button
-              type="button"
-              onClick={() => handleSelectTab('ajustes')}
-              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                activeTab === 'ajustes'
-                  ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/70 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
-                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
-              }`}
-              title="Ajustes de la Congregación"
-            >
-              <Settings className="w-4 h-4 stroke-[1.8]" />
-            </button>
+            {isTabAllowedForRole(effectiveRoleInfo.id, 'ajustes') && (
+              <button
+                type="button"
+                onClick={() => handleSelectTab('ajustes')}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                  activeTab === 'ajustes'
+                    ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/70 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
+                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                }`}
+                title="Ajustes de la Congregación"
+              >
+                <Settings className="w-4 h-4 stroke-[1.8]" />
+              </button>
+            )}
           </div>
         </aside>
       )}
@@ -958,18 +998,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             {/* Publicadores Quick Access (desktop / tablet) */}
-            <button
-              type="button"
-              onClick={() => handleSelectTab('publicadores')}
-              className={`w-9 h-9 rounded-xl hidden sm:flex items-center justify-center transition-all cursor-pointer ${
-                activeTab === 'publicadores'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 shadow-2xs font-bold'
-                  : 'text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              }`}
-              title="Catálogo y Directorio de Publicadores"
-            >
-              <Users className="w-4 h-4" />
-            </button>
+            {isTabAllowedForRole(effectiveRoleInfo.id, 'publicadores') && (
+              <button
+                type="button"
+                onClick={() => handleSelectTab('publicadores')}
+                className={`w-9 h-9 rounded-xl hidden sm:flex items-center justify-center transition-all cursor-pointer ${
+                  activeTab === 'publicadores'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 shadow-2xs font-bold'
+                    : 'text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+                title="Catálogo y Directorio de Publicadores"
+              >
+                <Users className="w-4 h-4" />
+              </button>
+            )}
 
             {/* Calendario Fijo en Barra Superior (PC / Desktop) */}
             <button
@@ -1022,7 +1064,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                     await uploadLocalDataToGoogle();
                   } catch {}
                 }
-                handleSelectTab('ajustes');
+                if (isTabAllowedForRole(effectiveRoleInfo.id, 'ajustes')) {
+                  handleSelectTab('ajustes');
+                }
               }}
               className="relative w-9 h-9 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/30 transition cursor-pointer"
               title={
@@ -1122,17 +1166,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <span>Mi Perfil</span>
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenDropdown(null);
-                        handleSelectTab('ajustes');
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
-                    >
-                      <Settings className="w-4 h-4 text-indigo-500" />
-                      <span>Ajustes de la Congregación</span>
-                    </button>
+                    {isTabAllowedForRole(effectiveRoleInfo.id, 'ajustes') && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          handleSelectTab('ajustes');
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
+                      >
+                        <Settings className="w-4 h-4 text-indigo-500" />
+                        <span>Ajustes de la Congregación</span>
+                      </button>
+                    )}
 
                     {onOpenRoleModal && (
                       <button
@@ -1686,19 +1732,34 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="text-[10px] mt-0.5 leading-tight font-semibold">Calendario</span>
           </button>
 
-          {/* 4. Hermanos (Publicadores & Grupos) */}
-          <button
-            type="button"
-            onClick={() => handleSelectTab('publicadores')}
-            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[44px] ${
-              activeTab === 'publicadores' || activeTab === 'grupos_servicio' || activeTab === 'precursores_auxiliares'
-                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/50'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-            }`}
-          >
-            <Users className="w-5 h-5 stroke-[2]" />
-            <span className="text-[10px] mt-0.5 leading-tight font-semibold">Hermanos</span>
-          </button>
+          {/* 4. Hermanos o Mi Portal según rol */}
+          {isTabAllowedForRole(effectiveRoleInfo.id, 'publicadores') ? (
+            <button
+              type="button"
+              onClick={() => handleSelectTab('publicadores')}
+              className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[44px] ${
+                activeTab === 'publicadores' || activeTab === 'grupos_servicio' || activeTab === 'precursores_auxiliares'
+                  ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/50'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              <Users className="w-5 h-5 stroke-[2]" />
+              <span className="text-[10px] mt-0.5 leading-tight font-semibold">Hermanos</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => handleSelectTab('mi_vista')}
+              className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[44px] ${
+                activeTab === 'mi_vista'
+                  ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/50'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              <UserCheck className="w-5 h-5 stroke-[2]" />
+              <span className="text-[10px] mt-0.5 leading-tight font-semibold">Mi Portal</span>
+            </button>
+          )}
 
           {/* 5. Menú (Abre Drawer completo de departamentos) */}
           <button

@@ -142,6 +142,11 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         identifiedRole = finalRole;
         finalBrotherName = matchingPub.name;
         if (matchingPub.email) emailToUse = matchingPub.email;
+        if (matchingPub.id) {
+          try {
+            localStorage.setItem('kongre_current_publisher_id_v2', matchingPub.id);
+          } catch {}
+        }
       } else {
         // B) Buscar en el directorio de PINs de roles de la congregación
         const pinResult = await identifyRoleByPersonalPin(cleanPersonalPin);
@@ -149,6 +154,11 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
           identifiedRole = pinResult.role;
           if (pinResult.name && !isGenericIdentityName(pinResult.name)) {
             finalBrotherName = pinResult.name;
+          }
+          if (pinResult.publisherId) {
+            try {
+              localStorage.setItem('kongre_current_publisher_id_v2', pinResult.publisherId);
+            } catch {}
           }
         } else {
           // C) Verificar si es un código de invitación generado por los ancianos
@@ -265,14 +275,16 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         assignRoleToEmail(emailToUse, identifiedRole, finalBrotherName, cleanPersonalPin);
         setActiveRole(identifiedRole);
 
-        // Asegurar que el hermano figure en la lista oficial de publicadores
-        if (!isGenericIdentityName(finalBrotherName)) {
+        // Asegurar que el hermano figure en la lista oficial de publicadores SOLO si no existía ya
+        if (!matchingPub && !isGenericIdentityName(finalBrotherName)) {
           const currentPubs = (cloudRes?.data?.publishers || publishers) as any[];
           const alreadyInList = currentPubs.some(
-            (p) => p.name && areNamesEquivalent(p.name, finalBrotherName)
+            (p) =>
+              (p.personalPin && cleanPersonalPin && String(p.personalPin).trim() === cleanPersonalPin.trim()) ||
+              (p.name && areNamesEquivalent(p.name, finalBrotherName))
           );
           if (!alreadyInList) {
-            const isElder = identifiedRole === 'coordinador' || identifiedRole === 'secretario' || identifiedRole === 'superintendente_vym';
+            const isElder = identifiedRole === 'coordinador' || identifiedRole === 'secretario' || identifiedRole === 'superintendente_vym' || identifiedRole === 'anciano';
             const isSM = identifiedRole.startsWith('siervo_');
             addPublisher({
               name: finalBrotherName,

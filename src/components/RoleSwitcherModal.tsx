@@ -1,5 +1,5 @@
 // src/components/RoleSwitcherModal.tsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAuth, PublisherPinRecord } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { TheocraticRole, THEOCRATIC_ROLES } from '../utils/rbac';
@@ -68,7 +68,13 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
 
   const [activeTabMode, setActiveTabMode] = useState<
     'identificar_pin' | 'directorio_pins' | 'cambiar_rol' | 'asignar_cuentas' | 'invitaciones_qr'
-  >('directorio_pins');
+  >(isCoordinator ? 'directorio_pins' : 'identificar_pin');
+
+  useEffect(() => {
+    if (!isCoordinator && activeTabMode !== 'identificar_pin') {
+      setActiveTabMode('identificar_pin');
+    }
+  }, [isCoordinator, activeTabMode]);
 
   // Personal PIN identification state
   const [enteredPersonalPin, setEnteredPersonalPin] = useState('');
@@ -362,6 +368,10 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
   };
 
   const handleSelectRole = (role: TheocraticRole) => {
+    if (!isCoordinator && role !== 'publico') {
+      alert('Solo el Coordinador puede cambiar manualmente de rol sin PIN.');
+      return;
+    }
     setActiveRole(role);
     const roleInfo = THEOCRATIC_ROLES[role];
 
@@ -503,20 +513,22 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
         {/* Tab switcher: Directorio de PINs (Principal), Identificar por PIN, Manual, Cuentas, QR */}
         <div className="px-6 pt-3 pb-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between overflow-x-auto">
           <div className="inline-flex p-1 bg-slate-200/80 dark:bg-slate-800 rounded-xl text-xs font-semibold gap-1 shrink-0">
-            <button
-              onClick={() => setActiveTabMode('directorio_pins')}
-              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                activeTabMode === 'directorio_pins'
-                  ? 'bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-2xs font-bold'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-300" />
-              <span>PINs por Publicador</span>
-              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold">
-                {combinedPublishersList.length}
-              </span>
-            </button>
+            {isCoordinator && (
+              <button
+                onClick={() => setActiveTabMode('directorio_pins')}
+                className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                  activeTabMode === 'directorio_pins'
+                    ? 'bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-2xs font-bold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-300" />
+                <span>PINs por Publicador</span>
+                <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-bold">
+                  {combinedPublishersList.length}
+                </span>
+              </button>
+            )}
 
             <button
               onClick={() => setActiveTabMode('identificar_pin')}
@@ -530,39 +542,43 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
               <span>Identificar con PIN</span>
             </button>
 
-            <button
-              onClick={() => setActiveTabMode('cambiar_rol')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                activeTabMode === 'cambiar_rol'
-                  ? 'bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-2xs font-bold'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              Cambio Rápido
-            </button>
+            {isCoordinator && (
+              <>
+                <button
+                  onClick={() => setActiveTabMode('cambiar_rol')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    activeTabMode === 'cambiar_rol'
+                      ? 'bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-2xs font-bold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  Cambio Rápido
+                </button>
 
-            <button
-              onClick={() => setActiveTabMode('asignar_cuentas')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                activeTabMode === 'asignar_cuentas'
-                  ? 'bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-2xs font-bold'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              Cuentas Google ({userRolesList.length})
-            </button>
+                <button
+                  onClick={() => setActiveTabMode('asignar_cuentas')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    activeTabMode === 'asignar_cuentas'
+                      ? 'bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-2xs font-bold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  Cuentas Google ({userRolesList.length})
+                </button>
 
-            <button
-              onClick={() => setActiveTabMode('invitaciones_qr')}
-              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                activeTabMode === 'invitaciones_qr'
-                  ? 'bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-2xs font-bold'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-300" />
-              <span>QR ({invitations.filter((i) => i.status === 'active').length})</span>
-            </button>
+                <button
+                  onClick={() => setActiveTabMode('invitaciones_qr')}
+                  className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                    activeTabMode === 'invitaciones_qr'
+                      ? 'bg-white dark:bg-indigo-600 text-slate-900 dark:text-white shadow-2xs font-bold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-300" />
+                  <span>QR ({invitations.filter((i) => i.status === 'active').length})</span>
+                </button>
+              </>
+            )}
           </div>
 
           <div className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block pl-2">

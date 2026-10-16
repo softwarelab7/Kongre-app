@@ -410,25 +410,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, message: 'Ingresa tu PIN Personal.' };
     }
 
-    const resolveNonGenericName = (candidate?: string | null, fallbackRole?: TheocraticRole): string => {
+    const resolveNonGenericName = (candidate?: string | null, targetRole?: TheocraticRole): string => {
       if (candidate && !isGenericIdentityName(candidate)) return candidate.trim();
-      const savedCoord = localStorage.getItem('kongre_coordinator_name');
-      if (savedCoord && !isGenericIdentityName(savedCoord)) return savedCoord.trim();
-      const googleName = localStorage.getItem('kongre_google_display_name');
-      if (googleName && !isGenericIdentityName(googleName)) return googleName.trim();
-      try {
-        const rawSettings = localStorage.getItem('kongre_saved_settings_backup') || localStorage.getItem('kongre_gestor_settings');
-        if (rawSettings) {
-          const parsed = JSON.parse(rawSettings);
-          if (parsed.coordinatorName && !isGenericIdentityName(parsed.coordinatorName)) {
-            return parsed.coordinatorName.trim();
+      // Only for coordinator role may we consider saved coordinator name
+      if (targetRole === 'coordinador') {
+        const savedCoord = localStorage.getItem('kongre_coordinator_name');
+        if (savedCoord && !isGenericIdentityName(savedCoord)) return savedCoord.trim();
+        const googleName = localStorage.getItem('kongre_google_display_name');
+        if (googleName && !isGenericIdentityName(googleName)) return googleName.trim();
+        try {
+          const rawSettings = localStorage.getItem('kongre_saved_settings_backup') || localStorage.getItem('kongre_gestor_settings');
+          if (rawSettings) {
+            const parsed = JSON.parse(rawSettings);
+            if (parsed.coordinatorName && !isGenericIdentityName(parsed.coordinatorName)) {
+              return parsed.coordinatorName.trim();
+            }
           }
-        }
-      } catch {}
-      if (currentBrotherName && !isGenericIdentityName(currentBrotherName)) {
-        return currentBrotherName;
+        } catch {}
       }
-      return candidate && !isGenericIdentityName(candidate) ? candidate : '';
+      return candidate && !isGenericIdentityName(candidate) ? candidate.trim() : '';
     };
 
     // 1. Search in unique publisher PINs directory (Principal: Por Publicador)
@@ -438,10 +438,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (foundPublisher) {
       setActiveRole(foundPublisher.role);
-      const brotherName = resolveNonGenericName(foundPublisher.name, foundPublisher.role) || foundPublisher.name;
+      const brotherName =
+        foundPublisher.name && !isGenericIdentityName(foundPublisher.name)
+          ? foundPublisher.name.trim()
+          : resolveNonGenericName(foundPublisher.name, foundPublisher.role) || 'Hermano';
       if (!isGenericIdentityName(brotherName)) {
         setCurrentBrotherName(brotherName);
         localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+        localStorage.setItem('kongre_identified_brother', brotherName);
       }
       if (foundPublisher.publisherId) {
         setIdentifiedPublisher(foundPublisher.publisherId, brotherName);
@@ -463,10 +467,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (foundUserEntry) {
       setActiveRole(foundUserEntry.role);
-      const brotherName = resolveNonGenericName(foundUserEntry.name, foundUserEntry.role);
-      if (brotherName) {
+      const brotherName =
+        foundUserEntry.name && !isGenericIdentityName(foundUserEntry.name)
+          ? foundUserEntry.name.trim()
+          : resolveNonGenericName(foundUserEntry.name, foundUserEntry.role) || 'Hermano';
+      if (!isGenericIdentityName(brotherName)) {
         setCurrentBrotherName(brotherName);
         localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+        localStorage.setItem('kongre_identified_brother', brotherName);
       }
 
       return {
@@ -484,10 +492,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (foundRoleEntry) {
       setActiveRole(foundRoleEntry.role);
-      const brotherName = resolveNonGenericName(foundRoleEntry.name, foundRoleEntry.role);
-      if (brotherName) {
+      const brotherName =
+        foundRoleEntry.name && !isGenericIdentityName(foundRoleEntry.name)
+          ? foundRoleEntry.name.trim()
+          : resolveNonGenericName(foundRoleEntry.name, foundRoleEntry.role);
+      if (brotherName && !isGenericIdentityName(brotherName)) {
         setCurrentBrotherName(brotherName);
         localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+        localStorage.setItem('kongre_identified_brother', brotherName);
       }
 
       return {
@@ -507,11 +519,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const matchPub = parsedPubs.find((p: any) => p.personalPin && String(p.personalPin).trim() === cleanPin);
           if (matchPub) {
             const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : matchPub.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
-            const brotherName = resolveNonGenericName(matchPub.name, role) || matchPub.name;
+            const brotherName =
+              matchPub.name && !isGenericIdentityName(matchPub.name)
+                ? matchPub.name.trim()
+                : resolveNonGenericName(matchPub.name, role) || 'Hermano';
             setActiveRole(role);
             if (!isGenericIdentityName(brotherName)) {
               setCurrentBrotherName(brotherName);
               localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+              localStorage.setItem('kongre_identified_brother', brotherName);
             }
             if (matchPub.id) {
               setIdentifiedPublisher(matchPub.id, brotherName);
@@ -544,11 +560,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const matchPub = cloudPubs.find((p: any) => p.personalPin && String(p.personalPin).trim() === cleanPin);
             if (matchPub) {
               const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : matchPub.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
-              const brotherName = resolveNonGenericName(matchPub.name, role) || matchPub.name;
+              const brotherName =
+                matchPub.name && !isGenericIdentityName(matchPub.name)
+                  ? matchPub.name.trim()
+                  : resolveNonGenericName(matchPub.name, role) || 'Hermano';
               setActiveRole(role);
               if (!isGenericIdentityName(brotherName)) {
                 setCurrentBrotherName(brotherName);
                 localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+                localStorage.setItem('kongre_identified_brother', brotherName);
               }
               if (matchPub.id) {
                 setIdentifiedPublisher(matchPub.id, brotherName);
@@ -571,9 +591,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.warn('Aviso buscando PIN en Firestore:', searchErr);
     }
 
-    // 4. Backward-compatibility: Check if PIN matches previously registered Coordinator App Lock PIN
+    // 4. Backward-compatibility: Check if PIN matches previously registered Coordinator App Lock PIN (only for coordinator)
     const coordLockPinHash = localStorage.getItem('kongre_security_pin_hash');
-    if (coordLockPinHash) {
+    if (coordLockPinHash && (isCoordinator || user?.email === 'hectorguti95@gmail.com')) {
       try {
         const isValid = await verifyPasscode(cleanPin, coordLockPinHash);
         if (isValid) {
@@ -582,36 +602,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (resolvedName) {
             setCurrentBrotherName(resolvedName);
             localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, resolvedName);
+            localStorage.setItem('kongre_identified_brother', resolvedName);
           }
           return {
             success: true,
             role: 'coordinador',
             name: resolvedName || undefined,
             message: '¡Identificación exitosa con tu PIN de Coordinador!',
-          };
-        }
-      } catch {
-        // ignore hash error
-      }
-    }
-
-    // 5. Backward-compatibility: Check if PIN matches previously registered Congregation PIN
-    const congPinHash = localStorage.getItem('kongre_security_congregation_pin_hash');
-    if (congPinHash) {
-      try {
-        const isValid = await verifyPasscode(cleanPin, congPinHash);
-        if (isValid) {
-          setActiveRole('coordinador');
-          const resolvedName = resolveNonGenericName(null, 'coordinador');
-          if (resolvedName) {
-            setCurrentBrotherName(resolvedName);
-            localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, resolvedName);
-          }
-          return {
-            success: true,
-            role: 'coordinador',
-            name: resolvedName || undefined,
-            message: '¡Identificación exitosa con PIN de Congregación!',
           };
         }
       } catch {

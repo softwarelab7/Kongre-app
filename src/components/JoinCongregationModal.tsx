@@ -110,9 +110,11 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
       // Verificar PIN de la Congregación
       const effectivePinHash = cloudRes?.data?.settings?.congregationPinHash || effectiveSettings.congregationPinHash;
-      let isCongPinValid = await verifyCongregationPin(cleanCongPin);
-      if (!isCongPinValid && effectivePinHash) {
+      let isCongPinValid = false;
+      if (effectivePinHash) {
         isCongPinValid = await verifyPasscode(cleanCongPin, effectivePinHash);
+      } else {
+        isCongPinValid = await verifyCongregationPin(cleanCongPin);
       }
 
       if (!isCongPinValid) {
@@ -128,7 +130,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       // A) Buscar en la lista de publicadores de la congregación por PIN personal
       const congPubs = (cloudRes?.data?.publishers || publishers) as any[];
       const matchingPub = congPubs.find(
-        (p) => p.personalPin && p.personalPin.trim() === cleanPersonalPin
+        (p) => p.personalPin && String(p.personalPin).trim() === cleanPersonalPin
       );
 
       if (matchingPub) {
@@ -140,7 +142,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
             ? 'siervo_territorios'
             : 'publico');
         identifiedRole = finalRole;
-        finalBrotherName = matchingPub.name;
+        finalBrotherName = matchingPub.name && !isGenericIdentityName(matchingPub.name) ? matchingPub.name.trim() : 'Hermano';
         if (matchingPub.email) emailToUse = matchingPub.email;
         if (matchingPub.id) {
           try {
@@ -180,24 +182,25 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
       // Resolver nombre no genérico con prioridad
       if (!finalBrotherName || isGenericIdentityName(finalBrotherName)) {
-        const cloudCoord = cloudRes?.data?.settings?.coordinatorName;
-        const localCoord = settings.coordinatorName;
-        const savedCoord = localStorage.getItem('kongre_coordinator_name');
-        const savedIdent = localStorage.getItem('kongre_identified_brother');
-        const googleName = user?.displayName;
+        if (identifiedRole === 'coordinador') {
+          const cloudCoord = cloudRes?.data?.settings?.coordinatorName;
+          const localCoord = settings.coordinatorName;
+          const savedCoord = localStorage.getItem('kongre_coordinator_name');
+          const googleName = user?.displayName;
 
-        if (cloudCoord && !isGenericIdentityName(cloudCoord)) {
-          finalBrotherName = cloudCoord.trim();
-        } else if (localCoord && !isGenericIdentityName(localCoord)) {
-          finalBrotherName = localCoord.trim();
-        } else if (savedCoord && !isGenericIdentityName(savedCoord)) {
-          finalBrotherName = savedCoord.trim();
-        } else if (savedIdent && !isGenericIdentityName(savedIdent)) {
-          finalBrotherName = savedIdent.trim();
-        } else if (googleName && !isGenericIdentityName(googleName)) {
-          finalBrotherName = googleName.trim();
+          if (cloudCoord && !isGenericIdentityName(cloudCoord)) {
+            finalBrotherName = cloudCoord.trim();
+          } else if (localCoord && !isGenericIdentityName(localCoord)) {
+            finalBrotherName = localCoord.trim();
+          } else if (savedCoord && !isGenericIdentityName(savedCoord)) {
+            finalBrotherName = savedCoord.trim();
+          } else if (googleName && !isGenericIdentityName(googleName)) {
+            finalBrotherName = googleName.trim();
+          } else {
+            finalBrotherName = 'Coordinador';
+          }
         } else {
-          finalBrotherName = identifiedRole === 'coordinador' ? 'Coordinador' : 'Hermano';
+          finalBrotherName = user?.displayName && !isGenericIdentityName(user.displayName) ? user.displayName.trim() : 'Hermano';
         }
       }
 

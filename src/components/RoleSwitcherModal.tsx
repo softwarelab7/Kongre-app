@@ -65,6 +65,14 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     isCoordinator,
   } = useAuth();
 
+  const isAllowedAccess = isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano';
+
+  useEffect(() => {
+    if (isOpen && !isAllowedAccess) {
+      onClose();
+    }
+  }, [isOpen, isAllowedAccess, onClose]);
+
   const { publishers, updatePublisher, settings } = useCongregation();
   const { invitations, createInvitation, revokeInvitation } = useSecurity();
 
@@ -72,15 +80,9 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
   // - 'directorio': Responsabilidades y PINs de los hermanos (Gestión principal)
   // - 'mi_sesion': Mi perfil actual, cambiar con PIN y simulación de roles
   // - 'nube_qr': Vinculación Google y Códigos QR
-  const [activeTabMode, setActiveTabMode] = useState<'directorio' | 'mi_sesion' | 'nube_qr'>(
-    isCoordinator ? 'directorio' : 'mi_sesion'
-  );
+  const [activeTabMode, setActiveTabMode] = useState<'directorio' | 'mi_sesion' | 'nube_qr'>('directorio');
 
-  useEffect(() => {
-    if (!isCoordinator && activeTabMode !== 'mi_sesion') {
-      setActiveTabMode('mi_sesion');
-    }
-  }, [isCoordinator, activeTabMode]);
+  if (!isOpen || !isAllowedAccess) return null;
 
   // Search & category filter in the directory
   const [searchTerm, setSearchTerm] = useState('');

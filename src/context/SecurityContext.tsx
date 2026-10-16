@@ -138,8 +138,8 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const verifyPersonalPin = useCallback(
     async (enteredPin: string): Promise<boolean> => {
-      if (!pinHash) return true;
-      return await verifyPasscode(enteredPin, pinHash);
+      if (!enteredPin || !enteredPin.trim() || !pinHash) return false;
+      return await verifyPasscode(enteredPin.trim(), pinHash);
     },
     [pinHash]
   );
@@ -176,8 +176,8 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const verifyCongregationPin = useCallback(
     async (enteredPin: string): Promise<boolean> => {
-      if (!congregationPinHash) return true;
-      return await verifyPasscode(enteredPin, congregationPinHash);
+      if (!enteredPin || !enteredPin.trim() || !congregationPinHash) return false;
+      return await verifyPasscode(enteredPin.trim(), congregationPinHash);
     },
     [congregationPinHash]
   );
@@ -195,7 +195,7 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const verifyMasterPassphrase = useCallback(
     async (passphrase: string): Promise<boolean> => {
-      if (!masterPassphraseHash) return true;
+      if (!passphrase || !passphrase.trim() || !masterPassphraseHash) return false;
       return await verifyPasscode(passphrase.trim(), masterPassphraseHash);
     },
     [masterPassphraseHash]

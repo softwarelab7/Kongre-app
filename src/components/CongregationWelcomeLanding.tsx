@@ -118,9 +118,9 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         setIsSubmittingCode(false);
         return;
       }
-      // 2. Validar al menos un PIN
-      if (!cleanCongPin && !cleanPersonalPin) {
-        setCodeError('Por favor introduce el PIN de la Congregación o tu PIN de registro.');
+      // 2. Validar PIN de congregación
+      if (!cleanCongPin) {
+        setCodeError('Por favor introduce el PIN de la Congregación.');
         setIsSubmittingCode(false);
         return;
       }
@@ -130,28 +130,45 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       const cloudData = cloudRes?.data;
       const effectiveId = formatCanonicalCongregationId(cloudData?.congregationId || cloudData?.settings?.congregationId || cleanId);
 
-      // 2. Validar coincidencia de PIN de Congregación
-      const effectivePinHash = cloudData?.settings?.congregationPinHash || settings.congregationPinHash;
+      const localMatches =
+        settings.isRegistered &&
+        (settings.congregationNumber?.toUpperCase() === cleanId.toUpperCase() ||
+          settings.congregationId?.toUpperCase() === cleanId.toUpperCase() ||
+          settings.congregationName?.toLowerCase() === cleanId.toLowerCase());
+
+      if (!cloudRes?.success && !localMatches) {
+        setCodeError('No se encontró ninguna congregación registrada con el ID ingresado. Verifica el ID o regístrala primero.');
+        setIsSubmittingCode(false);
+        return;
+      }
+
+      // 2. Validar coincidencia de PIN de Congregación (OBLIGATORIO)
+      const effectivePinHash =
+        cloudData?.settings?.congregationPinHash ||
+        cloudData?.congregationPinHash ||
+        (localMatches ? settings.congregationPinHash : null);
+
       let isCongPinValid = false;
-      if (cleanCongPin) {
+      if (effectivePinHash) {
+        isCongPinValid = await verifyPasscode(cleanCongPin, effectivePinHash);
+      } else {
         isCongPinValid = await verifyCongregationPin(cleanCongPin);
-        if (!isCongPinValid) {
-          isCongPinValid = await verifyPersonalPin(cleanCongPin);
-        }
-        if (!isCongPinValid && effectivePinHash) {
-          isCongPinValid = await verifyPasscode(cleanCongPin, effectivePinHash);
-        }
+      }
+
+      if (!isCongPinValid) {
+        setCodeError('El PIN de Congregación ingresado es incorrecto.');
+        setIsSubmittingCode(false);
+        return;
       }
 
       let identifiedRole: TheocraticRole | undefined;
 
-      // 3. Probar PIN personal en el directorio de la congregación (nube y local)
-      const pinToIdentify = cleanPersonalPin || cleanCongPin;
+      // 3. Probar PIN personal en el directorio de la congregación ÚNICAMENTE si el usuario lo ingresó
       let matchingPub: any = null;
-      if (pinToIdentify) {
+      if (cleanPersonalPin) {
         const congPubs = (cloudData?.publishers || publishers) as any[];
         matchingPub = congPubs.find(
-          (p) => p.personalPin && p.personalPin.trim() === pinToIdentify.trim()
+          (p) => p.personalPin && String(p.personalPin).trim() === cleanPersonalPin
         );
 
         if (matchingPub) {
@@ -163,20 +180,20 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               ? 'siervo_territorios'
               : 'publico');
           identifiedRole = finalRole;
-          nameToUse = matchingPub.name;
+          nameToUse = matchingPub.name && !isGenericIdentityName(matchingPub.name) ? matchingPub.name.trim() : 'Hermano';
           if (matchingPub.email) emailToUse = matchingPub.email;
-          setIdentifiedPublisher(matchingPub.id, matchingPub.name);
-          setIdentifiedBrother(matchingPub.name);
+          setIdentifiedPublisher(matchingPub.id, nameToUse);
+          setIdentifiedBrother(nameToUse);
           assignPersonalPinToPublisher(
             matchingPub.id,
-            pinToIdentify.trim(),
+            cleanPersonalPin,
             finalRole,
-            matchingPub.name,
+            nameToUse,
             matchingPub.email,
             matchingPub.privilege
           );
         } else {
-          const pinResult = await identifyRoleByPersonalPin(pinToIdentify);
+          const pinResult = await identifyRoleByPersonalPin(cleanPersonalPin);
           if (pinResult.success && pinResult.role) {
             identifiedRole = pinResult.role;
             if (pinResult.name && !isGenericIdentityName(pinResult.name)) {
@@ -187,37 +204,30 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               setIdentifiedBrother(pinResult.name);
             }
           } else {
-            const invResult = await redeemInvitationCode(pinToIdentify, emailToUse, nameToUse || 'Hermano');
+            const invResult = await redeemInvitationCode(cleanPersonalPin, emailToUse, nameToUse || 'Hermano');
             if (invResult.success && invResult.role) {
               identifiedRole = invResult.role;
               if (invResult.targetName && !isGenericIdentityName(invResult.targetName)) {
                 nameToUse = invResult.targetName;
               }
+            } else {
+              setCodeError('El PIN Personal ingresado no fue reconocido en esta congregación. Verifica el PIN asignado por los ancianos o déjalo vacío para entrar como Publicador.');
+              setIsSubmittingCode(false);
+              return;
             }
           }
         }
       }
 
-      // Si el PIN de congregación es válido y no tenía PIN personal identificado:
-      if (!identifiedRole && isCongPinValid) {
-        identifiedRole = 'coordinador';
-      }
+      // Si solo ingresó PIN de congregación sin PIN personal, el rol es ESTRICTAMENTE 'publico' (nunca 'coordinador')
+      const roleFinal: TheocraticRole = identifiedRole || 'publico';
 
-      if (!identifiedRole && !isCongPinValid) {
-        setCodeError('El PIN ingresado no fue reconocido. Asegúrate de ingresar el PIN con el que registraste tu congregación o el PIN personal que te asignaron los ancianos.');
-        setIsSubmittingCode(false);
-        return;
-      }
-
-      const roleFinal: TheocraticRole = identifiedRole || (isCongPinValid ? 'coordinador' : 'publico');
-
-      // 4. Resolver nombre real según la identidad identificada o datos de coordinador
+      // 4. Resolver nombre real según la identidad identificada
       if (!nameToUse || isGenericIdentityName(nameToUse)) {
         if (roleFinal === 'coordinador') {
           const cloudCoord = cloudData?.settings?.coordinatorName;
           const localCoord = settings.coordinatorName;
           const savedCoord = localStorage.getItem('kongre_coordinator_name');
-          const savedIdent = localStorage.getItem('kongre_identified_brother');
           const googleName = user?.displayName;
 
           if (cloudCoord && !isGenericIdentityName(cloudCoord)) {
@@ -226,151 +236,137 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             nameToUse = localCoord.trim();
           } else if (savedCoord && !isGenericIdentityName(savedCoord)) {
             nameToUse = savedCoord.trim();
-          } else if (savedIdent && !isGenericIdentityName(savedIdent)) {
-            nameToUse = savedIdent.trim();
           } else if (googleName && !isGenericIdentityName(googleName)) {
             nameToUse = googleName.trim();
           } else {
             nameToUse = 'Coordinador';
           }
         } else {
-          nameToUse = 'Hermano';
+          nameToUse = user?.displayName && !isGenericIdentityName(user.displayName) ? user.displayName.trim() : 'Publicador';
         }
       }
 
-      // 5. Si el PIN de congregación es válido o el PIN personal fue reconocido en el directorio:
-      const isAuthorizedMember =
-        isCongPinValid ||
-        Boolean(identifiedRole) ||
-        roleFinal === 'coordinador' ||
-        emailToUse === 'hectorguti95@gmail.com';
+      // 5. El usuario ha sido validado correctamente con el PIN de la congregación
+      const cleanCongName =
+        (cloudRes?.success && cloudRes.congregationName && !isCongregationIdString(cloudRes.congregationName)
+          ? cloudRes.congregationName
+          : null) ||
+        (settings.congregationName && !isCongregationIdString(settings.congregationName)
+          ? settings.congregationName
+          : (localStorage.getItem('kongre_congregation_name') || ''));
 
-      if (isAuthorizedMember) {
-        const cleanCongName =
-          (cloudRes?.success && cloudRes.congregationName && !isCongregationIdString(cloudRes.congregationName)
-            ? cloudRes.congregationName
-            : null) ||
-          (settings.congregationName && !isCongregationIdString(settings.congregationName)
-            ? settings.congregationName
-            : (localStorage.getItem('kongre_congregation_name') || ''));
+      localStorage.setItem('kongre_congregation_number', effectiveId);
+      localStorage.setItem('kongre_congregation_id', effectiveId);
 
-        localStorage.setItem('kongre_congregation_number', effectiveId);
-        localStorage.setItem('kongre_congregation_id', effectiveId);
+      const newSettingsUpdate: any = {
+        isRegistered: true,
+        ...(cleanCongName ? { congregationName: cleanCongName } : {}),
+        congregationNumber: effectiveId,
+        congregationId: effectiveId,
+      };
 
-        const newSettingsUpdate: any = {
-          isRegistered: true,
-          ...(cleanCongName ? { congregationName: cleanCongName } : {}),
-          congregationNumber: effectiveId,
-          congregationId: effectiveId,
-        };
-
-        if (!isGenericIdentityName(nameToUse)) {
-          localStorage.setItem('kongre_identified_brother', nameToUse);
-          setIdentifiedBrother(nameToUse);
-          if (roleFinal === 'coordinador') {
-            localStorage.setItem('kongre_coordinator_name', nameToUse);
-            newSettingsUpdate.coordinatorName = nameToUse;
-          }
+      if (!isGenericIdentityName(nameToUse)) {
+        localStorage.setItem('kongre_identified_brother', nameToUse);
+        setIdentifiedBrother(nameToUse);
+        if (roleFinal === 'coordinador') {
+          localStorage.setItem('kongre_coordinator_name', nameToUse);
+          newSettingsUpdate.coordinatorName = nameToUse;
         }
-
-        // Actualizar configuración local sin sobreescribir la nube recién descargada
-        updateSettings(newSettingsUpdate, { skipCloudWrite: true });
-
-        const cleanPhoto =
-          cloudData?.settings?.coordinatorPhotoURL ||
-          cloudData?.coordinatorPhotoURL ||
-          localStorage.getItem('kongre_coordinator_photo') ||
-          localStorage.getItem('kongre_google_photo') ||
-          '';
-
-        if (cleanPhoto) {
-          localStorage.setItem('kongre_coordinator_photo', cleanPhoto);
-          if (!localStorage.getItem('kongre_user_photo') || roleFinal === 'coordinador') {
-            localStorage.setItem('kongre_user_photo', cleanPhoto);
-          }
-        }
-
-        assignRoleToEmail(emailToUse, roleFinal, nameToUse, pinToIdentify);
-        setActiveRole(roleFinal);
-
-        // Asegurar que el hermano figure en la lista oficial de publicadores de la congregación SOLO si no existía
-        if (!matchingPub && !isGenericIdentityName(nameToUse)) {
-          const currentPubs = (cloudData?.publishers || publishers) as any[];
-          const alreadyInList = currentPubs.some(
-            (p) =>
-              (p.personalPin && pinToIdentify && String(p.personalPin).trim() === pinToIdentify.trim()) ||
-              (p.name && areNamesEquivalent(p.name, nameToUse))
-          );
-          if (!alreadyInList) {
-            const isElder = roleFinal === 'coordinador' || roleFinal === 'secretario' || roleFinal === 'superintendente_vym' || roleFinal === 'anciano';
-            const isSM = roleFinal.startsWith('siervo_');
-            addPublisher({
-              name: nameToUse,
-              gender: 'hermano',
-              phone: settings.coordinatorPhone || '',
-              email: emailToUse && !emailToUse.startsWith('hermano_') ? emailToUse : '',
-              personalPin: pinToIdentify || undefined,
-              notes: roleFinal === 'coordinador' ? 'Coordinador del Cuerpo de Ancianos' : (THEOCRATIC_ROLES[roleFinal]?.name || ''),
-              active: true,
-              groupNumber: 1,
-              privilege: isElder ? 'anciano' : isSM ? 'siervo_ministerial' : undefined,
-              theocraticRole: roleFinal,
-              hope: 'otras_ovejas',
-              absences: [],
-              roles: {
-                vym_presidente: isElder,
-                vym_oracion: isElder || isSM,
-                vym_tesoros_discurso: isElder,
-                vym_tesoros_perlas: isElder,
-                vym_tesoros_lectura: true,
-                vym_maestros_titular: true,
-                vym_maestros_ayudante: true,
-                vym_vida_partes: isElder || isSM,
-                vym_estudio_conductor: isElder,
-                vym_estudio_lector: true,
-                fds_presidente: isElder,
-                fds_atalaya_lector: isElder || isSM,
-                fds_oracion: isElder || isSM,
-                deber_acomodador: true,
-                deber_seguridad: true,
-                deber_audio: true,
-                deber_video: true,
-                deber_microfonos: true,
-                deber_plataforma: true,
-                deber_zoom: true,
-              },
-            });
-          }
-        }
-
-        localStorage.setItem('kongre_is_registered_congregation', 'true');
-        localStorage.setItem('kongre_has_entered_app', 'true');
-        localStorage.removeItem('kongre_needs_cloud_upload');
-        localStorage.setItem('kongre_last_local_update', cloudData?.updatedAt || new Date().toISOString());
-
-        // Vincular de forma persistente en /users/{uid} si el usuario tiene sesión de Google activa
-        const uidToLink = user?.uid || auth.currentUser?.uid;
-        if (uidToLink) {
-          try {
-            await setDoc(doc(db, 'users', uidToLink), {
-              congregationId: effectiveId,
-              congregationNumber: effectiveId,
-              congregationName: cleanCongName,
-              theocraticRole: roleFinal,
-              updatedAt: new Date().toISOString(),
-            }, { merge: true });
-          } catch {}
-        }
-
-        setCodeSuccess(`¡Conexión exitosa a ${cleanCongName}! Bienvenido, ${nameToUse} (${THEOCRATIC_ROLES[roleFinal]?.name || roleFinal}).`);
-        setTimeout(() => {
-          onEnterApp();
-        }, 900);
-      } else {
-        // Solicitud para publicador nuevo
-        await createAccountLinkRequest(emailToUse, nameToUse, pinToIdentify, roleFinal, cleanId);
-        setPendingApprovalEmail(emailToUse);
       }
+
+      // Actualizar configuración local sin sobreescribir la nube recién descargada
+      updateSettings(newSettingsUpdate, { skipCloudWrite: true });
+
+      const cleanPhoto =
+        cloudData?.settings?.coordinatorPhotoURL ||
+        cloudData?.coordinatorPhotoURL ||
+        localStorage.getItem('kongre_coordinator_photo') ||
+        localStorage.getItem('kongre_google_photo') ||
+        '';
+
+      if (cleanPhoto) {
+        localStorage.setItem('kongre_coordinator_photo', cleanPhoto);
+        if (roleFinal === 'coordinador') {
+          localStorage.setItem('kongre_user_photo', cleanPhoto);
+        }
+      }
+
+      assignRoleToEmail(emailToUse, roleFinal, nameToUse, cleanPersonalPin || undefined);
+      setActiveRole(roleFinal);
+
+      // Asegurar que el hermano figure en la lista oficial de publicadores de la congregación SOLO si se identificó personalmente
+      if (!matchingPub && !isGenericIdentityName(nameToUse) && (cleanPersonalPin || roleFinal === 'coordinador')) {
+        const currentPubs = (cloudData?.publishers || publishers) as any[];
+        const alreadyInList = currentPubs.some(
+          (p) =>
+            (p.personalPin && cleanPersonalPin && String(p.personalPin).trim() === cleanPersonalPin.trim()) ||
+            (p.name && areNamesEquivalent(p.name, nameToUse))
+        );
+        if (!alreadyInList) {
+          const isElder = roleFinal === 'coordinador' || roleFinal === 'secretario' || roleFinal === 'superintendente_vym' || roleFinal === 'anciano';
+          const isSM = roleFinal.startsWith('siervo_');
+          addPublisher({
+            name: nameToUse,
+            gender: 'hermano',
+            phone: settings.coordinatorPhone || '',
+            email: emailToUse && !emailToUse.startsWith('hermano_') ? emailToUse : '',
+            personalPin: cleanPersonalPin || undefined,
+            notes: roleFinal === 'coordinador' ? 'Coordinador del Cuerpo de Ancianos' : (THEOCRATIC_ROLES[roleFinal]?.name || ''),
+            active: true,
+            groupNumber: 1,
+            privilege: isElder ? 'anciano' : isSM ? 'siervo_ministerial' : undefined,
+            theocraticRole: roleFinal,
+            hope: 'otras_ovejas',
+            absences: [],
+            roles: {
+              vym_presidente: isElder,
+              vym_oracion: isElder || isSM,
+              vym_tesoros_discurso: isElder,
+              vym_tesoros_perlas: isElder,
+              vym_tesoros_lectura: true,
+              vym_maestros_titular: true,
+              vym_maestros_ayudante: true,
+              vym_vida_partes: isElder || isSM,
+              vym_estudio_conductor: isElder,
+              vym_estudio_lector: true,
+              fds_presidente: isElder,
+              fds_atalaya_lector: isElder || isSM,
+              fds_oracion: isElder || isSM,
+              deber_acomodador: true,
+              deber_seguridad: true,
+              deber_audio: true,
+              deber_video: true,
+              deber_microfonos: true,
+              deber_plataforma: true,
+              deber_zoom: true,
+            },
+          });
+        }
+      }
+
+      localStorage.setItem('kongre_is_registered_congregation', 'true');
+      localStorage.setItem('kongre_has_entered_app', 'true');
+      localStorage.removeItem('kongre_needs_cloud_upload');
+      localStorage.setItem('kongre_last_local_update', cloudData?.updatedAt || new Date().toISOString());
+
+      // Vincular de forma persistente en /users/{uid} si el usuario tiene sesión de Google activa
+      const uidToLink = user?.uid || auth.currentUser?.uid;
+      if (uidToLink) {
+        try {
+          await setDoc(doc(db, 'users', uidToLink), {
+            congregationId: effectiveId,
+            congregationNumber: effectiveId,
+            congregationName: cleanCongName,
+            theocraticRole: roleFinal,
+            updatedAt: new Date().toISOString(),
+          }, { merge: true });
+        } catch {}
+      }
+
+      setCodeSuccess(`¡Conexión exitosa a ${cleanCongName}! Bienvenido, ${nameToUse} (${THEOCRATIC_ROLES[roleFinal]?.name || roleFinal}).`);
+      setTimeout(() => {
+        onEnterApp();
+      }, 900);
     } catch (err: any) {
       setCodeError(err?.message || 'Error al conectar con la congregación.');
     } finally {

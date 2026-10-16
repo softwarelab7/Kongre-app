@@ -154,7 +154,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenLinkRequestsModal,
   onOpenWelcomeLanding,
 }) => {
-  const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo, currentBrotherName } = useAuth();
+  const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo, currentBrotherName, isCoordinator } = useAuth();
+  const canManageRoles = isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano';
   const {
     settings,
     updateSettings,
@@ -1180,7 +1181,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </button>
                     )}
 
-                    {onOpenRoleModal && (
+                    {canManageRoles && onOpenRoleModal && (
                       <button
                         type="button"
                         onClick={() => {
@@ -1306,7 +1307,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {effectiveDisplayName || 'Hermano'}
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    {onOpenRoleModal ? (
+                    {canManageRoles && onOpenRoleModal ? (
                       <button
                         type="button"
                         onClick={() => {
@@ -1320,8 +1321,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                         <span className="truncate">{effectiveRoleInfo?.name || 'Publicador'}</span>
                       </button>
                     ) : (
-                      <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-md bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 truncate">
-                        {effectiveRoleInfo?.name || 'Publicador'}
+                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 truncate flex items-center gap-1">
+                        <Shield className="w-2.5 h-2.5 shrink-0" />
+                        <span className="truncate">{effectiveRoleInfo?.name || 'Publicador'}</span>
                       </span>
                     )}
                     {user?.email && (

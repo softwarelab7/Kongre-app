@@ -18,6 +18,8 @@ import {
   KeyRound,
   Lock,
   Hash,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 interface JoinCongregationModalProps {
@@ -51,6 +53,8 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
   const [congregationIdInput, setCongregationIdInput] = useState(settings.congregationNumber || '');
   const [congregationPinInput, setCongregationPinInput] = useState('');
   const [personalPinInput, setPersonalPinInput] = useState('');
+  const [showCongPin, setShowCongPin] = useState(false);
+  const [showPersPin, setShowPersPin] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<{
@@ -421,19 +425,39 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
             {/* DATO 2: PIN DE LA CONGREGACIÓN */}
             <div className="space-y-1">
-              <label className="block font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>2. PIN de la Congregación: *</span>
-              </label>
-              <input
-                type="password"
-                maxLength={8}
-                value={congregationPinInput}
-                onChange={(e) => setCongregationPinInput(e.target.value)}
-                placeholder="PIN de la congregación (4 a 8 caracteres)"
-                className="w-full p-2.5 font-mono font-bold tracking-widest text-center text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-                required
-              />
+              <div className="flex items-center justify-between">
+                <label className="block font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 text-xs">
+                  <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>2. PIN de la Congregación: *</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowCongPin(!showCongPin)}
+                  className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer font-medium"
+                >
+                  {showCongPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                  <span>{showCongPin ? 'Ocultar' : 'Ver PIN'}</span>
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type={showCongPin ? 'text' : 'password'}
+                  maxLength={8}
+                  value={congregationPinInput}
+                  onChange={(e) => setCongregationPinInput(e.target.value)}
+                  placeholder="PIN de la congregación (4 a 8 caracteres)"
+                  className="w-full p-2.5 pr-10 font-mono font-bold tracking-widest text-center text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCongPin(!showCongPin)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                  tabIndex={-1}
+                >
+                  {showCongPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
               <span className="text-[10px] text-slate-400 block">
                 Clave de acceso general de la congregación establecida al registrarla.
               </span>
@@ -441,19 +465,39 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
             {/* DATO 3: PIN PERSONAL SUMINISTRADO POR EL COORDINADOR */}
             <div className="space-y-1 p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60">
-              <label className="block font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
-                <KeyRound className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>3. Tu PIN Personal (Suministrado por el Coordinador o anciano): *</span>
-              </label>
-              <input
-                type="password"
-                maxLength={16}
-                value={personalPinInput}
-                onChange={(e) => setPersonalPinInput(e.target.value)}
-                placeholder="PIN que te dio el Coordinador"
-                className="w-full p-2.5 font-mono font-bold tracking-widest text-center text-sm rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-                required
-              />
+              <div className="flex items-center justify-between">
+                <label className="block font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5 text-xs">
+                  <KeyRound className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>3. Tu PIN Personal (Suministrado por el Coordinador o anciano): *</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowPersPin(!showPersPin)}
+                  className="text-[11px] text-emerald-700 dark:text-emerald-300 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
+                >
+                  {showPersPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                  <span>{showPersPin ? 'Ocultar' : 'Ver PIN'}</span>
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type={showPersPin ? 'text' : 'password'}
+                  maxLength={16}
+                  value={personalPinInput}
+                  onChange={(e) => setPersonalPinInput(e.target.value)}
+                  placeholder="PIN que te dio el Coordinador"
+                  className="w-full p-2.5 pr-10 font-mono font-bold tracking-widest text-center text-sm rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPersPin(!showPersPin)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600/70 hover:text-emerald-800 dark:hover:text-emerald-200 cursor-pointer"
+                  tabIndex={-1}
+                >
+                  {showPersPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
               <span className="text-[10px] text-emerald-800/80 dark:text-emerald-300/80 block">
                 Identifica tu identidad teocrática y activa tus roles y responsabilidades automáticamente.
               </span>

@@ -34,6 +34,10 @@ import {
   Wifi,
   Layers,
   Hash,
+  Eye,
+  EyeOff,
+  Trash2,
+  AlertTriangle,
 } from 'lucide-react';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 import { PendingApprovalView } from './PendingApprovalView';
@@ -102,6 +106,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   );
   const [congregationPinInput, setCongregationPinInput] = useState('');
   const [personalPinInput, setPersonalPinInput] = useState('');
+  const [showCongPin, setShowCongPin] = useState(false);
+  const [showPersPin, setShowPersPin] = useState(false);
   const [isSubmittingCode, setIsSubmittingCode] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [codeSuccess, setCodeSuccess] = useState<string | null>(null);
@@ -137,19 +143,13 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
 
-      // 1. Cargar datos actualizados de la congregación desde la nube en Firestore primero si existen (sin hidratar aún)
+      // 1. Cargar datos actualizados de la congregación desde la nube en Firestore (sin hidratar aún)
       const cloudRes = await loadCongregationFromCloud(cleanId, { skipHydrate: true });
       const cloudData = cloudRes?.data;
       const effectiveId = formatCanonicalCongregationId(cloudData?.congregationId || cloudData?.settings?.congregationId || cleanId);
 
-      const localMatches =
-        settings.isRegistered &&
-        (settings.congregationNumber?.toUpperCase() === cleanId.toUpperCase() ||
-          settings.congregationId?.toUpperCase() === cleanId.toUpperCase() ||
-          settings.congregationName?.toLowerCase() === cleanId.toLowerCase());
-
-      if (!cloudRes?.success && !localMatches) {
-        setCodeError('No se encontró ninguna congregación registrada con el ID ingresado. Verifica el ID o regístrala primero.');
+      if (!cloudRes?.success || !cloudData) {
+        setCodeError(`No se encontró ninguna congregación registrada con el ID "${cleanId}" en Firebase. Verifica el ID o pulsa "Registrar mi Congregación".`);
         setIsSubmittingCode(false);
         return;
       }
@@ -157,8 +157,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       // 2. Validar coincidencia de PIN de Congregación (OBLIGATORIO)
       const effectivePinHash =
         cloudData?.settings?.congregationPinHash ||
-        cloudData?.congregationPinHash ||
-        (localMatches ? settings.congregationPinHash : null);
+        cloudData?.congregationPinHash;
 
       let isCongPinValid = false;
       if (effectivePinHash) {
@@ -370,8 +369,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
       const userEmail = loggedUser.email?.toLowerCase().trim() || '';
-      const userName = loggedUser.displayName?.trim() || '';
-      const userPhoto = loggedUser.photoURL || '';
 
       if (!userEmail) {
         setEmailError('No se pudo obtener el correo de la cuenta de Google.');
@@ -379,232 +376,18 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
 
-      // 1. Obtener ID y Nombre de la congregación existente (local o nube)
-      let existingCongId = formatCanonicalCongregationId(
-        settings.congregationNumber?.trim() ||
-        settings.congregationId?.trim() ||
-        localStorage.getItem('kongre_congregation_number')?.trim() ||
-        localStorage.getItem('kongre_congregation_id')?.trim() ||
-        ''
-      );
-
-      // Si no está en local, buscar ID de congregación para este usuario por su cuenta de Google
-      if (!existingCongId) {
-        try {
-          const foundId = await findUserCongregationId(userEmail, loggedUser.uid);
-          if (foundId) {
-            existingCongId = formatCanonicalCongregationId(foundId);
-            localStorage.setItem('kongre_congregation_number', existingCongId);
-            localStorage.setItem('kongre_congregation_id', existingCongId);
-          }
-        } catch (err) {
-          console.warn('Aviso buscando ID de congregación por Google auth:', err);
+      // Pre-llenar el ID de congregación si el usuario ya tenía uno registrado en su perfil
+      try {
+        const foundId = await findUserCongregationId(userEmail, loggedUser.uid);
+        if (foundId) {
+          setCongregationIdInput(foundId);
         }
+      } catch (err) {
+        console.warn('Aviso buscando ID de congregación:', err);
       }
 
-      const existingCongName =
-        (settings.congregationName && !isCongregationIdString(settings.congregationName) ? settings.congregationName.trim() : null) ||
-        (localStorage.getItem('kongre_congregation_name') && !isCongregationIdString(localStorage.getItem('kongre_congregation_name')!) ? localStorage.getItem('kongre_congregation_name')!.trim() : null) ||
-        '';
-
-      // 2. Si hay ID de congregación, cargar datos de Firestore (sin hidratar hasta verificar autorización)
-      let cloudData: any = null;
-      if (existingCongId) {
-        const cloudRes = await loadCongregationFromCloud(existingCongId, { skipHydrate: true });
-        cloudData = cloudRes?.data;
-      }
-
-      const allPublishers = (cloudData?.publishers || publishers || []) as any[];
-      const coordEmail = (
-        cloudData?.settings?.coordinatorEmail ||
-        settings.coordinatorEmail ||
-        (typeof window !== 'undefined' ? localStorage.getItem('kongre_coordinator_email') : '') ||
-        ''
-      ).toLowerCase().trim();
-      const coordName = cloudData?.settings?.coordinatorName || settings.coordinatorName || '';
-
-      // 3. Comprobar si el usuario es estrictamente el Coordinador registrado (sin atajos de correo)
-      const isKnownCoordinator = Boolean(existingCongId) && Boolean(coordEmail) && userEmail === coordEmail;
-
-      // 4. Comprobar si el usuario coincide con un publicador registrado por correo exacto (NUNCA sólo por nombre)
-      const matchingPub = existingCongId
-        ? allPublishers.find(
-            (p) => p.email && p.email.toLowerCase().trim() === userEmail
-          )
-        : undefined;
-
-      const matchingRole = existingCongId
-        ? userRolesList.find((r) => r.email.toLowerCase().trim() === userEmail)
-        : undefined;
-
-      const approvedReq = existingCongId
-        ? accountLinkRequests.find(
-            (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'approved'
-          )
-        : undefined;
-
-      const pendingReq = existingCongId
-        ? accountLinkRequests.find(
-            (r) => r.email.toLowerCase().trim() === userEmail && r.status === 'pending'
-          )
-        : undefined;
-
-      if (pendingReq) {
-        setPendingApprovalEmail(userEmail);
-        return;
-      }
-
-      // Si no hay congregación existente vinculada a este correo o dispositivo
-      if (!existingCongId) {
-        setActiveTab('code_login');
-        setCodeSuccess(
-          `Sesión de Google iniciada (${userEmail}). No encontramos una congregación vinculada a esta cuenta. Introduce el ID y PIN de tu congregación para vincularla, o selecciona "Registrar mi Congregación".`
-        );
-        return;
-      }
-
-      // CASO A: Es estrictamente el coordinador registrado de la congregación
-      if (isKnownCoordinator) {
-        if (cloudData) {
-          hydrateCongregation(cloudData);
-        }
-        const finalCoordName =
-          (userName && !isGenericIdentityName(userName) ? userName : null) ||
-          (coordName && !isGenericIdentityName(coordName) ? coordName : null) ||
-          localStorage.getItem('kongre_coordinator_name') ||
-          'Coordinador';
-
-        await updateSettings({
-          coordinatorEmail: userEmail,
-          coordinatorName: finalCoordName,
-          isRegistered: true,
-          ...(userPhoto ? { coordinatorPhotoURL: userPhoto } : {}),
-          ...(existingCongId ? { congregationNumber: existingCongId, congregationId: existingCongId } : {}),
-          ...(existingCongName ? { congregationName: existingCongName } : {}),
-        }, { skipCloudWrite: true });
-
-        if (finalCoordName && !isGenericIdentityName(finalCoordName)) {
-          setIdentifiedBrother(finalCoordName);
-          localStorage.setItem('kongre_identified_brother', finalCoordName);
-          localStorage.setItem('kongre_coordinator_name', finalCoordName);
-        }
-
-        assignRoleToEmail(userEmail, 'coordinador', finalCoordName);
-        setActiveRole('coordinador');
-        localStorage.setItem('kongre_is_registered_congregation', 'true');
-        localStorage.setItem('kongre_has_entered_app', 'true');
-        localStorage.removeItem('kongre_needs_cloud_upload');
-        localStorage.setItem('kongre_last_local_update', cloudData?.updatedAt || new Date().toISOString());
-
-        // Vincular de forma persistente su perfil en /users/{uid}
-        const activeUid = loggedUser.uid || user?.uid || auth.currentUser?.uid;
-        if (activeUid && existingCongId) {
-          try {
-            await setDoc(doc(db, 'users', activeUid), {
-              congregationId: existingCongId,
-              congregationNumber: existingCongId,
-              congregationName: existingCongName || cloudData?.settings?.congregationName || '',
-              theocraticRole: 'coordinador',
-              updatedAt: new Date().toISOString(),
-            }, { merge: true });
-          } catch {}
-        }
-
-        // Si ya figura como publicador, vincular su ID sin duplicar
-        if (finalCoordName && !isGenericIdentityName(finalCoordName)) {
-          const existingPub = allPublishers.find(
-            (p) => (p.email && p.email.toLowerCase().trim() === userEmail) || (p.name && areNamesEquivalent(p.name, finalCoordName))
-          );
-          if (existingPub && existingPub.id) {
-            setIdentifiedPublisher(existingPub.id, finalCoordName);
-          }
-        }
-
-        onEnterApp();
-        return;
-      }
-
-      // CASO B: Es un publicador o rol ya autorizado previamente por los ancianos
-      if (matchingPub || matchingRole || approvedReq) {
-        if (cloudData) {
-          hydrateCongregation(cloudData);
-        }
-        const roleToAssign: TheocraticRole =
-          matchingRole?.role ||
-          matchingPub?.theocraticRole ||
-          (matchingPub?.privilege === 'anciano'
-            ? 'anciano'
-            : matchingPub?.privilege === 'siervo_ministerial'
-            ? 'siervo_territorios'
-            : 'publico');
-
-        const brotherName =
-          matchingPub?.name ||
-          matchingRole?.name ||
-          userName ||
-          'Hermano';
-
-        if (brotherName && !isGenericIdentityName(brotherName)) {
-          setIdentifiedBrother(brotherName);
-          localStorage.setItem('kongre_identified_brother', brotherName);
-        }
-
-        if (matchingPub?.id) {
-          setIdentifiedPublisher(matchingPub.id, brotherName);
-        }
-
-        if (matchingPub && matchingPub.personalPin) {
-          localStorage.setItem('kongre_session_pin_v2', String(matchingPub.personalPin).trim());
-        }
-
-        assignRoleToEmail(userEmail, roleToAssign, brotherName);
-        setActiveRole(roleToAssign);
-        localStorage.setItem('kongre_is_registered_congregation', 'true');
-        localStorage.setItem('kongre_has_entered_app', 'true');
-
-        const canonicalCongId = formatCanonicalCongregationId(existingCongId);
-        if (canonicalCongId) {
-          await updateSettings({
-            isRegistered: true,
-            congregationNumber: canonicalCongId,
-            congregationId: canonicalCongId,
-            ...(existingCongName ? { congregationName: existingCongName } : {}),
-          }, { skipCloudWrite: true });
-        }
-
-        // Vincular de forma persistente su perfil en /users/{uid}
-        const activeUid = loggedUser.uid || user?.uid || auth.currentUser?.uid;
-        if (activeUid && canonicalCongId) {
-          try {
-            await setDoc(doc(db, 'users', activeUid), {
-              congregationId: canonicalCongId,
-              congregationNumber: canonicalCongId,
-              congregationName: existingCongName || cloudData?.settings?.congregationName || '',
-              theocraticRole: roleToAssign,
-              updatedAt: new Date().toISOString(),
-            }, { merge: true });
-          } catch {}
-        }
-
-        onEnterApp();
-        return;
-      }
-
-      // CASO C: La congregación existe pero la cuenta de Google NO está autorizada
-      if (existingCongId) {
-        setUnauthorizedGoogleAccount({
-          email: userEmail,
-          name: userName || 'Hermano',
-          congregationId: existingCongId,
-          congregationName: existingCongName || cloudData?.settings?.congregationName || 'la Congregación',
-        });
-        setActiveTab('unauthorized');
-        return;
-      }
-
-      // CASO D: Es un sistema completamente limpio sin congregación previa
-      setActiveTab('register');
-      setCodeSuccess('Cuenta de Google verificada. Puedes completar el registro de tu congregación.');
+      // Permanecer en la pantalla de inicio de sesión con Google para mostrar el enunciado y solicitar el ID de congregación
+      setActiveTab('email_login');
     } catch (err: any) {
       setEmailError(err?.message || 'Error al iniciar sesión con Google.');
     } finally {
@@ -985,51 +768,225 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     </div>
                   )}
 
-                  {/* Google One-Click Button */}
-                  <button
-                    type="button"
-                    onClick={handleGoogleLogin}
-                    disabled={isSubmittingEmail}
-                    className="w-full py-3.5 px-4 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50 bg-white dark:bg-slate-900"
-                  >
-                    <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
-                      <path
-                        fill="#4285F4"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      />
-                      <path
-                        fill="#34A853"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      />
-                      <path
-                        fill="#FBBC05"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                      />
-                      <path
-                        fill="#EA4335"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                      />
-                    </svg>
-                    <span>{isSubmittingEmail ? 'Conectando con Google...' : 'Continuar con Google'}</span>
-                  </button>
-
-                  {/* Acceso alternativo con ID y PIN */}
-                  <div className="pt-2 text-center border-t border-slate-100 dark:border-slate-800">
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      ¿Prefieres ingresar sin cuenta de Google?{' '}
+                  {!user ? (
+                    <>
+                      {/* Google One-Click Button */}
                       <button
                         type="button"
-                        onClick={() => {
-                          setActiveTab('code_login');
-                          setCodeError(null);
-                          setCodeSuccess(null);
-                        }}
-                        className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
+                        onClick={handleGoogleLogin}
+                        disabled={isSubmittingEmail}
+                        className="w-full py-3.5 px-4 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50 bg-white dark:bg-slate-900"
                       >
-                        Usa ID y PIN de Congregación →
+                        <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                          <path
+                            fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                          />
+                        </svg>
+                        <span>{isSubmittingEmail ? 'Conectando con Google...' : 'Continuar con Google'}</span>
                       </button>
-                    </p>
-                  </div>
+
+                      {/* Acceso alternativo con ID y PIN */}
+                      <div className="pt-2 text-center border-t border-slate-100 dark:border-slate-800">
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          ¿Prefieres ingresar sin cuenta de Google?{' '}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveTab('code_login');
+                              setCodeError(null);
+                              setCodeSuccess(null);
+                            }}
+                            className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer"
+                          >
+                            Usa ID y PIN de Congregación →
+                          </button>
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="space-y-4">
+                      {/* Tarjeta de cuenta de Google verificada */}
+                      <div className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          {user.photoURL ? (
+                            <img
+                              src={user.photoURL}
+                              alt={user.displayName || 'Google'}
+                              className="w-10 h-10 rounded-full border-2 border-indigo-300 dark:border-indigo-700 shrink-0"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center shrink-0 text-sm">
+                              {(user.displayName || user.email || 'G')[0].toUpperCase()}
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400">
+                              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                              <span>Sesión de Google iniciada</span>
+                            </div>
+                            <p className="text-xs text-slate-900 dark:text-white font-bold truncate">
+                              {user.displayName || user.email}
+                            </p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                              {user.email}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await signOutUser();
+                            setEmailError(null);
+                            setCodeError(null);
+                          }}
+                          className="text-xs text-rose-600 dark:text-rose-400 font-bold hover:underline shrink-0 cursor-pointer"
+                        >
+                          Cambiar cuenta
+                        </button>
+                      </div>
+
+                      {/* ENUNCIADO PARA PONER ID DE CONGREGACIÓN */}
+                      <div className="p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 space-y-1.5">
+                        <div className="flex items-center gap-2 text-xs font-bold text-amber-900 dark:text-amber-200">
+                          <Building2 className="w-4 h-4 text-amber-600 shrink-0" />
+                          <span>¿A qué congregación perteneces?</span>
+                        </div>
+                        <p className="text-xs text-amber-900/90 dark:text-amber-300/90 leading-relaxed">
+                          Firebase necesita saber a qué congregación enlazar tu cuenta de Google. Introduce el <strong>ID y el PIN de tu congregación</strong> para conectarte, o regístrala como una nueva congregación.
+                        </p>
+                      </div>
+
+                      {/* Formulario para ingresar ID y PIN de congregación */}
+                      <form onSubmit={handleConnectWithIdPin} className="space-y-3.5">
+                        {/* DATO 1: ID DE LA CONGREGACIÓN */}
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                            <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                            <span>1. ID de la Congregación: *</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={congregationIdInput}
+                            onChange={(e) => setCongregationIdInput(e.target.value)}
+                            placeholder="Ej: 10582"
+                            className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono"
+                          />
+                        </div>
+
+                        {/* DATO 2: PIN DE LA CONGREGACIÓN */}
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                              <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                              <span>2. PIN de la Congregación: *</span>
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setShowCongPin(!showCongPin)}
+                              className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer font-medium"
+                            >
+                              {showCongPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                              <span>{showCongPin ? 'Ocultar' : 'Ver PIN'}</span>
+                            </button>
+                          </div>
+                          <div className="relative">
+                            <input
+                              type={showCongPin ? 'text' : 'password'}
+                              required
+                              maxLength={8}
+                              value={congregationPinInput}
+                              onChange={(e) => setCongregationPinInput(e.target.value)}
+                              placeholder="PIN de 4 a 8 caracteres"
+                              className="w-full p-2.5 pr-10 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-widest text-center"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowCongPin(!showCongPin)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                              tabIndex={-1}
+                            >
+                              {showCongPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* DATO 3: PIN PERSONAL */}
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="block text-xs font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
+                              <KeyRound className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                              <span>3. PIN Personal Único:</span>
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setShowPersPin(!showPersPin)}
+                              className="text-[11px] text-emerald-700 dark:text-emerald-300 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
+                            >
+                              {showPersPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                              <span>{showPersPin ? 'Ocultar' : 'Ver PIN'}</span>
+                            </button>
+                          </div>
+                          <div className="relative">
+                            <input
+                              type={showPersPin ? 'text' : 'password'}
+                              maxLength={16}
+                              value={personalPinInput}
+                              onChange={(e) => setPersonalPinInput(e.target.value)}
+                              placeholder="PIN asignado o déjalo vacío si eres el creador"
+                              className="w-full p-2.5 pr-10 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-widest text-center"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPersPin(!showPersPin)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600/70 hover:text-emerald-800 dark:hover:text-emerald-200 cursor-pointer"
+                              tabIndex={-1}
+                            >
+                              {showPersPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">
+                            Si eres el Coordinador registrado en la congregación, puedes dejar este campo vacío.
+                          </span>
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={isSubmittingCode || !congregationIdInput.trim() || !congregationPinInput.trim()}
+                          className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                        >
+                          <ShieldCheck className="w-4 h-4" />
+                          <span>{isSubmittingCode ? 'Verificando y vinculando...' : 'Vincular cuenta de Google y Entrar'}</span>
+                        </button>
+                      </form>
+
+                      {/* Opción de Registrar Nueva Congregación */}
+                      <div className="pt-3 border-t border-slate-200 dark:border-slate-800 text-center">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveTab('register');
+                          }}
+                          className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                        >
+                          ¿Tu congregación aún no está registrada? Regístrala aquí →
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1072,19 +1029,39 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
                     {/* DATO 2: PIN DE LA CONGREGACIÓN */}
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
-                        <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                        <span>2. PIN de la Congregación: *</span>
-                      </label>
-                      <input
-                        type="password"
-                        required
-                        maxLength={8}
-                        value={congregationPinInput}
-                        onChange={(e) => setCongregationPinInput(e.target.value)}
-                        placeholder="PIN de 4 a 8 caracteres"
-                        className="w-full p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-widest text-center"
-                      />
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                          <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span>2. PIN de la Congregación: *</span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowCongPin(!showCongPin)}
+                          className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer font-medium"
+                        >
+                          {showCongPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                          <span>{showCongPin ? 'Ocultar' : 'Ver PIN'}</span>
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type={showCongPin ? 'text' : 'password'}
+                          required
+                          maxLength={8}
+                          value={congregationPinInput}
+                          onChange={(e) => setCongregationPinInput(e.target.value)}
+                          placeholder="PIN de 4 a 8 caracteres"
+                          className="w-full p-2.5 pr-10 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-widest text-center"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowCongPin(!showCongPin)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                          tabIndex={-1}
+                        >
+                          {showCongPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                       <span className="text-[10px] text-slate-400 mt-0.5 block">
                         Clave de seguridad general de la congregación establecida al registrarla.
                       </span>
@@ -1097,18 +1074,33 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                           <KeyRound className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                           <span>3. PIN Personal Único:</span>
                         </label>
-                        <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold">
-                          (Opcional si eres Coordinador)
-                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setShowPersPin(!showPersPin)}
+                          className="text-[11px] text-emerald-700 dark:text-emerald-300 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
+                        >
+                          {showPersPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                          <span>{showPersPin ? 'Ocultar' : 'Ver PIN'}</span>
+                        </button>
                       </div>
-                      <input
-                        type="password"
-                        maxLength={16}
-                        value={personalPinInput}
-                        onChange={(e) => setPersonalPinInput(e.target.value)}
-                        placeholder="PIN que te dio el Coordinador o déjalo vacío si eres el creador"
-                        className="w-full p-2.5 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-widest text-center"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showPersPin ? 'text' : 'password'}
+                          maxLength={16}
+                          value={personalPinInput}
+                          onChange={(e) => setPersonalPinInput(e.target.value)}
+                          placeholder="PIN que te dio el Coordinador o déjalo vacío si eres el creador"
+                          className="w-full p-2.5 pr-10 rounded-xl border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-widest text-center"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPersPin(!showPersPin)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600/70 hover:text-emerald-800 dark:hover:text-emerald-200 cursor-pointer"
+                          tabIndex={-1}
+                        >
+                          {showPersPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                       <span className="text-[10px] text-emerald-800/80 dark:text-emerald-300/80 block">
                         Si ya te habías registrado previamente antes de los cambios de PINs, puedes dejar este campo vacío o ingresar tu PIN anterior.
                       </span>

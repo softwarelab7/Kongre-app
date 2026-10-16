@@ -117,6 +117,7 @@ interface NavbarProps {
   onOpenInviteManager?: () => void;
   onOpenLinkRequestsModal?: () => void;
   onOpenWelcomeLanding?: () => void;
+  onOpenPinsModal?: () => void;
 }
 
 interface NavSubItem {
@@ -154,6 +155,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenInviteManager,
   onOpenLinkRequestsModal,
   onOpenWelcomeLanding,
+  onOpenPinsModal,
 }) => {
   const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo, currentBrotherName, isCoordinator } = useAuth();
   const canManageRoles = !effectiveRoleInfo.isReadOnly && activeRole !== 'publico' && (isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano');
@@ -1050,6 +1052,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
+            {/* PINs Directory Quick Access (desktop / tablet) */}
+            {onOpenPinsModal && (
+              <button
+                type="button"
+                onClick={onOpenPinsModal}
+                className="w-9 h-9 rounded-xl hidden sm:flex items-center justify-center text-slate-400 hover:text-amber-500 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer"
+                title="Directorio de PINs de los Publicadores y la Congregación"
+              >
+                <KeyRound className="w-4 h-4" />
+              </button>
+            )}
+
             {/* Bell Notifications with amber dot */}
             <button
               type="button"
@@ -1377,7 +1391,22 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block px-1">
                 Herramientas Rápidas
               </span>
-              <div className="grid grid-cols-5 gap-1.5 text-center">
+              <div className="grid grid-cols-6 gap-1 text-center">
+                {onOpenPinsModal && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      onOpenPinsModal();
+                    }}
+                    className="flex flex-col items-center justify-center p-2 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 text-amber-800 dark:text-amber-200 hover:text-amber-600 shadow-2xs transition cursor-pointer"
+                    title="Directorio de PINs"
+                  >
+                    <KeyRound className="w-4 h-4 text-amber-500 mb-1" />
+                    <span className="text-[9px] font-bold leading-tight truncate w-full">PINs</span>
+                  </button>
+                )}
+
                 {onOpenTimerModal && (
                   <button
                     type="button"

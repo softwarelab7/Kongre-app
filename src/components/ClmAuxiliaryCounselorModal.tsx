@@ -59,18 +59,16 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
   const [copiedWhatsApp, setCopiedWhatsApp] = useState(false);
   const [counselorNotes, setCounselorNotes] = useState<Record<string, string>>({});
 
-  if (!isOpen || !programa) return null;
-
   // Filtrar partes de sala auxiliar vs sala principal
-  const auxParts = (programa.partes || []).filter((p) => p.es_clase_auxiliar);
-  const mainParts = (programa.partes || []).filter((p) => !p.es_clase_auxiliar);
+  const auxParts = (programa?.partes || []).filter((p) => p.es_clase_auxiliar);
+  const mainParts = (programa?.partes || []).filter((p) => !p.es_clase_auxiliar);
 
   // Parte del Consejero de la Sala Auxiliar
   let counselorPart = auxParts.find((p) => p.tipo === 'conductor_auxiliar');
 
   // Si no existe la parte en auxParts, verificar si existe en el programa en general
   if (!counselorPart) {
-    counselorPart = (programa.partes || []).find((p) => p.tipo === 'conductor_auxiliar');
+    counselorPart = (programa?.partes || []).find((p) => p.tipo === 'conductor_auxiliar');
   }
 
   // Estudiantes en Sala Auxiliar
@@ -123,7 +121,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
         });
 
         // Verificar si tiene otra asignación esta semana
-        const otherAssignmentsThisWeek = (programa.partes || []).filter(
+        const otherAssignmentsThisWeek = (programa?.partes || []).filter(
           (pt) =>
             pt.id !== counselorPart?.id &&
             (pt.asignado_nid === pId || pt.asignado_auxiliar_nid === pId)
@@ -148,6 +146,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
 
   // Manejador para asignar consejero
   const handleAssignCounselor = (publisherId: string) => {
+    if (!programa) return;
     const selectedPub = publishers.find((p) => (p.nid || p.id) === publisherId);
     const pubName = selectedPub ? selectedPub.full_name || selectedPub.name : '';
 
@@ -211,6 +210,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
 
   // Clonar partes de estudiantes a Sala Auxiliar si no tiene ninguna
   const handleCloneStudentPartsToAux = () => {
+    if (!programa) return;
     const mainStudents = (programa.partes || []).filter(
       (p) => !p.es_clase_auxiliar && (p.seccion === 'maestros' || p.tipo === 'lectura_biblica')
     );
@@ -258,6 +258,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
 
   // Mover una parte entre salas
   const handleToggleRoom = (partId: string) => {
+    if (!programa) return;
     const updated = (programa.partes || []).map((p) => {
       if (p.id === partId) {
         const toAux = !p.es_clase_auxiliar;
@@ -286,6 +287,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
 
   // Actualizar lección de una parte en sala auxiliar
   const handleUpdateLesson = (partId: string, lessonNum: number) => {
+    if (!programa) return;
     const lesson = OFFICIAL_STUDENT_LESSONS.find((l) => l.number === lessonNum);
     const updated = (programa.partes || []).map((p) => {
       if (p.id === partId) {
@@ -308,6 +310,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
 
   // Texto del mensaje de WhatsApp para el consejero
   const whatsAppMessage = useMemo(() => {
+    if (!programa) return '';
     const name = counselorPart?.asignado_nombre || 'Hermano';
     let msg = `🏛️ *REUNIÓN VIDA Y MINISTERIO CRISTIANOS*\n`;
     msg += `📍 *Sala Auxiliar — Consejero Designado*\n\n`;
@@ -360,6 +363,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
 
   // Descargar PDF del Consejero
   const handleDownloadPdf = () => {
+    if (!programa) return;
     generateCounselorSheetPdf({
       congregationName,
       programa,
@@ -373,6 +377,8 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
   const handlePrintWorksheet = () => {
     window.print();
   };
+
+  if (!isOpen || !programa) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-fade-in">

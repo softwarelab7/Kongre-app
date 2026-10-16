@@ -220,6 +220,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
     cleanSampleData,
     clearAllPublishers,
     resetAllCongregationData,
+    deleteAllRegisteredCongregations,
     publishers,
     weeks,
     territories,
@@ -3060,9 +3061,9 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
               <button
                 type="button"
                 disabled={resetConfirmationText.trim().toUpperCase() !== 'RESETEAR'}
-                onClick={() => {
+                onClick={async () => {
                   setShowResetAllModal(false);
-                  resetAllCongregationData();
+                  await deleteAllRegisteredCongregations();
                   window.location.reload();
                 }}
                 className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs cursor-pointer shadow-md disabled:opacity-40 flex items-center gap-1.5"

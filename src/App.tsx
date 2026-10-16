@@ -61,6 +61,7 @@ import { AppLockPinSuggestionModal } from './components/AppLockPinSuggestionModa
 import { AccountLinkRequestsModal } from './components/AccountLinkRequestsModal';
 import { PendingApprovalView } from './components/PendingApprovalView';
 import { IdentityNamePrompt } from './components/IdentityNamePrompt';
+import { PublisherPinsModal } from './components/PublisherPinsModal';
 import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import { checkUpcomingAssignmentsAndNotify } from './services/notificationService';
@@ -83,6 +84,7 @@ const AppContent: React.FC = () => {
   const { showToast } = useToast();
   const canManageRoles = isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano';
   const [isLockPinSuggestionOpen, setIsLockPinSuggestionOpen] = useState(false);
+  const [isPinsModalOpen, setIsPinsModalOpen] = useState(false);
   const prevUserRef = useRef(user);
 
   const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
@@ -212,6 +214,30 @@ const AppContent: React.FC = () => {
       })();
     }
   }, [publishers, loadCongregationFromCloud]);
+
+  // Verificación de existencia real de la congregación en Firestore:
+  // Si la congregación activa fue eliminada de la nube o no existe, restablecer el acceso a la pantalla de bienvenida
+  useEffect(() => {
+    const activeCongId = settings.congregationNumber || settings.congregationId || localStorage.getItem('kongre_congregation_number');
+    if (activeCongId && activeCongId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(activeCongId.toUpperCase())) {
+      (async () => {
+        try {
+          const res = await loadCongregationFromCloud(activeCongId, { skipHydrate: true });
+          if (!res?.success || !res.data) {
+            // La congregación ya no existe en Firestore
+            localStorage.removeItem('kongre_has_entered_app');
+            localStorage.removeItem('kongre_is_registered_congregation');
+            localStorage.removeItem('kongre_congregation_number');
+            localStorage.removeItem('kongre_congregation_id');
+            localStorage.removeItem('kongre_congregation_name');
+            setShowWelcomeLanding(true);
+          }
+        } catch (e) {
+          console.warn('Verificando estado de congregación en la nube:', e);
+        }
+      })();
+    }
+  }, [settings.congregationNumber, settings.congregationId, loadCongregationFromCloud]);
 
   // Guardián de Sesión de Publicador: Revocación o cambio de PIN en tiempo real (p.ej. teléfono perdido o robo)
   useEffect(() => {
@@ -449,6 +475,7 @@ const AppContent: React.FC = () => {
         onOpenInviteManager={() => setIsInviteManagerOpen(true)}
         onOpenLinkRequestsModal={() => setIsLinkRequestsModalOpen(true)}
         onOpenWelcomeLanding={() => setShowWelcomeLanding(true)}
+        onOpenPinsModal={() => setIsPinsModalOpen(true)}
       />
 
       <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200`}>
@@ -507,6 +534,7 @@ const AppContent: React.FC = () => {
                 onOpenTimerModal={() => setIsTimerModalOpen(true)}
                 onOpenKioskModal={() => setIsKioskModalOpen(true)}
                 onOpenConflictsModal={() => setIsConflictsModalOpen(true)}
+                onOpenPinsModal={() => setIsPinsModalOpen(true)}
               />
             )}
             {activeTab === 'calendario' && (
@@ -666,6 +694,12 @@ const AppContent: React.FC = () => {
       <AppLockPinSuggestionModal
         isOpen={isLockPinSuggestionOpen}
         onClose={() => setIsLockPinSuggestionOpen(false)}
+      />
+
+      {/* Directory of Congregation & Publisher PINs */}
+      <PublisherPinsModal
+        isOpen={isPinsModalOpen}
+        onClose={() => setIsPinsModalOpen(false)}
       />
 
       {/* Modal para solicitar nombre e identidad si se inició con PIN sin nombre reconocido */}

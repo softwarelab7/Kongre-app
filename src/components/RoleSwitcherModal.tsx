@@ -83,8 +83,6 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
   // - 'nube_qr': Vinculación Google y Códigos QR
   const [activeTabMode, setActiveTabMode] = useState<'directorio' | 'mi_sesion' | 'nube_qr'>('directorio');
 
-  if (!isOpen || !isAllowedAccess) return null;
-
   // Search & category filter in the directory
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState<
@@ -275,7 +273,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     return { total, ancianosCount, siervosCount, withPin, withoutPin };
   }, [combinedPublishersList]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !isAllowedAccess) return null;
 
   // Toggle PIN visibility
   const togglePinVisibility = (id: string) => {

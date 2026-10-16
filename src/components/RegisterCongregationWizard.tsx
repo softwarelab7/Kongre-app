@@ -66,7 +66,6 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   onOpenJoinWithCode,
   embedded = false,
 }) => {
-  if (isOpen === false) return null;
   const { settings, updateSettings, publishers, addPublisher } = useCongregation();
   const { user, assignRoleToEmail, setActiveRole, assignPersonalPinToRole, setIdentifiedPublisher } = useAuth();
   const { setCongregationPin, setPersonalPin, setMasterPassphrase } = useSecurity();
@@ -153,8 +152,6 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  if (!isOpen) return null;
 
   // Al escribir o cambiar el nombre de la congregación, se genera automáticamente el ID
   const handleCongregationNameChange = (newName: string) => {
@@ -402,7 +399,6 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       if (!alreadyHasCoord && coordinatorName.trim()) {
         const coordId = `pub_coord_${Date.now()}`;
         addPublisher({
-          id: coordId,
           name: coordinatorName.trim(),
           gender: 'hermano',
           phone: coordinatorPhone.trim(),
@@ -473,6 +469,8 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
     { num: 4, title: 'Seguridad' },
     { num: 5, title: 'Confirmación' },
   ];
+
+  if (!isOpen) return null;
 
   const wizardContent = (
     <>

@@ -324,6 +324,7 @@ interface CongregationContextType {
   cleanSampleData: () => Promise<void> | void;
   clearAllPublishers: () => Promise<void> | void;
   resetAllCongregationData: () => void;
+  deleteAllRegisteredCongregations: () => Promise<{ success: boolean; message: string }>;
   restorePreviousRegistration: (congName?: string, coordName?: string, pin?: string) => Promise<void>;
   uploadLocalDataToGoogle: () => Promise<{ success: boolean; message: string }>;
   downloadDataFromGoogle: () => Promise<{ success: boolean; message: string }>;
@@ -5015,6 +5016,102 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   /**
+   * Elimina completamente todas las congregaciones registradas de Firestore y del almacenamiento local.
+   */
+  const deleteAllRegisteredCongregations = async (): Promise<{ success: boolean; message: string }> => {
+    try {
+      const candidateIds = new Set<string>();
+
+      // Recolectar IDs desde settings actuales
+      if (settings.congregationNumber) candidateIds.add(settings.congregationNumber);
+      if (settings.congregationId) candidateIds.add(settings.congregationId);
+      if (latestSettingsRef.current.congregationNumber) candidateIds.add(latestSettingsRef.current.congregationNumber);
+      if (latestSettingsRef.current.congregationId) candidateIds.add(latestSettingsRef.current.congregationId);
+
+      // Recolectar IDs desde localStorage antes de borrar
+      const storedNum = localStorage.getItem('kongre_congregation_number');
+      if (storedNum) candidateIds.add(storedNum);
+      const storedId = localStorage.getItem('kongre_congregation_id');
+      if (storedId) candidateIds.add(storedId);
+
+      const storedRegList = localStorage.getItem('kongre_registered_congregations');
+      if (storedRegList) {
+        try {
+          const parsed = JSON.parse(storedRegList);
+          if (Array.isArray(parsed)) {
+            parsed.forEach((c: any) => {
+              if (c?.id) candidateIds.add(String(c.id));
+              if (c?.number) candidateIds.add(String(c.number));
+            });
+          }
+        } catch {}
+      }
+
+      // Consultar documentos de congregaciones existentes en Firestore
+      if (!isFirestoreQuotaExceeded()) {
+        try {
+          const allCongsSnap = await getDocs(collection(db, 'congregations')).catch(() => null);
+          if (allCongsSnap && !allCongsSnap.empty) {
+            allCongsSnap.forEach(d => {
+              candidateIds.add(d.id);
+            });
+          }
+        } catch (e) {
+          console.warn('No se pudo listar todas las congregaciones de Firestore:', e);
+        }
+      }
+
+      // Eliminar documentos identificados en Firestore
+      for (const rawId of Array.from(candidateIds)) {
+        if (!rawId || rawId.trim().length === 0) continue;
+        const canonical = formatCanonicalCongregationId(rawId);
+        const unhyphenated = canonical.replace(/-/g, '');
+        const rawUpper = rawId.trim().toUpperCase();
+
+        await deleteDoc(doc(db, 'congregations', canonical)).catch(() => {});
+        if (unhyphenated !== canonical) {
+          await deleteDoc(doc(db, 'congregations', unhyphenated)).catch(() => {});
+        }
+        if (rawUpper !== canonical && rawUpper !== unhyphenated) {
+          await deleteDoc(doc(db, 'congregations', rawUpper)).catch(() => {});
+        }
+      }
+
+      // Limpiar perfil de usuario en Firestore si está autenticado
+      if (auth.currentUser?.uid) {
+        try {
+          await deleteDoc(doc(db, 'users', auth.currentUser.uid)).catch(() => {});
+        } catch {}
+      }
+
+      // Resetear estado reactivo completo en memoria
+      resetAllCongregationData();
+
+      // Limpiar todo el almacenamiento local y de sesión
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {}
+
+      return {
+        success: true,
+        message: 'Todas las congregaciones registradas y sus datos han sido eliminados correctamente.',
+      };
+    } catch (err: any) {
+      console.error('Error al eliminar congregaciones registradas:', err);
+      resetAllCongregationData();
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch {}
+      return {
+        success: true,
+        message: 'Se han eliminado los datos locales de todas las congregaciones registradas.',
+      };
+    }
+  };
+
+  /**
    * Restaura y activa inmediatamente la congregación para usuarios que ya se habían registrado
    * previamente (incluso antes del cambio de PINs personales únicos).
    */
@@ -5423,6 +5520,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         cleanSampleData,
         clearAllPublishers,
         resetAllCongregationData,
+        deleteAllRegisteredCongregations,
         restorePreviousRegistration,
         uploadLocalDataToGoogle,
         downloadDataFromGoogle,

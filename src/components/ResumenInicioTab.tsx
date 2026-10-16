@@ -3,6 +3,9 @@ import React, { useState, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { ActiveTab } from './Navbar';
+import { ResponsiveServiceChart } from './charts/ResponsiveServiceChart';
+import { ResponsiveAttendanceChart } from './charts/ResponsiveAttendanceChart';
+import { PublisherPinsModal } from './PublisherPinsModal';
 import {
   Calendar,
   Users,
@@ -32,6 +35,7 @@ import {
   Zap,
   MapPin,
   Check,
+  KeyRound,
 } from 'lucide-react';
 
 interface ResumenInicioTabProps {
@@ -39,6 +43,7 @@ interface ResumenInicioTabProps {
   onOpenTimerModal?: () => void;
   onOpenKioskModal?: () => void;
   onOpenConflictsModal?: () => void;
+  onOpenPinsModal?: () => void;
 }
 
 export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
@@ -46,7 +51,17 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
   onOpenTimerModal,
   onOpenKioskModal,
   onOpenConflictsModal,
+  onOpenPinsModal,
 }) => {
+  const [internalPinsModalOpen, setInternalPinsModalOpen] = useState(false);
+  const handleOpenPins = () => {
+    if (onOpenPinsModal) {
+      onOpenPinsModal();
+    } else {
+      setInternalPinsModalOpen(true);
+    }
+  };
+
   const {
     weeks,
     currentWeek,
@@ -55,7 +70,21 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
     territories,
     conflicts,
     settings,
+    monthlyReports,
   } = useCongregation();
+
+  const { publisherPinsList } = useAuth();
+  const publisherPinsCount = useMemo(() => {
+    return publishers.filter(
+      (p) =>
+        Boolean(p.personalPin) ||
+        publisherPinsList.some(
+          (rec) =>
+            (rec.publisherId === p.id || rec.name.toLowerCase().trim() === p.name.toLowerCase().trim()) &&
+            Boolean(rec.pin)
+        )
+    ).length;
+  }, [publishers, publisherPinsList]);
 
   // Active week
   const activeWeek = currentWeek || weeks[0];
@@ -127,19 +156,36 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
       {/* =========================================================================
           1. HEADER TITLE (EXACT REFERENCE: Panorama General)
          ========================================================================= */}
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-2xs">
-          <LayoutGrid className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-2xs">
+            <LayoutGrid className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+          </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5 leading-tight">
+              <span>Panorama</span>
+              <span className="text-indigo-600 dark:text-indigo-400">General</span>
+            </h2>
+            <p className="text-xs text-slate-400 font-medium">
+              Sincronización activa • Datos en tiempo real
+            </p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5 leading-tight">
-            <span>Panorama</span>
-            <span className="text-indigo-600 dark:text-indigo-400">General</span>
-          </h2>
-          <p className="text-xs text-slate-400 font-medium">
-            Sincronización activa • Datos en tiempo real
-          </p>
-        </div>
+
+        <button
+          type="button"
+          onClick={handleOpenPins}
+          className="self-start sm:self-auto flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-xs font-bold shadow-2xs transition-all cursor-pointer group"
+          title="Ver directorio de PINs de los publicadores y la congregación"
+        >
+          <div className="w-6 h-6 rounded-lg bg-amber-500 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+            <KeyRound className="w-3.5 h-3.5" />
+          </div>
+          <span>Ver PINs</span>
+          <span className="bg-amber-200/80 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full">
+            {publisherPinsCount} activos
+          </span>
+        </button>
       </div>
 
       {/* =========================================================================
@@ -253,125 +299,22 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
       </div>
 
       {/* =========================================================================
-          3. MIDDLE CHARTS SECTION (EXACT REFERENCE DESIGN)
+          3. MIDDLE CHARTS SECTION (Responsive, Beautiful, Non-stretched)
          ========================================================================= */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
-        {/* Left Chart: Actividad de Servicio del Campo (Horas y publicaciones) */}
-        <div className="lg:col-span-8 bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-            <div>
-              <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-                Actividad de Servicio del Campo
-              </h3>
-              <p className="text-xs text-slate-400">Horas y publicaciones</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <select
-                value={chartRange}
-                onChange={(e) => setChartRange(e.target.value as any)}
-                className="text-xs bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-2.5 py-1 text-slate-600 dark:text-slate-200 font-medium focus:outline-none cursor-pointer"
-              >
-                <option value="6 meses">6 meses</option>
-                <option value="12 meses">12 meses</option>
-              </select>
-              <div className="flex items-center gap-3 text-xs font-medium">
-                <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-                  <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
-                  Horas
-                </span>
-                <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-                  <span className="w-2 h-2 rounded-full bg-indigo-400"></span>
-                  Publicaciones
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* SVG Line Chart with clean baseline curve */}
-          <div className="relative h-56 w-full pt-2">
-            <svg
-              className="w-full h-full overflow-visible"
-              viewBox="0 0 600 200"
-              preserveAspectRatio="none"
-            >
-              {/* Y Axis Grid lines and labels (4, 3, 2, 1, 0) */}
-              <line x1="30" y1="20" x2="590" y2="20" stroke="#f1f5f9" strokeDasharray="3 3" />
-              <text x="15" y="24" fontSize="10" fill="#94a3b8" textAnchor="end">4</text>
-
-              <line x1="30" y1="58" x2="590" y2="58" stroke="#f1f5f9" strokeDasharray="3 3" />
-              <text x="15" y="62" fontSize="10" fill="#94a3b8" textAnchor="end">3</text>
-
-              <line x1="30" y1="96" x2="590" y2="96" stroke="#f1f5f9" strokeDasharray="3 3" />
-              <text x="15" y="100" fontSize="10" fill="#94a3b8" textAnchor="end">2</text>
-
-              <line x1="30" y1="134" x2="590" y2="134" stroke="#f1f5f9" strokeDasharray="3 3" />
-              <text x="15" y="138" fontSize="10" fill="#94a3b8" textAnchor="end">1</text>
-
-              <line x1="30" y1="172" x2="590" y2="172" stroke="#e2e8f0" strokeWidth="1" />
-              <text x="15" y="176" fontSize="10" fill="#94a3b8" textAnchor="end">0</text>
-
-              {/* Purple Curve line (matches screenshot curve) */}
-              <path
-                d="M 35 172 C 120 172, 150 172, 230 172 C 310 172, 400 172, 580 172"
-                fill="none"
-                stroke="#8b5cf6"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-
-              {/* Month labels along X Axis */}
-              <text x="35" y="195" fontSize="10" fill="#94a3b8" textAnchor="middle">May</text>
-              <text x="144" y="195" fontSize="10" fill="#94a3b8" textAnchor="middle">Jun</text>
-              <text x="253" y="195" fontSize="10" fill="#94a3b8" textAnchor="middle">Jul</text>
-              <text x="362" y="195" fontSize="10" fill="#94a3b8" textAnchor="middle">Ago</text>
-              <text x="471" y="195" fontSize="10" fill="#94a3b8" textAnchor="middle">Sept</text>
-              <text x="580" y="195" fontSize="10" fill="#94a3b8" textAnchor="middle">Oct</text>
-            </svg>
-          </div>
+        {/* Left Chart: Actividad de Servicio del Campo (Horas y Estudios) */}
+        <div className="lg:col-span-8">
+          <ResponsiveServiceChart
+            publishers={publishers}
+            monthlyReports={monthlyReports}
+          />
         </div>
 
-        {/* Right Chart: Asistencia (Últimas 4 semanas) */}
-        <div className="lg:col-span-4 bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-5 shadow-xs flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-                  Asistencia
-                </h3>
-                <p className="text-xs text-slate-400">Últimas 4 semanas</p>
-              </div>
-              <div className="flex flex-col items-end gap-1 text-[11px] font-medium">
-                <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-                  <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
-                  Fin de Semana
-                </span>
-                <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-                  <span className="w-2 h-2 rounded-full bg-indigo-300"></span>
-                  Entre Semana
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* SVG Canvas for attendance */}
-          <div className="relative h-56 w-full flex flex-col justify-end pt-4">
-            <svg
-              className="w-full h-44 overflow-visible"
-              viewBox="0 0 320 140"
-              preserveAspectRatio="none"
-            >
-              {/* Horizontal base line */}
-              <line x1="10" y1="130" x2="310" y2="130" stroke="#f1f5f9" strokeWidth="1" />
-            </svg>
-
-            {/* X Axis dates (14 sept, 21 sept, 28 sept, 05 oct) */}
-            <div className="flex items-center justify-between px-2 pt-2 text-[10px] text-slate-400 border-t border-slate-100 dark:border-slate-800/60">
-              <span>14 sept</span>
-              <span>21 sept</span>
-              <span>28 sept</span>
-              <span>05 oct</span>
-            </div>
-          </div>
+        {/* Right Chart: Asistencia a Reuniones */}
+        <div className="lg:col-span-4">
+          <ResponsiveAttendanceChart
+            weeks={weeks}
+          />
         </div>
       </div>
 
@@ -523,9 +466,27 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
               <MapPin className="w-4 h-4 text-rose-500 shrink-0" />
               <span className="truncate">Territorios</span>
             </button>
+
+            <button
+              type="button"
+              onClick={handleOpenPins}
+              className="col-span-2 sm:col-span-1 flex items-center gap-2 p-2.5 rounded-xl bg-amber-50/80 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-900/60 hover:text-amber-700 dark:hover:text-amber-300 border border-amber-200/80 dark:border-amber-800/80 text-xs font-bold text-amber-800 dark:text-amber-200 transition-all cursor-pointer shadow-2xs"
+            >
+              <KeyRound className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="truncate">Ver PINs</span>
+              <span className="ml-auto text-[10px] bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 px-1.5 py-0.5 rounded-full font-mono">
+                {publisherPinsCount}
+              </span>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Publisher PINs Modal */}
+      <PublisherPinsModal
+        isOpen={internalPinsModalOpen}
+        onClose={() => setInternalPinsModalOpen(false)}
+      />
     </div>
   );
 };

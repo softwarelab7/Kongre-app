@@ -156,7 +156,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenWelcomeLanding,
 }) => {
   const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo, currentBrotherName, isCoordinator } = useAuth();
-  const canManageRoles = isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano';
+  const canManageRoles = !effectiveRoleInfo.isReadOnly && activeRole !== 'publico' && (isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano');
   const {
     settings,
     updateSettings,
@@ -185,8 +185,12 @@ export const Navbar: React.FC<NavbarProps> = ({
     } catch {}
     try {
       localStorage.removeItem('kongre_has_entered_app');
+      localStorage.removeItem('kongre_is_registered_congregation');
       localStorage.removeItem('kongre_user_profile_guest');
       localStorage.removeItem('kongre_user_profile_active');
+      localStorage.removeItem('kongre_identified_brother');
+      localStorage.removeItem('kongre_active_role_v1');
+      sessionStorage.setItem('kongre_show_landing', 'true');
     } catch {}
     if (onOpenWelcomeLanding) {
       onOpenWelcomeLanding();

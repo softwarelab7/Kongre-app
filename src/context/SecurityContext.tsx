@@ -216,7 +216,8 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     async (role: TheocraticRole, targetName?: string, expiresInDays: number = 30): Promise<CongregationInvitation> => {
       // Role code prefix
       const rolePrefixMap: Record<TheocraticRole, string> = {
-        coordinador: 'ANC',
+        coordinador: 'COORD',
+        anciano: 'ANC',
         superintendente_vym: 'VYM',
         secretario: 'SEC',
         siervo_discursos: 'DIS',
@@ -238,7 +239,11 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         code,
         role,
         targetName: targetName?.trim() || undefined,
-        createdByEmail: 'hectorguti95@gmail.com',
+        createdByEmail:
+          (typeof window !== 'undefined'
+            ? localStorage.getItem('kongre_user_email') ||
+              localStorage.getItem('kongre_coordinator_email')
+            : null) || 'coordinador@kongre.org',
         createdAt: new Date().toISOString(),
         expiresAt: expiryDate.toISOString(),
         status: 'active',

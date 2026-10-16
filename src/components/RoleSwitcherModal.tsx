@@ -61,6 +61,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     publisherPinsList,
     identifyRoleByPersonalPin,
     assignPersonalPinToPublisher,
+    removePublisherPin,
     generateUniquePublisherPin,
     isCoordinator,
   } = useAuth();
@@ -338,6 +339,33 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     setTimeout(() => setFeedback(null), 3000);
   };
 
+  // Revocar PIN y cerrar todas las sesiones del publicador (ej. teléfono perdido o robo)
+  const handleRevokePinForPublisher = (publisherId: string) => {
+    const item = combinedPublishersList.find((p) => p.publisherId === publisherId);
+    if (!item) return;
+
+    if (
+      !confirm(
+        `¿Deseas revocar el PIN de ${item.name}?\n\nAl revocarlo, se cerrarán inmediatamente todas las sesiones activas en teléfonos o navegadores de este hermano (por ejemplo, si extravió su teléfono). Nadie podrá acceder hasta que se le asigne un nuevo PIN.`
+      )
+    ) {
+      return;
+    }
+
+    removePublisherPin(publisherId);
+
+    const matchingPub = publishers.find((p) => p.id === publisherId);
+    if (matchingPub) {
+      updatePublisher({
+        ...matchingPub,
+        personalPin: '',
+      });
+    }
+
+    setFeedback(`🔒 PIN revocado para ${item.name}. Todas las sesiones han sido cerradas.`);
+    setTimeout(() => setFeedback(null), 4000);
+  };
+
   // Auto-generate PINs for all publishers who don't have one
   const handleAutoAssignAllMissingPins = () => {
     const missing = combinedPublishersList.filter((p) => !p.pin);
@@ -385,23 +413,48 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     setTimeout(() => setFeedback(null), 3500);
   };
 
-  // Format theocratic WhatsApp invitation message
-  const getTheocraticShareMessage = (name: string, role: TheocraticRole, pin: string) => {
+  // Format theocratic WhatsApp invitation message with 1-click Pocket link
+  const getTheocraticShareMessage = (name: string, role: TheocraticRole, pin: string, id: string) => {
     const roleTitle = THEOCRATIC_ROLES[role]?.name || role;
     const congName = settings.congregationName || 'la Congregación';
+    const congNumber =
+      settings.congregationNumber ||
+      settings.congregationId ||
+      (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_number') || '' : '');
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const directLink = congNumber && id && pin
+      ? `${origin}?cong=${encodeURIComponent(congNumber)}&pub=${encodeURIComponent(id)}&pin=${encodeURIComponent(pin)}`
+      : '';
+
     return `🏛️ *CREDENCIALES TEOCRÁTICAS KONGRE*\n` +
       `Congregación: *${congName}*\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
       `👤 Hermano: *${name}*\n` +
       `📋 Responsabilidad: *${roleTitle}*\n` +
       `🔑 Tu PIN Personal Único: *${pin}*\n` +
+      (directLink ? `━━━━━━━━━━━━━━━━━━━━\n📲 *Enlace de Acceso Directo (un solo toque):*\n${directLink}\n` : '') +
       `━━━━━━━━━━━━━━━━━━━━\n` +
-      `_Guarda este PIN. Al abrir Kongre, ingrésalo para activar automáticamente tus departamentos asignados._`;
+      `_Abre el enlace o ingresa el PIN en Kongre para activar automáticamente tu perfil y departamentos asignados._`;
+  };
+
+  // Copy 1-click Pocket Direct Link to clipboard
+  const handleCopyDirectLink = (name: string, _role: TheocraticRole, pin: string, id: string) => {
+    const congNumber =
+      settings.congregationNumber ||
+      settings.congregationId ||
+      (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_number') || '' : '');
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const directLink = `${origin}?cong=${encodeURIComponent(congNumber)}&pub=${encodeURIComponent(id)}&pin=${encodeURIComponent(pin)}`;
+    navigator.clipboard.writeText(directLink);
+    setCopiedId(`link_${id}`);
+    setTimeout(() => setCopiedId(null), 2500);
+    setFeedback(`Enlace directo copiado para ${name}.`);
+    setTimeout(() => setFeedback(null), 3000);
   };
 
   // Copy or send by WhatsApp
   const handleShareWhatsApp = (name: string, role: TheocraticRole, pin: string, id: string) => {
-    const msg = getTheocraticShareMessage(name, role, pin);
+    const msg = getTheocraticShareMessage(name, role, pin, id);
     navigator.clipboard.writeText(msg);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2500);
@@ -952,6 +1005,15 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                               >
                                 <RefreshCw className="w-3.5 h-3.5" />
                               </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleRevokePinForPublisher(item.publisherId)}
+                                className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-colors"
+                                title="Revocar PIN y cerrar sesiones activas (teléfono perdido)"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
                             </div>
                           ) : (
                             <button
@@ -965,19 +1027,35 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                           )}
 
                           {hasPin && (
-                            <button
-                              type="button"
-                              onClick={() => handleShareWhatsApp(item.name, item.role, item.pin, item.publisherId)}
-                              className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/70 dark:hover:bg-emerald-900/80 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
-                              title="Copiar y enviar por WhatsApp"
-                            >
-                              {copiedId === item.publisherId ? (
-                                <Check className="w-3.5 h-3.5 text-emerald-600" />
-                              ) : (
-                                <Share2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                              )}
-                              <span className="hidden sm:inline">WhatsApp</span>
-                            </button>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleCopyDirectLink(item.name, item.role, item.pin, item.publisherId)}
+                                className="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                                title="Copiar enlace directo de publicador (un solo toque)"
+                              >
+                                {copiedId === `link_${item.publisherId}` ? (
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                ) : (
+                                  <Copy className="w-3.5 h-3.5 text-slate-500" />
+                                )}
+                                <span className="hidden sm:inline">Enlace</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleShareWhatsApp(item.name, item.role, item.pin, item.publisherId)}
+                                className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/70 dark:hover:bg-emerald-900/80 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
+                                title="Copiar y enviar por WhatsApp"
+                              >
+                                {copiedId === item.publisherId ? (
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                ) : (
+                                  <Share2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                                )}
+                                <span className="hidden sm:inline">WhatsApp</span>
+                              </button>
+                            </div>
                           )}
 
                           <button

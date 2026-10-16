@@ -265,6 +265,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(LOCAL_STORAGE_PUBLISHER_ID_KEY, publisherId);
     } else {
       localStorage.removeItem(LOCAL_STORAGE_PUBLISHER_ID_KEY);
+      localStorage.removeItem('kongre_session_pin_v2');
+      localStorage.removeItem('kongre_identified_brother');
     }
     if (name && !isGenericIdentityName(name)) {
       setCurrentBrotherName(name);
@@ -382,7 +384,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const removePublisherPin = (publisherId: string) => {
-    setPublisherPinsList((prev) => prev.filter((p) => p.publisherId !== publisherId));
+    setPublisherPinsList((prev) => {
+      const nextList = prev.filter((p) => p.publisherId !== publisherId);
+      try {
+        localStorage.setItem(LOCAL_STORAGE_PUBLISHER_PINS_KEY, JSON.stringify(nextList));
+        localStorage.setItem('kongre_publisher_unique_pins_v1', JSON.stringify(nextList));
+      } catch {}
+      return nextList;
+    });
+
+    // Si la sesión activa de publicador en este dispositivo es la que se revoca, cerrarla de inmediato
+    if (currentPublisherId === publisherId) {
+      setIdentifiedPublisher(null);
+      setActiveRole('publico');
+    }
+
+    // Emitir evento para sincronización reactiva inmediata
+    window.dispatchEvent(new CustomEvent('kongre_publisher_pins_updated'));
   };
 
   /**
@@ -406,8 +424,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     pin: string
   ): Promise<{ success: boolean; role?: TheocraticRole; name?: string; publisherId?: string; message: string }> => {
     const cleanPin = pin.trim();
-    if (!cleanPin) {
-      return { success: false, message: 'Ingresa tu PIN Personal.' };
+    if (!cleanPin || cleanPin.length < 4) {
+      return { success: false, message: 'El PIN Personal debe tener al menos 4 dígitos.' };
     }
 
     const resolveNonGenericName = (candidate?: string | null, targetRole?: TheocraticRole): string => {
@@ -433,7 +451,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 1. Search in unique publisher PINs directory (Principal: Por Publicador)
     const foundPublisher = publisherPinsList.find(
-      (entry) => entry.pin.trim() === cleanPin
+      (entry) => entry.pin && entry.pin.trim().length >= 4 && entry.pin.trim() === cleanPin
     );
 
     if (foundPublisher) {
@@ -447,6 +465,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
         localStorage.setItem('kongre_identified_brother', brotherName);
       }
+      localStorage.setItem('kongre_session_pin_v2', cleanPin);
       if (foundPublisher.publisherId) {
         setIdentifiedPublisher(foundPublisher.publisherId, brotherName);
       }
@@ -462,7 +481,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 2. Search in userRolesList
     const foundUserEntry = userRolesList.find(
-      (entry) => entry.personalPin && entry.personalPin.trim() === cleanPin
+      (entry) => entry.personalPin && entry.personalPin.trim().length >= 4 && entry.personalPin.trim() === cleanPin
     );
 
     if (foundUserEntry) {
@@ -476,37 +495,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
         localStorage.setItem('kongre_identified_brother', brotherName);
       }
+      localStorage.setItem('kongre_session_pin_v2', cleanPin);
 
       return {
         success: true,
         role: foundUserEntry.role,
         name: brotherName || undefined,
         message: `¡Identificación exitosa! Bienvenido${brotherName ? `, ${brotherName}` : ''} (${THEOCRATIC_ROLES[foundUserEntry.role]?.name}).`,
-      };
-    }
-
-    // 3. Fallback to rolePinsMap
-    const foundRoleEntry = Object.values(rolePinsMap).find(
-      (entry) => entry.pin && entry.pin.trim() === cleanPin
-    );
-
-    if (foundRoleEntry) {
-      setActiveRole(foundRoleEntry.role);
-      const brotherName =
-        foundRoleEntry.name && !isGenericIdentityName(foundRoleEntry.name)
-          ? foundRoleEntry.name.trim()
-          : resolveNonGenericName(foundRoleEntry.name, foundRoleEntry.role);
-      if (brotherName && !isGenericIdentityName(brotherName)) {
-        setCurrentBrotherName(brotherName);
-        localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
-        localStorage.setItem('kongre_identified_brother', brotherName);
-      }
-
-      return {
-        success: true,
-        role: foundRoleEntry.role,
-        name: brotherName || undefined,
-        message: `¡Identificación exitosa! Bienvenido${brotherName ? `, ${brotherName}` : ''} (${THEOCRATIC_ROLES[foundRoleEntry.role]?.name}).`,
       };
     }
 
@@ -591,14 +586,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.warn('Aviso buscando PIN en Firestore:', searchErr);
     }
 
-    // 4. Backward-compatibility: Check if PIN matches previously registered Coordinator App Lock PIN (only for coordinator)
+    // 4. Backward-compatibility: Check if PIN matches previously registered Coordinator App Lock PIN
     const coordLockPinHash = localStorage.getItem('kongre_security_pin_hash');
-    if (coordLockPinHash && (isCoordinator || user?.email === 'hectorguti95@gmail.com')) {
+    if (coordLockPinHash) {
       try {
         const isValid = await verifyPasscode(cleanPin, coordLockPinHash);
         if (isValid) {
           setActiveRole('coordinador');
-          const resolvedName = resolveNonGenericName(null, 'coordinador');
+          const savedCoord = localStorage.getItem('kongre_coordinator_name');
+          const resolvedName = savedCoord || resolveNonGenericName(null, 'coordinador');
           if (resolvedName) {
             setCurrentBrotherName(resolvedName);
             localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, resolvedName);
@@ -642,13 +638,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (currentUser?.email) {
         const email = currentUser.email.toLowerCase().trim();
         const found = userRolesList.find((r) => r.email.toLowerCase().trim() === email);
+        const registeredCoordEmail = (
+          localStorage.getItem('kongre_coordinator_email') || ''
+        ).toLowerCase().trim();
+
         if (found) {
           setActiveRole(found.role);
           if (found.name) setCurrentBrotherName(found.name);
-        } else if (email === 'hectorguti95@gmail.com' || email === 'hectorguti95@outlook.com') {
-          // Automatic owner/coordinator recognition for registered user
+        } else if (registeredCoordEmail && email === registeredCoordEmail) {
+          // Automatic recognition only if this email was explicitly registered as the congregation coordinator
           setActiveRole('coordinador');
-          const broName = currentUser.displayName || 'Coordinador';
+          const savedCoord = localStorage.getItem('kongre_coordinator_name');
+          const broName = savedCoord || currentUser.displayName || 'Coordinador';
           setCurrentBrotherName(broName);
         } else {
           setActiveRole('publico');
@@ -762,7 +763,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const initial: UserProfile = {
             uid: user.uid,
             email: user.email || '',
-            displayName: user.displayName || (currentBrotherName || (user.email?.toLowerCase() === 'hectorguti95@gmail.com' ? 'Hno. Héctor Gutiérrez' : 'Hno. ' + (user.email ? user.email.split('@')[0] : 'Usuario'))),
+            displayName: user.displayName || currentBrotherName || (user.email ? 'Hno. ' + user.email.split('@')[0] : 'Usuario'),
             photoURL: fallbackPhoto,
             phone: '',
             secondaryEmail: '',
@@ -902,7 +903,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIdentifiedPublisher(null);
       setUserProfile(null);
       localStorage.removeItem(LOCAL_STORAGE_BROTHER_NAME_KEY);
+      localStorage.removeItem('kongre_identified_brother');
+      localStorage.removeItem(LOCAL_STORAGE_PUBLISHER_ID_KEY);
       localStorage.removeItem('kongre_user_profile_active');
+      localStorage.removeItem('kongre_user_profile_guest');
+      localStorage.removeItem('kongre_has_entered_app');
+      localStorage.removeItem('kongre_active_role_v1');
     } catch (err: any) {
       console.error('Error signing out:', err);
       setError(err?.message || 'Error al cerrar sesión.');

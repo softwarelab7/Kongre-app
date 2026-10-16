@@ -32,7 +32,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
   onSuccessRole,
 }) => {
   const { redeemInvitationCode, verifyCongregationPin } = useSecurity();
-  const { user, assignRoleToEmail, setActiveRole, identifyRoleByPersonalPin, setIdentifiedBrother } = useAuth();
+  const { user, assignRoleToEmail, setActiveRole, identifyRoleByPersonalPin, setIdentifiedBrother, setIdentifiedPublisher } = useAuth();
   const {
     settings,
     updateSettings,
@@ -41,6 +41,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
     accountLinkRequests,
     createAccountLinkRequest,
     loadCongregationFromCloud,
+    hydrateCongregation,
   } = useCongregation();
 
   // Exactly three required theocratic credentials:
@@ -93,8 +94,8 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         return;
       }
 
-      // 1. Cargar datos actualizados de la congregación desde la nube en Firestore primero si existen
-      const cloudRes = await loadCongregationFromCloud(cleanId);
+      // 1. Cargar datos actualizados de la congregación desde la nube en Firestore primero si existen (sin hidratar aún)
+      const cloudRes = await loadCongregationFromCloud(cleanId, { skipHydrate: true });
       const effectiveSettings = cloudRes?.data?.settings || settings;
       const expectedId = effectiveSettings.congregationNumber || effectiveSettings.congregationId;
       const customCode = effectiveSettings.customCode;
@@ -127,10 +128,10 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       let identifiedRole: TheocraticRole | undefined;
       let finalBrotherName = '';
 
-      // A) Buscar en la lista de publicadores de la congregación por PIN personal
+      // A) Buscar estrictamente en la lista de publicadores de la congregación por PIN personal
       const congPubs = (cloudRes?.data?.publishers || publishers) as any[];
       const matchingPub = congPubs.find(
-        (p) => p.personalPin && String(p.personalPin).trim() === cleanPersonalPin
+        (p) => p.personalPin && String(p.personalPin).trim().length >= 4 && String(p.personalPin).trim() === cleanPersonalPin
       );
 
       if (matchingPub) {
@@ -145,37 +146,22 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         finalBrotherName = matchingPub.name && !isGenericIdentityName(matchingPub.name) ? matchingPub.name.trim() : 'Hermano';
         if (matchingPub.email) emailToUse = matchingPub.email;
         if (matchingPub.id) {
-          try {
-            localStorage.setItem('kongre_current_publisher_id_v2', matchingPub.id);
-          } catch {}
+          setIdentifiedPublisher(matchingPub.id, finalBrotherName);
+          localStorage.setItem('kongre_session_pin_v2', cleanPersonalPin);
         }
       } else {
-        // B) Buscar en el directorio de PINs de roles de la congregación
-        const pinResult = await identifyRoleByPersonalPin(cleanPersonalPin);
-        if (pinResult.success && pinResult.role) {
-          identifiedRole = pinResult.role;
-          if (pinResult.name && !isGenericIdentityName(pinResult.name)) {
-            finalBrotherName = pinResult.name;
-          }
-          if (pinResult.publisherId) {
-            try {
-              localStorage.setItem('kongre_current_publisher_id_v2', pinResult.publisherId);
-            } catch {}
-          }
-        } else {
-          // C) Verificar si es un código de invitación generado por los ancianos
-          const invResult = await redeemInvitationCode(cleanPersonalPin, emailToUse, 'Hermano');
-          if (invResult.success && invResult.role) {
-            identifiedRole = invResult.role;
-            if (invResult.targetName && !isGenericIdentityName(invResult.targetName)) {
-              finalBrotherName = invResult.targetName;
-            }
+        // B) Verificar si es un código de invitación generado por los ancianos
+        const invResult = await redeemInvitationCode(cleanPersonalPin, emailToUse, 'Hermano');
+        if (invResult.success && invResult.role) {
+          identifiedRole = invResult.role;
+          if (invResult.targetName && !isGenericIdentityName(invResult.targetName)) {
+            finalBrotherName = invResult.targetName;
           }
         }
       }
 
       if (!identifiedRole) {
-        setError('El PIN Personal no fue reconocido. Asegúrate de ingresar el PIN de rol que te suministró el Coordinador u otro anciano.');
+        setError('El PIN Personal no coincide con ningún publicador en esta congregación. Verifica el PIN asignado por los ancianos.');
         setIsSubmitting(false);
         return;
       }
@@ -217,8 +203,12 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
       if (isCoordinator || isPreRegisteredPublisher || isAlreadyApproved || !user?.email) {
         // Los 3 datos teocráticos son válidos y reconocidos
+        if (cloudRes?.data) {
+          hydrateCongregation(cloudRes.data);
+        }
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
+        localStorage.setItem('kongre_session_pin_v2', cleanPersonalPin);
         localStorage.removeItem('kongre_needs_cloud_upload');
         localStorage.setItem('kongre_last_local_update', cloudRes?.data?.updatedAt || new Date().toISOString());
 
@@ -278,54 +268,11 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         assignRoleToEmail(emailToUse, identifiedRole, finalBrotherName, cleanPersonalPin);
         setActiveRole(identifiedRole);
 
-        // Asegurar que el hermano figure en la lista oficial de publicadores SOLO si no existía ya
-        if (!matchingPub && !isGenericIdentityName(finalBrotherName)) {
-          const currentPubs = (cloudRes?.data?.publishers || publishers) as any[];
-          const alreadyInList = currentPubs.some(
-            (p) =>
-              (p.personalPin && cleanPersonalPin && String(p.personalPin).trim() === cleanPersonalPin.trim()) ||
-              (p.name && areNamesEquivalent(p.name, finalBrotherName))
-          );
-          if (!alreadyInList) {
-            const isElder = identifiedRole === 'coordinador' || identifiedRole === 'secretario' || identifiedRole === 'superintendente_vym' || identifiedRole === 'anciano';
-            const isSM = identifiedRole.startsWith('siervo_');
-            addPublisher({
-              name: finalBrotherName,
-              gender: 'hermano',
-              phone: settings.coordinatorPhone || '',
-              email: emailToUse && !emailToUse.startsWith('hermano_') ? emailToUse : '',
-              personalPin: cleanPersonalPin || undefined,
-              notes: identifiedRole === 'coordinador' ? 'Coordinador del Cuerpo de Ancianos' : (THEOCRATIC_ROLES[identifiedRole]?.name || ''),
-              active: true,
-              groupNumber: 1,
-              privilege: isElder ? 'anciano' : isSM ? 'siervo_ministerial' : undefined,
-              theocraticRole: identifiedRole,
-              hope: 'otras_ovejas',
-              absences: [],
-              roles: {
-                vym_presidente: isElder,
-                vym_oracion: isElder || isSM,
-                vym_tesoros_discurso: isElder,
-                vym_tesoros_perlas: isElder,
-                vym_tesoros_lectura: true,
-                vym_maestros_titular: true,
-                vym_maestros_ayudante: true,
-                vym_vida_partes: isElder || isSM,
-                vym_estudio_conductor: isElder,
-                vym_estudio_lector: true,
-                fds_presidente: isElder,
-                fds_atalaya_lector: isElder || isSM,
-                fds_oracion: isElder || isSM,
-                deber_acomodador: true,
-                deber_seguridad: true,
-                deber_audio: true,
-                deber_video: true,
-                deber_microfonos: true,
-                deber_plataforma: true,
-                deber_zoom: true,
-              },
-            });
-          }
+        // Si se identificó un publicador coincidente, vincularlo
+        if (matchingPub && matchingPub.id) {
+          try {
+            localStorage.setItem('kongre_current_publisher_id_v2', matchingPub.id);
+          } catch {}
         }
 
         setSuccessData({

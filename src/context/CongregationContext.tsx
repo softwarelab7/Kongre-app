@@ -1,6 +1,5 @@
-// src/context/CongregationContext.tsx
 import React, { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react';
-import { doc, getDoc, setDoc, onSnapshot, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, onSnapshot, collection, getDocs } from 'firebase/firestore';
 import { db, auth, isFirestoreQuotaExceeded, markFirestoreQuotaExceeded, isQuotaError } from '../firebase/config';
 import { useAuth } from './AuthContext';
 import {
@@ -328,7 +327,8 @@ interface CongregationContextType {
   restorePreviousRegistration: (congName?: string, coordName?: string, pin?: string) => Promise<void>;
   uploadLocalDataToGoogle: () => Promise<{ success: boolean; message: string }>;
   downloadDataFromGoogle: () => Promise<{ success: boolean; message: string }>;
-  loadCongregationFromCloud: (congId: string) => Promise<{ success: boolean; congregationName?: string; message: string; data?: any }>;
+  loadCongregationFromCloud: (congId: string, options?: { skipHydrate?: boolean }) => Promise<{ success: boolean; congregationName?: string; message: string; data?: any }>;
+  hydrateCongregation: (data: any) => void;
 
   // Account Link Requests (Vinculación de Cuentas de Google)
   accountLinkRequests: AccountLinkRequest[];
@@ -1009,12 +1009,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             email: p.email,
             privilege: p.privilege,
           }));
-        if (pinRecords.length > 0) {
-          localStorage.setItem('kongre_publisher_unique_pins_v1', JSON.stringify(pinRecords));
-          localStorage.setItem('kongre_publisher_personal_pins_v4', JSON.stringify(pinRecords));
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('kongre_publisher_pins_updated', { detail: pinRecords }));
-          }
+        localStorage.setItem('kongre_publisher_unique_pins_v1', JSON.stringify(pinRecords));
+        localStorage.setItem('kongre_publisher_personal_pins_v4', JSON.stringify(pinRecords));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('kongre_publisher_pins_updated', { detail: pinRecords }));
         }
       } catch {}
 
@@ -1948,7 +1946,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   // Función para cargar los datos de una congregación existente desde Firestore (incluso sin Google Auth)
-  const loadCongregationFromCloud = async (congId: string): Promise<{ success: boolean; congregationName?: string; message: string; data?: any }> => {
+  const loadCongregationFromCloud = async (
+    congId: string,
+    options?: { skipHydrate?: boolean }
+  ): Promise<{ success: boolean; congregationName?: string; message: string; data?: any }> => {
     const rawClean = congId.trim().toUpperCase();
     if (!rawClean) return { success: false, message: 'ID de congregación no válido.' };
 
@@ -2006,6 +2007,16 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
       }
 
+      // Si se solicita skipHydrate, devolver los datos sin contaminar el estado local ni localStorage
+      if (options?.skipHydrate) {
+        return {
+          success: true,
+          data,
+          congregationName: data.settings?.congregationName || 'Congregación',
+          message: '¡Datos de la congregación obtenidos exitosamente desde la nube!',
+        };
+      }
+
       hydrateAllFromData(data);
       const effectiveId = data.congregationId || rawClean;
       ensureCongregationIdPersisted(effectiveId);
@@ -2036,6 +2047,26 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       console.error('Error cargando congregación desde la nube:', err);
       return { success: false, message: err?.message || 'Error al conectar con la nube.' };
     }
+  };
+
+  // Hidratar congregación explícitamente tras validar credenciales/PIN
+  const hydrateCongregation = (data: any) => {
+    if (!data) return;
+    hydrateAllFromData(data);
+    const effectiveId = data.congregationId || data.settings?.congregationId;
+    if (effectiveId) {
+      ensureCongregationIdPersisted(effectiveId);
+    }
+    const downloadedPhoto = data.settings?.coordinatorPhotoURL || data.coordinatorPhotoURL || '';
+    if (downloadedPhoto) {
+      try {
+        localStorage.setItem('kongre_coordinator_photo', downloadedPhoto);
+        if (!localStorage.getItem('kongre_user_photo')) {
+          localStorage.setItem('kongre_user_photo', downloadedPhoto);
+        }
+      } catch {}
+    }
+    setSyncStatus('synced');
   };
 
   const findUserCongregationId = async (email?: string, uid?: string): Promise<string | null> => {
@@ -4965,33 +4996,22 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     ];
     keysToClear.forEach((k) => localStorage.removeItem(k));
 
-    {
-      saveToFirestore(
-        [],
-        cleanWeeks,
-        [],
-        customDuties,
-        INITIAL_SETTINGS,
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        null,
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-        {}
-      );
+    // Eliminar el documento de la congregación de Firestore
+    const targetCongId = settings.congregationNumber || settings.congregationId;
+    if (targetCongId) {
+      const canonical = formatCanonicalCongregationId(targetCongId);
+      const unhyphenated = canonical.replace(/-/g, '');
+      deleteDoc(doc(db, 'congregations', canonical)).catch(() => {});
+      if (unhyphenated !== canonical) {
+        deleteDoc(doc(db, 'congregations', unhyphenated)).catch(() => {});
+      }
     }
+
+    // Limpieza total del almacenamiento local del navegador
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+    } catch {}
   };
 
   /**
@@ -5407,6 +5427,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         uploadLocalDataToGoogle,
         downloadDataFromGoogle,
         loadCongregationFromCloud,
+        hydrateCongregation,
         findUserCongregationId,
         accountLinkRequests,
         createAccountLinkRequest,

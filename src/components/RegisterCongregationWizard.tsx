@@ -68,7 +68,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 }) => {
   if (isOpen === false) return null;
   const { settings, updateSettings, publishers, addPublisher } = useCongregation();
-  const { user, assignRoleToEmail, setActiveRole, assignPersonalPinToRole } = useAuth();
+  const { user, assignRoleToEmail, setActiveRole, assignPersonalPinToRole, setIdentifiedPublisher } = useAuth();
   const { setCongregationPin, setPersonalPin, setMasterPassphrase } = useSecurity();
 
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
@@ -104,10 +104,19 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   const [weekendDay, setWeekendDay] = useState('');
   const [weekendTime, setWeekendTime] = useState('');
 
-  // Step 3: Coordinator Details - Vacíos por defecto
-  const [coordinatorName, setCoordinatorName] = useState('');
-  const [coordinatorEmail, setCoordinatorEmail] = useState('');
+  // Step 3: Coordinator Details - Pre-llenados si el usuario inició sesión con Google
+  const [coordinatorName, setCoordinatorName] = useState(() => user?.displayName || '');
+  const [coordinatorEmail, setCoordinatorEmail] = useState(() => user?.email || '');
   const [coordinatorPhone, setCoordinatorPhone] = useState('');
+
+  React.useEffect(() => {
+    if (user?.email && !coordinatorEmail) {
+      setCoordinatorEmail(user.email);
+    }
+    if (user?.displayName && !coordinatorName) {
+      setCoordinatorName(user.displayName);
+    }
+  }, [user]);
 
   // Step 4: Security: PIN de Congregación + PIN Personal (vacíos por defecto)
   const [congregationPin, setCongregationPinInput] = useState('');
@@ -391,12 +400,15 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
           (p.email && coordinatorEmail.trim() && p.email.trim().toLowerCase() === coordinatorEmail.trim().toLowerCase())
       );
       if (!alreadyHasCoord && coordinatorName.trim()) {
+        const coordId = `pub_coord_${Date.now()}`;
         addPublisher({
+          id: coordId,
           name: coordinatorName.trim(),
           gender: 'hermano',
           phone: coordinatorPhone.trim(),
           email: coordinatorEmail.trim().toLowerCase(),
           personalPin: personalPin.trim(),
+          theocraticRole: 'coordinador',
           notes: 'Coordinador del Cuerpo de Ancianos',
           active: true,
           groupNumber: 1,
@@ -426,12 +438,16 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             deber_zoom: true,
           },
         });
+        setIdentifiedPublisher(coordId, coordinatorName.trim());
       }
 
       // 5. Store registration flag in localStorage
       localStorage.setItem('kongre_is_registered_congregation', 'true');
       localStorage.setItem('kongre_has_entered_app', 'true');
       localStorage.setItem('kongre_needs_cloud_upload', 'true');
+      localStorage.setItem('kongre_session_pin_v2', personalPin.trim());
+      localStorage.setItem('kongre_identified_brother', coordinatorName.trim());
+      localStorage.setItem('kongre_coordinator_name', coordinatorName.trim());
       localStorage.setItem('kongre_congregation_name', congregationName.trim());
       localStorage.setItem('kongre_congregation_number', finalId);
       localStorage.setItem('kongre_congregation_id', finalId);

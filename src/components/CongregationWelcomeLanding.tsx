@@ -25,6 +25,9 @@ import {
   ArrowRight,
   ArrowLeft,
   ShieldCheck,
+  ShieldAlert,
+  Users,
+  LogOut,
   Lock,
   Calendar,
   MapPin,
@@ -75,12 +78,20 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     restorePreviousRegistration,
     uploadLocalDataToGoogle,
     loadCongregationFromCloud,
+    hydrateCongregation,
     findUserCongregationId,
   } = useCongregation();
   const { isDark, toggleTheme } = useTheme();
 
-  const [activeTab, setActiveTab] = useState<'home' | 'email_login' | 'code_login' | 'register'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'email_login' | 'code_login' | 'register' | 'unauthorized'>('home');
   const [pendingApprovalEmail, setPendingApprovalEmail] = useState<string | null>(null);
+  const [unauthorizedGoogleAccount, setUnauthorizedGoogleAccount] = useState<{
+    email: string;
+    name: string;
+    congregationId: string;
+    congregationName: string;
+  } | null>(null);
+  const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
 
   // Three credentials (PIN Personal es opcional para coordinadores):
   // 1. ID de la Congregación
@@ -126,8 +137,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
 
-      // 1. Cargar datos actualizados de la congregación desde la nube en Firestore primero si existen
-      const cloudRes = await loadCongregationFromCloud(cleanId);
+      // 1. Cargar datos actualizados de la congregación desde la nube en Firestore primero si existen (sin hidratar aún)
+      const cloudRes = await loadCongregationFromCloud(cleanId, { skipHydrate: true });
       const cloudData = cloudRes?.data;
       const effectiveId = formatCanonicalCongregationId(cloudData?.congregationId || cloudData?.settings?.congregationId || cleanId);
 
@@ -169,7 +180,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       if (cleanPersonalPin) {
         const congPubs = (cloudData?.publishers || publishers) as any[];
         matchingPub = congPubs.find(
-          (p) => p.personalPin && String(p.personalPin).trim() === cleanPersonalPin
+          (p) => p.personalPin && String(p.personalPin).trim().length >= 4 && String(p.personalPin).trim() === cleanPersonalPin
         );
 
         if (matchingPub) {
@@ -185,37 +196,18 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           if (matchingPub.email) emailToUse = matchingPub.email;
           setIdentifiedPublisher(matchingPub.id, nameToUse);
           setIdentifiedBrother(nameToUse);
-          assignPersonalPinToPublisher(
-            matchingPub.id,
-            cleanPersonalPin,
-            finalRole,
-            nameToUse,
-            matchingPub.email,
-            matchingPub.privilege
-          );
         } else {
-          const pinResult = await identifyRoleByPersonalPin(cleanPersonalPin);
-          if (pinResult.success && pinResult.role) {
-            identifiedRole = pinResult.role;
-            if (pinResult.name && !isGenericIdentityName(pinResult.name)) {
-              nameToUse = pinResult.name;
-            }
-            if (pinResult.publisherId) {
-              setIdentifiedPublisher(pinResult.publisherId, pinResult.name);
-              setIdentifiedBrother(pinResult.name);
+          // Probar código de invitación generado por los ancianos
+          const invResult = await redeemInvitationCode(cleanPersonalPin, emailToUse, nameToUse || 'Hermano');
+          if (invResult.success && invResult.role) {
+            identifiedRole = invResult.role;
+            if (invResult.targetName && !isGenericIdentityName(invResult.targetName)) {
+              nameToUse = invResult.targetName;
             }
           } else {
-            const invResult = await redeemInvitationCode(cleanPersonalPin, emailToUse, nameToUse || 'Hermano');
-            if (invResult.success && invResult.role) {
-              identifiedRole = invResult.role;
-              if (invResult.targetName && !isGenericIdentityName(invResult.targetName)) {
-                nameToUse = invResult.targetName;
-              }
-            } else {
-              setCodeError('El PIN Personal ingresado no fue reconocido en esta congregación. Verifica el PIN asignado por los ancianos o déjalo vacío para entrar como Publicador.');
-              setIsSubmittingCode(false);
-              return;
-            }
+            setCodeError('El PIN Personal ingresado no coincide con ningún publicador en esta congregación. Verifica el PIN asignado por los ancianos o déjalo vacío para entrar en Modo Cartelera/Público.');
+            setIsSubmittingCode(false);
+            return;
           }
         }
       }
@@ -256,6 +248,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           ? settings.congregationName
           : (localStorage.getItem('kongre_congregation_name') || ''));
 
+      // Hidratar datos de la congregación de manera segura y controlada tras validar el PIN
+      if (cloudData) {
+        hydrateCongregation(cloudData);
+      }
+
       localStorage.setItem('kongre_congregation_number', effectiveId);
       localStorage.setItem('kongre_congregation_id', effectiveId);
 
@@ -273,6 +270,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           localStorage.setItem('kongre_coordinator_name', nameToUse);
           newSettingsUpdate.coordinatorName = nameToUse;
         }
+      }
+
+      if (cloudData) {
+        hydrateCongregation(cloudData);
       }
 
       // Actualizar configuración local sin sobreescribir la nube recién descargada
@@ -295,54 +296,13 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       assignRoleToEmail(emailToUse, roleFinal, nameToUse, cleanPersonalPin || undefined);
       setActiveRole(roleFinal);
 
-      // Asegurar que el hermano figure en la lista oficial de publicadores de la congregación SOLO si se identificó personalmente
-      if (!matchingPub && !isGenericIdentityName(nameToUse) && (cleanPersonalPin || roleFinal === 'coordinador')) {
-        const currentPubs = (cloudData?.publishers || publishers) as any[];
-        const alreadyInList = currentPubs.some(
-          (p) =>
-            (p.personalPin && cleanPersonalPin && String(p.personalPin).trim() === cleanPersonalPin.trim()) ||
-            (p.name && areNamesEquivalent(p.name, nameToUse))
-        );
-        if (!alreadyInList) {
-          const isElder = roleFinal === 'coordinador' || roleFinal === 'secretario' || roleFinal === 'superintendente_vym' || roleFinal === 'anciano';
-          const isSM = roleFinal.startsWith('siervo_');
-          addPublisher({
-            name: nameToUse,
-            gender: 'hermano',
-            phone: settings.coordinatorPhone || '',
-            email: emailToUse && !emailToUse.startsWith('hermano_') ? emailToUse : '',
-            personalPin: cleanPersonalPin || undefined,
-            notes: roleFinal === 'coordinador' ? 'Coordinador del Cuerpo de Ancianos' : (THEOCRATIC_ROLES[roleFinal]?.name || ''),
-            active: true,
-            groupNumber: 1,
-            privilege: isElder ? 'anciano' : isSM ? 'siervo_ministerial' : undefined,
-            theocraticRole: roleFinal,
-            hope: 'otras_ovejas',
-            absences: [],
-            roles: {
-              vym_presidente: isElder,
-              vym_oracion: isElder || isSM,
-              vym_tesoros_discurso: isElder,
-              vym_tesoros_perlas: isElder,
-              vym_tesoros_lectura: true,
-              vym_maestros_titular: true,
-              vym_maestros_ayudante: true,
-              vym_vida_partes: isElder || isSM,
-              vym_estudio_conductor: isElder,
-              vym_estudio_lector: true,
-              fds_presidente: isElder,
-              fds_atalaya_lector: isElder || isSM,
-              fds_oracion: isElder || isSM,
-              deber_acomodador: true,
-              deber_seguridad: true,
-              deber_audio: true,
-              deber_video: true,
-              deber_microfonos: true,
-              deber_plataforma: true,
-              deber_zoom: true,
-            },
-          });
-        }
+      if (cleanPersonalPin) {
+        localStorage.setItem('kongre_session_pin_v2', cleanPersonalPin);
+      }
+
+      // Si se identificó un publicador coincidente en la lista, asegurar la vinculación exacta
+      if (matchingPub && matchingPub.id) {
+        setIdentifiedPublisher(matchingPub.id, nameToUse);
       }
 
       localStorage.setItem('kongre_is_registered_congregation', 'true');
@@ -447,30 +407,29 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         (localStorage.getItem('kongre_congregation_name') && !isCongregationIdString(localStorage.getItem('kongre_congregation_name')!) ? localStorage.getItem('kongre_congregation_name')!.trim() : null) ||
         '';
 
-      // 2. Si hay ID de congregación, cargar datos de Firestore
+      // 2. Si hay ID de congregación, cargar datos de Firestore (sin hidratar hasta verificar autorización)
       let cloudData: any = null;
       if (existingCongId) {
-        const cloudRes = await loadCongregationFromCloud(existingCongId);
+        const cloudRes = await loadCongregationFromCloud(existingCongId, { skipHydrate: true });
         cloudData = cloudRes?.data;
       }
 
       const allPublishers = (cloudData?.publishers || publishers || []) as any[];
-      const coordEmail = (cloudData?.settings?.coordinatorEmail || settings.coordinatorEmail || '').toLowerCase().trim();
+      const coordEmail = (
+        cloudData?.settings?.coordinatorEmail ||
+        settings.coordinatorEmail ||
+        (typeof window !== 'undefined' ? localStorage.getItem('kongre_coordinator_email') : '') ||
+        ''
+      ).toLowerCase().trim();
       const coordName = cloudData?.settings?.coordinatorName || settings.coordinatorName || '';
 
-      // 3. Comprobar si el usuario es Coordinador/Creador
-      const isKnownCoordinator = Boolean(existingCongId) && (
-        userEmail === 'hectorguti95@gmail.com' ||
-        userEmail === 'hectorguti95@outlook.com' ||
-        (Boolean(coordEmail) && userEmail === coordEmail)
-      );
+      // 3. Comprobar si el usuario es estrictamente el Coordinador registrado (sin atajos de correo)
+      const isKnownCoordinator = Boolean(existingCongId) && Boolean(coordEmail) && userEmail === coordEmail;
 
-      // 4. Comprobar si el usuario coincide con un publicador registrado por correo o nombre
+      // 4. Comprobar si el usuario coincide con un publicador registrado por correo exacto (NUNCA sólo por nombre)
       const matchingPub = existingCongId
         ? allPublishers.find(
-            (p) =>
-              (p.email && p.email.toLowerCase().trim() === userEmail) ||
-              (userName && !isGenericIdentityName(userName) && p.name && areNamesEquivalent(p.name, userName))
+            (p) => p.email && p.email.toLowerCase().trim() === userEmail
           )
         : undefined;
 
@@ -495,7 +454,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
 
-      // Si no hay congregación existente vinculada a este correo o dispositivo, solicitar ID y PIN para vincularla
+      // Si no hay congregación existente vinculada a este correo o dispositivo
       if (!existingCongId) {
         setActiveTab('code_login');
         setCodeSuccess(
@@ -504,8 +463,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
 
-      // CASO A: Es el coordinador / creador o dueño del dispositivo con congregación existente
+      // CASO A: Es estrictamente el coordinador registrado de la congregación
       if (isKnownCoordinator) {
+        if (cloudData) {
+          hydrateCongregation(cloudData);
+        }
         const finalCoordName =
           (userName && !isGenericIdentityName(userName) ? userName : null) ||
           (coordName && !isGenericIdentityName(coordName) ? coordName : null) ||
@@ -548,47 +510,13 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           } catch {}
         }
 
-        // Asegurar que el coordinador figure como publicador en la lista
+        // Si ya figura como publicador, vincular su ID sin duplicar
         if (finalCoordName && !isGenericIdentityName(finalCoordName)) {
-          const alreadyInList = allPublishers.some(
-            (p) => p.name && areNamesEquivalent(p.name, finalCoordName)
+          const existingPub = allPublishers.find(
+            (p) => (p.email && p.email.toLowerCase().trim() === userEmail) || (p.name && areNamesEquivalent(p.name, finalCoordName))
           );
-          if (!alreadyInList) {
-            addPublisher({
-              name: finalCoordName,
-              gender: 'hermano',
-              phone: settings.coordinatorPhone || '',
-              email: userEmail,
-              notes: 'Coordinador del Cuerpo de Ancianos',
-              active: true,
-              groupNumber: 1,
-              privilege: 'anciano',
-              theocraticRole: 'coordinador',
-              hope: 'otras_ovejas',
-              absences: [],
-              roles: {
-                vym_presidente: true,
-                vym_oracion: true,
-                vym_tesoros_discurso: true,
-                vym_tesoros_perlas: true,
-                vym_tesoros_lectura: true,
-                vym_maestros_titular: true,
-                vym_maestros_ayudante: true,
-                vym_vida_partes: true,
-                vym_estudio_conductor: true,
-                vym_estudio_lector: true,
-                fds_presidente: true,
-                fds_atalaya_lector: true,
-                fds_oracion: true,
-                deber_acomodador: true,
-                deber_seguridad: true,
-                deber_audio: true,
-                deber_video: true,
-                deber_microfonos: true,
-                deber_plataforma: true,
-                deber_zoom: true,
-              },
-            });
+          if (existingPub && existingPub.id) {
+            setIdentifiedPublisher(existingPub.id, finalCoordName);
           }
         }
 
@@ -596,8 +524,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
 
-      // CASO B: Es un publicador o rol ya registrado
+      // CASO B: Es un publicador o rol ya autorizado previamente por los ancianos
       if (matchingPub || matchingRole || approvedReq) {
+        if (cloudData) {
+          hydrateCongregation(cloudData);
+        }
         const roleToAssign: TheocraticRole =
           matchingRole?.role ||
           matchingPub?.theocraticRole ||
@@ -616,6 +547,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         if (brotherName && !isGenericIdentityName(brotherName)) {
           setIdentifiedBrother(brotherName);
           localStorage.setItem('kongre_identified_brother', brotherName);
+        }
+
+        if (matchingPub?.id) {
+          setIdentifiedPublisher(matchingPub.id, brotherName);
+        }
+
+        if (matchingPub && matchingPub.personalPin) {
+          localStorage.setItem('kongre_session_pin_v2', String(matchingPub.personalPin).trim());
         }
 
         assignRoleToEmail(userEmail, roleToAssign, brotherName);
@@ -651,13 +590,15 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
 
-      // CASO C: La congregación existe pero la cuenta de Google necesita conectarse con el PIN
+      // CASO C: La congregación existe pero la cuenta de Google NO está autorizada
       if (existingCongId) {
-        setActiveTab('code_login');
-        if (existingCongId) setCongregationIdInput(existingCongId);
-        setCodeSuccess(
-          `Cuenta de Google iniciada (${userEmail}). Introduce el PIN de tu congregación o tu PIN personal para conectarte.`
-        );
+        setUnauthorizedGoogleAccount({
+          email: userEmail,
+          name: userName || 'Hermano',
+          congregationId: existingCongId,
+          congregationName: existingCongName || cloudData?.settings?.congregationName || 'la Congregación',
+        });
+        setActiveTab('unauthorized');
         return;
       }
 
@@ -668,6 +609,34 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       setEmailError(err?.message || 'Error al iniciar sesión con Google.');
     } finally {
       setIsSubmittingEmail(false);
+    }
+  };
+
+  const handleEnterAsGuest = () => {
+    setActiveRole('publico');
+    setIdentifiedBrother('Invitado');
+    localStorage.setItem('kongre_is_registered_congregation', 'true');
+    localStorage.setItem('kongre_has_entered_app', 'true');
+    localStorage.setItem('kongre_identified_brother', 'Invitado');
+    onEnterApp();
+  };
+
+  const handleRequestAccessFromCoordinator = async () => {
+    if (!unauthorizedGoogleAccount) return;
+    setIsSubmittingRequest(true);
+    try {
+      await createAccountLinkRequest(
+        unauthorizedGoogleAccount.email,
+        unauthorizedGoogleAccount.name,
+        '',
+        'publico',
+        unauthorizedGoogleAccount.congregationId
+      );
+      setPendingApprovalEmail(unauthorizedGoogleAccount.email);
+    } catch (err: any) {
+      setEmailError(err?.message || 'Error al enviar la solicitud al Coordinador.');
+    } finally {
+      setIsSubmittingRequest(false);
     }
   };
 
@@ -831,6 +800,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       ? 'Acceso con Google'
                       : activeTab === 'code_login'
                       ? 'Conectar con ID y PIN'
+                      : activeTab === 'unauthorized'
+                      ? 'Acceso Restringido'
                       : 'Registrar mi Congregación'}
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
@@ -840,6 +811,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       ? 'Inicia sesión con tu cuenta de Google para acceder a tus asignaciones y perfil'
                       : activeTab === 'code_login'
                       ? 'Introduce el ID de congregación y tu PIN para acceder'
+                      : activeTab === 'unauthorized'
+                      ? 'Esta cuenta requiere autorización previa del Cuerpo de Ancianos'
                       : 'Configura los datos oficiales de tu congregación paso a paso'}
                   </p>
                 </div>
@@ -935,6 +908,35 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     </div>
 
                     <div className="hidden sm:flex items-center self-center text-slate-400 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all">
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </button>
+
+                  {/* Option 4: Entrar como Invitado / Cartelera */}
+                  <button
+                    type="button"
+                    onClick={handleEnterAsGuest}
+                    className="w-full p-4 sm:p-5 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-xs transition-all text-left flex items-start gap-4 group cursor-pointer bg-white/60 dark:bg-slate-900/60"
+                  >
+                    <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                      <Users className="w-5 h-5" />
+                    </div>
+
+                    <div className="space-y-1 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                          Entrar como Invitado / Cartelera
+                        </h3>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200 shrink-0">
+                          Solo Lectura
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                        Accede al programa de reuniones y anuncios públicos sin necesidad de cuenta ni PIN.
+                      </p>
+                    </div>
+
+                    <div className="hidden sm:flex items-center self-center text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all">
                       <ArrowRight className="w-4 h-4" />
                     </div>
                   </button>
@@ -1147,6 +1149,89 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     onEnterApp();
                   }}
                 />
+              )}
+
+              {/* VIEW: CUENTA NO AUTORIZADA (Estilo Organized Unauthorized Role) */}
+              {activeTab === 'unauthorized' && unauthorizedGoogleAccount && (
+                <div className="space-y-5 pt-1 animate-in fade-in zoom-in-95 text-center">
+                  <div className="w-16 h-16 rounded-3xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-inner">
+                    <ShieldAlert className="w-8 h-8" />
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800">
+                      Privacidad Teocrática • Cero Confianza
+                    </span>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-3">
+                      Acceso Restringido a la Congregación
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 max-w-md mx-auto leading-relaxed">
+                      La cuenta de Google <strong className="text-slate-800 dark:text-slate-200">({unauthorizedGoogleAccount.email})</strong> no figura en la lista de ancianos ni de hermanos autorizados de <strong className="text-slate-800 dark:text-slate-200">{unauthorizedGoogleAccount.congregationName}</strong>.
+                    </p>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60 text-xs text-slate-600 dark:text-slate-300 text-left space-y-2">
+                    <p className="font-semibold text-slate-800 dark:text-slate-200">¿Cómo deseas proceder?</p>
+                    <ul className="list-disc list-inside space-y-1.5 text-slate-500 dark:text-slate-400">
+                      <li><strong>Solicitar Aprobación:</strong> El Coordinador recibirá tu solicitud y podrá autorizar tu cuenta con tu rol correspondiente.</li>
+                      <li><strong>PIN Personal:</strong> Si los ancianos ya te dieron un PIN de publicador, ingrésalo para conectarte directamente.</li>
+                      <li><strong>Entrar como Invitado:</strong> Verás el programa y los anuncios de solo lectura sin datos personales.</li>
+                    </ul>
+                  </div>
+
+                  {emailError && (
+                    <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold flex items-center gap-2 text-left">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                      <span>{emailError}</span>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-2.5 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleRequestAccessFromCoordinator}
+                      disabled={isSubmittingRequest}
+                      className="w-full py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      <Mail className="w-4 h-4" />
+                      <span>{isSubmittingRequest ? 'Enviando solicitud...' : 'Solicitar Aprobación al Coordinador'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCongregationIdInput(unauthorizedGoogleAccount.congregationId);
+                        setActiveTab('code_login');
+                      }}
+                      className="w-full py-2.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <KeyRound className="w-4 h-4 text-indigo-500" />
+                      <span>Conectar con ID y PIN de Congregación</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleEnterAsGuest}
+                      className="w-full py-2.5 px-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <Users className="w-4 h-4 text-emerald-500" />
+                      <span>Entrar como Invitado / Cartelera</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await signOutUser();
+                        setUnauthorizedGoogleAccount(null);
+                        setActiveTab('home');
+                      }}
+                      className="w-full py-2 px-4 text-rose-500 hover:text-rose-600 font-medium text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer mt-1"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Cerrar Sesión Google</span>
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           </div>

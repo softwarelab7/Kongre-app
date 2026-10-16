@@ -278,6 +278,7 @@ export const PersonalViewTab: React.FC = () => {
     try {
       const res = await identifyRoleByPersonalPin(enteredPin);
       if (res.success) {
+        localStorage.setItem('kongre_session_pin_v2', enteredPin.trim());
         if (res.publisherId && publishersMap.has(res.publisherId)) {
           setSelectedPublisherId(res.publisherId);
           setIdentifiedPublisher(res.publisherId, res.name);
@@ -308,6 +309,7 @@ export const PersonalViewTab: React.FC = () => {
   // Exit / switch publisher
   const handleExitPortal = () => {
     setIdentifiedPublisher(null);
+    localStorage.removeItem('kongre_session_pin_v2');
     setEnteredPin('');
     setShowSupervisorSelect(false);
   };
@@ -928,23 +930,11 @@ export const PersonalViewTab: React.FC = () => {
             </button>
           </form>
 
-          {/* Ayuda o modo supervisor */}
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 space-y-2">
+          {/* Ayuda */}
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 space-y-2 text-center">
             <p className="italic">
-              ¿No tienes tu PIN? Solicita a los ancianos tu <strong>papeleta de credenciales</strong> con tu código QR de acceso.
+              ¿No tienes tu PIN o lo extraviaste? Solicita a los ancianos tu <strong>papeleta de credenciales</strong> o nuevo enlace de acceso.
             </p>
-            {publishers.length > 0 && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedPublisherId(publishers[0].id);
-                  setIdentifiedPublisher(publishers[0].id, publishers[0].name);
-                }}
-                className="text-purple-600 dark:text-purple-400 hover:underline font-semibold block mx-auto text-[11px] pt-1"
-              >
-                (Acceso rápido de prueba / Modo Demostración)
-              </button>
-            )}
           </div>
         </div>
       </div>

@@ -8,7 +8,8 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { CongregationProvider, useCongregation } from './context/CongregationContext';
 import { Navbar, ActiveTab } from './components/Navbar';
-import { isTabAllowedForRole } from './utils/rbac';
+import { isTabAllowedForRole, TheocraticRole } from './utils/rbac';
+import { formatCanonicalCongregationId, isGenericIdentityName } from './utils/theocraticSecurity';
 import { CongregationCalendar } from './components/CongregationCalendar';
 import { ScheduleTab } from './components/ScheduleTab';
 import ClmScheduleView from './components/ClmScheduleView';
@@ -63,9 +64,24 @@ import { IdentityNamePrompt } from './components/IdentityNamePrompt';
 import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import { checkUpcomingAssignmentsAndNotify } from './services/notificationService';
+import { ToastProvider, useToast } from './context/ToastContext';
+import { ModalProvider } from './context/ModalContext';
 
 const AppContent: React.FC = () => {
-  const { user, effectiveRoleInfo, signOutUser, currentBrotherName, currentPublisherId } = useAuth();
+  const {
+    user,
+    activeRole,
+    setActiveRole,
+    effectiveRoleInfo,
+    signOutUser,
+    currentBrotherName,
+    currentPublisherId,
+    setIdentifiedBrother,
+    setIdentifiedPublisher,
+    isCoordinator,
+  } = useAuth();
+  const { showToast } = useToast();
+  const canManageRoles = isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano';
   const [isLockPinSuggestionOpen, setIsLockPinSuggestionOpen] = useState(false);
   const prevUserRef = useRef(user);
 
@@ -123,7 +139,127 @@ const AppContent: React.FC = () => {
     }
     return false;
   });
-  const { setCurrentWeekId, territories, settings, accountLinkRequests, publishers, weeks } = useCongregation();
+  const {
+    setCurrentWeekId,
+    territories,
+    settings,
+    accountLinkRequests,
+    publishers,
+    weeks,
+    loadCongregationFromCloud,
+  } = useCongregation();
+
+  // Theocratic Route Guard: Protect against unauthorized tab viewing
+  useEffect(() => {
+    if (!isTabAllowedForRole(effectiveRoleInfo.id, activeTab)) {
+      if (effectiveRoleInfo.allowedTabs.includes('mi_vista')) {
+        setActiveTab('mi_vista');
+      } else if (effectiveRoleInfo.allowedTabs.includes('inicio')) {
+        setActiveTab('inicio');
+      } else if (effectiveRoleInfo.allowedTabs.length > 0) {
+        setActiveTab(effectiveRoleInfo.allowedTabs[0]);
+      }
+    }
+  }, [effectiveRoleInfo.id, activeTab]);
+
+  // Organized-style "Pocket Mode" Direct Invitation Link (?cong=...&pub=...&pin=...)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCong = urlParams.get('cong');
+    const urlPub = urlParams.get('pub');
+    const urlPin = urlParams.get('pin');
+
+    if (urlCong && urlPub && urlPin) {
+      const cleanCong = formatCanonicalCongregationId(urlCong);
+      const cleanPub = urlPub.trim();
+      const cleanPin = urlPin.trim();
+
+      (async () => {
+        let matchingPub = (publishers || []).find(
+          (p) => p.id === cleanPub && p.personalPin && String(p.personalPin).trim() === cleanPin
+        );
+
+        if (!matchingPub && cleanCong) {
+          const cloudRes = await loadCongregationFromCloud(cleanCong);
+          if (cloudRes?.success && cloudRes.data?.publishers) {
+            matchingPub = cloudRes.data.publishers.find(
+              (p: any) => p.id === cleanPub && p.personalPin && String(p.personalPin).trim() === cleanPin
+            );
+          }
+        }
+
+        if (matchingPub) {
+          const role = (matchingPub.theocraticRole || (matchingPub.privilege === 'anciano' ? 'anciano' : matchingPub.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+          const brotherName = matchingPub.name && !isGenericIdentityName(matchingPub.name) ? matchingPub.name.trim() : 'Hermano';
+
+          setActiveRole(role);
+          setIdentifiedPublisher(matchingPub.id, brotherName);
+          setIdentifiedBrother(brotherName);
+          localStorage.setItem('kongre_session_pin_v2', cleanPin);
+          localStorage.setItem('kongre_is_registered_congregation', 'true');
+          localStorage.setItem('kongre_has_entered_app', 'true');
+          localStorage.setItem('kongre_congregation_number', cleanCong);
+          localStorage.setItem('kongre_congregation_id', cleanCong);
+          localStorage.setItem('kongre_identified_brother', brotherName);
+
+          setShowWelcomeLanding(false);
+          setActiveTab('mi_vista');
+
+          // Clean sensitive query credentials from browser address bar
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+      })();
+    }
+  }, [publishers, loadCongregationFromCloud]);
+
+  // Guardián de Sesión de Publicador: Revocación o cambio de PIN en tiempo real (p.ej. teléfono perdido o robo)
+  useEffect(() => {
+    // Solo aplica a sesiones de publicadores (no a ancianos/administradores autenticados con Google)
+    if (!currentPublisherId || user) return;
+    if (!publishers || publishers.length === 0) return;
+
+    const myPub = publishers.find((p) => p.id === currentPublisherId);
+    const storedSessionPin = localStorage.getItem('kongre_session_pin_v2');
+
+    // 1. El publicador fue eliminado del directorio de la congregación
+    if (!myPub) {
+      setIdentifiedPublisher(null);
+      setIdentifiedBrother('');
+      localStorage.removeItem('kongre_session_pin_v2');
+      localStorage.removeItem('kongre_identified_brother');
+      localStorage.removeItem('kongre_current_publisher_id_v2');
+      setActiveRole('publico');
+      showToast('Tu sesión ha finalizado porque ya no figuras en el directorio de la congregación.', 'warning');
+      return;
+    }
+
+    const currentServerPin = myPub.personalPin ? String(myPub.personalPin).trim() : '';
+
+    // 2. El PIN fue REVOCADO por los ancianos
+    if (!currentServerPin) {
+      setIdentifiedPublisher(null);
+      setIdentifiedBrother('');
+      localStorage.removeItem('kongre_session_pin_v2');
+      localStorage.removeItem('kongre_identified_brother');
+      localStorage.removeItem('kongre_current_publisher_id_v2');
+      setActiveRole('publico');
+      showToast('🔒 Sesión cerrada: Tu PIN de acceso fue revocado por los ancianos. Por favor solicita un nuevo PIN.', 'error');
+      return;
+    }
+
+    // 3. El PIN fue CAMBIADO o REGENERADO (el PIN local ya no coincide con el nuevo)
+    if (storedSessionPin && storedSessionPin.trim() !== currentServerPin) {
+      setIdentifiedPublisher(null);
+      setIdentifiedBrother('');
+      localStorage.removeItem('kongre_session_pin_v2');
+      localStorage.removeItem('kongre_identified_brother');
+      localStorage.removeItem('kongre_current_publisher_id_v2');
+      setActiveRole('publico');
+      showToast('🔑 Tu PIN de acceso ha sido actualizado. Por favor introduce tu nuevo PIN personal.', 'warning');
+      return;
+    }
+  }, [publishers, currentPublisherId, user, setIdentifiedPublisher, setIdentifiedBrother, setActiveRole, showToast]);
 
   // Escaneo automático de asignaciones teocráticas próximas para notificaciones nativas/push
   useEffect(() => {
@@ -227,14 +363,10 @@ const AppContent: React.FC = () => {
   }, [user, showWelcomeLanding]);
 
   // Mandatory Congregation Registration Check:
-  // A user MUST register the congregation (or join an existing one) before accessing the platform
+  // A user MUST register the congregation (or join an existing one with verified PIN/credentials) before accessing the platform
   const isCongregationRegistered = Boolean(
-    (settings.isRegistered && (settings.congregationName?.trim() || settings.congregationNumber || settings.congregationId)) ||
-    localStorage.getItem('kongre_is_registered_congregation') === 'true' ||
-    localStorage.getItem('kongre_has_entered_app') === 'true' ||
-    Boolean(localStorage.getItem('kongre_congregation_name')?.trim()) ||
-    Boolean(localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_congregation_id')) ||
-    Boolean(user?.email)
+    (localStorage.getItem('kongre_has_entered_app') === 'true' && localStorage.getItem('kongre_is_registered_congregation') === 'true') &&
+    (settings.isRegistered || Boolean(localStorage.getItem('kongre_congregation_id')) || Boolean(localStorage.getItem('kongre_congregation_number')))
   );
 
   if (showWelcomeLanding || !isCongregationRegistered) {
@@ -499,13 +631,15 @@ const AppContent: React.FC = () => {
       {/* Offline Connectivity & Cloud Sync Status Banner */}
       <OfflineSyncBanner />
 
-      {/* Role Switcher & Google Account Permissions Modal */}
-      <RoleSwitcherModal
-        isOpen={isRoleModalOpen}
-        onClose={() => setIsRoleModalOpen(false)}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+      {/* Role Switcher & Google Account Permissions Modal (Strictly Elders & Coordinator) */}
+      {canManageRoles && (
+        <RoleSwitcherModal
+          isOpen={isRoleModalOpen}
+          onClose={() => setIsRoleModalOpen(false)}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
+      )}
 
       {/* Theocratic Session Lock Modal */}
       <SessionLockModal />
@@ -540,9 +674,6 @@ const AppContent: React.FC = () => {
     </div>
   );
 };
-
-import { ToastProvider } from './context/ToastContext';
-import { ModalProvider } from './context/ModalContext';
 
 export default function App() {
   return (

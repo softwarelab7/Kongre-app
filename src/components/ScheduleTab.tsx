@@ -375,6 +375,7 @@ export const ScheduleTab: React.FC = () => {
     onSelect: (pid: string, suggestedLessonNumber?: number) => void,
     onClear: () => void
   ) => {
+    if (isReadOnly) return;
     setSelectorState({
       isOpen: true,
       title,

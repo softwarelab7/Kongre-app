@@ -1940,12 +1940,15 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const needsCoordRole = existing.theocraticRole !== 'coordinador' || existing.privilege !== 'anciano';
       const needsPhone = !existing.phone && !!settings.coordinatorPhone;
       const needsEmail = !existing.email && !!settings.coordinatorEmail;
+      const coordPin = localStorage.getItem('kongre_coordinator_pin') || localStorage.getItem('kongre_session_pin_v2') || '';
+      const needsPin = !existing.personalPin && !!coordPin;
 
-      if (needsCoordRole || needsPhone || needsEmail) {
+      if (needsCoordRole || needsPhone || needsEmail || needsPin) {
         const updatedCoord: Publisher = {
           ...existing,
           theocraticRole: 'coordinador',
           privilege: 'anciano',
+          personalPin: existing.personalPin || coordPin || undefined,
           phone: existing.phone || settings.coordinatorPhone || '',
           email: existing.email || settings.coordinatorEmail || '',
           notes: existing.notes || 'Coordinador del Cuerpo de Ancianos',
@@ -1961,10 +1964,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return;
     }
 
+    const coordPin = localStorage.getItem('kongre_coordinator_pin') || localStorage.getItem('kongre_session_pin_v2') || '';
     const coordPub: Publisher = {
       id: `pub-coord-${Date.now()}`,
       name: coordName,
       gender: 'hermano',
+      personalPin: coordPin || undefined,
       phone: settings.coordinatorPhone || '',
       email: settings.coordinatorEmail || '',
       notes: 'Coordinador del Cuerpo de Ancianos',
@@ -2048,8 +2053,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const newPub: Publisher = {
       ...pubData,
-      id: `pub-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      createdAt: new Date().toISOString(),
+      id: (pubData as any).id || `pub-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      createdAt: (pubData as any).createdAt || new Date().toISOString(),
     };
     const updated = [...publishers, newPub];
     setPublishers(updated);

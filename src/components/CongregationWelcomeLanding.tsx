@@ -174,11 +174,18 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
       // 3. Probar PIN personal en el directorio de la congregación ÚNICAMENTE si el usuario lo ingresó
       let matchingPub: any = null;
+      const savedCoordPin = localStorage.getItem('kongre_coordinator_pin');
       if (cleanPersonalPin) {
-        const congPubs = (cloudData?.publishers || publishers) as any[];
-        matchingPub = congPubs.find(
-          (p) => p.personalPin && String(p.personalPin).trim().length >= 4 && String(p.personalPin).trim() === cleanPersonalPin
-        );
+        if (savedCoordPin && savedCoordPin.trim() === cleanPersonalPin) {
+          identifiedRole = 'coordinador';
+          const savedCoord = localStorage.getItem('kongre_coordinator_name') || cloudData?.settings?.coordinatorName || settings.coordinatorName;
+          nameToUse = savedCoord && !isGenericIdentityName(savedCoord) ? savedCoord.trim() : 'Coordinador';
+          setIdentifiedBrother(nameToUse);
+        } else {
+          const congPubs = (cloudData?.publishers || publishers) as any[];
+          matchingPub = congPubs.find(
+            (p) => p.personalPin && String(p.personalPin).trim().length >= 4 && String(p.personalPin).trim() === cleanPersonalPin
+          );
 
         if (matchingPub) {
           const finalRole: TheocraticRole =
@@ -207,6 +214,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             return;
           }
         }
+      }
       }
 
       // Si solo ingresó PIN de congregación sin PIN personal, el rol es ESTRICTAMENTE 'publico' (nunca 'coordinador')

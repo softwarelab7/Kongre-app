@@ -71,9 +71,9 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
 
   useEffect(() => {
     if (isOpen && !isAllowedAccess) {
-      onClose();
+      setActiveTabMode('mi_sesion');
     }
-  }, [isOpen, isAllowedAccess, onClose]);
+  }, [isOpen, isAllowedAccess]);
 
   const { publishers, updatePublisher, settings } = useCongregation();
   const { invitations, createInvitation, revokeInvitation } = useSecurity();

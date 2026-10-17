@@ -244,12 +244,29 @@ const AppContent: React.FC = () => {
 
   // Guardián de Sesión de Publicador: Revocación o cambio de PIN en tiempo real (p.ej. teléfono perdido o robo)
   useEffect(() => {
-    // Solo aplica a sesiones de publicadores (no a ancianos/administradores autenticados con Google)
+    // Solo aplica a sesiones de publicadores (no a ancianos/administradores autenticados con Google ni al Coordinador)
     if (!currentPublisherId || user) return;
     if (!publishers || publishers.length === 0) return;
 
-    const myPub = publishers.find((p) => p.id === currentPublisherId);
     const storedSessionPin = localStorage.getItem('kongre_session_pin_v2');
+    const savedCoordPin = localStorage.getItem('kongre_coordinator_pin');
+
+    // NUNCA revocar la sesión del Coordinador a través del guardián de publicadores
+    if (
+      activeRole === 'coordinador' ||
+      isCoordinator ||
+      (savedCoordPin && storedSessionPin === savedCoordPin)
+    ) {
+      return;
+    }
+
+    let myPub = publishers.find((p) => p.id === currentPublisherId);
+    if (!myPub && storedSessionPin) {
+      myPub = publishers.find((p) => p.personalPin && String(p.personalPin).trim() === storedSessionPin.trim());
+      if (myPub) {
+        setIdentifiedPublisher(myPub.id, myPub.name);
+      }
+    }
 
     // 1. El publicador fue eliminado del directorio de la congregación
     if (!myPub) {

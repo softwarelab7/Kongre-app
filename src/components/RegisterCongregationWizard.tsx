@@ -376,6 +376,8 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       localStorage.setItem('kongre_has_entered_app', 'true');
       localStorage.setItem('kongre_identified_brother', coordinatorName.trim());
       localStorage.setItem('kongre_coordinator_name', coordinatorName.trim());
+      localStorage.setItem('kongre_coordinator_email', coordinatorEmail.trim().toLowerCase());
+      localStorage.setItem('theocratic_app_data_v1_active_role', 'coordinador');
       localStorage.setItem('kongre_congregation_name', congregationName.trim());
       localStorage.setItem('kongre_congregation_number', finalId);
       localStorage.setItem('kongre_congregation_id', finalId);

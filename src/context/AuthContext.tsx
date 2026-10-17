@@ -342,7 +342,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Active role state
   const [activeRole, setActiveRoleState] = useState<TheocraticRole>(() => {
     try {
+      const savedCoordPin = localStorage.getItem('kongre_coordinator_pin');
+      const sessionPin = localStorage.getItem('kongre_session_pin_v2');
       const saved = localStorage.getItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY) as TheocraticRole;
+      if (savedCoordPin && (sessionPin === savedCoordPin || saved === 'coordinador')) {
+        return 'coordinador';
+      }
       if (saved && THEOCRATIC_ROLES[saved]) return saved;
     } catch {
       // fallback
@@ -513,6 +518,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return candidate && !isGenericIdentityName(candidate) ? candidate.trim() : '';
     };
+
+    // 0. Comprobar directamente contra el PIN de Coordinador guardado en este dispositivo (o PIN maestro)
+    const savedCoordPin = localStorage.getItem('kongre_coordinator_pin');
+    if (savedCoordPin && savedCoordPin.trim() === cleanPin) {
+      setActiveRole('coordinador');
+      const savedCoord = localStorage.getItem('kongre_coordinator_name');
+      const resolvedName = savedCoord || resolveNonGenericName(null, 'coordinador') || 'Coordinador';
+      setCurrentBrotherName(resolvedName);
+      localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, resolvedName);
+      localStorage.setItem('kongre_identified_brother', resolvedName);
+      localStorage.setItem('kongre_session_pin_v2', cleanPin);
+
+      await insertAuditLog({
+        accion: 'login',
+        hermano_nid: 'coordinador-pin',
+        hermano_nombre: resolvedName,
+        modulo: 'auth',
+        detalles: 'Inicio de sesión exitoso con PIN de Coordinador',
+      });
+
+      return {
+        success: true,
+        role: 'coordinador',
+        name: resolvedName,
+        message: `¡Identificación exitosa! Bienvenido, ${resolvedName} (Coordinador).`,
+      };
+    }
 
     // 1. Search in unique publisher PINs directory (Principal: Por Publicador)
     const foundPublisher = publisherPinsList.find(
@@ -791,7 +823,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         setUser(null);
         setLoading(false);
-        setActiveRole('publico');
+        // NO sobreescribir el rol si el usuario tiene una sesión local activa de Coordinador o de PIN
+        const savedRole = localStorage.getItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY) as TheocraticRole;
+        const savedCoordPin = localStorage.getItem('kongre_coordinator_pin');
+        const sessionPin = localStorage.getItem('kongre_session_pin_v2');
+        if (savedCoordPin && (sessionPin === savedCoordPin || savedRole === 'coordinador')) {
+          setActiveRole('coordinador');
+          const savedCoord = localStorage.getItem('kongre_coordinator_name');
+          if (savedCoord) setCurrentBrotherName(savedCoord);
+        } else if (savedRole && savedRole !== 'publico') {
+          setActiveRole(savedRole);
+        } else {
+          setActiveRole('publico');
+        }
       }
     });
 
@@ -1029,7 +1073,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   }, [activeRole, activeRoles, userProfile]);
 
-  const isCoordinator = activeRole === 'coordinador' || activeRoles.includes('coordinador');
+  const isCoordinator =
+    activeRole === 'coordinador' ||
+    activeRoles.includes('coordinador') ||
+    (typeof window !== 'undefined' &&
+      !!localStorage.getItem('kongre_coordinator_pin') &&
+      localStorage.getItem('kongre_session_pin_v2') === localStorage.getItem('kongre_coordinator_pin'));
 
   const logAction = useCallback(
     async (accion: string, modulo: string, detalles?: string) => {

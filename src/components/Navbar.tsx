@@ -1196,17 +1196,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </button>
                     )}
 
-                    {canManageRoles && onOpenRoleModal && (
+                    {onOpenRoleModal && (
                       <button
                         type="button"
                         onClick={() => {
                           setOpenDropdown(null);
                           onOpenRoleModal();
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/50 rounded-xl transition cursor-pointer text-left"
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl transition cursor-pointer text-left ${
+                          activeRole === 'publico'
+                            ? 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100'
+                            : 'text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/50'
+                        }`}
                       >
                         <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                        <span>Directorio de Roles y PINs</span>
+                        <span>{canManageRoles ? 'Directorio de Roles y PINs' : '🔑 Activar Rol / Ingresar PIN'}</span>
                       </button>
                     )}
 
@@ -1336,18 +1340,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {effectiveDisplayName || 'Hermano'}
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    {canManageRoles && onOpenRoleModal ? (
+                    {onOpenRoleModal ? (
                       <button
                         type="button"
                         onClick={() => {
                           setIsMobileMenuOpen(false);
                           onOpenRoleModal();
                         }}
-                        className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50 transition cursor-pointer flex items-center gap-1 truncate"
-                        title="Toca para ver o cambiar Roles y PINs"
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-md transition cursor-pointer flex items-center gap-1 truncate ${
+                          activeRole === 'publico'
+                            ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 font-bold hover:bg-amber-200'
+                            : 'bg-purple-50 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50'
+                        }`}
+                        title="Toca para ingresar tu PIN y activar tu rol"
                       >
                         <Shield className="w-2.5 h-2.5 shrink-0" />
-                        <span className="truncate">{effectiveRoleInfo?.name || 'Publicador'}</span>
+                        <span className="truncate">
+                          {activeRole === 'publico' ? '🔑 Ingresar PIN (Activar Rol)' : effectiveRoleInfo?.name || 'Publicador'}
+                        </span>
                       </button>
                     ) : (
                       <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300 truncate flex items-center gap-1">

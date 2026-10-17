@@ -9,7 +9,6 @@ import {
   hashPasscode,
   generateMilitaryGradeCongregationId,
   formatCanonicalCongregationId,
-  evaluatePinStrength,
   generateSecureCongregationPin,
   generateSecureRolePin,
   isCongregationIdString,
@@ -132,26 +131,42 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
     }
   }, [user]);
 
-  // Step 4: Security: PIN de Congregación + PIN Personal (vacíos por defecto)
-  const [congregationPin, setCongregationPinInput] = useState('');
-  const [confirmCongregationPin, setConfirmCongregationPin] = useState('');
-  const [showCongregationPin, setShowCongregationPin] = useState(false);
+  // Step 4: Security: PIN de Congregación + PIN Personal (generados automáticamente con CSPRNG)
+  const [congregationPin, setCongregationPinInput] = useState(() => generateSecureCongregationPin());
+  const [confirmCongregationPin, setConfirmCongregationPin] = useState(() => congregationPin);
+  const [showCongregationPin, setShowCongregationPin] = useState(true);
+  const [copiedCongPin, setCopiedCongPin] = useState(false);
 
-  const [personalPin, setPersonalPinInput] = useState('');
-  const [confirmPersonalPin, setConfirmPersonalPin] = useState('');
-  const [showPersonalPin, setShowPersonalPin] = useState(false);
+  const [personalPin, setPersonalPinInput] = useState(() => generateSecureRolePin());
+  const [confirmPersonalPin, setConfirmPersonalPin] = useState(() => personalPin);
+  const [showPersonalPin, setShowPersonalPin] = useState(true);
+  const [copiedPersPin, setCopiedPersPin] = useState(false);
 
   const [pinRegeneratedCong, setPinRegeneratedCong] = useState(false);
   const [pinRegeneratedPers, setPinRegeneratedPers] = useState(false);
 
-  // Regeneradores de PINs automáticos con la app
+  const handleCopyCongPin = (textToCopy: string) => {
+    if (!textToCopy) return;
+    navigator.clipboard.writeText(textToCopy);
+    setCopiedCongPin(true);
+    setTimeout(() => setCopiedCongPin(false), 2000);
+  };
+
+  const handleCopyPersPin = (textToCopy: string) => {
+    if (!textToCopy) return;
+    navigator.clipboard.writeText(textToCopy);
+    setCopiedPersPin(true);
+    setTimeout(() => setCopiedPersPin(false), 2000);
+  };
+
+  // Regeneradores de PINs automáticos con CSPRNG
   const handleRegenerateCongregationPin = () => {
     const newPin = generateSecureCongregationPin();
     setCongregationPinInput(newPin);
     setConfirmCongregationPin(newPin);
     setShowCongregationPin(true);
     setPinRegeneratedCong(true);
-    setTimeout(() => setPinRegeneratedCong(false), 2000);
+    setTimeout(() => setPinRegeneratedCong(false), 1500);
   };
 
   const handleRegeneratePersonalPin = () => {
@@ -160,10 +175,8 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
     setConfirmPersonalPin(newPin);
     setShowPersonalPin(true);
     setPinRegeneratedPers(true);
-    setTimeout(() => setPinRegeneratedPers(false), 2000);
+    setTimeout(() => setPinRegeneratedPers(false), 1500);
   };
-
-  const pinStrength = evaluatePinStrength(congregationPin);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -309,19 +322,11 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
     }
     if (currentStep === 4) {
       if (!congregationPin.trim()) {
-        setError('El PIN de la Congregación es obligatorio (4 a 8 dígitos o caracteres).');
+        setError('El PIN de la Congregación es obligatorio.');
         return false;
       }
       if (congregationPin.trim().length < 4) {
         setError('El PIN de la Congregación debe tener al menos 4 caracteres o dígitos.');
-        return false;
-      }
-      if (pinStrength.isWeak) {
-        setError(pinStrength.message || 'El PIN seleccionado es predecible o inseguro. Por favor utiliza una combinación más segura.');
-        return false;
-      }
-      if (congregationPin !== confirmCongregationPin) {
-        setError('La confirmación del PIN de la Congregación no coincide.');
         return false;
       }
       if (!personalPin.trim()) {
@@ -964,133 +969,80 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 </div>
                 <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold">
                   <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span>Seguridad Personalizada</span>
+                  <span>Seguridad Criptográfica</span>
                 </div>
               </div>
               <p className="text-[11px] sm:text-xs text-amber-900/80 dark:text-amber-300/80 leading-relaxed">
-                Establece las claves de seguridad para tu congregación y para tu cuenta de Coordinador. Puedes ingresarlas manualmente o pulsar <strong>«Generar PIN»</strong> para crearlas automáticamente con alta seguridad teocrática.
+                Credenciales de seguridad criptográfica asignadas automáticamente según las nuevas normas de seguridad de Kongre. El <strong>PIN de la Congregación</strong> autoriza la conexión y sincronización de miembros, y tu <strong>PIN Personal</strong> te identifica a ti como Coordinador.
               </p>
             </div>
 
-            {/* 1. PIN de la Congregación */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs">
+            {/* 1. PIN de la Congregación (Clave General de Conexión y Cifrado) */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3.5 shadow-2xs">
               <div className="flex items-start gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
                   <Lock className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block">
-                    1. PIN de la Congregación (Bloqueo de Pantalla)
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block">
+                      1. PIN de la Congregación (Acceso y Sincronización)
+                    </span>
+                    <span className="text-rose-500 font-bold">*</span>
+                  </div>
                   <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5 leading-relaxed">
-                    Clave de seguridad exclusiva de tu congregación para bloquear la app y proteger la confidencialidad de los datos teocráticos en el Salón.
+                    Clave de seguridad criptográfica general de la congregación para conectar publicadores y autorizar sincronizaciones. <em>(No es el PIN de bloqueo de pantalla de la app)</em>.
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                      <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                      <span>PIN de la Congregación:</span>
-                      <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={handleRegenerateCongregationPin}
-                        className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-bold flex items-center gap-1 px-2 py-0.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/60 transition-colors cursor-pointer"
-                        title="Generar otro PIN de 6 dígitos aleatorio"
-                      >
-                        <RefreshCw className={`w-3 h-3 ${pinRegeneratedCong ? 'animate-spin' : ''}`} />
-                        <span>{pinRegeneratedCong ? '¡Generado!' : congregationPin ? 'Generar nuevo' : 'Generar PIN'}</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowCongregationPin(!showCongregationPin)}
-                        className="text-[11px] text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 cursor-pointer transition-colors"
-                        title={showCongregationPin ? 'Ocultar PIN' : 'Ver PIN'}
-                      >
-                        {showCongregationPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                        <span>{showCongregationPin ? 'Ocultar' : 'Ver'}</span>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type={showCongregationPin ? 'text' : 'password'}
-                      maxLength={8}
-                      value={congregationPin}
-                      onChange={(e) => {
-                        setCongregationPinInput(e.target.value);
-                        setConfirmCongregationPin(e.target.value);
-                      }}
-                      placeholder="Ej: 749258 o Teo#26"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
-                      required
-                    />
-                  </div>
-
-                  {/* Medidor de Fortaleza Teocrática del PIN */}
-                  {congregationPin.length > 0 && (
-                    <div className="mt-2 p-2 rounded-xl bg-white/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-700/60 space-y-1.5">
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-slate-500 font-semibold">Fortaleza Teocrática:</span>
-                        <span className={`font-bold px-2 py-0.5 rounded-full ${pinStrength.color}`}>
-                          {pinStrength.label}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-3 gap-1 h-1.5">
-                        <div className={`rounded-full transition-all ${pinStrength.score >= 1 ? (pinStrength.isWeak ? 'bg-rose-500' : 'bg-amber-500') : 'bg-slate-200 dark:bg-slate-700'}`} />
-                        <div className={`rounded-full transition-all ${pinStrength.score >= 2 ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
-                        <div className={`rounded-full transition-all ${pinStrength.score >= 3 ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
-                      </div>
-                      {pinStrength.message && (
-                        <p className={`text-[10px] leading-tight ${pinStrength.isWeak ? 'text-rose-600 dark:text-rose-400 font-semibold' : 'text-slate-500 dark:text-slate-400'}`}>
-                          {pinStrength.message}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1">
-                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
-                      <Sparkles className="w-3 h-3" /> Generado por la app (6 dígitos)
-                    </span>
-                    <span>De 4 a 8 dígitos</span>
-                  </div>
+              {/* Credencial generada automáticamente con CSPRNG */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs">
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <span className="font-mono font-bold text-base sm:text-lg tracking-widest text-indigo-700 dark:text-indigo-300">
+                    {showCongregationPin ? congregationPin : '••••••'}
+                  </span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    Asignado (CSPRNG)
+                  </span>
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                      <span>Confirmar PIN de la Congregación:</span>
-                      <span className="text-rose-500">*</span>
-                    </label>
-                  </div>
-                  <input
-                    type={showCongregationPin ? 'text' : 'password'}
-                    maxLength={8}
-                    value={confirmCongregationPin}
-                    onChange={(e) => setConfirmCongregationPin(e.target.value)}
-                    placeholder="Repite el PIN"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
-                    required
-                  />
-                  <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1">
-                    <span>Debe coincidir exactamente</span>
-                    {confirmCongregationPin.length > 0 && (
-                      confirmCongregationPin === congregationPin ? (
-                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓ Coincide (Verificado)</span>
-                      ) : (
-                        <span className="text-rose-500 font-bold">No coincide</span>
-                      )
-                    )}
-                  </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowCongregationPin(!showCongregationPin)}
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                    title={showCongregationPin ? 'Ocultar PIN' : 'Ver PIN'}
+                  >
+                    {showCongregationPin ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    <span>{showCongregationPin ? 'Ocultar' : 'Ver'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleRegenerateCongregationPin}
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                    title="Generar otro PIN criptográfico aleatorio"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${pinRegeneratedCong ? 'animate-spin' : ''}`} />
+                    <span>{pinRegeneratedCong ? '¡Generado!' : 'Generar otro'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleCopyCongPin(congregationPin)}
+                    className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    {copiedCongPin ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedCongPin ? '¡Copiado!' : 'Copiar PIN'}</span>
+                  </button>
                 </div>
               </div>
+
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>Generado automáticamente con entropía criptográfica (6 dígitos CSPRNG). Pertenece a la congregación en su conjunto.</span>
+              </p>
             </div>
 
             {/* 2. PIN Personal Único de Publicador (Coordinador) */}

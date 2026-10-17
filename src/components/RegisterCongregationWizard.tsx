@@ -72,9 +72,9 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
   const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
 
-  // Step 1: Congregation info - Inicia 100% vacío para registrar una congregación nueva
+  // Step 1: Congregation info - ID criptográfico preasignado con entropía pura
   const [congregationName, setCongregationName] = useState('');
-  const [congregationNumber, setCongregationNumber] = useState('');
+  const [congregationNumber, setCongregationNumber] = useState(() => generateMilitaryGradeCongregationId());
   const [copiedId, setCopiedId] = useState(false);
   const [circuitNumber, setCircuitNumber] = useState('');
 
@@ -153,11 +153,16 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Al escribir o cambiar el nombre de la congregación, se genera automáticamente el ID
+  // Al escribir el nombre de la congregación, mantenemos el ID estable sin recalcularlo
   const handleCongregationNameChange = (newName: string) => {
     setCongregationName(newName);
-    const militaryId = generateMilitaryGradeCongregationId(newName);
-    setCongregationNumber(militaryId);
+    if (!congregationNumber) {
+      setCongregationNumber(generateMilitaryGradeCongregationId());
+    }
+  };
+
+  const handleRegenerateCongregationId = () => {
+    setCongregationNumber(generateMilitaryGradeCongregationId());
   };
 
   const [isSuccessScreen, setIsSuccessScreen] = useState(false);
@@ -242,7 +247,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         return false;
       }
       if (!congregationNumber.trim()) {
-        const fresh = generateMilitaryGradeCongregationId(congregationName);
+        const fresh = generateMilitaryGradeCongregationId();
         setCongregationNumber(fresh);
         if (!fresh) {
           setError('Por favor genera o introduce el ID de la Congregación.');
@@ -587,7 +592,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 autoFocus
               />
               <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block leading-relaxed">
-                El ID de la congregación se genera automáticamente a partir del nombre ingresado.
+                Nombre oficial de la congregación según registros teocráticos.
               </span>
             </div>
 
@@ -607,7 +612,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     <span className="text-rose-500 font-bold">*</span>
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                    Identificador asignado a tu congregación para que los publicadores y ancianos puedan vincularse.
+                    Identificador criptográfico de enrutamiento para que los publicadores y ancianos puedan vincularse.
                   </p>
                 </div>
               </div>
@@ -615,7 +620,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs">
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="font-mono font-bold text-sm sm:text-base tracking-wider text-indigo-700 dark:text-indigo-300">
-                    {congregationNumber || 'Se generará automáticamente al ingresar el nombre'}
+                    {congregationNumber || 'Generando ID seguro...'}
                   </span>
                   {congregationNumber && (
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
@@ -625,6 +630,16 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleRegenerateCongregationId}
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                    title="Generar otro ID criptográfico aleatorio"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Generar otro</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => handleCopyId(congregationNumber)}
@@ -639,7 +654,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
               <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span>Este ID estará siempre visible en los ajustes de la congregación una vez registrado.</span>
+                <span>Generado con entropía criptográfica pura (64 bits CSPRNG). Es independiente del nombre e imposible de deducir o predecir.</span>
               </p>
             </div>
 

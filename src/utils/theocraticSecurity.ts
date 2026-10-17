@@ -192,18 +192,18 @@ export function maskPrivateNotes(notes?: string): string {
 
 /**
  * Genera un Identificador Teocrático de Congregación de Grado Militar.
+/**
+ * Genera un ID de congregación de Grado Militar Criptográfico (CSPRNG):
  * - Utiliza entropía criptográfica real de 64 bits (CSPRNG via Web Crypto API)
+ * - 100% independiente del nombre o datos públicos de la congregación (imposible de deducir)
  * - Codificación Base32 Crockford para evitar confusiones tipográficas (sin 0, O, 1, I)
- * - Algoritmo anti-colisiones y resistente a ataques de fuerza bruta
+ * - Espacio de claves de más de 1.09 billones de combinaciones (32^8)
  * - Formato estándar militar teocrático: KGR-XXXX-XXXX (ej. KGR-8P2M-7X4W)
  */
-export function generateMilitaryGradeCongregationId(name?: string): string {
-  if (!name || !name.trim()) return '';
+export function generateMilitaryGradeCongregationId(_optionalSeed?: string): string {
+  const CHARSET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // 32 caracteres seguros Crockford
 
-  const clean = name.trim().toUpperCase();
-  const CHARSET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // 32 caracteres seguros
-
-  // Generamos entropía aleatoria criptográfica con Web Crypto API
+  // Generamos entropía aleatoria criptográfica con Web Crypto API (CSPRNG)
   const randomBytes = new Uint8Array(8);
   if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
     window.crypto.getRandomValues(randomBytes);
@@ -213,29 +213,15 @@ export function generateMilitaryGradeCongregationId(name?: string): string {
     }
   }
 
-  // Mezcla de la semilla del nombre con la entropía criptográfica
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < clean.length; i++) {
-    hash ^= clean.charCodeAt(i);
-    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
-  }
-  hash >>>= 0;
-
   let block1 = '';
   let block2 = '';
 
   for (let i = 0; i < 4; i++) {
-    const shift = i * 8;
-    const seedByte = (hash >>> (shift % 32)) & 0xff;
-    const combined = (randomBytes[i] ^ seedByte ^ (clean.charCodeAt(i % clean.length) * 31)) % CHARSET.length;
-    block1 += CHARSET[combined];
+    block1 += CHARSET[randomBytes[i] % CHARSET.length];
   }
 
   for (let i = 4; i < 8; i++) {
-    const shift = (i - 4) * 8;
-    const seedByte = (hash >>> (shift % 32)) & 0xff;
-    const combined = (randomBytes[i] ^ seedByte ^ (clean.charCodeAt((i + 2) % clean.length) * 17)) % CHARSET.length;
-    block2 += CHARSET[combined];
+    block2 += CHARSET[randomBytes[i] % CHARSET.length];
   }
 
   return `KGR-${block1}-${block2}`;

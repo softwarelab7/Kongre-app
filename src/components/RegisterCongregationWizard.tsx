@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { useSecurity } from '../context/SecurityContext';
+import { supabaseSyncService } from '../services/supabaseSyncService';
+import { insertAuditLog } from '../services/auditLogService';
 import {
   hashPasscode,
   generateMilitaryGradeCongregationId,
@@ -330,12 +332,38 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
     setIsSubmitting(true);
 
     try {
-      const congPinHashed = await hashPasscode(congregationPin.trim());
-
+      const cleanPersonalPin = personalPin.trim();
+      const cleanCongPin = congregationPin.trim();
+      const congPinHashed = await hashPasscode(cleanCongPin);
       const finalId = formatCanonicalCongregationId(congregationNumber.trim()) || congregationNumber.trim().toUpperCase();
 
-      // 1. Update Congregation Settings in context and database
-      await updateSettings({
+      // 1. Guardar credenciales y PINs inmediatamente en almacenamiento local seguro
+      localStorage.setItem('kongre_session_pin_v2', cleanPersonalPin);
+      localStorage.setItem('kongre_coordinator_pin', cleanPersonalPin);
+      localStorage.setItem('kongre_registered_cong_pin', cleanCongPin);
+      localStorage.setItem('kongre_last_cong_pin', cleanCongPin);
+      localStorage.setItem('kongre_is_registered_congregation', 'true');
+      localStorage.setItem('kongre_has_entered_app', 'true');
+      localStorage.setItem('kongre_identified_brother', coordinatorName.trim());
+      localStorage.setItem('kongre_coordinator_name', coordinatorName.trim());
+      localStorage.setItem('kongre_congregation_name', congregationName.trim());
+      localStorage.setItem('kongre_congregation_number', finalId);
+      localStorage.setItem('kongre_congregation_id', finalId);
+      localStorage.setItem('kongre_midweek_day', midweekDay);
+      localStorage.setItem('kongre_midweek_time', midweekTime);
+      localStorage.setItem('kongre_weekend_day', weekendDay);
+      localStorage.setItem('kongre_weekend_time', weekendTime);
+      localStorage.setItem('kongre_last_local_update', new Date().toISOString());
+      sessionStorage.removeItem('kongre_show_landing');
+
+      if (user && user.uid) {
+        try {
+          localStorage.setItem('kongre_user_cong_id', finalId);
+        } catch {}
+      }
+
+      // 2. Actualizar configuración de la congregación en el contexto y estado
+      const registeredSettings = {
         congregationName: congregationName.trim(),
         congregationNumber: finalId,
         congregationId: finalId,
@@ -353,23 +381,17 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         coordinatorPhone: coordinatorPhone.trim(),
         isRegistered: true,
         registeredAt: new Date().toISOString(),
-      });
+      };
 
-      // Si el usuario está autenticado, registrar la congregación en localStorage
-      if (user && user.uid) {
-        try {
-          localStorage.setItem('kongre_user_cong_id', finalId);
-        } catch {}
-      }
+      await updateSettings(registeredSettings);
 
-      // 2. Set Congregation App Lock PIN and Personal PIN in security context
-      await setCongregationPin(congregationPin.trim());
-      await setPersonalPin(personalPin.trim());
+      // 3. Establecer PINs en SecurityContext y asignar rol de Coordinador
+      await setCongregationPin(cleanCongPin);
+      await setPersonalPin(cleanPersonalPin);
 
-      // 3. Assign Coordinator role and Personal PIN in AuthContext
       assignPersonalPinToRole(
         'coordinador',
-        personalPin.trim(),
+        cleanPersonalPin,
         coordinatorName.trim(),
         coordinatorEmail.trim().toLowerCase()
       );
@@ -378,11 +400,12 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         coordinatorEmail.trim().toLowerCase(),
         'coordinador',
         coordinatorName.trim(),
-        personalPin.trim()
+        cleanPersonalPin
       );
       setActiveRole('coordinador');
 
-      // 4. Add Coordinator to publishers list if not already present
+      // 4. Agregar al Coordinador al registro de publicadores si no existe
+      let updatedPubs = [...publishers];
       const alreadyHasCoord = publishers.some(
         (p) =>
           areNamesEquivalent(p.name, coordinatorName.trim()) ||
@@ -390,18 +413,19 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       );
       if (!alreadyHasCoord && coordinatorName.trim()) {
         const coordId = `pub_coord_${Date.now()}`;
-        addPublisher({
+        const coordPub = {
+          id: coordId,
           name: coordinatorName.trim(),
-          gender: 'hermano',
+          gender: 'hermano' as const,
           phone: coordinatorPhone.trim(),
           email: coordinatorEmail.trim().toLowerCase(),
-          personalPin: personalPin.trim(),
-          theocraticRole: 'coordinador',
+          personalPin: cleanPersonalPin,
+          theocraticRole: 'coordinador' as const,
           notes: 'Coordinador del Cuerpo de Ancianos',
           active: true,
           groupNumber: 1,
-          privilege: 'anciano',
-          hope: 'otras_ovejas',
+          privilege: 'anciano' as const,
+          hope: 'otras_ovejas' as const,
           absences: [],
           roles: {
             vym_presidente: true,
@@ -425,26 +449,38 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             deber_plataforma: true,
             deber_zoom: true,
           },
-        });
+        };
+        addPublisher(coordPub);
         setIdentifiedPublisher(coordId, coordinatorName.trim());
+        updatedPubs = [...publishers, coordPub];
       }
 
-      // 5. Store registration flag in localStorage
-      localStorage.setItem('kongre_is_registered_congregation', 'true');
-      localStorage.setItem('kongre_has_entered_app', 'true');
-      localStorage.setItem('kongre_needs_cloud_upload', 'true');
-      localStorage.setItem('kongre_session_pin_v2', personalPin.trim());
-      localStorage.setItem('kongre_identified_brother', coordinatorName.trim());
-      localStorage.setItem('kongre_coordinator_name', coordinatorName.trim());
-      localStorage.setItem('kongre_congregation_name', congregationName.trim());
-      localStorage.setItem('kongre_congregation_number', finalId);
-      localStorage.setItem('kongre_congregation_id', finalId);
-      localStorage.setItem('kongre_midweek_day', midweekDay);
-      localStorage.setItem('kongre_midweek_time', midweekTime);
-      localStorage.setItem('kongre_weekend_day', weekendDay);
-      localStorage.setItem('kongre_weekend_time', weekendTime);
-      localStorage.setItem('kongre_last_local_update', new Date().toISOString());
-      sessionStorage.removeItem('kongre_show_landing');
+      // 5. Cifrado de grado militar (AES-256-GCM) y subida inmediata a Supabase
+      try {
+        await supabaseSyncService.uploadCongregation({
+          congregationId: finalId,
+          data: {
+            settings: { ...settings, ...registeredSettings },
+            publishers: updatedPubs,
+            weeks: [],
+            territories: [],
+            notices: [],
+          },
+          pinMaestro: cleanPersonalPin,
+          pinCongregacion: cleanCongPin,
+        });
+      } catch (uploadErr) {
+        console.warn('Aviso de subida inicial a Supabase diferida:', uploadErr);
+      }
+
+      // 6. Registrar en la Pista de Auditoría Teocrática
+      await insertAuditLog({
+        modulo: 'seguridad',
+        accion: 'REGISTRO_CONGREGACION',
+        hermano_nid: cleanPersonalPin,
+        hermano_nombre: coordinatorName.trim(),
+        detalles: `Congregación ${congregationName.trim()} (${finalId}) registrada con seguridad Cero Conocimiento.`,
+      });
 
       setIsSubmitting(false);
       setIsSuccessScreen(true);

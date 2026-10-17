@@ -301,6 +301,11 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         setError('Por favor introduce el teléfono / WhatsApp de contacto del Coordinador.');
         return false;
       }
+      const phoneDigits = coordinatorPhone.replace(/\D/g, '');
+      if (phoneDigits.length < 7) {
+        setError('Por favor introduce un número de teléfono válido (mínimo 7 dígitos numéricos).');
+        return false;
+      }
     }
     if (currentStep === 4) {
       if (!congregationPin.trim()) {
@@ -877,7 +882,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 type="text"
                 value={coordinatorName}
                 onChange={(e) => setCoordinatorName(e.target.value)}
-                placeholder="Ej: Héctor Gutiérrez"
+                placeholder="Ej: Carlos Mendoza"
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                 required
               />
@@ -893,7 +898,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 type="email"
                 value={coordinatorEmail}
                 onChange={(e) => setCoordinatorEmail(e.target.value)}
-                placeholder="Ej: hectorguti95@gmail.com"
+                placeholder="Ej: coordinador.cbe@gmail.com"
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                 required
               />
@@ -910,12 +915,38 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               </label>
               <input
                 type="tel"
+                inputMode="tel"
                 value={coordinatorPhone}
-                onChange={(e) => setCoordinatorPhone(e.target.value)}
-                placeholder="Ej: +57 300 1234567"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                onChange={(e) => {
+                  // Solo permitir números, el '+' internacional al inicio y espacios
+                  let val = e.target.value.replace(/[^0-9+\s-]/g, '');
+                  if (val.indexOf('+') > 0) {
+                    val = val.charAt(0) + val.slice(1).replace(/\+/g, '');
+                  }
+                  setCoordinatorPhone(val);
+                }}
+                onKeyDown={(e) => {
+                  // Bloquear cualquier tecla alfabética (no permite escribir letras)
+                  if (/^[a-zA-Z]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                    e.preventDefault();
+                  }
+                }}
+                onPaste={(e) => {
+                  e.preventDefault();
+                  const text = e.clipboardData.getData('text');
+                  let cleaned = text.replace(/[^0-9+\s-]/g, '');
+                  if (cleaned.indexOf('+') > 0) {
+                    cleaned = cleaned.charAt(0) + cleaned.slice(1).replace(/\+/g, '');
+                  }
+                  setCoordinatorPhone(cleaned);
+                }}
+                placeholder="Ej: +57 300 123 4567"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs font-mono"
                 required
               />
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
+                Solo se admiten números y código de país (ej. +57). No admite letras.
+              </span>
             </div>
           </div>
         )}

@@ -498,9 +498,9 @@ export interface CongregationSettings {
   language?: string;           // ej. 'Español'
   country?: string;            // ej. 'Colombia'
   city?: string;               // ej. 'Bogotá'
-  coordinatorName?: string;    // ej. 'Héctor Gutiérrez'
-  coordinatorEmail?: string;   // ej. 'hectorguti95@gmail.com'
-  coordinatorPhone?: string;   // ej. '+57 300 1234567'
+  coordinatorName?: string;    // ej. 'Carlos Mendoza'
+  coordinatorEmail?: string;   // ej. 'coordinador.cbe@gmail.com'
+  coordinatorPhone?: string;   // ej. '+57 300 123 4567'
   coordinatorPhotoURL?: string; // Foto de perfil del coordinador (Google Auth / nube)
   isRegistered?: boolean;      // true if the congregation registration wizard has been completed
   registeredAt?: string;       // ISO date

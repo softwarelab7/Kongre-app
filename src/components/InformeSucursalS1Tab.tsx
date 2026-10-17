@@ -946,7 +946,7 @@ export const InformeSucursalS1Tab: React.FC = () => {
                   type="text"
                   value={submitForm.submittedBy}
                   onChange={(e) => setSubmitForm({ ...submitForm, submittedBy: e.target.value })}
-                  placeholder="Ej. Héctor Gutiérrez (Secretario)"
+                  placeholder="Ej. Carlos Mendoza (Secretario)"
                   className="w-full bg-slate-800 border border-white/10 rounded-xl px-3.5 py-2 text-white text-xs focus:outline-none focus:ring-2 focus:ring-sky-500"
                 />
               </div>

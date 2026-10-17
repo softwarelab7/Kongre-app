@@ -622,7 +622,7 @@ export const UserProfileSettingsView: React.FC = () => {
                 required
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Ej. Hno. Héctor Gutiérrez"
+                placeholder="Ej. Hno. Carlos Mendoza"
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
               />
               <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">

@@ -975,7 +975,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="shrink-0 cursor-pointer transition-transform hover:scale-105 active:scale-95 hidden md:block"
                 title="Kongre - Panorama General"
               >
-                <KongreLogo size="sm" className="w-7 h-7" />
+                <Logo variant="isotipo" className="w-7 h-7 object-contain" />
               </button>
             )}
 

@@ -38,10 +38,12 @@ export default function ThemeToggle({
       setInternalDark(next);
       if (typeof document !== "undefined") {
         document.documentElement.classList.toggle("dark", next);
+        document.documentElement.dataset.theme = next ? "dark" : "light";
         document.documentElement.style.colorScheme = next ? "dark" : "light";
       }
       try {
         localStorage.setItem("theme", next ? "dark" : "light");
+        localStorage.setItem("kongre-theme", next ? "dark" : "light");
         localStorage.setItem("kongre_theme", next ? "dark" : "light");
       } catch {}
     }

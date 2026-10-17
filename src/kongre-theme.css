@@ -79,5 +79,10 @@
   color-scheme: dark;
 }
 
+/* Degradado de marca (el del icono). Uso: class="bg-brand-gradient" */
+:root { --gradient-brand: linear-gradient(135deg, #6D6AF5, #3F36C9); }
+@utility bg-brand-gradient { background-image: var(--gradient-brand); }
+
 /* Evita el parpadeo blanco al cargar */
 html { background: var(--bg); color: var(--text); }
+

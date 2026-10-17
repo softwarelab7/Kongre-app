@@ -9,14 +9,10 @@ export interface KongreLogoProps {
 }
 
 /**
- * Logotipo oficial de Kongre
- * Inspirado directamente en el favicon oficial de la aplicación:
- * - Lienzo squircle redondeado (rx=112) con degradado índigo profundo (desde #4f46e5 pasando por #4338ca hasta #1e1b4b).
- * - Cuadrícula 2x2 armónica con sutil sombra:
- *   - Superior Izquierda: Blanco nítido con degradado suave (#ffffff -> #e0e7ff)
- *   - Superior Derecha: Índigo suave aperlado (#c7d2fe -> #818cf8, 92% opacidad)
- *   - Inferior Izquierda: Índigo suave aperlado (#c7d2fe -> #818cf8, 92% opacidad)
- *   - Inferior Derecha: Acento cian eléctrico (#38bdf8, 95% opacidad)
+ * Logotipo oficial de Kongre (Guía de Marca V2)
+ * - Squircle continuo con curvatura superelipse
+ * - Degradado oficial en diagonal 135° (#6D6AF5 -> #3F36C9)
+ * - Símbolo 'K' calado con barra vertical de puntas redondeadas y chevrón simétrico (#FFFFFF)
  */
 export const KongreLogo: React.FC<KongreLogoProps> = ({
   className = '',
@@ -26,13 +22,8 @@ export const KongreLogo: React.FC<KongreLogoProps> = ({
   title = 'Kongre',
 }) => {
   const rawId = useId();
-  // Safe HTML/SVG identifier without colons
   const safeId = rawId.replace(/[^a-zA-Z0-9_-]/g, '_');
-
-  const bgGradId = `kongre_bg_${safeId}`;
-  const tileGrad1Id = `kongre_tile1_${safeId}`;
-  const tileGrad2Id = `kongre_tile2_${safeId}`;
-  const shadowId = `kongre_shadow_${safeId}`;
+  const gradId = `kongre_brand_grad_${safeId}`;
 
   const sizeMap: Record<NonNullable<KongreLogoProps['size']>, string> = {
     xs: 'w-6 h-6',
@@ -43,14 +34,12 @@ export const KongreLogo: React.FC<KongreLogoProps> = ({
     '2xl': 'w-16 h-16',
   };
 
-  const hasBackground = showBackground && variant !== 'transparent';
   const hasCustomWidth = className.includes('w-') || className.includes('size-');
   const sizeClasses = hasCustomWidth ? '' : sizeMap[size];
 
   return (
     <svg
-      viewBox={hasBackground ? '0 0 512 512' : '100 100 312 312'}
-      fill="none"
+      viewBox="0 0 100 100"
       xmlns="http://www.w3.org/2000/svg"
       className={`shrink-0 select-none ${sizeClasses} ${className}`}
       aria-label={title}
@@ -58,61 +47,32 @@ export const KongreLogo: React.FC<KongreLogoProps> = ({
     >
       <title>{title}</title>
       <defs>
-        {/* Degradado de fondo índigo profundo a azul medianoche */}
-        <linearGradient id={bgGradId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#4f46e5" />
-          <stop offset="50%" stopColor="#4338ca" />
-          <stop offset="100%" stopColor="#1e1b4b" />
+        <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#6D6AF5" />
+          <stop offset="100%" stopColor="#3F36C9" />
         </linearGradient>
-
-        {/* Mosaico superior izquierdo: blanco puro a lavanda sutil */}
-        <linearGradient id={tileGrad1Id} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="100%" stopColor="#e0e7ff" />
-        </linearGradient>
-
-        {/* Mosaicos aperlados (superior derecho e inferior izquierdo) */}
-        <linearGradient id={tileGrad2Id} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#c7d2fe" />
-          <stop offset="100%" stopColor="#818cf8" />
-        </linearGradient>
-
-        {/* Sombra suave bajo los 4 paneles */}
-        <filter id={shadowId} x="-10%" y="-10%" width="120%" height="125%">
-          <feDropShadow dx="0" dy="12" stdDeviation="16" floodColor="#0f172a" floodOpacity="0.32" />
-        </filter>
       </defs>
-
-      {/* Lienzo squircle redondeado oficial de Kongre */}
-      {hasBackground && (
-        <rect
-          width="512"
-          height="512"
-          rx="112"
-          fill={`url(#${bgGradId})`}
+      {showBackground && (
+        <path
+          d="M100.00,50.00L99.98,63.69L99.94,68.06L99.86,71.23L99.75,73.81L99.61,76.01L99.44,77.94L99.24,79.68L99.01,81.26L98.74,82.71L98.44,84.05L98.11,85.30L97.74,86.46L97.35,87.55L96.91,88.57L96.44,89.52L95.94,90.43L95.39,91.27L94.81,92.07L94.19,92.82L93.53,93.53L92.82,94.19L92.07,94.81L91.27,95.39L90.43,95.94L89.52,96.44L88.57,96.91L87.55,97.35L86.46,97.74L85.30,98.11L84.05,98.44L82.71,98.74L81.26,99.01L79.68,99.24L77.94,99.44L76.01,99.61L73.81,99.75L71.23,99.86L68.06,99.94L63.69,99.98L50.00,100.00L36.31,99.98L31.94,99.94L28.77,99.86L26.19,99.75L23.99,99.61L22.06,99.44L20.32,99.24L18.74,99.01L17.29,98.74L15.95,98.44L14.70,98.11L13.54,97.74L12.45,97.35L11.43,96.91L10.48,96.44L9.57,95.94L8.73,95.39L7.93,94.81L7.18,94.19L6.47,93.53L5.81,92.82L5.19,92.07L4.61,91.27L4.06,90.43L3.56,89.52L3.09,88.57L2.65,87.55L2.26,86.46L1.89,85.30L1.56,84.05L1.26,82.71L0.99,81.26L0.76,79.68L0.56,77.94L0.39,76.01L0.25,73.81L0.14,71.23L0.06,68.06L0.02,63.69L0.00,50.00L0.02,36.31L0.06,31.94L0.14,28.77L0.25,26.19L0.39,23.99L0.56,22.06L0.76,20.32L0.99,18.74L1.26,17.29L1.56,15.95L1.89,14.70L2.26,13.54L2.65,12.45L3.09,11.43L3.56,10.48L4.06,9.57L4.61,8.73L5.19,7.93L5.81,7.18L6.47,6.47L7.18,5.81L7.93,5.19L8.73,4.61L9.57,4.06L10.48,3.56L11.43,3.09L12.45,2.65L13.54,2.26L14.70,1.89L15.95,1.56L17.29,1.26L18.74,0.99L20.32,0.76L22.06,0.56L23.99,0.39L26.19,0.25L28.77,0.14L31.94,0.06L36.31,0.02L50.00,0.00L63.69,0.02L68.06,0.06L71.23,0.14L73.81,0.25L76.01,0.39L77.94,0.56L79.68,0.76L81.26,0.99L82.71,1.26L84.05,1.56L85.30,1.89L86.46,2.26L87.55,2.65L88.57,3.09L89.52,3.56L90.43,4.06L91.27,4.61L92.07,5.19L92.82,5.81L93.53,6.47L94.19,7.18L94.81,7.93L95.39,8.73L95.94,9.57L96.44,10.48L96.91,11.43L97.35,12.45L97.74,13.54L98.11,14.70L98.44,15.95L98.74,17.29L99.01,18.74L99.24,20.32L99.44,22.06L99.61,23.99L99.75,26.19L99.86,28.77L99.94,31.94L99.98,36.31Z"
+          fill={variant === 'flat' ? '#4F46E5' : `url(#${gradId})`}
         />
       )}
-
-      {/* Cuadrícula icónica de 4 paneles */}
-      <g filter={hasBackground ? `url(#${shadowId})` : undefined}>
-        {/* Mosaico Superior Izquierdo: Blanco */}
-        <rect x="116" y="116" width="126" height="126" rx="28" fill={`url(#${tileGrad1Id})`} />
-        {/* Mosaico Superior Derecho: Índigo Perla */}
-        <rect x="270" y="116" width="126" height="126" rx="28" fill={`url(#${tileGrad2Id})`} fillOpacity="0.92" />
-        {/* Mosaico Inferior Izquierdo: Índigo Perla */}
-        <rect x="116" y="270" width="126" height="126" rx="28" fill={`url(#${tileGrad2Id})`} fillOpacity="0.92" />
-        {/* Mosaico Inferior Derecho: Acento Cian Kongre */}
-        <rect x="270" y="270" width="126" height="126" rx="28" fill="#38bdf8" fillOpacity="0.92" />
-      </g>
+      <rect x="25" y="26" width="13" height="48" rx="6.5" fill="#fff" />
+      <path
+        d="M70 27L51 50L70 73"
+        fill="none"
+        stroke="#fff"
+        strokeWidth="13"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 };
 
-/**
- * Icono de panel de 4 cuadrados sin fondo
- */
 export const KongreLogoIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => {
-  return <KongreLogo showBackground={false} className={className} />;
+  return <KongreLogo className={className} />;
 };
 
 export default KongreLogo;

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useId } from 'react';
-import { Clock, Check, ChevronDown, X, Sparkles } from 'lucide-react';
+import { Clock, Check, ChevronDown, X } from 'lucide-react';
 
 export interface IosTimePickerProps {
   value: string; // Formato 24h: "HH:mm" (ej. "19:00", "09:30")
@@ -65,6 +65,7 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
   presets,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [openUpward, setOpenUpward] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const pickerId = useId();
 
@@ -79,9 +80,19 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
   const minutesRef = useRef<HTMLDivElement>(null);
   const periodsRef = useRef<HTMLDivElement>(null);
 
-  // Sincronizar al abrir
+  // Detección inteligente de dirección (arriba o abajo para evitar scroll)
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      // Si hay menos de 260px abajo y arriba hay más espacio, abrir hacia arriba
+      if (spaceBelow < 260 && rect.top > spaceBelow) {
+        setOpenUpward(true);
+      } else {
+        setOpenUpward(false);
+      }
+
+      // Sincronizar datos al abrir
       const p = parse24to12(value);
       setSelectedHour(p.hour12);
       setSelectedMinute(p.minute);
@@ -110,8 +121,8 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
     };
   }, [isOpen]);
 
-  // Scroll suave al elemento seleccionado en la rueda
-  const scrollToItem = (container: HTMLDivElement | null, index: number, itemHeight = 36) => {
+  // Scroll suave al elemento seleccionado en la rueda (altura de item: 32px)
+  const scrollToItem = (container: HTMLDivElement | null, index: number, itemHeight = 32) => {
     if (container) {
       container.scrollTo({
         top: index * itemHeight,
@@ -130,7 +141,7 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
         if (hIdx !== -1) scrollToItem(hoursRef.current, hIdx);
         if (mIdx !== -1) scrollToItem(minutesRef.current, mIdx);
         if (pIdx !== -1) scrollToItem(periodsRef.current, pIdx);
-      }, 50);
+      }, 40);
     }
   }, [isOpen]);
 
@@ -155,7 +166,7 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
   const activeText = isEmerald ? 'text-emerald-600 dark:text-emerald-400' : 'text-indigo-600 dark:text-indigo-400';
 
   const defaultPresets = isEmerald
-    ? ['09:30', '10:00', '16:00', '17:00']
+    ? ['09:00', '09:30', '10:00', '16:00', '17:00']
     : ['18:30', '19:00', '19:30', '20:00'];
 
   const effectivePresets = presets || defaultPresets;
@@ -200,11 +211,15 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
         />
       </button>
 
-      {/* Popover iOS Cupertino Wheel Picker */}
+      {/* Popover iOS Cupertino Wheel Picker (Auto-posicionado arriba o abajo para evitar scroll) */}
       {isOpen && !disabled && (
-        <div className="absolute z-50 left-0 right-0 sm:right-auto sm:w-80 mt-1.5 rounded-3xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl shadow-slate-900/15 dark:shadow-black/60 border border-slate-200/90 dark:border-slate-800 overflow-hidden text-xs sm:text-sm animate-in fade-in zoom-in-95 duration-150 origin-top">
-          {/* Header iOS */}
-          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between bg-slate-50/60 dark:bg-slate-800/40">
+        <div
+          className={`absolute z-50 left-0 sm:left-auto sm:right-0 w-full sm:w-76 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl shadow-slate-900/20 dark:shadow-black/70 border border-slate-200/90 dark:border-slate-800 overflow-hidden text-xs sm:text-sm animate-in fade-in zoom-in-95 duration-150 ${
+            openUpward ? 'bottom-full mb-2 origin-bottom' : 'top-full mt-2 origin-top'
+          }`}
+        >
+          {/* Header iOS compacto */}
+          <div className="px-3.5 py-2.5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between bg-slate-50/60 dark:bg-slate-800/40">
             <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-indigo-500" />
               Seleccionar Horario
@@ -218,9 +233,9 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
             </button>
           </div>
 
-          {/* Quick Presets / Horarios habituales */}
+          {/* Quick Presets / Horarios habituales compactos */}
           <div className="p-2.5 pb-1 border-b border-slate-100 dark:border-slate-800/60">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 block mb-1.5 px-1">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 block mb-1 px-1">
               Horarios Frecuentes
             </span>
             <div className="flex items-center gap-1.5 flex-wrap">
@@ -231,7 +246,7 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
                     key={preset}
                     type="button"
                     onClick={() => handleSelectPreset(preset)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
                       isSelected
                         ? `${activeBg} text-white shadow-2xs`
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -244,26 +259,26 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
             </div>
           </div>
 
-          {/* iOS 3-Column Wheel Container */}
-          <div className="relative p-3">
-            {/* Horizontal Center Highlight Bar (Lente de selección iOS) */}
-            <div className="absolute left-3 right-3 top-1/2 -translate-y-1/2 h-10 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 pointer-events-none -z-0" />
+          {/* iOS 3-Column Wheel Container Compacto (altura 100px) */}
+          <div className="relative p-2.5 py-2">
+            {/* Lente de selección central iOS */}
+            <div className="absolute left-2.5 right-2.5 top-1/2 -translate-y-1/2 h-8 rounded-lg bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/70 dark:border-slate-700/70 pointer-events-none -z-0" />
 
-            {/* Top Fade Gradient */}
-            <div className="absolute left-3 right-3 top-3 h-12 bg-gradient-to-b from-white/95 via-white/70 to-transparent dark:from-slate-900/95 dark:via-slate-900/70 pointer-events-none z-10" />
+            {/* Gradiente difuminado superior */}
+            <div className="absolute left-2.5 right-2.5 top-2 h-9 bg-gradient-to-b from-white/95 via-white/70 to-transparent dark:from-slate-900/95 dark:via-slate-900/70 pointer-events-none z-10" />
 
-            {/* Bottom Fade Gradient */}
-            <div className="absolute left-3 right-3 bottom-3 h-12 bg-gradient-to-t from-white/95 via-white/70 to-transparent dark:from-slate-900/95 dark:via-slate-900/70 pointer-events-none z-10" />
+            {/* Gradiente difuminado inferior */}
+            <div className="absolute left-2.5 right-2.5 bottom-2 h-9 bg-gradient-to-t from-white/95 via-white/70 to-transparent dark:from-slate-900/95 dark:via-slate-900/70 pointer-events-none z-10" />
 
-            <div className="grid grid-cols-3 gap-2 relative z-0">
+            <div className="grid grid-cols-3 gap-1.5 relative z-0">
               {/* Columna Horas */}
               <div className="flex flex-col items-center">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
                   Hora
                 </span>
                 <div
                   ref={hoursRef}
-                  className="h-32 w-full overflow-y-auto scrollbar-none snap-y snap-mandatory py-11 text-center"
+                  className="h-24 w-full overflow-y-auto scrollbar-none snap-y snap-mandatory py-8 text-center"
                 >
                   {HOURS_12.map((hour, idx) => {
                     const isSelected = selectedHour === hour;
@@ -272,9 +287,9 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
                         key={hour}
                         onClick={() => {
                           setSelectedHour(hour);
-                          scrollToItem(hoursRef.current, idx);
+                          scrollToItem(hoursRef.current, idx, 32);
                         }}
-                        className={`h-9 flex items-center justify-center snap-center text-sm font-bold cursor-pointer transition-all ${
+                        className={`h-8 flex items-center justify-center snap-center text-xs font-bold cursor-pointer transition-all ${
                           isSelected
                             ? 'text-indigo-600 dark:text-indigo-400 font-black scale-110'
                             : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'
@@ -289,12 +304,12 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
 
               {/* Columna Minutos */}
               <div className="flex flex-col items-center border-x border-slate-100 dark:border-slate-800/60">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
                   Minuto
                 </span>
                 <div
                   ref={minutesRef}
-                  className="h-32 w-full overflow-y-auto scrollbar-none snap-y snap-mandatory py-11 text-center"
+                  className="h-24 w-full overflow-y-auto scrollbar-none snap-y snap-mandatory py-8 text-center"
                 >
                   {MINUTES.map((min, idx) => {
                     const isSelected = selectedMinute === min;
@@ -303,9 +318,9 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
                         key={min}
                         onClick={() => {
                           setSelectedMinute(min);
-                          scrollToItem(minutesRef.current, idx);
+                          scrollToItem(minutesRef.current, idx, 32);
                         }}
-                        className={`h-9 flex items-center justify-center snap-center text-sm font-bold cursor-pointer transition-all ${
+                        className={`h-8 flex items-center justify-center snap-center text-xs font-bold cursor-pointer transition-all ${
                           isSelected
                             ? 'text-indigo-600 dark:text-indigo-400 font-black scale-110'
                             : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'
@@ -320,12 +335,12 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
 
               {/* Columna AM / PM */}
               <div className="flex flex-col items-center">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
                   Tanda
                 </span>
                 <div
                   ref={periodsRef}
-                  className="h-32 w-full overflow-y-auto scrollbar-none snap-y snap-mandatory py-11 text-center"
+                  className="h-24 w-full overflow-y-auto scrollbar-none snap-y snap-mandatory py-8 text-center"
                 >
                   {PERIODS.map((period, idx) => {
                     const isSelected = selectedPeriod === period;
@@ -334,9 +349,9 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
                         key={period}
                         onClick={() => {
                           setSelectedPeriod(period);
-                          scrollToItem(periodsRef.current, idx);
+                          scrollToItem(periodsRef.current, idx, 32);
                         }}
-                        className={`h-9 flex items-center justify-center snap-center text-sm font-bold cursor-pointer transition-all ${
+                        className={`h-8 flex items-center justify-center snap-center text-xs font-bold cursor-pointer transition-all ${
                           isSelected
                             ? 'text-indigo-600 dark:text-indigo-400 font-black scale-110'
                             : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'
@@ -352,10 +367,10 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
           </div>
 
           {/* Footer Preview & Actions */}
-          <div className="p-3 bg-slate-50/80 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div className="p-2.5 px-3 bg-slate-50/80 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <div className="text-xs">
-              <span className="text-slate-400 text-[11px] block">Hora seleccionada:</span>
-              <span className="font-bold text-slate-900 dark:text-white">
+              <span className="text-slate-400 text-[10px] block">Hora seleccionada:</span>
+              <span className="font-bold text-slate-900 dark:text-white text-xs">
                 {parseInt(selectedHour, 10)}:{selectedMinute} {selectedPeriod}
               </span>
             </div>
@@ -363,7 +378,7 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
             <button
               type="button"
               onClick={handleConfirm}
-              className={`flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold text-white ${activeBg} hover:opacity-95 transition-transform active:scale-95 cursor-pointer shadow-xs`}
+              className={`flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white ${activeBg} hover:opacity-95 transition-transform active:scale-95 cursor-pointer shadow-xs`}
             >
               <Check className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Aplicar</span>

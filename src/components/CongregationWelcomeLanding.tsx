@@ -41,6 +41,7 @@ import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 import { PendingApprovalView } from './PendingApprovalView';
 import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
+import ThemeToggle from './ThemeToggle';
 
 interface CongregationWelcomeLandingProps {
   onEnterApp: () => void;
@@ -427,21 +428,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
         {/* Right Actions: Theme Switch */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Dark / Light Mode Toggle Switch */}
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="w-12 h-6 p-0.5 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center transition-colors relative cursor-pointer select-none"
-            title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-          >
-            <div
-              className={`w-5 h-5 rounded-full bg-white shadow-xs flex items-center justify-center transition-transform pointer-events-none ${
-                isDark ? 'translate-x-6 text-indigo-400' : 'translate-x-0 text-amber-500'
-              }`}
-            >
-              {isDark ? <Moon className="w-3 h-3" /> : <Sun className="w-3 h-3" />}
-            </div>
-          </button>
+          <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
         </div>
       </header>
 

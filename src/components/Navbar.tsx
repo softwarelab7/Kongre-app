@@ -7,6 +7,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { PWAInstallButton } from './PWAInstallButton';
 import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
+import ThemeToggle from './ThemeToggle';
 import { getFriendlyCongregationName, isGenericIdentityName } from '../utils/theocraticSecurity';
 import { isTabAllowedForRole } from '../utils/rbac';
 import {
@@ -1105,14 +1106,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 hidden sm:block" />
 
             {/* Dark Mode Moon / Sun Toggle */}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-              title={isDark ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
-            >
-              {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
-            </button>
+            <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={36} />
 
             {/* Divider */}
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 hidden sm:block" />

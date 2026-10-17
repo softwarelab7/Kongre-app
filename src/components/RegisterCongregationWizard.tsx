@@ -17,8 +17,22 @@ import {
 import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import { COUNTRIES_WITH_CITIES, COUNTRIES_LIST } from '../data/countriesAndCities';
 import { SearchableCombobox } from './SearchableCombobox';
+import { Select } from './Select';
 import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
+
+const MIDWEEK_DAY_OPTIONS = [
+  { value: 'Lunes', label: 'Lunes' },
+  { value: 'Martes', label: 'Martes' },
+  { value: 'Miércoles', label: 'Miércoles' },
+  { value: 'Jueves', label: 'Jueves' },
+  { value: 'Viernes', label: 'Viernes' },
+];
+
+const WEEKEND_DAY_OPTIONS = [
+  { value: 'Sábado', label: 'Sábado' },
+  { value: 'Domingo', label: 'Domingo' },
+];
 import {
   Building2,
   Calendar,
@@ -765,18 +779,12 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     <Clock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                     <span>Día de la semana:</span>
                   </label>
-                  <select
+                  <Select
                     value={midweekDay}
-                    onChange={(e) => setMidweekDay(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-medium text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs cursor-pointer"
-                  >
-                    <option value="">Selecciona un día...</option>
-                    <option value="Lunes">Lunes</option>
-                    <option value="Martes">Martes</option>
-                    <option value="Miércoles">Miércoles</option>
-                    <option value="Jueves">Jueves</option>
-                    <option value="Viernes">Viernes</option>
-                  </select>
+                    onChange={setMidweekDay}
+                    options={MIDWEEK_DAY_OPTIONS}
+                    placeholder="Selecciona un día..."
+                  />
                 </div>
 
                 <div>
@@ -816,15 +824,12 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     <span>Día de la semana:</span>
                   </label>
-                  <select
+                  <Select
                     value={weekendDay}
-                    onChange={(e) => setWeekendDay(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-medium text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs cursor-pointer"
-                  >
-                    <option value="">Selecciona un día...</option>
-                    <option value="Sábado">Sábado</option>
-                    <option value="Domingo">Domingo</option>
-                  </select>
+                    onChange={setWeekendDay}
+                    options={WEEKEND_DAY_OPTIONS}
+                    placeholder="Selecciona un día..."
+                  />
                 </div>
 
                 <div>

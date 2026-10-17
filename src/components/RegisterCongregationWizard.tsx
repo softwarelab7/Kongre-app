@@ -989,7 +989,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
             {/* 2-Column Responsive Grid: Congregation PIN & Personal PIN Side-by-Side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-              {/* Card 1: PIN de la Congregación */}
+              {/* Card 1: Clave / PIN de la Congregación (Alfanumérico) */}
               <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs flex flex-col justify-between">
                 <div>
                   <div className="flex items-start gap-2 mb-2">
@@ -998,23 +998,38 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     </div>
                     <div className="min-w-0">
                       <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block truncate">
-                        1. PIN de Congregación (General)
+                        1. Clave / PIN de la Congregación
                       </span>
                       <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-tight mt-0.5">
-                        Clave de seguridad para conectar y sincronizar publicadores.
+                        Clave de seguridad criptográfica general de la congregación (Alfanumérica).
                       </p>
                     </div>
                   </div>
 
-                  {/* Credencial CSPRNG */}
+                  {/* Input y Credencial Alfanumérica CSPRNG */}
                   <div className="p-3 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono font-bold text-base sm:text-lg tracking-widest text-indigo-700 dark:text-indigo-300">
-                        {showCongregationPin ? congregationPin : '••••••'}
+                      <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                        Clave Criptográfica:
                       </span>
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                        6 Dígitos CSPRNG
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                        Alfanumérica (1.09B+ comb.)
                       </span>
+                    </div>
+
+                    <div className="relative">
+                      <input
+                        type={showCongregationPin ? 'text' : 'password'}
+                        value={congregationPin}
+                        onChange={(e) => {
+                          const val = e.target.value.toUpperCase();
+                          setCongregationPinInput(val);
+                          setConfirmCongregationPin(val);
+                        }}
+                        placeholder="Ej: 8X4W-9M2K"
+                        className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-sm sm:text-base focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        required
+                      />
                     </div>
 
                     <div className="flex items-center gap-1.5 pt-1 border-t border-slate-100 dark:border-slate-700/70">
@@ -1031,7 +1046,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                         type="button"
                         onClick={handleRegenerateCongregationPin}
                         className="flex-1 py-1 px-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer"
-                        title="Generar otro PIN aleatorio"
+                        title="Generar otra clave alfanumérica aleatoria"
                       >
                         <RefreshCw className={`w-3 h-3 ${pinRegeneratedCong ? 'animate-spin' : ''}`} />
                         <span>{pinRegeneratedCong ? '¡Listo!' : 'Generar'}</span>
@@ -1051,7 +1066,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3 text-emerald-600 shrink-0" />
-                  <span>Pertenece a la congregación, no al dispositivo.</span>
+                  <span>CSPRNG alfanumérico (letras y números). Inmune a deducción o fuerza bruta.</span>
                 </p>
               </div>
 

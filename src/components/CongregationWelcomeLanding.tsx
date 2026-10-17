@@ -905,11 +905,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                             <input
                               type={showCongPin ? 'text' : 'password'}
                               required
-                              maxLength={8}
+                              maxLength={32}
                               value={congregationPinInput}
                               onChange={(e) => setCongregationPinInput(e.target.value)}
-                              placeholder="PIN de 4 a 8 caracteres"
-                              className="w-full p-2.5 pr-10 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-widest text-center"
+                              placeholder="Clave / PIN de congregación (ej: 8X4W-9M2K)"
+                              className="w-full p-2.5 pr-10 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-wider text-center"
                             />
                             <button
                               type="button"
@@ -1045,11 +1045,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                         <input
                           type={showCongPin ? 'text' : 'password'}
                           required
-                          maxLength={8}
+                          maxLength={32}
                           value={congregationPinInput}
                           onChange={(e) => setCongregationPinInput(e.target.value)}
-                          placeholder="PIN de 4 a 8 caracteres"
-                          className="w-full p-2.5 pr-10 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono tracking-widest text-center"
+                          placeholder="Clave / PIN de congregación (ej: 8X4W-9M2K)"
+                          className="w-full p-2.5 pr-10 font-mono font-bold tracking-wider text-center text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                         />
                         <button
                           type="button"

@@ -533,7 +533,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   const wizardContent = (
     <>
       {/* Step Indicator Progress Bar */}
-      <div className={`${embedded ? 'px-0 pt-1 pb-4' : 'px-6 pt-4 pb-3 bg-slate-50/70 dark:bg-slate-900/50'} border-b border-slate-100 dark:border-slate-800 w-full overflow-hidden`}>
+      <div className={`${embedded ? 'px-0 pt-0.5 pb-2.5' : 'px-4 sm:px-6 pt-3 pb-2.5 bg-slate-50/70 dark:bg-slate-900/50'} border-b border-slate-100 dark:border-slate-800 w-full overflow-hidden`}>
         <div className="flex items-center justify-between gap-1 sm:gap-2 w-full">
           {stepsList.map((s, index) => {
             const isPassed = step > s.num;
@@ -542,7 +542,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               <React.Fragment key={s.num}>
                 <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                   <div
-                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center text-xs font-black transition-all ${
+                    className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl flex items-center justify-center text-[11px] sm:text-xs font-black transition-all ${
                       isPassed
                         ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/30'
                         : isCurrent
@@ -550,15 +550,15 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-200/70 dark:border-slate-700/70'
                     }`}
                   >
-                    {isPassed ? <CheckCircle2 className="w-4 h-4" /> : s.num}
+                    {isPassed ? <CheckCircle2 className="w-3.5 h-3.5" /> : s.num}
                   </div>
                   <span
                     className={`text-xs font-bold transition-all ${
                       isCurrent
                         ? 'inline text-indigo-600 dark:text-indigo-400'
                         : isPassed
-                        ? 'hidden lg:inline text-slate-700 dark:text-slate-300'
-                        : 'hidden lg:inline text-slate-400 dark:text-slate-500'
+                        ? 'hidden sm:inline text-slate-700 dark:text-slate-300'
+                        : 'hidden sm:inline text-slate-400 dark:text-slate-500'
                     }`}
                   >
                     {s.title}
@@ -578,9 +578,9 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       </div>
 
       {/* Form Body */}
-      <div className={`${embedded ? 'p-0 pt-3' : 'p-6 flex-1 overflow-y-auto'} text-xs space-y-4`}>
+      <div className={`${embedded ? 'p-0 pt-2.5' : 'p-4 sm:p-6 flex-1 overflow-y-auto'} text-xs space-y-3 sm:space-y-3.5`}>
         {error && (
-          <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200/80 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold flex items-center gap-2.5 shadow-2xs">
+          <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200/80 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold flex items-center gap-2.5 shadow-2xs">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
             <span>{error}</span>
           </div>
@@ -588,274 +588,276 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
         {/* STEP 1: CONGREGATION INFO */}
         {step === 1 && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 space-y-1 shadow-2xs">
-              <div className="flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                <span className="font-bold text-xs text-slate-900 dark:text-white">
-                  Paso 1: Identidad de la Congregación
-                </span>
+          <div className="space-y-3 sm:space-y-3.5 animate-fade-in">
+            {/* Step 1 Compact Banner */}
+            <div className="p-2.5 sm:p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                  <Building2 className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <span className="font-bold text-xs text-slate-900 dark:text-white block truncate">
+                    Paso 1: Identidad de la Congregación
+                  </span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+                    Ingresa los datos oficiales según registros teocráticos.
+                  </span>
+                </div>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Ingresa los datos oficiales de tu congregación tal como aparecen en los registros teocráticos.
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <Building2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>Nombre de la Congregación:</span>
-                <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={congregationName}
-                onChange={(e) => handleCongregationNameChange(e.target.value)}
-                placeholder="Ej: Congregación Central, Congregación Los Olivos"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
-                required
-                autoFocus
-              />
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block leading-relaxed">
-                Nombre oficial de la congregación según registros teocráticos.
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 shrink-0">
+                1 de 5
               </span>
             </div>
 
-            {/* ========================================================= */}
-            {/* ID DE LA CONGREGACIÓN                                     */}
-            {/* ========================================================= */}
-            <div className="p-4 sm:p-5 rounded-2xl border border-indigo-200/80 dark:border-indigo-800/60 bg-gradient-to-br from-indigo-50/70 via-white to-slate-50/70 dark:from-slate-900/90 dark:via-slate-900/60 dark:to-indigo-950/30 space-y-3.5 shadow-2xs">
-              <div className="flex items-start gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
-                  <Hash className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
-                      ID de la Congregación
-                    </h4>
-                    <span className="text-rose-500 font-bold">*</span>
-                  </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                    Identificador criptográfico de enrutamiento para que los publicadores y ancianos puedan vincularse.
-                  </p>
-                </div>
+            {/* Responsive Grid for Step 1 Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-3.5">
+              {/* Row 1: Nombre de la Congregación (8 cols) + Circuito (4 cols) */}
+              <div className="md:col-span-8">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Nombre de la Congregación:</span>
+                  <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={congregationName}
+                  onChange={(e) => handleCongregationNameChange(e.target.value)}
+                  placeholder="Ej: Usme, Congregación Los Olivos"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                  required
+                  autoFocus
+                />
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block leading-tight">
+                  Nombre oficial según registros teocráticos.
+                </span>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs">
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <span className="font-mono font-bold text-sm sm:text-base tracking-wider text-indigo-700 dark:text-indigo-300">
-                    {congregationNumber || 'Generando ID seguro...'}
-                  </span>
-                  {congregationNumber && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      Asignado
-                    </span>
-                  )}
+              <div className="md:col-span-4">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Circuito Asignado:</span>
+                  <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={circuitNumber}
+                  onChange={(e) => setCircuitNumber(e.target.value)}
+                  placeholder="Ej: CO-04, ES-08"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white uppercase font-mono font-bold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                  required
+                />
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block leading-tight">
+                  Código de circuito.
+                </span>
+              </div>
+
+              {/* Row 2: ID Criptográfico Horizontal Elegante (Full width) */}
+              <div className="md:col-span-12 p-3 rounded-xl border border-indigo-200/80 dark:border-indigo-800/60 bg-gradient-to-r from-indigo-50/70 via-white to-slate-50/70 dark:from-slate-900/90 dark:via-slate-900/60 dark:to-indigo-950/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shadow-2xs">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 shadow-2xs">
+                    <Hash className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-xs font-bold text-slate-900 dark:text-white">ID de Congregación:</span>
+                      <span className="font-mono font-bold text-xs sm:text-sm tracking-wider text-indigo-700 dark:text-indigo-300 bg-white dark:bg-slate-800 px-2 py-0.5 rounded-md border border-indigo-200 dark:border-indigo-800 shadow-2xs">
+                        {congregationNumber || 'Generando ID seguro...'}
+                      </span>
+                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        CSPRNG
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">
+                      Identificador criptográfico aleatorio independiente del nombre para vincular publicadores.
+                    </p>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                   <button
                     type="button"
                     onClick={handleRegenerateCongregationId}
-                    className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer"
                     title="Generar otro ID criptográfico aleatorio"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Generar otro</span>
+                    <span className="text-[11px]">Generar otro</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => handleCopyId(congregationNumber)}
                     disabled={!congregationNumber}
-                    className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 shadow-xs"
                   >
-                    {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedId ? 'Copiado' : 'Copiar ID'}</span>
+                    {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-300" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span className="text-[11px] font-bold">{copiedId ? 'Copiado' : 'Copiar ID'}</span>
                   </button>
                 </div>
               </div>
 
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span>Generado con entropía criptográfica pura (64 bits CSPRNG). Es independiente del nombre e imposible de deducir o predecir.</span>
-              </p>
-            </div>
-
-            {/* Circuito Asignado */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>Circuito Asignado:</span>
-                <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={circuitNumber}
-                onChange={(e) => setCircuitNumber(e.target.value)}
-                placeholder="Ej: CO-04, ES-08, MX-12"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white uppercase font-mono font-bold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
-                required
-              />
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block leading-relaxed">
-                Código oficial de circuito de asambleas.
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* 1. PAÍS */}
-              <div>
+              {/* Row 3: País (6 cols) + Ciudad (6 cols) */}
+              <div className="md:col-span-6">
                 <SearchableCombobox
                   label="País:"
                   value={country}
                   onChange={handleCountryChange}
                   options={COUNTRIES_LIST}
-                  placeholder="Escribe el país (ej: Colombia, México, España)..."
-                  helperText="Escribe para filtrar o pulsa para seleccionar de la lista completa."
+                  placeholder="Escribe el país (ej: Colombia)..."
+                  helperText="Filtra o pulsa para seleccionar."
                   required
                 />
               </div>
 
-              {/* 2. CIUDAD / MUNICIPIO */}
-              <div>
+              <div className="md:col-span-6">
                 <SearchableCombobox
                   label="Ciudad / Municipio:"
                   value={city}
                   onChange={(val) => setCity(val)}
                   options={availableCities}
-                  placeholder={country ? `Escribe o busca en ${country}...` : "Escribe la ciudad o municipio..."}
+                  placeholder={country ? `Busca en ${country}...` : "Escribe la ciudad..."}
                   helperText={
                     availableCities.length > 0
-                      ? `Ciudades de ${country}. Puedes seleccionar o escribir otra.`
-                      : "Escribe el nombre de la ciudad o municipio del Salón."
+                      ? `Ciudades de ${country}. Puedes escribir otra.`
+                      : "Escribe la ciudad del Salón."
                   }
                   required
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>Dirección del Salón del Reino:</span>
-                <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={hallAddress}
-                onChange={(e) => setHallAddress(e.target.value)}
-                placeholder="Ej: Calle 45 # 12-34, Barrio El Paraíso"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
-                required
-              />
+              {/* Row 4: Dirección del Salón del Reino (12 cols) */}
+              <div className="md:col-span-12">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Dirección del Salón del Reino:</span>
+                  <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={hallAddress}
+                  onChange={(e) => setHallAddress(e.target.value)}
+                  placeholder="Ej: Calle 45 # 12-34, Barrio El Paraíso"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                  required
+                />
+              </div>
             </div>
           </div>
         )}
 
         {/* STEP 2: MEETINGS AND SCHEDULES */}
         {step === 2 && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 space-y-1 shadow-2xs">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                <span className="font-bold text-xs text-slate-900 dark:text-white">
-                  Paso 2: Días y Horarios de las Reuniones
-                </span>
+          <div className="space-y-3 sm:space-y-3.5 animate-fade-in">
+            <div className="p-2.5 sm:p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                  <Calendar className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <span className="font-bold text-xs text-slate-900 dark:text-white block truncate">
+                    Paso 2: Días y Horarios de las Reuniones
+                  </span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+                    Para calcular automáticamente los programas semanales y hojas S-89.
+                  </span>
+                </div>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Configura los horarios para calcular automáticamente los programas semanales y hojas S-89.
-              </p>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 shrink-0">
+                2 de 5
+              </span>
             </div>
 
-            {/* Midweek Meeting */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-                  <Calendar className="w-4 h-4" />
+            {/* 2-Column Responsive Grid: Midweek & Weekend Side-by-Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+              {/* Midweek Meeting Card */}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs flex flex-col justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block truncate">
+                      Reunión Entre Semana (Vida y Ministerio)
+                    </span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block">
+                      Día y horario habitual de entre semana
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block">
-                    Reunión Entre Semana (Vida y Ministerio Cristianos)
-                  </span>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Día y hora de la reunión semanal de entre semana
-                  </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                      <span>Día:</span>
+                    </label>
+                    <Select
+                      value={midweekDay}
+                      onChange={setMidweekDay}
+                      options={MIDWEEK_DAY_OPTIONS}
+                      placeholder="Selecciona día..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                      <span>Hora de inicio:</span>
+                    </label>
+                    <IosTimePicker
+                      value={midweekTime}
+                      onChange={setMidweekTime}
+                      placeholder="Ej. 19:00"
+                      accentColor="indigo"
+                      presets={['18:30', '19:00', '19:30', '20:00']}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                    <span>Día de la semana:</span>
-                  </label>
-                  <Select
-                    value={midweekDay}
-                    onChange={setMidweekDay}
-                    options={MIDWEEK_DAY_OPTIONS}
-                    placeholder="Selecciona un día..."
-                  />
+              {/* Weekend Meeting Card */}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs flex flex-col justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block truncate">
+                      Reunión Fin de Semana (Público y Atalaya)
+                    </span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block">
+                      Día y horario de la reunión de fin de semana
+                    </span>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                    <span>Hora de inicio:</span>
-                  </label>
-                  <IosTimePicker
-                    value={midweekTime}
-                    onChange={setMidweekTime}
-                    placeholder="Selecciona hora (ej. 19:00)"
-                    accentColor="indigo"
-                    presets={['18:30', '19:00', '19:30', '20:00']}
-                  />
-                </div>
-              </div>
-            </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <span>Día:</span>
+                    </label>
+                    <Select
+                      value={weekendDay}
+                      onChange={setWeekendDay}
+                      options={WEEKEND_DAY_OPTIONS}
+                      placeholder="Selecciona día..."
+                    />
+                  </div>
 
-            {/* Weekend Meeting */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                  <Calendar className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block">
-                    Reunión Fin de Semana (Discurso Público y La Atalaya)
-                  </span>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Día y hora de la reunión del fin de semana
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                    <span>Día de la semana:</span>
-                  </label>
-                  <Select
-                    value={weekendDay}
-                    onChange={setWeekendDay}
-                    options={WEEKEND_DAY_OPTIONS}
-                    placeholder="Selecciona un día..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                    <span>Hora de inicio:</span>
-                  </label>
-                  <IosTimePicker
-                    value={weekendTime}
-                    onChange={setWeekendTime}
-                    placeholder="Selecciona hora (ej. 10:00)"
-                    accentColor="emerald"
-                    presets={['09:00', '09:30', '10:00', '16:00', '17:00']}
-                  />
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <span>Hora de inicio:</span>
+                    </label>
+                    <IosTimePicker
+                      value={weekendTime}
+                      onChange={setWeekendTime}
+                      placeholder="Ej. 10:00"
+                      accentColor="emerald"
+                      presets={['09:00', '09:30', '10:00', '16:00', '17:00']}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -864,21 +866,28 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
         {/* STEP 3: COORDINATOR INFO */}
         {step === 3 && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 space-y-1 shadow-2xs">
-              <div className="flex items-center gap-2">
-                <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                <span className="font-bold text-xs text-slate-900 dark:text-white">
-                  Paso 3: Datos del Coordinador del Cuerpo de Ancianos
-                </span>
+          <div className="space-y-3 sm:space-y-3.5 animate-fade-in">
+            <div className="p-2.5 sm:p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                  <User className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <span className="font-bold text-xs text-slate-900 dark:text-white block truncate">
+                    Paso 3: Datos del Coordinador del Cuerpo de Ancianos
+                  </span>
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+                    Tendrá acceso total como administrador general de la congregación.
+                  </span>
+                </div>
               </div>
-              <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                El Coordinador tendrá acceso total como administrador general de la congregación y podrá generar invitaciones para los demás ancianos y siervos.
-              </p>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 shrink-0">
+                3 de 5
+              </span>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
                 <User className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 <span>Nombre completo del Coordinador:</span>
                 <span className="text-rose-500">*</span>
@@ -888,257 +897,253 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 value={coordinatorName}
                 onChange={(e) => setCoordinatorName(e.target.value)}
                 placeholder="Ej: Carlos Mendoza"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                 required
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>Correo Electrónico (Google / Cuenta principal):</span>
-                <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="email"
-                value={coordinatorEmail}
-                onChange={(e) => setCoordinatorEmail(e.target.value)}
-                placeholder="Ej: coordinador.cbe@gmail.com"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
-                required
-              />
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block leading-relaxed">
-                * Esta cuenta recibirá acceso de Coordinador con supervisión de todos los departamentos.
-              </span>
-            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Correo Electrónico (Google):</span>
+                  <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={coordinatorEmail}
+                  onChange={(e) => setCoordinatorEmail(e.target.value)}
+                  placeholder="Ej: coordinador.cbe@gmail.com"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                  required
+                />
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                  Cuenta con acceso de Coordinador.
+                </span>
+              </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>Teléfono / WhatsApp de Contacto:</span>
-                <span className="text-rose-500">*</span>
-              </label>
-              <input
-                type="tel"
-                inputMode="tel"
-                value={coordinatorPhone}
-                onChange={(e) => {
-                  // Solo permitir números, el '+' internacional al inicio y espacios
-                  let val = e.target.value.replace(/[^0-9+\s-]/g, '');
-                  if (val.indexOf('+') > 0) {
-                    val = val.charAt(0) + val.slice(1).replace(/\+/g, '');
-                  }
-                  setCoordinatorPhone(val);
-                }}
-                onKeyDown={(e) => {
-                  // Bloquear cualquier tecla alfabética (no permite escribir letras)
-                  if (/^[a-zA-Z]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>Teléfono / WhatsApp de Contacto:</span>
+                  <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  inputMode="tel"
+                  value={coordinatorPhone}
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/[^0-9+\s-]/g, '');
+                    if (val.indexOf('+') > 0) {
+                      val = val.charAt(0) + val.slice(1).replace(/\+/g, '');
+                    }
+                    setCoordinatorPhone(val);
+                  }}
+                  onKeyDown={(e) => {
+                    if (/^[a-zA-Z]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onPaste={(e) => {
                     e.preventDefault();
-                  }
-                }}
-                onPaste={(e) => {
-                  e.preventDefault();
-                  const text = e.clipboardData.getData('text');
-                  let cleaned = text.replace(/[^0-9+\s-]/g, '');
-                  if (cleaned.indexOf('+') > 0) {
-                    cleaned = cleaned.charAt(0) + cleaned.slice(1).replace(/\+/g, '');
-                  }
-                  setCoordinatorPhone(cleaned);
-                }}
-                placeholder="Ej: +57 300 123 4567"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs font-mono"
-                required
-              />
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
-                Solo se admiten números y código de país (ej. +57). No admite letras.
-              </span>
+                    const text = e.clipboardData.getData('text');
+                    let cleaned = text.replace(/[^0-9+\s-]/g, '');
+                    if (cleaned.indexOf('+') > 0) {
+                      cleaned = cleaned.charAt(0) + cleaned.slice(1).replace(/\+/g, '');
+                    }
+                    setCoordinatorPhone(cleaned);
+                  }}
+                  placeholder="Ej: +57 300 123 4567"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs font-mono"
+                  required
+                />
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                  Solo números y código de país (+).
+                </span>
+              </div>
             </div>
           </div>
         )}
 
         {/* STEP 4: SECURITY - PIN DE CONGREGACIÓN Y PIN PERSONAL */}
         {step === 4 && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 text-slate-700 dark:text-slate-300 space-y-2 shadow-2xs">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                  <span className="font-bold text-xs text-amber-950 dark:text-amber-200">
+          <div className="space-y-3 sm:space-y-3.5 animate-fade-in">
+            <div className="p-2.5 sm:p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-6 h-6 rounded-lg bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <span className="font-bold text-xs text-amber-950 dark:text-amber-200 block truncate">
                     Paso 4: Seguridad Teocrática y Roles
                   </span>
-                </div>
-                <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span>Seguridad Criptográfica</span>
+                  <span className="text-[11px] text-amber-900/80 dark:text-amber-300/80 hidden sm:block">
+                    Credenciales asignadas según las nuevas directrices de seguridad de Kongre.
+                  </span>
                 </div>
               </div>
-              <p className="text-[11px] sm:text-xs text-amber-900/80 dark:text-amber-300/80 leading-relaxed">
-                Credenciales de seguridad criptográfica asignadas automáticamente según las nuevas normas de seguridad de Kongre. El <strong>PIN de la Congregación</strong> autoriza la conexión y sincronización de miembros, y tu <strong>PIN Personal</strong> te identifica a ti como Coordinador.
-              </p>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
+                CSPRNG
+              </span>
             </div>
 
-            {/* 1. PIN de la Congregación (Clave General de Conexión y Cifrado) */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3.5 shadow-2xs">
-              <div className="flex items-start gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
-                  <Lock className="w-4 h-4" />
-                </div>
+            {/* 2-Column Responsive Grid: Congregation PIN & Personal PIN Side-by-Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+              {/* Card 1: PIN de la Congregación */}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block">
-                      1. PIN de la Congregación (Acceso y Sincronización)
-                    </span>
-                    <span className="text-rose-500 font-bold">*</span>
+                  <div className="flex items-start gap-2 mb-2">
+                    <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                      <Lock className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block truncate">
+                        1. PIN de Congregación (General)
+                      </span>
+                      <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-tight mt-0.5">
+                        Clave de seguridad para conectar y sincronizar publicadores.
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5 leading-relaxed">
-                    Clave de seguridad criptográfica general de la congregación para conectar publicadores y autorizar sincronizaciones. <em>(No es el PIN de bloqueo de pantalla de la app)</em>.
-                  </p>
-                </div>
-              </div>
 
-              {/* Credencial generada automáticamente con CSPRNG */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs">
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <span className="font-mono font-bold text-base sm:text-lg tracking-widest text-indigo-700 dark:text-indigo-300">
-                    {showCongregationPin ? congregationPin : '••••••'}
-                  </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                    Asignado (CSPRNG)
-                  </span>
-                </div>
+                  {/* Credencial CSPRNG */}
+                  <div className="p-3 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-bold text-base sm:text-lg tracking-widest text-indigo-700 dark:text-indigo-300">
+                        {showCongregationPin ? congregationPin : '••••••'}
+                      </span>
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                        6 Dígitos CSPRNG
+                      </span>
+                    </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowCongregationPin(!showCongregationPin)}
-                    className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
-                    title={showCongregationPin ? 'Ocultar PIN' : 'Ver PIN'}
-                  >
-                    {showCongregationPin ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                    <span>{showCongregationPin ? 'Ocultar' : 'Ver'}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleRegenerateCongregationPin}
-                    className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
-                    title="Generar otro PIN criptográfico aleatorio"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${pinRegeneratedCong ? 'animate-spin' : ''}`} />
-                    <span>{pinRegeneratedCong ? '¡Generado!' : 'Generar otro'}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleCopyCongPin(congregationPin)}
-                    className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
-                  >
-                    {copiedCongPin ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedCongPin ? '¡Copiado!' : 'Copiar PIN'}</span>
-                  </button>
-                </div>
-              </div>
-
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span>Generado automáticamente con entropía criptográfica (6 dígitos CSPRNG). Pertenece a la congregación en su conjunto.</span>
-              </p>
-            </div>
-
-            {/* 2. PIN Personal Único de Publicador (Coordinador) */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs">
-              <div className="flex items-start gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
-                  <KeyRound className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block">
-                    2. Tu PIN Personal de Publicador (Coordinador)
-                  </span>
-                  <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5 leading-relaxed">
-                    En Kongre, los PINs son <strong>únicos por publicador</strong> (pertenecen a cada hermano, no a un privilegio genérico). Este PIN te identificará a ti como Coordinador. Para los demás hermanos, podrás generar sus PINs personales únicos desde la pestaña de Publicadores o el Gestor de PINs.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                      <KeyRound className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span>Tu PIN Personal Único:</span>
-                      <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 pt-1 border-t border-slate-100 dark:border-slate-700/70">
                       <button
                         type="button"
-                        onClick={handleRegeneratePersonalPin}
-                        className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 font-bold flex items-center gap-1 px-2 py-0.5 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/60 transition-colors cursor-pointer"
-                        title="Generar otro PIN personal de 4 dígitos"
+                        onClick={() => setShowCongregationPin(!showCongregationPin)}
+                        className="flex-1 py-1 px-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer"
                       >
-                        <RefreshCw className={`w-3 h-3 ${pinRegeneratedPers ? 'animate-spin' : ''}`} />
-                        <span>{pinRegeneratedPers ? '¡Generado!' : personalPin ? 'Generar nuevo' : 'Generar PIN'}</span>
+                        {showCongregationPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                        <span>{showCongregationPin ? 'Ocultar' : 'Ver'}</span>
                       </button>
+
                       <button
                         type="button"
-                        onClick={() => setShowPersonalPin(!showPersonalPin)}
-                        className="text-[11px] text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1 cursor-pointer transition-colors"
-                        title={showPersonalPin ? 'Ocultar PIN' : 'Ver PIN'}
+                        onClick={handleRegenerateCongregationPin}
+                        className="flex-1 py-1 px-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer"
+                        title="Generar otro PIN aleatorio"
                       >
-                        {showPersonalPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                        <span>{showPersonalPin ? 'Ocultar' : 'Ver'}</span>
+                        <RefreshCw className={`w-3 h-3 ${pinRegeneratedCong ? 'animate-spin' : ''}`} />
+                        <span>{pinRegeneratedCong ? '¡Listo!' : 'Generar'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleCopyCongPin(congregationPin)}
+                        className="flex-1 py-1 px-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-[11px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer shadow-xs"
+                      >
+                        {copiedCongPin ? <Check className="w-3 h-3 text-emerald-300" /> : <Copy className="w-3 h-3" />}
+                        <span>{copiedCongPin ? '¡Copiado!' : 'Copiar'}</span>
                       </button>
                     </div>
                   </div>
-                  <input
-                    type={showPersonalPin ? 'text' : 'password'}
-                    maxLength={6}
-                    value={personalPin}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/\D/g, '');
-                      setPersonalPinInput(val);
-                      setConfirmPersonalPin(val);
-                    }}
-                    placeholder="Ej: 1234"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
-                    required
-                  />
-                  <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1">
-                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold">
-                      <Sparkles className="w-3 h-3" /> Generado por la app (4 dígitos)
-                    </span>
-                    <span>De 4 a 6 dígitos</span>
+                </div>
+
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600 shrink-0" />
+                  <span>Pertenece a la congregación, no al dispositivo.</span>
+                </p>
+              </div>
+
+              {/* Card 2: PIN Personal Único */}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start gap-2 mb-2">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
+                      <KeyRound className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block truncate">
+                        2. Tu PIN Personal (Coordinador)
+                      </span>
+                      <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-tight mt-0.5">
+                        PIN único que te identifica a ti como Coordinador.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                        PIN de 4 dígitos:
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={handleRegeneratePersonalPin}
+                          className="text-[10px] text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 font-bold flex items-center gap-1 px-1.5 py-0.5 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-950/60 transition-colors cursor-pointer"
+                        >
+                          <RefreshCw className={`w-3 h-3 ${pinRegeneratedPers ? 'animate-spin' : ''}`} />
+                          <span>{pinRegeneratedPers ? '¡Listo!' : 'Generar'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setShowPersonalPin(!showPersonalPin)}
+                          className="text-[10px] text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1 cursor-pointer transition-colors"
+                        >
+                          {showPersonalPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <input
+                          type={showPersonalPin ? 'text' : 'password'}
+                          maxLength={6}
+                          value={personalPin}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, '');
+                            setPersonalPinInput(val);
+                            setConfirmPersonalPin(val);
+                          }}
+                          placeholder="PIN"
+                          className="w-full px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type={showPersonalPin ? 'text' : 'password'}
+                          maxLength={6}
+                          value={confirmPersonalPin}
+                          onChange={(e) => setConfirmPersonalPin(e.target.value.replace(/\D/g, ''))}
+                          placeholder="Confirmar"
+                          className="w-full px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[10px] pt-0.5">
+                      <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                        <Sparkles className="w-3 h-3" /> Generado con CSPRNG
+                      </span>
+                      {confirmPersonalPin.length > 0 && (
+                        confirmPersonalPin === personalPin ? (
+                          <span className="text-emerald-600 font-bold">✓ Coincide</span>
+                        ) : (
+                          <span className="text-rose-500 font-bold">No coincide</span>
+                        )
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span>Confirmar PIN Personal:</span>
-                      <span className="text-rose-500">*</span>
-                    </label>
-                  </div>
-                  <input
-                    type={showPersonalPin ? 'text' : 'password'}
-                    maxLength={6}
-                    value={confirmPersonalPin}
-                    onChange={(e) => setConfirmPersonalPin(e.target.value.replace(/\D/g, ''))}
-                    placeholder="Repite el PIN"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
-                    required
-                  />
-                  <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1">
-                    <span>Debe coincidir exactamente</span>
-                    {confirmPersonalPin.length > 0 && (
-                      confirmPersonalPin === personalPin ? (
-                        <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓ Coincide (Verificado)</span>
-                      ) : (
-                        <span className="text-rose-500 font-bold">No coincide</span>
-                      )
-                    )}
-                  </div>
-                </div>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600 shrink-0" />
+                  <span>Cada publicador tendrá su propio PIN personal único.</span>
+                </p>
               </div>
             </div>
           </div>
@@ -1146,27 +1151,39 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
         {/* STEP 5: SUMMARY & ACTIVATION */}
         {step === 5 && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 text-center space-y-2 shadow-2xs">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-900/80 text-emerald-600 dark:text-emerald-300 flex items-center justify-center mx-auto shadow-xs">
-                <CheckCircle2 className="w-5 h-5" />
+          <div className="space-y-3 sm:space-y-3.5 animate-fade-in">
+            <div className="p-3 sm:p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 flex items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/80 text-emerald-600 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
+                    ¡Todo listo para registrar la congregación!
+                  </h4>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 truncate hidden sm:block">
+                    Verifica el resumen antes de activar el sistema.
+                  </p>
+                </div>
               </div>
-              <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-                ¡Todo listo para registrar la congregación!
-              </h4>
-              <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
-                Verifica el resumen de los datos antes de activar el sistema. Al registrarte podrás generar los códigos de invitación para los demás siervos y ancianos.
-              </p>
+              <button
+                type="button"
+                onClick={handleCopySecurityData}
+                className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-1 shadow-2xs transition-all cursor-pointer shrink-0"
+              >
+                {copiedSecurity ? <Check className="w-3 h-3 text-emerald-300" /> : <Copy className="w-3 h-3" />}
+                <span className="text-[11px]">{copiedSecurity ? '¡Copiado!' : 'Copiar claves'}</span>
+              </button>
             </div>
 
-            {/* Summary Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1.5 shadow-2xs">
+            {/* Summary Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+              <div className="p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1 shadow-2xs">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                   Congregación
                 </span>
-                <p className="font-bold text-slate-900 dark:text-white text-sm">{congregationName}</p>
-                <p className="text-slate-700 dark:text-slate-200 font-mono font-bold text-xs pt-0.5">
+                <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">{congregationName}</p>
+                <p className="text-slate-700 dark:text-slate-200 font-mono font-bold text-xs">
                   ID: {congregationNumber}
                 </p>
                 <p className="text-slate-500 font-mono text-xs">
@@ -1176,7 +1193,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 <p className="text-[11px] text-slate-400 truncate">{hallAddress}</p>
               </div>
 
-              <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1.5 shadow-2xs">
+              <div className="p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1 shadow-2xs">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                   Reuniones Semanales
                 </span>
@@ -1188,98 +1205,47 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1.5 shadow-2xs">
+              <div className="p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1 shadow-2xs">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                   Coordinador Designado
                 </span>
-                <p className="font-bold text-slate-900 dark:text-white text-sm">{coordinatorName}</p>
+                <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">{coordinatorName}</p>
                 <p className="text-xs text-indigo-600 dark:text-indigo-400 font-mono font-semibold">{coordinatorEmail}</p>
                 <p className="text-xs text-slate-500">{coordinatorPhone}</p>
               </div>
 
-              <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-2.5 shadow-2xs">
+              <div className="p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1.5 shadow-2xs">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                     Seguridad Teocrática
                   </span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowSummaryPins(!showSummaryPins)}
-                      className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold hover:underline flex items-center gap-1 cursor-pointer"
-                    >
-                      {showSummaryPins ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                      <span>{showSummaryPins ? 'Ocultar' : 'Ver claves'}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleCopySecurityData}
-                      className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
-                      title="Copiar todos los datos de seguridad juntos"
-                    >
-                      {copiedSecurity ? <Check className="w-3 h-3 text-emerald-300" /> : <Copy className="w-3 h-3" />}
-                      <span>{copiedSecurity ? '¡Copiado!' : 'Copiar todo'}</span>
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowSummaryPins(!showSummaryPins)}
+                    className="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    {showSummaryPins ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                    <span>{showSummaryPins ? 'Ocultar' : 'Ver'}</span>
+                  </button>
                 </div>
-                <div className="flex flex-col gap-2 text-xs">
+                <div className="flex flex-col gap-1.5 text-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-600 dark:text-slate-400">ID Congregación:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-slate-900 dark:text-white">{congregationNumber}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleCopySingle(congregationNumber, 'id_step5')}
-                        className="text-slate-400 hover:text-indigo-600 p-0.5 cursor-pointer"
-                        title="Copiar ID"
-                      >
-                        {copiedField === 'id_step5' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
+                    <span className="font-mono font-bold text-slate-900 dark:text-white">{congregationNumber}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-slate-600 dark:text-slate-400">PIN Congregación:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
-                        {showSummaryPins ? congregationPin : '••••••••'}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleCopySingle(congregationPin, 'pin_cong_step5')}
-                        className="text-slate-400 hover:text-indigo-600 p-0.5 cursor-pointer"
-                        title="Copiar PIN"
-                      >
-                        {copiedField === 'pin_cong_step5' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
+                    <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                      {showSummaryPins ? congregationPin : '••••••••'}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-slate-600 dark:text-slate-400">PIN Personal:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                        {showSummaryPins ? personalPin : '••••••'}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleCopySingle(personalPin, 'pin_pers_step5')}
-                        className="text-slate-400 hover:text-indigo-600 p-0.5 cursor-pointer"
-                        title="Copiar PIN Personal"
-                      >
-                        {copiedField === 'pin_pers_step5' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
+                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                      {showSummaryPins ? personalPin : '••••••'}
+                    </span>
                   </div>
                 </div>
-
-                {/* Botón destacado para copiar todo el cuadro de seguridad sin ir uno por uno */}
-                <button
-                  type="button"
-                  onClick={handleCopySecurityData}
-                  className="w-full mt-2 py-2 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
-                >
-                  {copiedSecurity ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedSecurity ? '¡Todos los datos copiados al portapapeles!' : 'Copiar todos los datos de seguridad'}</span>
-                </button>
               </div>
             </div>
           </div>
@@ -1287,12 +1253,12 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       </div>
 
       {/* Footer Navigation Buttons */}
-      <div className={`${embedded ? 'pt-4' : 'p-5 bg-slate-50/50 dark:bg-slate-900/50'} border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3`}>
+      <div className={`${embedded ? 'pt-3 sm:pt-3.5' : 'p-4 sm:p-5 bg-slate-50/50 dark:bg-slate-900/50'} border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3`}>
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={step > 1 ? handleBack : onClose}
-            className="px-4 py-2.5 rounded-xl text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/70 dark:border-slate-700/70 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs active:scale-[0.99]"
+            className="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/70 dark:border-slate-700/70 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs active:scale-[0.99]"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>{step > 1 ? 'Anterior' : 'Volver atrás'}</span>
@@ -1313,9 +1279,9 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
           <button
             type="button"
             onClick={handleNext}
-            className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md shadow-indigo-600/20 transition-all"
+            className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md shadow-indigo-600/20 transition-all"
           >
-            <span>Continuar</span>
+            <span>Continuar al Paso {step + 1}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         ) : (
@@ -1323,7 +1289,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             type="button"
             onClick={handleFinalSubmit}
             disabled={isSubmitting}
-            className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-600/20 transition-all disabled:opacity-50"
+            className="px-5 py-2 sm:px-6 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-600/20 transition-all disabled:opacity-50"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>{isSubmitting ? 'Registrando...' : 'Registrar y Comenzar'}</span>
@@ -1496,8 +1462,8 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
     }
 
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col py-6 sm:py-10 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
-        <div className="w-full max-w-3xl mx-auto flex-1 flex flex-col justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col py-3 sm:py-6 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
+        <div className="w-full max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto flex-1 flex flex-col justify-center">
           <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden p-4 sm:p-6">
             {successCard}
           </div>
@@ -1507,12 +1473,12 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   }
 
   if (embedded) {
-    return <div className="space-y-4 pt-1 animate-fade-in">{wizardContent}</div>;
+    return <div className="space-y-3 sm:space-y-4 pt-0.5 animate-fade-in">{wizardContent}</div>;
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col py-6 sm:py-10 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
-      <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col py-3 sm:py-6 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
+      <div className="w-full max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto flex-1 flex flex-col">
         {/* Top Back Navigation Bar */}
         <div className="mb-4 sm:mb-6 flex items-center justify-between">
           <button

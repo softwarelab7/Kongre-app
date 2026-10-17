@@ -435,72 +435,72 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       {/* ========================================================= */}
       {/* 2. MAIN WORKSPACE / RESPONSIVE HERO & ACTIONS            */}
       {/* ========================================================= */}
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 lg:py-12 flex-1 flex flex-col justify-center">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 xl:gap-16 items-center">
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-5 lg:py-6 flex-1 flex flex-col justify-center min-h-[calc(100vh-65px)]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 xl:gap-12 items-center">
           {/* ========================================================= */}
           {/* LEFT COLUMN: DESKTOP HERO & THEOCRATIC FEATURES          */}
           {/* ========================================================= */}
-          <div className={`${activeTab === 'register' ? 'hidden' : 'lg:col-span-7 xl:col-span-7 hidden lg:flex'} flex-col space-y-6 transition-all duration-300`}>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold w-fit shadow-xs">
-              <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          <div className={`${activeTab === 'register' ? 'hidden' : 'lg:col-span-7 xl:col-span-7 hidden lg:flex'} flex-col space-y-4 sm:space-y-5 transition-all duration-300`}>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold w-fit shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
               <span>Gestor Teocrático Integral • Seguro y Eficiente</span>
             </div>
 
-            <div className="space-y-3">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.15]">
+            <div className="space-y-2">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.2]">
                 Toda la gestión teocrática de tu congregación, <span className="bg-linear-to-r from-indigo-600 via-indigo-500 to-blue-500 bg-clip-text text-transparent">en un solo lugar</span>.
               </h1>
-              <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
                 Plataforma digital especializada para coordinadores, secretarios, superintendentes de servicio y publicadores. Organiza programas semanales, hojas S-89, asignaciones de limpieza y territorios con soporte offline PWA.
               </p>
             </div>
 
             {/* Feature Cards Grid (2x2 on Desktop) */}
-            <div className="grid grid-cols-2 gap-4 pt-1">
-              <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-2 group hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                  <Calendar className="w-5 h-5" />
+            <div className="grid grid-cols-2 gap-3 pt-0.5">
+              <div className="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1.5 group hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                  <Calendar className="w-4 h-4" />
                 </div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
                   Reuniones & Guía S-89
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   Programación Vida y Ministerio, Fin de Semana, generación automática e impresión de hojas S-89 oficiales.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-2 group hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                  <MapPin className="w-5 h-5" />
+              <div className="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1.5 group hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <MapPin className="w-4 h-4" />
                 </div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
                   Territorios & Carritos
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   Manzanas georreferenciadas, enlaces digitales por QR para publicadores y control de turnos en carritos.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-2 group hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                  <ShieldCheck className="w-5 h-5" />
+              <div className="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1.5 group hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                  <ShieldCheck className="w-4 h-4" />
                 </div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
                   Seguridad por Roles & PIN
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   Autenticación con ID de congregación, PIN de congregación y PIN personal bajo estrictas directrices.
                 </p>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-2 group hover:border-amber-300 dark:hover:border-amber-700 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                  <Wifi className="w-5 h-5" />
+              <div className="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1.5 group hover:border-amber-300 dark:hover:border-amber-700 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                  <Wifi className="w-4 h-4" />
                 </div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
                   PWA & Modo Offline
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   Úsala en el Salón sin conexión a internet; tus datos se sincronizan al volver a tener red.
                 </p>
               </div>
@@ -510,10 +510,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           {/* ========================================================= */}
           {/* RIGHT COLUMN: INTERACTIVE ACCESS CARD                    */}
           {/* ========================================================= */}
-          <div className={`${activeTab === 'register' ? 'lg:col-span-12 max-w-3xl' : 'lg:col-span-5 xl:col-span-5 max-w-xl'} w-full mx-auto transition-all duration-300`}>
-            <div className="bg-white dark:bg-slate-900 rounded-[28px] border border-slate-200/90 dark:border-slate-800 p-6 sm:p-8 lg:p-9 shadow-xl shadow-slate-900/5 space-y-6">
+          <div className={`${activeTab === 'register' ? 'lg:col-span-12 max-w-4xl xl:max-w-5xl 2xl:max-w-6xl' : 'lg:col-span-5 xl:col-span-5 max-w-xl'} w-full mx-auto transition-all duration-300`}>
+            <div className="bg-white dark:bg-slate-900 rounded-[24px] sm:rounded-[28px] border border-slate-200/90 dark:border-slate-800 p-4 sm:p-6 lg:p-7 shadow-xl shadow-slate-900/5 space-y-3.5 sm:space-y-4">
               {/* UNIFIED CARD HEADER ACROSS ALL VIEWS */}
-              <div className="pb-4 border-b border-slate-100 dark:border-slate-800 space-y-3">
+              <div className="pb-3 border-b border-slate-100 dark:border-slate-800 space-y-1.5 sm:space-y-2">
                 {/* Top utility row: Logo, Section Badge & Back Button */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -553,8 +553,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 </div>
 
                 {/* Main Title & Subtitle */}
-                <div className="space-y-1">
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                <div className="space-y-0.5">
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                     {activeTab === 'home'
                       ? '¡Bienvenido a Kongre!'
                       : activeTab === 'email_login'
@@ -565,7 +565,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       ? 'Acceso Restringido'
                       : 'Registrar mi Congregación'}
                   </h2>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-normal">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-normal font-normal">
                     {activeTab === 'home'
                       ? 'Una herramienta teocrática que facilita la gestión integral de la congregación'
                       : activeTab === 'email_login'
@@ -581,20 +581,20 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
               {/* VIEW: MAIN HOME OPTIONS */}
               {activeTab === 'home' && (
-                <div className="space-y-4 pt-1">
+                <div className="space-y-2.5 sm:space-y-3 pt-0.5">
                   {/* Option 1: Registrar una Nueva Congregación */}
                   <button
                     type="button"
                     onClick={() => setActiveTab('register')}
-                    className="w-full p-4 sm:p-5 rounded-2xl border-2 border-indigo-500/50 bg-indigo-50/50 dark:bg-indigo-950/30 hover:border-indigo-600 dark:hover:border-indigo-400 hover:shadow-md transition-all text-left flex items-start gap-4 group cursor-pointer"
+                    className="w-full p-3 sm:p-3.5 lg:p-4 rounded-xl sm:rounded-2xl border-2 border-indigo-500/50 bg-indigo-50/50 dark:bg-indigo-950/30 hover:border-indigo-600 dark:hover:border-indigo-400 hover:shadow-md transition-all text-left flex items-start gap-3 sm:gap-3.5 group cursor-pointer"
                   >
-                    <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform shadow-xs">
-                      <Building2 className="w-5 h-5" />
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform shadow-xs">
+                      <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
 
-                    <div className="space-y-1 flex-1">
+                    <div className="space-y-0.5 sm:space-y-1 flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                        <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
                           Registrar mi Congregación
                         </h3>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-200 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 shrink-0">
@@ -606,7 +606,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       </p>
                     </div>
 
-                    <div className="hidden sm:flex items-center self-center text-indigo-500 group-hover:translate-x-0.5 transition-transform">
+                    <div className="hidden sm:flex items-center self-center text-indigo-500 group-hover:translate-x-0.5 transition-transform shrink-0">
                       <ArrowRight className="w-4 h-4" />
                     </div>
                   </button>
@@ -615,19 +615,19 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   <button
                     type="button"
                     onClick={() => setActiveTab('email_login')}
-                    className="w-full p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xs transition-all text-left flex items-start gap-4 group cursor-pointer bg-white dark:bg-slate-900"
+                    className="w-full p-3 sm:p-3.5 lg:p-4 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xs transition-all text-left flex items-start gap-3 sm:gap-3.5 group cursor-pointer bg-white dark:bg-slate-900"
                   >
-                    <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
                       <div className="relative">
-                        <UserIcon className="w-5 h-5" />
-                        <span className="absolute -bottom-1 -right-1 text-[9px] font-bold bg-indigo-600 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center">
+                        <UserIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <span className="absolute -bottom-1 -right-1 text-[8px] font-bold bg-indigo-600 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center">
                           @
                         </span>
                       </div>
                     </div>
 
-                    <div className="space-y-1 flex-1">
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    <div className="space-y-0.5 sm:space-y-1 flex-1 min-w-0">
+                      <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
                         Iniciar sesión con Google
                       </h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
@@ -635,7 +635,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       </p>
                     </div>
 
-                    <div className="hidden sm:flex items-center self-center text-slate-400 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all">
+                    <div className="hidden sm:flex items-center self-center text-slate-400 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all shrink-0">
                       <ArrowRight className="w-4 h-4" />
                     </div>
                   </button>
@@ -648,19 +648,19 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       setCodeError(null);
                       setCodeSuccess(null);
                     }}
-                    className="w-full p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xs transition-all text-left flex items-start gap-4 group cursor-pointer bg-white dark:bg-slate-900"
+                    className="w-full p-3 sm:p-3.5 lg:p-4 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xs transition-all text-left flex items-start gap-3 sm:gap-3.5 group cursor-pointer bg-white dark:bg-slate-900"
                   >
-                    <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
                       <div className="relative">
-                        <Home className="w-5 h-5" />
+                        <Home className="w-4 h-4 sm:w-5 sm:h-5" />
                         <span className="absolute -bottom-1 -right-1 text-[8px] font-mono font-bold bg-indigo-600 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center">
                           *
                         </span>
                       </div>
                     </div>
 
-                    <div className="space-y-1 flex-1">
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    <div className="space-y-0.5 sm:space-y-1 flex-1 min-w-0">
+                      <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
                         Conectar con ID y PIN de Congregación
                       </h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
@@ -668,7 +668,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       </p>
                     </div>
 
-                    <div className="hidden sm:flex items-center self-center text-slate-400 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all">
+                    <div className="hidden sm:flex items-center self-center text-slate-400 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all shrink-0">
                       <ArrowRight className="w-4 h-4" />
                     </div>
                   </button>
@@ -677,15 +677,15 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   <button
                     type="button"
                     onClick={handleEnterAsGuest}
-                    className="w-full p-4 sm:p-5 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-xs transition-all text-left flex items-start gap-4 group cursor-pointer bg-white/60 dark:bg-slate-900/60"
+                    className="w-full p-3 sm:p-3.5 lg:p-4 rounded-xl sm:rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-xs transition-all text-left flex items-start gap-3 sm:gap-3.5 group cursor-pointer bg-white/60 dark:bg-slate-900/60"
                   >
-                    <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                      <Users className="w-5 h-5" />
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                      <Users className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
 
-                    <div className="space-y-1 flex-1">
+                    <div className="space-y-0.5 sm:space-y-1 flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                        <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
                           Entrar como Invitado / Cartelera
                         </h3>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200 shrink-0">
@@ -697,7 +697,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       </p>
                     </div>
 
-                    <div className="hidden sm:flex items-center self-center text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all">
+                    <div className="hidden sm:flex items-center self-center text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all shrink-0">
                       <ArrowRight className="w-4 h-4" />
                     </div>
                   </button>

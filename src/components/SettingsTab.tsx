@@ -69,6 +69,7 @@ import {
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 import { Select } from './Select';
 import { IosTimePicker } from './IosTimePicker';
+import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
 
 export type SettingsCategoryTab =
   | 'all'
@@ -83,6 +84,7 @@ export type SettingsCategoryTab =
 
 interface SettingsTabProps {
   onNavigateToProfile?: () => void;
+  onOpenVersionModal?: () => void;
 }
 
 export const SETTINGS_TABS_CONFIG: Record<
@@ -210,7 +212,7 @@ export const SETTINGS_TABS_CONFIG: Record<
   },
 };
 
-export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile }) => {
+export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, onOpenVersionModal }) => {
   const {
     settings,
     updateSettings,
@@ -1337,6 +1339,46 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
 
               <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-fuchsia-600 dark:text-fuchsia-400 group-hover:translate-x-1 transition-transform">
                 <span>Configurar Gemini AI</span>
+                <ChevronRight size={16} />
+              </div>
+            </div>
+
+            {/* Tarjeta 9: Registro de Versiones y Changelog (Google AI Studio) */}
+            <div
+              onClick={() => onOpenVersionModal?.()}
+              className="bg-white dark:bg-[#0f1623] hover:bg-indigo-50/[0.3] dark:hover:bg-indigo-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-indigo-400/50 dark:hover:border-indigo-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+                    <RefreshCw size={22} />
+                  </div>
+                  <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    v{CURRENT_APP_VERSION}
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  Registro de Versiones y Changelog
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                  Historial detallado de actualizaciones, verificación de despliegue en Google AI Studio (Anti-Gravity) y estado de compilación.
+                </p>
+
+                <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Compilación:</span>
+                    <span className="font-semibold text-indigo-600 dark:text-indigo-400 font-mono text-[11px]">v{CURRENT_APP_VERSION}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Fecha de actualización:</span>
+                    <span className="font-semibold">{BUILD_DATE}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-1 transition-transform">
+                <span>Ver registro de cambios completo</span>
                 <ChevronRight size={16} />
               </div>
             </div>

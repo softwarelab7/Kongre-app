@@ -63,6 +63,8 @@ import { PendingApprovalView } from './components/PendingApprovalView';
 import { IdentityNamePrompt } from './components/IdentityNamePrompt';
 import { PublisherPinsModal } from './components/PublisherPinsModal';
 import { AuditLogModal } from './components/AuditLogModal';
+import { AppFooter } from './components/AppFooter';
+import { VersionHistoryModal } from './components/VersionHistoryModal';
 import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import { checkUpcomingAssignmentsAndNotify } from './services/notificationService';
@@ -184,6 +186,7 @@ const AppContent: React.FC = () => {
   const [isInviteManagerOpen, setIsInviteManagerOpen] = useState(false);
   const [isRegisterWizardOpen, setIsRegisterWizardOpen] = useState(false);
   const [isLinkRequestsModalOpen, setIsLinkRequestsModalOpen] = useState(false);
+  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
   const [showWelcomeLanding, setShowWelcomeLanding] = useState<boolean>(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const hashInfo = typeof window !== 'undefined' ? parseAppHash(window.location.hash) : null;
@@ -310,6 +313,7 @@ const AppContent: React.FC = () => {
         setIsPinsModalOpen(false);
         setIsAuditLogOpen(false);
         setIsRegisterWizardOpen(false);
+        setIsVersionModalOpen(false);
         return;
       }
 
@@ -339,6 +343,7 @@ const AppContent: React.FC = () => {
       setIsPinsModalOpen(targetModal === 'pines');
       setIsAuditLogOpen(targetModal === 'auditoria');
       setIsRegisterWizardOpen(targetModal === 'registro_congregacion');
+      setIsVersionModalOpen(targetModal === 'versiones');
     };
 
     window.addEventListener('popstate', onPopState);
@@ -390,6 +395,7 @@ const AppContent: React.FC = () => {
         if (initialModal === 'pines') setIsPinsModalOpen(true);
         if (initialModal === 'auditoria') setIsAuditLogOpen(true);
         if (initialModal === 'registro_congregacion') setIsRegisterWizardOpen(true);
+        if (initialModal === 'versiones') setIsVersionModalOpen(true);
       }
     }
   }, []);
@@ -740,10 +746,11 @@ const AppContent: React.FC = () => {
         }}
         onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
         onOpenAuditLog={() => openModalWithHistory('auditoria', setIsAuditLogOpen)}
+        onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
       />
 
-      <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200`}>
-        <div className="w-full mx-auto px-3 sm:px-6 lg:px-8 2xl:px-12 py-3 sm:py-6 pb-[calc(env(safe-area-inset-bottom,0px)+6rem)] md:pb-8">
+      <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200 flex flex-col justify-between`}>
+        <div className="w-full mx-auto px-3 sm:px-6 lg:px-8 2xl:px-12 py-3 sm:py-6 pb-6">
           {!isTabAllowedForRole(effectiveRoleInfo.id, activeTab) ? (
           <AccessRestrictedView
             requiredRoleName={
@@ -839,11 +846,15 @@ const AppContent: React.FC = () => {
             {activeTab === 'mi_vista' && <PersonalViewTab />}
             {activeTab === 'perfil' && <UserProfileSettingsView />}
             {activeTab === 'ajustes' && (
-              <SettingsTab onNavigateToProfile={() => setActiveTab('perfil')} />
+              <SettingsTab
+                onNavigateToProfile={() => setActiveTab('perfil')}
+                onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
+              />
             )}
           </>
         )}
         </div>
+        <AppFooter onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)} />
       </main>
 
       {/* Global Modals */}
@@ -976,6 +987,12 @@ const AppContent: React.FC = () => {
 
       {/* Modal para solicitar nombre e identidad si se inició con PIN sin nombre reconocido */}
       <IdentityNamePrompt />
+
+      {/* Registro de Versiones y Control de Cambios en Google AI Studio */}
+      <VersionHistoryModal
+        isOpen={isVersionModalOpen}
+        onClose={() => closeModalWithHistory('versiones', setIsVersionModalOpen)}
+      />
 
     </div>
   );

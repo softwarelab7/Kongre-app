@@ -453,7 +453,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           {/* ========================================================= */}
           {/* LEFT COLUMN: DESKTOP HERO & THEOCRATIC FEATURES          */}
           {/* ========================================================= */}
-          <div className={`${activeTab === 'register' ? 'lg:col-span-5 xl:col-span-5' : 'lg:col-span-7 xl:col-span-7'} hidden lg:flex flex-col space-y-6 transition-all duration-300`}>
+          <div className={`${activeTab === 'register' ? 'hidden' : 'lg:col-span-7 xl:col-span-7 hidden lg:flex'} flex-col space-y-6 transition-all duration-300`}>
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold w-fit shadow-xs">
               <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               <span>Gestor Teocrático Integral • Seguro y Eficiente</span>
@@ -523,7 +523,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           {/* ========================================================= */}
           {/* RIGHT COLUMN: INTERACTIVE ACCESS CARD                    */}
           {/* ========================================================= */}
-          <div className={`${activeTab === 'register' ? 'lg:col-span-7 xl:col-span-7 max-w-2xl' : 'lg:col-span-5 xl:col-span-5 max-w-xl'} w-full mx-auto lg:max-w-none transition-all duration-300`}>
+          <div className={`${activeTab === 'register' ? 'lg:col-span-12 max-w-3xl' : 'lg:col-span-5 xl:col-span-5 max-w-xl'} w-full mx-auto transition-all duration-300`}>
             <div className="bg-white dark:bg-slate-900 rounded-[28px] border border-slate-200/90 dark:border-slate-800 p-6 sm:p-8 lg:p-9 shadow-xl shadow-slate-900/5 space-y-6">
               {/* UNIFIED CARD HEADER ACROSS ALL VIEWS */}
               <div className="pb-4 border-b border-slate-100 dark:border-slate-800 space-y-3">

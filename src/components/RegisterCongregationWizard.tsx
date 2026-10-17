@@ -503,8 +503,8 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   const wizardContent = (
     <>
       {/* Step Indicator Progress Bar */}
-      <div className={`${embedded ? 'px-0 pt-1 pb-4' : 'px-6 pt-4 pb-3 bg-slate-50/70 dark:bg-slate-900/50'} border-b border-slate-100 dark:border-slate-800`}>
-        <div className="flex items-center justify-between gap-1">
+      <div className={`${embedded ? 'px-0 pt-1 pb-4' : 'px-6 pt-4 pb-3 bg-slate-50/70 dark:bg-slate-900/50'} border-b border-slate-100 dark:border-slate-800 w-full overflow-hidden`}>
+        <div className="flex items-center justify-between gap-1 sm:gap-2 w-full">
           {stepsList.map((s, index) => {
             const isPassed = step > s.num;
             const isCurrent = step === s.num;
@@ -523,12 +523,12 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     {isPassed ? <CheckCircle2 className="w-4 h-4" /> : s.num}
                   </div>
                   <span
-                    className={`text-xs font-bold hidden sm:inline ${
+                    className={`text-xs font-bold transition-all ${
                       isCurrent
-                        ? 'text-indigo-600 dark:text-indigo-400'
+                        ? 'inline text-indigo-600 dark:text-indigo-400'
                         : isPassed
-                        ? 'text-slate-700 dark:text-slate-300'
-                        : 'text-slate-400 dark:text-slate-500'
+                        ? 'hidden lg:inline text-slate-700 dark:text-slate-300'
+                        : 'hidden lg:inline text-slate-400 dark:text-slate-500'
                     }`}
                   >
                     {s.title}
@@ -536,7 +536,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 </div>
                 {index < stepsList.length - 1 && (
                   <div
-                    className={`h-0.5 flex-1 mx-1 sm:mx-2 rounded-full transition-all ${
+                    className={`h-0.5 flex-1 min-w-2 sm:min-w-3 mx-1 sm:mx-1.5 rounded-full transition-all ${
                       step > s.num ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-800'
                     }`}
                   />

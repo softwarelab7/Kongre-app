@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { supabaseSyncService } from '../services/supabaseSyncService';
+import { QueueStats, getOfflineQueueStats } from '../services/indexedDbQueue';
 import { useAuth } from './AuthContext';
 import {
   Publisher,
@@ -348,6 +349,11 @@ interface CongregationContextType {
   lastSupabaseSyncAt: string | null;
   isSupabaseSyncing: boolean;
   syncNowWithSupabase: (forceUpload?: boolean) => Promise<{ success: boolean; message: string; action?: string }>;
+
+  // Cola de sincronización Offline en IndexedDB
+  isOnline: boolean;
+  offlineQueueStats: QueueStats;
+  syncOfflineQueueNow: () => Promise<{ success: boolean; syncedCount: number; message: string }>;
 }
 
 const LOCAL_STORAGE_KEY = 'teocratic_app_data_v1';
@@ -736,6 +742,67 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return supabaseSyncService.getLastSyncTimestamp();
   });
   const [isSupabaseSyncing, setIsSupabaseSyncing] = useState<boolean>(false);
+
+  // Cola de sincronización Offline en IndexedDB
+  const [isOnline, setIsOnline] = useState<boolean>(() => {
+    return typeof navigator !== 'undefined' ? navigator.onLine : true;
+  });
+
+  const [offlineQueueStats, setOfflineQueueStats] = useState<QueueStats>({
+    pendingCount: 0,
+    syncingCount: 0,
+    errorCount: 0,
+    totalCount: 0,
+    lastQueuedAt: null,
+  });
+
+  const refreshQueueStats = async () => {
+    try {
+      const st = await getOfflineQueueStats();
+      setOfflineQueueStats(st);
+    } catch {}
+  };
+
+  const syncOfflineQueueNow = async (): Promise<{ success: boolean; syncedCount: number; message: string }> => {
+    const pinMaestro =
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_session_pin_v2') ||
+          localStorage.getItem('kongre_coordinator_pin') ||
+          localStorage.getItem('kongre_registered_cong_pin') ||
+          localStorage.getItem('kongre_last_cong_pin')
+        : '') || '';
+    const pinCongregacion =
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_registered_cong_pin') ||
+          localStorage.getItem('kongre_last_cong_pin') ||
+          pinMaestro
+        : '') || pinMaestro;
+
+    setIsSupabaseSyncing(true);
+    try {
+      const res = await supabaseSyncService.flushOfflineQueue(pinMaestro, pinCongregacion);
+      await refreshQueueStats();
+      if (res.success) {
+        setSyncStatus('synced');
+        return {
+          success: true,
+          syncedCount: res.syncedCount,
+          message:
+            res.syncedCount > 0
+              ? `¡${res.syncedCount} cambio(s) guardados en IndexedDB se sincronizaron con éxito en Supabase!`
+              : 'La cola de IndexedDB ya está al día con Supabase.',
+        };
+      } else {
+        return {
+          success: false,
+          syncedCount: 0,
+          message: 'No se pudo sincronizar la cola offline con Supabase en este momento.',
+        };
+      }
+    } finally {
+      setIsSupabaseSyncing(false);
+    }
+  };
 
   // Publishers quick map
   const publishersMap = useMemo(() => {
@@ -1785,11 +1852,15 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
-  // Sincronización continua en segundo plano y reconexión automática con Supabase
+  // Sincronización continua en segundo plano y reconexión automática con Supabase & IndexedDB
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    // Cargar estadísticas iniciales de la cola IndexedDB
+    refreshQueueStats();
+
     const handleOnline = async () => {
+      setIsOnline(true);
       const pinMaestro =
         localStorage.getItem('kongre_session_pin_v2') ||
         localStorage.getItem('kongre_coordinator_pin') ||
@@ -1805,9 +1876,23 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         await supabaseSyncService.flushOfflineQueue(pinMaestro, pinCongregacion);
         syncNowWithSupabase(false).catch(() => {});
       }
+      refreshQueueStats();
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      setSyncStatus('offline');
+      refreshQueueStats();
+    };
+
+    const handleQueueChanged = () => {
+      refreshQueueStats();
     };
 
     window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('kongre_indexeddb_queue_changed', handleQueueChanged);
+    window.addEventListener('kongre_offline_sync_queued', handleQueueChanged);
 
     const intervalId = window.setInterval(() => {
       if (typeof navigator !== 'undefined' && navigator.onLine) {
@@ -1816,10 +1901,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           syncNowWithSupabase(false).catch(() => {});
         }
       }
-    }, 60000);
+      refreshQueueStats();
+    }, 45000);
 
     return () => {
       window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('kongre_indexeddb_queue_changed', handleQueueChanged);
+      window.removeEventListener('kongre_offline_sync_queued', handleQueueChanged);
       window.clearInterval(intervalId);
     };
   }, []);
@@ -2067,6 +2156,31 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const updatePublisher = (pub: Publisher) => {
     const updated = publishers.map(p => (p.id === pub.id ? pub : p));
     setPublishers(updated);
+
+    const congId = resolveCongregationDocId();
+    if (congId && typeof navigator !== 'undefined' && !navigator.onLine) {
+      supabaseSyncService.enqueueReportChange({
+        congregationId: congId,
+        publisherId: pub.id,
+        description: `Modificación de informe/datos: ${pub.name}`,
+        reportPayload: { publisherId: pub.id, name: pub.name, s21_records: pub.s21_records },
+        fullData: {
+          settings: latestSettingsRef.current,
+          publishers: updated,
+          weeks,
+          territories,
+          notices,
+          transactions,
+          audits: quarterlyAudits,
+          literatureItems,
+          literatureOrders: specialOrders,
+          literatureDistributions: groupDistributions,
+          literatureInventory: inventoryRecords,
+        },
+      }).catch(() => {});
+      refreshQueueStats();
+    }
+
     saveToFirestore(updated);
   };
 
@@ -2893,6 +3007,32 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const updateMeetingAttendance = (weekId: string, attendance: MeetingAttendance) => {
     const updated = weeks.map(w => (w.id === weekId ? { ...w, attendance } : w));
     setWeeks(updated);
+
+    const congId = resolveCongregationDocId();
+    if (congId && typeof navigator !== 'undefined' && !navigator.onLine) {
+      const attDesc = `Asistencia reunión (${weekId}): Entre semana ${attendance.midweek?.total || 0} / Fin de semana ${attendance.weekend?.total || 0}`;
+      supabaseSyncService.enqueueAttendanceChange({
+        congregationId: congId,
+        weekId,
+        description: attDesc,
+        attendancePayload: attendance,
+        fullData: {
+          settings: latestSettingsRef.current,
+          publishers,
+          weeks: updated,
+          territories,
+          notices,
+          transactions,
+          audits: quarterlyAudits,
+          literatureItems,
+          literatureOrders: specialOrders,
+          literatureDistributions: groupDistributions,
+          literatureInventory: inventoryRecords,
+        },
+      }).catch(() => {});
+      refreshQueueStats();
+    }
+
     saveToFirestore(publishers, updated);
   };
 
@@ -3615,6 +3755,33 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       updated = [...monthlyReports, { ...report, id: report.id || `rep-${Date.now()}` }];
     }
     setMonthlyReports(updated);
+
+    const congId = resolveCongregationDocId();
+    if (congId && typeof navigator !== 'undefined' && !navigator.onLine) {
+      supabaseSyncService.enqueueOfflineChange(
+        congId,
+        {
+          settings: latestSettingsRef.current,
+          publishers,
+          weeks,
+          territories,
+          notices,
+          transactions,
+          audits: quarterlyAudits,
+          literatureItems,
+          literatureOrders: specialOrders,
+          literatureDistributions: groupDistributions,
+          literatureInventory: inventoryRecords,
+        },
+        {
+          actionType: 'UPDATE_SERVICE_REPORT',
+          description: `Informe de servicio S-4 mes ${report.month}: ${publishers.find(p => p.id === report.publisherId)?.name || report.publisherId} (${report.hours || 0} hrs)`,
+          payload: report,
+        }
+      ).catch(() => {});
+      refreshQueueStats();
+    }
+
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, updated);
   };
 
@@ -5210,6 +5377,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         lastSupabaseSyncAt,
         isSupabaseSyncing,
         syncNowWithSupabase,
+        isOnline,
+        offlineQueueStats,
+        syncOfflineQueueNow,
       }}
     >
       {children}

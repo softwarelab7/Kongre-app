@@ -11,6 +11,7 @@ import ThemeToggle from './ThemeToggle';
 import { getFriendlyCongregationName, isGenericIdentityName } from '../utils/theocraticSecurity';
 import { isTabAllowedForRole } from '../utils/rbac';
 import { CURRENT_APP_VERSION } from '../utils/versionLog';
+import { OfflineSyncBadge } from './OfflineSyncBadge';
 import {
   Calendar,
   Users,
@@ -123,6 +124,7 @@ interface NavbarProps {
   onOpenPinsModal?: () => void;
   onOpenAuditLog?: () => void;
   onOpenVersionModal?: () => void;
+  onOpenQueueModal?: () => void;
 }
 
 interface NavSubItem {
@@ -163,6 +165,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenPinsModal,
   onOpenAuditLog,
   onOpenVersionModal,
+  onOpenQueueModal,
 }) => {
   const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo, currentBrotherName, isCoordinator, permissions } = useAuth();
   const canManageRoles = !effectiveRoleInfo.isReadOnly && activeRole !== 'publico' && (isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano');
@@ -176,6 +179,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     accountLinkRequests,
     auxPioneerRequests,
     uploadLocalDataToGoogle,
+    isOnline,
   } = useCongregation();
   const effectiveDisplayName =
     currentBrotherName && !isGenericIdentityName(currentBrotherName)
@@ -1139,6 +1143,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-1.5 ring-white dark:ring-slate-900" />
             </button>
 
+            {/* Offline Sync Badge (IndexedDB & Supabase) */}
+            {onOpenQueueModal && (
+              <OfflineSyncBadge
+                isOnline={isOnline}
+                onOpenQueueModal={onOpenQueueModal}
+                className="hidden md:inline-flex"
+              />
+            )}
+
             {/* Divider */}
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 hidden sm:block" />
 
@@ -1893,6 +1906,27 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <span className="text-[10px] mt-0.5 leading-tight font-semibold">Menú</span>
           </button>
+        </div>
+
+        {/* Mobile Persistent Version Bar */}
+        <div className="flex items-center justify-between px-3 pt-1 border-t border-slate-100 dark:border-slate-800/80 mt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
+          <span className="flex items-center gap-1.5 text-[10px]">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-semibold text-slate-700 dark:text-slate-300">Kongre</span>
+            <span className="text-slate-400 dark:text-slate-500 hidden xs:inline">• Google Studio</span>
+          </span>
+          {onOpenVersionModal && (
+            <button
+              type="button"
+              onClick={onOpenVersionModal}
+              className="inline-flex items-center gap-1 font-mono font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+            >
+              <span>v{CURRENT_APP_VERSION}</span>
+              <span className="text-[9px] px-1 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60">
+                Changelog
+              </span>
+            </button>
+          )}
         </div>
       </nav>
     </>

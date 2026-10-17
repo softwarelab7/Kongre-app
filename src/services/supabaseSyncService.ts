@@ -61,6 +61,16 @@ export interface PublicFilteredData {
   }>;
 }
 
+import {
+  enqueueOfflineOperation,
+  getPendingOfflineOperations,
+  updateOfflineOperation,
+  removeOfflineOperation,
+  getOfflineQueueStats,
+  OfflineQueueItem,
+  QueueActionType,
+} from './indexedDbQueue';
+
 const LOCAL_STORAGE_LAST_SYNC_KEY = 'kongre_last_supabase_sync_at';
 const LOCAL_STORAGE_OFFLINE_QUEUE_KEY = 'kongre_offline_supabase_queue_v1';
 
@@ -451,50 +461,171 @@ export const supabaseSyncService = {
   },
 
   /**
-   * Guarda cambios pendientes en la cola local si el dispositivo está sin internet
+   * Guarda cambios pendientes en la cola persistente de IndexedDB si el dispositivo está sin internet
    */
-  enqueueOfflineChange(congregationId: string, data: CongregationFullData) {
+  async enqueueOfflineChange(
+    congregationId: string,
+    data: CongregationFullData,
+    options?: {
+      actionType?: QueueActionType;
+      description?: string;
+      payload?: any;
+    }
+  ) {
     if (typeof window === 'undefined') return;
+    const cleanId = normalizeCongregationId(congregationId);
+    const actionType = options?.actionType || 'FULL_SYNC';
+    const description = options?.description || 'Actualización de congregación';
+
     try {
+      await enqueueOfflineOperation({
+        congregationId: cleanId,
+        actionType,
+        description,
+        payload: options?.payload,
+        snapshotData: data,
+      });
+
+      // Respaldo de compatibilidad
       const item = {
-        congregationId: normalizeCongregationId(congregationId),
+        congregationId: cleanId,
         data,
         queuedAt: new Date().toISOString(),
       };
       localStorage.setItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY, JSON.stringify(item));
       window.dispatchEvent(new CustomEvent('kongre_offline_sync_queued'));
-    } catch {}
+    } catch (e) {
+      console.warn('Error al encolar en IndexedDB:', e);
+    }
   },
 
   /**
-   * Procesa la cola offline cuando se recupera la conexión a internet
+   * Encola específicamente una marcación o conteo de asistencia de reunión en IndexedDB
+   */
+  async enqueueAttendanceChange(params: {
+    congregationId: string;
+    weekId: string;
+    description: string;
+    attendancePayload: any;
+    fullData: CongregationFullData;
+  }) {
+    return this.enqueueOfflineChange(params.congregationId, params.fullData, {
+      actionType: 'UPDATE_ATTENDANCE',
+      description: params.description || `Asistencia reunión (${params.weekId})`,
+      payload: { weekId: params.weekId, attendance: params.attendancePayload },
+    });
+  },
+
+  /**
+   * Encola específicamente una edición de informe de servicio S-21 / S-4 en IndexedDB
+   */
+  async enqueueReportChange(params: {
+    congregationId: string;
+    publisherId: string;
+    description: string;
+    reportPayload: any;
+    fullData: CongregationFullData;
+  }) {
+    return this.enqueueOfflineChange(params.congregationId, params.fullData, {
+      actionType: 'UPDATE_SERVICE_REPORT',
+      description: params.description || `Informe de servicio (${params.publisherId})`,
+      payload: { publisherId: params.publisherId, report: params.reportPayload },
+    });
+  },
+
+  /**
+   * Obtiene estadísticas de la cola IndexedDB
+   */
+  async getQueueStats() {
+    return getOfflineQueueStats();
+  },
+
+  /**
+   * Procesa la cola offline de IndexedDB cuando se recupera la conexión a internet
+   * y sube los cambios cifrados con AES-256 a Supabase.
    */
   async flushOfflineQueue(
     pinMaestro: string,
     pinCongregacion?: string
-  ): Promise<boolean> {
-    if (typeof window === 'undefined') return false;
-    const raw = localStorage.getItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY);
-    if (!raw) return true;
+  ): Promise<{ success: boolean; syncedCount: number }> {
+    if (typeof window === 'undefined') return { success: false, syncedCount: 0 };
 
     try {
-      const item = JSON.parse(raw);
-      if (item.congregationId && item.data && pinMaestro) {
+      // 1. Obtener todas las operaciones pendientes de IndexedDB
+      const pendingItems = await getPendingOfflineOperations();
+
+      if (pendingItems.length === 0) {
+        // Verificar si queda algún elemento en el localStorage antiguo
+        const rawLegacy = localStorage.getItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY);
+        if (rawLegacy) {
+          try {
+            const item = JSON.parse(rawLegacy);
+            if (item.congregationId && item.data && pinMaestro) {
+              const res = await this.uploadCongregation({
+                congregationId: item.congregationId,
+                data: item.data,
+                pinMaestro,
+                pinCongregacion,
+              });
+              if (res.success) {
+                localStorage.removeItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY);
+                return { success: true, syncedCount: 1 };
+              }
+            }
+          } catch {
+            localStorage.removeItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY);
+          }
+        }
+        return { success: true, syncedCount: 0 };
+      }
+
+      // Marcar todas como sincronizando
+      for (const item of pendingItems) {
+        await updateOfflineOperation(item.id, {
+          status: 'syncing',
+          attempts: (item.attempts || 0) + 1,
+        });
+      }
+
+      // Encontrar el snapshot más reciente o por congregación
+      // Dado que cada snapshotData acumula el estado completo fusionado,
+      // la versión más reciente con snapshotData tiene el estado fiel.
+      const itemsWithSnapshot = pendingItems.filter((i) => i.snapshotData && i.congregationId);
+      const latestItem = itemsWithSnapshot.length > 0
+        ? itemsWithSnapshot[itemsWithSnapshot.length - 1]
+        : pendingItems[pendingItems.length - 1];
+
+      if (latestItem && latestItem.snapshotData && pinMaestro) {
         const res = await this.uploadCongregation({
-          congregationId: item.congregationId,
-          data: item.data,
+          congregationId: latestItem.congregationId,
+          data: latestItem.snapshotData,
           pinMaestro,
           pinCongregacion,
         });
+
         if (res.success) {
+          // Remover todas las operaciones pendientes procesadas
+          for (const item of pendingItems) {
+            await removeOfflineOperation(item.id);
+          }
           localStorage.removeItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY);
-          return true;
+          return { success: true, syncedCount: pendingItems.length };
+        } else {
+          // Marcar con error
+          for (const item of pendingItems) {
+            await updateOfflineOperation(item.id, {
+              status: 'error',
+              lastError: res.error || 'Fallo de conexión',
+            });
+          }
+          return { success: false, syncedCount: 0 };
         }
       }
-      return false;
-    } catch {
-      localStorage.removeItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY);
-      return false;
+
+      return { success: true, syncedCount: 0 };
+    } catch (err: any) {
+      console.warn('Error al procesar la cola offline de IndexedDB:', err);
+      return { success: false, syncedCount: 0 };
     }
   },
 

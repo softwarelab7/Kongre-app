@@ -2,14 +2,21 @@ import React from 'react';
 import { Sparkles, GitBranch, ShieldCheck, History, ExternalLink } from 'lucide-react';
 import { CURRENT_APP_VERSION, BUILD_DATE, BUILD_ENVIRONMENT } from '../utils/versionLog';
 import Logo from '../Logo';
+import { OfflineSyncBadge } from './OfflineSyncBadge';
 
 interface AppFooterProps {
   onOpenVersionModal: () => void;
+  onOpenQueueModal?: () => void;
+  isOnline?: boolean;
 }
 
-export const AppFooter: React.FC<AppFooterProps> = ({ onOpenVersionModal }) => {
+export const AppFooter: React.FC<AppFooterProps> = ({
+  onOpenVersionModal,
+  onOpenQueueModal,
+  isOnline = true,
+}) => {
   return (
-    <footer className="w-full mt-auto border-t border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md select-none transition-colors">
+    <footer className="w-full mt-auto border-t border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md select-none transition-colors pb-20 md:pb-0">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12 py-3 sm:py-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
           {/* Left: Brand & Status */}
@@ -34,8 +41,15 @@ export const AppFooter: React.FC<AppFooterProps> = ({ onOpenVersionModal }) => {
             </div>
           </div>
 
-          {/* Right: Version pill & Changlog trigger button */}
-          <div className="flex items-center gap-2">
+          {/* Right: Offline Sync Badge & Version pill */}
+          <div className="flex flex-wrap items-center gap-2">
+            {onOpenQueueModal && (
+              <OfflineSyncBadge
+                isOnline={isOnline}
+                onOpenQueueModal={onOpenQueueModal}
+              />
+            )}
+
             <span className="text-[11px] text-slate-400 dark:text-slate-500 hidden lg:inline">
               Actualizado: {BUILD_DATE}
             </span>

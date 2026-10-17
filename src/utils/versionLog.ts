@@ -25,19 +25,49 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.5.0';
-export const CURRENT_BUILD_CODE = '2026.10.17.250';
+export const CURRENT_APP_VERSION = '2.6.0';
+export const CURRENT_BUILD_CODE = '2026.10.17.260';
 export const BUILD_DATE = '17 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Google AI Studio (Anti-Gravity)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.6.0',
+    buildCode: '2026.10.17.260',
+    date: '17 de Octubre, 2026',
+    title: 'Sincronización en Cola Offline con IndexedDB y Supabase',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa en Google AI Studio',
+    environment: 'Google AI Studio (Anti-Gravity)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Cola de sincronización persistente en IndexedDB: las modificaciones realizadas sin internet (asistencia, informes de servicio, publicadores) se almacenan localmente en el dispositivo de forma garantizada.',
+      },
+      {
+        category: 'feature',
+        text: 'Sincronización automática con Supabase: al recuperar conexión WiFi o datos móviles, la cola de IndexedDB se vacía y transmite los datos cifrados con AES-256-GCM (Cero Conocimiento).',
+      },
+      {
+        category: 'feature',
+        text: 'Modal interactivo de Cola Offline: accesible desde el pie de página y la barra superior para inspeccionar cada cambio pendiente y forzar sincronización manual.',
+      },
+      {
+        category: 'improvement',
+        text: 'Consolidación de la arquitectura de base de datos en Supabase (eliminando cualquier remanente hacia Firebase).',
+      },
+      {
+        category: 'improvement',
+        text: 'Banner inteligente de conectividad que indica la cantidad exacta de operaciones en cola esperando red.',
+      },
+    ],
+  },
+  {
     version: '2.5.0',
     buildCode: '2026.10.17.250',
     date: '17 de Octubre, 2026',
     title: 'Registro de Versión en Pie de Página y Navegación Histórica',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa en Google AI Studio',
+    isCurrent: false,
     environment: 'Google AI Studio (Anti-Gravity)',
     changes: [
       {

@@ -25,7 +25,22 @@ Cada vez que se solicite un cambio o actualización en Google AI Studio / Anti-G
 
 ## 🚀 Historial de Versiones
 
-### [v2.5.0] - 17 de Octubre, 2026 (Compilación Activa)
+### [v2.6.0] - 17 de Octubre, 2026 (Compilación Activa)
+**Título:** Sincronización en Cola Offline con IndexedDB y Supabase (Zero-Knowledge)
+- **Cola de Sincronización Persistente en IndexedDB:**
+  - **Almacenamiento Local Garantizado**: Cuando el dispositivo pierde conexión o está en modo offline (por ejemplo, en el Salón del Reino o en el territorio), las modificaciones críticas como la marcación de asistencia (S-88), edición de informes de servicio (S-21 / S-4) o actualizaciones de publicadores se guardan inmediatamente en una cola persistente de **IndexedDB** (`kongre_offline_sync_db`).
+  - **Tolerancia a fallos**: Si la red falla a mitad de una petición, la operación se encola automáticamente con descripción legible, datos de contexto y marca de tiempo exacta para garantizar cero pérdida de datos.
+- **Sincronización Automática con Supabase:**
+  - **Detección reactiva de conexión**: Mediante escucha continua del evento `online` y latido de reconexión, Kongre detecta el restablecimiento de WiFi o red móvil y vacía la cola automáticamente.
+  - **Cifrado AES-256-GCM (Cero Conocimiento)**: Los datos encolados se cifran localmente con el PIN maestro antes de subir el snapshot a Supabase, manteniendo la privacidad absoluta de la congregación.
+  - **Aclaración y Consolidación de Arquitectura**: Todo el flujo de persistencia en la nube está unificado en Supabase, eliminando dependencias obsoletas de Firebase.
+- **Interfaz y Control de Usuario:**
+  - **Modal Interactivo de Cola Offline**: Accesible desde el indicador en el pie de página y la barra superior para revisar las operaciones en cola, hora de registro y botón de "Sincronizar ahora con Supabase".
+  - **Banner Dinámico de Conectividad**: Notifica en vivo el número exacto de cambios guardados en IndexedDB y el progreso de subida al reconectar.
+
+---
+
+### [v2.5.0] - 17 de Octubre, 2026
 **Título:** Registro Oficial de Versiones y Navegación Histórica del Navegador
 - **Novedades:**
   - **Pie de página con Registro de Versión**: Se agregó en la parte inferior de la aplicación el número de versión visible (`v2.5.0`) con enlace directo al modal detallado de registro de cambios.

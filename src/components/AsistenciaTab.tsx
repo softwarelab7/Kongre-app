@@ -22,9 +22,11 @@ import {
   Smartphone,
 } from 'lucide-react';
 import { SectionHeader } from './SectionHeader';
+import { AttendanceTrendsDashboard } from './charts/AttendanceTrendsDashboard';
 
 export const AsistenciaTab: React.FC = () => {
   const { weeks, updateMeetingAttendance, settings, currentWeek } = useCongregation();
+  const [mainView, setMainView] = useState<'dashboard' | 'registro'>('dashboard');
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     // Current year-month (e.g. 2026-10)
     const now = new Date();
@@ -189,26 +191,38 @@ export const AsistenciaTab: React.FC = () => {
       {/* SectionHeader Kongre 1 Style */}
       <SectionHeader
         icon={Users}
-        title="Control de"
+        title="Control y Tendencias de"
         highlightWord="Asistencia"
-        subtitle="Registro de asistencia presencial y por Zoom • Cálculo automático de promedios"
+        subtitle="Dashboard visual del año de servicio con Recharts • Registro mensual S-88 • Cálculo automático de promedios"
         colorTheme="emerald"
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            {/* Month selector capsule */}
-            <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] px-3 py-1.5 rounded-xl">
-              <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="bg-transparent text-slate-800 dark:text-white font-semibold text-xs sm:text-sm outline-hidden cursor-pointer"
+            {/* View Switcher Pills */}
+            <div className="flex items-center p-1 bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] rounded-xl text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setMainView('dashboard')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  mainView === 'dashboard'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                }`}
               >
-                {availableMonths.map((m) => (
-                  <option key={m} value={m} className="text-slate-900 bg-white dark:bg-slate-900">
-                    Mes: {m}
-                  </option>
-                ))}
-              </select>
+                <BarChart3 className="w-3.5 h-3.5" />
+                <span>Dashboard Visual</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMainView('registro')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  mainView === 'registro'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Registro Semanal</span>
+              </button>
             </div>
 
             <button
@@ -223,29 +237,77 @@ export const AsistenciaTab: React.FC = () => {
               <Smartphone className="w-4 h-4" />
               <span>Contador en Vivo</span>
             </button>
-
-            <button
-              onClick={handleCopySecretaryReport}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
-            >
-              {copiedSuccess ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-300" />
-                  <span>¡Informe Copiado!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4" />
-                  <span>Copiar Informe</span>
-                </>
-              )}
-            </button>
           </div>
         }
       />
 
-      {/* KPI Cards Ribbon */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* 1. VISUAL DASHBOARD VIEW: RECHARTS HISTORICAL SERVICE YEAR TRENDS */}
+      {mainView === 'dashboard' && (
+        <AttendanceTrendsDashboard
+          weeks={weeks}
+          settings={settings}
+          onUpdateAttendance={updateMeetingAttendance}
+          onSelectMonth={(monthKey) => {
+            setSelectedMonth(monthKey);
+            setMainView('registro');
+          }}
+        />
+      )}
+
+      {/* 2. REGISTRO VIEW: MONTHLY S-88 CARDS AND TABLE */}
+      {mainView === 'registro' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Month selector & Secretary action bar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-white dark:bg-[#131d2e] border border-slate-200/90 dark:border-white/[0.06] shadow-2xs">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Mes seleccionado:</span>
+              <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 px-3 py-1.5 rounded-xl">
+                <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="bg-transparent text-slate-800 dark:text-white font-semibold text-xs sm:text-sm outline-hidden cursor-pointer"
+                >
+                  {availableMonths.map((m) => (
+                    <option key={m} value={m} className="text-slate-900 bg-white dark:bg-slate-900">
+                      Mes: {m}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setMainView('dashboard')}
+                className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <span>Ver gráficos anuales</span>
+                <span>↗</span>
+              </button>
+
+              <button
+                onClick={handleCopySecretaryReport}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
+              >
+                {copiedSuccess ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+                    <span>¡Informe Copiado!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    <span>Copiar Informe Mes</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* KPI Cards Ribbon */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs">
           <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
             <span className="text-xs font-semibold uppercase tracking-wider">Promedio Entre Semana</span>
@@ -762,6 +824,8 @@ export const AsistenciaTab: React.FC = () => {
         </div>
         )}
       </div>
+      </div>
+      )}
 
       {/* MODAL DE CONTADOR TÁCTIL EN VIVO (Para Acomodadores / Audio en Reunión) */}
       {isCounterOpen && (() => {

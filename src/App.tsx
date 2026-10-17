@@ -65,6 +65,7 @@ import { PublisherPinsModal } from './components/PublisherPinsModal';
 import { AuditLogModal } from './components/AuditLogModal';
 import { AppFooter } from './components/AppFooter';
 import { VersionHistoryModal } from './components/VersionHistoryModal';
+import { OfflineSyncQueueModal } from './components/OfflineSyncQueueModal';
 import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import { checkUpcomingAssignmentsAndNotify } from './services/notificationService';
@@ -187,6 +188,7 @@ const AppContent: React.FC = () => {
   const [isRegisterWizardOpen, setIsRegisterWizardOpen] = useState(false);
   const [isLinkRequestsModalOpen, setIsLinkRequestsModalOpen] = useState(false);
   const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
+  const [isQueueModalOpen, setIsQueueModalOpen] = useState(false);
   const [showWelcomeLanding, setShowWelcomeLanding] = useState<boolean>(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const hashInfo = typeof window !== 'undefined' ? parseAppHash(window.location.hash) : null;
@@ -215,6 +217,8 @@ const AppContent: React.FC = () => {
     publishers,
     weeks,
     loadCongregationFromCloud,
+    isOnline,
+    syncOfflineQueueNow,
   } = useCongregation();
 
   // Navigation with browser History (Back / Forward button support)
@@ -314,6 +318,7 @@ const AppContent: React.FC = () => {
         setIsAuditLogOpen(false);
         setIsRegisterWizardOpen(false);
         setIsVersionModalOpen(false);
+        setIsQueueModalOpen(false);
         return;
       }
 
@@ -344,6 +349,7 @@ const AppContent: React.FC = () => {
       setIsAuditLogOpen(targetModal === 'auditoria');
       setIsRegisterWizardOpen(targetModal === 'registro_congregacion');
       setIsVersionModalOpen(targetModal === 'versiones');
+      setIsQueueModalOpen(targetModal === 'cola_offline' || targetModal === 'cola');
     };
 
     window.addEventListener('popstate', onPopState);
@@ -673,6 +679,9 @@ const AppContent: React.FC = () => {
           onOpenJoinModal={() => {
             openModalWithHistory('unirse', setIsJoinModalOpen);
           }}
+          onOpenVersionModal={() => {
+            openModalWithHistory('versiones', setIsVersionModalOpen);
+          }}
         />
         <JoinCongregationModal
           isOpen={isJoinModalOpen}
@@ -685,6 +694,16 @@ const AppContent: React.FC = () => {
             localStorage.setItem('kongre_is_registered_congregation', 'true');
             window.history.pushState({ tab: activeTab, modal: null, landing: false }, '', `#${activeTab}`);
           }}
+        />
+        <VersionHistoryModal
+          isOpen={isVersionModalOpen}
+          onClose={() => closeModalWithHistory('versiones', setIsVersionModalOpen)}
+        />
+        <OfflineSyncQueueModal
+          isOpen={isQueueModalOpen}
+          onClose={() => closeModalWithHistory('cola_offline', setIsQueueModalOpen)}
+          isOnline={isOnline}
+          onSyncNow={syncOfflineQueueNow}
         />
       </>
     );
@@ -747,6 +766,7 @@ const AppContent: React.FC = () => {
         onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
         onOpenAuditLog={() => openModalWithHistory('auditoria', setIsAuditLogOpen)}
         onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
+        onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
       />
 
       <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200 flex flex-col justify-between`}>
@@ -854,7 +874,11 @@ const AppContent: React.FC = () => {
           </>
         )}
         </div>
-        <AppFooter onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)} />
+        <AppFooter
+          onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
+          onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
+          isOnline={isOnline}
+        />
       </main>
 
       {/* Global Modals */}
@@ -932,7 +956,7 @@ const AppContent: React.FC = () => {
       />
 
       {/* Offline Connectivity & Cloud Sync Status Banner */}
-      <OfflineSyncBanner />
+      <OfflineSyncBanner onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)} />
 
       {/* Role Switcher & Google Account Permissions Modal (Strictly Elders & Coordinator) */}
       {canManageRoles && (
@@ -992,6 +1016,14 @@ const AppContent: React.FC = () => {
       <VersionHistoryModal
         isOpen={isVersionModalOpen}
         onClose={() => closeModalWithHistory('versiones', setIsVersionModalOpen)}
+      />
+
+      {/* Modal de Cola de Sincronización Offline (IndexedDB / Supabase) */}
+      <OfflineSyncQueueModal
+        isOpen={isQueueModalOpen}
+        onClose={() => closeModalWithHistory('cola_offline', setIsQueueModalOpen)}
+        isOnline={isOnline}
+        onSyncNow={syncOfflineQueueNow}
       />
 
     </div>

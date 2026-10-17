@@ -41,15 +41,18 @@ import { PendingApprovalView } from './PendingApprovalView';
 import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
 import ThemeToggle from './ThemeToggle';
+import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
 
 interface CongregationWelcomeLandingProps {
   onEnterApp: () => void;
   onOpenJoinModal?: () => void;
+  onOpenVersionModal?: () => void;
 }
 
 export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProps> = ({
   onEnterApp,
   onOpenJoinModal,
+  onOpenVersionModal,
 }) => {
   const {
     user,
@@ -1285,9 +1288,36 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         </p>
       </main>
 
-      {/* Subtle bottom note */}
-      <footer className="w-full text-center py-4 text-[11px] text-slate-400 dark:text-slate-600">
-        Kongre • Gestor Teocrático Integral para Congregaciones
+      {/* Footer with Version & Changelog Link */}
+      <footer className="w-full border-t border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md py-4 px-4 sm:px-8 mt-auto select-none transition-colors">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+            <span className="font-bold text-slate-800 dark:text-slate-200">Kongre</span>
+            <span>•</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">Gestor Teocrático Integral</span>
+            <span>•</span>
+            <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Google AI Studio
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {onOpenVersionModal && (
+              <button
+                type="button"
+                onClick={onOpenVersionModal}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer font-semibold shadow-2xs active:scale-95 text-xs"
+                title="Ver registro de versiones y novedades"
+              >
+                <span>v{CURRENT_APP_VERSION}</span>
+                <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-100/80 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                  Ver Cambios
+                </span>
+              </button>
+            )}
+          </div>
+        </div>
       </footer>
     </div>
   );

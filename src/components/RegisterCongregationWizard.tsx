@@ -18,6 +18,7 @@ import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import { COUNTRIES_WITH_CITIES, COUNTRIES_LIST } from '../data/countriesAndCities';
 import { SearchableCombobox } from './SearchableCombobox';
 import { Select } from './Select';
+import { IosTimePicker } from './IosTimePicker';
 import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
 
@@ -792,11 +793,12 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     <Clock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                     <span>Hora de inicio:</span>
                   </label>
-                  <input
-                    type="time"
+                  <IosTimePicker
                     value={midweekTime}
-                    onChange={(e) => setMidweekTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-mono font-bold text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                    onChange={setMidweekTime}
+                    placeholder="Selecciona hora (ej. 19:00)"
+                    accentColor="indigo"
+                    presets={['18:30', '19:00', '19:30', '20:00']}
                   />
                 </div>
               </div>
@@ -837,11 +839,12 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     <span>Hora de inicio:</span>
                   </label>
-                  <input
-                    type="time"
+                  <IosTimePicker
                     value={weekendTime}
-                    onChange={(e) => setWeekendTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-mono font-bold text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                    onChange={setWeekendTime}
+                    placeholder="Selecciona hora (ej. 10:00)"
+                    accentColor="emerald"
+                    presets={['09:00', '09:30', '10:00', '16:00', '17:00']}
                   />
                 </div>
               </div>

@@ -219,11 +219,18 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         coordinador: 'COORD',
         anciano: 'ANC',
         superintendente_vym: 'VYM',
+        superintendente_servicio: 'SRV',
         secretario: 'SEC',
         siervo_discursos: 'DIS',
         siervo_territorios: 'TER',
+        siervo_carritos: 'CRT',
         siervo_literatura: 'LIT',
         siervo_cuentas: 'CTA',
+        superintendente_grupo: 'GRP',
+        encargado_mantenimiento: 'MNT',
+        encargado_audiovideo: 'AV',
+        encargado_acomodadores: 'ACO',
+        encargado_cartelera: 'CAR',
         publico: 'PUB',
       };
 

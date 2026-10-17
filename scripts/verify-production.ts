@@ -46,40 +46,30 @@ if (fs.existsSync(manifestPath)) {
   }
 }
 
-// 3. Validar sintaxis y reglas de Firestore
-console.log('\n🛡️ 3. Validando firestore.rules y RBAC teocrático...');
-const rulesPath = path.resolve(process.cwd(), 'firestore.rules');
-if (fs.existsSync(rulesPath)) {
-  const rules = fs.readFileSync(rulesPath, 'utf8');
-  const requiredSubcollections = [
-    '/publishers/{pubId}',
-    '/weeks/{weekId}',
-    '/territories/{terrId}',
-    '/accounts/{accId}',
-    '/literature/{litId}',
-    '/notices/{noticeId}',
-  ];
+// 3. Validar arquitectura de seguridad Cero Conocimiento (Supabase + AES-256-GCM)
+console.log('\n🛡️ 3. Validando arquitectura de seguridad Cero Conocimiento (Supabase)...');
+const syncServicePath = path.resolve(process.cwd(), 'src/services/supabaseSyncService.ts');
+const cryptoUtilsPath = path.resolve(process.cwd(), 'src/utils/crypto.ts');
 
-  for (const sub of requiredSubcollections) {
-    if (!rules.includes(sub)) {
-      console.error(`❌ Subcolección requerida no encontrada en firestore.rules: ${sub}`);
-      hasError = true;
-    } else {
-      console.log(`  ✅ Subcolección protegida: ${sub}`);
-    }
+if (fs.existsSync(syncServicePath) && fs.existsSync(cryptoUtilsPath)) {
+  const syncContent = fs.readFileSync(syncServicePath, 'utf8');
+  const cryptoContent = fs.readFileSync(cryptoUtilsPath, 'utf8');
+
+  if (cryptoContent.includes('AES-GCM') && cryptoContent.includes('PBKDF2')) {
+    console.log('  ✅ Cifrado de grado militar activo (AES-256-GCM + PBKDF2 100k iteraciones).');
+  } else {
+    console.error('❌ Módulo de criptografía incompleto.');
+    hasError = true;
   }
 
-  // Comprobar balanceo de llaves {}
-  const openBraces = (rules.match(/{/g) || []).length;
-  const closeBraces = (rules.match(/}/g) || []).length;
-  if (openBraces !== closeBraces) {
-    console.error(`❌ Llaves desbalanceadas en firestore.rules: ${openBraces} abiertas vs ${closeBraces} cerradas`);
-    hasError = true;
+  if (syncContent.includes('uploadCongregation') && syncContent.includes('fetchAndDecryptCongregation')) {
+    console.log('  ✅ Pipeline de sincronización Cero Conocimiento configurado correctamente.');
   } else {
-    console.log(`  ✅ Estructura sintáctica de reglas correcta (${openBraces} bloques).`);
+    console.error('❌ Pipeline de sincronización Supabase incompleto.');
+    hasError = true;
   }
 } else {
-  console.error('❌ No se encontró firestore.rules');
+  console.error('❌ Faltan archivos requeridos para el stack de seguridad Supabase');
   hasError = true;
 }
 

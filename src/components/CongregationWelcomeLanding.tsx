@@ -1,7 +1,5 @@
 // src/components/CongregationWelcomeLanding.tsx
 import React, { useState } from 'react';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase/config';
 import { useAuth } from '../context/AuthContext';
 import { useSecurity } from '../context/SecurityContext';
 import { useCongregation } from '../context/CongregationContext';
@@ -43,7 +41,6 @@ import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 import { PendingApprovalView } from './PendingApprovalView';
 import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
-import { auth } from '../firebase/config';
 
 interface CongregationWelcomeLandingProps {
   onEnterApp: () => void;
@@ -149,7 +146,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       const effectiveId = formatCanonicalCongregationId(cloudData?.congregationId || cloudData?.settings?.congregationId || cleanId);
 
       if (!cloudRes?.success || !cloudData) {
-        setCodeError(`No se encontró ninguna congregación registrada con el ID "${cleanId}" en Firebase. Verifica el ID o pulsa "Registrar mi Congregación".`);
+        setCodeError(`No se encontró ninguna congregación registrada con el ID "${cleanId}". Verifica el ID o pulsa "Registrar mi Congregación".`);
         setIsSubmittingCode(false);
         return;
       }
@@ -309,17 +306,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       localStorage.removeItem('kongre_needs_cloud_upload');
       localStorage.setItem('kongre_last_local_update', cloudData?.updatedAt || new Date().toISOString());
 
-      // Vincular de forma persistente en /users/{uid} si el usuario tiene sesión de Google activa
-      const uidToLink = user?.uid || auth.currentUser?.uid;
+      // Vincular de forma persistente si el usuario tiene sesión activa
+      const uidToLink = user?.uid;
       if (uidToLink) {
         try {
-          await setDoc(doc(db, 'users', uidToLink), {
-            congregationId: effectiveId,
-            congregationNumber: effectiveId,
-            congregationName: cleanCongName,
-            theocraticRole: roleFinal,
-            updatedAt: new Date().toISOString(),
-          }, { merge: true });
+          localStorage.setItem('kongre_user_cong_id', effectiveId);
         } catch {}
       }
 
@@ -761,6 +752,26 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     </div>
                   </div>
 
+                  {typeof window !== 'undefined' &&
+                    window.location.hostname !== 'localhost' &&
+                    (window.location.hostname === '127.0.0.1' || /^(\d{1,3}\.){3}\d{1,3}$/.test(window.location.hostname)) && (
+                      <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 text-xs flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
+                        <div className="space-y-1">
+                          <p className="font-bold">Aviso importante de dominio local:</p>
+                          <p>
+                            Estás accediendo mediante <span className="font-mono font-bold">{window.location.hostname}</span>. La autenticación con Google autoriza <span className="font-mono font-bold">localhost</span> para entornos locales.
+                          </p>
+                          <a
+                            href={`http://localhost:${window.location.port || '3050'}/`}
+                            className="inline-block font-semibold text-indigo-600 dark:text-indigo-400 underline hover:text-indigo-700"
+                          >
+                            Abrir en http://localhost:{window.location.port || '3050'}/ →
+                          </a>
+                        </div>
+                      </div>
+                    )}
+
                   {emailError && (
                     <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
@@ -865,7 +876,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                           <span>¿A qué congregación perteneces?</span>
                         </div>
                         <p className="text-xs text-amber-900/90 dark:text-amber-300/90 leading-relaxed">
-                          Firebase necesita saber a qué congregación enlazar tu cuenta de Google. Introduce el <strong>ID y el PIN de tu congregación</strong> para conectarte, o regístrala como una nueva congregación.
+                          Kongre necesita saber a qué congregación enlazar tu cuenta. Introduce el <strong>ID y el PIN de tu congregación</strong> para conectarte, o regístrala como una nueva congregación.
                         </p>
                       </div>
 

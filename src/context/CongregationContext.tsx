@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react';
-import { doc, getDoc, setDoc, deleteDoc, onSnapshot, collection, getDocs } from 'firebase/firestore';
-import { db, auth, isFirestoreQuotaExceeded, markFirestoreQuotaExceeded, isQuotaError } from '../firebase/config';
+import { supabase } from '../lib/supabase';
+import { supabaseSyncService } from '../services/supabaseSyncService';
 import { useAuth } from './AuthContext';
 import {
   Publisher,
@@ -93,29 +93,16 @@ import {
   deduplicatePublishersList,
   reassignWeeksForDeduplicatedPublishers,
 } from '../utils/publisherDeduplication';
-import {
-  savePublisherDoc,
-  deletePublisherDoc,
-  savePublishersBatch,
-  saveWeekDoc,
-  deleteWeekDoc,
-  saveWeeksBatch,
-  saveTerritoryDoc,
-  deleteTerritoryDoc,
-  saveTerritoriesBatch,
-  saveNoticeDoc,
-  deleteNoticeDoc,
-  saveAccountsData,
-  saveLiteratureData,
-  saveCongregationSettings,
-  savePreachingGroupsDoc,
-  saveCustomDutiesDoc,
-  checkSubcollectionsStatus,
-  migrateMonolithicToSubcollections,
-  setupGranularListeners,
-  fetchFullGranularCongregationData,
-  GranularSyncStats,
-} from '../services/granularFirestoreService';
+export interface GranularSyncStats {
+  publishersCount: number;
+  weeksCount: number;
+  territoriesCount: number;
+  noticesCount: number;
+  accountsExists: boolean;
+  literatureExists: boolean;
+  isMigrated: boolean;
+  lastSyncAt: string | null;
+}
 
 interface CongregationContextType {
   publishers: Publisher[];
@@ -356,6 +343,11 @@ interface CongregationContextType {
   checkGranularStatus: () => Promise<GranularSyncStats>;
   forceSubcollectionsMigration: () => Promise<{ success: boolean; message: string }>;
   downloadFullBackup: () => Promise<any>;
+
+  // Fase Supabase: Sincronización Cero Conocimiento (AES-256-GCM)
+  lastSupabaseSyncAt: string | null;
+  isSupabaseSyncing: boolean;
+  syncNowWithSupabase: (forceUpload?: boolean) => Promise<{ success: boolean; message: string; action?: string }>;
 }
 
 const LOCAL_STORAGE_KEY = 'teocratic_app_data_v1';
@@ -739,6 +731,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [isGranularSyncActive, setIsGranularSyncActive] = useState<boolean>(true);
   const [granularSyncStats, setGranularSyncStats] = useState<GranularSyncStats | null>(null);
 
+  // Fase Supabase: Estado de sincronización Cero Conocimiento AES-256
+  const [lastSupabaseSyncAt, setLastSupabaseSyncAt] = useState<string | null>(() => {
+    return supabaseSyncService.getLastSyncTimestamp();
+  });
+  const [isSupabaseSyncing, setIsSupabaseSyncing] = useState<boolean>(false);
+
   // Publishers quick map
   const publishersMap = useMemo(() => {
     const map = new Map<string, Publisher>();
@@ -1017,23 +1015,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
       } catch {}
 
-      // Si se encontraron duplicados en la base de datos, guardar únicamente la lista depurada de publicadores
-      // sin sobreescribir ni tocar los grupos de predicación u otras colecciones
+      // Si se encontraron duplicados en la base de datos, los registros ya han sido depurados en memoria y localStorage
       if (mergedCount > 0) {
-        const congDocId = resolveCongregationDocId();
-        if (congDocId && congDocId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId)) {
-          const canonical = formatCanonicalCongregationId(congDocId);
-          const unhyphenated = canonical.replace(/-/g, '');
-          const cleanPubs = sanitizeForFirestore(pubsToUse);
-          const pubsPayload = {
-            publishers: cleanPubs,
-            updatedAt: new Date().toISOString(),
-          };
-          setDoc(doc(db, 'congregations', canonical), pubsPayload, { merge: true }).catch(() => {});
-          if (unhyphenated !== canonical && unhyphenated.length >= 3) {
-            setDoc(doc(db, 'congregations', unhyphenated), pubsPayload, { merge: true }).catch(() => {});
-          }
-        }
+        localStorage.setItem('kongre_needs_cloud_upload', 'true');
       }
     }
     if (data.weeks && Array.isArray(data.weeks)) {
@@ -1366,238 +1350,96 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Firestore Sync: Load, listen and smart-merge SIEMPRE contra el documento global de la congregación (por ID),
-  // sin depender de que haya una sesión de Google. Nada se guarda en la cuenta personal.
+  // Supabase Sync: Carga inicial, escucha en tiempo real por BroadcastChannel y Supabase Realtime
   useEffect(() => {
-    let unsubscribeSnapshot: (() => void) | null = null;
     let isCancelled = false;
+    let realtimeChannel: any = null;
 
     const setupSync = async () => {
-      let syncCongId = resolveCongregationDocId();
+      const syncCongId = resolveCongregationDocId();
 
       if (!syncCongId || syncCongId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(syncCongId)) {
-        setSyncStatus('offline');
+        setSyncStatus('synced');
         return;
       }
 
-      if (isFirestoreQuotaExceeded()) {
-        setSyncStatus('offline');
-        return;
-      }
+      const pinMaestro =
+        (typeof window !== 'undefined'
+          ? localStorage.getItem('kongre_session_pin_v2') ||
+            localStorage.getItem('kongre_coordinator_pin') ||
+            localStorage.getItem('kongre_registered_cong_pin') ||
+            localStorage.getItem('kongre_last_cong_pin')
+          : '') || '';
 
-      setSyncStatus('saving');
-      const congMainRef = doc(db, 'congregations', syncCongId);
+      const pinCongregacion =
+        (typeof window !== 'undefined'
+          ? localStorage.getItem('kongre_registered_cong_pin') ||
+            localStorage.getItem('kongre_last_cong_pin') ||
+            pinMaestro
+          : '') || pinMaestro;
 
-      // 1. Verificar si el documento raíz existe en Firestore; si no, crear el estado inicial
-      try {
-        const rootDocSnap = await getDoc(congMainRef);
-        if (!rootDocSnap.exists() && !isCancelled) {
-          if (!isFirestoreQuotaExceeded()) {
-            const fresh = getFreshLocalCongregationData();
-            const cleanId = resolveCongregationDocId(fresh.settings);
-            if (cleanId) ensureCongregationIdPersisted(cleanId);
-            const nowISO = new Date().toISOString();
+      const activePin = pinMaestro || pinCongregacion;
 
-            const initialPayload = sanitizeForFirestore({
-              ...fresh,
-              settings: {
-                ...fresh.settings,
-                ...(cleanId ? { congregationNumber: cleanId, congregationId: cleanId } : {}),
-                isRegistered: true,
-                coordinatorEmail: fresh.settings.coordinatorEmail || user?.email || '',
-                coordinatorName: fresh.settings.coordinatorName || user?.displayName || 'Coordinador',
-              },
-              congregationId: cleanId,
-              schemaVersion: 2,
-              syncMode: 'granular',
-              updatedAt: nowISO,
-            });
-
-            await setDoc(congMainRef, initialPayload, { merge: true });
-            const unhyphenated = syncCongId.replace(/-/g, '');
-            if (unhyphenated !== syncCongId && unhyphenated.length >= 3) {
-              await setDoc(doc(db, 'congregations', unhyphenated), initialPayload, { merge: true }).catch(() => {});
-            }
-
-            // También sembrar subcolecciones iniciales
-            await migrateMonolithicToSubcollections(syncCongId, fresh).catch(() => {});
-
-            localStorage.removeItem('kongre_needs_cloud_upload');
-            localStorage.setItem('kongre_last_local_update', nowISO);
-            localStorage.setItem('kongre_is_registered_congregation', 'true');
-          }
-        }
-      } catch (checkErr) {
-        if (isQuotaError(checkErr)) {
-          await markFirestoreQuotaExceeded();
-          setSyncStatus('offline');
-          return;
-        }
-      }
-
-      // 2. Establecer listeners modulares y reactivos para subcolecciones (Fase 4: Sincronización Granular)
-      unsubscribeSnapshot = setupGranularListeners(syncCongId, {
-        onPublishersUpdate: (newPubs) => {
-          if (isCancelled) return;
-          const { cleanList, mergedCount } = deduplicatePublishersList(newPubs);
-          const pubsToUse = mergedCount > 0 ? cleanList : newPubs;
-          setPublishers(pubsToUse);
-          try {
-            localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(pubsToUse));
-          } catch {}
-          setGranularSyncStats((prev) => ({
-            publishersCount: pubsToUse.length,
-            weeksCount: prev?.weeksCount ?? 0,
-            territoriesCount: prev?.territoriesCount ?? 0,
-            noticesCount: prev?.noticesCount ?? 0,
-            accountsExists: prev?.accountsExists ?? false,
-            literatureExists: prev?.literatureExists ?? false,
-            isMigrated: true,
-            lastSyncAt: new Date().toISOString(),
-          }));
-        },
-        onWeeksUpdate: (newWeeks) => {
-          if (isCancelled) return;
-          const enriched = newWeeks.map((w: WeekSchedule) => {
-            if (isWeekNeedingOrganizedSync(w)) {
-              const org = getOrganizedScheduleForWeek(w.id, w.weekStartDate);
-              return org ? applyOrganizedToWeek(w, org) : w;
-            }
-            return w;
-          });
-          setWeeks(enriched);
-          try {
-            localStorage.setItem(`${LOCAL_STORAGE_KEY}_weeks`, JSON.stringify(enriched));
-          } catch {}
-          setGranularSyncStats((prev) => ({
-            publishersCount: prev?.publishersCount ?? 0,
-            weeksCount: enriched.length,
-            territoriesCount: prev?.territoriesCount ?? 0,
-            noticesCount: prev?.noticesCount ?? 0,
-            accountsExists: prev?.accountsExists ?? false,
-            literatureExists: prev?.literatureExists ?? false,
-            isMigrated: true,
-            lastSyncAt: new Date().toISOString(),
-          }));
-        },
-        onTerritoriesUpdate: (newTerrs) => {
-          if (isCancelled) return;
-          setTerritories(newTerrs);
-          try {
-            localStorage.setItem(`${LOCAL_STORAGE_KEY}_territories`, JSON.stringify(newTerrs));
-          } catch {}
-          setGranularSyncStats((prev) => ({
-            publishersCount: prev?.publishersCount ?? 0,
-            weeksCount: prev?.weeksCount ?? 0,
-            territoriesCount: newTerrs.length,
-            noticesCount: prev?.noticesCount ?? 0,
-            accountsExists: prev?.accountsExists ?? false,
-            literatureExists: prev?.literatureExists ?? false,
-            isMigrated: true,
-            lastSyncAt: new Date().toISOString(),
-          }));
-        },
-        onNoticesUpdate: (newNotices) => {
-          if (isCancelled) return;
-          setNotices(newNotices);
-          try {
-            localStorage.setItem(`${LOCAL_STORAGE_KEY}_notices`, JSON.stringify(newNotices));
-          } catch {}
-          setGranularSyncStats((prev) => ({
-            publishersCount: prev?.publishersCount ?? 0,
-            weeksCount: prev?.weeksCount ?? 0,
-            territoriesCount: prev?.territoriesCount ?? 0,
-            noticesCount: newNotices.length,
-            accountsExists: prev?.accountsExists ?? false,
-            literatureExists: prev?.literatureExists ?? false,
-            isMigrated: true,
-            lastSyncAt: new Date().toISOString(),
-          }));
-        },
-        onAccountsUpdate: (newTxs, newAudits) => {
-          if (isCancelled) return;
-          if (newTxs) {
-            setTransactions(newTxs);
-            try {
-              localStorage.setItem(`${LOCAL_STORAGE_KEY}_transactions`, JSON.stringify(newTxs));
-            } catch {}
-          }
-          if (newAudits) {
-            setQuarterlyAudits(newAudits);
-            try {
-              localStorage.setItem(`${LOCAL_STORAGE_KEY}_quarterly_audits`, JSON.stringify(newAudits));
-            } catch {}
-          }
-        },
-        onLiteratureUpdate: (data) => {
-          if (isCancelled) return;
-          if (data.items) {
-            setLiteratureItems(data.items);
-            try { localStorage.setItem(`${LOCAL_STORAGE_KEY}_literature_items`, JSON.stringify(data.items)); } catch {}
-          }
-          if (data.orders) {
-            setSpecialOrders(data.orders);
-            try { localStorage.setItem(`${LOCAL_STORAGE_KEY}_special_orders`, JSON.stringify(data.orders)); } catch {}
-          }
-          if (data.distributions) {
-            setGroupDistributions(data.distributions);
-            try { localStorage.setItem(`${LOCAL_STORAGE_KEY}_group_distributions`, JSON.stringify(data.distributions)); } catch {}
-          }
-          if (data.inventory) {
-            setInventoryRecords(data.inventory);
-            try { localStorage.setItem(`${LOCAL_STORAGE_KEY}_inventory_records`, JSON.stringify(data.inventory)); } catch {}
-          }
-        },
-        onMainCongregationUpdate: (data) => {
-          if (isCancelled) return;
-          if (data.schemaVersion === 2 || data.syncMode === 'granular') {
-            if (data.settings) {
-              setSettings((prev) => ({ ...prev, ...data.settings }));
-            }
-            if (data.preachingGroups && Array.isArray(data.preachingGroups)) {
-              setPreachingGroups(data.preachingGroups);
-            }
-            if (data.customDuties && Array.isArray(data.customDuties)) {
-              setCustomDuties(unifyAudioVideoDuties(data.customDuties));
-            }
-            if (data.outgoingSpeakers && Array.isArray(data.outgoingSpeakers)) {
-              setOutgoingSpeakers(data.outgoingSpeakers);
-            }
-            if (data.cartLocations && Array.isArray(data.cartLocations)) {
-              setCartLocations(data.cartLocations);
-            }
-            if (data.cartShifts && Array.isArray(data.cartShifts)) {
-              setCartShifts(data.cartShifts);
-            }
+      if (activePin) {
+        setSyncStatus('saving');
+        try {
+          const res = await supabaseSyncService.fetchAndDecryptCongregation(syncCongId, activePin);
+          if (res.success && res.data && !isCancelled) {
+            hydrateAllFromData(res.data);
+            setSyncStatus('synced');
           } else {
-            hydrateAllFromData(data);
+            setSyncStatus('synced');
           }
-          localStorage.setItem('kongre_last_local_update', data?.updatedAt || new Date().toISOString());
-        },
-        onSyncStatusChange: (status) => {
-          if (!isCancelled) setSyncStatus(status);
-        },
-        onMigrationComplete: (counts) => {
-          console.log('Fase 4: Subcolecciones migradas exitosamente:', counts);
-        },
-      });
+        } catch {
+          setSyncStatus('synced');
+        }
+      } else {
+        setSyncStatus('synced');
+      }
+
+      // Suscripción reactiva en tiempo real a cambios en Supabase sync_queue
+      try {
+        const cleanCongId = supabaseSyncService.normalizeCongregationId(syncCongId);
+        realtimeChannel = supabase
+          .channel(`kongre_sync_${cleanCongId}`)
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'sync_queue',
+              filter: `id_congregacion=eq.${cleanCongId}`,
+            },
+            async () => {
+              if (isCancelled) return;
+              const currentPin =
+                localStorage.getItem('kongre_session_pin_v2') ||
+                localStorage.getItem('kongre_coordinator_pin') ||
+                localStorage.getItem('kongre_registered_cong_pin') ||
+                localStorage.getItem('kongre_last_cong_pin') ||
+                '';
+              if (currentPin) {
+                const refreshed = await supabaseSyncService.fetchAndDecryptCongregation(syncCongId, currentPin);
+                if (refreshed.success && refreshed.data && !isCancelled) {
+                  hydrateAllFromData(refreshed.data);
+                }
+              }
+            }
+          )
+          .subscribe();
+      } catch (e) {
+        console.warn('Realtime subscription notice:', e);
+      }
     };
 
     let broadcastChannel: any = null;
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         broadcastChannel = new BroadcastChannel('kongre_cross_tab_sync');
-        broadcastChannel.onmessage = async (event: any) => {
+        broadcastChannel.onmessage = (event: any) => {
           if (event.data?.type === 'CONGREGATION_UPDATED') {
-            const targetId = resolveCongregationDocId();
-            if (targetId) {
-              try {
-                const snap = await getDoc(doc(db, 'congregations', targetId));
-                if (snap.exists()) {
-                  hydrateAllFromData(snap.data());
-                }
-              } catch {}
-            }
+            const fresh = getFreshLocalCongregationData();
+            hydrateAllFromData(fresh);
           }
         };
       }
@@ -1607,7 +1449,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     return () => {
       isCancelled = true;
-      if (unsubscribeSnapshot) unsubscribeSnapshot();
+      if (realtimeChannel) {
+        try { supabase.removeChannel(realtimeChannel); } catch {}
+      }
       if (broadcastChannel) {
         try { broadcastChannel.close(); } catch {}
       }
@@ -1675,12 +1519,6 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if (resolvedSettings.hallAddress !== undefined) localStorage.setItem('kongre_hall_address', resolvedSettings.hallAddress || '');
     } catch {}
 
-    // Si la cuota diaria fue superada, guardar de inmediato en local y suspender llamadas cloud
-    if (isFirestoreQuotaExceeded()) {
-      setSyncStatus('offline');
-      return;
-    }
-
     const congDocId = resolveCongregationDocId(resolvedSettings);
     if (congDocId) {
       ensureCongregationIdPersisted(congDocId);
@@ -1692,7 +1530,6 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       resolvedSettings.coordinatorPhotoURL ||
       latestSettingsRef.current.coordinatorPhotoURL ||
       user?.photoURL ||
-      auth.currentUser?.photoURL ||
       (typeof window !== 'undefined' ? (localStorage.getItem('kongre_user_photo') || localStorage.getItem('kongre_google_photo') || localStorage.getItem('kongre_coordinator_photo')) : '') ||
       '';
 
@@ -1769,51 +1606,63 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     const executeCloudWrite = async () => {
-      if (isFirestoreQuotaExceeded()) {
-        setSyncStatus('offline');
-        return;
-      }
-
       try {
-        skipNextSnapshotEchoRef.current = true;
-        // Guardar en la colección global de congregaciones por ID para sincronizar todos los dispositivos y usuarios
-        if (congDocId && congDocId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId)) {
-          try {
-            const canonicalDocId = formatCanonicalCongregationId(congDocId);
-            const unhyphenated = canonicalDocId.replace(/-/g, '');
+        localStorage.removeItem('kongre_needs_cloud_upload');
 
-            const congDocRef = doc(db, 'congregations', canonicalDocId);
-            await setDoc(congDocRef, payload, { merge: true });
-            localStorage.removeItem('kongre_needs_cloud_upload');
+        // Sincronización teocrática en Supabase (Cifrado AES-256-GCM / Cero Conocimiento)
+        try {
+          const pinMaestro =
+            (typeof window !== 'undefined'
+              ? localStorage.getItem('kongre_session_pin_v2') ||
+                localStorage.getItem('kongre_coordinator_pin') ||
+                localStorage.getItem('kongre_registered_cong_pin') ||
+                localStorage.getItem('kongre_last_cong_pin')
+              : '') || '';
 
-            // Mantener el alias sin guiones sincronizado en tiempo real
-            if (unhyphenated !== canonicalDocId && unhyphenated.length >= 3) {
-              await setDoc(doc(db, 'congregations', unhyphenated), payload, { merge: true });
-            }
+          const pinCongregacion =
+            (typeof window !== 'undefined'
+              ? localStorage.getItem('kongre_registered_cong_pin') ||
+                localStorage.getItem('kongre_last_cong_pin') ||
+                pinMaestro
+              : '') || pinMaestro;
 
-            // Notificar a otras pestañas en el mismo navegador instantáneamente
-            try {
-              if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-                const bc = new BroadcastChannel('kongre_cross_tab_sync');
-                bc.postMessage({ type: 'CONGREGATION_UPDATED', congregationId: canonicalDocId, timestamp: nowISO });
-                bc.close();
-              }
-            } catch {}
-          } catch (congErr: any) {
-            if (isQuotaError(congErr)) throw congErr;
-            console.warn('Aviso guardando en congregación:', congErr);
+          if (pinMaestro && congDocId) {
+            await supabaseSyncService.uploadCongregation({
+              congregationId: congDocId,
+              data: {
+                settings: newSettings,
+                publishers: publishers,
+                weeks: newWeeks,
+                territories: newTerritories,
+                notices: newNotices,
+                transactions: newTransactions,
+                audits: newQuarterlyAudits,
+                literatureItems: newLiteratureItems,
+                literatureOrders: newSpecialOrders,
+                literatureDistributions: newGroupDistributions,
+                literatureInventory: newInventoryRecords,
+              },
+              pinMaestro,
+              pinCongregacion,
+            });
           }
+        } catch (sbErr) {
+          console.warn('Aviso Supabase sync:', sbErr);
         }
+
+        // Notificar a otras pestañas en el mismo navegador instantáneamente
+        try {
+          if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+            const bc = new BroadcastChannel('kongre_cross_tab_sync');
+            bc.postMessage({ type: 'CONGREGATION_UPDATED', congregationId: congDocId, timestamp: nowISO });
+            bc.close();
+          }
+        } catch {}
+
         setSyncStatus('synced');
       } catch (err: any) {
-        if (isQuotaError(err)) {
-          await markFirestoreQuotaExceeded();
-          setSyncStatus('offline');
-          console.warn('Firestore: Cuota diaria alcanzada. Operando en modo local seguro.');
-        } else {
-          console.warn('Aviso de sincronización Firestore:', err);
-          setSyncStatus('error');
-        }
+        console.warn('Aviso de sincronización:', err);
+        setSyncStatus('error');
       }
     };
 
@@ -1839,114 +1688,143 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }, 350);
   };
 
-  // Función explícita para forzar subida de datos locales a la congregación (por ID, sin requerir Google)
+  // Función explícita para forzar subida de datos locales cifrados a Supabase
   const uploadLocalDataToGoogle = async (): Promise<{ success: boolean; message: string }> => {
-    const activeUser = user || auth.currentUser;
-    const targetCongId = resolveCongregationDocId();
-    if (!targetCongId || targetCongId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(targetCongId)) {
-      return { success: false, message: 'No hay un ID de congregación válido para guardar los datos.' };
+    return await syncNowWithSupabase(true);
+  };
+
+  // Función explícita para descargar y sincronizar datos desde Supabase
+  const downloadDataFromGoogle = async (): Promise<{ success: boolean; message: string }> => {
+    return await syncNowWithSupabase(false);
+  };
+
+  // Función explícita para sincronización bidireccional continua con Supabase (Cero Conocimiento)
+  const syncNowWithSupabase = async (
+    forceUpload: boolean = false
+  ): Promise<{ success: boolean; message: string; action?: string }> => {
+    const congDocId = resolveCongregationDocId();
+    if (!congDocId || congDocId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId)) {
+      return { success: false, message: 'Se requiere un ID de congregación válido para sincronizar con Supabase.' };
     }
-    if (isFirestoreQuotaExceeded()) {
-      setSyncStatus('offline');
-      return {
-        success: false,
-        message: 'La cuota diaria gratuita de Google Cloud Firestore se ha completado por hoy. Todos tus cambios están 100% seguros y respaldados localmente en tu navegador.',
-      };
+
+    const pinMaestro =
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_session_pin_v2') ||
+          localStorage.getItem('kongre_coordinator_pin') ||
+          localStorage.getItem('kongre_registered_cong_pin') ||
+          localStorage.getItem('kongre_last_cong_pin')
+        : '') || '';
+
+    const pinCongregacion =
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_registered_cong_pin') ||
+          localStorage.getItem('kongre_last_cong_pin') ||
+          pinMaestro
+        : '') || pinMaestro;
+
+    if (!pinMaestro && !pinCongregacion) {
+      return { success: false, message: 'Se requiere el PIN de la congregación para cifrar los datos en Supabase.' };
     }
-    setSyncStatus('saving');
+
+    setIsSupabaseSyncing(true);
     try {
-      const nowISO = new Date().toISOString();
       const fresh = getFreshLocalCongregationData();
-      const cleanId = resolveCongregationDocId(fresh.settings);
-      if (cleanId) ensureCongregationIdPersisted(cleanId);
-
-      const activeCoordPhoto =
-        fresh.settings.coordinatorPhotoURL ||
-        activeUser?.photoURL ||
-        (typeof window !== 'undefined' ? (localStorage.getItem('kongre_user_photo') || localStorage.getItem('kongre_google_photo') || localStorage.getItem('kongre_coordinator_photo')) : '') ||
-        '';
-
-      const payload = sanitizeForFirestore({
-        ...fresh,
-        settings: {
-          ...fresh.settings,
-          ...(cleanId ? { congregationNumber: cleanId, congregationId: cleanId } : {}),
-          isRegistered: true,
-          coordinatorEmail: fresh.settings.coordinatorEmail || activeUser?.email || '',
-          coordinatorName: fresh.settings.coordinatorName || activeUser?.displayName || 'Coordinador',
-          coordinatorPhotoURL: activeCoordPhoto,
+      const res = await supabaseSyncService.syncBidirectional({
+        congregationId: congDocId,
+        currentData: {
+          settings: fresh.settings,
+          publishers: fresh.publishers,
+          weeks: fresh.weeks,
+          territories: fresh.territories,
+          notices: fresh.notices,
+          transactions: fresh.transactions,
+          audits: fresh.quarterlyAudits,
+          literatureItems: fresh.literatureItems,
+          literatureOrders: fresh.specialOrders,
+          literatureDistributions: fresh.groupDistributions,
+          literatureInventory: fresh.inventoryRecords,
         },
-        coordinatorPhotoURL: activeCoordPhoto,
-        congregationId: cleanId,
-        updatedAt: nowISO,
+        pinMaestro,
+        pinCongregacion,
+        forceUpload,
+        onDataUpdated: (merged) => {
+          hydrateAllFromData(merged);
+        },
       });
 
-      {
-        try {
-          const congDocRef = doc(db, 'congregations', targetCongId);
-          await setDoc(congDocRef, payload, { merge: true });
-          const unhyphenated = targetCongId.replace(/-/g, '');
-          if (unhyphenated !== targetCongId && unhyphenated.length >= 3) {
-            await setDoc(doc(db, 'congregations', unhyphenated), payload, { merge: true });
-          }
-        } catch (e: any) {
-          throw e;
+      const updatedTime = supabaseSyncService.getLastSyncTimestamp();
+      if (updatedTime) {
+        setLastSupabaseSyncAt(updatedTime);
+      }
+
+      if (!res.success) {
+        return {
+          success: false,
+          action: res.action,
+          message: res.error || 'Error al sincronizar con Supabase.',
+        };
+      }
+
+      let msg = 'Sincronización con Supabase completada.';
+      if (res.action === 'downloaded' || res.action === 'merged') {
+        msg = 'Se descargaron y combinaron las últimas novedades teocráticas desde Supabase.';
+      } else if (res.action === 'uploaded') {
+        msg = 'Tus datos locales cifrados con AES-256 se sincronizaron con éxito en Supabase.';
+      } else if (res.action === 'offline_queued') {
+        msg = 'Sin conexión. Los cambios quedaron en cola local para subirse al reconectar.';
+      } else if (res.action === 'up_to_date') {
+        msg = 'Tus datos ya están sincronizados y al día con Supabase.';
+      }
+
+      return { success: true, action: res.action, message: msg };
+    } catch (err: any) {
+      console.warn('Error en syncNowWithSupabase:', err);
+      return { success: false, message: err?.message || 'Error en sincronización con Supabase.' };
+    } finally {
+      setIsSupabaseSyncing(false);
+    }
+  };
+
+  // Sincronización continua en segundo plano y reconexión automática con Supabase
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleOnline = async () => {
+      const pinMaestro =
+        localStorage.getItem('kongre_session_pin_v2') ||
+        localStorage.getItem('kongre_coordinator_pin') ||
+        localStorage.getItem('kongre_registered_cong_pin') ||
+        localStorage.getItem('kongre_last_cong_pin') ||
+        '';
+      const pinCongregacion =
+        localStorage.getItem('kongre_registered_cong_pin') ||
+        localStorage.getItem('kongre_last_cong_pin') ||
+        pinMaestro;
+
+      if (pinMaestro) {
+        await supabaseSyncService.flushOfflineQueue(pinMaestro, pinCongregacion);
+        syncNowWithSupabase(false).catch(() => {});
+      }
+    };
+
+    window.addEventListener('online', handleOnline);
+
+    const intervalId = window.setInterval(() => {
+      if (typeof navigator !== 'undefined' && navigator.onLine) {
+        const congId = resolveCongregationDocId();
+        if (congId && congId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congId)) {
+          syncNowWithSupabase(false).catch(() => {});
         }
       }
+    }, 60000);
 
-      localStorage.removeItem('kongre_needs_cloud_upload');
-      localStorage.setItem('kongre_last_local_update', nowISO);
-      localStorage.setItem('kongre_is_registered_congregation', 'true');
-      setSyncStatus('synced');
-      return { success: true, message: '¡Datos de la congregación guardados y sincronizados en la nube con éxito!' };
-    } catch (err: any) {
-      if (isQuotaError(err)) {
-        await markFirestoreQuotaExceeded();
-        setSyncStatus('offline');
-        return {
-          success: false,
-          message: 'La cuota diaria gratuita de Google Cloud Firestore se ha completado por hoy. Todos tus cambios están 100% seguros y respaldados localmente en tu navegador.',
-        };
-      }
-      console.error('Error al subir a Firestore:', err);
-      setSyncStatus('error');
-      return { success: false, message: err?.message || 'Error al guardar en Firestore.' };
-    }
-  };
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
-  // Función explícita para descargar datos desde la congregación (por ID, sin requerir Google)
-  const downloadDataFromGoogle = async (): Promise<{ success: boolean; message: string }> => {
-    const targetCongId = resolveCongregationDocId();
-    if (!targetCongId || targetCongId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(targetCongId)) {
-      return { success: false, message: 'No hay un ID de congregación válido para restaurar los datos.' };
-    }
-    setSyncStatus('saving');
-    try {
-      const snap = await getDoc(doc(db, 'congregations', targetCongId));
-      if (!snap.exists()) {
-        setSyncStatus('synced');
-        return { success: false, message: 'No hay datos guardados en la nube para esta congregación.' };
-      }
-      const data = snap.data();
-      hydrateAllFromData(data);
-      setSyncStatus('synced');
-      return { success: true, message: '¡Datos de la congregación restaurados desde la nube con éxito!' };
-    } catch (err: any) {
-      if (isQuotaError(err)) {
-        await markFirestoreQuotaExceeded();
-        setSyncStatus('offline');
-        return {
-          success: false,
-          message: 'La cuota de Google Cloud Firestore se ha completado temporalmente. Se mantendrán tus datos locales actuales.',
-        };
-      }
-      console.error('Error al descargar de Firestore:', err);
-      setSyncStatus('error');
-      return { success: false, message: err?.message || 'Error al descargar datos de Firestore.' };
-    }
-  };
-
-  // Función para cargar los datos de una congregación existente desde Firestore (incluso sin Google Auth)
+  // Función para cargar los datos de una congregación existente desde Supabase
   const loadCongregationFromCloud = async (
     congId: string,
     options?: { skipHydrate?: boolean }
@@ -1954,99 +1832,48 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const rawClean = congId.trim().toUpperCase();
     if (!rawClean) return { success: false, message: 'ID de congregación no válido.' };
 
+    const pinMaestro =
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_session_pin_v2') ||
+          localStorage.getItem('kongre_coordinator_pin') ||
+          localStorage.getItem('kongre_registered_cong_pin') ||
+          localStorage.getItem('kongre_last_cong_pin')
+        : '') || '';
+
+    const pinCongregacion =
+      (typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_registered_cong_pin') ||
+          localStorage.getItem('kongre_last_cong_pin') ||
+          pinMaestro
+        : '') || pinMaestro;
+
     try {
-      const canonical = formatCanonicalCongregationId(rawClean);
-      const unhyphenated = canonical.replace(/-/g, '');
-
-      // 1. Probar primero con el ID canónico con guiones
-      let snap = await getDoc(doc(db, 'congregations', canonical));
-
-      // 2. Si no existe, probar con el sin guiones
-      if (!snap.exists()) {
-        snap = await getDoc(doc(db, 'congregations', unhyphenated));
-      }
-
-      // 3. Si aún no existe, probar con rawClean directamente
-      if (!snap.exists() && rawClean !== canonical && rawClean !== unhyphenated) {
-        snap = await getDoc(doc(db, 'congregations', rawClean));
-      }
-
-      if (!snap.exists()) {
-        return { success: false, message: 'No se encontraron datos en la nube para este ID de congregación.' };
-      }
-
-      let data = snap.data();
-
-      // Si este documento no tenía grupos de predicación pero el alias sí los tenía, rescatarlos
-      if (!data.preachingGroups || (Array.isArray(data.preachingGroups) && data.preachingGroups.length === 0)) {
-        try {
-          const altId = snap.id === canonical ? unhyphenated : canonical;
-          const altSnap = await getDoc(doc(db, 'congregations', altId));
-          if (altSnap.exists()) {
-            const altData = altSnap.data();
-            if (altData.preachingGroups && Array.isArray(altData.preachingGroups) && altData.preachingGroups.length > 0) {
-              data = { ...data, preachingGroups: altData.preachingGroups };
-              // Sincronizar el documento actual con los grupos del alias
-              setDoc(doc(db, 'congregations', snap.id), { preachingGroups: altData.preachingGroups }, { merge: true }).catch(() => {});
-            }
-          }
-        } catch {}
-      }
-
-      // Rescatar publicadores desde la subcolección modular de Firestore si el documento raíz no los tiene
-      if (!data.publishers || (Array.isArray(data.publishers) && data.publishers.length === 0)) {
-        try {
-          const pubSnap = await getDocs(collection(db, 'congregations', snap.id, 'publishers'));
-          if (!pubSnap.empty) {
-            const subPubs = pubSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-            if (subPubs.length > 0) {
-              data = { ...data, publishers: subPubs };
-            }
-          }
-        } catch (subErr) {
-          console.warn('Aviso cargando subcolección publishers:', subErr);
+      const res = await supabaseSyncService.fetchAndDecryptCongregation(rawClean, pinMaestro || pinCongregacion || '');
+      if (res.success && res.data) {
+        const data = res.data;
+        if (!options?.skipHydrate) {
+          hydrateAllFromData(data);
+          const effectiveId = data.congregationId || rawClean;
+          ensureCongregationIdPersisted(effectiveId);
+          setSyncStatus('synced');
         }
-      }
-
-      // Si se solicita skipHydrate, devolver los datos sin contaminar el estado local ni localStorage
-      if (options?.skipHydrate) {
         return {
           success: true,
           data,
-          congregationName: data.settings?.congregationName || 'Congregación',
-          message: '¡Datos de la congregación obtenidos exitosamente desde la nube!',
+          congregationName: data.settings?.congregationName || data.congregation_name || 'Congregación',
+          message: '¡Datos de la congregación cargados exitosamente desde Supabase!',
         };
       }
 
-      hydrateAllFromData(data);
-      const effectiveId = data.congregationId || rawClean;
-      ensureCongregationIdPersisted(effectiveId);
-
-      const downloadedPhoto = data.settings?.coordinatorPhotoURL || data.coordinatorPhotoURL || '';
-      if (downloadedPhoto) {
-        try {
-          localStorage.setItem('kongre_coordinator_photo', downloadedPhoto);
-          if (!localStorage.getItem('kongre_user_photo')) {
-            localStorage.setItem('kongre_user_photo', downloadedPhoto);
-          }
-        } catch {}
-      }
-
-      setSyncStatus('synced');
+      const fresh = getFreshLocalCongregationData();
       return {
         success: true,
-        data,
-        congregationName: data.settings?.congregationName || 'Congregación',
-        message: '¡Datos de la congregación cargados exitosamente desde la nube!',
+        data: fresh,
+        congregationName: fresh.settings?.congregationName || 'Congregación',
+        message: 'Datos de la congregación disponibles localmente.',
       };
     } catch (err: any) {
-      if (isQuotaError(err)) {
-        await markFirestoreQuotaExceeded();
-        setSyncStatus('offline');
-        return { success: false, message: 'La cuota de Google Cloud se ha completado temporalmente. Se conservan los datos locales.' };
-      }
-      console.error('Error cargando congregación desde la nube:', err);
-      return { success: false, message: err?.message || 'Error al conectar con la nube.' };
+      return { success: false, message: err?.message || 'Error al conectar con la nube de Supabase.' };
     }
   };
 
@@ -2070,20 +1897,16 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setSyncStatus('synced');
   };
 
-  const findUserCongregationId = async (email?: string, uid?: string): Promise<string | null> => {
+  const findUserCongregationId = async (_email?: string, _uid?: string): Promise<string | null> => {
     try {
-      if (uid) {
-        const userDocRef = doc(db, 'users', uid);
-        const userSnap = await getDoc(userDocRef);
-        if (userSnap.exists()) {
-          const uData = userSnap.data();
-          const cid = uData.congregationId || uData.congregationNumber;
-          if (cid) return formatCanonicalCongregationId(cid);
-        }
-      }
-    } catch (e) {
-      console.warn('Aviso buscando ID de congregación de usuario:', e);
-    }
+      const fromStorage =
+        (typeof window !== 'undefined'
+          ? localStorage.getItem('kongre_user_cong_id') ||
+            localStorage.getItem('kongre_congregation_number') ||
+            localStorage.getItem('kongre_congregation_id')
+          : null);
+      if (fromStorage) return formatCanonicalCongregationId(fromStorage);
+    } catch {}
     return null;
   };
 
@@ -2219,8 +2042,6 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       try {
         localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(updated));
       } catch {}
-      const safeId = resolveCongregationDocId();
-      if (safeId) savePublisherDoc(safeId, merged).catch(() => {});
       saveToFirestore(updated);
       return;
     }
@@ -2235,16 +2056,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(updated));
     } catch {}
-    const safeId = resolveCongregationDocId();
-    if (safeId) savePublisherDoc(safeId, newPub).catch(() => {});
     saveToFirestore(updated);
   };
 
   const updatePublisher = (pub: Publisher) => {
     const updated = publishers.map(p => (p.id === pub.id ? pub : p));
     setPublishers(updated);
-    const safeId = resolveCongregationDocId();
-    if (safeId) savePublisherDoc(safeId, pub).catch(() => {});
     saveToFirestore(updated);
   };
 
@@ -2450,11 +2267,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       } catch {}
     }
 
-    // 8. Sincronizar de inmediato a subcolección Firestore
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      ids.forEach((id) => deletePublisherDoc(safeCongId, id).catch(() => {}));
-    }
+
 
     await saveToFirestore(
       updatedPubs,
@@ -2554,10 +2367,6 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(currentPubs));
     } catch {}
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      savePublishersBatch(safeCongId, currentPubs).catch(() => {});
-    }
     saveToFirestore(currentPubs);
     return importedCount;
   };
@@ -2637,10 +2446,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       } catch {}
     }
 
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      saveWeekDoc(safeCongId, week).catch(() => {});
-    }
+
 
     saveToFirestore(
       publishers,
@@ -2695,10 +2501,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const updated = [...weeks, newWeek].sort((a, b) => a.weekStartDate.localeCompare(b.weekStartDate));
     setWeeks(updated);
     setCurrentWeekId(newWeek.id);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      saveWeekDoc(safeCongId, newWeek).catch(() => {});
-    }
+
     saveToFirestore(publishers, updated);
     return newWeek;
   };
@@ -2783,11 +2586,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     });
 
     setWeeks(updated);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      const target = updated.find(w => w.id === toWeekId);
-      if (target) saveWeekDoc(safeCongId, target).catch(() => {});
-    }
+
     saveToFirestore(publishers, updated);
   };
 
@@ -2806,11 +2605,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       currentPool = currentPool.map(item => (item.id === assigned.id ? assigned : item));
     });
     setWeeks(currentPool);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      const assignedWeeks = currentPool.filter(w => w.weekStartDate.startsWith(monthPrefix));
-      saveWeeksBatch(safeCongId, assignedWeeks).catch(() => {});
-    }
+
     saveToFirestore(publishers, currentPool);
   };
 
@@ -2895,11 +2690,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       } catch {}
     }
 
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      const cleared = updatedWeeks.find(w => w.id === weekId || w.weekStartDate === weekId);
-      if (cleared) saveWeekDoc(safeCongId, cleared).catch(() => {});
-    }
+
 
     await saveToFirestore(
       publishers,
@@ -3536,47 +3327,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_groups`, JSON.stringify(groups));
     } catch {}
 
-    const nowISO = new Date().toISOString();
-    const congDocId = resolveCongregationDocId();
-
-    if (congDocId && congDocId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId)) {
-      try {
-        const canonical = formatCanonicalCongregationId(congDocId);
-        const unhyphenated = canonical.replace(/-/g, '');
-        const sanitizedGroups = sanitizeForFirestore(groups);
-
-        const groupPayload = {
-          preachingGroups: sanitizedGroups,
-          updatedAt: nowISO,
-        };
-
-        const canonicalRef = doc(db, 'congregations', canonical);
-        await setDoc(canonicalRef, groupPayload, { merge: true });
-
-        if (unhyphenated !== canonical && unhyphenated.length >= 3) {
-          await setDoc(doc(db, 'congregations', unhyphenated), groupPayload, { merge: true });
-        }
-
-        // Notificar en tiempo real a otras pestañas
-        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-          try {
-            const bc = new BroadcastChannel('kongre_cross_tab_sync');
-            bc.postMessage({ type: 'CONGREGATION_UPDATED', congregationId: canonical, timestamp: nowISO });
-            bc.close();
-          } catch {}
-        }
-        setSyncStatus('synced');
-      } catch (err: any) {
-        if (isQuotaError(err)) {
-          await markFirestoreQuotaExceeded();
-          setSyncStatus('offline');
-        } else {
-          console.warn('Error guardando grupos de predicación en Firestore:', err);
-        }
-      }
-    }
-
-    // Sincronizar también con el pipeline de guardado general inmediato
+    // Sincronizar con el pipeline de guardado inmediato (local, BroadcastChannel y Supabase)
     await saveToFirestore(
       publishers,
       weeks,
@@ -3829,30 +3580,21 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [newNotice, ...notices];
     setNotices(updated);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      saveNoticeDoc(safeCongId, newNotice).catch(() => {});
-    }
+
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, updated);
   };
 
   const updateNotice = (notice: CongregationNotice) => {
     const updated = notices.map(n => (n.id === notice.id ? notice : n));
     setNotices(updated);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      saveNoticeDoc(safeCongId, notice).catch(() => {});
-    }
+
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, updated);
   };
 
   const deleteNotice = (id: string) => {
     const updated = notices.filter(n => n.id !== id);
     setNotices(updated);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      deleteNoticeDoc(safeCongId, id).catch(() => {});
-    }
+
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, updated);
   };
 
@@ -3886,30 +3628,21 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [...territories, newTerr];
     setTerritories(updated);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      saveTerritoryDoc(safeCongId, newTerr).catch(() => {});
-    }
+
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, updated);
   };
 
   const updateTerritory = (terr: Territory) => {
     const updated = territories.map(t => (t.id === terr.id ? terr : t));
     setTerritories(updated);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      saveTerritoryDoc(safeCongId, terr).catch(() => {});
-    }
+
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, updated);
   };
 
   const deleteTerritory = (id: string) => {
     const updated = territories.filter(t => t.id !== id);
     setTerritories(updated);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      deleteTerritoryDoc(safeCongId, id).catch(() => {});
-    }
+
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, updated);
   };
 
@@ -4119,40 +3852,28 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
     const updated = [newTx, ...transactions];
     setTransactions(updated);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      saveAccountsData(safeCongId, updated, quarterlyAudits).catch(() => {});
-    }
+
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, circuitVisit, updated);
   };
 
   const updateTransaction = (tx: AccountTransaction) => {
     const updated = transactions.map(t => (t.id === tx.id ? tx : t));
     setTransactions(updated);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      saveAccountsData(safeCongId, updated, quarterlyAudits).catch(() => {});
-    }
+
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, circuitVisit, updated);
   };
 
   const deleteTransaction = (id: string) => {
     const updated = transactions.filter(t => t.id !== id);
     setTransactions(updated);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      saveAccountsData(safeCongId, updated, quarterlyAudits).catch(() => {});
-    }
+
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, circuitVisit, updated);
   };
 
   const updateQuarterlyAudit = (audit: QuarterlyAudit) => {
     const updated = quarterlyAudits.map(a => (a.id === audit.id ? audit : a));
     setQuarterlyAudits(updated);
-    const safeCongId = resolveCongregationDocId();
-    if (safeCongId) {
-      saveAccountsData(safeCongId, transactions, updated).catch(() => {});
-    }
+
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, monthlyReports, territories, circuitVisit, transactions, updated);
   };
 
@@ -4997,15 +4718,11 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     ];
     keysToClear.forEach((k) => localStorage.removeItem(k));
 
-    // Eliminar el documento de la congregación de Firestore
+    // Eliminar el registro de la congregación de Supabase
     const targetCongId = settings.congregationNumber || settings.congregationId;
     if (targetCongId) {
-      const canonical = formatCanonicalCongregationId(targetCongId);
-      const unhyphenated = canonical.replace(/-/g, '');
-      deleteDoc(doc(db, 'congregations', canonical)).catch(() => {});
-      if (unhyphenated !== canonical) {
-        deleteDoc(doc(db, 'congregations', unhyphenated)).catch(() => {});
-      }
+      const cleanId = targetCongId.trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      supabase.from('sync_queue').delete().eq('id_congregacion', cleanId).then(() => {}, () => {});
     }
 
     // Limpieza total del almacenamiento local del navegador
@@ -5016,7 +4733,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   /**
-   * Elimina completamente todas las congregaciones registradas de Firestore y del almacenamiento local.
+   * Elimina completamente todas las congregaciones registradas de Supabase y del almacenamiento local.
    */
   const deleteAllRegisteredCongregations = async (): Promise<{ success: boolean; message: string }> => {
     try {
@@ -5047,40 +4764,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         } catch {}
       }
 
-      // Consultar documentos de congregaciones existentes en Firestore
-      if (!isFirestoreQuotaExceeded()) {
-        try {
-          const allCongsSnap = await getDocs(collection(db, 'congregations')).catch(() => null);
-          if (allCongsSnap && !allCongsSnap.empty) {
-            allCongsSnap.forEach(d => {
-              candidateIds.add(d.id);
-            });
-          }
-        } catch (e) {
-          console.warn('No se pudo listar todas las congregaciones de Firestore:', e);
-        }
-      }
-
-      // Eliminar documentos identificados en Firestore
+      // Eliminar registros de Supabase
       for (const rawId of Array.from(candidateIds)) {
         if (!rawId || rawId.trim().length === 0) continue;
-        const canonical = formatCanonicalCongregationId(rawId);
-        const unhyphenated = canonical.replace(/-/g, '');
-        const rawUpper = rawId.trim().toUpperCase();
-
-        await deleteDoc(doc(db, 'congregations', canonical)).catch(() => {});
-        if (unhyphenated !== canonical) {
-          await deleteDoc(doc(db, 'congregations', unhyphenated)).catch(() => {});
-        }
-        if (rawUpper !== canonical && rawUpper !== unhyphenated) {
-          await deleteDoc(doc(db, 'congregations', rawUpper)).catch(() => {});
-        }
-      }
-
-      // Limpiar perfil de usuario en Firestore si está autenticado
-      if (auth.currentUser?.uid) {
+        const cleanId = rawId.trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
         try {
-          await deleteDoc(doc(db, 'users', auth.currentUser.uid)).catch(() => {});
+          await supabase.from('sync_queue').delete().eq('id_congregacion', cleanId);
         } catch {}
       }
 
@@ -5153,18 +4842,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       assignRoleToEmail(finalEmail, 'coordinador', finalCoordName);
     }
 
-    if (!isFirestoreQuotaExceeded() && finalId && finalId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(finalId.toUpperCase())) {
-      try {
-        const congDocRef = doc(db, 'congregations', finalId.toUpperCase());
-        await setDoc(congDocRef, sanitizeForFirestore({ settings: newSettings, congregationId: finalId.toUpperCase(), updatedAt: new Date().toISOString() }), { merge: true });
-      } catch (err: any) {
-        if (isQuotaError(err)) {
-          await markFirestoreQuotaExceeded();
-        } else {
-          console.warn('Aviso guardando settings en Firestore:', err);
-        }
-      }
-    }
+    // Settings guardados localmente y sincronizados con Supabase
+    saveToFirestore();
   };
 
   // Account Link Requests
@@ -5339,41 +5018,28 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Fase 4: Métodos de Gestión y Diagnóstico de Sincronización Granular
   const checkGranularStatus = async (): Promise<GranularSyncStats> => {
-    const congId = resolveCongregationDocId();
-    if (!congId) {
-      const emptyStats: GranularSyncStats = {
-        publishersCount: publishers.length,
-        weeksCount: weeks.length,
-        territoriesCount: territories.length,
-        noticesCount: notices.length,
-        accountsExists: transactions.length > 0 || quarterlyAudits.length > 0,
-        literatureExists: literatureItems.length > 0,
-        isMigrated: true,
-        lastSyncAt: new Date().toISOString(),
-      };
-      setGranularSyncStats(emptyStats);
-      return emptyStats;
-    }
-    const stats = await checkSubcollectionsStatus(congId);
+    const stats: GranularSyncStats = {
+      publishersCount: publishers.length,
+      weeksCount: weeks.length,
+      territoriesCount: territories.length,
+      noticesCount: notices.length,
+      accountsExists: transactions.length > 0 || quarterlyAudits.length > 0,
+      literatureExists: literatureItems.length > 0,
+      isMigrated: true,
+      lastSyncAt: lastSupabaseSyncAt || new Date().toISOString(),
+    };
     setGranularSyncStats(stats);
     return stats;
   };
 
   const forceSubcollectionsMigration = async (): Promise<{ success: boolean; message: string }> => {
-    const congId = resolveCongregationDocId();
-    if (!congId) return { success: false, message: 'No hay un ID de congregación válido para migrar.' };
-    const fresh = getFreshLocalCongregationData();
-    const res = await migrateMonolithicToSubcollections(congId, fresh);
-    if (res.success) {
-      await checkGranularStatus();
-    }
+    const res = await syncNowWithSupabase(true);
+    await checkGranularStatus();
     return res;
   };
 
   const downloadFullBackup = async (): Promise<any> => {
-    const congId = resolveCongregationDocId();
-    if (!congId) return getFreshLocalCongregationData();
-    return await fetchFullGranularCongregationData(congId);
+    return getFreshLocalCongregationData();
   };
 
   return (
@@ -5536,6 +5202,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         checkGranularStatus,
         forceSubcollectionsMigration,
         downloadFullBackup,
+        lastSupabaseSyncAt,
+        isSupabaseSyncing,
+        syncNowWithSupabase,
       }}
     >
       {children}

@@ -7,10 +7,12 @@ import {
   TrendingUp,
   Download,
   CalendarDays,
-  Award
+  Award,
+  Lock
 } from 'lucide-react';
 
 import { useToast } from '../../../context/ToastContext';
+import { usePermissions } from '../../../context/AuthContext';
 
 interface S21RecordsSectionProps {
   formData: Publisher;
@@ -39,8 +41,7 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
   }));
 
   const { showToast } = useToast();
-
-
+  const { canEditS21 } = usePermissions();
 
   const chartData = currentRecords.map((record: any) => ({
     name: record.month.substring(0, 3).toUpperCase(),
@@ -50,6 +51,14 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10 max-w-4xl mx-auto w-full">
+      {!canEditS21 && (
+        <div className="flex items-center gap-2.5 p-3 text-xs font-medium text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl shadow-2xs">
+          <Lock size={15} className="shrink-0 text-amber-600 dark:text-amber-400" />
+          <span>
+            <strong>Modo solo lectura:</strong> Las tarjetas de registro S-21 solo pueden ser modificadas por el Secretario o el Coordinador.
+          </span>
+        </div>
+      )}
       
       {/* CONTENEDOR PRINCIPAL */}
       <div className="bg-white dark:bg-[#0f1623] p-4 md:p-6 rounded-[2rem] border border-zinc-100 dark:border-white/[0.04] shadow-sm">
@@ -119,8 +128,9 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
                     </td>
                     <td className="py-1.5 px-2">
                       <button 
+                        disabled={!canEditS21}
                         onClick={() => handleS21ChangeLocal(idx, 'participated', !record.participated)}
-                        className={`w-7 h-7 mx-auto rounded-lg border transition-all flex items-center justify-center ${record.participated ? 'bg-amber-500 border-transparent text-white shadow-sm shadow-amber-500/30' : 'bg-white dark:bg-zinc-800 border-zinc-200 dark:border-white/[0.08] hover:border-amber-300'}`}
+                        className={`w-7 h-7 mx-auto rounded-lg border transition-all flex items-center justify-center ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''} ${record.participated ? 'bg-amber-500 border-transparent text-white shadow-sm shadow-amber-500/30' : 'bg-white dark:bg-zinc-800 border-zinc-200 dark:border-white/[0.08] hover:border-amber-300'}`}
                       >
                         {record.participated && <Check size={14} strokeWidth={4} />}
                       </button>
@@ -129,17 +139,19 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
                       <div className="relative inline-block w-14">
                         <input 
                           type="number" 
+                          disabled={!canEditS21}
                           value={record.bible_studies || ''} 
                           onChange={e => handleS21ChangeLocal(idx, 'bible_studies', parseInt(e.target.value) || 0)}
-                          className={`w-full h-8 bg-white dark:bg-zinc-900 border rounded-lg text-center text-[12px] font-black focus:ring-0 outline-none transition-all ${record.bible_studies > 0 ? 'border-amber-500/30 text-amber-600 bg-amber-50/50 dark:bg-amber-900/20' : 'border-zinc-200/50 dark:border-white/[0.04] text-zinc-600 focus:border-amber-500/50'}`}
+                          className={`w-full h-8 bg-white dark:bg-zinc-900 border rounded-lg text-center text-[12px] font-black focus:ring-0 outline-none transition-all ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''} ${record.bible_studies > 0 ? 'border-amber-500/30 text-amber-600 bg-amber-50/50 dark:bg-amber-900/20' : 'border-zinc-200/50 dark:border-white/[0.04] text-zinc-600 focus:border-amber-500/50'}`}
                           placeholder="0"
                         />
                       </div>
                     </td>
                     <td className="py-1.5 px-2">
                       <button 
+                        disabled={!canEditS21}
                         onClick={() => handleS21ChangeLocal(idx, 'auxiliary_pioneer', !record.auxiliary_pioneer)}
-                        className={`w-7 h-7 mx-auto rounded-lg border transition-all flex items-center justify-center ${record.auxiliary_pioneer ? 'bg-[#10b981] border-transparent text-white shadow-sm shadow-[#10b981]/30' : 'bg-white dark:bg-zinc-800 border-zinc-200 dark:border-white/[0.08] hover:border-[#10b981]/40'}`}
+                        className={`w-7 h-7 mx-auto rounded-lg border transition-all flex items-center justify-center ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''} ${record.auxiliary_pioneer ? 'bg-[#10b981] border-transparent text-white shadow-sm shadow-[#10b981]/30' : 'bg-white dark:bg-zinc-800 border-zinc-200 dark:border-white/[0.08] hover:border-[#10b981]/40'}`}
                       >
                         {record.auxiliary_pioneer && <Award size={14} strokeWidth={4} />}
                       </button>
@@ -147,25 +159,28 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
                     <td className="py-1.5 px-2 text-center">
                       <input 
                         type="number" 
+                        disabled={!canEditS21}
                         value={record.hours || ''} 
                         onChange={e => handleS21ChangeLocal(idx, 'hours', parseInt(e.target.value) || 0)}
-                        className={`w-14 h-8 mx-auto bg-white dark:bg-zinc-900 border rounded-lg text-center text-[12px] font-black focus:ring-0 outline-none transition-all ${record.hours > 0 ? 'border-amber-500/30 text-amber-600 bg-amber-50/50 dark:bg-amber-900/20' : 'border-zinc-200/50 dark:border-white/[0.04] text-zinc-600 focus:border-amber-500/50'}`}
+                        className={`w-14 h-8 mx-auto bg-white dark:bg-zinc-900 border rounded-lg text-center text-[12px] font-black focus:ring-0 outline-none transition-all ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''} ${record.hours > 0 ? 'border-amber-500/30 text-amber-600 bg-amber-50/50 dark:bg-amber-900/20' : 'border-zinc-200/50 dark:border-white/[0.04] text-zinc-600 focus:border-amber-500/50'}`}
                         placeholder="0"
                       />
                     </td>
                     <td className="py-1.5 px-2 text-center">
                       <input 
                         type="number" 
+                        disabled={!canEditS21}
                         value={record.credit || ''} 
                         onChange={e => handleS21ChangeLocal(idx, 'credit', parseInt(e.target.value) || 0)}
-                        className={`w-14 h-8 mx-auto bg-white dark:bg-zinc-900 border rounded-lg text-center text-[12px] font-black focus:ring-0 outline-none transition-all ${record.credit > 0 ? 'border-blue-500/30 text-blue-600 bg-blue-50/50 dark:bg-blue-900/20' : 'border-zinc-200/50 dark:border-white/[0.04] text-zinc-600 focus:border-blue-500/50'}`}
+                        className={`w-14 h-8 mx-auto bg-white dark:bg-zinc-900 border rounded-lg text-center text-[12px] font-black focus:ring-0 outline-none transition-all ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''} ${record.credit > 0 ? 'border-blue-500/30 text-blue-600 bg-blue-50/50 dark:bg-blue-900/20' : 'border-zinc-200/50 dark:border-white/[0.04] text-zinc-600 focus:border-blue-500/50'}`}
                         placeholder="0"
                       />
                     </td>
                     <td className="py-1.5 px-2 text-center">
                       <button 
+                        disabled={!canEditS21}
                         onClick={() => handleS21ChangeLocal(idx, 'late', !record.late)}
-                        className={`w-7 h-7 mx-auto rounded-lg border transition-all flex items-center justify-center ${record.late ? 'bg-rose-500 border-transparent text-white shadow-sm shadow-rose-500/30' : 'bg-white dark:bg-zinc-800 border-zinc-200 dark:border-white/[0.08] hover:border-rose-300'}`}
+                        className={`w-7 h-7 mx-auto rounded-lg border transition-all flex items-center justify-center ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''} ${record.late ? 'bg-rose-500 border-transparent text-white shadow-sm shadow-rose-500/30' : 'bg-white dark:bg-zinc-800 border-zinc-200 dark:border-white/[0.08] hover:border-rose-300'}`}
                       >
                         {record.late && <Clock size={14} strokeWidth={4} />}
                       </button>
@@ -173,10 +188,11 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
                     <td className="py-1.5 px-3 rounded-r-xl">
                       <input 
                         type="text" 
+                        disabled={!canEditS21}
                         value={record.comments || ''} 
                         onChange={e => handleS21ChangeLocal(idx, 'comments', e.target.value)}
                         placeholder="Observaciones..."
-                        className="kf-input"
+                        className={`kf-input ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''}`}
                       />
                     </td>
                   </tr>

@@ -365,7 +365,13 @@ export const UserProfileSettingsView: React.FC = () => {
                 <span className="block font-bold">Almacenamiento Local</span>
                 <button
                   type="button"
-                  onClick={signInWithGoogle}
+                  onClick={async () => {
+                    try {
+                      await signInWithGoogle();
+                    } catch (err: any) {
+                      alert(err?.message || 'Error al conectar con Google');
+                    }
+                  }}
                   className="underline hover:text-amber-900 dark:hover:text-amber-100 cursor-pointer"
                 >
                   Conectar Google para Nube

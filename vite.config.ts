@@ -141,8 +141,8 @@ export default defineConfig(() => {
               if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
                 return 'vendor-react';
               }
-              if (id.includes('firebase')) {
-                return 'vendor-firebase';
+              if (id.includes('@supabase')) {
+                return 'vendor-supabase';
               }
               if (id.includes('jspdf') || id.includes('html2canvas') || id.includes('purify')) {
                 return 'vendor-pdf';

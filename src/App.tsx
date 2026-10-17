@@ -62,6 +62,7 @@ import { AccountLinkRequestsModal } from './components/AccountLinkRequestsModal'
 import { PendingApprovalView } from './components/PendingApprovalView';
 import { IdentityNamePrompt } from './components/IdentityNamePrompt';
 import { PublisherPinsModal } from './components/PublisherPinsModal';
+import { AuditLogModal } from './components/AuditLogModal';
 import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import { checkUpcomingAssignmentsAndNotify } from './services/notificationService';
@@ -80,11 +81,13 @@ const AppContent: React.FC = () => {
     setIdentifiedBrother,
     setIdentifiedPublisher,
     isCoordinator,
+    permissions,
   } = useAuth();
   const { showToast } = useToast();
   const canManageRoles = isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano';
   const [isLockPinSuggestionOpen, setIsLockPinSuggestionOpen] = useState(false);
   const [isPinsModalOpen, setIsPinsModalOpen] = useState(false);
+  const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
   const prevUserRef = useRef(user);
 
   const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
@@ -215,7 +218,7 @@ const AppContent: React.FC = () => {
     }
   }, [publishers, loadCongregationFromCloud]);
 
-  // Verificación de existencia real de la congregación en Firestore:
+  // Verificación de existencia real de la congregación en la nube (Supabase):
   // Si la congregación activa fue eliminada de la nube o no existe, restablecer el acceso a la pantalla de bienvenida
   useEffect(() => {
     const activeCongId = settings.congregationNumber || settings.congregationId || localStorage.getItem('kongre_congregation_number');
@@ -224,7 +227,7 @@ const AppContent: React.FC = () => {
         try {
           const res = await loadCongregationFromCloud(activeCongId, { skipHydrate: true });
           if (!res?.success || !res.data) {
-            // La congregación ya no existe en Firestore
+            // La congregación ya no existe en la nube
             localStorage.removeItem('kongre_has_entered_app');
             localStorage.removeItem('kongre_is_registered_congregation');
             localStorage.removeItem('kongre_congregation_number');
@@ -476,6 +479,7 @@ const AppContent: React.FC = () => {
         onOpenLinkRequestsModal={() => setIsLinkRequestsModalOpen(true)}
         onOpenWelcomeLanding={() => setShowWelcomeLanding(true)}
         onOpenPinsModal={() => setIsPinsModalOpen(true)}
+        onOpenAuditLog={() => setIsAuditLogOpen(true)}
       />
 
       <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200`}>
@@ -701,6 +705,14 @@ const AppContent: React.FC = () => {
         isOpen={isPinsModalOpen}
         onClose={() => setIsPinsModalOpen(false)}
       />
+
+      {/* Theocratic Audit Log Modal (Elders & Coordinators) */}
+      {permissions.canViewAuditLog && (
+        <AuditLogModal
+          isOpen={isAuditLogOpen}
+          onClose={() => setIsAuditLogOpen(false)}
+        />
+      )}
 
       {/* Modal para solicitar nombre e identidad si se inició con PIN sin nombre reconocido */}
       <IdentityNamePrompt />

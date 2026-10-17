@@ -1,7 +1,6 @@
-// src/components/OfflineSyncBanner.tsx
 import React from 'react';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
-import { WifiOff, Wifi, CloudCheck, CheckCircle2 } from 'lucide-react';
+import { WifiOff, Wifi, CloudCheck, ShieldCheck } from 'lucide-react';
 
 export const OfflineSyncBanner: React.FC = () => {
   const { isOnline, wasOffline } = useOnlineStatus();
@@ -20,11 +19,11 @@ export const OfflineSyncBanner: React.FC = () => {
             </div>
             <div className="min-w-0">
               <p className="text-xs font-bold text-white flex items-center gap-1.5">
-                <span>Modo Sin Conexión</span>
+                <span>Modo Local Offline</span>
                 <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
               </p>
               <p className="text-[11px] text-slate-300 truncate">
-                Puedes registrar asistencia y notas; se sincronizarán con la nube al reconectar.
+                Tus cambios están protegidos localmente y se cifrarán a Supabase al reconectar.
               </p>
             </div>
           </div>
@@ -43,10 +42,11 @@ export const OfflineSyncBanner: React.FC = () => {
         <div className="min-w-0">
           <p className="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
             <span>Conexión restablecida</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <CloudCheck className="w-3.5 h-3.5 text-emerald-400" />
           </p>
           <p className="text-[11px] text-emerald-100 truncate">
-            Sincronizando registros con la nube (Firestore)...
+            Sincronizando registros cifrados con Supabase (Cero Conocimiento AES-256)...
           </p>
         </div>
       </div>

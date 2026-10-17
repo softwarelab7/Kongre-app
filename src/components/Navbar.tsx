@@ -118,6 +118,7 @@ interface NavbarProps {
   onOpenLinkRequestsModal?: () => void;
   onOpenWelcomeLanding?: () => void;
   onOpenPinsModal?: () => void;
+  onOpenAuditLog?: () => void;
 }
 
 interface NavSubItem {
@@ -156,8 +157,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenLinkRequestsModal,
   onOpenWelcomeLanding,
   onOpenPinsModal,
+  onOpenAuditLog,
 }) => {
-  const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo, currentBrotherName, isCoordinator } = useAuth();
+  const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo, currentBrotherName, isCoordinator, permissions } = useAuth();
   const canManageRoles = !effectiveRoleInfo.isReadOnly && activeRole !== 'publico' && (isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano');
   const {
     settings,
@@ -1211,6 +1213,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                       >
                         <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                         <span>Directorio de Roles y PINs</span>
+                      </button>
+                    )}
+
+                    {permissions.canViewAuditLog && onOpenAuditLog && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          onOpenAuditLog();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-xl transition cursor-pointer text-left"
+                      >
+                        <ClipboardList className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                        <span>Registro de Auditoría</span>
                       </button>
                     )}
 

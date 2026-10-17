@@ -1,7 +1,5 @@
 // src/components/RegisterCongregationWizard.tsx
 import React, { useState } from 'react';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase/config';
 import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { useSecurity } from '../context/SecurityContext';
@@ -357,16 +355,10 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         registeredAt: new Date().toISOString(),
       });
 
-      // Si el usuario está autenticado con Google, vincular inmediatamente en /users/{uid}
+      // Si el usuario está autenticado, registrar la congregación en localStorage
       if (user && user.uid) {
         try {
-          await setDoc(doc(db, 'users', user.uid), {
-            congregationId: finalId,
-            congregationNumber: finalId,
-            congregationName: congregationName.trim(),
-            theocraticRole: 'coordinador',
-            updatedAt: new Date().toISOString(),
-          }, { merge: true });
+          localStorage.setItem('kongre_user_cong_id', finalId);
         } catch {}
       }
 

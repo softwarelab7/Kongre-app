@@ -436,7 +436,7 @@ export function isCongregationIdString(name?: string | null): boolean {
   // Formato UUID estándar (8-4-4-4-12 caracteres hexadecimales)
   if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clean)) return true;
 
-  // Identificadores de sistema Firebase / Cloud Run / AI Studio (e.g. ai-studio-kongre-... o ais-...)
+  // Identificadores de sistema Cloud / Cloud Run / AI Studio (e.g. ai-studio-kongre-... o ais-...)
   if (/^(ai-studio|ais-dev|ais-pre|applet)[0-9a-z_-]+/i.test(clean)) return true;
 
   // Código técnico KGR-... o CONG_... con números/códigos largos

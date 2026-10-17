@@ -1,13 +1,12 @@
 // src/components/JoinCongregationModal.tsx
 import React, { useState } from 'react';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase/config';
 import { useSecurity } from '../context/SecurityContext';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
 import { verifyPasscode, isCongregationIdString, isGenericIdentityName } from '../utils/theocraticSecurity';
 import { areNamesEquivalent } from '../utils/publisherDeduplication';
+import { supabaseSyncService } from '../services/supabaseSyncService';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -98,9 +97,23 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         return;
       }
 
-      // 1. Cargar datos actualizados de la congregación desde la nube en Firestore primero si existen (sin hidratar aún)
+      // 1. Cargar datos actualizados de la congregación desde Firestore o Supabase (sin hidratar aún)
       const cloudRes = await loadCongregationFromCloud(cleanId, { skipHydrate: true });
-      const effectiveSettings = cloudRes?.data?.settings || settings;
+      let cloudData = cloudRes?.data;
+
+      // Si no se encontró en Firestore, intentar descargar y descifrar desde Supabase con el PIN provisto
+      let isSupabaseDecrypted = false;
+      if (!cloudData) {
+        try {
+          const sbRes = await supabaseSyncService.fetchAndDecryptCongregation(cleanId, cleanCongPin);
+          if (sbRes.success && sbRes.data) {
+            cloudData = sbRes.data;
+            isSupabaseDecrypted = true;
+          }
+        } catch {}
+      }
+
+      const effectiveSettings = cloudData?.settings || settings;
       const expectedId = effectiveSettings.congregationNumber || effectiveSettings.congregationId;
       const customCode = effectiveSettings.customCode;
       const isIdMatch =
@@ -114,12 +127,14 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       }
 
       // Verificar PIN de la Congregación
-      const effectivePinHash = cloudRes?.data?.settings?.congregationPinHash || effectiveSettings.congregationPinHash;
-      let isCongPinValid = false;
-      if (effectivePinHash) {
-        isCongPinValid = await verifyPasscode(cleanCongPin, effectivePinHash);
-      } else {
-        isCongPinValid = await verifyCongregationPin(cleanCongPin);
+      const effectivePinHash = cloudData?.settings?.congregationPinHash || effectiveSettings.congregationPinHash;
+      let isCongPinValid = isSupabaseDecrypted;
+      if (!isCongPinValid) {
+        if (effectivePinHash) {
+          isCongPinValid = await verifyPasscode(cleanCongPin, effectivePinHash);
+        } else {
+          isCongPinValid = await verifyCongregationPin(cleanCongPin);
+        }
       }
 
       if (!isCongPinValid) {
@@ -133,7 +148,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       let finalBrotherName = '';
 
       // A) Buscar estrictamente en la lista de publicadores de la congregación por PIN personal
-      const congPubs = (cloudRes?.data?.publishers || publishers) as any[];
+      const congPubs = (cloudData?.publishers || publishers) as any[];
       const matchingPub = congPubs.find(
         (p) => p.personalPin && String(p.personalPin).trim().length >= 4 && String(p.personalPin).trim() === cleanPersonalPin
       );
@@ -173,7 +188,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       // Resolver nombre no genérico con prioridad
       if (!finalBrotherName || isGenericIdentityName(finalBrotherName)) {
         if (identifiedRole === 'coordinador') {
-          const cloudCoord = cloudRes?.data?.settings?.coordinatorName;
+          const cloudCoord = cloudData?.settings?.coordinatorName;
           const localCoord = settings.coordinatorName;
           const savedCoord = localStorage.getItem('kongre_coordinator_name');
           const googleName = user?.displayName;
@@ -207,14 +222,14 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
       if (isCoordinator || isPreRegisteredPublisher || isAlreadyApproved || !user?.email) {
         // Los 3 datos teocráticos son válidos y reconocidos
-        if (cloudRes?.data) {
-          hydrateCongregation(cloudRes.data);
+        if (cloudData) {
+          hydrateCongregation(cloudData);
         }
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
         localStorage.setItem('kongre_session_pin_v2', cleanPersonalPin);
         localStorage.removeItem('kongre_needs_cloud_upload');
-        localStorage.setItem('kongre_last_local_update', cloudRes?.data?.updatedAt || new Date().toISOString());
+        localStorage.setItem('kongre_last_local_update', cloudData?.updatedAt || new Date().toISOString());
 
         const cleanCongName =
           settings.congregationName && !isCongregationIdString(settings.congregationName)
@@ -242,16 +257,10 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
         updateSettings(newSettingsUpdate, { skipCloudWrite: true });
 
-        // Si hay una cuenta de Google conectada, vincular en Firestore en /users/{uid}
+        // Si hay una cuenta conectada, registrar la congregación en localStorage
         if (user && user.uid) {
           try {
-            setDoc(doc(db, 'users', user.uid), {
-              congregationId: cleanId,
-              congregationNumber: cleanId,
-              congregationName: cleanCongName,
-              theocraticRole: identifiedRole,
-              updatedAt: new Date().toISOString(),
-            }, { merge: true });
+            localStorage.setItem('kongre_user_cong_id', cleanId);
           } catch {}
         }
 

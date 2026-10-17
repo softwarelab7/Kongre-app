@@ -64,9 +64,10 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     removePublisherPin,
     generateUniquePublisherPin,
     isCoordinator,
+    permissions,
   } = useAuth();
 
-  const isAllowedAccess = isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano';
+  const isAllowedAccess = permissions.canManageAccess || isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano';
 
   useEffect(() => {
     if (isOpen && !isAllowedAccess) {

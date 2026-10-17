@@ -1,9 +1,26 @@
 // src/context/AuthContext.tsx
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
-import { User, onAuthStateChanged, signInWithPopup, signOut, updateProfile } from 'firebase/auth';
-import { doc, onSnapshot, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
-import { auth, googleProvider, db, isFirestoreQuotaExceeded, markFirestoreQuotaExceeded, isQuotaError } from '../firebase/config';
-import { TheocraticRole, TheocraticRoleInfo, THEOCRATIC_ROLES } from '../utils/rbac';
+import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
+import { supabase } from '../lib/supabase';
+import { supabaseSyncService } from '../services/supabaseSyncService';
+
+export interface User {
+  uid: string;
+  id?: string;
+  email?: string | null;
+  displayName?: string | null;
+  photoURL?: string | null;
+}
+import {
+  TheocraticRole,
+  TheocraticRoleInfo,
+  THEOCRATIC_ROLES,
+  Permission,
+  NO_PERMISSIONS,
+  ROLE_PERMISSIONS,
+  getPermissionsForRoles,
+  normalizeTheocraticRole,
+} from '../utils/rbac';
+import { insertAuditLog } from '../services/auditLogService';
 import { generateSecurePublisherPin, verifyPasscode, sanitizeForFirestore, isGenericIdentityName, formatCanonicalCongregationId } from '../utils/theocraticSecurity';
 import { UserProfile, PreferredContactMethod, ContactTimePreference } from '../types';
 
@@ -38,8 +55,12 @@ interface AuthContextType {
   signOutUser: () => Promise<void>;
   error: string | null;
   activeRole: TheocraticRole;
+  activeRoles: TheocraticRole[];
   effectiveRoleInfo: TheocraticRoleInfo;
+  permissions: Permission;
+  isAdmin: boolean;
   setActiveRole: (role: TheocraticRole) => void;
+  setActiveRoles: (roles: TheocraticRole[]) => void;
   currentBrotherName: string | null;
   setIdentifiedBrother: (name: string) => void;
   userRolesList: UserRoleRecord[];
@@ -47,7 +68,7 @@ interface AuthContextType {
   publisherPinsList: PublisherPinRecord[];
   currentPublisherId: string | null;
   setIdentifiedPublisher: (publisherId: string | null, name?: string) => void;
-  identifyRoleByPersonalPin: (pin: string) => Promise<{ success: boolean; role?: TheocraticRole; name?: string; publisherId?: string; message: string }>;
+  identifyRoleByPersonalPin: (pin: string) => Promise<{ success: boolean; role?: TheocraticRole; roles?: TheocraticRole[]; name?: string; publisherId?: string; message: string }>;
   assignPersonalPinToPublisher: (
     publisherId: string,
     pin: string,
@@ -64,10 +85,12 @@ interface AuthContextType {
   isCoordinator: boolean;
   userProfile: UserProfile | null;
   updateUserProfile: (data: Partial<UserProfile>) => Promise<{ success: boolean; error?: string }>;
+  logAction: (accion: string, modulo: string, detalles?: string) => Promise<void>;
 }
 
 const LOCAL_STORAGE_ROLES_KEY = 'kongre_user_roles_v1';
 const LOCAL_STORAGE_ACTIVE_ROLE_KEY = 'kongre_active_role_v1';
+const LOCAL_STORAGE_ACTIVE_ROLES_KEY = 'kongre_active_roles_v1';
 const LOCAL_STORAGE_ROLE_PINS_KEY = 'kongre_role_personal_pins_v2';
 const LOCAL_STORAGE_PUBLISHER_PINS_KEY = 'kongre_publisher_personal_pins_v4';
 const LOCAL_STORAGE_BROTHER_NAME_KEY = 'kongre_current_brother_name_v1';
@@ -79,11 +102,18 @@ const DEFAULT_ROLE_PINS: Record<TheocraticRole, RolePinAssignment> = {
   anciano: { role: 'anciano', pin: '', name: 'Anciano de Congregación' },
   secretario: { role: 'secretario', pin: '', name: 'Secretario' },
   superintendente_vym: { role: 'superintendente_vym', pin: '', name: 'Superintendente de VyM' },
+  superintendente_servicio: { role: 'superintendente_servicio', pin: '', name: 'Superintendente de Servicio' },
   siervo_territorios: { role: 'siervo_territorios', pin: '', name: 'Siervo de Territorios' },
+  siervo_carritos: { role: 'siervo_carritos', pin: '', name: 'Encargado de Carritos' },
   siervo_literatura: { role: 'siervo_literatura', pin: '', name: 'Siervo de Literatura' },
   siervo_cuentas: { role: 'siervo_cuentas', pin: '', name: 'Siervo de Cuentas' },
   siervo_discursos: { role: 'siervo_discursos', pin: '', name: 'Siervo de Discursos Públicos' },
-  publico: { role: 'publico', pin: '', name: 'Publicador / Auditorio' },
+  superintendente_grupo: { role: 'superintendente_grupo', pin: '', name: 'Superintendente de Grupo' },
+  encargado_mantenimiento: { role: 'encargado_mantenimiento', pin: '', name: 'Mantenimiento y Aseo' },
+  encargado_audiovideo: { role: 'encargado_audiovideo', pin: '', name: 'Audio y Video' },
+  encargado_acomodadores: { role: 'encargado_acomodadores', pin: '', name: 'Acomodadores' },
+  encargado_cartelera: { role: 'encargado_cartelera', pin: '', name: 'Cartelera / Anuncios' },
+  publico: { role: 'publico', pin: '', name: 'Publicador / Cartelera' },
 };
 
 // Default initial publisher pins: Los PINs son estrictamente ÚNICOS por cada publicador/hermano
@@ -98,8 +128,12 @@ const AuthContext = createContext<AuthContextType>({
   signOutUser: async () => {},
   error: null,
   activeRole: 'publico',
+  activeRoles: [],
   effectiveRoleInfo: THEOCRATIC_ROLES.publico,
+  permissions: NO_PERMISSIONS,
+  isAdmin: false,
   setActiveRole: () => {},
+  setActiveRoles: () => {},
   currentBrotherName: null,
   setIdentifiedBrother: () => {},
   userRolesList: [],
@@ -117,6 +151,7 @@ const AuthContext = createContext<AuthContextType>({
   isCoordinator: false,
   userProfile: null,
   updateUserProfile: async () => ({ success: true }),
+  logAction: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -290,6 +325,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem(LOCAL_STORAGE_ROLES_KEY, JSON.stringify(userRolesList));
   }, [userRolesList]);
 
+  // Active roles state (soporta asignación de múltiples roles teocráticos simultáneos)
+  const [activeRoles, setActiveRolesState] = useState<TheocraticRole[]>(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_ACTIVE_ROLES_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((r: any) => normalizeTheocraticRole(r));
+        }
+      }
+    } catch {}
+    return [];
+  });
+
   // Active role state
   const [activeRole, setActiveRoleState] = useState<TheocraticRole>(() => {
     try {
@@ -301,9 +350,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return 'publico';
   });
 
+  const setActiveRoles = (roles: TheocraticRole[]) => {
+    const normalized = roles.map((r) => normalizeTheocraticRole(r));
+    setActiveRolesState(normalized);
+    localStorage.setItem(LOCAL_STORAGE_ACTIVE_ROLES_KEY, JSON.stringify(normalized));
+    if (normalized.length > 0) {
+      setActiveRoleState(normalized[0]);
+      localStorage.setItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY, normalized[0]);
+    } else {
+      setActiveRoleState('publico');
+      localStorage.setItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY, 'publico');
+    }
+  };
+
   const setActiveRole = (role: TheocraticRole) => {
-    setActiveRoleState(role);
-    localStorage.setItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY, role);
+    const norm = normalizeTheocraticRole(role);
+    setActiveRoleState(norm);
+    localStorage.setItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY, norm);
+    setActiveRolesState([norm]);
+    localStorage.setItem(LOCAL_STORAGE_ACTIVE_ROLES_KEY, JSON.stringify([norm]));
   };
 
   /**
@@ -470,6 +535,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIdentifiedPublisher(foundPublisher.publisherId, brotherName);
       }
 
+      await insertAuditLog({
+        accion: 'login',
+        hermano_nid: foundPublisher.publisherId || 'personal',
+        hermano_nombre: brotherName,
+        modulo: 'auth',
+        detalles: `Inicio de sesión con PIN único (${THEOCRATIC_ROLES[foundPublisher.role]?.name || foundPublisher.role})`,
+      });
+
       return {
         success: true,
         role: foundPublisher.role,
@@ -496,6 +569,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('kongre_identified_brother', brotherName);
       }
       localStorage.setItem('kongre_session_pin_v2', cleanPin);
+
+      await insertAuditLog({
+        accion: 'login',
+        hermano_nid: foundUserEntry.email,
+        hermano_nombre: brotherName,
+        modulo: 'auth',
+        detalles: `Inicio de sesión con PIN de usuario (${THEOCRATIC_ROLES[foundUserEntry.role]?.name || foundUserEntry.role})`,
+      });
 
       return {
         success: true,
@@ -528,6 +609,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               setIdentifiedPublisher(matchPub.id, brotherName);
             }
             assignPersonalPinToPublisher(matchPub.id, cleanPin, role, brotherName, matchPub.email, matchPub.privilege);
+
+            await insertAuditLog({
+              accion: 'login',
+              hermano_nid: matchPub.id || 'publisher',
+              hermano_nombre: brotherName,
+              modulo: 'auth',
+              detalles: `Inicio de sesión detectado en datos locales (${THEOCRATIC_ROLES[role]?.name || role})`,
+            });
+
             return {
               success: true,
               role,
@@ -539,7 +629,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
 
-      // Check Firestore directly if not found locally
+      // Consultar en Supabase mediante descifrado si no se encuentra localmente
       const congId = (
         localStorage.getItem('kongre_congregation_number') ||
         localStorage.getItem('kongre_congregation_id') ||
@@ -547,43 +637,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ).trim().toUpperCase();
 
       if (congId && congId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congId)) {
-        const congSnap = await getDoc(doc(db, 'congregations', congId));
-        if (congSnap.exists()) {
-          const cloudData = congSnap.data();
-          const cloudPubs = cloudData.publishers;
-          if (Array.isArray(cloudPubs)) {
-            const matchPub = cloudPubs.find((p: any) => p.personalPin && String(p.personalPin).trim() === cleanPin);
-            if (matchPub) {
-              const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : matchPub.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
-              const brotherName =
-                matchPub.name && !isGenericIdentityName(matchPub.name)
-                  ? matchPub.name.trim()
-                  : resolveNonGenericName(matchPub.name, role) || 'Hermano';
-              setActiveRole(role);
-              if (!isGenericIdentityName(brotherName)) {
-                setCurrentBrotherName(brotherName);
-                localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
-                localStorage.setItem('kongre_identified_brother', brotherName);
+        try {
+          const cloudRes = await supabaseSyncService.fetchAndDecryptCongregation(congId, cleanPin);
+          if (cloudRes.success && cloudRes.data) {
+            const cloudPubs = cloudRes.data.publishers;
+            if (Array.isArray(cloudPubs)) {
+              const matchPub = cloudPubs.find((p: any) => p.personalPin && String(p.personalPin).trim() === cleanPin);
+              if (matchPub) {
+                const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : matchPub.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+                const brotherName =
+                  matchPub.name && !isGenericIdentityName(matchPub.name)
+                    ? matchPub.name.trim()
+                    : resolveNonGenericName(matchPub.name, role) || 'Hermano';
+                setActiveRole(role);
+                if (!isGenericIdentityName(brotherName)) {
+                  setCurrentBrotherName(brotherName);
+                  localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+                  localStorage.setItem('kongre_identified_brother', brotherName);
+                }
+                if (matchPub.id) {
+                  setIdentifiedPublisher(matchPub.id, brotherName);
+                }
+                assignPersonalPinToPublisher(matchPub.id, cleanPin, role, brotherName, matchPub.email, matchPub.privilege);
+                localStorage.setItem('kongre_is_registered_congregation', 'true');
+                localStorage.setItem('kongre_has_entered_app', 'true');
+
+                await insertAuditLog({
+                  accion: 'login',
+                  hermano_nid: matchPub.id || 'cloud-publisher',
+                  hermano_nombre: brotherName,
+                  modulo: 'auth',
+                  detalles: `Inicio de sesión sincronizado con Supabase (${THEOCRATIC_ROLES[role]?.name || role})`,
+                });
+
+                return {
+                  success: true,
+                  role,
+                  name: brotherName,
+                  publisherId: matchPub.id,
+                  message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[role]?.name || role}.`,
+                };
               }
-              if (matchPub.id) {
-                setIdentifiedPublisher(matchPub.id, brotherName);
-              }
-              assignPersonalPinToPublisher(matchPub.id, cleanPin, role, brotherName, matchPub.email, matchPub.privilege);
-              localStorage.setItem('kongre_is_registered_congregation', 'true');
-              localStorage.setItem('kongre_has_entered_app', 'true');
-              return {
-                success: true,
-                role,
-                name: brotherName,
-                publisherId: matchPub.id,
-                message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[role]?.name || role}.`,
-              };
             }
           }
+        } catch (searchErr) {
+          console.warn('Aviso buscando PIN en Supabase:', searchErr);
         }
       }
     } catch (searchErr) {
-      console.warn('Aviso buscando PIN en Firestore:', searchErr);
+      console.warn('Aviso en búsqueda de PIN:', searchErr);
     }
 
     // 4. Backward-compatibility: Check if PIN matches previously registered Coordinator App Lock PIN
@@ -600,6 +702,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, resolvedName);
             localStorage.setItem('kongre_identified_brother', resolvedName);
           }
+
+          await insertAuditLog({
+            accion: 'login',
+            hermano_nid: 'coordinador-pin',
+            hermano_nombre: resolvedName || 'Coordinador',
+            modulo: 'auth',
+            detalles: 'Acceso autorizado con PIN de bloqueo de Coordinador',
+          });
+
           return {
             success: true,
             role: 'coordinador',
@@ -619,24 +730,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-      if (currentUser) {
-        if (currentUser.photoURL) {
-          localStorage.setItem('kongre_google_photo', currentUser.photoURL);
-          localStorage.setItem('kongre_user_photo', currentUser.photoURL);
-          localStorage.setItem('kongre_coordinator_photo', currentUser.photoURL);
-        }
-        if (currentUser.displayName) {
-          localStorage.setItem('kongre_google_display_name', currentUser.displayName);
-        }
-        if (currentUser.email) {
-          localStorage.setItem('kongre_user_email', currentUser.email);
-        }
+    // 1. Obtener sesión actual de Supabase
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const u = session.user;
+        const mapped: User = {
+          uid: u.id,
+          id: u.id,
+          email: u.email || null,
+          displayName: u.user_metadata?.full_name || u.user_metadata?.name || (u.email ? u.email.split('@')[0] : null),
+          photoURL: u.user_metadata?.avatar_url || u.user_metadata?.picture || null,
+        };
+        setUser(mapped);
       }
-      if (currentUser?.email) {
-        const email = currentUser.email.toLowerCase().trim();
+      setLoading(false);
+    });
+
+    // 2. Escuchar cambios de estado en Supabase
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const currentUser = session?.user;
+      if (currentUser) {
+        const mappedUser: User = {
+          uid: currentUser.id,
+          id: currentUser.id,
+          email: currentUser.email || null,
+          displayName: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || (currentUser.email ? currentUser.email.split('@')[0] : null),
+          photoURL: currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || null,
+        };
+        setUser(mappedUser);
+        setLoading(false);
+        if (mappedUser.photoURL) {
+          localStorage.setItem('kongre_google_photo', mappedUser.photoURL);
+          localStorage.setItem('kongre_user_photo', mappedUser.photoURL);
+          localStorage.setItem('kongre_coordinator_photo', mappedUser.photoURL);
+        }
+        if (mappedUser.displayName) {
+          localStorage.setItem('kongre_google_display_name', mappedUser.displayName);
+        }
+        if (mappedUser.email) {
+          localStorage.setItem('kongre_user_email', mappedUser.email);
+        }
+
+        const email = (mappedUser.email || '').toLowerCase().trim();
         const found = userRolesList.find((r) => r.email.toLowerCase().trim() === email);
         const registeredCoordEmail = (
           localStorage.getItem('kongre_coordinator_email') || ''
@@ -646,22 +781,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setActiveRole(found.role);
           if (found.name) setCurrentBrotherName(found.name);
         } else if (registeredCoordEmail && email === registeredCoordEmail) {
-          // Automatic recognition only if this email was explicitly registered as the congregation coordinator
           setActiveRole('coordinador');
           const savedCoord = localStorage.getItem('kongre_coordinator_name');
-          const broName = savedCoord || currentUser.displayName || 'Coordinador';
+          const broName = savedCoord || mappedUser.displayName || 'Coordinador';
           setCurrentBrotherName(broName);
         } else {
           setActiveRole('publico');
         }
       } else {
+        setUser(null);
+        setLoading(false);
         setActiveRole('publico');
       }
     });
-    return () => unsubscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [userRolesList]);
 
-  // Firestore Sync: Escuchar y cargar el documento de perfil del usuario en /users/{userId}
+  // Cargar el documento de perfil del usuario desde almacenamiento local y caché
   useEffect(() => {
     if (!user) {
       try {
@@ -706,91 +845,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    if (isFirestoreQuotaExceeded()) {
-      return;
+    const fallbackPhoto = user.photoURL || localStorage.getItem('kongre_google_photo') || localStorage.getItem('kongre_user_photo') || '';
+    const cached = localStorage.getItem(`kongre_user_profile_${user.uid}`) || localStorage.getItem('kongre_user_profile_active');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (!parsed.photoURL && fallbackPhoto) parsed.photoURL = fallbackPhoto;
+        setUserProfile(parsed);
+        return;
+      } catch {}
     }
 
-    const userDocRef = doc(db, 'users', user.uid);
-    const unsubscribeProfile = onSnapshot(
-      userDocRef,
-      (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          const effectivePhoto =
-            data.photoURL ||
-            user.photoURL ||
-            localStorage.getItem('kongre_google_photo') ||
-            localStorage.getItem('kongre_user_photo') ||
-            '';
-
-          const loaded: UserProfile = {
-            uid: user.uid,
-            email: data.email || user.email || '',
-            displayName: data.displayName || user.displayName || (currentBrotherName || 'Hno. ' + (user.email ? user.email.split('@')[0] : 'Usuario')),
-            photoURL: effectivePhoto,
-            phone: data.phone || '',
-            secondaryEmail: data.secondaryEmail || '',
-            preferredContactMethod: data.preferredContactMethod || 'whatsapp',
-            contactTimePreference: data.contactTimePreference || 'anytime',
-            notificationsEnabled: data.notificationsEnabled ?? true,
-            notes: data.notes || '',
-            congregationId: data.congregationId || data.congregationNumber || '',
-            congregationNumber: data.congregationNumber || data.congregationId || '',
-            congregationName: data.congregationName || '',
-            updatedAt: data.updatedAt || new Date().toISOString(),
-          };
-          setUserProfile(loaded);
-          localStorage.setItem('kongre_user_profile_active', JSON.stringify(loaded));
-          localStorage.setItem(`kongre_user_profile_${user.uid}`, JSON.stringify(loaded));
-          if (data.congregationId || data.congregationNumber) {
-            const cleanCId = formatCanonicalCongregationId(data.congregationId || data.congregationNumber);
-            if (cleanCId && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(cleanCId)) {
-              localStorage.setItem('kongre_congregation_number', cleanCId);
-              localStorage.setItem('kongre_congregation_id', cleanCId);
-            }
-          }
-          if (effectivePhoto) {
-            localStorage.setItem('kongre_user_photo', effectivePhoto);
-            localStorage.setItem('kongre_coordinator_photo', effectivePhoto);
-          }
-          if (loaded.displayName) {
-            setCurrentBrotherName(loaded.displayName);
-            localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, loaded.displayName);
-          }
-        } else {
-          // Si el documento en Firestore no existe todavía, crear objeto inicial predeterminado
-          const fallbackPhoto = user.photoURL || localStorage.getItem('kongre_google_photo') || localStorage.getItem('kongre_user_photo') || '';
-          const initial: UserProfile = {
-            uid: user.uid,
-            email: user.email || '',
-            displayName: user.displayName || currentBrotherName || (user.email ? 'Hno. ' + user.email.split('@')[0] : 'Usuario'),
-            photoURL: fallbackPhoto,
-            phone: '',
-            secondaryEmail: '',
-            preferredContactMethod: 'whatsapp',
-            contactTimePreference: 'anytime',
-            notificationsEnabled: true,
-            notes: '',
-            updatedAt: new Date().toISOString(),
-          };
-          setUserProfile(initial);
-          localStorage.setItem('kongre_user_profile_active', JSON.stringify(initial));
-          if (fallbackPhoto) {
-            localStorage.setItem('kongre_user_photo', fallbackPhoto);
-            localStorage.setItem('kongre_coordinator_photo', fallbackPhoto);
-          }
-        }
-      },
-      (err) => {
-        if (isQuotaError(err)) {
-          markFirestoreQuotaExceeded();
-        } else {
-          console.warn('Aviso de sincronización de perfil Firestore:', err);
-        }
-      }
-    );
-
-    return () => unsubscribeProfile();
+    const initial: UserProfile = {
+      uid: user.uid,
+      email: user.email || '',
+      displayName: user.displayName || currentBrotherName || (user.email ? 'Hno. ' + user.email.split('@')[0] : 'Usuario'),
+      photoURL: fallbackPhoto,
+      phone: '',
+      secondaryEmail: '',
+      preferredContactMethod: 'whatsapp',
+      contactTimePreference: 'anytime',
+      notificationsEnabled: true,
+      notes: '',
+      updatedAt: new Date().toISOString(),
+    };
+    setUserProfile(initial);
+    localStorage.setItem('kongre_user_profile_active', JSON.stringify(initial));
+    localStorage.setItem(`kongre_user_profile_${user.uid}`, JSON.stringify(initial));
   }, [user]);
 
   /**
@@ -821,30 +902,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: now,
       };
 
-      // 1. Guardar en Firestore en el documento /users/{userId} si cuota disponible
+      // Guardar en almacenamiento local
       if (user && user.uid) {
-        if (!isFirestoreQuotaExceeded()) {
-          try {
-            const userDocRef = doc(db, 'users', user.uid);
-            await setDoc(userDocRef, sanitizeForFirestore(merged), { merge: true });
-          } catch (firestoreErr) {
-            if (isQuotaError(firestoreErr)) {
-              await markFirestoreQuotaExceeded();
-            } else {
-              console.warn('Aviso al guardar perfil en Firestore:', firestoreErr);
-            }
-          }
-        }
-
-        // Actualizar datos del objeto nativo de Firebase Auth si es posible
-        try {
-          await updateProfile(user, {
-            displayName: merged.displayName || undefined,
-            photoURL: merged.photoURL || undefined,
-          });
-        } catch (authErr) {
-          console.warn('Aviso al actualizar perfil en Auth:', authErr);
-        }
+        localStorage.setItem(`kongre_user_profile_${user.uid}`, JSON.stringify(merged));
       }
 
       // 2. Persistir localmente en memoria y almacenamiento local
@@ -872,33 +932,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithGoogle = async (): Promise<User | null> => {
     setError(null);
     try {
-      const res = await signInWithPopup(auth, googleProvider);
-      if (res?.user) {
-        setUser(res.user);
-        return res.user;
-      }
-      return auth.currentUser;
-    } catch (err: any) {
-      if (
-        err?.code === 'auth/popup-closed-by-user' ||
-        err?.code === 'auth/cancelled-popup-request'
-      ) {
-        return null;
-      }
-      if (err?.code === 'auth/popup-blocked') {
-        setError('El navegador bloqueó la ventana emergente. Por favor, habilite las ventanas emergentes para iniciar sesión con Google.');
-        return null;
-      }
-      console.warn('Google sign-in status:', err?.code, err?.message);
-      setError(err?.message || 'Error al iniciar sesión con Google.');
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+        },
+      });
+      if (error) throw error;
       return null;
+    } catch (err: any) {
+      const errorMsg = err?.message || 'Error al iniciar sesión con Google mediante Supabase.';
+      console.warn('Google sign-in error:', err);
+      setError(errorMsg);
+      throw new Error(errorMsg);
     }
   };
 
   const signOutUser = async () => {
     try {
-      await signOut(auth);
+      if (currentBrotherName || currentPublisherId || user) {
+        await insertAuditLog({
+          accion: 'logout',
+          hermano_nid: currentPublisherId || user?.uid || 'anonimo',
+          hermano_nombre: currentBrotherName || user?.displayName || undefined,
+          modulo: 'auth',
+          detalles: `Cierre de sesión de ${currentBrotherName || 'usuario'}`,
+        });
+      }
+      await supabase.auth.signOut();
+      setUser(null);
       setActiveRole('publico');
+      setActiveRolesState([]);
       setCurrentBrotherName(null);
       setIdentifiedPublisher(null);
       setUserProfile(null);
@@ -909,6 +973,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('kongre_user_profile_guest');
       localStorage.removeItem('kongre_has_entered_app');
       localStorage.removeItem('kongre_active_role_v1');
+      localStorage.removeItem(LOCAL_STORAGE_ACTIVE_ROLES_KEY);
     } catch (err: any) {
       console.error('Error signing out:', err);
       setError(err?.message || 'Error al cerrar sesión.');
@@ -946,8 +1011,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserRolesList((prev) => prev.filter((r) => r.email.toLowerCase() !== cleanEmail));
   };
 
+  const effectiveRolesList = useMemo(() => {
+    return activeRoles.length > 0 ? activeRoles : [activeRole];
+  }, [activeRoles, activeRole]);
+
   const effectiveRoleInfo = THEOCRATIC_ROLES[activeRole] || THEOCRATIC_ROLES.publico;
-  const isCoordinator = activeRole === 'coordinador';
+
+  const permissions = useMemo(() => {
+    return getPermissionsForRoles(effectiveRolesList);
+  }, [effectiveRolesList]);
+
+  const isAdmin = useMemo(() => {
+    return (
+      activeRole === 'coordinador' ||
+      activeRoles.includes('coordinador') ||
+      (userProfile as any)?.role === 'admin'
+    );
+  }, [activeRole, activeRoles, userProfile]);
+
+  const isCoordinator = activeRole === 'coordinador' || activeRoles.includes('coordinador');
+
+  const logAction = useCallback(
+    async (accion: string, modulo: string, detalles?: string) => {
+      try {
+        await insertAuditLog({
+          accion,
+          hermano_nid: currentPublisherId || user?.uid || 'anonimo',
+          hermano_nombre: currentBrotherName || user?.displayName || undefined,
+          modulo,
+          detalles,
+        });
+      } catch (err) {
+        console.warn('Aviso en logAction:', err);
+      }
+    },
+    [currentPublisherId, user, currentBrotherName]
+  );
 
   return (
     <AuthContext.Provider
@@ -958,8 +1057,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signOutUser,
         error,
         activeRole,
+        activeRoles,
         effectiveRoleInfo,
+        permissions,
+        isAdmin,
         setActiveRole,
+        setActiveRoles,
         currentBrotherName,
         setIdentifiedBrother,
         userRolesList,
@@ -977,6 +1080,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isCoordinator,
         userProfile,
         updateUserProfile,
+        logAction,
       }}
     >
       {children}
@@ -986,15 +1090,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => useContext(AuthContext);
 
-export const usePermissions = () => {
-  const { effectiveRoleInfo } = useAuth();
-  return {
-    canEditPublishers: effectiveRoleInfo?.canEditPublishers ?? false,
-    canViewS21: effectiveRoleInfo?.canViewS21 ?? false,
-    canEditS21: effectiveRoleInfo?.canEditS21 ?? false,
-    canEditSchedule: effectiveRoleInfo?.canEditSchedule ?? false,
-    canManageTerritories: effectiveRoleInfo?.canManageTerritories ?? false,
-    canManageLiterature: effectiveRoleInfo?.canManageLiterature ?? false,
-    canManageAccounts: effectiveRoleInfo?.canManageAccounts ?? false,
-  };
+export const usePermissions = (): Permission => {
+  const { permissions } = useAuth();
+  return permissions;
 };

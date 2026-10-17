@@ -67,6 +67,8 @@ import {
   isGeminiConfigured,
 } from '../services/geminiService';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
+import { Select } from './Select';
+import { IosTimePicker } from './IosTimePicker';
 
 export type SettingsCategoryTab =
   | 'all'
@@ -1417,74 +1419,78 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile })
                 </div>
 
                 {/* Reunión Entre Semana */}
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-3">
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5">
                       Día Entre Semana
                     </label>
-                    <select
+                    <Select
                       value={midDay}
-                      onChange={(e) => {
-                        setMidDay(e.target.value);
+                      onChange={(val) => {
+                        setMidDay(val);
                         userHasEditedRef.current = true;
                       }}
-                      className="w-full p-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
-                    >
-                      <option value="Lunes">Lunes</option>
-                      <option value="Martes">Martes</option>
-                      <option value="Miércoles">Miércoles</option>
-                      <option value="Jueves">Jueves</option>
-                      <option value="Viernes">Viernes</option>
-                    </select>
+                      options={[
+                        { value: 'Lunes', label: 'Lunes' },
+                        { value: 'Martes', label: 'Martes' },
+                        { value: 'Miércoles', label: 'Miércoles' },
+                        { value: 'Jueves', label: 'Jueves' },
+                        { value: 'Viernes', label: 'Viernes' },
+                      ]}
+                      placeholder="Selecciona un día..."
+                    />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5">
                       Hora de Inicio
                     </label>
-                    <input
-                      type="time"
+                    <IosTimePicker
                       value={midTime}
-                      onChange={(e) => {
-                        setMidTime(e.target.value);
+                      onChange={(val) => {
+                        setMidTime(val);
                         userHasEditedRef.current = true;
                       }}
-                      className="w-full p-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
+                      placeholder="Hora (ej. 19:00)"
+                      accentColor="indigo"
+                      presets={['18:30', '19:00', '19:30', '20:00']}
                     />
                   </div>
                 </div>
 
                 {/* Reunión Fin de Semana */}
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-2 gap-3">
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5">
                       Día Fin de Semana
                     </label>
-                    <select
+                    <Select
                       value={fdsDay}
-                      onChange={(e) => {
-                        setFdsDay(e.target.value);
+                      onChange={(val) => {
+                        setFdsDay(val);
                         userHasEditedRef.current = true;
                       }}
-                      className="w-full p-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
-                    >
-                      <option value="Sábado">Sábado</option>
-                      <option value="Domingo">Domingo</option>
-                    </select>
+                      options={[
+                        { value: 'Sábado', label: 'Sábado' },
+                        { value: 'Domingo', label: 'Domingo' },
+                      ]}
+                      placeholder="Selecciona un día..."
+                    />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1.5">
                       Hora de Inicio
                     </label>
-                    <input
-                      type="time"
+                    <IosTimePicker
                       value={fdsTime}
-                      onChange={(e) => {
-                        setFdsTime(e.target.value);
+                      onChange={(val) => {
+                        setFdsTime(val);
                         userHasEditedRef.current = true;
                       }}
-                      className="w-full p-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-medium"
+                      placeholder="Hora (ej. 10:00)"
+                      accentColor="emerald"
+                      presets={['09:00', '09:30', '10:00', '16:00', '17:00']}
                     />
                   </div>
                 </div>

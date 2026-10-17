@@ -34,6 +34,7 @@ import {
   Tv,
   Menu,
   X,
+  ChevronLeft,
   ChevronRight,
   ChevronDown,
   Award,
@@ -978,6 +979,28 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Logo variant="isotipo" className="w-7 h-7 object-contain" />
               </button>
             )}
+
+            {/* Browser Back / Forward Controls */}
+            <div className="flex items-center gap-0.5 shrink-0">
+              <button
+                type="button"
+                onClick={() => window.history.back()}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                title="Atrás (Navegador)"
+                aria-label="Atrás"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => window.history.forward()}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                title="Adelante (Navegador)"
+                aria-label="Adelante"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
 
             {/* Congregation title & breadcrumb navigation */}
             <div className="truncate">

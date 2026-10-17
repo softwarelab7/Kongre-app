@@ -81,6 +81,7 @@ export interface PublisherRoles {
 
 export interface Publisher {
   id: string;
+  publisherCode?: string; // ID Único de Publicador (ej. 'PUB-01')
   name: string;
   gender: Gender;
   phone: string;

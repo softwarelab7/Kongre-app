@@ -1,5 +1,4 @@
-// src/components/CongregationWelcomeLanding.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSecurity } from '../context/SecurityContext';
 import { useCongregation } from '../context/CongregationContext';
@@ -85,7 +84,44 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   } = useCongregation();
   const { isDark, toggleTheme } = useTheme();
 
-  const [activeTab, setActiveTab] = useState<'home' | 'email_login' | 'code_login' | 'register' | 'unauthorized'>('home');
+  const [activeTab, setRawActiveTab] = useState<'home' | 'email_login' | 'code_login' | 'register' | 'unauthorized'>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      const params = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+      const v = params.get('view') as any;
+      if (['home', 'email_login', 'code_login', 'register', 'unauthorized'].includes(v)) {
+        return v;
+      }
+    }
+    return 'home';
+  });
+
+  const setActiveTab = useCallback((nextTabOrFn: any) => {
+    setRawActiveTab((prev: any) => {
+      const nextTab = typeof nextTabOrFn === 'function' ? nextTabOrFn(prev) : nextTabOrFn;
+      if (nextTab === prev) return prev;
+      const hash = nextTab === 'home' ? '#portal' : `#portal?view=${nextTab}`;
+      window.history.pushState({ landing: true, view: nextTab }, '', hash);
+      return nextTab;
+    });
+  }, []);
+
+  useEffect(() => {
+    const onPop = (e: PopStateEvent) => {
+      const hash = window.location.hash;
+      if (hash.startsWith('#portal') || hash.startsWith('#bienvenida')) {
+        const params = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+        const v = (params.get('view') || e.state?.view || 'home') as any;
+        if (['home', 'email_login', 'code_login', 'register', 'unauthorized'].includes(v)) {
+          setRawActiveTab(v);
+        } else {
+          setRawActiveTab('home');
+        }
+      }
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
   const [pendingApprovalEmail, setPendingApprovalEmail] = useState<string | null>(null);
   const [unauthorizedGoogleAccount, setUnauthorizedGoogleAccount] = useState<{
     email: string;

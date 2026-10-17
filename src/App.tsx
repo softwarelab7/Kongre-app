@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { CongregationProvider, useCongregation } from './context/CongregationContext';
@@ -69,6 +69,57 @@ import { checkUpcomingAssignmentsAndNotify } from './services/notificationServic
 import { ToastProvider, useToast } from './context/ToastContext';
 import { ModalProvider } from './context/ModalContext';
 
+export const VALID_TABS_MAP: Record<string, ActiveTab> = {
+  inicio: 'inicio',
+  calendario: 'calendario',
+  programacion: 'programacion',
+  clm_vmc: 'clm_vmc',
+  clm: 'clm_vmc',
+  vmc: 'clm_vmc',
+  s89: 's89',
+  's-89': 's89',
+  publicadores: 'publicadores',
+  precursores_auxiliares: 'precursores_auxiliares',
+  precursores: 'precursores_auxiliares',
+  grupos_servicio: 'grupos_servicio',
+  grupos: 'grupos_servicio',
+  territorios: 'territorios',
+  visita_sc: 'visita_sc',
+  memorial_asambleas: 'memorial_asambleas',
+  discursos: 'discursos',
+  hospitalidad: 'hospitalidad',
+  carritos: 'carritos',
+  asistencia: 'asistencia',
+  informe_s1: 'informe_s1',
+  informes_servicio: 'informes_servicio',
+  tarjetas_s21: 'tarjetas_s21',
+  cuentas: 'cuentas',
+  literatura: 'literatura',
+  limpieza_deberes: 'limpieza_deberes',
+  panel_electrico: 'panel_electrico',
+  mantenimiento: 'mantenimiento',
+  tablero_anuncios: 'tablero_anuncios',
+  conflictos: 'conflictos',
+  equidad: 'equidad',
+  exportar_pdf: 'exportar_pdf',
+  mi_vista: 'mi_vista',
+  perfil: 'perfil',
+  ajustes: 'ajustes',
+};
+
+export function parseAppHash(hashString: string) {
+  const clean = (hashString || '').replace(/^#\/?/, '').trim();
+  if (!clean) return null;
+  const [routePart, queryPart] = clean.split('?');
+  const normalizedRoute = routePart.toLowerCase().trim();
+  const searchParams = new URLSearchParams(queryPart || '');
+  const tab = VALID_TABS_MAP[normalizedRoute] || null;
+  const modal = searchParams.get('modal') || null;
+  const semana = searchParams.get('semana') || null;
+  const isLanding = normalizedRoute === 'portal' || normalizedRoute === 'bienvenida';
+  return { tab, modal, semana, isLanding };
+}
+
 const AppContent: React.FC = () => {
   const {
     user,
@@ -90,10 +141,13 @@ const AppContent: React.FC = () => {
   const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
   const prevUserRef = useRef(user);
 
-  const [activeTab, setActiveTab] = useState<ActiveTab>(() => {
-    // If scanning QR code with ?modo=tablero, open personal view directly
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('modo') === 'tablero') return 'mi_vista';
+  const [activeTab, setRawActiveTab] = useState<ActiveTab>(() => {
+    if (typeof window !== 'undefined') {
+      const parsed = parseAppHash(window.location.hash);
+      if (parsed?.tab) return parsed.tab;
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('modo') === 'tablero') return 'mi_vista';
+    }
     return 'inicio';
   });
 
@@ -128,8 +182,14 @@ const AppContent: React.FC = () => {
     return !!urlParams.get('invite');
   });
   const [isInviteManagerOpen, setIsInviteManagerOpen] = useState(false);
+  const [isRegisterWizardOpen, setIsRegisterWizardOpen] = useState(false);
+  const [isLinkRequestsModalOpen, setIsLinkRequestsModalOpen] = useState(false);
   const [showWelcomeLanding, setShowWelcomeLanding] = useState<boolean>(() => {
     const urlParams = new URLSearchParams(window.location.search);
+    const hashInfo = typeof window !== 'undefined' ? parseAppHash(window.location.hash) : null;
+    if (hashInfo?.isLanding) {
+      return true;
+    }
     if (
       urlParams.get('portal') === '1' ||
       urlParams.get('inicio') === '1' ||
@@ -154,18 +214,198 @@ const AppContent: React.FC = () => {
     loadCongregationFromCloud,
   } = useCongregation();
 
+  // Navigation with browser History (Back / Forward button support)
+  const setActiveTab = useCallback(
+    (
+      targetTabOrFn: ActiveTab | ((prev: ActiveTab) => ActiveTab),
+      options?: { replace?: boolean; weekId?: string; modal?: string | null }
+    ) => {
+      setRawActiveTab((prevTab) => {
+        const nextTab = typeof targetTabOrFn === 'function' ? targetTabOrFn(prevTab) : targetTabOrFn;
+        const currentModal = options?.modal !== undefined ? options.modal : null;
+        const currentWeekId = options?.weekId || null;
+
+        let newHash = `#${nextTab}`;
+        const params = new URLSearchParams();
+        if (currentWeekId) params.set('semana', currentWeekId);
+        if (currentModal) params.set('modal', currentModal);
+        const q = params.toString();
+        if (q) newHash += `?${q}`;
+
+        const newState = {
+          tab: nextTab,
+          modal: currentModal,
+          weekId: currentWeekId,
+          landing: false,
+        };
+
+        if (options?.replace) {
+          window.history.replaceState(newState, '', newHash);
+        } else {
+          if (
+            window.location.hash === newHash &&
+            window.history.state?.tab === nextTab &&
+            window.history.state?.modal === currentModal
+          ) {
+            window.history.replaceState(newState, '', newHash);
+          } else {
+            window.history.pushState(newState, '', newHash);
+          }
+        }
+
+        return nextTab;
+      });
+    },
+    []
+  );
+
+  const openModalWithHistory = useCallback(
+    (modalName: string, setter: React.Dispatch<React.SetStateAction<boolean>>) => {
+      setter(true);
+      const nextHash = `#${activeTab}?modal=${modalName}`;
+      const nextState = {
+        tab: activeTab,
+        modal: modalName,
+        landing: false,
+      };
+      window.history.pushState(nextState, '', nextHash);
+    },
+    [activeTab]
+  );
+
+  const closeModalWithHistory = useCallback(
+    (modalName: string, setter: React.Dispatch<React.SetStateAction<boolean>>) => {
+      if (window.history.state?.modal === modalName) {
+        window.history.back();
+      } else {
+        setter(false);
+        const parsed = parseAppHash(window.location.hash);
+        if (parsed?.modal === modalName) {
+          window.history.replaceState({ tab: activeTab, modal: null, landing: false }, '', `#${activeTab}`);
+        }
+      }
+    },
+    [activeTab]
+  );
+
+  // Synchronize browser history events (Back / Forward button in browser)
+  useEffect(() => {
+    const onPopState = (event: PopStateEvent) => {
+      const state = event.state;
+      const hashInfo = parseAppHash(window.location.hash);
+
+      const isLanding = state?.landing ?? hashInfo?.isLanding ?? false;
+      if (isLanding) {
+        setShowWelcomeLanding(true);
+        setIsConflictsModalOpen(false);
+        setIsQrModalOpen(false);
+        setIsTimerModalOpen(false);
+        setIsKioskModalOpen(false);
+        setIsSearchModalOpen(false);
+        setIsRoleModalOpen(false);
+        setIsThemeModalOpen(false);
+        setIsJoinModalOpen(false);
+        setIsInviteManagerOpen(false);
+        setIsLinkRequestsModalOpen(false);
+        setIsPinsModalOpen(false);
+        setIsAuditLogOpen(false);
+        setIsRegisterWizardOpen(false);
+        return;
+      }
+
+      setShowWelcomeLanding(false);
+
+      const targetTab = state?.tab || hashInfo?.tab || 'inicio';
+      const targetModal = state?.modal ?? hashInfo?.modal ?? null;
+      const targetWeekId = state?.weekId || hashInfo?.semana || null;
+
+      if (targetWeekId) {
+        setCurrentWeekId(targetWeekId);
+      }
+
+      setRawActiveTab(targetTab);
+
+      // Sync modals with history
+      setIsConflictsModalOpen(targetModal === 'conflictos');
+      setIsQrModalOpen(targetModal === 'qr');
+      setIsTimerModalOpen(targetModal === 'cronometro');
+      setIsKioskModalOpen(targetModal === 'tablero_salon');
+      setIsSearchModalOpen(targetModal === 'buscar');
+      setIsRoleModalOpen(targetModal === 'roles');
+      setIsThemeModalOpen(targetModal === 'tema');
+      setIsJoinModalOpen(targetModal === 'unirse');
+      setIsInviteManagerOpen(targetModal === 'invitaciones');
+      setIsLinkRequestsModalOpen(targetModal === 'vinculacion');
+      setIsPinsModalOpen(targetModal === 'pines');
+      setIsAuditLogOpen(targetModal === 'auditoria');
+      setIsRegisterWizardOpen(targetModal === 'registro_congregacion');
+    };
+
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [setCurrentWeekId]);
+
+  // Initial history state synchronization on app mount
+  useEffect(() => {
+    const hashInfo = parseAppHash(window.location.hash);
+    const isLanding = showWelcomeLanding || (hashInfo?.isLanding ?? false);
+    const initialModal = hashInfo?.modal || null;
+
+    if (isLanding) {
+      window.history.replaceState({ tab: activeTab, modal: null, landing: true }, '', '#portal');
+    } else {
+      let initialHash = `#${activeTab}`;
+      const params = new URLSearchParams();
+      if (hashInfo?.semana) params.set('semana', hashInfo.semana);
+      if (initialModal) params.set('modal', initialModal);
+      const q = params.toString();
+      if (q) initialHash += `?${q}`;
+
+      window.history.replaceState(
+        {
+          tab: activeTab,
+          modal: initialModal,
+          weekId: hashInfo?.semana || null,
+          landing: false,
+        },
+        '',
+        initialHash
+      );
+
+      if (hashInfo?.semana) {
+        setCurrentWeekId(hashInfo.semana);
+      }
+
+      if (initialModal) {
+        if (initialModal === 'conflictos') setIsConflictsModalOpen(true);
+        if (initialModal === 'qr') setIsQrModalOpen(true);
+        if (initialModal === 'cronometro') setIsTimerModalOpen(true);
+        if (initialModal === 'tablero_salon') setIsKioskModalOpen(true);
+        if (initialModal === 'buscar') setIsSearchModalOpen(true);
+        if (initialModal === 'roles') setIsRoleModalOpen(true);
+        if (initialModal === 'tema') setIsThemeModalOpen(true);
+        if (initialModal === 'unirse') setIsJoinModalOpen(true);
+        if (initialModal === 'invitaciones') setIsInviteManagerOpen(true);
+        if (initialModal === 'vinculacion') setIsLinkRequestsModalOpen(true);
+        if (initialModal === 'pines') setIsPinsModalOpen(true);
+        if (initialModal === 'auditoria') setIsAuditLogOpen(true);
+        if (initialModal === 'registro_congregacion') setIsRegisterWizardOpen(true);
+      }
+    }
+  }, []);
+
   // Theocratic Route Guard: Protect against unauthorized tab viewing
   useEffect(() => {
     if (!isTabAllowedForRole(effectiveRoleInfo.id, activeTab)) {
       if (effectiveRoleInfo.allowedTabs.includes('mi_vista')) {
-        setActiveTab('mi_vista');
+        setActiveTab('mi_vista', { replace: true });
       } else if (effectiveRoleInfo.allowedTabs.includes('inicio')) {
-        setActiveTab('inicio');
+        setActiveTab('inicio', { replace: true });
       } else if (effectiveRoleInfo.allowedTabs.length > 0) {
-        setActiveTab(effectiveRoleInfo.allowedTabs[0]);
+        setActiveTab(effectiveRoleInfo.allowedTabs[0], { replace: true });
       }
     }
-  }, [effectiveRoleInfo.id, activeTab]);
+  }, [effectiveRoleInfo.id, activeTab, setActiveTab]);
 
   // Organized-style "Pocket Mode" Direct Invitation Link (?cong=...&pub=...&pin=...)
   useEffect(() => {
@@ -319,8 +559,6 @@ const AppContent: React.FC = () => {
       weeks,
     }).catch((err) => console.warn('Error al verificar recordatorios de asignaciones:', err));
   }, [weeks, currentBrotherName, currentPublisherId, user?.displayName]);
-  const [isRegisterWizardOpen, setIsRegisterWizardOpen] = useState(false);
-  const [isLinkRequestsModalOpen, setIsLinkRequestsModalOpen] = useState(false);
   const [isSidebarVisible, setIsSidebarVisible] = useState<boolean>(() => {
     try {
       return localStorage.getItem('kongre_sidebar_visible') !== 'false';
@@ -372,12 +610,12 @@ const AppContent: React.FC = () => {
 
   const handleNavigateToWeek = (weekId: string) => {
     setCurrentWeekId(weekId);
-    setActiveTab('programacion');
+    setActiveTab('programacion', { weekId });
   };
 
   const handleSearchNavigate = (tab: ActiveTab, extraAction?: () => void) => {
+    closeModalWithHistory('buscar', setIsSearchModalOpen);
     setActiveTab(tab);
-    setIsSearchModalOpen(false);
     if (extraAction) {
       extraAction();
     }
@@ -424,20 +662,22 @@ const AppContent: React.FC = () => {
             sessionStorage.removeItem('kongre_show_landing');
             localStorage.setItem('kongre_has_entered_app', 'true');
             localStorage.setItem('kongre_is_registered_congregation', 'true');
+            window.history.pushState({ tab: activeTab, modal: null, landing: false }, '', `#${activeTab}`);
           }}
           onOpenJoinModal={() => {
-            setIsJoinModalOpen(true);
+            openModalWithHistory('unirse', setIsJoinModalOpen);
           }}
         />
         <JoinCongregationModal
           isOpen={isJoinModalOpen}
-          onClose={() => setIsJoinModalOpen(false)}
+          onClose={() => closeModalWithHistory('unirse', setIsJoinModalOpen)}
           onSuccessRole={() => {
-            setIsJoinModalOpen(false);
+            closeModalWithHistory('unirse', setIsJoinModalOpen);
             setShowWelcomeLanding(false);
             sessionStorage.removeItem('kongre_show_landing');
             localStorage.setItem('kongre_has_entered_app', 'true');
             localStorage.setItem('kongre_is_registered_congregation', 'true');
+            window.history.pushState({ tab: activeTab, modal: null, landing: false }, '', `#${activeTab}`);
           }}
         />
       </>
@@ -448,8 +688,8 @@ const AppContent: React.FC = () => {
   if (isRegisterWizardOpen) {
     return (
       <RegisterCongregationWizard
-        onClose={() => setIsRegisterWizardOpen(false)}
-        onRegisteredSuccess={() => setIsRegisterWizardOpen(false)}
+        onClose={() => closeModalWithHistory('registro_congregacion', setIsRegisterWizardOpen)}
+        onRegisteredSuccess={() => closeModalWithHistory('registro_congregacion', setIsRegisterWizardOpen)}
       />
     );
   }
@@ -484,19 +724,22 @@ const AppContent: React.FC = () => {
         setActiveTab={setActiveTab}
         isSidebarVisible={isSidebarVisible}
         onToggleSidebar={handleToggleSidebar}
-        onOpenConflictsModal={() => setIsConflictsModalOpen(true)}
-        onOpenQrModal={() => setIsQrModalOpen(true)}
-        onOpenTimerModal={() => setIsTimerModalOpen(true)}
-        onOpenKioskModal={() => setIsKioskModalOpen(true)}
-        onOpenSearchModal={() => setIsSearchModalOpen(true)}
-        onOpenRoleModal={() => setIsRoleModalOpen(true)}
-        onOpenThemeModal={() => setIsThemeModalOpen(true)}
-        onOpenJoinModal={() => setIsJoinModalOpen(true)}
-        onOpenInviteManager={() => setIsInviteManagerOpen(true)}
-        onOpenLinkRequestsModal={() => setIsLinkRequestsModalOpen(true)}
-        onOpenWelcomeLanding={() => setShowWelcomeLanding(true)}
-        onOpenPinsModal={() => setIsPinsModalOpen(true)}
-        onOpenAuditLog={() => setIsAuditLogOpen(true)}
+        onOpenConflictsModal={() => openModalWithHistory('conflictos', setIsConflictsModalOpen)}
+        onOpenQrModal={() => openModalWithHistory('qr', setIsQrModalOpen)}
+        onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
+        onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
+        onOpenSearchModal={() => openModalWithHistory('buscar', setIsSearchModalOpen)}
+        onOpenRoleModal={() => openModalWithHistory('roles', setIsRoleModalOpen)}
+        onOpenThemeModal={() => openModalWithHistory('tema', setIsThemeModalOpen)}
+        onOpenJoinModal={() => openModalWithHistory('unirse', setIsJoinModalOpen)}
+        onOpenInviteManager={() => openModalWithHistory('invitaciones', setIsInviteManagerOpen)}
+        onOpenLinkRequestsModal={() => openModalWithHistory('vinculacion', setIsLinkRequestsModalOpen)}
+        onOpenWelcomeLanding={() => {
+          setShowWelcomeLanding(true);
+          window.history.pushState({ tab: activeTab, modal: null, landing: true }, '', '#portal');
+        }}
+        onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
+        onOpenAuditLog={() => openModalWithHistory('auditoria', setIsAuditLogOpen)}
       />
 
       <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200`}>
@@ -541,7 +784,7 @@ const AppContent: React.FC = () => {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setIsRegisterWizardOpen(true)}
+                  onClick={() => openModalWithHistory('registro_congregacion', setIsRegisterWizardOpen)}
                   className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition-all shrink-0 cursor-pointer text-center"
                 >
                   Registrar mi Congregación
@@ -552,10 +795,10 @@ const AppContent: React.FC = () => {
             {activeTab === 'inicio' && (
               <ResumenInicioTab
                 setActiveTab={setActiveTab}
-                onOpenTimerModal={() => setIsTimerModalOpen(true)}
-                onOpenKioskModal={() => setIsKioskModalOpen(true)}
-                onOpenConflictsModal={() => setIsConflictsModalOpen(true)}
-                onOpenPinsModal={() => setIsPinsModalOpen(true)}
+                onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
+                onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
+                onOpenConflictsModal={() => openModalWithHistory('conflictos', setIsConflictsModalOpen)}
+                onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
               />
             )}
             {activeTab === 'calendario' && (
@@ -606,32 +849,32 @@ const AppContent: React.FC = () => {
       {/* Global Modals */}
       <ConflictsModal
         isOpen={isConflictsModalOpen}
-        onClose={() => setIsConflictsModalOpen(false)}
+        onClose={() => closeModalWithHistory('conflictos', setIsConflictsModalOpen)}
         onNavigateToWeek={handleNavigateToWeek}
       />
 
       <QrCodeModal
         isOpen={isQrModalOpen}
-        onClose={() => setIsQrModalOpen(false)}
+        onClose={() => closeModalWithHistory('qr', setIsQrModalOpen)}
       />
 
       <MeetingTimerModal
         isOpen={isTimerModalOpen}
-        onClose={() => setIsTimerModalOpen(false)}
+        onClose={() => closeModalWithHistory('cronometro', setIsTimerModalOpen)}
       />
 
       <TableroSalonModal
         isOpen={isKioskModalOpen}
-        onClose={() => setIsKioskModalOpen(false)}
+        onClose={() => closeModalWithHistory('tablero_salon', setIsKioskModalOpen)}
       />
 
       <GlobalSearchModal
         isOpen={isSearchModalOpen}
-        onClose={() => setIsSearchModalOpen(false)}
+        onClose={() => closeModalWithHistory('buscar', setIsSearchModalOpen)}
         onNavigate={handleSearchNavigate}
-        onOpenKiosk={() => setIsKioskModalOpen(true)}
-        onOpenTimer={() => setIsTimerModalOpen(true)}
-        onOpenQr={() => setIsQrModalOpen(true)}
+        onOpenKiosk={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
+        onOpenTimer={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
+        onOpenQr={() => openModalWithHistory('qr', setIsQrModalOpen)}
       />
 
       {/* 1-Click WhatsApp Direct Assignment Confirmation Modal */}
@@ -674,7 +917,7 @@ const AppContent: React.FC = () => {
       {/* Theme Toggle Modal (Modo Claro / Modo Oscuro / Cabina de Audio & Acomodadores) */}
       <ThemeToggleModal
         isOpen={isThemeModalOpen}
-        onClose={() => setIsThemeModalOpen(false)}
+        onClose={() => closeModalWithHistory('tema', setIsThemeModalOpen)}
       />
 
       {/* Offline Connectivity & Cloud Sync Status Banner */}
@@ -684,7 +927,7 @@ const AppContent: React.FC = () => {
       {canManageRoles && (
         <RoleSwitcherModal
           isOpen={isRoleModalOpen}
-          onClose={() => setIsRoleModalOpen(false)}
+          onClose={() => closeModalWithHistory('roles', setIsRoleModalOpen)}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
@@ -696,19 +939,19 @@ const AppContent: React.FC = () => {
       {/* Join Congregation with Code Modal */}
       <JoinCongregationModal
         isOpen={isJoinModalOpen}
-        onClose={() => setIsJoinModalOpen(false)}
+        onClose={() => closeModalWithHistory('unirse', setIsJoinModalOpen)}
       />
 
       {/* Theocratic Invitations & QR Manager Modal */}
       <InvitationManagerModal
         isOpen={isInviteManagerOpen}
-        onClose={() => setIsInviteManagerOpen(false)}
+        onClose={() => closeModalWithHistory('invitaciones', setIsInviteManagerOpen)}
       />
 
       {/* Account Link Requests Approval Modal (Elders/Coordinator) */}
       <AccountLinkRequestsModal
         isOpen={isLinkRequestsModalOpen}
-        onClose={() => setIsLinkRequestsModalOpen(false)}
+        onClose={() => closeModalWithHistory('vinculacion', setIsLinkRequestsModalOpen)}
       />
 
       {/* App Lock PIN Setup Suggestion Modal (appears after session starts / login) */}
@@ -720,14 +963,14 @@ const AppContent: React.FC = () => {
       {/* Directory of Congregation & Publisher PINs */}
       <PublisherPinsModal
         isOpen={isPinsModalOpen}
-        onClose={() => setIsPinsModalOpen(false)}
+        onClose={() => closeModalWithHistory('pines', setIsPinsModalOpen)}
       />
 
       {/* Theocratic Audit Log Modal (Elders & Coordinators) */}
       {permissions.canViewAuditLog && (
         <AuditLogModal
           isOpen={isAuditLogOpen}
-          onClose={() => setIsAuditLogOpen(false)}
+          onClose={() => closeModalWithHistory('auditoria', setIsAuditLogOpen)}
         />
       )}
 

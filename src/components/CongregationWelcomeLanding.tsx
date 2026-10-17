@@ -428,7 +428,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
         {/* Right Actions: Theme Switch */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={36} />
+          <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={28} />
         </div>
       </header>
 

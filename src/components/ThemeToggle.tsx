@@ -14,7 +14,7 @@ export default function ThemeToggle({
   onToggle,
   className = "",
   style = {},
-  size = 36,
+  size = 28,
 }: ThemeToggleProps) {
   const [internalDark, setInternalDark] = useState(() => {
     if (typeof isDark === "boolean") return isDark;
@@ -50,8 +50,8 @@ export default function ThemeToggle({
     onToggle?.(next);
   }
 
-  // Calculate icon size proportionally (18px for 36px, 22px for 48px)
-  const iconSize = size === 48 ? 22 : Math.max(16, Math.round(size * 0.5));
+  // Calculate icon size proportionally (14px for 28px, 18px for 36px, 22px for 48px)
+  const iconSize = size === 48 ? 22 : Math.max(13, Math.round(size * 0.5));
 
   return (
     <button

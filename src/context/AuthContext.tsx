@@ -162,6 +162,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // User Profile state (almacenado en Firestore: /users/{userId})
   const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
     try {
+      const isDemo =
+        typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true';
+
+      if (isDemo) {
+        const demoCached = localStorage.getItem('kongre_demo_user_profile');
+        if (demoCached) {
+          try {
+            return JSON.parse(demoCached);
+          } catch {}
+        }
+        return {
+          uid: 'demo-user',
+          email: 'carlos.mendoza@kongre-demo.org',
+          displayName: 'Carlos Mendoza',
+          photoURL: '',
+          phone: '+52 55 1234 5678',
+          secondaryEmail: '',
+          preferredContactMethod: 'whatsapp',
+          contactTimePreference: 'anytime',
+          notificationsEnabled: true,
+          notes: 'Coordinador en Modo Demostración',
+          updatedAt: new Date().toISOString(),
+        };
+      }
+
       const activeCached = localStorage.getItem('kongre_user_profile_active');
       const fallbackPhoto =
         localStorage.getItem('kongre_user_photo') ||
@@ -846,6 +871,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Cargar el documento de perfil del usuario desde almacenamiento local y caché
   useEffect(() => {
+    const isDemo =
+      typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true';
+
+    if (isDemo) {
+      const demoCached = localStorage.getItem('kongre_demo_user_profile');
+      if (demoCached) {
+        try {
+          setUserProfile(JSON.parse(demoCached));
+          return;
+        } catch {}
+      }
+      setUserProfile({
+        uid: 'demo-user',
+        email: 'carlos.mendoza@kongre-demo.org',
+        displayName: 'Carlos Mendoza',
+        photoURL: '',
+        phone: '+52 55 1234 5678',
+        secondaryEmail: '',
+        preferredContactMethod: 'whatsapp',
+        contactTimePreference: 'anytime',
+        notificationsEnabled: true,
+        notes: 'Coordinador en Modo Demostración',
+        updatedAt: new Date().toISOString(),
+      });
+      return;
+    }
+
     if (!user) {
       try {
         const fallbackPhoto =
@@ -946,6 +998,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatedAt: now,
       };
 
+      const isDemo =
+        typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true';
+
+      if (isDemo) {
+        localStorage.setItem('kongre_demo_user_profile', JSON.stringify(merged));
+        setUserProfile(merged);
+        if (merged.displayName) {
+          setCurrentBrotherName(merged.displayName);
+        }
+        return { success: true };
+      }
+
       // Guardar en almacenamiento local
       if (user && user.uid) {
         localStorage.setItem(`kongre_user_profile_${user.uid}`, JSON.stringify(merged));
@@ -957,6 +1021,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (merged.photoURL) {
         localStorage.setItem('kongre_user_photo', merged.photoURL);
         localStorage.setItem('kongre_coordinator_photo', merged.photoURL);
+      } else {
+        localStorage.removeItem('kongre_user_photo');
+        localStorage.removeItem('kongre_google_photo');
+        localStorage.removeItem('kongre_coordinator_photo');
       }
       setUserProfile(merged);
 

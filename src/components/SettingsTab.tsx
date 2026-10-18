@@ -1871,7 +1871,11 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                         <KeyRound className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                         PIN de Bloqueo de Sesión
                       </span>
-                      {isPinEnabled ? (
+                      {isDemoMode ? (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200">
+                          Desactivado en Modo Prueba
+                        </span>
+                      ) : isPinEnabled ? (
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200">
                           PIN Activado
                         </span>
@@ -1882,12 +1886,14 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                       )}
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Bloquea la aplicación con un código numérico para proteger la confidencialidad en computadoras compartidas del Salón del Reino o cabina de audio.
+                      {isDemoMode
+                        ? 'En modo prueba el bloqueo de sesión por PIN está desactivado para permitir una navegación fluida sin interrupciones.'
+                        : 'Bloquea la aplicación con un código numérico para proteger la confidencialidad en computadoras compartidas del Salón del Reino o cabina de audio.'}
                     </p>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-700/60">
-                    {isPinEnabled && (
+                    {!isDemoMode && isPinEnabled && (
                       <button
                         type="button"
                         onClick={lockSession}
@@ -1900,6 +1906,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
 
                     <button
                       type="button"
+                      disabled={isDemoMode}
                       onClick={() => {
                         setPinCurrent('');
                         setPinNew('');
@@ -1907,7 +1914,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                         setPinModalError(null);
                         setShowPinSetupModal(true);
                       }}
-                      className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer"
+                      className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
                     >
                       {isPinEnabled ? 'Cambiar o Quitar PIN' : 'Configurar PIN de Seguridad'}
                     </button>
@@ -1922,15 +1929,17 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                       Bloqueo Automático por Inactividad
                     </span>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Bloquea la pantalla automáticamente si no se detecta actividad del mouse o teclado durante el tiempo seleccionado.
+                      {isDemoMode
+                        ? 'El auto-bloqueo está desactivado temporalmente mientras explores el modo de prueba.'
+                        : 'Bloquea la pantalla automáticamente si no se detecta actividad del mouse o teclado durante el tiempo seleccionado.'}
                     </p>
                   </div>
 
                   <div>
                     <select
-                      value={autoLockMinutes}
+                      value={isDemoMode ? 0 : autoLockMinutes}
                       onChange={(e) => setAutoLockMinutes(Number(e.target.value))}
-                      disabled={!isPinEnabled}
+                      disabled={isDemoMode || !isPinEnabled}
                       className="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-semibold disabled:opacity-50"
                     >
                       <option value={2}>Bloquear tras 2 minutos de inactividad</option>

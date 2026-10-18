@@ -25,19 +25,44 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.8.1';
-export const CURRENT_BUILD_CODE = '2026.10.18.281';
+export const CURRENT_APP_VERSION = '2.8.2';
+export const CURRENT_BUILD_CODE = '2026.10.18.282';
 export const BUILD_DATE = '18 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.8.2',
+    buildCode: '2026.10.18.282',
+    date: '18 de Octubre, 2026',
+    title: 'Optimización de Espaciados en Bienvenida PC y Modo Demo Sin Bloqueos',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Optimización del diseño responsive en la pantalla de bienvenida de PC (hero compacto, tipografía fluida y tarjetas ajustadas para visibilidad sin scroll vertical).',
+      },
+      {
+        category: 'fix',
+        text: 'Aislamiento estricto de perfiles en Modo Demo: avatar limpio y predeterminado sin filtraciones de avatares de sesiones previas en localStorage.',
+      },
+      {
+        category: 'security',
+        text: 'Desactivación del bloqueo de sesión por PIN y del temporizador de inactividad mientras se use el Modo Demo para una navegación fluida.',
+      },
+      {
+        category: 'improvement',
+        text: 'Actualización y optimización de activos vectoriales, iconos de línea y logotipos en el directorio público.',
+      },
+    ],
+  },
+  {
     version: '2.8.1',
     buildCode: '2026.10.18.281',
     date: '18 de Octubre, 2026',
     title: 'Aislamiento Local del Modo Demo (Sin Conexión a Supabase)',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

@@ -76,12 +76,14 @@ function LandingFeatureCard({
 }) {
   const [play, bump] = usePlay();
   return (
-    <article onMouseEnter={bump} className="border-t border-line py-5 cursor-default group">
-      <AnimIcon icon={icon} motion={motion} delay={delay} size={28} play={play} />
-      <h3 className="mb-1.5 mt-3 text-base font-bold text-ink group-hover:text-brand transition-colors">
-        {title}
-      </h3>
-      <p className="text-[13.5px] leading-relaxed text-muted">
+    <article onMouseEnter={bump} className="border-t border-line py-3 lg:py-3.5 cursor-default group transition-colors">
+      <div className="flex items-center gap-2.5">
+        <AnimIcon icon={icon} motion={motion} delay={delay} size={22} play={play} />
+        <h3 className="text-sm lg:text-[14.5px] font-bold text-ink group-hover:text-brand transition-colors">
+          {title}
+        </h3>
+      </div>
+      <p className="mt-1 text-xs sm:text-[12.5px] leading-relaxed text-muted line-clamp-2 xl:line-clamp-none">
         {text}
       </p>
     </article>
@@ -121,21 +123,23 @@ function DesktopOption({
         bump();
         onClick();
       }}
-      className={`opt hov group mb-2 flex w-full cursor-pointer items-start gap-4 rounded-[18px] border-[1.5px] p-4 text-left transition-all ${
+      className={`opt hov group mb-1.5 flex w-full cursor-pointer items-start gap-3 rounded-2xl border-[1.5px] p-2.5 sm:p-3 text-left transition-all ${
         isFeatured
-          ? 'border-bline bg-brand-soft hover:border-brand'
+          ? 'border-bline bg-brand-soft hover:border-brand shadow-xs'
           : 'border-transparent hover:bg-hover'
       }`}
     >
       <span className="mt-0.5 shrink-0">
-        {iconCustom ? iconCustom : <AnimIcon icon={icon} motion={motion} delay={delay} size={28} play={play} />}
+        {iconCustom ? iconCustom : <AnimIcon icon={icon} motion={motion} delay={delay} size={24} play={play} />}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="flex flex-wrap items-center gap-2">
-          <b className="text-[15.5px] font-bold text-ink group-hover:text-brand transition-colors">{title}</b>
+        <span className="flex flex-wrap items-center gap-1.5">
+          <b className="text-[13.5px] sm:text-[14px] lg:text-[14.5px] font-bold text-ink group-hover:text-brand transition-colors leading-snug">
+            {title}
+          </b>
           {pill && (
             <span
-              className={`rounded-full px-2.5 py-0.5 text-[11.5px] font-semibold whitespace-nowrap ${
+              className={`rounded-full px-2 py-0.5 text-[10.5px] font-semibold whitespace-nowrap ${
                 pill.tone === 'of' ? 'bg-ofb text-off' : 'bg-okb text-okf'
               }`}
             >
@@ -143,11 +147,13 @@ function DesktopOption({
             </span>
           )}
         </span>
-        <span className="mt-1 block text-[13px] leading-normal text-muted">{description}</span>
+        <span className="mt-0.5 block text-[11.5px] sm:text-[12px] leading-snug text-muted">
+          {description}
+        </span>
       </span>
       <ArrowRight
-        size={20}
-        className="mt-0.5 text-muted transition-all group-hover:translate-x-1 group-hover:text-brand shrink-0"
+        size={18}
+        className="mt-1 text-muted transition-all group-hover:translate-x-1 group-hover:text-brand shrink-0"
         aria-hidden
       />
     </button>
@@ -895,18 +901,18 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       )}
 
       {/* Main Container: Desktop view or Mobile active subviews */}
-      <div className={`${activeTab === 'home' ? 'hidden md:flex' : 'flex'} flex-col justify-between flex-1`}>
+      <div className={`${activeTab === 'home' ? 'hidden md:flex' : 'flex'} flex-col min-h-screen justify-between flex-1`}>
         {/* ========================================================= */}
         {/* 1. TOP HEADER                                            */}
         {/* ========================================================= */}
-        <header className="w-full bg-card border-b border-line px-4 sm:px-6 md:px-8 py-3.5 flex items-center justify-between sticky top-0 z-30 transition-colors">
+        <header className="w-full bg-card border-b border-line px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 flex items-center justify-between sticky top-0 z-30 transition-colors">
           {/* Logo and Brand */}
           <div className="flex items-center gap-2.5">
-            <AnimatedLogo height={34} />
+            <AnimatedLogo height={32} />
           </div>
 
           {/* Right Actions: Demo Mode Button & Theme Switch */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-2.5">
             <button
               type="button"
               onClick={handleEnterDemoMode}
@@ -921,9 +927,9 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               onClick={() => setThemeMode(nextTheme)}
               title={`Tema: ${THEME_NAMES[themeMode]} (cambiar a ${THEME_NAMES[nextTheme]})`}
               aria-label={`Tema: ${THEME_NAMES[themeMode]}. Cambiar a ${THEME_NAMES[nextTheme]}`}
-              className="tbtn grid size-10 cursor-pointer place-items-center rounded-full bg-brand-soft text-brand transition-colors hover:opacity-90"
+              className="tbtn grid size-9 cursor-pointer place-items-center rounded-full bg-brand-soft text-brand transition-colors hover:opacity-90"
             >
-              <CurrentThemeIcon size={20} aria-hidden />
+              <CurrentThemeIcon size={18} aria-hidden />
             </button>
           </div>
         </header>
@@ -932,10 +938,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         {/* 2. MAIN WORKSPACE / RESPONSIVE HERO & ACTIONS            */}
         {/* ========================================================= */}
         <main
-          className={`mx-auto grid w-full flex-1 items-center gap-8 lg:gap-14 px-4 py-8 md:px-8 ${
+          className={`mx-auto grid w-full flex-1 items-center gap-6 lg:gap-10 xl:gap-14 px-4 sm:px-6 md:px-8 ${
             activeTab === 'register'
-              ? 'max-w-5xl grid-cols-1 py-6'
-              : 'max-w-[1180px] lg:grid-cols-[1.1fr_.9fr] lg:py-14'
+              ? 'max-w-5xl grid-cols-1 py-4'
+              : 'max-w-[1240px] 2xl:max-w-[1360px] lg:grid-cols-[1.12fr_.88fr] py-4 sm:py-6 lg:py-6 xl:py-8'
           }`}
         >
           {/* ========================================================= */}
@@ -947,25 +953,25 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 type="button"
                 onClick={bumpBadge}
                 onMouseEnter={bumpBadge}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-bline bg-brand-soft px-3.5 py-1.5 text-[12.5px] font-semibold text-brand"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-bline bg-brand-soft px-3 py-1 text-[11.5px] sm:text-xs font-semibold text-brand mb-2.5 sm:mb-3"
               >
-                <AnimIcon icon={Sparkles} motion="pulse" delay={0.2} size={16} play={badgePlay} />
+                <AnimIcon icon={Sparkles} motion="pulse" delay={0.2} size={15} play={badgePlay} />
                 <span>Gestor Teocrático Integral • Seguro y Eficiente</span>
               </button>
 
-              <h1 className="mb-4 mt-5 text-[clamp(34px,4.4vw,58px)] font-extrabold leading-[1.06] tracking-tight text-ink">
+              <h1 className="mb-2.5 sm:mb-3 text-[clamp(26px,2.9vw,48px)] font-black leading-[1.08] tracking-tight text-ink">
                 Toda la gestión teocrática de tu congregación,{' '}
                 <em className="bg-linear-to-r from-(--t1) to-(--t2) bg-clip-text not-italic text-transparent">
                   en un solo lugar.
                 </em>
               </h1>
 
-              <p className="max-w-[560px] text-[16.5px] leading-relaxed text-muted">
+              <p className="max-w-[520px] text-xs sm:text-[13.5px] lg:text-[14.5px] leading-relaxed text-muted mb-4 sm:mb-5">
                 Plataforma digital especializada para coordinadores, secretarios, superintendentes de servicio y publicadores. Organiza programas semanales, hojas S-89, asignaciones de limpieza y territorios con soporte offline PWA.
               </p>
 
               {/* Feature Cards Grid (2x2 on Desktop) */}
-              <div className="mt-9 grid gap-x-8 sm:grid-cols-2">
+              <div className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
                 <LandingFeatureCard
                   icon={CalendarDays}
                   motion="tilt"
@@ -1004,11 +1010,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           <div className={`${activeTab === 'register' ? 'w-full' : 'w-full'} mx-auto transition-all duration-300`}>
             <section
               aria-label="Portal de acceso"
-              className="card rounded-[28px] border border-line bg-card p-6 lg:p-7 transition-all"
+              className="card rounded-3xl border border-line bg-card p-4 sm:p-5 lg:p-6 transition-all shadow-xl"
               style={{ boxShadow: 'var(--card-shadow)' }}
             >
               {/* UNIFIED CARD HEADER ACROSS ALL VIEWS */}
-              <div className="eye flex items-center justify-between text-[11.5px] font-bold tracking-[0.06em] text-brand">
+              <div className="eye flex items-center justify-between text-[11px] font-bold tracking-[0.06em] text-brand">
                 <span className="uppercase">
                   KONGRE • {
                     activeTab === 'home'
@@ -1035,20 +1041,20 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       setEmailError(null);
                       setInviteCodeError(null);
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-hover text-muted hover:text-brand font-semibold text-xs tracking-normal transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-hover text-muted hover:text-brand font-semibold text-xs tracking-normal transition-colors cursor-pointer"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Volver al inicio</span>
                   </button>
                 ) : (
-                  <span className="rounded-full bg-hover px-2.5 py-0.5 font-semibold tracking-normal text-muted">
+                  <span className="rounded-full bg-hover px-2.5 py-0.5 font-semibold tracking-normal text-muted text-[10.5px]">
                     Gestor Teocrático
                   </span>
                 )}
               </div>
 
               {/* Main Title & Subtitle */}
-              <h2 className="mb-1 mt-3.5 text-[26px] font-extrabold tracking-tight text-ink">
+              <h2 className="mb-0.5 mt-2 text-[20px] sm:text-[22px] lg:text-[24px] font-extrabold tracking-tight text-ink">
                 {activeTab === 'home'
                   ? '¡Bienvenido a Kongre!'
                   : activeTab === 'email_login'
@@ -1061,7 +1067,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   ? 'Acceso Restringido'
                   : 'Registrar mi Congregación'}
               </h2>
-              <p className="mb-4 text-[13.5px] leading-normal text-muted">
+              <p className="mb-3 sm:mb-3.5 text-xs sm:text-[13px] leading-normal text-muted">
                 {activeTab === 'home'
                   ? 'Una herramienta teocrática que facilita la gestión integral de la congregación'
                   : activeTab === 'email_login'
@@ -1077,7 +1083,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
               {/* VIEW: MAIN HOME OPTIONS */}
               {activeTab === 'home' && (
-                <div className="space-y-1 pt-0.5">
+                <div className="space-y-0.5 pt-0.5">
                   <DesktopOption
                     isFeatured
                     icon={Building2}
@@ -1085,7 +1091,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     delay={0.9}
                     pill={{ label: 'Oficial', tone: 'of' }}
                     title="Registrar mi Congregación"
-                    description="Configura tu congregación desde cero: ID, PIN de Congregación, PIN Personal, circuito y horarios."
+                    description="Configura tu congregación desde cero: ID, PINs, circuito y horarios."
                     onClick={() => setActiveTab('register')}
                   />
 
@@ -1094,7 +1100,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     motion="pulse"
                     delay={1.05}
                     title="Iniciar sesión con Google"
-                    description="Accede con tu cuenta verificada para sincronizar asignaciones y acceder a tu perfil."
+                    description="Accede con tu cuenta verificada para sincronizar asignaciones y perfil."
                     onClick={() => setActiveTab('email_login')}
                   />
 
@@ -1103,7 +1109,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     motion="wiggle"
                     delay={1.2}
                     title="Conectar con ID y PIN de Congregación"
-                    description="Accede a una congregación existente con su ID y PIN o código de invitación."
+                    description="Accede a una congregación existente con su ID y PIN."
                     onClick={() => {
                       setActiveTab('code_login');
                       setCodeError(null);
@@ -1116,7 +1122,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     motion="blink"
                     delay={1.3}
                     title="Iniciar sesión con código de invitación"
-                    description="Accede con un código de un solo uso en este dispositivo."
+                    description="Accede con un código temporal de un solo uso en este dispositivo."
                     onClick={() => {
                       setInviteCodeError(null);
                       setInviteCodeSuccess(null);
@@ -1752,9 +1758,9 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         </main>
 
         {/* Footer Policy & Terms Notice */}
-        <footer className="w-full border-t border-line bg-card/60 backdrop-blur-xs py-5 px-4 sm:px-8 mt-auto select-none transition-colors">
-          <div className="max-w-[1180px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted">
-            <div className="text-center sm:text-left text-[13px]">
+        <footer className="w-full border-t border-line bg-card/60 backdrop-blur-xs py-2.5 px-4 sm:px-6 md:px-8 mt-auto select-none transition-colors">
+          <div className="max-w-[1240px] 2xl:max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted">
+            <div className="text-center sm:text-left text-xs">
               Más información sobre nuestros{' '}
               <a
                 href="#"
@@ -1780,10 +1786,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               .
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 text-[11px]">
               <span className="font-bold text-ink">Kongre</span>
               <span>•</span>
-              <span className="text-[11px] text-muted">Gestor Teocrático Integral</span>
+              <span className="text-muted">Gestor Teocrático Integral</span>
               <span>•</span>
               <span className="inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-full bg-okb text-okf font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -1793,12 +1799,12 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 <button
                   type="button"
                   onClick={onOpenVersionModal}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-hover border border-line text-ink hover:text-brand transition-all cursor-pointer font-semibold text-xs"
+                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-hover border border-line text-ink hover:text-brand transition-all cursor-pointer font-semibold text-xs"
                   title="Ver registro de versiones y novedades"
                 >
                   <span>v{CURRENT_APP_VERSION}</span>
                   <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-brand-soft text-brand">
-                    Ver Cambios
+                    Novedades
                   </span>
                 </button>
               )}

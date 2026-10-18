@@ -239,6 +239,20 @@ const AppContent: React.FC = () => {
     }
   }, [isDemoMode]);
 
+  // Limpieza de fotos y perfiles residuales previos para que no contaminen el modo prueba
+  useEffect(() => {
+    if (isDemoMode || (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')) {
+      try {
+        if (localStorage.getItem('kongre_user_photo')) localStorage.removeItem('kongre_user_photo');
+        if (localStorage.getItem('kongre_google_photo')) localStorage.removeItem('kongre_google_photo');
+        if (localStorage.getItem('kongre_coordinator_photo')) localStorage.removeItem('kongre_coordinator_photo');
+        if (localStorage.getItem('kongre_user_profile_active')) localStorage.removeItem('kongre_user_profile_active');
+        if (localStorage.getItem('kongre_user_profile_guest')) localStorage.removeItem('kongre_user_profile_guest');
+        if (sessionStorage.getItem('kongre_session_locked')) sessionStorage.removeItem('kongre_session_locked');
+      } catch {}
+    }
+  }, [isDemoMode]);
+
   // Navigation with browser History (Back / Forward button support)
   const setActiveTab = useCallback(
     (
@@ -656,6 +670,11 @@ const AppContent: React.FC = () => {
 
   // Suggest setting up app lock PIN on this device after user enters the session / logs in
   useEffect(() => {
+    const isDemo =
+      isDemoMode ||
+      (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true');
+    if (isDemo) return;
+
     const isGuest = localStorage.getItem('kongre_is_guest') === 'true' || localStorage.getItem('kongre_identified_brother') === 'Invitado';
     if (!showWelcomeLanding && !isGuest) {
       const hasPersonalPin = localStorage.getItem('kongre_security_pin_hash');
@@ -667,9 +686,14 @@ const AppContent: React.FC = () => {
         return () => clearTimeout(timer);
       }
     }
-  }, [showWelcomeLanding]);
+  }, [showWelcomeLanding, isDemoMode]);
 
   useEffect(() => {
+    const isDemo =
+      isDemoMode ||
+      (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true');
+    if (isDemo) return;
+
     if (user && !prevUserRef.current && !showWelcomeLanding) {
       const hasPersonalPin = localStorage.getItem('kongre_security_pin_hash');
       const dismissed = localStorage.getItem('kongre_lock_pin_suggestion_dismissed');
@@ -678,7 +702,7 @@ const AppContent: React.FC = () => {
       }
     }
     prevUserRef.current = user;
-  }, [user, showWelcomeLanding]);
+  }, [user, showWelcomeLanding, isDemoMode]);
 
   // Mandatory Congregation Registration Check:
   // A user MUST register the congregation (or join an existing one with verified PIN/credentials),
@@ -1005,7 +1029,7 @@ const AppContent: React.FC = () => {
       )}
 
       {/* Theocratic Session Lock Modal */}
-      <SessionLockModal />
+      {!isDemoMode && <SessionLockModal />}
 
       {/* Join Congregation with Code Modal */}
       <JoinCongregationModal
@@ -1026,10 +1050,12 @@ const AppContent: React.FC = () => {
       />
 
       {/* App Lock PIN Setup Suggestion Modal (appears after session starts / login) */}
-      <AppLockPinSuggestionModal
-        isOpen={isLockPinSuggestionOpen}
-        onClose={() => setIsLockPinSuggestionOpen(false)}
-      />
+      {!isDemoMode && (
+        <AppLockPinSuggestionModal
+          isOpen={isLockPinSuggestionOpen}
+          onClose={() => setIsLockPinSuggestionOpen(false)}
+        />
+      )}
 
       {/* Directory of Congregation & Publisher PINs */}
       <PublisherPinsModal

@@ -25,7 +25,14 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.8.1] - 18 de Octubre, 2026 (Compilación Activa)
+### [v2.8.2] - 18 de Octubre, 2026 (Compilación Activa)
+**Título:** Optimización de Espaciados en Bienvenida PC y Modo Demo Sin Bloqueos
+- **Optimización de Espaciados en PC (100% Responsive):** Ajuste de contenedores, espaciados verticales (`py-4 sm:py-6 lg:py-6 xl:py-8`), tipografía con escalado fluido `clamp` y tarjetas de opciones compactas para evitar desbordamientos y permitir visualización completa sin barra de desplazamiento en pantallas de escritorio y portátiles.
+- **Aislamiento Estricto de Perfiles en Modo Demo:** Se previene la filtración de avatares guardados en `localStorage` procedentes de sesiones reales o pruebas previas, asignando un perfil limpio de demostración ("Carlos Mendoza") con iniciales por defecto.
+- **Eliminación del Bloqueo por PIN en Modo Demo:** Desactivación de modales de bloqueo por PIN, temporizador de inactividad y advertencias de sesión bloqueada mientras se navega en modo de demostración.
+- **Actualización de Activos de Marca:** Inclusión y optimización de logotipos e iconos vectoriales de alta definición en el directorio público.
+
+### [v2.8.1] - 18 de Octubre, 2026
 **Título:** Aislamiento Local del Modo Demo (Sin Conexión a Supabase)
 - **Desconexión Total de Supabase en Modo Demo:** Bloqueo preventivo en `supabaseSyncService` y `CongregationContext` para evitar que peticiones de subida, descarga o consultas remotas toquen la base de datos de Supabase en modo demostración.
 - **Canales en Tiempo Real Desactivados:** Los canales de Supabase Realtime (`sync_queue`) se desconectan y no se abren mientras el modo demo esté activo.

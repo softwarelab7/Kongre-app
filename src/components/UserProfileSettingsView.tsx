@@ -97,7 +97,7 @@ const AVATAR_PRESETS = [
 
 export const UserProfileSettingsView: React.FC = () => {
   const { user, userProfile, updateUserProfile, effectiveRoleInfo, signInWithGoogle } = useAuth();
-  const { settings, updateSettings } = useCongregation();
+  const { settings, updateSettings, isDemoMode } = useCongregation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -157,6 +157,24 @@ export const UserProfileSettingsView: React.FC = () => {
 
   // Initialize form when userProfile changes
   useEffect(() => {
+    const activeIsDemo =
+      isDemoMode ||
+      settings?.congregationId?.includes('DEMO') ||
+      settings?.congregationNumber?.includes('DEMO') ||
+      (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true');
+
+    if (activeIsDemo) {
+      setDisplayName(userProfile?.displayName || settings?.coordinatorName || 'Carlos Mendoza');
+      setPhotoURL(userProfile?.photoURL || '');
+      setPhone(userProfile?.phone || settings?.coordinatorPhone || '+52 55 1234 5678');
+      setSecondaryEmail(userProfile?.secondaryEmail || 'carlos.mendoza@kongre-demo.org');
+      setPreferredContactMethod(userProfile?.preferredContactMethod || 'whatsapp');
+      setContactTimePreference(userProfile?.contactTimePreference || 'anytime');
+      setNotificationsEnabled(userProfile?.notificationsEnabled ?? true);
+      setNotes(userProfile?.notes || 'Coordinador en Modo Demostración');
+      return;
+    }
+
     const fallbackPhoto =
       userProfile?.photoURL ||
       user?.photoURL ||
@@ -196,7 +214,7 @@ export const UserProfileSettingsView: React.FC = () => {
       if (fallbackPhoto) setPhotoURL(fallbackPhoto);
       if (fallbackName) setDisplayName(fallbackName);
     }
-  }, [userProfile, user, settings?.coordinatorPhotoURL, settings?.coordinatorName, settings?.coordinatorPhone]);
+  }, [userProfile, user, settings?.coordinatorPhotoURL, settings?.coordinatorName, settings?.coordinatorPhone, isDemoMode]);
 
   // Handle image upload from disk, compress to max 256x256 WebP/JPEG dataURL
   const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -270,6 +288,14 @@ export const UserProfileSettingsView: React.FC = () => {
     setPhotoURL('');
     setSelectedPresetId(null);
     setShowUrlInput(false);
+    try {
+      localStorage.removeItem('kongre_user_photo');
+      localStorage.removeItem('kongre_google_photo');
+      localStorage.removeItem('kongre_coordinator_photo');
+      localStorage.removeItem('kongre_demo_user_photo');
+      updateSettings({ coordinatorPhotoURL: '' });
+      updateUserProfile({ photoURL: '' });
+    } catch {}
   };
 
   // Handle custom URL input
@@ -305,11 +331,25 @@ export const UserProfileSettingsView: React.FC = () => {
       notes: notes.trim(),
     });
 
+    const activeIsDemo =
+      isDemoMode ||
+      (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true');
+
     if (cleanPhoto) {
       try {
-        localStorage.setItem('kongre_user_photo', cleanPhoto);
-        localStorage.setItem('kongre_coordinator_photo', cleanPhoto);
+        if (!activeIsDemo) {
+          localStorage.setItem('kongre_user_photo', cleanPhoto);
+          localStorage.setItem('kongre_coordinator_photo', cleanPhoto);
+        }
         updateSettings({ coordinatorPhotoURL: cleanPhoto });
+      } catch {}
+    } else {
+      try {
+        localStorage.removeItem('kongre_user_photo');
+        localStorage.removeItem('kongre_google_photo');
+        localStorage.removeItem('kongre_coordinator_photo');
+        localStorage.removeItem('kongre_demo_user_photo');
+        updateSettings({ coordinatorPhotoURL: '' });
       } catch {}
     }
 
@@ -431,6 +471,15 @@ export const UserProfileSettingsView: React.FC = () => {
             </span>
           </div>
 
+          {(isDemoMode || (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')) && (
+            <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 text-xs">
+              <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span>
+                <strong>Modo Prueba:</strong> El perfil y el avatar se mantienen aislados localmente para la simulación sin acceder a cuentas personales ni fotos externas.
+              </span>
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
             {/* Live Avatar Preview */}
             <div className="relative group shrink-0">
@@ -493,7 +542,7 @@ export const UserProfileSettingsView: React.FC = () => {
                   <span>Subir Foto</span>
                 </button>
 
-                {(() => {
+                {!(isDemoMode || (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')) && (() => {
                   const googlePhoto =
                     user?.photoURL ||
                     (typeof window !== 'undefined'

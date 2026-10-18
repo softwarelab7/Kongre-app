@@ -100,8 +100,28 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(activeSessions));
   }, [activeSessions]);
 
-  // Start unlocked unless a PIN is configured and was previously locked in this session
+  // Helper to check if demo mode is active
+  const isDemoSession = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    return (
+      localStorage.getItem('kongre_demo_mode') === 'true' ||
+      localStorage.getItem('kongre_congregation_number')?.includes('DEMO') === true ||
+      localStorage.getItem('kongre_congregation_id')?.includes('DEMO') === true
+    );
+  };
+
+  // Start unlocked unless a PIN is configured and was previously locked in this session (and not demo mode)
   const [isLocked, setIsLocked] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const isDemo =
+        localStorage.getItem('kongre_demo_mode') === 'true' ||
+        localStorage.getItem('kongre_congregation_number')?.includes('DEMO') ||
+        localStorage.getItem('kongre_congregation_id')?.includes('DEMO');
+      if (isDemo) {
+        sessionStorage.removeItem('kongre_session_locked');
+        return false;
+      }
+    }
     const hadPin = !!localStorage.getItem(PIN_STORAGE_KEY);
     const wasLocked = sessionStorage.getItem('kongre_session_locked') === 'true';
     return hadPin && wasLocked;
@@ -110,6 +130,7 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const lockSession = useCallback(() => {
+    if (isDemoSession()) return;
     if (!pinHash) return;
     setIsLocked(true);
     sessionStorage.setItem('kongre_session_locked', 'true');
@@ -354,6 +375,12 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Inactivity detection for Auto-lock
   useEffect(() => {
+    if (isDemoSession()) {
+      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+      if (isLocked) setIsLocked(false);
+      return;
+    }
+
     if (!pinHash || autoLockMinutes <= 0) {
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
       return;
@@ -386,8 +413,8 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   return (
     <SecurityContext.Provider
       value={{
-        isLocked,
-        isPinEnabled: !!pinHash || !!congregationPinHash,
+        isLocked: isDemoSession() ? false : isLocked,
+        isPinEnabled: isDemoSession() ? false : !!pinHash || !!congregationPinHash,
         isPersonalPinSet: !!pinHash,
         autoLockMinutes,
         privacyModeEnabled,

@@ -4903,6 +4903,19 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     localStorage.setItem('kongre_congregation_name', demo.settings.congregationName || 'Congregación Central (Demostración)');
     localStorage.setItem('kongre_congregation_number', demo.settings.congregationNumber || 'DEMO-001');
     localStorage.setItem('kongre_congregation_id', demo.settings.congregationId || 'DEMO-001');
+
+    // Purgar fotos y perfiles residuales previos del navegador para aislamiento total en modo prueba
+    try {
+      localStorage.removeItem('kongre_user_photo');
+      localStorage.removeItem('kongre_google_photo');
+      localStorage.removeItem('kongre_coordinator_photo');
+      localStorage.removeItem('kongre_user_profile_active');
+      localStorage.removeItem('kongre_user_profile_guest');
+      localStorage.removeItem('kongre_demo_user_profile');
+      localStorage.removeItem('kongre_demo_user_photo');
+      sessionStorage.removeItem('kongre_session_locked');
+    } catch {}
+
     setSyncStatus('synced');
   };
 
@@ -4918,6 +4931,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     localStorage.removeItem('kongre_congregation_name');
     localStorage.removeItem('kongre_congregation_number');
     localStorage.removeItem('kongre_congregation_id');
+    localStorage.removeItem('kongre_demo_user_profile');
+    localStorage.removeItem('kongre_demo_user_photo');
     sessionStorage.setItem('kongre_show_landing', 'true');
     resetAllCongregationData();
   };

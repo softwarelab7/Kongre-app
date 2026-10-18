@@ -11,7 +11,7 @@ import {
 
 export const SessionLockModal: React.FC = () => {
   const { isLocked, unlockSession } = useSecurity();
-  const { settings } = useCongregation();
+  const { settings, isDemoMode } = useCongregation();
 
   const [enteredPin, setEnteredPin] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -20,16 +20,22 @@ export const SessionLockModal: React.FC = () => {
   const [lockoutSeconds, setLockoutSeconds] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const isDemo =
+    isDemoMode ||
+    settings?.congregationNumber?.includes('DEMO') ||
+    settings?.congregationId?.includes('DEMO') ||
+    (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true');
+
   // Check lockout on mount and on lock
   useEffect(() => {
-    if (isLocked) {
+    if (isLocked && !isDemo) {
       setEnteredPin('');
       setErrorMsg(null);
       const remaining = getPinLockoutRemainingSeconds();
       setLockoutSeconds(remaining);
       setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, [isLocked]);
+  }, [isLocked, isDemo]);
 
   // Countdown timer for lockout
   useEffect(() => {
@@ -46,7 +52,7 @@ export const SessionLockModal: React.FC = () => {
     return () => clearInterval(timer);
   }, [lockoutSeconds]);
 
-  if (!isLocked) return null;
+  if (isDemo || !isLocked) return null;
 
   const handleKeyPress = (digit: string) => {
     if (lockoutSeconds > 0) return;

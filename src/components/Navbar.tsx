@@ -196,8 +196,9 @@ export const Navbar: React.FC<NavbarProps> = ({
     loadDemoData();
     window.location.reload();
   };
-  const effectiveDisplayName =
-    currentBrotherName && !isGenericIdentityName(currentBrotherName)
+  const effectiveDisplayName = isDemoMode
+    ? (userProfile?.displayName || settings?.coordinatorName || 'Carlos Mendoza (Demo)')
+    : currentBrotherName && !isGenericIdentityName(currentBrotherName)
       ? (currentBrotherName as string)
       : userProfile?.displayName && !isGenericIdentityName(userProfile.displayName)
       ? (userProfile!.displayName as string)
@@ -1172,15 +1173,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold flex items-center justify-center text-xs shadow-xs overflow-hidden ring-2 ring-indigo-500/20">
                   {(() => {
-                    const effectiveAvatar =
-                      userProfile?.photoURL ||
-                      user?.photoURL ||
-                      settings?.coordinatorPhotoURL ||
-                      (typeof window !== 'undefined'
-                        ? localStorage.getItem('kongre_user_photo') ||
-                          localStorage.getItem('kongre_google_photo') ||
-                          localStorage.getItem('kongre_coordinator_photo')
-                        : null);
+                    const effectiveAvatar = isDemoMode
+                      ? userProfile?.photoURL || null
+                      : userProfile?.photoURL ||
+                        user?.photoURL ||
+                        settings?.coordinatorPhotoURL ||
+                        (typeof window !== 'undefined'
+                          ? localStorage.getItem('kongre_user_photo') ||
+                            localStorage.getItem('kongre_google_photo') ||
+                            localStorage.getItem('kongre_coordinator_photo')
+                          : null);
 
                     if (effectiveAvatar) {
                       return (
@@ -1279,17 +1281,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </button>
                     )}
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenDropdown(null);
-                        lockSession();
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
-                    >
-                      <Lock className="w-4 h-4 text-emerald-500" />
-                      <span>Bloquear Sesión con PIN</span>
-                    </button>
+                    {!isDemoMode && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          lockSession();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
+                      >
+                        <Lock className="w-4 h-4 text-emerald-500" />
+                        <span>Bloquear Sesión con PIN</span>
+                      </button>
+                    )}
                   </div>
 
                   <div className="border-t border-slate-100 dark:border-slate-800 my-1 p-1">
@@ -1367,15 +1371,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold flex items-center justify-center text-xs shadow-xs shrink-0 overflow-hidden ring-2 ring-indigo-500/20">
                   {(() => {
-                    const effectiveAvatar =
-                      userProfile?.photoURL ||
-                      user?.photoURL ||
-                      settings?.coordinatorPhotoURL ||
-                      (typeof window !== 'undefined'
-                        ? localStorage.getItem('kongre_user_photo') ||
-                          localStorage.getItem('kongre_google_photo') ||
-                          localStorage.getItem('kongre_coordinator_photo')
-                        : null);
+                    const effectiveAvatar = isDemoMode
+                      ? userProfile?.photoURL || null
+                      : userProfile?.photoURL ||
+                        user?.photoURL ||
+                        settings?.coordinatorPhotoURL ||
+                        (typeof window !== 'undefined'
+                          ? localStorage.getItem('kongre_user_photo') ||
+                            localStorage.getItem('kongre_google_photo') ||
+                            localStorage.getItem('kongre_coordinator_photo')
+                          : null);
 
                     if (effectiveAvatar) {
                       return (
@@ -1398,7 +1403,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                    {effectiveDisplayName || 'Hermano'}
+                    {effectiveDisplayName || (isDemoMode ? 'Carlos Mendoza' : 'Hermano')}
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     {onOpenRoleModal ? (
@@ -1763,17 +1768,19 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Drawer Footer */}
             <div className="p-3 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2.5 bg-slate-50/60 dark:bg-slate-800/30 shrink-0">
               <div className="flex items-center justify-between text-xs">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    lockSession();
-                  }}
-                  className="font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 flex items-center gap-1.5 py-1 px-2 rounded-lg cursor-pointer"
-                >
-                  <Lock className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Bloquear PIN</span>
-                </button>
+                {!isDemoMode && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      lockSession();
+                    }}
+                    className="font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 flex items-center gap-1.5 py-1 px-2 rounded-lg cursor-pointer"
+                  >
+                    <Lock className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Bloquear PIN</span>
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => {

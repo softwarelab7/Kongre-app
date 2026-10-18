@@ -1,8 +1,8 @@
 /**
  * REGISTRO OFICIAL DE VERSIONES Y ACTUALIZACIONES DE KONGRE
  * 
- * ⚠️ INSTRUCCIONES PARA DESARROLLADORES / ANTI-GRAVITY (GOOGLE AI STUDIO):
- * Cada vez que se implemente una actualización o cambio en Google AI Studio (Anti-Gravity):
+ * ⚠️ INSTRUCCIONES PARA DESARROLLADORES:
+ * Cada vez que se implemente una actualización o cambio en el sistema:
  * 1. Incrementa CURRENT_APP_VERSION (ej. de '2.5.0' a '2.5.1' o '2.6.0').
  * 2. Actualiza BUILD_DATE y CURRENT_BUILD_CODE.
  * 3. Agrega la nueva versión al inicio de VERSION_HISTORY.
@@ -25,20 +25,51 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.6.0';
-export const CURRENT_BUILD_CODE = '2026.10.17.260';
-export const BUILD_DATE = '17 de Octubre, 2026';
-export const BUILD_ENVIRONMENT = 'Google AI Studio (Anti-Gravity)';
+export const CURRENT_APP_VERSION = '2.7.0';
+export const CURRENT_BUILD_CODE = '2026.10.18.270';
+export const BUILD_DATE = '18 de Octubre, 2026';
+export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '2.7.0',
+    buildCode: '2026.10.18.270',
+    date: '18 de Octubre, 2026',
+    title: 'Dashboard Visual de Tendencias de Asistencia con Recharts',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Dashboard interactivo de tendencias históricas de asistencia a reuniones usando la librería Recharts (gráficos compuestos de barras y áreas continuas).',
+      },
+      {
+        category: 'feature',
+        text: 'Agrupación y análisis teocrático por Año de Servicio (Septiembre a Agosto) con comparativa entre reunión Entre Semana y Fin de Semana.',
+      },
+      {
+        category: 'feature',
+        text: 'Desglose detallado de canales: Asistencia Presencial vs. Zoom con porcentaje de distribución mensual y anual.',
+      },
+      {
+        category: 'feature',
+        text: 'Líneas de referencia de promedio histórico, métricas de pico máximo de asistencia y vista de tabla analítica con exportación a formato CSV.',
+      },
+      {
+        category: 'improvement',
+        text: 'Navegación fluida entre la vista de dashboard analítico y el registro mensual de asistencia (S-88) con selector rápido de meses.',
+      },
+    ],
+  },
   {
     version: '2.6.0',
     buildCode: '2026.10.17.260',
     date: '17 de Octubre, 2026',
     title: 'Sincronización en Cola Offline con IndexedDB y Supabase',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa en Google AI Studio',
-    environment: 'Google AI Studio (Anti-Gravity)',
+    isCurrent: false,
+    highlight: 'Versión previa estable',
+    environment: 'Producción Cloud (Kongre)',
     changes: [
       {
         category: 'feature',
@@ -68,7 +99,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     date: '17 de Octubre, 2026',
     title: 'Registro de Versión en Pie de Página y Navegación Histórica',
     isCurrent: false,
-    environment: 'Google AI Studio (Anti-Gravity)',
+    environment: 'Producción Cloud (Kongre)',
     changes: [
       {
         category: 'feature',
@@ -80,7 +111,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
       },
       {
         category: 'feature',
-        text: 'Documento oficial CHANGELOG.md para registrar metódicamente cada actualización realizada en Anti-Gravity.',
+        text: 'Documento oficial CHANGELOG.md para registrar metódicamente cada actualización realizada en el sistema.',
       },
       {
         category: 'feature',
@@ -102,7 +133,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     date: '16 de Octubre, 2026',
     title: 'Autenticación Simplificada por ID de Congregación y PIN Personal',
     isCurrent: false,
-    environment: 'Google AI Studio (Anti-Gravity)',
+    environment: 'Producción Cloud (Kongre)',
     changes: [
       {
         category: 'security',
@@ -128,7 +159,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     date: '15 de Octubre, 2026',
     title: 'Pocket Mode Teocrático, Códigos QR y Enlaces Directos',
     isCurrent: false,
-    environment: 'Google AI Studio (Anti-Gravity)',
+    environment: 'Producción Cloud (Kongre)',
     changes: [
       {
         category: 'feature',
@@ -154,7 +185,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     date: '14 de Octubre, 2026',
     title: 'Sincronización en la Nube y Respaldo Híbrido',
     isCurrent: false,
-    environment: 'Google AI Studio (Anti-Gravity)',
+    environment: 'Producción Cloud (Kongre)',
     changes: [
       {
         category: 'feature',
@@ -176,7 +207,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     date: '12 de Octubre, 2026',
     title: 'Formularios Oficiales S-21, S-88, S-89 e Informes S-1',
     isCurrent: false,
-    environment: 'Google AI Studio (Anti-Gravity)',
+    environment: 'Producción Cloud (Kongre)',
     changes: [
       {
         category: 'feature',
@@ -202,7 +233,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     date: '10 de Octubre, 2026',
     title: 'Rediseño Integral Kongre, Tema Oscuro y PWA',
     isCurrent: false,
-    environment: 'Google AI Studio (Anti-Gravity)',
+    environment: 'Producción Cloud (Kongre)',
     changes: [
       {
         category: 'feature',

@@ -289,7 +289,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return localStorage.getItem(LOCAL_STORAGE_BROTHER_NAME_KEY);
   });
 
-  // Current identified publisher ID (NW Scheduler personal access)
+  // Current identified publisher ID (personal portal access)
   const [currentPublisherId, setCurrentPublisherId] = useState<string | null>(() => {
     return localStorage.getItem(LOCAL_STORAGE_PUBLISHER_ID_KEY);
   });

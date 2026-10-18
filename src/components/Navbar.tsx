@@ -21,9 +21,6 @@ import {
   UserCheck,
   Settings,
   Sparkles,
-  CloudCheck,
-  CloudUpload,
-  WifiOff,
   LogIn,
   LogOut,
   ShieldCheck,
@@ -173,12 +170,10 @@ export const Navbar: React.FC<NavbarProps> = ({
     settings,
     updateSettings,
     conflicts,
-    syncStatus,
     notices,
     territories,
     accountLinkRequests,
     auxPioneerRequests,
-    uploadLocalDataToGoogle,
     isOnline,
   } = useCongregation();
   const effectiveDisplayName =
@@ -549,7 +544,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         },
         {
           id: 'mi_vista',
-          label: 'NW Publisher (Mi Portal)',
+          label: 'Portal del Publicador',
           description: 'Asignaciones, informe mensual S-4 y ausencias con PIN personal',
           icon: UserCheck,
         },
@@ -1119,36 +1114,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
             </button>
 
-            {/* Cloud Sync Status Icon */}
-            <button
-              type="button"
-              onClick={async () => {
-                if (user) {
-                  try {
-                    await uploadLocalDataToGoogle();
-                  } catch {}
-                }
-                if (isTabAllowedForRole(effectiveRoleInfo.id, 'ajustes')) {
-                  handleSelectTab('ajustes');
-                }
-              }}
-              className="relative w-9 h-9 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50/70 dark:hover:bg-emerald-950/30 transition cursor-pointer"
-              title={
-                user
-                  ? `Sincronizado con Google (${user.email}). Pulsa para sincronizar o ver ajustes`
-                  : 'Respaldo automático activo en la nube. Pulsa para ver ajustes'
-              }
-            >
-              <CloudCheck className="w-4 h-4" />
-              <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-1.5 ring-white dark:ring-slate-900" />
-            </button>
-
-            {/* Offline Sync Badge (IndexedDB & Supabase) */}
+            {/* Unified Cloud & Offline Sync Badge (Supabase & IndexedDB) */}
             {onOpenQueueModal && (
               <OfflineSyncBadge
                 isOnline={isOnline}
                 onOpenQueueModal={onOpenQueueModal}
-                className="hidden md:inline-flex"
               />
             )}
 
@@ -1906,27 +1876,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <span className="text-[10px] mt-0.5 leading-tight font-semibold">Menú</span>
           </button>
-        </div>
-
-        {/* Mobile Persistent Version Bar */}
-        <div className="flex items-center justify-between px-3 pt-1 border-t border-slate-100 dark:border-slate-800/80 mt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
-          <span className="flex items-center gap-1.5 text-[10px]">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-slate-700 dark:text-slate-300">Kongre</span>
-            <span className="text-slate-400 dark:text-slate-500 hidden xs:inline">• Google Studio</span>
-          </span>
-          {onOpenVersionModal && (
-            <button
-              type="button"
-              onClick={onOpenVersionModal}
-              className="inline-flex items-center gap-1 font-mono font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
-            >
-              <span>v{CURRENT_APP_VERSION}</span>
-              <span className="text-[9px] px-1 py-0.2 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60">
-                Changelog
-              </span>
-            </button>
-          )}
         </div>
       </nav>
     </>

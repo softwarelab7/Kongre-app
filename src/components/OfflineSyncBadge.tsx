@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Wifi, WifiOff, RefreshCw, Database, CheckCircle2 } from 'lucide-react';
+import { Wifi, WifiOff, RefreshCw, Database, CloudCheck, CloudUpload } from 'lucide-react';
 import { getOfflineQueueStats, QueueStats } from '../services/indexedDbQueue';
 
 interface OfflineSyncBadgeProps {
@@ -61,47 +61,51 @@ export const OfflineSyncBadge: React.FC<OfflineSyncBadgeProps> = ({
             ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 border-indigo-300/80 dark:border-indigo-700/80 hover:bg-indigo-100'
             : 'bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-200 border-blue-300/80 dark:border-blue-700/80 hover:bg-blue-100'
         } ${className}`}
-        title="Ver cola de sincronización offline en IndexedDB para Supabase"
+        title="Ver estado de conexión y cola de sincronización en la nube"
       >
         {!isOnline ? (
           <>
             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
             <WifiOff className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
-            <span>Sin Conexión</span>
+            <span className="hidden sm:inline">Sin Conexión</span>
+            <span className="sm:hidden text-[10px]">Offline</span>
             {hasPending && (
               <span className="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-amber-200/80 dark:bg-amber-900 text-amber-900 dark:text-amber-100">
-                {stats.pendingCount} en cola
+                {stats.pendingCount}
               </span>
             )}
           </>
         ) : isSyncing ? (
           <>
             <RefreshCw className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 animate-spin shrink-0" />
-            <span>Sincronizando con Supabase...</span>
+            <span className="hidden sm:inline">Sincronizando nube...</span>
+            <span className="sm:hidden text-[10px]">Sincronizando</span>
           </>
         ) : (
           <>
-            <Database className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
-            <span>{stats.pendingCount} pendiente(s)</span>
-            <span className="text-[10px] underline font-normal">Sincronizar</span>
+            <CloudUpload className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+            <span>{stats.pendingCount} pend.</span>
+            <span className="text-[10px] underline font-normal hidden sm:inline">Sincronizar</span>
           </>
         )}
       </button>
     );
   }
 
-  // Si está online y al día, mostrar badge sutil de Supabase al día
+  // Si está online y al día, mostrar badge único de conexión a la nube
   return (
     <button
       type="button"
       onClick={onOpenQueueModal}
-      className={`group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-50 dark:bg-slate-800/80 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/50 border border-slate-200/80 dark:border-slate-700/80 hover:border-indigo-300 dark:hover:border-indigo-800 transition-all cursor-pointer ${className}`}
-      title="Supabase y cola IndexedDB al día. Clic para ver detalles."
+      className={`group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-emerald-300 bg-emerald-50/70 dark:bg-emerald-950/40 hover:bg-emerald-100/70 dark:hover:bg-emerald-900/50 border border-emerald-200/70 dark:border-emerald-800/60 transition-all cursor-pointer shadow-2xs active:scale-95 ${className}`}
+      title="Conexión en la nube activa y sincronizada (Supabase e IndexedDB). Clic para ver detalles."
     >
-      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-      <Database className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-      <span className="text-[11px] font-medium hidden sm:inline">Supabase</span>
-      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Al día</span>
+      <span className="relative flex items-center justify-center">
+        <CloudCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+        <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-1 ring-white dark:ring-slate-900" />
+      </span>
+      <span className="text-[11px] font-medium hidden sm:inline">Nube</span>
+      <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-bold hidden xs:inline">Al día</span>
     </button>
   );
 };

@@ -58,7 +58,8 @@ import {
   checkUpcomingAssignmentsAndNotify,
 } from '../services/notificationService';
 
-export type NWPublisherTab = 'asignaciones' | 'informe' | 'ausencias' | 'grupo' | 'avisos';
+export type PublisherPortalTab = 'asignaciones' | 'informe' | 'ausencias' | 'grupo' | 'avisos';
+export type NWPublisherTab = PublisherPortalTab;
 
 export const PersonalViewTab: React.FC = () => {
   const {
@@ -91,8 +92,8 @@ export const PersonalViewTab: React.FC = () => {
     publisherPinsList,
   } = useAuth();
 
-  // Active module within NW Publisher
-  const [activeModule, setActiveModule] = useState<NWPublisherTab>('asignaciones');
+  // Módulo activo dentro del Portal del Publicador
+  const [activeModule, setActiveModule] = useState<PublisherPortalTab>('asignaciones');
 
   // Selected publisher state
   const [selectedPublisherId, setSelectedPublisherId] = useState<string>(() => {
@@ -365,7 +366,7 @@ export const PersonalViewTab: React.FC = () => {
       (reportForm.hours > 0 ? `⏱️ *Horas:* ${reportForm.hours}\n` : '') +
       (reportForm.bibleStudies > 0 ? `📖 *Cursos Bíblicos:* ${reportForm.bibleStudies}\n` : '') +
       (reportForm.notes ? `📝 *Notas:* ${reportForm.notes}\n` : '') +
-      `\n_Enviado desde el Portal Teocrático Kongre (NW Publisher)_`;
+      `\n_Enviado desde el Portal del Publicador Kongre_`;
 
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
@@ -823,7 +824,7 @@ export const PersonalViewTab: React.FC = () => {
       `📌 *Parte:* ${item.assignmentTitle}` +
       (item.room ? `\n🏛 *Sala:* ${item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}` : '') +
       (item.assistantName ? `\n👥 ${item.assistantName}` : '') +
-      `\n\n_Kongre NW Publisher_`;
+      `\n\n_Portal del Publicador Kongre_`;
 
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
@@ -840,7 +841,7 @@ export const PersonalViewTab: React.FC = () => {
 
           <div className="space-y-1.5">
             <span className="text-[10px] uppercase font-bold tracking-widest text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 px-3 py-1 rounded-full border border-purple-200/60 dark:border-purple-800/60">
-              NW PUBLISHER APP • PORTAL DEL PUBLICADOR
+              PORTAL DEL PUBLICADOR • KONGRE
             </span>
             <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white pt-1">
               Bienvenido a tu Portal Teocrático
@@ -941,10 +942,10 @@ export const PersonalViewTab: React.FC = () => {
     );
   }
 
-  // 2. MAIN NW PUBLISHER PORTAL
+  // 2. PORTAL PRINCIPAL DEL PUBLICADOR
   return (
     <div className="w-full space-y-5 animate-in fade-in duration-300">
-      {/* 2.1 BARRA SUPERIOR DE IDENTIDAD DEL PUBLICADOR (NW PUBLISHER HEADER) */}
+      {/* 2.1 BARRA SUPERIOR DE IDENTIDAD DEL PUBLICADOR (HEADER) */}
       <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
@@ -953,7 +954,7 @@ export const PersonalViewTab: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/70 px-2.5 py-0.5 rounded-full border border-purple-200/60 dark:border-purple-800/60">
-                NW Publisher • Portal Oficial
+                Portal del Publicador
               </span>
               <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/40 flex items-center gap-1">
                 <CheckCircle2 size={10} /> PIN Verificado
@@ -1095,7 +1096,7 @@ export const PersonalViewTab: React.FC = () => {
         </div>
       )}
 
-      {/* 2.2 PESTAÑAS PRINCIPALES DEL PORTAL (NW PUBLISHER TABS) */}
+      {/* 2.2 PESTAÑAS PRINCIPALES DEL PORTAL */}
       <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 overflow-x-auto scrollbar-none border border-slate-200/80 dark:border-slate-700/80">
         <button
           type="button"
@@ -1283,7 +1284,7 @@ export const PersonalViewTab: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Botones de acción estilo NW Scheduler */}
+                      {/* Botones de acción rápida */}
                       <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap">
                         {/* Confirmar / Rechazar */}
                         <div className="flex items-center gap-1.5">

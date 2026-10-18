@@ -1012,7 +1012,7 @@ const AppContent: React.FC = () => {
       {/* Modal para solicitar nombre e identidad si se inició con PIN sin nombre reconocido */}
       <IdentityNamePrompt />
 
-      {/* Registro de Versiones y Control de Cambios en Google AI Studio */}
+      {/* Registro de Versiones y Control de Cambios */}
       <VersionHistoryModal
         isOpen={isVersionModalOpen}
         onClose={() => closeModalWithHistory('versiones', setIsVersionModalOpen)}

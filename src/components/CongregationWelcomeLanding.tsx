@@ -1298,7 +1298,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             <span>•</span>
             <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 font-semibold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Google AI Studio
+              En línea
             </span>
           </div>
 

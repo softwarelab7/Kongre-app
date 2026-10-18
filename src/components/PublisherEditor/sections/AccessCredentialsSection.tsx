@@ -208,7 +208,7 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
     const congId = settings.congregationNumber || settings.congregationId || 'Configurado';
     const roleTitle = THEOCRATIC_ROLES[currentRole]?.name || 'Publicador';
 
-    return `🔐 CREDENCIALES TEOCRÁTICAS KONGRE (ESTILO NW SCHEDULER)
+    return `🔐 CREDENCIALES TEOCRÁTICAS KONGRE (PORTAL DEL PUBLICADOR)
 ━━━━━━━━━━━━━━━━━━━━
 👤 Hermano(a): ${publisherName}
 🏛️ Congregación: ${congTitle}
@@ -279,7 +279,7 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* 1. Header con Resumen de Acceso estilo NW Scheduler */}
+      {/* 1. Header con Resumen de Acceso Teocrático */}
       <div className="bg-white dark:bg-[#0f1623] p-6 rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="p-3 bg-purple-50 dark:bg-purple-500/10 rounded-2xl text-purple-600 dark:text-purple-400 font-bold shadow-xs shrink-0 ring-4 ring-purple-500/5">
@@ -301,7 +301,7 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
               </span>
             </div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Identificación individual al estilo NW Scheduler para la aplicación móvil y portal del publicador.
+              Identificación individual segura para la aplicación móvil y portal del publicador.
             </p>
           </div>
         </div>
@@ -616,7 +616,7 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
         </button>
       </div>
 
-      {/* 5. MODAL: PAPELETA DE ACCESO TEOCRÁTICO (SLIP / QR NW SCHEDULER) */}
+      {/* 5. MODAL: PAPELETA DE ACCESO TEOCRÁTICO (SLIP / QR) */}
       {showSlipModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-fade-in">
           <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-5">
@@ -630,7 +630,7 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
                   <h4 className="font-bold text-slate-900 dark:text-white text-sm">
                     Papeleta de Acceso Teocrático
                   </h4>
-                  <p className="text-[11px] text-slate-500">Credencial personal estilo NW Scheduler</p>
+                  <p className="text-[11px] text-slate-500">Credencial personal del publicador</p>
                 </div>
               </div>
               <button

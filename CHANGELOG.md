@@ -1,12 +1,12 @@
 # Registro Oficial de Versiones y Actualizaciones (Changelog) - Kongre
 
-Este documento registra de manera clara y cronológica cada una de las actualizaciones, mejoras, correcciones y nuevas funciones implementadas en **Kongre** a través del entorno de desarrollo **Google AI Studio (Anti-Gravity)**.
+Este documento registra de manera clara y cronológica cada una de las actualizaciones, mejoras, correcciones y nuevas funciones implementadas en **Kongre**.
 
 ---
 
-## 📌 Guía para Desarrolladores / Anti-Gravity (Google AI Studio)
+## 📌 Guía para Desarrolladores
 
-Cada vez que se solicite un cambio o actualización en Google AI Studio / Anti-Gravity, se debe seguir este procedimiento para mantener al usuario informado y garantizar la trazabilidad de los cambios:
+Cada vez que se solicite un cambio o actualización en el sistema, se debe seguir este procedimiento para mantener al usuario informado y garantizar la trazabilidad de los cambios:
 
 1. **Incrementar el número de versión** siguiendo versionado semántico:
    - **Parche (v2.5.x)**: Corrección de errores menores, textos, ajustes de estilos visuales.
@@ -25,7 +25,19 @@ Cada vez que se solicite un cambio o actualización en Google AI Studio / Anti-G
 
 ## 🚀 Historial de Versiones
 
-### [v2.6.0] - 17 de Octubre, 2026 (Compilación Activa)
+### [v2.7.0] - 18 de Octubre, 2026 (Compilación Activa)
+**Título:** Dashboard Visual de Tendencias de Asistencia con Recharts
+- **Dashboard Analítico con Recharts:**
+  - **Gráficos Compuestos de Asistencia**: Visualización de doble capa (barras y áreas suaves) para observar la evolución de la asistencia mes a mes durante el Año de Servicio teocrático (Septiembre a Agosto).
+  - **Filtros Dinámicos**: Posibilidad de alternar entre reuniones Entre Semana, Fin de Semana o vista combinada.
+  - **Desglose de Canales (Presencial vs. Zoom)**: Gráficos de barras apiladas y distribución porcentual para monitorear la asistencia física y remota.
+  - **Líneas de Referencia y Máximos Históricos**: Indicador visual de promedio anual con identificación del mes pico de asistencia.
+  - **Vistas Especializadas**: Modos de visualización por Tendencias Mensuales, Distribución de Canales, Vista Semanal continua y Tabla de Datos con exportación a CSV.
+  - **Interconexión Directa**: Botones de acceso rápido entre el dashboard analítico y el registro mensual de asistencia (S-88).
+
+---
+
+### [v2.6.0] - 17 de Octubre, 2026
 **Título:** Sincronización en Cola Offline con IndexedDB y Supabase (Zero-Knowledge)
 - **Cola de Sincronización Persistente en IndexedDB:**
   - **Almacenamiento Local Garantizado**: Cuando el dispositivo pierde conexión o está en modo offline (por ejemplo, en el Salón del Reino o en el territorio), las modificaciones críticas como la marcación de asistencia (S-88), edición de informes de servicio (S-21 / S-4) o actualizaciones de publicadores se guardan inmediatamente en una cola persistente de **IndexedDB** (`kongre_offline_sync_db`).
@@ -45,7 +57,7 @@ Cada vez que se solicite un cambio o actualización en Google AI Studio / Anti-G
 - **Novedades:**
   - **Pie de página con Registro de Versión**: Se agregó en la parte inferior de la aplicación el número de versión visible (`v2.5.0`) con enlace directo al modal detallado de registro de cambios.
   - **Modal Interactivo de Historial de Versiones**: Ventana que permite inspeccionar todas las versiones, fechas de despliegue, cambios realizados y copiar datos de diagnóstico.
-  - **Documento Oficial de Registro de Cambios (`CHANGELOG.md`)**: Estructura formal para auditar cada cambio subido en Google AI Studio (Anti-Gravity).
+  - **Documento Oficial de Registro de Cambios (`CHANGELOG.md`)**: Estructura formal para auditar cada versión y cambio desplegado en la aplicación.
 - **Navegación e Historial del Navegador:**
   - **Soporte de botones Atrás y Adelante**: Compatibilidad total con las flechas de navegación del navegador (o gestos móviles en Android/iOS) para moverse entre las pestañas (`#publicadores`, `#programacion`, `#territorios`, etc.) sin perder el estado ni recargar la aplicación.
   - **Cierre de modales con el botón Atrás**: Al pulsar Atrás con un modal abierto (PINs, selector de rol, etc.), el modal se cierra automáticamente manteniendo la pestaña actual.

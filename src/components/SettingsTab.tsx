@@ -1343,7 +1343,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
               </div>
             </div>
 
-            {/* Tarjeta 9: Registro de Versiones y Changelog (Google AI Studio) */}
+            {/* Tarjeta 9: Registro de Versiones y Changelog */}
             <div
               onClick={() => onOpenVersionModal?.()}
               className="bg-white dark:bg-[#0f1623] hover:bg-indigo-50/[0.3] dark:hover:bg-indigo-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-indigo-400/50 dark:hover:border-indigo-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
@@ -1362,7 +1362,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                   Registro de Versiones y Changelog
                 </h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
-                  Historial detallado de actualizaciones, verificación de despliegue en Google AI Studio (Anti-Gravity) y estado de compilación.
+                  Historial detallado de actualizaciones, verificación de despliegue y estado de compilación de la aplicación.
                 </p>
 
                 <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
@@ -2657,7 +2657,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
               <div className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                    <span>Clave de API de Gemini (Google AI Studio)</span>
+                    <span>Clave de API de Gemini</span>
                     <a
                       href="https://aistudio.google.com/app/apikey"
                       target="_blank"

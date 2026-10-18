@@ -79,7 +79,7 @@ export const TAB_CONFIG: Record<Tab, {
   all:         { label: 'Panel de Tarjetas',   icon: Layers,      color: 'text-indigo-600 dark:text-indigo-400',   gradient: 'from-indigo-600 via-indigo-600 to-violet-600', shadow: 'shadow-indigo-600/30', badge: 'Hub', desc: 'Panel de categorías teocráticas independientes' },
   personal:    { label: 'Información Personal', icon: User,        color: 'text-blue-600 dark:text-blue-400',       gradient: 'from-blue-600 to-indigo-600', shadow: 'shadow-blue-600/30', desc: 'Datos civiles, filiación y registro básico' },
   contact:     { label: 'Contacto y Ubicación', icon: MapPin,     color: 'text-cyan-600 dark:text-cyan-400',       gradient: 'from-cyan-600 to-blue-600', shadow: 'shadow-cyan-600/30', desc: 'Teléfono, móvil, dirección y mapas' },
-  access:      { label: 'Acceso y PIN',        icon: KeyRound,    color: 'text-purple-600 dark:text-purple-400',   gradient: 'from-purple-600 to-indigo-600', shadow: 'shadow-purple-600/30', desc: 'PIN personal, rol de sistema y credenciales estilo NW Scheduler' },
+  access:      { label: 'Acceso y PIN',        icon: KeyRound,    color: 'text-purple-600 dark:text-purple-400',   gradient: 'from-purple-600 to-indigo-600', shadow: 'shadow-purple-600/30', desc: 'PIN personal, rol de sistema y credenciales de acceso individual' },
   medical:     { label: 'DPA & Salud',        icon: Stethoscope, color: 'text-rose-600 dark:text-rose-400',       gradient: 'from-rose-600 to-pink-600', shadow: 'shadow-rose-600/30', desc: 'Directriz médica anticipada y salud' },
   spiritual:   { label: 'Estado Espiritual',   icon: Shield,      color: 'text-emerald-600 dark:text-emerald-400', gradient: 'from-emerald-600 to-teal-600', shadow: 'shadow-emerald-600/30', desc: 'Bautismo, privilegios y rol eclesiástico' },
   assignments: { label: 'Asignaciones',       icon: CheckCircle, color: 'text-violet-600 dark:text-violet-400',   gradient: 'from-violet-600 to-purple-600', shadow: 'shadow-violet-600/30', desc: 'Partes de reunión, tareas y servicio' },
@@ -622,7 +622,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                 </div>
               </div>
 
-              {/* Contenedor: Acceso Teocrático y PIN (NW Scheduler) */}
+              {/* Contenedor: Acceso Teocrático y PIN */}
               <div 
                 onClick={() => setActiveTab('access')}
                 className="bg-white dark:bg-[#0f1623] hover:bg-purple-50/[0.3] dark:hover:bg-purple-500/[0.04] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-purple-400/50 dark:hover:border-purple-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
@@ -644,7 +644,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                     Acceso Teocrático y PIN
                   </h4>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
-                    PIN personal para la app móvil / portal, credenciales, código QR y permisos estilo NW Scheduler.
+                    PIN personal para el portal teocrático, credenciales, código QR y permisos del publicador.
                   </p>
 
                   <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">

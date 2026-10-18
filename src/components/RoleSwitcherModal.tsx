@@ -1122,7 +1122,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                     Ingresar con PIN de Publicador
                   </h4>
                   <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                    Si eres un hermano con responsabilidades o deseas acceder a tu NW Publisher personal, introduce tu PIN de 4 a 6 dígitos aquí:
+                    Si eres un hermano con responsabilidades o deseas acceder a tu portal personal de publicador, introduce tu PIN de 4 a 6 dígitos aquí:
                   </p>
                 </div>
 

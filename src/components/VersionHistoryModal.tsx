@@ -94,7 +94,7 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
                 Registro de Versiones y Actualizaciones
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                Control oficial de compilaciones en Google AI Studio (Anti-Gravity)
+                Control oficial de versiones y compilaciones de la aplicación
               </p>
             </div>
           </div>
@@ -160,7 +160,7 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
           <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
             <Info className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
             <div className="leading-relaxed">
-              <strong>Verificación de Actualizaciones:</strong> Cada vez que solicites cambios en Google AI Studio (Anti-Gravity), el asistente incrementa el número de versión y registra las novedades en este documento (`CHANGELOG.md` y `src/utils/versionLog.ts`). Si el número en el pie de página coincide con este registro, tus cambios ya están correctamente desplegados y en línea.
+              <strong>Verificación de Actualizaciones:</strong> Cada vez que se compila una actualización, se incrementa el número de versión y se registran las novedades en el historial del sistema. Si el número de versión en el pie de página coincide con este registro, los cambios ya están activos y listos para usar.
             </div>
           </div>
 

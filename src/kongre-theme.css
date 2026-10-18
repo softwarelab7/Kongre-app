@@ -28,8 +28,8 @@
 /* ---------- Claro (por defecto) ---------- */
 :root,
 [data-theme="light"] {
-  --brand: #4F46E5;
-  --brand-hover: #4338CA;
+  --brand: #4C3AED;
+  --brand-hover: #3E2FCE;
   --brand-soft: #EEF2FF;
   --on-brand: #FFFFFF;
   --bg: #FFFFFF;
@@ -45,8 +45,8 @@
 
 /* ---------- Oscuro ---------- */
 [data-theme="dark"] {
-  --brand: #818CF8;
-  --brand-hover: #A5B4FC;
+  --brand: #9085F4;
+  --brand-hover: #A9A0F6;
   --brand-soft: #312E81;
   --on-brand: #111827;
   --bg: #111827;
@@ -64,9 +64,9 @@
    Pensado para luz baja: negro puro y texto un poco atenuado
    para que no deslumbre ni se vea desde la sala. Ajusta a tu gusto. */
 [data-theme="cabina"] {
-  --brand: #818CF8;
-  --brand-hover: #A5B4FC;
-  --brand-soft: #1E1B4B;
+  --brand: #9085F4;
+  --brand-hover: #A9A0F6;
+  --brand-soft: #0F0C2F;
   --on-brand: #000000;
   --bg: #000000;
   --surface: #0A0A0F;
@@ -80,7 +80,7 @@
 }
 
 /* Degradado de marca (el del icono). Uso: class="bg-brand-gradient" */
-:root { --gradient-brand: linear-gradient(135deg, #6D6AF5, #3F36C9); }
+:root { --gradient-brand: linear-gradient(135deg, #4C3AED, #3728BE); }
 @utility bg-brand-gradient { background-image: var(--gradient-brand); }
 
 /* Evita el parpadeo blanco al cargar */

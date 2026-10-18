@@ -374,6 +374,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       localStorage.setItem('kongre_last_cong_pin', cleanCongPin);
       localStorage.setItem('kongre_is_registered_congregation', 'true');
       localStorage.setItem('kongre_has_entered_app', 'true');
+      localStorage.removeItem('kongre_is_guest');
       localStorage.setItem('kongre_identified_brother', coordinatorName.trim());
       localStorage.setItem('kongre_coordinator_name', coordinatorName.trim());
       localStorage.setItem('kongre_coordinator_email', coordinatorEmail.trim().toLowerCase());

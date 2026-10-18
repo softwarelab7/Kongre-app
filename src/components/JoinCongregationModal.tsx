@@ -227,6 +227,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         }
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
+        localStorage.removeItem('kongre_is_guest');
         localStorage.setItem('kongre_session_pin_v2', cleanPersonalPin);
         localStorage.removeItem('kongre_needs_cloud_upload');
         localStorage.setItem('kongre_last_local_update', cloudData?.updatedAt || new Date().toISOString());

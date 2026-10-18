@@ -42,7 +42,7 @@ const AVATAR_PRESETS = [
     name: 'Anciano / Biblia',
     icon: '📖',
     bgColor: 'bg-indigo-600',
-    dataUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><rect width="96" height="96" rx="48" fill="%234f46e5"/><text x="50%" y="54%" font-size="44" text-anchor="middle" dominant-baseline="middle">📖</text></svg>',
+    dataUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><rect width="96" height="96" rx="48" fill="%234c3aed"/><text x="50%" y="54%" font-size="44" text-anchor="middle" dominant-baseline="middle">📖</text></svg>',
   },
   {
     id: 'salon',

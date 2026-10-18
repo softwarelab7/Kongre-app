@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 export type Theme = 'light' | 'dark' | 'cabina';
 const KEY = 'kongre-theme';
-const BAR: Record<Theme, string> = { light: '#4F46E5', dark: '#111827', cabina: '#000000' };
+const BAR: Record<Theme, string> = { light: '#4C3AED', dark: '#111827', cabina: '#000000' };
 
 export function applyTheme(t: Theme) {
   const root = document.documentElement;

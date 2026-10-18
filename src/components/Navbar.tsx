@@ -12,6 +12,7 @@ import { getFriendlyCongregationName, isGenericIdentityName } from '../utils/the
 import { isTabAllowedForRole } from '../utils/rbac';
 import { CURRENT_APP_VERSION } from '../utils/versionLog';
 import { OfflineSyncBadge } from './OfflineSyncBadge';
+import { DemoBanner } from './DemoBanner';
 import {
   Calendar,
   Users,
@@ -122,6 +123,7 @@ interface NavbarProps {
   onOpenAuditLog?: () => void;
   onOpenVersionModal?: () => void;
   onOpenQueueModal?: () => void;
+  onOpenRegisterModal?: () => void;
 }
 
 interface NavSubItem {
@@ -163,6 +165,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAuditLog,
   onOpenVersionModal,
   onOpenQueueModal,
+  onOpenRegisterModal,
 }) => {
   const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo, currentBrotherName, isCoordinator, permissions } = useAuth();
   const canManageRoles = !effectiveRoleInfo.isReadOnly && activeRole !== 'publico' && (isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano');
@@ -175,7 +178,24 @@ export const Navbar: React.FC<NavbarProps> = ({
     accountLinkRequests,
     auxPioneerRequests,
     isOnline,
+    isDemoMode,
+    loadDemoData,
+    exitDemoMode,
   } = useCongregation();
+
+  const handleExitDemo = () => {
+    exitDemoMode();
+    if (onOpenWelcomeLanding) {
+      onOpenWelcomeLanding();
+    } else {
+      window.location.reload();
+    }
+  };
+
+  const handleResetDemo = () => {
+    loadDemoData();
+    window.location.reload();
+  };
   const effectiveDisplayName =
     currentBrotherName && !isGenericIdentityName(currentBrotherName)
       ? (currentBrotherName as string)
@@ -194,6 +214,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     try {
       localStorage.removeItem('kongre_has_entered_app');
       localStorage.removeItem('kongre_is_registered_congregation');
+      localStorage.removeItem('kongre_is_guest');
       localStorage.removeItem('kongre_user_profile_guest');
       localStorage.removeItem('kongre_user_profile_active');
       localStorage.removeItem('kongre_identified_brother');
@@ -1017,10 +1038,20 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Congregation title & breadcrumb navigation */}
             <div className="truncate">
-              <div className="flex items-center gap-1.5 text-xs">
+              <div className="flex items-center gap-2 text-xs">
                 <h1 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight truncate">
                   {displayCongregationName}
                 </h1>
+                {isDemoMode && (
+                  <div className="shrink-0">
+                    <DemoBanner
+                      onOpenRoleModal={onOpenRoleModal}
+                      onOpenRegisterModal={onOpenRegisterModal}
+                      onExitDemo={handleExitDemo}
+                      onResetDemo={handleResetDemo}
+                    />
+                  </div>
+                )}
                 <span className="text-slate-300 dark:text-slate-600 font-normal hidden sm:inline">/</span>
                 <span className="text-indigo-600 dark:text-indigo-400 font-semibold truncate hidden sm:inline text-xs">
                   {getCurrentTabSubtitle(activeTab)}
@@ -1302,9 +1333,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="flex items-center gap-2.5 min-w-0">
                 <Logo variant="isotipo" className="w-8 h-8 object-contain shrink-0" />
                 <div className="min-w-0">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                    {displayCongregationName}
-                  </h3>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                      {displayCongregationName}
+                    </h3>
+                    {isDemoMode && (
+                      <DemoBanner
+                        onOpenRoleModal={onOpenRoleModal}
+                        onOpenRegisterModal={onOpenRegisterModal}
+                        onExitDemo={handleExitDemo}
+                        onResetDemo={handleResetDemo}
+                      />
+                    )}
+                  </div>
                   <p className="text-[11px] text-slate-400 truncate">Menú de Navegación Teocrático</p>
                 </div>
               </div>

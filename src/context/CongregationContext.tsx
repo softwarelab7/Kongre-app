@@ -80,6 +80,7 @@ import {
   createEmptyWeek,
   formatDateISO,
 } from '../utils/sampleData';
+import { getDemoCongregationData } from '../utils/demoData';
 import { parseISODateParts, getMeetingDateForWeek, getMondayFromDate } from '../utils/dateUtils';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganizedSync } from '../utils/organizedSync';
 import { detectConflictsInWeek } from '../utils/conflictDetector';
@@ -312,6 +313,9 @@ interface CongregationContextType {
   cleanSampleData: () => Promise<void> | void;
   clearAllPublishers: () => Promise<void> | void;
   resetAllCongregationData: () => void;
+  isDemoMode: boolean;
+  loadDemoData: () => void;
+  exitDemoMode: () => void;
   deleteAllRegisteredCongregations: () => Promise<{ success: boolean; message: string }>;
   restorePreviousRegistration: (congName?: string, coordName?: string, pin?: string) => Promise<void>;
   uploadLocalDataToGoogle: () => Promise<{ success: boolean; message: string }>;
@@ -4819,6 +4823,43 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     await deletePublishersBatch(publishers.map(p => p.id));
   };
 
+  const [isDemoMode, setIsDemoMode] = useState<boolean>(() => {
+    return typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true';
+  });
+
+  const loadDemoData = () => {
+    const demo = getDemoCongregationData();
+    hydrateAllFromData(demo);
+    setIsDemoMode(true);
+    localStorage.setItem('kongre_demo_mode', 'true');
+    localStorage.setItem('kongre_is_guest', 'true');
+    localStorage.setItem('kongre_has_entered_app', 'true');
+    localStorage.setItem('kongre_is_registered_congregation', 'true');
+    localStorage.setItem('kongre_identified_brother', 'Carlos Mendoza (Demo)');
+    localStorage.setItem('theocratic_app_data_v1_active_role', 'coordinador');
+    localStorage.setItem('kongre_active_role_v1', 'coordinador');
+    localStorage.setItem('kongre_congregation_name', demo.settings.congregationName || 'Congregación Central (Demostración)');
+    localStorage.setItem('kongre_congregation_number', demo.settings.congregationNumber || 'DEMO-001');
+    localStorage.setItem('kongre_congregation_id', demo.settings.congregationId || 'DEMO-001');
+    setSyncStatus('synced');
+  };
+
+  const exitDemoMode = () => {
+    setIsDemoMode(false);
+    localStorage.removeItem('kongre_demo_mode');
+    localStorage.removeItem('kongre_is_guest');
+    localStorage.removeItem('kongre_has_entered_app');
+    localStorage.removeItem('kongre_is_registered_congregation');
+    localStorage.removeItem('kongre_identified_brother');
+    localStorage.removeItem('theocratic_app_data_v1_active_role');
+    localStorage.removeItem('kongre_active_role_v1');
+    localStorage.removeItem('kongre_congregation_name');
+    localStorage.removeItem('kongre_congregation_number');
+    localStorage.removeItem('kongre_congregation_id');
+    sessionStorage.setItem('kongre_show_landing', 'true');
+    resetAllCongregationData();
+  };
+
   const resetAllCongregationData = () => {
     setPublishers([]);
     setPreachingGroups([]);
@@ -5358,6 +5399,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         cleanSampleData,
         clearAllPublishers,
         resetAllCongregationData,
+        isDemoMode,
+        loadDemoData,
+        exitDemoMode,
         deleteAllRegisteredCongregations,
         restorePreviousRegistration,
         uploadLocalDataToGoogle,

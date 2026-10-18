@@ -25,19 +25,45 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.7.0';
-export const CURRENT_BUILD_CODE = '2026.10.18.270';
+export const CURRENT_APP_VERSION = '2.8.0';
+export const CURRENT_BUILD_CODE = '2026.10.18.280';
 export const BUILD_DATE = '18 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.8.0',
+    buildCode: '2026.10.18.280',
+    date: '18 de Octubre, 2026',
+    title: 'Diseño Oficial de Bienvenida para PC / Escritorio (Kongre v3)',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Implementación del diseño de bienvenida para PC según la plantilla teocrática oficial con AnimatedLogo, selector de Modo Demo y botón de tema circular de 3 modos (Claro, Oscuro, Cabina A/V).',
+      },
+      {
+        category: 'improvement',
+        text: 'Columna de presentación con badge interactivo de destellos, titular con gradiente de marca y cuadrícula 2x2 de características con divisores sutiles y microanimaciones de trazo SVG.',
+      },
+      {
+        category: 'improvement',
+        text: 'Tarjeta de acceso rediseñada con estilos .card y .opt, asignación del icono del ojo a "Iniciar sesión con código de invitación" y retiro del acceso público de invitado.',
+      },
+      {
+        category: 'improvement',
+        text: 'Pie de página con enlaces a Términos de Uso, Política de Privacidad, estado de conectividad en línea y acceso al historial de cambios.',
+      },
+    ],
+  },
+  {
     version: '2.7.0',
     buildCode: '2026.10.18.270',
     date: '18 de Octubre, 2026',
     title: 'Dashboard Visual de Tendencias de Asistencia con Recharts',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

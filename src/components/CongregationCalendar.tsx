@@ -1025,8 +1025,8 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
     type EventStyle = { bg: string; border: string; text: string };
     const styles: Record<string, EventStyle> = {
       meeting: isDark
-        ? { bg: 'rgba(79,70,229,0.25)', border: '#818cf8', text: '#e0e7ff' }
-        : { bg: '#eef2ff', border: '#4f46e5', text: '#312e81' },
+        ? { bg: 'rgba(76,58,237,0.25)', border: '#9085f4', text: '#e0e7ff' }
+        : { bg: '#eef2ff', border: '#4C3AED', text: '#312e81' },
       visit: isDark
         ? { bg: 'rgba(139,92,246,0.22)', border: '#a78bfa', text: '#c4b5fd' }
         : { bg: '#f3e5f5', border: '#8e24aa', text: '#8e24aa' },

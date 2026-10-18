@@ -219,7 +219,7 @@ export const TerritoryMapView: React.FC<TerritoryMapViewProps> = ({
           className: 'hall-marker',
           html: `
             <div style="
-              background: #4f46e5;
+              background: #4C3AED;
               color: white;
               padding: 4px 8px;
               border-radius: 12px;

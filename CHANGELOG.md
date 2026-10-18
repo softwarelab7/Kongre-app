@@ -25,7 +25,36 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.7.0] - 18 de Octubre, 2026 (Compilación Activa)
+### [v2.8.0] - 18 de Octubre, 2026 (Compilación Activa)
+**Título:** Diseño Oficial de Bienvenida para PC / Escritorio (Kongre v3)
+- **Cabecera de Escritorio:**
+  - Logotipo animado SVG oficial `AnimatedLogo` (34px) con efecto de dibujo y revelación tipográfica.
+  - Botón de acceso directo a **Modo Demo** con datos precargados.
+  - Selector circular de tema `.tbtn` con alternancia entre 3 modos: **Claro**, **Oscuro** y **Cabina A/V**.
+- **Columna de Presentación Teocrática (Izquierda):**
+  - Insignia interactiva con destellos animados (`Sparkles`) al pasar el cursor: *«Gestor Teocrático Integral • Seguro y Eficiente»*.
+  - Titular principal con gradiente de marca: *«Toda la gestión teocrática de tu congregación, en un solo lugar.»*.
+  - Párrafo introductorio optimizado para lectura y contexto teocrático.
+  - Cuadrícula 2x2 de características (`.feat`) con separadores superiores sutiles y microanimaciones de trazo SVG (`AnimIcon` con `tilt`, `drop`, `pulse`, `flash`):
+    - *Reuniones & Guía S-89*
+    - *Territorios & Carritos*
+    - *Seguridad por Roles & PIN*
+    - *PWA & Modo Offline*
+- **Tarjeta de Acceso Interactiva (Derecha):**
+  - Estructura `.card` con sombra teocrática suavizada y ceja descriptiva (`.eye`) con indicador *«KONGRE • PORTAL DE ACCESO»* y pill *«Gestor Teocrático»*.
+  - Opciones de entrada rediseñadas (`.opt`):
+    - **Registrar mi Congregación**: Estilo destacado `.main` con badge oficial.
+    - **Iniciar sesión con Google**: Vinculación de perfil y asignaciones.
+    - **Conectar con ID y PIN de Congregación**: Acceso teocrático directo.
+    - **Iniciar sesión con código de invitación**: Acceso de un solo uso por dispositivo con icono del ojo (`Eye`) animado.
+    - Acceso exclusivo para publicadores y siervos registrados (se eliminó la opción pública de Invitado/Cartas).
+- **Pie de Página Unificado:**
+  - Enlaces a Términos de Uso y Política de Privacidad.
+  - Indicador de estado en línea y acceso directo al registro de cambios de versión.
+
+---
+
+### [v2.7.0] - 18 de Octubre, 2026
 **Título:** Dashboard Visual de Tendencias de Asistencia con Recharts
 - **Dashboard Analítico con Recharts:**
   - **Gráficos Compuestos de Asistencia**: Visualización de doble capa (barras y áreas suaves) para observar la evolución de la asistencia mes a mes durante el Año de Servicio teocrático (Septiembre a Agosto).

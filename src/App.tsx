@@ -66,6 +66,7 @@ import { AuditLogModal } from './components/AuditLogModal';
 import { AppFooter } from './components/AppFooter';
 import { VersionHistoryModal } from './components/VersionHistoryModal';
 import { OfflineSyncQueueModal } from './components/OfflineSyncQueueModal';
+import { DemoNoticeModal } from './components/DemoNoticeModal';
 import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import { checkUpcomingAssignmentsAndNotify } from './services/notificationService';
@@ -219,7 +220,24 @@ const AppContent: React.FC = () => {
     loadCongregationFromCloud,
     isOnline,
     syncOfflineQueueNow,
+    isDemoMode,
+    loadDemoData,
+    exitDemoMode,
   } = useCongregation();
+
+  const [isDemoNoticeOpen, setIsDemoNoticeOpen] = useState(() => {
+    return (
+      typeof window !== 'undefined' &&
+      localStorage.getItem('kongre_demo_mode') === 'true' &&
+      sessionStorage.getItem('kongre_demo_notice_shown') !== 'true'
+    );
+  });
+
+  useEffect(() => {
+    if (isDemoMode && sessionStorage.getItem('kongre_demo_notice_shown') !== 'true') {
+      setIsDemoNoticeOpen(true);
+    }
+  }, [isDemoMode]);
 
   // Navigation with browser History (Back / Forward button support)
   const setActiveTab = useCallback(
@@ -473,8 +491,11 @@ const AppContent: React.FC = () => {
   // Verificación de existencia real de la congregación en la nube (Supabase):
   // Si la congregación activa fue eliminada de la nube o no existe, restablecer el acceso a la pantalla de bienvenida
   useEffect(() => {
+    if (isDemoMode || localStorage.getItem('kongre_demo_mode') === 'true') {
+      return;
+    }
     const activeCongId = settings.congregationNumber || settings.congregationId || localStorage.getItem('kongre_congregation_number');
-    if (activeCongId && activeCongId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(activeCongId.toUpperCase())) {
+    if (activeCongId && activeCongId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID', 'DEMO-001'].includes(activeCongId.toUpperCase())) {
       (async () => {
         try {
           const res = await loadCongregationFromCloud(activeCongId, { skipHydrate: true });
@@ -492,7 +513,7 @@ const AppContent: React.FC = () => {
         }
       })();
     }
-  }, [settings.congregationNumber, settings.congregationId, loadCongregationFromCloud]);
+  }, [settings.congregationNumber, settings.congregationId, loadCongregationFromCloud, isDemoMode]);
 
   // Guardián de Sesión de Publicador: Revocación o cambio de PIN en tiempo real (p.ej. teléfono perdido o robo)
   useEffect(() => {
@@ -635,7 +656,8 @@ const AppContent: React.FC = () => {
 
   // Suggest setting up app lock PIN on this device after user enters the session / logs in
   useEffect(() => {
-    if (!showWelcomeLanding) {
+    const isGuest = localStorage.getItem('kongre_is_guest') === 'true' || localStorage.getItem('kongre_identified_brother') === 'Invitado';
+    if (!showWelcomeLanding && !isGuest) {
       const hasPersonalPin = localStorage.getItem('kongre_security_pin_hash');
       const dismissed = localStorage.getItem('kongre_lock_pin_suggestion_dismissed');
       if (!hasPersonalPin && !dismissed) {
@@ -659,10 +681,19 @@ const AppContent: React.FC = () => {
   }, [user, showWelcomeLanding]);
 
   // Mandatory Congregation Registration Check:
-  // A user MUST register the congregation (or join an existing one with verified PIN/credentials) before accessing the platform
+  // A user MUST register the congregation (or join an existing one with verified PIN/credentials),
+  // OR enter as guest (read-only mode like Organized app) before accessing the platform
+  const isGuestSession = Boolean(
+    isDemoMode ||
+    localStorage.getItem('kongre_demo_mode') === 'true' ||
+    localStorage.getItem('kongre_is_guest') === 'true' ||
+    localStorage.getItem('kongre_identified_brother') === 'Invitado'
+  );
+
   const isCongregationRegistered = Boolean(
-    (localStorage.getItem('kongre_has_entered_app') === 'true' && localStorage.getItem('kongre_is_registered_congregation') === 'true') &&
-    (settings.isRegistered || Boolean(localStorage.getItem('kongre_congregation_id')) || Boolean(localStorage.getItem('kongre_congregation_number')))
+    isGuestSession ||
+    ((localStorage.getItem('kongre_has_entered_app') === 'true' && localStorage.getItem('kongre_is_registered_congregation') === 'true') &&
+    (settings.isRegistered || Boolean(localStorage.getItem('kongre_congregation_id')) || Boolean(localStorage.getItem('kongre_congregation_number'))))
   );
 
   if (showWelcomeLanding || !isCongregationRegistered) {
@@ -674,7 +705,8 @@ const AppContent: React.FC = () => {
             sessionStorage.removeItem('kongre_show_landing');
             localStorage.setItem('kongre_has_entered_app', 'true');
             localStorage.setItem('kongre_is_registered_congregation', 'true');
-            window.history.pushState({ tab: activeTab, modal: null, landing: false }, '', `#${activeTab}`);
+            setActiveTab('inicio');
+            window.history.pushState({ tab: 'inicio', modal: null, landing: false }, '', '#inicio');
           }}
           onOpenJoinModal={() => {
             openModalWithHistory('unirse', setIsJoinModalOpen);
@@ -767,6 +799,7 @@ const AppContent: React.FC = () => {
         onOpenAuditLog={() => openModalWithHistory('auditoria', setIsAuditLogOpen)}
         onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
         onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
+        onOpenRegisterModal={() => openModalWithHistory('registro_congregacion', setIsRegisterWizardOpen)}
       />
 
       <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200 flex flex-col justify-between`}>
@@ -802,10 +835,12 @@ const AppContent: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                      ¡Bienvenido! Tu congregación aún no está configurada
+                      {isGuestSession ? 'Modo Invitado / Exploración Activa' : '¡Bienvenido! Tu congregación aún no está configurada'}
                     </h4>
                     <p className="text-xs text-slate-600 dark:text-slate-300">
-                      Puedes usar y explorar la app libremente, o registrar los datos oficiales (nombre, circuito y reuniones) para comenzar a organizar.
+                      {isGuestSession
+                        ? 'Estás explorando Kongre en modo invitado (solo lectura). Puedes consultar el programa de reuniones, cartelera y calendario, o registrar tu congregación para empezar a administrarla.'
+                        : 'Puedes usar y explorar la app libremente, o registrar los datos oficiales (nombre, circuito y reuniones) para comenzar a organizar.'}
                     </p>
                   </div>
                 </div>
@@ -958,8 +993,8 @@ const AppContent: React.FC = () => {
       {/* Offline Connectivity & Cloud Sync Status Banner */}
       <OfflineSyncBanner onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)} />
 
-      {/* Role Switcher & Google Account Permissions Modal (Strictly Elders & Coordinator) */}
-      {canManageRoles && (
+      {/* Role Switcher & Google Account Permissions Modal (Strictly Elders & Coordinator, or Demo Mode) */}
+      {(canManageRoles || isDemoMode) && (
         <RoleSwitcherModal
           isOpen={isRoleModalOpen}
           onClose={() => closeModalWithHistory('roles', setIsRoleModalOpen)}
@@ -1024,6 +1059,20 @@ const AppContent: React.FC = () => {
         onClose={() => closeModalWithHistory('cola_offline', setIsQueueModalOpen)}
         isOnline={isOnline}
         onSyncNow={syncOfflineQueueNow}
+      />
+
+      {/* Demo Notice Modal (Organized-style Welcome to Demo Notice) */}
+      <DemoNoticeModal
+        isOpen={isDemoNoticeOpen}
+        onClose={() => {
+          setIsDemoNoticeOpen(false);
+          sessionStorage.setItem('kongre_demo_notice_shown', 'true');
+        }}
+        onOpenRegisterModal={() => {
+          setIsDemoNoticeOpen(false);
+          sessionStorage.setItem('kongre_demo_notice_shown', 'true');
+          openModalWithHistory('registro_congregacion', setIsRegisterWizardOpen);
+        }}
       />
 
     </div>

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./kongre-theme.css";
+@import "./kongre-welcome.css";
 @import "leaflet/dist/leaflet.css";
 
 @layer base {
@@ -381,7 +382,7 @@
 
 .polygon-vertex-handle:hover {
   transform: scale(1.35);
-  border-color: #4f46e5;
+  border-color: #4C3AED;
   background-color: #e0e7ff;
 }
 

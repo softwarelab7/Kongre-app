@@ -1,7 +1,7 @@
-export type LogoVariant = 'horizontal' | 'vertical' | 'isotipo' | 'logotipo';
+type Variant = 'horizontal' | 'vertical' | 'isotipo' | 'logotipo';
 
 /** Muestra el logo positivo en Claro y el negativo en Oscuro/Cabina, sin JavaScript. */
-export default function Logo({ variant = 'horizontal', className = 'h-8' }: { variant?: LogoVariant; className?: string }) {
+export default function Logo({ variant = 'horizontal', className = 'h-8' }: { variant?: Variant; className?: string }) {
   return (
     <>
       <img src={`/logo/kongre_${variant}_positivo.svg`} alt="Kongre" className={`${className} block dark:hidden`} />
@@ -9,5 +9,3 @@ export default function Logo({ variant = 'horizontal', className = 'h-8' }: { va
     </>
   );
 }
-
-export { Logo };

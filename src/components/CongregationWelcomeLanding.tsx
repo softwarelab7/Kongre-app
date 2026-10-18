@@ -9,6 +9,8 @@ import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import {
   Sun,
   Moon,
+  MonitorSpeaker,
+  CircleUserRound,
   User as UserIcon,
   Mail,
   Home,
@@ -27,8 +29,10 @@ import {
   LogOut,
   Lock,
   Calendar,
+  CalendarDays,
   MapPin,
   Wifi,
+  CloudOff,
   Layers,
   Hash,
   Eye,
@@ -36,17 +40,183 @@ import {
   Trash2,
   AlertTriangle,
 } from 'lucide-react';
+import { DemoStartupModal } from './DemoStartupModal';
+import { IconCongregationAccess } from './IconCongregationAccess';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 import { PendingApprovalView } from './PendingApprovalView';
 import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
+import AnimatedLogo from '../AnimatedLogo';
+import AnimIcon, { usePlay, type Motion } from '../AnimIcon';
 import ThemeToggle from './ThemeToggle';
 import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
+
+const NEXT_THEME: Record<string, 'light' | 'dark' | 'cabina'> = { light: 'dark', dark: 'cabina', cabina: 'light' };
+const THEME_NAMES: Record<string, string> = { light: 'Claro', dark: 'Oscuro', cabina: 'Cabina A/V' };
+const THEME_ICONS: Record<string, any> = { light: Sun, dark: Moon, cabina: MonitorSpeaker };
 
 interface CongregationWelcomeLandingProps {
   onEnterApp: () => void;
   onOpenJoinModal?: () => void;
   onOpenVersionModal?: () => void;
+}
+
+function LandingFeatureCard({
+  icon,
+  motion,
+  delay,
+  title,
+  text,
+}: {
+  icon: any;
+  motion: Motion;
+  delay: number;
+  title: string;
+  text: string;
+}) {
+  const [play, bump] = usePlay();
+  return (
+    <article onMouseEnter={bump} className="border-t border-line py-5 cursor-default group">
+      <AnimIcon icon={icon} motion={motion} delay={delay} size={28} play={play} />
+      <h3 className="mb-1.5 mt-3 text-base font-bold text-ink group-hover:text-brand transition-colors">
+        {title}
+      </h3>
+      <p className="text-[13.5px] leading-relaxed text-muted">
+        {text}
+      </p>
+    </article>
+  );
+}
+
+interface DesktopOptionProps {
+  icon: any;
+  motion: Motion;
+  delay: number;
+  title: string;
+  description: string;
+  pill?: { label: string; tone: 'of' | 'ok' };
+  isFeatured?: boolean;
+  onClick: () => void;
+  iconCustom?: React.ReactNode;
+}
+
+function DesktopOption({
+  icon,
+  motion,
+  delay,
+  title,
+  description,
+  pill,
+  isFeatured = false,
+  onClick,
+  iconCustom,
+}: DesktopOptionProps) {
+  const [play, bump] = usePlay();
+  return (
+    <button
+      type="button"
+      onMouseEnter={bump}
+      onFocus={bump}
+      onClick={() => {
+        bump();
+        onClick();
+      }}
+      className={`opt hov group mb-2 flex w-full cursor-pointer items-start gap-4 rounded-[18px] border-[1.5px] p-4 text-left transition-all ${
+        isFeatured
+          ? 'border-bline bg-brand-soft hover:border-brand'
+          : 'border-transparent hover:bg-hover'
+      }`}
+    >
+      <span className="mt-0.5 shrink-0">
+        {iconCustom ? iconCustom : <AnimIcon icon={icon} motion={motion} delay={delay} size={28} play={play} />}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-center gap-2">
+          <b className="text-[15.5px] font-bold text-ink group-hover:text-brand transition-colors">{title}</b>
+          {pill && (
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-[11.5px] font-semibold whitespace-nowrap ${
+                pill.tone === 'of' ? 'bg-ofb text-off' : 'bg-okb text-okf'
+              }`}
+            >
+              {pill.label}
+            </span>
+          )}
+        </span>
+        <span className="mt-1 block text-[13px] leading-normal text-muted">{description}</span>
+      </span>
+      <ArrowRight
+        size={20}
+        className="mt-0.5 text-muted transition-all group-hover:translate-x-1 group-hover:text-brand shrink-0"
+        aria-hidden
+      />
+    </button>
+  );
+}
+
+interface LandingOptionRowProps {
+  icon?: any;
+  title: string;
+  description: string;
+  badge?: { label: string; tone: 'oficial' | 'lectura' };
+  isFeatured?: boolean;
+  onClick: () => void;
+  iconCustom?: React.ReactNode;
+  iconColor?: string;
+}
+
+function LandingOptionRow({
+  icon: Icon,
+  title,
+  description,
+  badge,
+  isFeatured = false,
+  onClick,
+  iconCustom,
+  iconColor = 'text-brand',
+}: LandingOptionRowProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full box-border p-3.5 sm:p-4 rounded-2xl text-left cursor-pointer transition-all flex items-start gap-3.5 sm:gap-4 group ${
+        isFeatured
+          ? 'bg-brand-soft border-[1.5px] border-bline hover:border-brand dark:bg-indigo-950/40 dark:border-indigo-800 dark:hover:border-indigo-600 shadow-xs'
+          : 'bg-transparent border-[1.5px] border-transparent hover:bg-slate-100 dark:hover:bg-slate-800/60'
+      }`}
+    >
+      <div className="shrink-0 mt-0.5">
+        {iconCustom ? (
+          iconCustom
+        ) : Icon ? (
+          <Icon className={`w-7 h-7 ${iconColor}`} strokeWidth={2} aria-hidden />
+        ) : null}
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center flex-wrap gap-2">
+          <span className="text-[15.5px] sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-brand transition-colors">
+            {title}
+          </span>
+          {badge && badge.tone === 'oficial' && (
+            <span className="px-2.5 py-0.5 rounded-full bg-[#E0E7FF] dark:bg-indigo-900/70 text-[#3730A3] dark:text-indigo-200 text-xs font-semibold whitespace-nowrap">
+              {badge.label}
+            </span>
+          )}
+          {badge && badge.tone === 'lectura' && (
+            <span className="px-2.5 py-0.5 rounded-full bg-[#DCFCE7] dark:bg-emerald-950 text-[#166534] dark:text-emerald-300 text-xs font-semibold whitespace-nowrap">
+              {badge.label}
+            </span>
+          )}
+        </div>
+        <div className="mt-1 text-[13px] leading-snug text-slate-500 dark:text-slate-400">
+          {description}
+        </div>
+      </div>
+
+      <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-brand group-hover:translate-x-1 transition-all shrink-0 mt-0.5" />
+    </button>
+  );
 }
 
 export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProps> = ({
@@ -84,15 +254,19 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     loadCongregationFromCloud,
     hydrateCongregation,
     findUserCongregationId,
+    loadDemoData,
   } = useCongregation();
-  const { isDark, toggleTheme } = useTheme();
+  const { themeMode, setThemeMode, isDark, toggleTheme } = useTheme();
+  const nextTheme = NEXT_THEME[themeMode] || 'dark';
+  const CurrentThemeIcon = THEME_ICONS[themeMode] || (isDark ? Moon : Sun);
+  const [badgePlay, bumpBadge] = usePlay();
 
-  const [activeTab, setRawActiveTab] = useState<'home' | 'email_login' | 'code_login' | 'register' | 'unauthorized'>(() => {
+  const [activeTab, setRawActiveTab] = useState<'home' | 'email_login' | 'code_login' | 'invite_code_login' | 'register' | 'unauthorized'>(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash;
       const params = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
       const v = params.get('view') as any;
-      if (['home', 'email_login', 'code_login', 'register', 'unauthorized'].includes(v)) {
+      if (['home', 'email_login', 'code_login', 'invite_code_login', 'register', 'unauthorized'].includes(v)) {
         return v;
       }
     }
@@ -115,7 +289,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       if (hash.startsWith('#portal') || hash.startsWith('#bienvenida')) {
         const params = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
         const v = (params.get('view') || e.state?.view || 'home') as any;
-        if (['home', 'email_login', 'code_login', 'register', 'unauthorized'].includes(v)) {
+        if (['home', 'email_login', 'code_login', 'invite_code_login', 'register', 'unauthorized'].includes(v)) {
           setRawActiveTab(v);
         } else {
           setRawActiveTab('home');
@@ -152,6 +326,139 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   // Email login state
   const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
+
+  // Invitation code login state (Organized Pocket mode)
+  const [inviteCodeInput, setInviteCodeInput] = useState('');
+  const [showInviteCode, setShowInviteCode] = useState(false);
+  const [isActivatingCode, setIsActivatingCode] = useState(false);
+  const [inviteCodeError, setInviteCodeError] = useState<string | null>(null);
+  const [inviteCodeSuccess, setInviteCodeSuccess] = useState<string | null>(null);
+
+  const handleActivateWithInviteCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setInviteCodeError(null);
+    setInviteCodeSuccess(null);
+    const cleanCode = inviteCodeInput.trim();
+    if (!cleanCode) {
+      setInviteCodeError('Por favor introduce el código de invitación.');
+      return;
+    }
+
+    setIsActivatingCode(true);
+
+    try {
+      let finalRole: TheocraticRole | null = null;
+      let finalBrotherName = '';
+      let publisherIdToSet: string | null = null;
+      let targetCongregationId = settings.congregationNumber || settings.congregationId || '';
+
+      // 1. Verificar si el código contiene guion con formato CONG-PIN o similar (patrón Pocket de Organized)
+      if (cleanCode.includes('-')) {
+        const parts = cleanCode.split('-');
+        if (parts.length >= 2) {
+          const potentialCong = formatCanonicalCongregationId(parts[0].trim());
+          const potentialPin = parts.slice(1).join('-').trim();
+
+          const cloudRes = await loadCongregationFromCloud(potentialCong, { skipHydrate: true });
+          if (cloudRes?.success && cloudRes.data) {
+            targetCongregationId = potentialCong;
+            const pubs = (cloudRes.data.publishers || []) as any[];
+            const matched = pubs.find(
+              (p: any) => p.personalPin && String(p.personalPin).trim() === potentialPin
+            );
+            if (matched) {
+              finalRole = (matched.theocraticRole || (matched.privilege === 'anciano' ? 'anciano' : matched.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+              finalBrotherName = matched.name && !isGenericIdentityName(matched.name) ? matched.name.trim() : 'Hermano';
+              publisherIdToSet = matched.id;
+              await hydrateCongregation(cloudRes.data);
+            }
+          }
+        }
+      }
+
+      // 2. Verificar si es un código de invitación local generado en InvitationManagerModal
+      if (!finalRole) {
+        const invRes = await redeemInvitationCode(cleanCode, user?.email || `hermano_${Date.now()}@kongre.org`, 'Hermano');
+        if (invRes.success && invRes.role) {
+          finalRole = invRes.role;
+          finalBrotherName = invRes.targetName && !isGenericIdentityName(invRes.targetName) ? invRes.targetName : 'Hermano';
+        }
+      }
+
+      // 3. Verificar si el código coincide con el PIN personal de algún publicador en la congregación activa
+      if (!finalRole && publishers && publishers.length > 0) {
+        const matched = publishers.find(
+          (p) => p.personalPin && String(p.personalPin).trim().toUpperCase() === cleanCode.toUpperCase()
+        );
+        if (matched) {
+          finalRole = (matched.theocraticRole || (matched.privilege === 'anciano' ? 'anciano' : matched.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+          finalBrotherName = matched.name && !isGenericIdentityName(matched.name) ? matched.name.trim() : 'Hermano';
+          publisherIdToSet = matched.id;
+        }
+      }
+
+      // 4. Si el código es 'DEMO', activar el modo de prueba
+      if (!finalRole && (cleanCode.toUpperCase() === 'DEMO' || cleanCode.toUpperCase() === 'DEMO-001' || cleanCode.toUpperCase() === 'INV-DEMO')) {
+        loadDemoData();
+        setActiveRole('coordinador');
+        setIdentifiedBrother('Carlos Mendoza (Demo)');
+        sessionStorage.setItem('kongre_demo_notice_shown', 'false');
+        setInviteCodeSuccess('¡Activado con éxito en modo de prueba!');
+        setTimeout(() => {
+          setIsActivatingCode(false);
+          onEnterApp();
+        }, 600);
+        return;
+      }
+
+      // 5. Verificar si coincide con algún publicador en la nube para la congregación activa
+      if (!finalRole) {
+        const activeCongId = targetCongregationId || localStorage.getItem('kongre_congregation_number') || 'CENTRAL';
+        const cloudRes = await loadCongregationFromCloud(activeCongId, { skipHydrate: true });
+        if (cloudRes?.success && cloudRes.data?.publishers) {
+          const matched = cloudRes.data.publishers.find(
+            (p: any) => p.personalPin && String(p.personalPin).trim().toUpperCase() === cleanCode.toUpperCase()
+          );
+          if (matched) {
+            finalRole = (matched.theocraticRole || (matched.privilege === 'anciano' ? 'anciano' : matched.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+            finalBrotherName = matched.name && !isGenericIdentityName(matched.name) ? matched.name.trim() : 'Hermano';
+            publisherIdToSet = matched.id;
+            await hydrateCongregation(cloudRes.data);
+          }
+        }
+      }
+
+      if (!finalRole) {
+        setInviteCodeError('Código de invitación no válido o expirado. Por favor verifica que esté bien escrito o solicita un nuevo código a los ancianos de tu congregación.');
+        setIsActivatingCode(false);
+        return;
+      }
+
+      // Activación exitosa: Aplicar rol, identificar hermano y entrar a la app
+      setActiveRole(finalRole);
+      setIdentifiedBrother(finalBrotherName || 'Hermano');
+      if (publisherIdToSet) {
+        setIdentifiedPublisher(publisherIdToSet, finalBrotherName);
+      }
+      localStorage.setItem('kongre_session_pin_v2', cleanCode);
+      localStorage.setItem('kongre_is_registered_congregation', 'true');
+      localStorage.setItem('kongre_has_entered_app', 'true');
+      localStorage.setItem('kongre_identified_brother', finalBrotherName || 'Hermano');
+      if (targetCongregationId) {
+        localStorage.setItem('kongre_congregation_number', targetCongregationId);
+        localStorage.setItem('kongre_congregation_id', targetCongregationId);
+      }
+
+      setInviteCodeSuccess(`¡Bienvenido, ${finalBrotherName}! Activando aplicación...`);
+      setTimeout(() => {
+        setIsActivatingCode(false);
+        onEnterApp();
+      }, 700);
+    } catch (err: any) {
+      setInviteCodeError(err?.message || 'Error al validar el código de invitación.');
+      setIsActivatingCode(false);
+    }
+  };
 
   const handleConnectWithIdPin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -434,13 +741,22 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     }
   };
 
+  const [isStartingDemo, setIsStartingDemo] = useState(false);
+
+  const handleEnterDemoMode = () => {
+    setIsStartingDemo(true);
+    setTimeout(() => {
+      loadDemoData();
+      setActiveRole('coordinador');
+      setIdentifiedBrother('Carlos Mendoza (Demo)');
+      sessionStorage.setItem('kongre_demo_notice_shown', 'false');
+      setIsStartingDemo(false);
+      onEnterApp();
+    }, 700);
+  };
+
   const handleEnterAsGuest = () => {
-    setActiveRole('publico');
-    setIdentifiedBrother('Invitado');
-    localStorage.setItem('kongre_is_registered_congregation', 'true');
-    localStorage.setItem('kongre_has_entered_app', 'true');
-    localStorage.setItem('kongre_identified_brother', 'Invitado');
-    onEnterApp();
+    handleEnterDemoMode();
   };
 
   const handleRequestAccessFromCoordinator = async () => {
@@ -463,291 +779,350 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col justify-between font-sans selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+    <div className="min-h-screen bg-page text-ink flex flex-col justify-between font-sans selection:bg-brand selection:text-white transition-colors duration-200">
       {/* ========================================================= */}
-      {/* 1. TOP HEADER                                            */}
+      {/* 0. MOBILE HERO & SHEET VIEW (< md) - FIEL A BIENVENIDA-HTML*/}
       {/* ========================================================= */}
-      <header className="w-full bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-30">
-        {/* Logo and Brand */}
-        <div className="flex items-center gap-2.5">
-          <Logo variant="horizontal" className="h-7 w-auto object-contain" />
-        </div>
+      {activeTab === 'home' && (
+        <div className="md:hidden flex flex-col min-h-screen bg-white dark:bg-slate-900 font-sans">
+          {/* Top Gradient Banner with Vertical White Logo & Slogan */}
+          <div
+            className="relative px-5 pt-4 pb-12 sm:pb-14 flex flex-col items-center select-none text-white shrink-0"
+            style={{ background: 'linear-gradient(135deg, #4C3AED, #3728BE)' }}
+          >
+            {/* Top Utility Bar (Demo Mode & Theme Toggle) */}
+            <div className="w-full flex items-center justify-between z-10 mb-2">
+              <button
+                type="button"
+                onClick={handleEnterDemoMode}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xs backdrop-blur-xs transition-all cursor-pointer shadow-xs active:scale-95"
+                title="Probar Kongre con datos de demostración"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>Modo Demo</span>
+              </button>
 
-        {/* Right Actions: Theme Switch */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={28} />
-        </div>
-      </header>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                aria-label="Cambiar tema"
+                className="p-2 rounded-full text-white/90 hover:text-white hover:bg-white/20 transition-all cursor-pointer"
+              >
+                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
+            </div>
 
-      {/* ========================================================= */}
-      {/* 2. MAIN WORKSPACE / RESPONSIVE HERO & ACTIONS            */}
-      {/* ========================================================= */}
-      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-5 lg:py-6 flex-1 flex flex-col justify-center min-h-[calc(100vh-65px)]">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 xl:gap-12 items-center">
+            {/* Centered Vertical Negative Logo */}
+            <div className="mt-1 flex flex-col items-center">
+              <img
+                src="/logo/kongre_vertical_negativo.svg"
+                alt="Kongre"
+                className="h-28 w-auto drop-shadow-md select-none"
+              />
+            </div>
+
+            {/* Slogan */}
+            <p className="mt-3.5 max-w-[290px] text-center text-[15px] leading-relaxed text-white/95 font-medium">
+              Una herramienta teocrática que facilita la gestión integral de la congregación
+            </p>
+          </div>
+
+          {/* Sliding Bottom Sheet */}
+          <div className="-mt-7 flex-1 rounded-t-[28px] bg-white dark:bg-slate-900 px-5 pt-7 pb-6 flex flex-col shadow-2xl z-10">
+            <h1 className="text-[22px] font-bold text-slate-900 dark:text-white m-0 tracking-tight">
+              ¡Bienvenido a Kongre!
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-4">
+              Elige cómo quieres entrar
+            </p>
+
+            {/* Mobile Options List */}
+            <div className="space-y-1.5 flex-1">
+              <LandingOptionRow
+                isFeatured
+                icon={Building2}
+                title="Registrar mi congregación"
+                badge={{ label: 'Oficial', tone: 'oficial' }}
+                description="Configura tu congregación desde cero: ID, PIN, circuito y horarios."
+                onClick={() => setActiveTab('register')}
+              />
+
+              <LandingOptionRow
+                icon={UserIcon}
+                iconCustom={
+                  <div className="relative">
+                    <UserIcon className="w-7 h-7 text-brand" strokeWidth={2} />
+                    <span className="absolute -bottom-1 -right-1 text-[8.5px] font-bold bg-brand text-white rounded-full w-3.5 h-3.5 flex items-center justify-center">
+                      @
+                    </span>
+                  </div>
+                }
+                title="Iniciar sesión con Google"
+                description="Sincroniza tus asignaciones y accede a tu perfil."
+                onClick={() => setActiveTab('email_login')}
+              />
+
+              <LandingOptionRow
+                icon={KeyRound}
+                title="Conectar con ID y PIN"
+                description="Únete a una congregación existente con su ID y PIN o código de invitación."
+                onClick={() => {
+                  setActiveTab('code_login');
+                  setCodeError(null);
+                  setCodeSuccess(null);
+                }}
+              />
+
+              <LandingOptionRow
+                icon={Eye}
+                title="Iniciar sesión con código de invitación"
+                description="Accede con un código de un solo uso en este dispositivo."
+                onClick={() => {
+                  setInviteCodeError(null);
+                  setInviteCodeSuccess(null);
+                  setActiveTab('invite_code_login');
+                }}
+              />
+            </div>
+
+            {/* Offline note footer */}
+            <div className="mt-auto pt-6 pb-2 flex items-center justify-center gap-2 text-[12.5px] text-slate-500 dark:text-slate-400 text-center">
+              <CloudOff className="w-4 h-4 text-slate-400 shrink-0" />
+              <span>Funciona sin conexión y se sincroniza al volver</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Container: Desktop view or Mobile active subviews */}
+      <div className={`${activeTab === 'home' ? 'hidden md:flex' : 'flex'} flex-col justify-between flex-1`}>
+        {/* ========================================================= */}
+        {/* 1. TOP HEADER                                            */}
+        {/* ========================================================= */}
+        <header className="w-full bg-card border-b border-line px-4 sm:px-6 md:px-8 py-3.5 flex items-center justify-between sticky top-0 z-30 transition-colors">
+          {/* Logo and Brand */}
+          <div className="flex items-center gap-2.5">
+            <AnimatedLogo height={34} />
+          </div>
+
+          {/* Right Actions: Demo Mode Button & Theme Switch */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              onClick={handleEnterDemoMode}
+              className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+              title="Probar Kongre con datos de demostración"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300 group-hover:rotate-12 transition-transform" />
+              <span>Modo Demo</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setThemeMode(nextTheme)}
+              title={`Tema: ${THEME_NAMES[themeMode]} (cambiar a ${THEME_NAMES[nextTheme]})`}
+              aria-label={`Tema: ${THEME_NAMES[themeMode]}. Cambiar a ${THEME_NAMES[nextTheme]}`}
+              className="tbtn grid size-10 cursor-pointer place-items-center rounded-full bg-brand-soft text-brand transition-colors hover:opacity-90"
+            >
+              <CurrentThemeIcon size={20} aria-hidden />
+            </button>
+          </div>
+        </header>
+
+        {/* ========================================================= */}
+        {/* 2. MAIN WORKSPACE / RESPONSIVE HERO & ACTIONS            */}
+        {/* ========================================================= */}
+        <main
+          className={`mx-auto grid w-full flex-1 items-center gap-8 lg:gap-14 px-4 py-8 md:px-8 ${
+            activeTab === 'register'
+              ? 'max-w-5xl grid-cols-1 py-6'
+              : 'max-w-[1180px] lg:grid-cols-[1.1fr_.9fr] lg:py-14'
+          }`}
+        >
           {/* ========================================================= */}
           {/* LEFT COLUMN: DESKTOP HERO & THEOCRATIC FEATURES          */}
           {/* ========================================================= */}
-          <div className={`${activeTab === 'register' ? 'hidden' : 'lg:col-span-7 xl:col-span-7 hidden lg:flex'} flex-col space-y-4 sm:space-y-5 transition-all duration-300`}>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold w-fit shadow-xs">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>Gestor Teocrático Integral • Seguro y Eficiente</span>
-            </div>
+          {activeTab !== 'register' && (
+            <section className="space-y-0">
+              <button
+                type="button"
+                onClick={bumpBadge}
+                onMouseEnter={bumpBadge}
+                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-bline bg-brand-soft px-3.5 py-1.5 text-[12.5px] font-semibold text-brand"
+              >
+                <AnimIcon icon={Sparkles} motion="pulse" delay={0.2} size={16} play={badgePlay} />
+                <span>Gestor Teocrático Integral • Seguro y Eficiente</span>
+              </button>
 
-            <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.2]">
-                Toda la gestión teocrática de tu congregación, <span className="bg-linear-to-r from-indigo-600 via-indigo-500 to-blue-500 bg-clip-text text-transparent">en un solo lugar</span>.
+              <h1 className="mb-4 mt-5 text-[clamp(34px,4.4vw,58px)] font-extrabold leading-[1.06] tracking-tight text-ink">
+                Toda la gestión teocrática de tu congregación,{' '}
+                <em className="bg-linear-to-r from-(--t1) to-(--t2) bg-clip-text not-italic text-transparent">
+                  en un solo lugar.
+                </em>
               </h1>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+
+              <p className="max-w-[560px] text-[16.5px] leading-relaxed text-muted">
                 Plataforma digital especializada para coordinadores, secretarios, superintendentes de servicio y publicadores. Organiza programas semanales, hojas S-89, asignaciones de limpieza y territorios con soporte offline PWA.
               </p>
-            </div>
 
-            {/* Feature Cards Grid (2x2 on Desktop) */}
-            <div className="grid grid-cols-2 gap-3 pt-0.5">
-              <div className="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1.5 group hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                  <Calendar className="w-4 h-4" />
-                </div>
-                <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
-                  Reuniones & Guía S-89
-                </h4>
-                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Programación Vida y Ministerio, Fin de Semana, generación automática e impresión de hojas S-89 oficiales.
-                </p>
+              {/* Feature Cards Grid (2x2 on Desktop) */}
+              <div className="mt-9 grid gap-x-8 sm:grid-cols-2">
+                <LandingFeatureCard
+                  icon={CalendarDays}
+                  motion="tilt"
+                  delay={0.5}
+                  title="Reuniones & Guía S-89"
+                  text="Programación Vida y Ministerio, Fin de Semana, generación automática e impresión de hojas S-89 oficiales."
+                />
+                <LandingFeatureCard
+                  icon={MapPin}
+                  motion="drop"
+                  delay={0.65}
+                  title="Territorios & Carritos"
+                  text="Manzanas georreferenciadas, enlaces digitales por QR para publicadores y control de turnos en carritos."
+                />
+                <LandingFeatureCard
+                  icon={ShieldCheck}
+                  motion="pulse"
+                  delay={0.8}
+                  title="Seguridad por Roles & PIN"
+                  text="Autenticación con ID de congregación, PIN de congregación y PIN personal bajo estrictas directrices."
+                />
+                <LandingFeatureCard
+                  icon={Wifi}
+                  motion="flash"
+                  delay={0.95}
+                  title="PWA & Modo Offline"
+                  text="Úsala en el Salón sin conexión a internet; tus datos se sincronizan al volver a tener red."
+                />
               </div>
-
-              <div className="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1.5 group hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors">
-                <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                  <MapPin className="w-4 h-4" />
-                </div>
-                <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
-                  Territorios & Carritos
-                </h4>
-                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Manzanas georreferenciadas, enlaces digitales por QR para publicadores y control de turnos en carritos.
-                </p>
-              </div>
-
-              <div className="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1.5 group hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
-                <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-                <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
-                  Seguridad por Roles & PIN
-                </h4>
-                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Autenticación con ID de congregación, PIN de congregación y PIN personal bajo estrictas directrices.
-                </p>
-              </div>
-
-              <div className="p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-1.5 group hover:border-amber-300 dark:hover:border-amber-700 transition-colors">
-                <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                  <Wifi className="w-4 h-4" />
-                </div>
-                <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
-                  PWA & Modo Offline
-                </h4>
-                <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                  Úsala en el Salón sin conexión a internet; tus datos se sincronizan al volver a tener red.
-                </p>
-              </div>
-            </div>
-          </div>
+            </section>
+          )}
 
           {/* ========================================================= */}
           {/* RIGHT COLUMN: INTERACTIVE ACCESS CARD                    */}
           {/* ========================================================= */}
-          <div className={`${activeTab === 'register' ? 'lg:col-span-12 max-w-4xl xl:max-w-5xl 2xl:max-w-6xl' : 'lg:col-span-5 xl:col-span-5 max-w-xl'} w-full mx-auto transition-all duration-300`}>
-            <div className="bg-white dark:bg-slate-900 rounded-[24px] sm:rounded-[28px] border border-slate-200/90 dark:border-slate-800 p-4 sm:p-6 lg:p-7 shadow-xl shadow-slate-900/5 space-y-3.5 sm:space-y-4">
+          <div className={`${activeTab === 'register' ? 'w-full' : 'w-full'} mx-auto transition-all duration-300`}>
+            <section
+              aria-label="Portal de acceso"
+              className="card rounded-[28px] border border-line bg-card p-6 lg:p-7 transition-all"
+              style={{ boxShadow: 'var(--card-shadow)' }}
+            >
               {/* UNIFIED CARD HEADER ACROSS ALL VIEWS */}
-              <div className="pb-3 border-b border-slate-100 dark:border-slate-800 space-y-1.5 sm:space-y-2">
-                {/* Top utility row: Logo, Section Badge & Back Button */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Logo variant="isotipo" className="w-5 h-5 object-contain" />
-                    <span className="text-[11px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                      Kongre • {
-                        activeTab === 'home'
-                          ? 'Portal de Acceso'
-                          : activeTab === 'email_login'
-                          ? 'Acceso con Google'
-                          : activeTab === 'code_login'
-                          ? 'Conexión con PIN'
-                          : 'Registro de Congregación'
-                      }
-                    </span>
-                  </div>
-
-                  {activeTab !== 'home' ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveTab('home');
-                        setCodeError(null);
-                        setCodeSuccess(null);
-                        setEmailError(null);
-                      }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs transition-all cursor-pointer shadow-2xs hover:text-indigo-600 dark:hover:text-indigo-400"
-                    >
-                      <ArrowLeft className="w-3.5 h-3.5" />
-                      <span>Volver al inicio</span>
-                    </button>
-                  ) : (
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
-                      Gestor Teocrático
-                    </span>
-                  )}
-                </div>
-
-                {/* Main Title & Subtitle */}
-                <div className="space-y-0.5">
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                    {activeTab === 'home'
-                      ? '¡Bienvenido a Kongre!'
+              <div className="eye flex items-center justify-between text-[11.5px] font-bold tracking-[0.06em] text-brand">
+                <span className="uppercase">
+                  KONGRE • {
+                    activeTab === 'home'
+                      ? 'PORTAL DE ACCESO'
                       : activeTab === 'email_login'
-                      ? 'Acceso con Google'
+                      ? 'ACCESO CON GOOGLE'
                       : activeTab === 'code_login'
-                      ? 'Conectar con ID y PIN'
+                      ? 'CONECTAR CON ID Y PIN'
+                      : activeTab === 'invite_code_login'
+                      ? 'CÓDIGO DE INVITACIÓN'
                       : activeTab === 'unauthorized'
-                      ? 'Acceso Restringido'
-                      : 'Registrar mi Congregación'}
-                  </h2>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-normal font-normal">
-                    {activeTab === 'home'
-                      ? 'Una herramienta teocrática que facilita la gestión integral de la congregación'
-                      : activeTab === 'email_login'
-                      ? 'Inicia sesión con tu cuenta de Google para acceder a tus asignaciones y perfil'
-                      : activeTab === 'code_login'
-                      ? 'Introduce el ID de congregación y tu PIN para acceder'
-                      : activeTab === 'unauthorized'
-                      ? 'Esta cuenta requiere autorización previa del Cuerpo de Ancianos'
-                      : 'Configura los datos oficiales de tu congregación paso a paso'}
-                  </p>
-                </div>
+                      ? 'ACCESO RESTRINGIDO'
+                      : 'REGISTRO DE CONGREGACIÓN'
+                  }
+                </span>
+
+                {activeTab !== 'home' ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveTab('home');
+                      setCodeError(null);
+                      setCodeSuccess(null);
+                      setEmailError(null);
+                      setInviteCodeError(null);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-hover text-muted hover:text-brand font-semibold text-xs tracking-normal transition-colors cursor-pointer"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Volver al inicio</span>
+                  </button>
+                ) : (
+                  <span className="rounded-full bg-hover px-2.5 py-0.5 font-semibold tracking-normal text-muted">
+                    Gestor Teocrático
+                  </span>
+                )}
               </div>
+
+              {/* Main Title & Subtitle */}
+              <h2 className="mb-1 mt-3.5 text-[26px] font-extrabold tracking-tight text-ink">
+                {activeTab === 'home'
+                  ? '¡Bienvenido a Kongre!'
+                  : activeTab === 'email_login'
+                  ? 'Acceso con Google'
+                  : activeTab === 'code_login'
+                  ? 'Conectar con ID y PIN'
+                  : activeTab === 'invite_code_login'
+                  ? 'Código de Invitación'
+                  : activeTab === 'unauthorized'
+                  ? 'Acceso Restringido'
+                  : 'Registrar mi Congregación'}
+              </h2>
+              <p className="mb-4 text-[13.5px] leading-normal text-muted">
+                {activeTab === 'home'
+                  ? 'Una herramienta teocrática que facilita la gestión integral de la congregación'
+                  : activeTab === 'email_login'
+                  ? 'Inicia sesión con tu cuenta de Google para acceder a tus asignaciones y perfil'
+                  : activeTab === 'code_login'
+                  ? 'Introduce el ID de congregación y tu PIN para acceder'
+                  : activeTab === 'invite_code_login'
+                  ? 'Introduce el código de invitación temporal para vincular este dispositivo'
+                  : activeTab === 'unauthorized'
+                  ? 'Esta cuenta requiere autorización previa del Cuerpo de Ancianos'
+                  : 'Configura los datos oficiales de tu congregación paso a paso'}
+              </p>
 
               {/* VIEW: MAIN HOME OPTIONS */}
               {activeTab === 'home' && (
-                <div className="space-y-2.5 sm:space-y-3 pt-0.5">
-                  {/* Option 1: Registrar una Nueva Congregación */}
-                  <button
-                    type="button"
+                <div className="space-y-1 pt-0.5">
+                  <DesktopOption
+                    isFeatured
+                    icon={Building2}
+                    motion="rise"
+                    delay={0.9}
+                    pill={{ label: 'Oficial', tone: 'of' }}
+                    title="Registrar mi Congregación"
+                    description="Configura tu congregación desde cero: ID, PIN de Congregación, PIN Personal, circuito y horarios."
                     onClick={() => setActiveTab('register')}
-                    className="w-full p-3 sm:p-3.5 lg:p-4 rounded-xl sm:rounded-2xl border-2 border-indigo-500/50 bg-indigo-50/50 dark:bg-indigo-950/30 hover:border-indigo-600 dark:hover:border-indigo-400 hover:shadow-md transition-all text-left flex items-start gap-3 sm:gap-3.5 group cursor-pointer"
-                  >
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform shadow-xs">
-                      <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </div>
+                  />
 
-                    <div className="space-y-0.5 sm:space-y-1 flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
-                          Registrar mi Congregación
-                        </h3>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-200 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 shrink-0">
-                          Oficial
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                        Configura tu congregación desde cero (ID, PIN de Congregación, PIN Personal, circuito y horarios).
-                      </p>
-                    </div>
-
-                    <div className="hidden sm:flex items-center self-center text-indigo-500 group-hover:translate-x-0.5 transition-transform shrink-0">
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  </button>
-
-                  {/* Option 2: Iniciar sesión con correo electrónico */}
-                  <button
-                    type="button"
+                  <DesktopOption
+                    icon={CircleUserRound}
+                    motion="pulse"
+                    delay={1.05}
+                    title="Iniciar sesión con Google"
+                    description="Accede con tu cuenta verificada para sincronizar asignaciones y acceder a tu perfil."
                     onClick={() => setActiveTab('email_login')}
-                    className="w-full p-3 sm:p-3.5 lg:p-4 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xs transition-all text-left flex items-start gap-3 sm:gap-3.5 group cursor-pointer bg-white dark:bg-slate-900"
-                  >
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                      <div className="relative">
-                        <UserIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                        <span className="absolute -bottom-1 -right-1 text-[8px] font-bold bg-indigo-600 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center">
-                          @
-                        </span>
-                      </div>
-                    </div>
+                  />
 
-                    <div className="space-y-0.5 sm:space-y-1 flex-1 min-w-0">
-                      <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
-                        Iniciar sesión con Google
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Accede con tu cuenta verificada para sincronizar asignaciones y acceder a tu perfil.
-                      </p>
-                    </div>
-
-                    <div className="hidden sm:flex items-center self-center text-slate-400 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all shrink-0">
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  </button>
-
-                  {/* Option 3: Iniciar sesión con ID & PIN o código de invitación */}
-                  <button
-                    type="button"
+                  <DesktopOption
+                    icon={KeyRound}
+                    motion="wiggle"
+                    delay={1.2}
+                    title="Conectar con ID y PIN de Congregación"
+                    description="Accede a una congregación existente con su ID y PIN o código de invitación."
                     onClick={() => {
                       setActiveTab('code_login');
                       setCodeError(null);
                       setCodeSuccess(null);
                     }}
-                    className="w-full p-3 sm:p-3.5 lg:p-4 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xs transition-all text-left flex items-start gap-3 sm:gap-3.5 group cursor-pointer bg-white dark:bg-slate-900"
-                  >
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                      <div className="relative">
-                        <Home className="w-4 h-4 sm:w-5 sm:h-5" />
-                        <span className="absolute -bottom-1 -right-1 text-[8px] font-mono font-bold bg-indigo-600 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center">
-                          *
-                        </span>
-                      </div>
-                    </div>
+                  />
 
-                    <div className="space-y-0.5 sm:space-y-1 flex-1 min-w-0">
-                      <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
-                        Conectar con ID y PIN de Congregación
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Accede a una congregación existente con su ID y PIN o código de invitación.
-                      </p>
-                    </div>
-
-                    <div className="hidden sm:flex items-center self-center text-slate-400 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all shrink-0">
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  </button>
-
-                  {/* Option 4: Entrar como Invitado / Cartelera */}
-                  <button
-                    type="button"
-                    onClick={handleEnterAsGuest}
-                    className="w-full p-3 sm:p-3.5 lg:p-4 rounded-xl sm:rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-xs transition-all text-left flex items-start gap-3 sm:gap-3.5 group cursor-pointer bg-white/60 dark:bg-slate-900/60"
-                  >
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                      <Users className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </div>
-
-                    <div className="space-y-0.5 sm:space-y-1 flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
-                          Entrar como Invitado / Cartelera
-                        </h3>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/80 text-emerald-800 dark:text-emerald-200 shrink-0">
-                          Solo Lectura
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Accede al programa de reuniones y anuncios públicos sin necesidad de cuenta ni PIN.
-                      </p>
-                    </div>
-
-                    <div className="hidden sm:flex items-center self-center text-slate-400 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all shrink-0">
-                      <ArrowRight className="w-4 h-4" />
-                    </div>
-                  </button>
+                  <DesktopOption
+                    icon={Eye}
+                    motion="blink"
+                    delay={1.3}
+                    title="Iniciar sesión con código de invitación"
+                    description="Accede con un código de un solo uso en este dispositivo."
+                    onClick={() => {
+                      setInviteCodeError(null);
+                      setInviteCodeSuccess(null);
+                      setActiveTab('invite_code_login');
+                    }}
+                  />
                 </div>
               )}
 
@@ -1171,6 +1546,95 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 </div>
               )}
 
+              {/* VIEW: INICIAR SESIÓN CON CÓDIGO DE INVITACIÓN (Organized Pocket SignUp) */}
+              {activeTab === 'invite_code_login' && (
+                <div className="space-y-6 pt-1 animate-in fade-in zoom-in-95 duration-150">
+                  {/* Page Header matching Image 2 */}
+                  <div className="space-y-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setInviteCodeError(null);
+                        setInviteCodeSuccess(null);
+                        setActiveTab('home');
+                      }}
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-full text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group"
+                      title="Volver"
+                    >
+                      <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
+                    </button>
+
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+                      Conéctate a tu congregación
+                    </h2>
+
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                      Para activar la aplicación Kongre en este dispositivo, ingresa el código de invitación que recibiste de los ancianos de tu congregación.
+                    </p>
+                  </div>
+
+                  {/* Activation Form */}
+                  <form onSubmit={handleActivateWithInviteCode} className="space-y-5">
+                    {inviteCodeError && (
+                      <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-700 dark:text-rose-300 flex items-start gap-2.5 animate-in fade-in">
+                        <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <span className="font-bold block">No se pudo activar</span>
+                          <span>{inviteCodeError}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {inviteCodeSuccess && (
+                      <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900/60 text-xs text-emerald-700 dark:text-emerald-300 flex items-start gap-2.5 animate-in fade-in">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <span className="font-bold block">¡Activación exitosa!</span>
+                          <span>{inviteCodeSuccess}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Input with border & eye toggle matching Image 2 */}
+                    <div className="relative">
+                      <input
+                        type={showInviteCode ? 'text' : 'password'}
+                        autoComplete="off"
+                        value={inviteCodeInput}
+                        onChange={(e) => setInviteCodeInput(e.target.value)}
+                        placeholder="Código de invitación"
+                        className="w-full px-4 py-3.5 pr-12 rounded-xl border border-indigo-300 dark:border-indigo-700/80 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-2xs"
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowInviteCode((prev) => !prev)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 cursor-pointer"
+                        title={showInviteCode ? 'Ocultar código' : 'Mostrar código'}
+                      >
+                        {showInviteCode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+
+                    {/* Big Action Button "ACTIVAR" matching Image 2 */}
+                    <button
+                      type="submit"
+                      disabled={!inviteCodeInput.trim() || isActivatingCode}
+                      className="w-full py-3.5 px-6 rounded-xl bg-indigo-100 hover:bg-indigo-600 dark:bg-indigo-950/80 dark:hover:bg-indigo-600 text-indigo-700 hover:text-white dark:text-indigo-300 dark:hover:text-white disabled:opacity-40 disabled:hover:bg-indigo-100 dark:disabled:hover:bg-indigo-950/80 disabled:hover:text-indigo-700 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed shadow-xs"
+                    >
+                      {isActivatingCode ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                          <span>ACTIVANDO...</span>
+                        </>
+                      ) : (
+                        <span>ACTIVAR</span>
+                      )}
+                    </button>
+                  </form>
+                </div>
+              )}
+
               {/* VIEW: REGISTRO DE CONGREGACIÓN (Unificado en la misma tarjeta) */}
               {activeTab === 'register' && (
                 <RegisterCongregationWizard
@@ -1248,11 +1712,24 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
                     <button
                       type="button"
-                      onClick={handleEnterAsGuest}
-                      className="w-full py-2.5 px-4 rounded-2xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                      onClick={() => {
+                        setInviteCodeError(null);
+                        setInviteCodeSuccess(null);
+                        setActiveTab('invite_code_login');
+                      }}
+                      className="w-full py-2.5 px-4 rounded-2xl border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <Users className="w-4 h-4 text-emerald-500" />
-                      <span>Entrar como Invitado / Cartelera</span>
+                      <IconCongregationAccess className="w-4 h-4 text-indigo-500" />
+                      <span>Iniciar sesión con código de invitación</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleEnterDemoMode}
+                      className="w-full py-2.5 px-4 rounded-2xl border border-purple-200 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-950/50 text-purple-700 dark:text-purple-300 font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4 text-purple-500" />
+                      <span>Probar Kongre en Modo Demo</span>
                     </button>
 
                     <button
@@ -1270,55 +1747,68 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   </div>
                 </div>
               )}
-            </div>
+            </section>
           </div>
-        </div>
+        </main>
 
         {/* Footer Policy & Terms Notice */}
-        <p className="text-center text-xs text-slate-500 dark:text-slate-400 mt-8 leading-relaxed">
-          Más información sobre nuestros{' '}
-          <a href="#" onClick={(e) => { e.preventDefault(); }} className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
-            Términos de Uso
-          </a>{' '}
-          y{' '}
-          <a href="#" onClick={(e) => { e.preventDefault(); }} className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
-            Política de Privacidad
-          </a>
-          .
-        </p>
-      </main>
-
-      {/* Footer with Version & Changelog Link */}
-      <footer className="w-full border-t border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md py-4 px-4 sm:px-8 mt-auto select-none transition-colors">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-            <span className="font-bold text-slate-800 dark:text-slate-200">Kongre</span>
-            <span>•</span>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400">Gestor Teocrático Integral</span>
-            <span>•</span>
-            <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60 font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              En línea
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {onOpenVersionModal && (
-              <button
-                type="button"
-                onClick={onOpenVersionModal}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer font-semibold shadow-2xs active:scale-95 text-xs"
-                title="Ver registro de versiones y novedades"
+        <footer className="w-full border-t border-line bg-card/60 backdrop-blur-xs py-5 px-4 sm:px-8 mt-auto select-none transition-colors">
+          <div className="max-w-[1180px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted">
+            <div className="text-center sm:text-left text-[13px]">
+              Más información sobre nuestros{' '}
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onOpenVersionModal?.();
+                }}
+                className="font-semibold text-brand hover:underline"
               >
-                <span>v{CURRENT_APP_VERSION}</span>
-                <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-100/80 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
-                  Ver Cambios
-                </span>
-              </button>
-            )}
+                Términos de Uso
+              </a>{' '}
+              y{' '}
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onOpenVersionModal?.();
+                }}
+                className="font-semibold text-brand hover:underline"
+              >
+                Política de Privacidad
+              </a>
+              .
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="font-bold text-ink">Kongre</span>
+              <span>•</span>
+              <span className="text-[11px] text-muted">Gestor Teocrático Integral</span>
+              <span>•</span>
+              <span className="inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-full bg-okb text-okf font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                En línea
+              </span>
+              {onOpenVersionModal && (
+                <button
+                  type="button"
+                  onClick={onOpenVersionModal}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-hover border border-line text-ink hover:text-brand transition-all cursor-pointer font-semibold text-xs"
+                  title="Ver registro de versiones y novedades"
+                >
+                  <span>v{CURRENT_APP_VERSION}</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-brand-soft text-brand">
+                    Ver Cambios
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
+
+      {/* Demo Mode Startup & Data Preparation Modal */}
+      <DemoStartupModal isOpen={isStartingDemo} />
     </div>
   );
 };

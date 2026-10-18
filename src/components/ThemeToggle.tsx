@@ -1,62 +1,107 @@
 import { useState, useEffect, CSSProperties } from "react";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Tv } from "lucide-react";
+import { useTheme, ThemeMode } from "../context/ThemeContext";
 
 export interface ThemeToggleProps {
   isDark?: boolean;
-  onToggle?: (next: boolean) => void;
+  themeMode?: ThemeMode;
+  onToggle?: (next?: any) => void;
   className?: string;
   style?: CSSProperties;
   size?: number;
 }
 
 export default function ThemeToggle({
-  isDark,
+  isDark: propIsDark,
+  themeMode: propThemeMode,
   onToggle,
   className = "",
   style = {},
   size = 28,
 }: ThemeToggleProps) {
-  const [internalDark, setInternalDark] = useState(() => {
-    if (typeof isDark === "boolean") return isDark;
-    if (typeof document !== "undefined") {
-      return document.documentElement.classList.contains("dark");
-    }
-    return false;
-  });
-  const dark = typeof isDark === "boolean" ? isDark : internalDark;
+  let themeCtx: ReturnType<typeof useTheme> | null = null;
+  try {
+    themeCtx = useTheme();
+  } catch {}
+
+  const activeMode: ThemeMode =
+    propThemeMode ||
+    themeCtx?.themeMode ||
+    (typeof propIsDark === "boolean"
+      ? propIsDark
+        ? "dark"
+        : "light"
+      : typeof document !== "undefined" && document.documentElement.classList.contains("theme-cabina")
+      ? "cabina"
+      : typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+      ? "dark"
+      : "light");
 
   const [isHovered, setIsHovered] = useState(false);
   const [isActive, setIsActive] = useState(false);
 
-  useEffect(() => {
-    if (typeof isDark === "boolean") setInternalDark(isDark);
-  }, [isDark]);
+  function handleCycleTheme() {
+    let next: ThemeMode = "dark";
+    if (activeMode === "light") next = "dark";
+    else if (activeMode === "dark") next = "cabina";
+    else if (activeMode === "cabina") next = "light";
+    else next = "dark";
 
-  function toggleTheme() {
-    const next = !dark;
-    if (typeof isDark !== "boolean") {
-      setInternalDark(next);
+    if (themeCtx?.setThemeMode) {
+      themeCtx.setThemeMode(next);
+    } else {
       if (typeof document !== "undefined") {
-        document.documentElement.classList.toggle("dark", next);
-        document.documentElement.dataset.theme = next ? "dark" : "light";
-        document.documentElement.style.colorScheme = next ? "dark" : "light";
+        const root = document.documentElement;
+        root.dataset.theme = next;
+        if (next === "dark" || next === "cabina") root.classList.add("dark");
+        else root.classList.remove("dark");
+
+        if (next === "cabina") root.classList.add("theme-cabina");
+        else root.classList.remove("theme-cabina");
       }
       try {
-        localStorage.setItem("theme", next ? "dark" : "light");
-        localStorage.setItem("kongre-theme", next ? "dark" : "light");
-        localStorage.setItem("kongre_theme", next ? "dark" : "light");
+        localStorage.setItem("theme", next);
+        localStorage.setItem("kongre-theme", next);
+        localStorage.setItem("kongre_theme", next);
       } catch {}
     }
+
     onToggle?.(next);
   }
 
-  // Calculate icon size proportionally (14px for 28px, 18px for 36px, 22px for 48px)
+  // Calculate icon size proportionally
   const iconSize = size === 48 ? 22 : Math.max(13, Math.round(size * 0.5));
+
+  const modeLabels: Record<ThemeMode, { title: string; aria: string; bg: string; color: string; border: string }> = {
+    light: {
+      title: "Modo Claro (Día) • Clic para Modo Oscuro",
+      aria: "Modo Claro activo. Cambiar a Modo Oscuro",
+      bg: "#E5EAF5",
+      color: "#1B4F91",
+      border: "rgba(27, 79, 145, 0.15)",
+    },
+    dark: {
+      title: "Modo Oscuro (Noche) • Clic para Modo Cabina A/V",
+      aria: "Modo Oscuro activo. Cambiar a Modo Cabina",
+      bg: "#1E293B",
+      color: "#9085F4",
+      border: "rgba(144, 133, 244, 0.3)",
+    },
+    cabina: {
+      title: "Modo Cabina & Acomodadores (Auditorio) • Clic para Modo Claro",
+      aria: "Modo Cabina activo. Cambiar a Modo Claro",
+      bg: "#050811",
+      color: "#34D399",
+      border: "rgba(52, 211, 153, 0.4)",
+    },
+  };
+
+  const currentConfig = modeLabels[activeMode] || modeLabels.light;
 
   return (
     <button
       type="button"
-      onClick={toggleTheme}
+      onClick={handleCycleTheme}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -64,29 +109,32 @@ export default function ThemeToggle({
       }}
       onMouseDown={() => setIsActive(true)}
       onMouseUp={() => setIsActive(false)}
-      aria-label={dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
-      aria-pressed={dark}
-      title={dark ? "Modo claro" : "Modo oscuro"}
-      className={`relative inline-flex items-center justify-center select-none outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1B4F91] cursor-pointer ${className}`}
+      aria-label={currentConfig.aria}
+      title={currentConfig.title}
+      className={`relative inline-flex items-center justify-center select-none outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1B4F91] cursor-pointer transition-all ${className}`}
       style={{
         width: size,
         height: size,
         borderRadius: "50%",
-        border: 0,
+        border: `1.5px solid ${currentConfig.border}`,
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
         cursor: "pointer",
-        background: dark ? "#D5E3FF" : "#E5EAF5",
-        color: "#1B4F91",
+        background: currentConfig.bg,
+        color: currentConfig.color,
         boxShadow: isHovered
-          ? dark
-            ? "0 4px 16px rgba(213, 227, 255, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.15)"
+          ? activeMode === "cabina"
+            ? "0 0 16px rgba(52, 211, 153, 0.4), 0 0 0 1px rgba(52, 211, 153, 0.3)"
+            : activeMode === "dark"
+            ? "0 4px 16px rgba(144, 133, 244, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15)"
             : "0 4px 16px rgba(27, 79, 145, 0.18), 0 0 0 1px rgba(27, 79, 145, 0.08)"
+          : activeMode === "cabina"
+          ? "0 0 8px rgba(52, 211, 153, 0.25)"
           : "0 1px 3px rgba(0, 0, 0, 0.05)",
         transform: isActive ? "scale(0.92)" : isHovered ? "scale(1.06)" : "scale(1)",
         transition:
-          "background 250ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 250ms ease",
+          "background 250ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 250ms ease, border-color 250ms ease",
         ...style,
       }}
     >
@@ -101,7 +149,7 @@ export default function ThemeToggle({
           justifyContent: "center",
         }}
       >
-        {/* Sun Icon (shown when dark) */}
+        {/* Phase 1: Sun Icon (shown in light mode) */}
         <div
           style={{
             position: "absolute",
@@ -109,17 +157,17 @@ export default function ThemeToggle({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            transform: dark ? "rotate(0deg) scale(1)" : "rotate(90deg) scale(0)",
-            opacity: dark ? 1 : 0,
+            transform: activeMode === "light" ? "rotate(0deg) scale(1)" : "rotate(-90deg) scale(0)",
+            opacity: activeMode === "light" ? 1 : 0,
             transition:
-              "transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 300ms ease",
+              "transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 250ms ease",
             pointerEvents: "none",
           }}
         >
           <Sun size={iconSize} />
         </div>
 
-        {/* Moon Icon (shown when light) */}
+        {/* Phase 2: Moon Icon (shown in dark mode) */}
         <div
           style={{
             position: "absolute",
@@ -127,14 +175,32 @@ export default function ThemeToggle({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            transform: dark ? "rotate(-90deg) scale(0)" : "rotate(0deg) scale(1)",
-            opacity: dark ? 0 : 1,
+            transform: activeMode === "dark" ? "rotate(0deg) scale(1)" : "rotate(90deg) scale(0)",
+            opacity: activeMode === "dark" ? 1 : 0,
             transition:
-              "transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 300ms ease",
+              "transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 250ms ease",
             pointerEvents: "none",
           }}
         >
           <Moon size={iconSize} />
+        </div>
+
+        {/* Phase 3: Cabina A/V Icon (shown in cabina mode) */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transform: activeMode === "cabina" ? "rotate(0deg) scale(1)" : "scale(0)",
+            opacity: activeMode === "cabina" ? 1 : 0,
+            transition:
+              "transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1), opacity 250ms ease",
+            pointerEvents: "none",
+          }}
+        >
+          <Tv size={iconSize} />
         </div>
       </div>
     </button>

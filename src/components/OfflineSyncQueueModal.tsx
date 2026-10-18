@@ -90,6 +90,18 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
   if (!isOpen) return null;
 
   const handleManualSync = async () => {
+    if (
+      typeof window !== 'undefined' &&
+      (localStorage.getItem('kongre_demo_mode') === 'true' ||
+        localStorage.getItem('kongre_is_guest') === 'true')
+    ) {
+      setSyncFeedback({
+        type: 'error',
+        message: 'El modo de demostración opera de manera 100% local sin conexión a Supabase.',
+      });
+      return;
+    }
+
     if (!isOnline) {
       setSyncFeedback({
         type: 'error',

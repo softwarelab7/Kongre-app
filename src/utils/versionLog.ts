@@ -25,19 +25,41 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.8.0';
-export const CURRENT_BUILD_CODE = '2026.10.18.280';
+export const CURRENT_APP_VERSION = '2.8.1';
+export const CURRENT_BUILD_CODE = '2026.10.18.281';
 export const BUILD_DATE = '18 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.8.1',
+    buildCode: '2026.10.18.281',
+    date: '18 de Octubre, 2026',
+    title: 'Aislamiento Local del Modo Demo (Sin Conexión a Supabase)',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Desactivación total de peticiones de subida, descarga y suscripción en tiempo real a Supabase durante el Modo Demo para garantizar operación 100% local.',
+      },
+      {
+        category: 'improvement',
+        text: 'Ocultación del indicador de sincronización en la nube (OfflineSyncBadge) y de sincronizaciones periódicas automáticas cuando el Modo Demo está activo.',
+      },
+      {
+        category: 'improvement',
+        text: 'Inclusión de aviso informativo en Ajustes > Nube y en el modal de cola offline indicando que el modo demostración opera en memoria local sin conexión a Supabase.',
+      },
+    ],
+  },
+  {
     version: '2.8.0',
     buildCode: '2026.10.18.280',
     date: '18 de Octubre, 2026',
     title: 'Diseño Oficial de Bienvenida para PC / Escritorio (Kongre v3)',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

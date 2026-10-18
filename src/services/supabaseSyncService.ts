@@ -28,6 +28,28 @@ export function normalizeCongregationId(rawId: string): string {
     .toUpperCase();
 }
 
+/**
+ * Determina si la aplicación o congregación actual está en modo de demostración
+ * para desactivar absolutamente cualquier intento de conexión con Supabase.
+ */
+export function isDemoModeActive(congregationId?: string): boolean {
+  if (typeof window !== 'undefined') {
+    if (
+      localStorage.getItem('kongre_demo_mode') === 'true' ||
+      localStorage.getItem('kongre_is_guest') === 'true'
+    ) {
+      return true;
+    }
+  }
+  if (congregationId) {
+    const clean = normalizeCongregationId(congregationId);
+    if (!clean || clean.startsWith('DEMO') || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(clean)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export interface CongregationFullData {
   settings: CongregationSettings;
   publishers: Publisher[];
@@ -168,6 +190,11 @@ export const supabaseSyncService = {
     if (!cleanId) return { success: false, error: 'ID de congregación requerido' };
     if (!cleanMasterPin) return { success: false, error: 'PIN maestro requerido para cifrar' };
 
+    // En modo demo no se conecta ni sube nada a Supabase
+    if (isDemoModeActive(cleanId)) {
+      return { success: true };
+    }
+
     // Si estamos en navegador sin conexión a internet, guardar en cola offline
     if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && !navigator.onLine) {
       this.enqueueOfflineChange(cleanId, params.data);
@@ -261,7 +288,7 @@ export const supabaseSyncService = {
     error?: string;
   }> {
     const cleanId = normalizeCongregationId(rawId);
-    if (!cleanId) return { hasUpdate: false };
+    if (!cleanId || isDemoModeActive(cleanId)) return { hasUpdate: false };
 
     try {
       const { data, error } = await supabase
@@ -309,6 +336,11 @@ export const supabaseSyncService = {
 
     if (!cleanId) return { success: false, error: 'ID de congregación requerido' };
     if (!cleanPin) return { success: false, error: 'PIN requerido' };
+
+    // En modo demo no se consulta Supabase
+    if (isDemoModeActive(cleanId)) {
+      return { success: false, error: 'Modo demo activo: sin conexión a Supabase.' };
+    }
 
     try {
       const { data, error } = await supabase
@@ -390,6 +422,11 @@ export const supabaseSyncService = {
   }> {
     const cleanId = normalizeCongregationId(params.congregationId);
     if (!cleanId) return { success: false, action: 'up_to_date', error: 'Sin ID de congregación' };
+
+    // En modo demo no se sincroniza con Supabase
+    if (isDemoModeActive(cleanId)) {
+      return { success: true, action: 'up_to_date' };
+    }
 
     // Si estamos en navegador sin internet, encolar cambios locales
     if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && !navigator.onLine) {
@@ -474,6 +511,7 @@ export const supabaseSyncService = {
   ) {
     if (typeof window === 'undefined') return;
     const cleanId = normalizeCongregationId(congregationId);
+    if (isDemoModeActive(cleanId)) return;
     const actionType = options?.actionType || 'FULL_SYNC';
     const description = options?.description || 'Actualización de congregación';
 
@@ -549,6 +587,7 @@ export const supabaseSyncService = {
     pinCongregacion?: string
   ): Promise<{ success: boolean; syncedCount: number }> {
     if (typeof window === 'undefined') return { success: false, syncedCount: 0 };
+    if (isDemoModeActive()) return { success: true, syncedCount: 0 };
 
     try {
       // 1. Obtener todas las operaciones pendientes de IndexedDB

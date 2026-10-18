@@ -760,6 +760,11 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     lastQueuedAt: null,
   });
 
+  // Modo de Demostración (declarado con el resto de estados para evitar TDZ en hooks superiores)
+  const [isDemoMode, setIsDemoMode] = useState<boolean>(() => {
+    return typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true';
+  });
+
   const refreshQueueStats = async () => {
     try {
       const st = await getOfflineQueueStats();
@@ -1427,9 +1432,23 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     let realtimeChannel: any = null;
 
     const setupSync = async () => {
+      // En modo demo no se conecta a Supabase ni se abren canales en tiempo real
+      if (
+        isDemoMode ||
+        (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')
+      ) {
+        setSyncStatus('synced');
+        return;
+      }
+
       const syncCongId = resolveCongregationDocId();
 
-      if (!syncCongId || syncCongId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(syncCongId)) {
+      if (
+        !syncCongId ||
+        syncCongId.length < 3 ||
+        ['1001', 'CENTRAL', 'MAIN', 'ID', 'DEMO001', 'DEMO-001'].includes(syncCongId.toUpperCase()) ||
+        syncCongId.toUpperCase().startsWith('DEMO')
+      ) {
         setSyncStatus('synced');
         return;
       }
@@ -1527,7 +1546,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         try { broadcastChannel.close(); } catch {}
       }
     };
-  }, [settings.congregationNumber, settings.congregationId, user?.email]);
+  }, [settings.congregationNumber, settings.congregationId, user?.email, isDemoMode]);
 
   // Helper to sync changes to Firestore whenever state updates (with debounce & quota guard)
   const saveToFirestore = async (
@@ -1697,7 +1716,13 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 pinMaestro
               : '') || pinMaestro;
 
-          if (pinMaestro && congDocId) {
+          const isCurrentDemo =
+            isDemoMode ||
+            (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true') ||
+            congDocId?.toUpperCase().startsWith('DEMO') ||
+            ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId?.toUpperCase() || '');
+
+          if (pinMaestro && congDocId && !isCurrentDemo) {
             await supabaseSyncService.uploadCongregation({
               congregationId: congDocId,
               data: {
@@ -1773,8 +1798,20 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const syncNowWithSupabase = async (
     forceUpload: boolean = false
   ): Promise<{ success: boolean; message: string; action?: string }> => {
+    if (
+      isDemoMode ||
+      (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')
+    ) {
+      return { success: true, message: 'El modo de demostración opera de manera 100% local sin conexión a Supabase.' };
+    }
+
     const congDocId = resolveCongregationDocId();
-    if (!congDocId || congDocId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId)) {
+    if (
+      !congDocId ||
+      congDocId.length < 3 ||
+      ['1001', 'CENTRAL', 'MAIN', 'ID', 'DEMO001', 'DEMO-001'].includes(congDocId.toUpperCase()) ||
+      congDocId.toUpperCase().startsWith('DEMO')
+    ) {
       return { success: false, message: 'Se requiere un ID de congregación válido para sincronizar con Supabase.' };
     }
 
@@ -1865,6 +1902,13 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const handleOnline = async () => {
       setIsOnline(true);
+      if (
+        isDemoMode ||
+        (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')
+      ) {
+        refreshQueueStats();
+        return;
+      }
       const pinMaestro =
         localStorage.getItem('kongre_session_pin_v2') ||
         localStorage.getItem('kongre_coordinator_pin') ||
@@ -1900,8 +1944,19 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const intervalId = window.setInterval(() => {
       if (typeof navigator !== 'undefined' && navigator.onLine) {
+        if (
+          isDemoMode ||
+          (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')
+        ) {
+          return;
+        }
         const congId = resolveCongregationDocId();
-        if (congId && congId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congId)) {
+        if (
+          congId &&
+          congId.length >= 3 &&
+          !['1001', 'CENTRAL', 'MAIN', 'ID', 'DEMO001', 'DEMO-001'].includes(congId.toUpperCase()) &&
+          !congId.toUpperCase().startsWith('DEMO')
+        ) {
           syncNowWithSupabase(false).catch(() => {});
         }
       }
@@ -1924,6 +1979,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   ): Promise<{ success: boolean; congregationName?: string; message: string; data?: any }> => {
     const rawClean = congId.trim().toUpperCase();
     if (!rawClean) return { success: false, message: 'ID de congregación no válido.' };
+
+    if (
+      isDemoMode ||
+      (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true') ||
+      rawClean.startsWith('DEMO')
+    ) {
+      return { success: false, message: 'El modo demo opera de manera 100% local sin conexión a Supabase.' };
+    }
 
     const pinMaestro =
       (typeof window !== 'undefined'
@@ -4823,11 +4886,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     await deletePublishersBatch(publishers.map(p => p.id));
   };
 
-  const [isDemoMode, setIsDemoMode] = useState<boolean>(() => {
-    return typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true';
-  });
-
   const loadDemoData = () => {
+    try {
+      supabase.removeAllChannels();
+    } catch {}
     const demo = getDemoCongregationData();
     hydrateAllFromData(demo);
     setIsDemoMode(true);

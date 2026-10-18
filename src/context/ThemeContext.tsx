@@ -52,13 +52,21 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const toggleTheme = () => {
     setThemeModeState((prev) => {
-      // Check both React state AND current DOM dark class so it never requires a double click
-      const isDomDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
-      const isCurrentlyDark = prev === 'dark' || prev === 'cabina' || isDomDark;
-      const nextMode: ThemeMode = isCurrentlyDark ? 'light' : 'dark';
+      let nextMode: ThemeMode = 'dark';
+      if (prev === 'light') {
+        nextMode = 'dark';
+      } else if (prev === 'dark') {
+        nextMode = 'cabina';
+      } else if (prev === 'cabina') {
+        nextMode = 'light';
+      } else {
+        nextMode = 'dark';
+      }
 
       try {
         localStorage.setItem('kongre_theme', nextMode);
+        localStorage.setItem('kongre-theme', nextMode);
+        localStorage.setItem('theme', nextMode);
       } catch (e) {}
       applyThemeToDOM(nextMode);
       return nextMode;

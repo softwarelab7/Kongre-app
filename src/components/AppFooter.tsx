@@ -8,12 +8,14 @@ interface AppFooterProps {
   onOpenVersionModal: () => void;
   onOpenQueueModal?: () => void;
   isOnline?: boolean;
+  isDemoMode?: boolean;
 }
 
 export const AppFooter: React.FC<AppFooterProps> = ({
   onOpenVersionModal,
   onOpenQueueModal,
   isOnline = true,
+  isDemoMode = false,
 }) => {
   return (
     <footer className="w-full mt-auto border-t border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md select-none transition-colors pb-20 md:pb-0">
@@ -43,7 +45,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
 
           {/* Right: Offline Sync Badge & Version pill */}
           <div className="flex flex-wrap items-center gap-2">
-            {onOpenQueueModal && (
+            {onOpenQueueModal && !isDemoMode && (
               <OfflineSyncBadge
                 isOnline={isOnline}
                 onOpenQueueModal={onOpenQueueModal}

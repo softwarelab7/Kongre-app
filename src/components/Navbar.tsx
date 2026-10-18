@@ -1146,7 +1146,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             {/* Unified Cloud & Offline Sync Badge (Supabase & IndexedDB) */}
-            {onOpenQueueModal && (
+            {onOpenQueueModal && !isDemoMode && (
               <OfflineSyncBadge
                 isOnline={isOnline}
                 onOpenQueueModal={onOpenQueueModal}

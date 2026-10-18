@@ -49,6 +49,16 @@ export const OfflineSyncBadge: React.FC<OfflineSyncBadgeProps> = ({
   const hasPending = stats.pendingCount > 0;
   const isSyncing = stats.syncingCount > 0;
 
+  // En modo demo no hay conexión ni sincronización con Supabase
+  const isDemo =
+    typeof window !== 'undefined' &&
+    (localStorage.getItem('kongre_demo_mode') === 'true' ||
+      localStorage.getItem('kongre_is_guest') === 'true');
+
+  if (isDemo) {
+    return null;
+  }
+
   if (!isOnline || hasPending || isSyncing) {
     return (
       <button

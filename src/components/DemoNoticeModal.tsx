@@ -65,7 +65,7 @@ export const DemoNoticeModal: React.FC<DemoNoticeModalProps> = ({
             Este es un entorno de demostración con datos predefinidos para una <strong>congregación modelo imaginaria</strong>.
           </p>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Puedes explorar y probar libremente todas las herramientas de la plataforma sin afectar datos reales de ninguna congregación.
+            Funciona de manera 100% local en tu dispositivo sin conexión a la nube de Supabase, por lo que puedes explorar y probar todas las herramientas sin afectar datos reales.
           </p>
         </div>
 

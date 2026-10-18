@@ -25,7 +25,14 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.8.0] - 18 de Octubre, 2026 (Compilación Activa)
+### [v2.8.1] - 18 de Octubre, 2026 (Compilación Activa)
+**Título:** Aislamiento Local del Modo Demo (Sin Conexión a Supabase)
+- **Desconexión Total de Supabase en Modo Demo:** Bloqueo preventivo en `supabaseSyncService` y `CongregationContext` para evitar que peticiones de subida, descarga o consultas remotas toquen la base de datos de Supabase en modo demostración.
+- **Canales en Tiempo Real Desactivados:** Los canales de Supabase Realtime (`sync_queue`) se desconectan y no se abren mientras el modo demo esté activo.
+- **Sincronizaciones Periódicas Deshabilitadas:** Se cancela el intervalo en segundo plano de sincronización automática y la subida de cola offline en reconexión de red mientras se use el modo demo.
+- **Interfaz Contextualizada:** Se oculta el indicador de nube (`OfflineSyncBadge`) en la barra de navegación y pie de página, y se incluye una advertencia informativa en Ajustes > Nube indicando que los datos operan 100% de manera local.
+
+### [v2.8.0] - 18 de Octubre, 2026
 **Título:** Diseño Oficial de Bienvenida para PC / Escritorio (Kongre v3)
 - **Cabecera de Escritorio:**
   - Logotipo animado SVG oficial `AnimatedLogo` (34px) con efecto de dibujo y revelación tipográfica.

@@ -913,6 +913,7 @@ const AppContent: React.FC = () => {
           onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
           onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
           isOnline={isOnline}
+          isDemoMode={isDemoMode}
         />
       </main>
 

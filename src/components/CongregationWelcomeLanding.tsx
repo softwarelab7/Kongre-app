@@ -785,7 +785,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       {/* ========================================================= */}
       {activeTab === 'home' && (
         <div className="md:hidden flex flex-col min-h-screen bg-white dark:bg-slate-900 font-sans">
-          {/* Top Gradient Banner with Vertical White Logo & Slogan */}
+          {/* Top Gradient Banner with Horizontal White Logo & Slogan */}
           <div
             className="relative px-5 pt-4 pb-12 sm:pb-14 flex flex-col items-center select-none text-white shrink-0"
             style={{ background: 'linear-gradient(135deg, #4C3AED, #3728BE)' }}
@@ -812,12 +812,12 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               </button>
             </div>
 
-            {/* Centered Vertical Negative Logo */}
-            <div className="mt-1 flex flex-col items-center">
+            {/* Centered Horizontal Negative Logo */}
+            <div className="mt-2 mb-1 flex items-center justify-center">
               <img
-                src="/logo/kongre_vertical_negativo.svg"
+                src="/logo/kongre_horizontal_negativo.svg"
                 alt="Kongre"
-                className="h-28 w-auto drop-shadow-md select-none"
+                className="h-12 sm:h-14 w-auto max-w-[260px] drop-shadow-md select-none"
               />
             </div>
 

@@ -239,6 +239,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
     syncNowWithSupabase,
     lastSupabaseSyncAt,
     isSupabaseSyncing,
+    isDemoMode,
   } = useCongregation();
 
   const { user, signOutUser } = useAuth();
@@ -398,6 +399,13 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
 
   const handleSyncSupabase = async (forceUpload: boolean = false) => {
     setSupabaseSyncFeedback(null);
+    if (isDemoMode) {
+      setSupabaseSyncFeedback({
+        type: 'info',
+        msg: 'El modo de demostración opera de manera 100% local sin conexión a Supabase.',
+      });
+      return;
+    }
     try {
       const res = await syncNowWithSupabase(forceUpload);
       setSupabaseSyncFeedback({
@@ -2313,32 +2321,41 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <button
-                      type="button"
-                      onClick={() => handleSyncSupabase(false)}
-                      disabled={isSupabaseSyncing}
-                      className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer disabled:opacity-50"
-                      title="Sincroniza y combina bidireccionalmente los datos con Supabase"
-                    >
-                      {isSupabaseSyncing ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <RefreshCw className="w-3.5 h-3.5" />
-                      )}
-                      <span>{isSupabaseSyncing ? 'Sincronizando...' : 'Sincronizar con Supabase'}</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleSyncSupabase(true)}
-                      disabled={isSupabaseSyncing}
-                      className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                      title="Fuerza la subida del snapshot local cifrado a Supabase"
-                    >
-                      <Upload className="w-3.5 h-3.5" />
-                      <span>Forzar Subida</span>
-                    </button>
-                  </div>
+                  {isDemoMode ? (
+                    <div className="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs flex items-center gap-2.5">
+                      <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                      <span>
+                        <strong>Modo Demostración Activo:</strong> La conexión con Supabase está deshabilitada. Los datos son locales para proteger la nube.
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => handleSyncSupabase(false)}
+                        disabled={isSupabaseSyncing}
+                        className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer disabled:opacity-50"
+                        title="Sincroniza y combina bidireccionalmente los datos con Supabase"
+                      >
+                        {isSupabaseSyncing ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <RefreshCw className="w-3.5 h-3.5" />
+                        )}
+                        <span>{isSupabaseSyncing ? 'Sincronizando...' : 'Sincronizar con Supabase'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSyncSupabase(true)}
+                        disabled={isSupabaseSyncing}
+                        className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        title="Fuerza la subida del snapshot local cifrado a Supabase"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Forzar Subida</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {supabaseSyncFeedback && (

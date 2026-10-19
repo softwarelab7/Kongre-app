@@ -1010,43 +1010,44 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               <div className={`eye flex items-center justify-between text-[11px] font-bold tracking-[0.06em] text-brand ${
                 activeTab === 'register' ? 'kg-header-enter' : ''
               }`}>
-                <span className="uppercase">
-                  KONGRE • {
-                    activeTab === 'home'
-                      ? 'PORTAL DE ACCESO'
-                      : activeTab === 'email_login'
-                      ? 'ACCESO CON GOOGLE'
-                      : activeTab === 'code_login'
-                      ? 'CONECTAR CON ID Y PIN'
-                      : activeTab === 'invite_code_login'
-                      ? 'CÓDIGO DE INVITACIÓN'
-                      : activeTab === 'unauthorized'
-                      ? 'ACCESO RESTRINGIDO'
-                      : 'REGISTRO DE CONGREGACIÓN'
-                  }
-                </span>
-
-                {activeTab !== 'home' ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveTab('home');
-                      setCodeError(null);
-                      setCodeSuccess(null);
-                      setEmailError(null);
-                      setInviteCodeError(null);
-                    }}
-                    className="inline-flex items-center justify-center w-8 h-8 rounded-full text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group"
-                    title="Volver"
-                    aria-label="Volver"
-                  >
-                    <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
-                  </button>
-                ) : (
-                  <span className="rounded-full bg-hover px-2.5 py-0.5 font-semibold tracking-normal text-muted text-[10.5px]">
-                    Gestor Teocrático
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  {activeTab !== 'home' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('home');
+                        setCodeError(null);
+                        setCodeSuccess(null);
+                        setEmailError(null);
+                        setInviteCodeError(null);
+                      }}
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-full text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group -ml-1.5"
+                      title="Volver"
+                      aria-label="Volver"
+                    >
+                      <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
+                    </button>
+                  )}
+                  <span className="uppercase">
+                    KONGRE • {
+                      activeTab === 'home'
+                        ? 'PORTAL DE ACCESO'
+                        : activeTab === 'email_login'
+                        ? 'ACCESO CON GOOGLE'
+                        : activeTab === 'code_login'
+                        ? 'CONECTAR CON ID Y PIN'
+                        : activeTab === 'invite_code_login'
+                        ? 'CÓDIGO DE INVITACIÓN'
+                        : activeTab === 'unauthorized'
+                        ? 'ACCESO RESTRINGIDO'
+                        : 'REGISTRO DE CONGREGACIÓN'
+                    }
                   </span>
-                )}
+                </div>
+
+                <span className="rounded-full bg-hover px-2.5 py-0.5 font-semibold tracking-normal text-muted text-[10.5px]">
+                  Gestor Teocrático
+                </span>
               </div>
 
               {/* Main Title & Subtitle */}

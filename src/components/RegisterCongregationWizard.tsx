@@ -536,7 +536,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   const wizardContent = (
     <>
       {/* Step Indicator Progress Bar */}
-      <div className={`${embedded ? 'px-0 pt-0.5 pb-2 sm:pb-2.5' : 'px-4 sm:px-6 pt-2.5 pb-2 sm:pb-2.5 bg-slate-50/70 dark:bg-slate-900/50'} border-b border-slate-100 dark:border-slate-800 w-full overflow-hidden shrink-0`}>
+      <div className={`${embedded ? 'px-0 pt-0.5 pb-2 sm:pb-2.5 kg-stepper-enter' : 'px-4 sm:px-6 pt-2.5 pb-2 sm:pb-2.5 bg-slate-50/70 dark:bg-slate-900/50'} border-b border-slate-100 dark:border-slate-800 w-full overflow-hidden shrink-0`}>
         <div className="flex items-center justify-between gap-1 sm:gap-2 w-full overflow-x-auto scrollbar-none py-0.5">
           {stepsList.map((s, index) => {
             const isPassed = step > s.num;
@@ -581,7 +581,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       </div>
 
       {/* Form Body */}
-      <div className={`${embedded ? 'p-0 pt-2 sm:pt-2.5 max-h-[calc(100vh-270px)] sm:max-h-[min(580px,calc(100vh-260px))] overflow-y-auto overscroll-contain pr-1 scrollbar-thin' : 'p-3.5 sm:p-6 flex-1 overflow-y-auto'} text-xs space-y-2.5 sm:space-y-3`}>
+      <div className={`${embedded ? 'p-0 pt-2 sm:pt-2.5 max-h-[calc(100vh-270px)] sm:max-h-[min(580px,calc(100vh-260px))] overflow-y-auto overscroll-contain pr-1 scrollbar-thin kg-form-enter' : 'p-3.5 sm:p-6 flex-1 overflow-y-auto'} text-xs space-y-2.5 sm:space-y-3`}>
         {error && (
           <div className="p-2.5 sm:p-3 rounded-xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200/80 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold flex items-center gap-2.5 shadow-2xs">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
@@ -1271,7 +1271,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       </div>
 
       {/* Footer Navigation Buttons */}
-      <div className={`${embedded ? 'pt-2.5 sm:pt-3' : 'p-3.5 sm:p-4 bg-slate-50/50 dark:bg-slate-900/50'} border-t border-slate-100 dark:border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 shrink-0`}>
+      <div className={`${embedded ? 'pt-2.5 sm:pt-3 kg-actions-enter' : 'p-3.5 sm:p-4 bg-slate-50/50 dark:bg-slate-900/50'} border-t border-slate-100 dark:border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 shrink-0`}>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -1515,7 +1515,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         </div>
 
         {/* Main Card */}
-        <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden flex flex-col flex-1">
+        <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden flex flex-col flex-1 kg-register-box-enter">
           {/* Header */}
           <div className="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-2.5">

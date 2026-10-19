@@ -981,14 +981,24 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           {/* ========================================================= */}
           <div className={`${activeTab === 'register' ? 'w-full' : 'w-full'} mx-auto transition-all duration-300`}>
             <section
+              key={activeTab === 'register' ? 'register-box' : `portal-${activeTab}`}
               aria-label="Portal de acceso"
-              className={`card rounded-3xl border border-line bg-card ${
-                activeTab === 'register' ? 'p-3.5 sm:p-5 lg:p-6' : 'p-4 sm:p-5 lg:p-6'
-              } transition-all shadow-xl`}
+              className={`card rounded-3xl border border-line bg-card relative overflow-hidden ${
+                activeTab === 'register'
+                  ? 'p-3.5 sm:p-5 lg:p-6 kg-register-box-enter shadow-2xl'
+                  : 'p-4 sm:p-5 lg:p-6 kg-home-box-enter shadow-xl'
+              } transition-all`}
               style={{ boxShadow: 'var(--card-shadow)' }}
             >
+              {/* Vibrant glowing gradient line at top for register mode */}
+              {activeTab === 'register' && (
+                <div className="absolute top-0 left-0 right-0 h-1 kg-shimmer-bar z-10" />
+              )}
+
               {/* UNIFIED CARD HEADER ACROSS ALL VIEWS */}
-              <div className="eye flex items-center justify-between text-[11px] font-bold tracking-[0.06em] text-brand">
+              <div className={`eye flex items-center justify-between text-[11px] font-bold tracking-[0.06em] text-brand ${
+                activeTab === 'register' ? 'kg-header-enter' : ''
+              }`}>
                 <span className="uppercase">
                   KONGRE • {
                     activeTab === 'home'
@@ -1028,40 +1038,42 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               </div>
 
               {/* Main Title & Subtitle */}
-              <h2 className={`font-extrabold tracking-tight text-ink ${
-                activeTab === 'register'
-                  ? 'mb-0.5 mt-1 sm:mt-1.5 text-lg sm:text-xl lg:text-2xl'
-                  : 'mb-0.5 mt-2 text-[20px] sm:text-[22px] lg:text-[24px]'
-              }`}>
-                {activeTab === 'home'
-                  ? '¡Bienvenido a Kongre!'
-                  : activeTab === 'email_login'
-                  ? 'Acceso con Google'
-                  : activeTab === 'code_login'
-                  ? 'Conectar con ID y PIN'
-                  : activeTab === 'invite_code_login'
-                  ? 'Código de Invitación'
-                  : activeTab === 'unauthorized'
-                  ? 'Acceso Restringido'
-                  : 'Registrar mi Congregación'}
-              </h2>
-              <p className={`text-muted ${
-                activeTab === 'register'
-                  ? 'mb-2 sm:mb-2.5 text-[11px] sm:text-xs'
-                  : 'mb-3 sm:mb-3.5 text-xs sm:text-[13px]'
-              } leading-normal`}>
-                {activeTab === 'home'
-                  ? 'Una herramienta teocrática que facilita la gestión integral de la congregación'
-                  : activeTab === 'email_login'
-                  ? 'Inicia sesión con tu cuenta de Google para acceder a tus asignaciones y perfil'
-                  : activeTab === 'code_login'
-                  ? 'Introduce el ID de congregación y tu PIN para acceder'
-                  : activeTab === 'invite_code_login'
-                  ? 'Introduce el código de invitación temporal para vincular este dispositivo'
-                  : activeTab === 'unauthorized'
-                  ? 'Esta cuenta requiere autorización previa del Cuerpo de Ancianos'
-                  : 'Configura los datos oficiales de tu congregación paso a paso'}
-              </p>
+              <div className={activeTab === 'register' ? 'kg-title-enter' : ''}>
+                <h2 className={`font-extrabold tracking-tight text-ink ${
+                  activeTab === 'register'
+                    ? 'mb-0.5 mt-1 sm:mt-1.5 text-lg sm:text-xl lg:text-2xl'
+                    : 'mb-0.5 mt-2 text-[20px] sm:text-[22px] lg:text-[24px]'
+                }`}>
+                  {activeTab === 'home'
+                    ? '¡Bienvenido a Kongre!'
+                    : activeTab === 'email_login'
+                    ? 'Acceso con Google'
+                    : activeTab === 'code_login'
+                    ? 'Conectar con ID y PIN'
+                    : activeTab === 'invite_code_login'
+                    ? 'Código de Invitación'
+                    : activeTab === 'unauthorized'
+                    ? 'Acceso Restringido'
+                    : 'Registrar mi Congregación'}
+                </h2>
+                <p className={`text-muted ${
+                  activeTab === 'register'
+                    ? 'mb-2 sm:mb-2.5 text-[11px] sm:text-xs'
+                    : 'mb-3 sm:mb-3.5 text-xs sm:text-[13px]'
+                } leading-normal`}>
+                  {activeTab === 'home'
+                    ? 'Una herramienta teocrática que facilita la gestión integral de la congregación'
+                    : activeTab === 'email_login'
+                    ? 'Inicia sesión con tu cuenta de Google para acceder a tus asignaciones y perfil'
+                    : activeTab === 'code_login'
+                    ? 'Introduce el ID de congregación y tu PIN para acceder'
+                    : activeTab === 'invite_code_login'
+                    ? 'Introduce el código de invitación temporal para vincular este dispositivo'
+                    : activeTab === 'unauthorized'
+                    ? 'Esta cuenta requiere autorización previa del Cuerpo de Ancianos'
+                    : 'Configura los datos oficiales de tu congregación paso a paso'}
+                </p>
+              </div>
 
               {/* VIEW: MAIN HOME OPTIONS */}
               {activeTab === 'home' && (

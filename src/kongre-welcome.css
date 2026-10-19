@@ -13,29 +13,17 @@
   --color-logo:var(--logo);--color-ofb:var(--ofb);--color-off:var(--off);--color-okb:var(--okb);--color-okf:var(--okf);
 }
 
-/* Iconos: se dibujan al entrar */
-.kg-ico svg{overflow:visible;transform-origin:50% 50%}
-.kg-ico svg *{stroke-dasharray:120;stroke-dashoffset:120;opacity:0;animation:kg-draw .9s cubic-bezier(.65,0,.35,1) var(--d,0s) forwards}
-.kg-m svg{animation:var(--m) .75s ease}
-
 /* Logo */
 .kg-sq{transform-origin:50px 50px;animation:kg-pop .6s cubic-bezier(.34,1.56,.64,1) both}
 .kg-k{fill:none;stroke:#fff;stroke-width:13;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;opacity:0;animation:kg-draw1 .5s ease forwards}
 .kg-wm{animation:kg-reveal .8s 1s cubic-bezier(.65,0,.35,1) both}
 
-@keyframes kg-draw{0%{stroke-dashoffset:120;opacity:0}1%{opacity:1}100%{stroke-dashoffset:0;opacity:1}}
 @keyframes kg-draw1{0%{stroke-dashoffset:1;opacity:0}1%{opacity:1}100%{stroke-dashoffset:0;opacity:1}}
 @keyframes kg-pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes kg-reveal{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
-@keyframes kg-tilt{25%{transform:rotate(-12deg)}75%{transform:rotate(12deg)}}
-@keyframes kg-drop{0%{transform:translateY(-9px)}55%{transform:translateY(2px)}100%{transform:none}}
-@keyframes kg-pulse{50%{transform:scale(1.2)}}
-@keyframes kg-wiggle{25%{transform:rotate(-22deg)}75%{transform:rotate(22deg)}}
-@keyframes kg-blink{45%,55%{transform:scaleY(.1)}}
-@keyframes kg-rise{50%{transform:translateY(-5px)}}
-@keyframes kg-flash{0%,100%{opacity:1}25%,75%{opacity:.25}50%{opacity:1}}
 
 /* Respeta "reducir movimiento" del sistema */
 @media (prefers-reduced-motion:reduce){
-  .kg-ico svg,.kg-ico svg *,.kg-sq,.kg-k,.kg-wm{animation:none!important;stroke-dashoffset:0!important;opacity:1!important;clip-path:none!important}
+  .kg-sq,.kg-k,.kg-wm{animation:none!important;stroke-dashoffset:0!important;opacity:1!important;clip-path:none!important}
 }
+

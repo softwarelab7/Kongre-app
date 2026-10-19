@@ -25,12 +25,19 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.8.2] - 18 de Octubre, 2026 (Compilación Activa)
+### [v2.8.3] - 18 de Octubre, 2026 (Compilación Activa)
+**Título:** Eliminación Total de Iconos v4 y Estandarización Teocrática con Lucide React
+- **Eliminación Integral de Paquete de Iconos v4:** Se removieron por completo más de 250 archivos gráficos y vectoriales redundantes en `/public/icons/` y `/public/anim/`, reduciendo la memoria del Service Worker PWA (más de 8 MB liberados) y aligerando la carga de red.
+- **Estandarización Teocrática de Iconos:** La pantalla de bienvenida y los componentes del sistema renderizan de forma directa y nativa los iconos vectoriales de Lucide React, eliminando dependencias y envoltorios de animación artificiales.
+- **Limpieza de Componentes Redundantes:** Eliminación de los archivos `src/SectionIconsLinea.tsx`, `src/components/icons/SectionIconsLinea.tsx`, `src/Bienvenida.tsx` y el envoltorio `src/AnimIcon.tsx`.
+- **Depuración de Hojas de Estilo:** Retiro de selectores de animación `.kg-ico`, `.kg-m` y `@keyframes` de trazo y movimiento en `kongre-welcome.css`.
+
+### [v2.8.2] - 18 de Octubre, 2026
 **Título:** Optimización de Espaciados en Bienvenida PC y Modo Demo Sin Bloqueos
 - **Optimización de Espaciados en PC (100% Responsive):** Ajuste de contenedores, espaciados verticales (`py-4 sm:py-6 lg:py-6 xl:py-8`), tipografía con escalado fluido `clamp` y tarjetas de opciones compactas para evitar desbordamientos y permitir visualización completa sin barra de desplazamiento en pantallas de escritorio y portátiles.
 - **Aislamiento Estricto de Perfiles en Modo Demo:** Se previene la filtración de avatares guardados en `localStorage` procedentes de sesiones reales o pruebas previas, asignando un perfil limpio de demostración ("Carlos Mendoza") con iniciales por defecto.
 - **Eliminación del Bloqueo por PIN en Modo Demo:** Desactivación de modales de bloqueo por PIN, temporizador de inactividad y advertencias de sesión bloqueada mientras se navega en modo de demostración.
-- **Actualización de Activos de Marca:** Inclusión y optimización de logotipos e iconos vectoriales de alta definición en el directorio público.
+- **Actualización de Activos de Marca:** Inclusión y optimización de logotipos e isotipos vectoriales de alta definición en el directorio público.
 
 ### [v2.8.1] - 18 de Octubre, 2026
 **Título:** Aislamiento Local del Modo Demo (Sin Conexión a Supabase)
@@ -46,10 +53,10 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
   - Botón de acceso directo a **Modo Demo** con datos precargados.
   - Selector circular de tema `.tbtn` con alternancia entre 3 modos: **Claro**, **Oscuro** y **Cabina A/V**.
 - **Columna de Presentación Teocrática (Izquierda):**
-  - Insignia interactiva con destellos animados (`Sparkles`) al pasar el cursor: *«Gestor Teocrático Integral • Seguro y Eficiente»*.
+  - Insignia interactiva con destellos animados (`Sparkles`): *«Gestor Teocrático Integral • Seguro y Eficiente»*.
   - Titular principal con gradiente de marca: *«Toda la gestión teocrática de tu congregación, en un solo lugar.»*.
   - Párrafo introductorio optimizado para lectura y contexto teocrático.
-  - Cuadrícula 2x2 de características (`.feat`) con separadores superiores sutiles y microanimaciones de trazo SVG (`AnimIcon` con `tilt`, `drop`, `pulse`, `flash`):
+  - Cuadrícula 2x2 de características (`.feat`) con separadores superiores sutiles e iconografía teocrática Lucide React:
     - *Reuniones & Guía S-89*
     - *Territorios & Carritos*
     - *Seguridad por Roles & PIN*

@@ -47,7 +47,6 @@ import { PendingApprovalView } from './PendingApprovalView';
 import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
 import AnimatedLogo from '../AnimatedLogo';
-import AnimIcon, { usePlay, type Motion } from '../AnimIcon';
 import ThemeToggle from './ThemeToggle';
 import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
 
@@ -62,23 +61,18 @@ interface CongregationWelcomeLandingProps {
 }
 
 function LandingFeatureCard({
-  icon,
-  motion,
-  delay,
+  icon: Icon,
   title,
   text,
 }: {
   icon: any;
-  motion: Motion;
-  delay: number;
   title: string;
   text: string;
 }) {
-  const [play, bump] = usePlay();
   return (
-    <article onMouseEnter={bump} className="border-t border-line py-3 lg:py-3.5 cursor-default group transition-colors">
+    <article className="border-t border-line py-3 lg:py-3.5 cursor-default group transition-colors">
       <div className="flex items-center gap-2.5">
-        <AnimIcon icon={icon} motion={motion} delay={delay} size={22} play={play} />
+        <Icon size={22} className="text-brand shrink-0" strokeWidth={2} aria-hidden />
         <h3 className="text-sm lg:text-[14.5px] font-bold text-ink group-hover:text-brand transition-colors">
           {title}
         </h3>
@@ -92,8 +86,6 @@ function LandingFeatureCard({
 
 interface DesktopOptionProps {
   icon: any;
-  motion: Motion;
-  delay: number;
   title: string;
   description: string;
   pill?: { label: string; tone: 'of' | 'ok' };
@@ -103,9 +95,7 @@ interface DesktopOptionProps {
 }
 
 function DesktopOption({
-  icon,
-  motion,
-  delay,
+  icon: Icon,
   title,
   description,
   pill,
@@ -113,24 +103,18 @@ function DesktopOption({
   onClick,
   iconCustom,
 }: DesktopOptionProps) {
-  const [play, bump] = usePlay();
   return (
     <button
       type="button"
-      onMouseEnter={bump}
-      onFocus={bump}
-      onClick={() => {
-        bump();
-        onClick();
-      }}
+      onClick={onClick}
       className={`opt hov group mb-1.5 flex w-full cursor-pointer items-start gap-3 rounded-2xl border-[1.5px] p-2.5 sm:p-3 text-left transition-all ${
         isFeatured
           ? 'border-bline bg-brand-soft hover:border-brand shadow-xs'
           : 'border-transparent hover:bg-hover'
       }`}
     >
-      <span className="mt-0.5 shrink-0">
-        {iconCustom ? iconCustom : <AnimIcon icon={icon} motion={motion} delay={delay} size={24} play={play} />}
+      <span className="mt-0.5 shrink-0 text-brand">
+        {iconCustom ? iconCustom : <Icon size={24} strokeWidth={2} aria-hidden />}
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-1.5">
@@ -265,7 +249,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   const { themeMode, setThemeMode, isDark, toggleTheme } = useTheme();
   const nextTheme = NEXT_THEME[themeMode] || 'dark';
   const CurrentThemeIcon = THEME_ICONS[themeMode] || (isDark ? Moon : Sun);
-  const [badgePlay, bumpBadge] = usePlay();
 
   const [activeTab, setRawActiveTab] = useState<'home' | 'email_login' | 'code_login' | 'invite_code_login' | 'register' | 'unauthorized'>(() => {
     if (typeof window !== 'undefined') {
@@ -949,15 +932,12 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           {/* ========================================================= */}
           {activeTab !== 'register' && (
             <section className="space-y-0">
-              <button
-                type="button"
-                onClick={bumpBadge}
-                onMouseEnter={bumpBadge}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-bline bg-brand-soft px-3 py-1 text-[11.5px] sm:text-xs font-semibold text-brand mb-2.5 sm:mb-3"
+              <div
+                className="inline-flex items-center gap-2 rounded-full border border-bline bg-brand-soft px-3 py-1 text-[11.5px] sm:text-xs font-semibold text-brand mb-2.5 sm:mb-3 select-none"
               >
-                <AnimIcon icon={Sparkles} motion="pulse" delay={0.2} size={15} play={badgePlay} />
+                <Sparkles size={15} className="text-brand shrink-0" aria-hidden />
                 <span>Gestor Teocrático Integral • Seguro y Eficiente</span>
-              </button>
+              </div>
 
               <h1 className="mb-2.5 sm:mb-3 text-[clamp(26px,2.9vw,48px)] font-black leading-[1.08] tracking-tight text-ink">
                 Toda la gestión teocrática de tu congregación,{' '}
@@ -974,29 +954,21 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               <div className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
                 <LandingFeatureCard
                   icon={CalendarDays}
-                  motion="tilt"
-                  delay={0.5}
                   title="Reuniones & Guía S-89"
                   text="Programación Vida y Ministerio, Fin de Semana, generación automática e impresión de hojas S-89 oficiales."
                 />
                 <LandingFeatureCard
                   icon={MapPin}
-                  motion="drop"
-                  delay={0.65}
                   title="Territorios & Carritos"
                   text="Manzanas georreferenciadas, enlaces digitales por QR para publicadores y control de turnos en carritos."
                 />
                 <LandingFeatureCard
                   icon={ShieldCheck}
-                  motion="pulse"
-                  delay={0.8}
                   title="Seguridad por Roles & PIN"
                   text="Autenticación con ID de congregación, PIN de congregación y PIN personal bajo estrictas directrices."
                 />
                 <LandingFeatureCard
                   icon={Wifi}
-                  motion="flash"
-                  delay={0.95}
                   title="PWA & Modo Offline"
                   text="Úsala en el Salón sin conexión a internet; tus datos se sincronizan al volver a tener red."
                 />
@@ -1087,8 +1059,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   <DesktopOption
                     isFeatured
                     icon={Building2}
-                    motion="rise"
-                    delay={0.9}
                     pill={{ label: 'Oficial', tone: 'of' }}
                     title="Registrar mi Congregación"
                     description="Configura tu congregación desde cero: ID, PINs, circuito y horarios."
@@ -1097,8 +1067,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
                   <DesktopOption
                     icon={CircleUserRound}
-                    motion="pulse"
-                    delay={1.05}
                     title="Iniciar sesión con Google"
                     description="Accede con tu cuenta verificada para sincronizar asignaciones y perfil."
                     onClick={() => setActiveTab('email_login')}
@@ -1106,8 +1074,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
                   <DesktopOption
                     icon={KeyRound}
-                    motion="wiggle"
-                    delay={1.2}
                     title="Conectar con ID y PIN de Congregación"
                     description="Accede a una congregación existente con su ID y PIN."
                     onClick={() => {
@@ -1119,8 +1085,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
                   <DesktopOption
                     icon={Eye}
-                    motion="blink"
-                    delay={1.3}
                     title="Iniciar sesión con código de invitación"
                     description="Accede con un código temporal de un solo uso en este dispositivo."
                     onClick={() => {

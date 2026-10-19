@@ -25,19 +25,41 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.8.2';
-export const CURRENT_BUILD_CODE = '2026.10.18.282';
+export const CURRENT_APP_VERSION = '2.8.3';
+export const CURRENT_BUILD_CODE = '2026.10.18.283';
 export const BUILD_DATE = '18 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.8.3',
+    buildCode: '2026.10.18.283',
+    date: '18 de Octubre, 2026',
+    title: 'Eliminación Total de Iconos v4 y Estandarización Teocrática',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Eliminación total del paquete de iconos v4 y archivos duplicados en /public/icons/ y /public/anim/, liberando más de 8 MB de precaché PWA.',
+      },
+      {
+        category: 'improvement',
+        text: 'Estandarización directa y nativa de iconografía con Lucide React en la pantalla de bienvenida y componentes del sistema.',
+      },
+      {
+        category: 'fix',
+        text: 'Remoción de componentes y utilidades redundantes (SectionIconsLinea, AnimIcon, Bienvenida) y depuración de animaciones CSS innecesarias.',
+      },
+    ],
+  },
+  {
     version: '2.8.2',
     buildCode: '2026.10.18.282',
     date: '18 de Octubre, 2026',
     title: 'Optimización de Espaciados en Bienvenida PC y Modo Demo Sin Bloqueos',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {
@@ -54,7 +76,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
       },
       {
         category: 'improvement',
-        text: 'Actualización y optimización de activos vectoriales, iconos de línea y logotipos en el directorio público.',
+        text: 'Actualización y optimización de logotipos e isotipos vectoriales de alta definición en el directorio público.',
       },
     ],
   },

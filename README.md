@@ -46,12 +46,12 @@
 - **Experiencia de Escritorio (PC)**:
   - Cabecera con selector de tema de 3 modos: **Claro**, **Oscuro** y **Cabina A/V** (modo de contraste especial para cabina de sonido).
   - Acceso directo a **Modo Demo** con un solo clic.
-  - Columna izquierda con insignia de destellos interactivos, titular en gradiente y cuadrícula 2x2 de características (`.feat`) con divisores sutiles y microanimaciones de trazo SVG (`AnimIcon`).
+  - Columna izquierda con insignia de destellos interactivos, titular en gradiente y cuadrícula 2x2 de características (`.feat`) con divisores sutiles e iconografía teocrática Lucide React.
   - Tarjeta interactiva de acceso (`.card` y `.opt`):
     - 🏛️ **Registrar mi Congregación**: Asistente completo por pasos con badge oficial.
     - 👤 **Iniciar sesión con Google**: Vinculación de perfil y asignaciones.
     - 🔑 **Conectar con ID y PIN de Congregación**: Autenticación teocrática directa.
-    - 👁️ **Iniciar sesión con código de invitación**: Acceso de un solo uso en dispositivo local con icono animado del ojo.
+    - 👁️ **Iniciar sesión con código de invitación**: Acceso de un solo uso en dispositivo local con código temporal.
 - **Experiencia Móvil (Smartphones)**:
   - Encabezado con gradiente teocrático `#4C3AED`, logotipo vertical e indicador de estado offline.
   - Bottom sheet táctil deslizante con esquinas redondeadas y opciones optimizadas para pulsación con una sola mano.

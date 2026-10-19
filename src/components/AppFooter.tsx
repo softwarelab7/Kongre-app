@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, GitBranch, ShieldCheck, History, ExternalLink } from 'lucide-react';
+import { Sparkles, ShieldCheck, ScrollText, ExternalLink } from 'lucide-react';
 import { CURRENT_APP_VERSION, BUILD_DATE, BUILD_ENVIRONMENT } from '../utils/versionLog';
 import Logo from '../Logo';
 import { OfflineSyncBadge } from './OfflineSyncBadge';
@@ -62,7 +62,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
               className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 border border-slate-200/80 dark:border-slate-700/80 hover:border-indigo-300 dark:hover:border-indigo-700/70 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer shadow-2xs active:scale-95 text-xs font-semibold"
               title="Ver registro de cambios y versiones de la aplicación"
             >
-              <History className="w-3.5 h-3.5 text-indigo-500 group-hover:rotate-12 transition-transform" />
+              <ScrollText className="w-3.5 h-3.5 text-indigo-500 group-hover:rotate-12 transition-transform" />
               <span>v{CURRENT_APP_VERSION}</span>
               <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-100/80 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                 Changelog

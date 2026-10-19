@@ -70,7 +70,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
 
   return (
     <div className="relative w-full" ref={containerRef}>
-      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
+      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
         <span>{label}</span>
         {required && <span className="text-rose-500">*</span>}
       </label>
@@ -92,7 +92,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
           required={required}
           list={datalistId}
           autoComplete="off"
-          className="w-full px-3.5 py-2.5 pr-14 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium text-base sm:text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-2xs disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full px-3 py-1.5 sm:py-2 pr-14 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold text-xs sm:text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-2xs disabled:opacity-60 disabled:cursor-not-allowed"
         />
 
         {/* Browser native datalist fallback for accessibility */}
@@ -128,7 +128,7 @@ export const SearchableCombobox: React.FC<SearchableComboboxProps> = ({
       </div>
 
       {helperText && (
-        <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block leading-relaxed">
+        <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block leading-tight">
           {helperText}
         </span>
       )}

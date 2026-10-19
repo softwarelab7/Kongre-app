@@ -921,10 +921,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         {/* 2. MAIN WORKSPACE / RESPONSIVE HERO & ACTIONS            */}
         {/* ========================================================= */}
         <main
-          className={`mx-auto grid w-full flex-1 items-center gap-6 lg:gap-10 xl:gap-14 px-4 sm:px-6 md:px-8 ${
+          className={`mx-auto grid w-full flex-1 gap-6 lg:gap-10 xl:gap-14 px-4 sm:px-6 md:px-8 ${
             activeTab === 'register'
-              ? 'max-w-5xl grid-cols-1 py-4'
-              : 'max-w-[1240px] 2xl:max-w-[1360px] lg:grid-cols-[1.12fr_.88fr] py-4 sm:py-6 lg:py-6 xl:py-8'
+              ? 'max-w-4xl xl:max-w-5xl grid-cols-1 py-2 sm:py-3.5 my-auto items-center'
+              : 'max-w-[1240px] 2xl:max-w-[1360px] lg:grid-cols-[1.12fr_.88fr] py-4 sm:py-6 lg:py-6 xl:py-8 items-center'
           }`}
         >
           {/* ========================================================= */}
@@ -982,7 +982,9 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           <div className={`${activeTab === 'register' ? 'w-full' : 'w-full'} mx-auto transition-all duration-300`}>
             <section
               aria-label="Portal de acceso"
-              className="card rounded-3xl border border-line bg-card p-4 sm:p-5 lg:p-6 transition-all shadow-xl"
+              className={`card rounded-3xl border border-line bg-card ${
+                activeTab === 'register' ? 'p-3.5 sm:p-5 lg:p-6' : 'p-4 sm:p-5 lg:p-6'
+              } transition-all shadow-xl`}
               style={{ boxShadow: 'var(--card-shadow)' }}
             >
               {/* UNIFIED CARD HEADER ACROSS ALL VIEWS */}
@@ -1026,7 +1028,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               </div>
 
               {/* Main Title & Subtitle */}
-              <h2 className="mb-0.5 mt-2 text-[20px] sm:text-[22px] lg:text-[24px] font-extrabold tracking-tight text-ink">
+              <h2 className={`font-extrabold tracking-tight text-ink ${
+                activeTab === 'register'
+                  ? 'mb-0.5 mt-1 sm:mt-1.5 text-lg sm:text-xl lg:text-2xl'
+                  : 'mb-0.5 mt-2 text-[20px] sm:text-[22px] lg:text-[24px]'
+              }`}>
                 {activeTab === 'home'
                   ? '¡Bienvenido a Kongre!'
                   : activeTab === 'email_login'
@@ -1039,7 +1045,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   ? 'Acceso Restringido'
                   : 'Registrar mi Congregación'}
               </h2>
-              <p className="mb-3 sm:mb-3.5 text-xs sm:text-[13px] leading-normal text-muted">
+              <p className={`text-muted ${
+                activeTab === 'register'
+                  ? 'mb-2 sm:mb-2.5 text-[11px] sm:text-xs'
+                  : 'mb-3 sm:mb-3.5 text-xs sm:text-[13px]'
+              } leading-normal`}>
                 {activeTab === 'home'
                   ? 'Una herramienta teocrática que facilita la gestión integral de la congregación'
                   : activeTab === 'email_login'

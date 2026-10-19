@@ -380,7 +380,7 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
         onClick={() => !disabled && setIsOpen(!isOpen)}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
-        className={`w-full flex items-center justify-between gap-2.5 rounded-xl border bg-white dark:bg-slate-800/90 px-3.5 py-2.5 text-xs sm:text-sm font-semibold transition-all outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none shadow-2xs ${
+        className={`w-full flex items-center justify-between gap-2.5 rounded-xl border bg-white dark:bg-slate-800/90 px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold transition-all outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 select-none shadow-2xs ${
           isOpen
             ? `${activeRing} ring-2 shadow-xs`
             : 'border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800'

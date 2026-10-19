@@ -536,8 +536,8 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   const wizardContent = (
     <>
       {/* Step Indicator Progress Bar */}
-      <div className={`${embedded ? 'px-0 pt-0.5 pb-2.5' : 'px-4 sm:px-6 pt-3 pb-2.5 bg-slate-50/70 dark:bg-slate-900/50'} border-b border-slate-100 dark:border-slate-800 w-full overflow-hidden`}>
-        <div className="flex items-center justify-between gap-1 sm:gap-2 w-full">
+      <div className={`${embedded ? 'px-0 pt-0.5 pb-2 sm:pb-2.5' : 'px-4 sm:px-6 pt-2.5 pb-2 sm:pb-2.5 bg-slate-50/70 dark:bg-slate-900/50'} border-b border-slate-100 dark:border-slate-800 w-full overflow-hidden shrink-0`}>
+        <div className="flex items-center justify-between gap-1 sm:gap-2 w-full overflow-x-auto scrollbar-none py-0.5">
           {stepsList.map((s, index) => {
             const isPassed = step > s.num;
             const isCurrent = step === s.num;
@@ -545,7 +545,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               <React.Fragment key={s.num}>
                 <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                   <div
-                    className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg sm:rounded-xl flex items-center justify-center text-[11px] sm:text-xs font-black transition-all ${
+                    className={`w-5.5 h-5.5 sm:w-6.5 sm:h-6.5 rounded-lg flex items-center justify-center text-[10.5px] sm:text-xs font-black transition-all ${
                       isPassed
                         ? 'bg-emerald-600 text-white shadow-xs shadow-emerald-600/30'
                         : isCurrent
@@ -560,8 +560,8 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                       isCurrent
                         ? 'inline text-indigo-600 dark:text-indigo-400'
                         : isPassed
-                        ? 'hidden sm:inline text-slate-700 dark:text-slate-300'
-                        : 'hidden sm:inline text-slate-400 dark:text-slate-500'
+                        ? 'hidden md:inline text-slate-700 dark:text-slate-300'
+                        : 'hidden md:inline text-slate-400 dark:text-slate-500'
                     }`}
                   >
                     {s.title}
@@ -569,7 +569,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 </div>
                 {index < stepsList.length - 1 && (
                   <div
-                    className={`h-0.5 flex-1 min-w-2 sm:min-w-3 mx-1 sm:mx-1.5 rounded-full transition-all ${
+                    className={`h-0.5 flex-1 min-w-1.5 sm:min-w-3 mx-1 sm:mx-1.5 rounded-full transition-all ${
                       step > s.num ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-800'
                     }`}
                   />
@@ -581,9 +581,9 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       </div>
 
       {/* Form Body */}
-      <div className={`${embedded ? 'p-0 pt-2.5' : 'p-4 sm:p-6 flex-1 overflow-y-auto'} text-xs space-y-3 sm:space-y-3.5`}>
+      <div className={`${embedded ? 'p-0 pt-2 sm:pt-2.5 max-h-[calc(100vh-270px)] sm:max-h-[min(580px,calc(100vh-260px))] overflow-y-auto overscroll-contain pr-1 scrollbar-thin' : 'p-3.5 sm:p-6 flex-1 overflow-y-auto'} text-xs space-y-2.5 sm:space-y-3`}>
         {error && (
-          <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200/80 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold flex items-center gap-2.5 shadow-2xs">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200/80 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold flex items-center gap-2.5 shadow-2xs">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
             <span>{error}</span>
           </div>
@@ -591,29 +591,29 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
         {/* STEP 1: CONGREGATION INFO */}
         {step === 1 && (
-          <div className="space-y-3 sm:space-y-3.5 animate-fade-in">
+          <div className="space-y-2.5 sm:space-y-3 animate-fade-in">
             {/* Step 1 Compact Banner */}
-            <div className="p-2.5 sm:p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-3 shadow-2xs">
+            <div className="py-1.5 px-2.5 sm:py-2 sm:px-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-2.5 sm:gap-3 shadow-2xs">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                <div className="w-5.5 h-5.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                   <Building2 className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0">
                   <span className="font-bold text-xs text-slate-900 dark:text-white block truncate">
                     Paso 1: Identidad de la Congregación
                   </span>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+                  <span className="text-[10.5px] text-slate-500 dark:text-slate-400 hidden sm:block">
                     Ingresa los datos oficiales según registros teocráticos.
                   </span>
                 </div>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 shrink-0">
+              <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 shrink-0">
                 1 de 5
               </span>
             </div>
 
             {/* Responsive Grid for Step 1 Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-3.5">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-2.5 sm:gap-3">
               {/* Row 1: Nombre de la Congregación (8 cols) + Circuito (4 cols) */}
               <div className="md:col-span-8">
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
@@ -626,7 +626,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                   value={congregationName}
                   onChange={(e) => handleCongregationNameChange(e.target.value)}
                   placeholder="Ej: Usme, Congregación Los Olivos"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                  className="w-full px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                   required
                   autoFocus
                 />
@@ -646,7 +646,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                   value={circuitNumber}
                   onChange={(e) => setCircuitNumber(e.target.value)}
                   placeholder="Ej: CO-04, ES-08"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white uppercase font-mono font-bold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                  className="w-full px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white uppercase font-mono font-bold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                   required
                 />
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block leading-tight">
@@ -655,10 +655,10 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               </div>
 
               {/* Row 2: ID Criptográfico Horizontal Elegante (Full width) */}
-              <div className="md:col-span-12 p-3 rounded-xl border border-indigo-200/80 dark:border-indigo-800/60 bg-gradient-to-r from-indigo-50/70 via-white to-slate-50/70 dark:from-slate-900/90 dark:via-slate-900/60 dark:to-indigo-950/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shadow-2xs">
+              <div className="md:col-span-12 p-2.5 sm:p-3 rounded-xl border border-indigo-200/80 dark:border-indigo-800/60 bg-gradient-to-r from-indigo-50/70 via-white to-slate-50/70 dark:from-slate-900/90 dark:via-slate-900/60 dark:to-indigo-950/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-2xs">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 shadow-2xs">
-                    <Hash className="w-4 h-4" />
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 shadow-2xs">
+                    <Hash className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
@@ -676,7 +676,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 self-stretch sm:self-center justify-end">
                   <button
                     type="button"
                     onClick={handleRegenerateCongregationId}
@@ -740,7 +740,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                   value={hallAddress}
                   onChange={(e) => setHallAddress(e.target.value)}
                   placeholder="Ej: Calle 45 # 12-34, Barrio El Paraíso"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                  className="w-full px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                   required
                 />
               </div>
@@ -750,36 +750,36 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
         {/* STEP 2: MEETINGS AND SCHEDULES */}
         {step === 2 && (
-          <div className="space-y-3 sm:space-y-3.5 animate-fade-in">
-            <div className="p-2.5 sm:p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-3 shadow-2xs">
+          <div className="space-y-2.5 sm:space-y-3 animate-fade-in">
+            <div className="py-1.5 px-2.5 sm:py-2 sm:px-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-2.5 sm:gap-3 shadow-2xs">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                <div className="w-5.5 h-5.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                   <Calendar className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0">
                   <span className="font-bold text-xs text-slate-900 dark:text-white block truncate">
                     Paso 2: Días y Horarios de las Reuniones
                   </span>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+                  <span className="text-[10.5px] text-slate-500 dark:text-slate-400 hidden sm:block">
                     Para calcular automáticamente los programas semanales y hojas S-89.
                   </span>
                 </div>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 shrink-0">
+              <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 shrink-0">
                 2 de 5
               </span>
             </div>
 
             {/* 2-Column Responsive Grid: Midweek & Weekend Side-by-Side */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
               {/* Midweek Meeting Card */}
-              <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs flex flex-col justify-between">
+              <div className="p-2.5 sm:p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 sm:space-y-2.5 shadow-2xs flex flex-col justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-                    <Calendar className="w-4 h-4" />
+                  <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                    <Calendar className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
-                    <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block truncate">
+                    <span className="font-bold text-xs text-slate-900 dark:text-white block truncate">
                       Reunión Entre Semana (Vida y Ministerio)
                     </span>
                     <span className="text-[10px] text-slate-500 dark:text-slate-400 block">
@@ -788,7 +788,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
                       <Clock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -819,13 +819,13 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               </div>
 
               {/* Weekend Meeting Card */}
-              <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs flex flex-col justify-between">
+              <div className="p-2.5 sm:p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 sm:space-y-2.5 shadow-2xs flex flex-col justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                    <Calendar className="w-4 h-4" />
+                  <div className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <Calendar className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
-                    <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white block truncate">
+                    <span className="font-bold text-xs text-slate-900 dark:text-white block truncate">
                       Reunión Fin de Semana (Público y Atalaya)
                     </span>
                     <span className="text-[10px] text-slate-500 dark:text-slate-400 block">
@@ -834,7 +834,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
                       <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -869,22 +869,22 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
         {/* STEP 3: COORDINATOR INFO */}
         {step === 3 && (
-          <div className="space-y-3 sm:space-y-3.5 animate-fade-in">
-            <div className="p-2.5 sm:p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-3 shadow-2xs">
+          <div className="space-y-2.5 sm:space-y-3 animate-fade-in">
+            <div className="py-1.5 px-2.5 sm:py-2 sm:px-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-2.5 sm:gap-3 shadow-2xs">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                <div className="w-5.5 h-5.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                   <User className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0">
                   <span className="font-bold text-xs text-slate-900 dark:text-white block truncate">
                     Paso 3: Datos del Coordinador del Cuerpo de Ancianos
                   </span>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+                  <span className="text-[10.5px] text-slate-500 dark:text-slate-400 hidden sm:block">
                     Tendrá acceso total como administrador general de la congregación.
                   </span>
                 </div>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 shrink-0">
+              <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 shrink-0">
                 3 de 5
               </span>
             </div>
@@ -900,12 +900,12 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 value={coordinatorName}
                 onChange={(e) => setCoordinatorName(e.target.value)}
                 placeholder="Ej: Carlos Mendoza"
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                className="w-full px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-semibold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                 required
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
                   <Mail className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -917,7 +917,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                   value={coordinatorEmail}
                   onChange={(e) => setCoordinatorEmail(e.target.value)}
                   placeholder="Ej: coordinador.cbe@gmail.com"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                  className="w-full px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-mono text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                   required
                 />
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
@@ -957,7 +957,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     setCoordinatorPhone(cleaned);
                   }}
                   placeholder="Ej: +57 300 123 4567"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs font-mono"
+                  className="w-full px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs font-mono"
                   required
                 />
                 <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
@@ -970,33 +970,33 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
         {/* STEP 4: SECURITY - PIN DE CONGREGACIÓN Y PIN PERSONAL */}
         {step === 4 && (
-          <div className="space-y-3 sm:space-y-3.5 animate-fade-in">
-            <div className="p-2.5 sm:p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-3 shadow-2xs">
+          <div className="space-y-2.5 sm:space-y-3 animate-fade-in">
+            <div className="py-1.5 px-2.5 sm:py-2 sm:px-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/60 text-slate-700 dark:text-slate-300 flex items-center justify-between gap-2.5 sm:gap-3 shadow-2xs">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-6 h-6 rounded-lg bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+                <div className="w-5.5 h-5.5 rounded-lg bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
                   <ShieldCheck className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0">
                   <span className="font-bold text-xs text-amber-950 dark:text-amber-200 block truncate">
                     Paso 4: Seguridad Teocrática y Roles
                   </span>
-                  <span className="text-[11px] text-amber-900/80 dark:text-amber-300/80 hidden sm:block">
-                    Credenciales asignadas según las nuevas directrices de seguridad de Kongre.
+                  <span className="text-[10.5px] text-amber-900/80 dark:text-amber-300/80 hidden sm:block">
+                    Credenciales asignadas según las directrices de seguridad de Kongre.
                   </span>
                 </div>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
+              <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shrink-0">
                 CSPRNG
               </span>
             </div>
 
             {/* 2-Column Responsive Grid: Congregation PIN & Personal PIN Side-by-Side */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
               {/* Card 1: Clave / PIN de la Congregación (Alfanumérico) */}
-              <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs flex flex-col justify-between">
+              <div className="p-2.5 sm:p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 sm:space-y-2.5 shadow-2xs flex flex-col justify-between">
                 <div>
-                  <div className="flex items-start gap-2 mb-2">
-                    <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                  <div className="flex items-start gap-2 mb-1.5">
+                    <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
                       <Lock className="w-3.5 h-3.5" />
                     </div>
                     <div className="min-w-0">
@@ -1010,7 +1010,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                   </div>
 
                   {/* Input y Credencial Alfanumérica CSPRNG */}
-                  <div className="p-3 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs space-y-2">
+                  <div className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
                         Clave Criptográfica:
@@ -1030,7 +1030,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                           setConfirmCongregationPin(val);
                         }}
                         placeholder="Ej: 8X4W-9M2K"
-                        className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-sm sm:text-base focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        className="w-full px-3 py-1.5 sm:py-2 rounded-lg border border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                         required
                       />
                     </div>
@@ -1039,7 +1039,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                       <button
                         type="button"
                         onClick={() => setShowCongregationPin(!showCongregationPin)}
-                        className="flex-1 py-1 px-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer"
+                        className="flex-1 py-1 px-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10.5px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer"
                       >
                         {showCongregationPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                         <span>{showCongregationPin ? 'Ocultar' : 'Ver'}</span>
@@ -1048,7 +1048,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                       <button
                         type="button"
                         onClick={handleRegenerateCongregationPin}
-                        className="flex-1 py-1 px-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer"
+                        className="flex-1 py-1 px-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10.5px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer"
                         title="Generar otra clave alfanumérica aleatoria"
                       >
                         <RefreshCw className={`w-3 h-3 ${pinRegeneratedCong ? 'animate-spin' : ''}`} />
@@ -1058,7 +1058,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                       <button
                         type="button"
                         onClick={() => handleCopyCongPin(congregationPin)}
-                        className="flex-1 py-1 px-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-[11px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer shadow-xs"
+                        className="flex-1 py-1 px-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-[10.5px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer shadow-xs"
                       >
                         {copiedCongPin ? <Check className="w-3 h-3 text-emerald-300" /> : <Copy className="w-3 h-3" />}
                         <span>{copiedCongPin ? '¡Copiado!' : 'Copiar'}</span>
@@ -1074,10 +1074,10 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               </div>
 
               {/* Card 2: PIN Personal Único */}
-              <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-3 shadow-2xs flex flex-col justify-between">
+              <div className="p-2.5 sm:p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 sm:space-y-2.5 shadow-2xs flex flex-col justify-between">
                 <div>
-                  <div className="flex items-start gap-2 mb-2">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="flex items-start gap-2 mb-1.5">
+                    <div className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
                       <KeyRound className="w-3.5 h-3.5" />
                     </div>
                     <div className="min-w-0">
@@ -1090,7 +1090,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs space-y-2">
+                  <div className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
                         PIN de 4 dígitos:
@@ -1145,7 +1145,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
                     <div className="flex items-center justify-between text-[10px] pt-0.5">
                       <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                        <Sparkles className="w-3 h-3" /> Generado con CSPRNG
+                        <Sparkles className="w-3 h-3" /> CSPRNG seguro
                       </span>
                       {confirmPersonalPin.length > 0 && (
                         confirmPersonalPin === personalPin ? (
@@ -1169,17 +1169,17 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
         {/* STEP 5: SUMMARY & ACTIVATION */}
         {step === 5 && (
-          <div className="space-y-3 sm:space-y-3.5 animate-fade-in">
-            <div className="p-3 sm:p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 flex items-center justify-between gap-3 shadow-2xs">
+          <div className="space-y-2.5 sm:space-y-3 animate-fade-in">
+            <div className="py-1.5 px-2.5 sm:py-2 sm:px-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 flex items-center justify-between gap-2.5 sm:gap-3 shadow-2xs">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/80 text-emerald-600 dark:text-emerald-300 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="w-4 h-4" />
+                <div className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/80 text-emerald-600 dark:text-emerald-300 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0">
                   <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">
                     ¡Todo listo para registrar la congregación!
                   </h4>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-300 truncate hidden sm:block">
+                  <p className="text-[10.5px] text-slate-600 dark:text-slate-300 truncate hidden sm:block">
                     Verifica el resumen antes de activar el sistema.
                   </p>
                 </div>
@@ -1187,31 +1187,31 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               <button
                 type="button"
                 onClick={handleCopySecurityData}
-                className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-1 shadow-2xs transition-all cursor-pointer shrink-0"
+                className="px-2 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] sm:text-xs flex items-center gap-1 shadow-2xs transition-all cursor-pointer shrink-0"
               >
                 {copiedSecurity ? <Check className="w-3 h-3 text-emerald-300" /> : <Copy className="w-3 h-3" />}
-                <span className="text-[11px]">{copiedSecurity ? '¡Copiado!' : 'Copiar claves'}</span>
+                <span>{copiedSecurity ? '¡Copiado!' : 'Copiar claves'}</span>
               </button>
             </div>
 
             {/* Summary Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-              <div className="p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1 shadow-2xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
+              <div className="p-2.5 sm:p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1 shadow-2xs">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                   Congregación
                 </span>
-                <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">{congregationName}</p>
+                <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm truncate">{congregationName}</p>
                 <p className="text-slate-700 dark:text-slate-200 font-mono font-bold text-xs">
                   ID: {congregationNumber}
                 </p>
                 <p className="text-slate-500 font-mono text-xs">
                   Circuito {circuitNumber}
                 </p>
-                <p className="text-xs text-slate-500">{[city, country].filter(Boolean).join(', ')}</p>
+                <p className="text-xs text-slate-500 truncate">{[city, country].filter(Boolean).join(', ')}</p>
                 <p className="text-[11px] text-slate-400 truncate">{hallAddress}</p>
               </div>
 
-              <div className="p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1 shadow-2xs">
+              <div className="p-2.5 sm:p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1 shadow-2xs">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                   Reuniones Semanales
                 </span>
@@ -1223,16 +1223,16 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1 shadow-2xs">
+              <div className="p-2.5 sm:p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1 shadow-2xs">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                   Coordinador Designado
                 </span>
-                <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">{coordinatorName}</p>
-                <p className="text-xs text-indigo-600 dark:text-indigo-400 font-mono font-semibold">{coordinatorEmail}</p>
+                <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm truncate">{coordinatorName}</p>
+                <p className="text-xs text-indigo-600 dark:text-indigo-400 font-mono font-semibold truncate">{coordinatorEmail}</p>
                 <p className="text-xs text-slate-500">{coordinatorPhone}</p>
               </div>
 
-              <div className="p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1.5 shadow-2xs">
+              <div className="p-2.5 sm:p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/50 space-y-1.5 shadow-2xs">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                     Seguridad Teocrática
@@ -1246,7 +1246,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                     <span>{showSummaryPins ? 'Ocultar' : 'Ver'}</span>
                   </button>
                 </div>
-                <div className="flex flex-col gap-1.5 text-xs">
+                <div className="flex flex-col gap-1 text-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-600 dark:text-slate-400">ID Congregación:</span>
                     <span className="font-mono font-bold text-slate-900 dark:text-white">{congregationNumber}</span>
@@ -1271,12 +1271,12 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       </div>
 
       {/* Footer Navigation Buttons */}
-      <div className={`${embedded ? 'pt-3 sm:pt-3.5' : 'p-4 sm:p-5 bg-slate-50/50 dark:bg-slate-900/50'} border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3`}>
-        <div className="flex items-center gap-2 sm:gap-3">
+      <div className={`${embedded ? 'pt-2.5 sm:pt-3' : 'p-3.5 sm:p-4 bg-slate-50/50 dark:bg-slate-900/50'} border-t border-slate-100 dark:border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 shrink-0`}>
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={step > 1 ? handleBack : onClose}
-            className="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/70 dark:border-slate-700/70 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs active:scale-[0.99]"
+            className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/70 dark:border-slate-700/70 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-all shadow-2xs active:scale-[0.99]"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>{step > 1 ? 'Anterior' : 'Volver atrás'}</span>
@@ -1286,7 +1286,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             <button
               type="button"
               onClick={onOpenJoinWithCode}
-              className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer transition-colors"
+              className="text-[11px] sm:text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline cursor-pointer transition-colors"
             >
               ¿Tienes ID y PIN? Conectar
             </button>
@@ -1297,7 +1297,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
           <button
             type="button"
             onClick={handleNext}
-            className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md shadow-indigo-600/20 transition-all"
+            className="px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold text-xs flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md shadow-indigo-600/20 transition-all ml-auto sm:ml-0"
           >
             <span>Continuar al Paso {step + 1}</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -1307,7 +1307,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             type="button"
             onClick={handleFinalSubmit}
             disabled={isSubmitting}
-            className="px-5 py-2 sm:px-6 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-xs flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-600/20 transition-all disabled:opacity-50"
+            className="px-4 py-1.5 sm:px-5 sm:py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-xs flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md shadow-emerald-600/20 transition-all disabled:opacity-50 ml-auto sm:ml-0"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>{isSubmitting ? 'Registrando...' : 'Registrar y Comenzar'}</span>
@@ -1319,23 +1319,23 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
   if (isSuccessScreen) {
     const successCard = (
-      <div className="space-y-5 animate-fade-in p-2 sm:p-4">
+      <div className="space-y-3 sm:space-y-4 animate-fade-in p-1 sm:p-2 max-h-[calc(100vh-230px)] overflow-y-auto overscroll-contain pr-1">
         {/* Banner de Éxito */}
-        <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-emerald-500/15 via-emerald-500/5 to-transparent border border-emerald-500/30 text-center space-y-2.5">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-emerald-600/30">
-            <CheckCircle2 className="w-8 h-8" />
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-emerald-500/15 via-emerald-500/5 to-transparent border border-emerald-500/30 text-center space-y-1.5">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-md shadow-emerald-600/30">
+            <CheckCircle2 className="w-6 h-6" />
           </div>
-          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
             ¡Congregación Registrada con Éxito!
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-lg mx-auto leading-relaxed">
+          <p className="text-xs text-slate-600 dark:text-slate-300 max-w-lg mx-auto leading-relaxed">
             La <strong>{congregationName}</strong> ya está configurada en Kongre. Guarda y copia tus claves y datos antes de comenzar.
           </p>
         </div>
 
         {/* Tarjeta de Credenciales */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-4 sm:p-6 space-y-4 shadow-sm">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-3 sm:p-4 space-y-2.5 sm:space-y-3 shadow-xs">
+          <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
@@ -1363,9 +1363,9 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5">
             {/* ID Congregación */}
-            <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between gap-3">
+            <div className="p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <span className="text-[10px] font-bold uppercase text-slate-400 block">ID de la Congregación</span>
                 <span className="font-mono font-bold text-sm sm:text-base text-slate-900 dark:text-white select-all">{congregationNumber}</span>
@@ -1373,7 +1373,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               <button
                 type="button"
                 onClick={() => handleCopySingle(congregationNumber, 'id_final')}
-                className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-bold text-xs hover:bg-indigo-100 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-bold text-xs hover:bg-indigo-100 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
               >
                 {copiedField === 'id_final' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copiedField === 'id_final' ? 'Copiado' : 'Copiar'}</span>
@@ -1381,7 +1381,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             </div>
 
             {/* PIN de la Congregación */}
-            <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between gap-3">
+            <div className="p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <span className="text-[10px] font-bold uppercase text-slate-400 block">PIN de la Congregación</span>
                 <span className="font-mono font-bold text-sm sm:text-base text-indigo-600 dark:text-indigo-400 select-all">
@@ -1391,7 +1391,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               <button
                 type="button"
                 onClick={() => handleCopySingle(congregationPin, 'pin_cong_final')}
-                className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-bold text-xs hover:bg-indigo-100 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-bold text-xs hover:bg-indigo-100 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
               >
                 {copiedField === 'pin_cong_final' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copiedField === 'pin_cong_final' ? 'Copiado' : 'Copiar'}</span>
@@ -1399,7 +1399,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             </div>
 
             {/* PIN Personal Coordinador */}
-            <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between gap-3">
+            <div className="p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <span className="text-[10px] font-bold uppercase text-slate-400 block">Tu PIN Personal (Coordinador)</span>
                 <span className="font-mono font-bold text-sm sm:text-base text-emerald-600 dark:text-emerald-400 select-all">
@@ -1409,7 +1409,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               <button
                 type="button"
                 onClick={() => handleCopySingle(personalPin, 'pin_pers_final')}
-                className="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-300 font-bold text-xs hover:bg-emerald-100 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-300 font-bold text-xs hover:bg-emerald-100 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
               >
                 {copiedField === 'pin_pers_final' ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copiedField === 'pin_pers_final' ? 'Copiado' : 'Copiar'}</span>
@@ -1417,7 +1417,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             </div>
 
             {/* Coordinador Info */}
-            <div className="p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between gap-3 text-xs">
+            <div className="p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between gap-3 text-xs">
               <div className="min-w-0">
                 <span className="text-[10px] font-bold uppercase text-slate-400 block">Coordinador Designado</span>
                 <span className="font-bold text-slate-800 dark:text-slate-200 truncate block">{coordinatorName}</span>
@@ -1430,29 +1430,29 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
           <button
             type="button"
             onClick={handleCopySecurityData}
-            className="w-full py-2.5 px-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
+            className="w-full py-2 px-3.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs"
           >
-            {copiedSecurity ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+            {copiedSecurity ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copiedSecurity ? '¡Todos los datos copiados al portapapeles!' : 'Copiar todos los datos de seguridad (ID y PINs)'}</span>
           </button>
         </div>
 
         {/* Action Buttons: Copiar todo & Descargar .txt */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           <button
             type="button"
             onClick={handleCopyAll}
-            className="py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-indigo-600/20 active:scale-[0.99] transition-all cursor-pointer"
+            className="py-2.5 px-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-indigo-600/20 active:scale-[0.99] transition-all cursor-pointer"
           >
-            {copiedAll ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
+            {copiedAll ? <Check className="w-3.5 h-3.5 text-emerald-300" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copiedAll ? '¡Todas las credenciales copiadas!' : 'Copiar todas las credenciales'}</span>
           </button>
           <button
             type="button"
             onClick={handleDownloadTxt}
-            className="py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200/70 dark:border-slate-700/70 active:scale-[0.99] transition-all cursor-pointer"
+            className="py-2.5 px-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200/70 dark:border-slate-700/70 active:scale-[0.99] transition-all cursor-pointer"
           >
-            <Download className="w-4 h-4" />
+            <Download className="w-3.5 h-3.5" />
             <span>Descargar comprobante (.txt)</span>
           </button>
         </div>
@@ -1462,27 +1462,27 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         </p>
 
         {/* Enter App Button */}
-        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+        <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex justify-end">
           <button
             type="button"
             onClick={() => onRegisteredSuccess()}
-            className="w-full sm:w-auto py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 active:scale-[0.99] transition-all cursor-pointer"
+            className="w-full sm:w-auto py-2.5 sm:py-3 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 active:scale-[0.99] transition-all cursor-pointer"
           >
             <span>Ir al Gestor Teocrático</span>
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </div>
     );
 
     if (embedded) {
-      return <div className="space-y-4 pt-1 animate-fade-in">{successCard}</div>;
+      return <div className="space-y-3 pt-0.5 animate-fade-in">{successCard}</div>;
     }
 
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col py-3 sm:py-6 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col py-2 sm:py-5 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
         <div className="w-full max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto flex-1 flex flex-col justify-center">
-          <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden p-4 sm:p-6">
+          <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden p-3.5 sm:p-5">
             {successCard}
           </div>
         </div>
@@ -1491,57 +1491,57 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   }
 
   if (embedded) {
-    return <div className="space-y-3 sm:space-y-4 pt-0.5 animate-fade-in">{wizardContent}</div>;
+    return <div className="space-y-2.5 sm:space-y-3 pt-0.5 animate-fade-in">{wizardContent}</div>;
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col py-3 sm:py-6 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col py-2 sm:py-4 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="w-full max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto flex-1 flex flex-col">
         {/* Top Back Navigation Bar */}
-        <div className="mb-4 sm:mb-6 flex items-center justify-between">
+        <div className="mb-2.5 sm:mb-4 flex items-center justify-between">
           <button
             type="button"
             onClick={step > 1 ? handleBack : onClose}
-            className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200 dark:border-slate-800 font-bold text-xs sm:text-sm shadow-xs transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200 dark:border-slate-800 font-bold text-xs shadow-xs transition-all cursor-pointer"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5" />
             <span>{step > 1 ? 'Paso anterior' : 'Volver al Inicio'}</span>
           </button>
 
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <Logo variant="isotipo" className="w-5 h-5 object-contain" />
+            <Logo variant="isotipo" className="w-4 h-4 object-contain" />
             <span className="hidden sm:inline">Kongre • Registro de Congregación</span>
           </div>
         </div>
 
         {/* Main Card */}
-        <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden flex flex-col flex-1">
+        <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden flex flex-col flex-1">
           {/* Header */}
-          <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3">
+          <div className="p-3.5 sm:p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-2 sm:gap-2.5">
               <button
                 type="button"
                 onClick={step > 1 ? handleBack : onClose}
-                className="p-2 -ml-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center gap-1"
+                className="p-1.5 -ml-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center gap-1"
                 title={step > 1 ? 'Paso anterior' : 'Volver atrás'}
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4" />
               </button>
-              <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-                <Building2 className="w-5 h-5" />
+              <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                <Building2 className="w-4 h-4" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                     Registro de Congregación
                   </h3>
                   {isMandatory && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                    <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
                       Requisito Obligatorio
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
                   {isMandatory
                     ? 'Debes registrar los datos oficiales de tu congregación para comenzar a usar Kongre'
                     : 'Asistente de configuración inicial teocrática'}
@@ -1552,10 +1552,10 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             <button
               type="button"
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               title="Cerrar y volver atrás"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   X,
-  GitBranch,
+  History,
   Calendar,
   CheckCircle2,
   Copy,
@@ -87,7 +87,7 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
         <div className="px-5 sm:px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4 bg-slate-50/70 dark:bg-slate-950/40">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-200/50 dark:border-indigo-800/50">
-              <GitBranch className="w-5 h-5" />
+              <History className="w-5 h-5" />
             </div>
             <div className="truncate">
               <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white truncate">

@@ -462,7 +462,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
                 )}
               </div>
               <span className="text-[10px] text-slate-400 block">
-                Estructura oficial asignada a tu congregación (formato KGR-XXXX-XXXX).
+                Identificador oficial asignado a tu congregación (formato KGR-XXXX-XXXX).
               </span>
             </div>
 

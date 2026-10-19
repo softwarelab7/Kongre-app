@@ -1331,7 +1331,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                             )}
                           </div>
                           <span className="text-[10px] text-slate-400 block mt-0.5">
-                            Estructura estándar oficial con guiones automáticos (ej: KGR-NQ5A-JQAA).
+                            Formato estándar oficial con guiones automáticos (ej: KGR-NQ5A-JQAA).
                           </span>
                         </div>
 

@@ -1036,10 +1036,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       setEmailError(null);
                       setInviteCodeError(null);
                     }}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-hover text-muted hover:text-brand font-semibold text-xs tracking-normal transition-colors cursor-pointer"
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-full text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group"
+                    title="Volver"
+                    aria-label="Volver"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    <span>Volver al inicio</span>
+                    <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
                   </button>
                 ) : (
                   <span className="rounded-full bg-hover px-2.5 py-0.5 font-semibold tracking-normal text-muted text-[10.5px]">
@@ -1062,7 +1063,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     : activeTab === 'code_login'
                     ? 'Conectar con ID y PIN'
                     : activeTab === 'invite_code_login'
-                    ? 'Código de Invitación'
+                    ? 'Conéctate a tu congregación'
                     : activeTab === 'unauthorized'
                     ? 'Acceso Restringido'
                     : 'Registrar mi Congregación'}
@@ -1079,7 +1080,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     : activeTab === 'code_login'
                     ? 'Introduce el ID de congregación y tu PIN para acceder'
                     : activeTab === 'invite_code_login'
-                    ? 'Introduce el código de invitación temporal para vincular este dispositivo'
+                    ? 'Para activar la aplicación Kongre en este dispositivo, ingresa el código de invitación que recibiste de los ancianos de tu congregación.'
                     : activeTab === 'unauthorized'
                     ? 'Esta cuenta requiere autorización previa del Cuerpo de Ancianos'
                     : 'Configura los datos oficiales de tu congregación paso a paso'}
@@ -1564,30 +1565,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               {/* VIEW: INICIAR SESIÓN CON CÓDIGO DE INVITACIÓN (Organized Pocket SignUp) */}
               {activeTab === 'invite_code_login' && (
                 <div className="space-y-6 pt-1 animate-in fade-in zoom-in-95 duration-150">
-                  {/* Page Header matching Image 2 */}
-                  <div className="space-y-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setInviteCodeError(null);
-                        setInviteCodeSuccess(null);
-                        setActiveTab('home');
-                      }}
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-full text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group"
-                      title="Volver"
-                    >
-                      <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
-                    </button>
-
-                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
-                      Conéctate a tu congregación
-                    </h2>
-
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                      Para activar la aplicación Kongre en este dispositivo, ingresa el código de invitación que recibiste de los ancianos de tu congregación.
-                    </p>
-                  </div>
-
                   {/* Activation Form */}
                   <form onSubmit={handleActivateWithInviteCode} className="space-y-5">
                     {inviteCodeError && (

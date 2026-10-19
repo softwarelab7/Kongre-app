@@ -73,13 +73,15 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4">
             <div className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center">
-                    <Smartphone className="w-4 h-4" />
-                  </div>
+                <div className="flex items-center gap-2.5">
+                  <img
+                    src="/apple-touch-icon.png"
+                    alt="Kongre"
+                    className="w-9 h-9 rounded-xl shadow-xs border border-indigo-200/50 shrink-0"
+                  />
                   <div>
                     <h3 className="text-sm font-bold text-slate-900">Instalar en iPhone o iPad</h3>
-                    <p className="text-[11px] text-slate-500">Sin tienda de aplicaciones</p>
+                    <p className="text-[11px] text-slate-500">Agrega Kongre a tu pantalla de inicio</p>
                   </div>
                 </div>
                 <button

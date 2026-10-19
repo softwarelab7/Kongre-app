@@ -25,18 +25,45 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.8.4';
-export const CURRENT_BUILD_CODE = '2026.10.18.284';
-export const BUILD_DATE = '18 de Octubre, 2026';
+export const CURRENT_APP_VERSION = '2.8.5';
+export const CURRENT_BUILD_CODE = '2026.10.19.285';
+export const BUILD_DATE = '19 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '2.8.5',
+    buildCode: '2026.10.19.285',
+    date: '19 de Octubre, 2026',
+    title: 'Soporte Completo de Icono PWA en iPhone (iOS Apple Touch Icon)',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'fix',
+        text: 'Corrección del icono en iPhone: generación de apple-touch-icon.png (180x180) con fondo 100% opaco índigo (#4C3AED) y sin canal alfa transparente, evitando que Safari muestre un cuadro negro o captura genérica.',
+      },
+      {
+        category: 'improvement',
+        text: 'Inclusión de todas las resoluciones oficiales de iOS: apple-touch-icon-180x180, apple-touch-icon-152x152, apple-touch-icon-167x167 y apple-touch-icon-precomposed en el HTML.',
+      },
+      {
+        category: 'improvement',
+        text: 'Creación de public/manifest.webmanifest y enlace explícito en index.html para compatibilidad PWA moderna con Safari en iOS 15, 16, 17 y 18.',
+      },
+      {
+        category: 'improvement',
+        text: 'Actualización de la guía paso a paso de instalación en iOS con previsualización del icono oficial de la app.',
+      },
+    ],
+  },
   {
     version: '2.8.4',
     buildCode: '2026.10.18.284',
     date: '18 de Octubre, 2026',
     title: 'Estandarización de Marca Oficial Índigo #4C3AED y Optimización de Activos',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Última versión compilada y activa',
     environment: 'Producción Cloud (Kongre)',
     changes: [

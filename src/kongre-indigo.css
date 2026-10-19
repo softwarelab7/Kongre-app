@@ -1,0 +1,19 @@
+/* Kongre - la escala "indigo" de Tailwind pasa a ser la de la marca (#4C3AED).
+   Asi las ~2.900 clases indigo-* que ya tienes (text-indigo-600, bg-indigo-50, ring-indigo-500...)
+   toman el color oficial sin tocar los componentes.
+   En src/index.css, DESPUES de kongre-theme.css:
+     @import "./kongre-indigo.css";
+*/
+@theme {
+  --color-indigo-50: #F4F3FE;
+  --color-indigo-100: #E6E3FC;
+  --color-indigo-200: #CDC8FA;
+  --color-indigo-300: #AEA6F7;
+  --color-indigo-400: #8579F3;
+  --color-indigo-500: #6556F0;
+  --color-indigo-600: #4C3AED;
+  --color-indigo-700: #4132CC;
+  --color-indigo-800: #3427A1;
+  --color-indigo-900: #281E7B;
+  --color-indigo-950: #1D165A;
+}

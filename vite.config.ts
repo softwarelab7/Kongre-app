@@ -11,37 +11,22 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg', 'favicon-32x32.png', 'favicon-16x16.png'],
+        includeAssets: ['favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'favicon-16.png', 'favicon-32.png'],
         manifest: {
           id: '/',
           name: 'Kongre - Gestor Teocrático',
           short_name: 'Kongre',
           description: 'Gestión de asignaciones de congregación, reuniones, asistencia S-88 y territorios con soporte offline.',
-          theme_color: '#4f46e5',
-          background_color: '#f8fafc',
+          theme_color: '#4C3AED',
+          background_color: '#FFFFFF',
           display: 'standalone',
           orientation: 'portrait-primary',
           start_url: '/',
           scope: '/',
           icons: [
-            {
-              src: '/pwa-192x192.png',
-              sizes: '192x192',
-              type: 'image/png',
-              purpose: 'any',
-            },
-            {
-              src: '/pwa-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'any',
-            },
-            {
-              src: '/pwa-maskable-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'maskable',
-            },
+            { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+            { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
           ],
         },
         workbox: {

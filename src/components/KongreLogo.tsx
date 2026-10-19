@@ -11,13 +11,13 @@ export interface KongreLogoProps {
 /**
  * Logotipo oficial de Kongre (Guía de Marca V2)
  * - Squircle continuo con curvatura superelipse
- * - Degradado oficial en diagonal 135° (#6D6AF5 -> #3F36C9)
+ * - Degradado oficial en diagonal 135° (#4C3AED -> #4C3AED)
  * - Símbolo 'K' calado con barra vertical de puntas redondeadas y chevrón simétrico (#FFFFFF)
  */
 export const KongreLogo: React.FC<KongreLogoProps> = ({
   className = '',
   size = 'md',
-  variant = 'gradient',
+  variant = 'flat',
   showBackground = true,
   title = 'Kongre',
 }) => {

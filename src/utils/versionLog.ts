@@ -25,19 +25,48 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.8.3';
-export const CURRENT_BUILD_CODE = '2026.10.18.283';
+export const CURRENT_APP_VERSION = '2.8.4';
+export const CURRENT_BUILD_CODE = '2026.10.18.284';
 export const BUILD_DATE = '18 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.8.4',
+    buildCode: '2026.10.18.284',
+    date: '18 de Octubre, 2026',
+    title: 'Estandarización de Marca Oficial Índigo #4C3AED y Optimización de Activos',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Redefinición completa de la escala indigo de TailwindCSS con la paleta de marca (#4C3AED) mediante kongre-indigo.css.',
+      },
+      {
+        category: 'improvement',
+        text: 'Actualización del manifiesto PWA en vite.config.ts con tema oficial (#4C3AED) e iconos limpios (icon-192, icon-512, icon-maskable-512).',
+      },
+      {
+        category: 'improvement',
+        text: 'Estandarización de URLs absolutas en metadatos OpenGraph y Twitter Card para previsualización correcta en WhatsApp y redes.',
+      },
+      {
+        category: 'fix',
+        text: 'Depuración exhaustiva de colores hexadecimales residuales y remoción de archivos obsoletos en public/ (pwa-*, icon.svg, etc.).',
+      },
+      {
+        category: 'improvement',
+        text: 'Alineación de KongreLogo a la variante plana oficial para máxima fidelidad gráfica y consistencia.',
+      },
+    ],
+  },
+  {
     version: '2.8.3',
     buildCode: '2026.10.18.283',
     date: '18 de Octubre, 2026',
     title: 'Eliminación Total de Iconos v4 y Estandarización Teocrática',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

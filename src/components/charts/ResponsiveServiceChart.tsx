@@ -365,14 +365,14 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
           <defs>
             {/* Area Gradient for Hours */}
             <linearGradient id="serviceHoursGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#6366f1" stopOpacity="0.32" />
-              <stop offset="60%" stopColor="#6366f1" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="#6366f1" stopOpacity="0.00" />
+              <stop offset="0%" stopColor="#6556F0" stopOpacity="0.32" />
+              <stop offset="60%" stopColor="#6556F0" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#6556F0" stopOpacity="0.00" />
             </linearGradient>
 
             {/* Subtle glow filter for interactive dots */}
             <filter id="pointGlow" x="-50%" y="-50%" width="200%" height="200%">
-              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#6366f1" floodOpacity="0.4" />
+              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#6556F0" floodOpacity="0.4" />
             </filter>
           </defs>
 
@@ -414,7 +414,7 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
             <path
               d={hourPath}
               fill="none"
-              stroke="#6366f1"
+              stroke="#6556F0"
               strokeWidth={3}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -466,7 +466,7 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
                 y1={padding.top}
                 x2={hourPoints[hoveredIdx].x}
                 y2={baselineY}
-                stroke="#6366f1"
+                stroke="#6556F0"
                 strokeWidth={1.5}
                 strokeDasharray="2 2"
                 className="opacity-70 dark:opacity-80"
@@ -478,7 +478,7 @@ export const ResponsiveServiceChart: React.FC<ResponsiveServiceChartProps> = ({
                   cx={hourPoints[hoveredIdx].x}
                   cy={hourPoints[hoveredIdx].y}
                   r={6}
-                  fill="#6366f1"
+                  fill="#6556F0"
                   stroke="#ffffff"
                   strokeWidth={2.5}
                   filter="url(#pointGlow)"

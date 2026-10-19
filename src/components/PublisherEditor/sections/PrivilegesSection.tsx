@@ -68,7 +68,7 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
 
   const COLORS = {
     green: { bg: 'bg-[#10b981]', soft: 'bg-[#e6f6f0]', text: 'text-[#10b981]', shadow: 'shadow-[#10b981]/30' },
-    blue: { bg: 'bg-[#6366f1]', soft: 'bg-[#eef2ff]', text: 'text-[#6366f1]', shadow: 'shadow-[#6366f1]/30' },
+    blue: { bg: 'bg-[#6556F0]', soft: 'bg-[#eef2ff]', text: 'text-[#6556F0]', shadow: 'shadow-[#6556F0]/30' },
     sky: { bg: 'bg-[#0ea5e9]', soft: 'bg-[#e0f2fe]', text: 'text-[#0ea5e9]', shadow: 'shadow-[#0ea5e9]/30' },
     orange: { bg: 'bg-[#ff9500]', soft: 'bg-[#fff4e6]', text: 'text-[#ff9500]', shadow: 'shadow-[#ff9500]/30' },
     zinc: { bg: 'bg-[#71717a]', soft: 'bg-[#f4f4f5]', text: 'text-[#71717a]', shadow: 'shadow-zinc-500/30' }
@@ -118,7 +118,7 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
                <span className={`px-4 py-2 rounded-xl text-[11px] font-bold ${COLORS.sky.soft} ${COLORS.sky.text} border border-[#0ea5e9]/10 shadow-sm animate-in zoom-in-95`}>Publicador Bautizado</span>
              )}
              {formData.role === 'servant' && (
-               <span className={`px-4 py-2 rounded-xl text-[11px] font-bold ${COLORS.blue.soft} ${COLORS.blue.text} border border-[#6366f1]/10 shadow-sm animate-in zoom-in-95`}>Siervo Ministerial</span>
+               <span className={`px-4 py-2 rounded-xl text-[11px] font-bold ${COLORS.blue.soft} ${COLORS.blue.text} border border-[#6556F0]/10 shadow-sm animate-in zoom-in-95`}>Siervo Ministerial</span>
              )}
              {formData.role === 'elder' && (
                <span className={`px-4 py-2 rounded-xl text-[11px] font-bold ${COLORS.green.soft} ${COLORS.green.text} border border-[#10b981]/10 shadow-sm animate-in zoom-in-95`}>Anciano de Congregación</span>
@@ -129,7 +129,7 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
                </span>
              )}
              {yearsBaptized > 0 && formData.role !== 'unbaptized' && (
-               <span className={`px-4 py-2 rounded-xl text-[11px] font-bold ${COLORS.blue.soft} ${COLORS.blue.text} border border-[#6366f1]/10 shadow-sm animate-in zoom-in-95`}>
+               <span className={`px-4 py-2 rounded-xl text-[11px] font-bold ${COLORS.blue.soft} ${COLORS.blue.text} border border-[#6556F0]/10 shadow-sm animate-in zoom-in-95`}>
                  {yearsBaptized} Años Bautizado
                </span>
              )}
@@ -428,7 +428,7 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
                 className={`relative group rounded-2xl border transition-all duration-300 overflow-hidden ${
                   currentRole === 'titular'
                     ? `${priv.color.soft || 'bg-indigo-50 dark:bg-indigo-500/10'} border-transparent ring-1 ring-inset ${
-                        priv.color.bg === 'bg-indigo-600' || priv.color.bg === 'bg-[#6366f1]'
+                        priv.color.bg === 'bg-indigo-600' || priv.color.bg === 'bg-[#6556F0]'
                           ? 'ring-indigo-200 dark:ring-indigo-500/30'
                           : 'ring-zinc-200 dark:ring-zinc-500/20'
                       }`

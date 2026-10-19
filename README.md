@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-2.8.0-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión 2.8.0" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-2.8.4-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión 2.8.4" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
   <img src="https://img.shields.io/badge/TypeScript-7.0-3178c6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Vite-8.3-646cff?style=flat-square&logo=vite&logoColor=white" alt="Vite 8" />
@@ -35,12 +35,14 @@
 
 ---
 
-## ✨ Novedades Recientes (v2.8.0)
+## ✨ Novedades Recientes (v2.8.4)
 
-### 🎨 Identidad de Marca Oficial Kongre v3
-- **Nuevo Isotipo y Logotipo Oficial**: Paleta teocrática con color primario `#4C3AED`, fondo de página `#F8F9FC` y tokens temáticos adaptativos.
-- **Logotipo Animado SVG (`AnimatedLogo`)**: Animación suave de dibujo de trazos y revelación tipográfica integrada en cabeceras.
-- **Paquete Completo de Activos**: Variantes en positivo, negativo y negro en SVG y PNG de alta resolución, favicons multiformato e iconos web manifest PWA maskable.
+### 🎨 Estandarización de Marca Oficial Índigo (#4C3AED) y Parche v3
+- **Escala de Color Tailwind Centralizada**: Integración de `kongre-indigo.css` mapeando la paleta oficial de marca sobre las clases `indigo-*` de TailwindCSS.
+- **PWA Manifest Estandarizado**: Tema `#4C3AED`, fondo `#FFFFFF` e iconos limpios de 192px, 512px y 512px maskable en el Service Worker.
+- **Metadatos y Tarjetas Sociales**: URLs absolutas oficiales para imágenes Open Graph y Twitter Cards (`https://kongre.ai.studio/og-image-1200x630.png`).
+- **Depuración Integral de Activos**: Retiro de archivos gráficos antiguos y generación de favicons multiformato, splash screen y logotipos de alta fidelidad.
+- **Logotipo Unificado**: Variante plana (`flat`) por defecto en `KongreLogo` para consistencia absoluta con los recursos de marca.
 
 ### 💻 Portal de Bienvenida Teocrático para PC y Móviles
 - **Experiencia de Escritorio (PC)**:

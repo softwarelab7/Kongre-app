@@ -135,7 +135,7 @@
 }
 
 .kg-shimmer-bar {
-  background: linear-gradient(90deg, #4338CA, #6366F1, #8B5CF6, #6366F1, #4338CA);
+  background: linear-gradient(90deg, #4132CC, #6556F0, #8B5CF6, #6556F0, #4132CC);
   background-size: 200% 100%;
   animation: kg-shimmer-accent 4s linear infinite;
 }

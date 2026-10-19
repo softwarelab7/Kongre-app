@@ -321,8 +321,8 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
       return {
         grid: '#1e293b',
         text: '#94a3b8',
-        midweek: '#818cf8', // Indigo 400
-        midweekGrad: '#6366f1',
+        midweek: '#8579F3', // Indigo 400
+        midweekGrad: '#6556F0',
         weekend: '#38bdf8', // Sky 400
         weekendGrad: '#0284c7',
         overall: '#34d399', // Emerald 400

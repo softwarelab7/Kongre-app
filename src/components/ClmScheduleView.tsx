@@ -2281,8 +2281,8 @@ export default function ClmScheduleView({
                           <span
                             className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
                             style={{
-                              backgroundColor: `${SECTION_BANNERS[part.seccion as keyof typeof SECTION_BANNERS]?.bgColor || '#6366f1'}20`,
-                              color: SECTION_BANNERS[part.seccion as keyof typeof SECTION_BANNERS]?.bgColor || '#6366f1',
+                              backgroundColor: `${SECTION_BANNERS[part.seccion as keyof typeof SECTION_BANNERS]?.bgColor || '#6556F0'}20`,
+                              color: SECTION_BANNERS[part.seccion as keyof typeof SECTION_BANNERS]?.bgColor || '#6556F0',
                             }}
                           >
                             {part.seccion.replace('_', ' ')}

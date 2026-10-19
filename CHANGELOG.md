@@ -25,7 +25,15 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.8.3] - 18 de Octubre, 2026 (Compilación Activa)
+### [v2.8.4] - 18 de Octubre, 2026 (Compilación Activa)
+**Título:** Estandarización de Marca Oficial Índigo #4C3AED y Optimización Integral de Activos
+- **Redefinición de Escala Tailwind Indigo:** Creación e importación de `src/kongre-indigo.css`, alineando las más de 2.900 clases de Tailwind a los tonos oficiales de la marca (#4C3AED) de forma centralizada y limpia.
+- **Configuración Oficial de Manifiesto PWA:** Actualización de `vite.config.ts` estableciendo el color de tema en `#4C3AED`, fondo `#FFFFFF` e íconos limpios (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png`).
+- **Metadatos OpenGraph y Redes Sociales:** Estandarización de URLs absolutas en `index.html` para la imagen destacada (`og:image` y `twitter:image`), garantizando una correcta previsualización en WhatsApp y redes sociales.
+- **Depuración de Activos en `public/`:** Eliminación de archivos obsoletos (`icon.svg`, `pwa-*.png`, favicons redundantes y variantes oscuras previas), y regeneración de todos los logos e íconos en índigo de alta resolución.
+- **Uniformidad Gráfica:** Ajuste del componente `KongreLogo` a la variante plana (`flat`) para consistencia milimétrica con los archivos de marca.
+
+### [v2.8.3] - 18 de Octubre, 2026
 **Título:** Eliminación Total de Iconos v4 y Estandarización Teocrática con Lucide React
 - **Eliminación Integral de Paquete de Iconos v4:** Se removieron por completo más de 250 archivos gráficos y vectoriales redundantes en `/public/icons/` y `/public/anim/`, reduciendo la memoria del Service Worker PWA (más de 8 MB liberados) y aligerando la carga de red.
 - **Estandarización Teocrática de Iconos:** La pantalla de bienvenida y los componentes del sistema renderizan de forma directa y nativa los iconos vectoriales de Lucide React, eliminando dependencias y envoltorios de animación artificiales.

@@ -1003,7 +1003,7 @@ export const PublishersTab: React.FC = () => {
                           style={{
                             background: isFemale
                               ? 'linear-gradient(135deg, #ec4899, #8b5cf6)'
-                              : 'linear-gradient(135deg, #6366f1, #3b82f6)',
+                              : 'linear-gradient(135deg, #6556F0, #3b82f6)',
                           }}
                         >
                           <svg
@@ -1392,7 +1392,7 @@ export const PublishersTab: React.FC = () => {
                               style={{
                                 background: isFemale
                                   ? 'linear-gradient(135deg, #ec4899, #8b5cf6)'
-                                  : 'linear-gradient(135deg, #6366f1, #3b82f6)',
+                                  : 'linear-gradient(135deg, #6556F0, #3b82f6)',
                               }}
                             >
                               <svg

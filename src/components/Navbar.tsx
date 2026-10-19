@@ -1157,8 +1157,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Divider */}
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 hidden sm:block" />
 
-            {/* Dark Mode Moon / Sun Toggle */}
-            <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={28} />
+            {/* Dark Mode Moon / Sun / Cabina Toggle */}
+            <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={34} />
 
             {/* Divider */}
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 hidden sm:block" />

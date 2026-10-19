@@ -1,14 +1,15 @@
-import { useState, useEffect, CSSProperties } from "react";
-import { Moon, Sun, Tv } from "lucide-react";
+import { useState, CSSProperties } from "react";
+import { Moon, Sun, MonitorSpeaker } from "lucide-react";
 import { useTheme, ThemeMode } from "../context/ThemeContext";
 
 export interface ThemeToggleProps {
   isDark?: boolean;
   themeMode?: ThemeMode;
-  onToggle?: (next?: any) => void;
+  onToggle?: (next?: ThemeMode) => void;
   className?: string;
   style?: CSSProperties;
   size?: number;
+  variant?: "default" | "onBrand";
 }
 
 export default function ThemeToggle({
@@ -17,7 +18,8 @@ export default function ThemeToggle({
   onToggle,
   className = "",
   style = {},
-  size = 28,
+  size = 34,
+  variant = "default",
 }: ThemeToggleProps) {
   let themeCtx: ReturnType<typeof useTheme> | null = null;
   try {
@@ -49,6 +51,8 @@ export default function ThemeToggle({
 
     if (themeCtx?.setThemeMode) {
       themeCtx.setThemeMode(next);
+    } else if (onToggle) {
+      onToggle(next);
     } else {
       if (typeof document !== "undefined") {
         const root = document.documentElement;
@@ -65,34 +69,34 @@ export default function ThemeToggle({
         localStorage.setItem("kongre_theme", next);
       } catch {}
     }
-
-    onToggle?.(next);
   }
 
-  // Calculate icon size proportionally
-  const iconSize = size === 48 ? 22 : Math.max(13, Math.round(size * 0.5));
+  const iconSize = size === 48 ? 22 : Math.max(15, Math.round(size * 0.5));
 
-  const modeLabels: Record<ThemeMode, { title: string; aria: string; bg: string; color: string; border: string }> = {
+  const modeLabels: Record<
+    ThemeMode,
+    { title: string; aria: string; bg: string; color: string; border: string }
+  > = {
     light: {
-      title: "Modo Claro (Día) • Clic para Modo Oscuro",
-      aria: "Modo Claro activo. Cambiar a Modo Oscuro",
-      bg: "#E5EAF5",
-      color: "#1B4F91",
-      border: "rgba(27, 79, 145, 0.15)",
+      title: "Tema: Claro • Clic para cambiar a Oscuro",
+      aria: "Tema Claro activo. Cambiar a Modo Oscuro",
+      bg: variant === "onBrand" ? "rgba(255, 255, 255, 0.2)" : "rgba(76, 58, 237, 0.1)",
+      color: variant === "onBrand" ? "#FFFFFF" : "#4C3AED",
+      border: variant === "onBrand" ? "rgba(255, 255, 255, 0.35)" : "rgba(76, 58, 237, 0.22)",
     },
     dark: {
-      title: "Modo Oscuro (Noche) • Clic para Modo Cabina A/V",
-      aria: "Modo Oscuro activo. Cambiar a Modo Cabina",
-      bg: "#1E293B",
-      color: "#9085F4",
-      border: "rgba(144, 133, 244, 0.3)",
+      title: "Tema: Oscuro • Clic para cambiar a Cabina A/V",
+      aria: "Tema Oscuro activo. Cambiar a Modo Cabina A/V",
+      bg: variant === "onBrand" ? "rgba(15, 23, 42, 0.55)" : "#1E1B4B",
+      color: "#A5B4FC",
+      border: "rgba(165, 180, 252, 0.32)",
     },
     cabina: {
-      title: "Modo Cabina & Acomodadores (Auditorio) • Clic para Modo Claro",
-      aria: "Modo Cabina activo. Cambiar a Modo Claro",
+      title: "Tema: Cabina A/V • Clic para cambiar a Claro",
+      aria: "Tema Cabina A/V activo. Cambiar a Modo Claro",
       bg: "#050811",
       color: "#34D399",
-      border: "rgba(52, 211, 153, 0.4)",
+      border: "rgba(52, 211, 153, 0.45)",
     },
   };
 
@@ -111,11 +115,11 @@ export default function ThemeToggle({
       onMouseUp={() => setIsActive(false)}
       aria-label={currentConfig.aria}
       title={currentConfig.title}
-      className={`relative inline-flex items-center justify-center select-none outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1B4F91] cursor-pointer transition-all ${className}`}
+      className={`relative inline-flex items-center justify-center select-none outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#4C3AED] cursor-pointer transition-all shrink-0 backdrop-blur-xs ${className}`}
       style={{
         width: size,
         height: size,
-        borderRadius: "50%",
+        borderRadius: "9999px",
         border: `1.5px solid ${currentConfig.border}`,
         display: "inline-flex",
         alignItems: "center",
@@ -125,20 +129,19 @@ export default function ThemeToggle({
         color: currentConfig.color,
         boxShadow: isHovered
           ? activeMode === "cabina"
-            ? "0 0 16px rgba(52, 211, 153, 0.4), 0 0 0 1px rgba(52, 211, 153, 0.3)"
+            ? "0 0 14px rgba(52, 211, 153, 0.38)"
             : activeMode === "dark"
-            ? "0 4px 16px rgba(144, 133, 244, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.15)"
-            : "0 4px 16px rgba(27, 79, 145, 0.18), 0 0 0 1px rgba(27, 79, 145, 0.08)"
+            ? "0 4px 14px rgba(129, 140, 248, 0.3)"
+            : "0 4px 14px rgba(76, 58, 237, 0.2)"
           : activeMode === "cabina"
-          ? "0 0 8px rgba(52, 211, 153, 0.25)"
-          : "0 1px 3px rgba(0, 0, 0, 0.05)",
+          ? "0 0 8px rgba(52, 211, 153, 0.22)"
+          : "0 1px 2px rgba(0, 0, 0, 0.04)",
         transform: isActive ? "scale(0.92)" : isHovered ? "scale(1.06)" : "scale(1)",
         transition:
           "background 250ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 250ms ease, border-color 250ms ease",
         ...style,
       }}
     >
-      {/* Animated Icon Container */}
       <div
         style={{
           position: "relative",
@@ -149,7 +152,7 @@ export default function ThemeToggle({
           justifyContent: "center",
         }}
       >
-        {/* Phase 1: Sun Icon (shown in light mode) */}
+        {/* Phase 1: Sun Icon (Light Mode) */}
         <div
           style={{
             position: "absolute",
@@ -164,10 +167,10 @@ export default function ThemeToggle({
             pointerEvents: "none",
           }}
         >
-          <Sun size={iconSize} />
+          <Sun size={iconSize} strokeWidth={2.2} />
         </div>
 
-        {/* Phase 2: Moon Icon (shown in dark mode) */}
+        {/* Phase 2: Moon Icon (Dark Mode) */}
         <div
           style={{
             position: "absolute",
@@ -182,10 +185,10 @@ export default function ThemeToggle({
             pointerEvents: "none",
           }}
         >
-          <Moon size={iconSize} />
+          <Moon size={iconSize} strokeWidth={2.2} />
         </div>
 
-        {/* Phase 3: Cabina A/V Icon (shown in cabina mode) */}
+        {/* Phase 3: Cabina A/V Icon (Cabina Mode) */}
         <div
           style={{
             position: "absolute",
@@ -200,7 +203,7 @@ export default function ThemeToggle({
             pointerEvents: "none",
           }}
         >
-          <Tv size={iconSize} />
+          <MonitorSpeaker size={iconSize} strokeWidth={2.2} />
         </div>
       </div>
     </button>

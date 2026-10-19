@@ -25,7 +25,41 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.8.4] - 18 de Octubre, 2026 (Compilación Activa)
+### [v2.8.8] - 19 de Octubre, 2026 (Compilación Activa)
+**Título:** Optimización de Roles Teocráticos, Ingreso por ID/PIN entre Dispositivos y Códigos de Invitación QR
+- **Conexión Multidispositivo por ID y PIN de Congregación:**
+  - Actualizado `loadCongregationFromCloud` para recibir directamente el PIN de Congregación y el PIN Personal ingresados por el usuario, permitiendo descifrar desde cero en navegadores o teléfonos móviles nuevos.
+  - Eliminado el falso positivo que retornaba datos locales vacíos cuando un ID no existía o el PIN era incorrecto.
+- **Sincronización de PIN Personal e Invitaciones en Payload Público:**
+  - Enriquecido `payload_public` en `supabaseSyncService` con la estructura de ajustes básicos (`congregationPinHash`), directorio de roles/PINs personales e invitaciones activas, manteniendo privadas las tarjetas S-21 y notas pastorales.
+- **Códigos de Invitación Portátiles y Lectura Automática de QR:**
+  - Los códigos e invitaciones generados en `InvitationManagerModal` ahora sincronizan automáticamente con Supabase y generan enlaces directos y códigos QR con autocompletado automático (`?invite=...&cong=...&cpin=...`) en la pantalla de bienvenida.
+- **Refinamiento de Roles Teocráticos:**
+  - Corregido el rol base por defecto para siervos ministeriales sin departamento asignado y eliminada la llamada duplicada a `hydrateCongregation`.
+
+---
+
+### [v2.8.7] - 19 de Octubre, 2026
+**Título:** Vista Previa de Documentos PDF antes de Descargar y Orientación de Página
+- **Opciones de Orientación de Página (Vertical y Horizontal):** Incorporación de selectores visuales de orientación (*Vertical / Retrato* y *Horizontal / Paisaje*) compatibles con formatos Carta (`216 × 279 mm` / `279 × 216 mm`) y A4 (`210 × 297 mm` / `297 × 210 mm`), persistidos en la configuración de la congregación.
+- **Vista Previa del Documento antes de la Descarga (`ExportPdfTab`):**
+  - Alternancia en tiempo real entre **Hoja Interactiva** (con geometría proporcional a la orientación elegida y controles de zoom de `75%` a `120%`) y **Documento PDF Real** (visor PDF integrado generado con `jsPDF`).
+  - **Modal de Previsualización Previa a la Descarga:** Permite inspeccionar el PDF final (tanto del Programa Mensual como de las Papeletas S-89), alternar orientación o tamaño al instante y confirmar la descarga.
+- **Optimización de `pdfGenerator.ts`:** Soporte nativo de orientación dinámica, ajuste inteligente de texto multilínea (`splitTextToSize`), encabezados temáticos según plantilla y numeración automática de páginas.
+
+### [v2.8.6] - 19 de Octubre, 2026
+**Título:** Unificación de Barra Inferior, Términos Legales, Botón de Tema y Mejoras Móviles
+- **Términos de Uso y Política de Privacidad (`TermsAndPrivacyModal`):** Redacción completa e integración de ventana interactiva con pestañas dedicadas para los *Términos de Uso Teocrático* (propósito, custodia de PINs, uso ético y soporte PWA) y la *Política de Privacidad y Seguridad* (arquitectura Cero Conocimiento, cifrado AES-256-GCM con PBKDF2, minimización de datos, cero publicidad y control total por el Cuerpo de Ancianos).
+- **Unificación de la Barra Inferior (`AppFooter`) en PC y Móvil:** Diseño unificado tanto en la portada de bienvenida (`variant="landing"`) como en el interior de la aplicación (`variant="app"`), integrando isotipo oficial, indicador de estado En línea / Modo Offline, enlaces directos a Términos de Uso y Política de Privacidad, insignia de sincronización offline y botón de versión/novedades.
+- **Unificación del Botón de Modo Oscuro (`ThemeToggle`):** Estandarización visual e interactiva del selector circular de tema (Claro, Oscuro y Cabina A/V) en la bienvenida móvil (`variant="onBrand"`), cabecera de escritorio y barra superior de la aplicación.
+- **Optimización de Bienvenida y Registro en Móvil:** Inclusión de la sección *Funciones de la App* debajo de las opciones de bienvenida en la vista principal móvil (ocultándose automáticamente al entrar en subvistas) y eliminación de contenedores con scroll interno en el asistente de registro de congregación para evitar el doble scroll.
+
+### [v2.8.5] - 19 de Octubre, 2026
+**Título:** Soporte Completo de Icono PWA en iPhone (iOS Apple Touch Icon)
+- **Corrección del Icono en iPhone (iOS):** Generación de `apple-touch-icon.png` (180x180) y variantes (`152x152`, `167x167`, `precomposed`) con fondo 100% opaco índigo (`#4C3AED`) y sin canal alfa transparente para evitar iconos negros o capturas genéricas en Safari iOS.
+- **Manifiesto Web Estándar:** Enlace explícito a `/manifest.webmanifest` en `index.html` y actualización del modal de guía de instalación en iOS con vista previa real del icono.
+
+### [v2.8.4] - 18 de Octubre, 2026
 **Título:** Estandarización de Marca Oficial Índigo #4C3AED y Optimización Integral de Activos
 - **Redefinición de Escala Tailwind Indigo:** Creación e importación de `src/kongre-indigo.css`, alineando las más de 2.900 clases de Tailwind a los tonos oficiales de la marca (#4C3AED) de forma centralizada y limpia.
 - **Configuración Oficial de Manifiesto PWA:** Actualización de `vite.config.ts` estableciendo el color de tema en `#4C3AED`, fondo `#FFFFFF` e íconos limpios (`icon-192.png`, `icon-512.png`, `icon-maskable-512.png`).

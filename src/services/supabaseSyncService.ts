@@ -62,16 +62,26 @@ export interface CongregationFullData {
   literatureOrders?: LiteratureSpecialOrder[];
   literatureDistributions?: LiteratureGroupDistribution[];
   literatureInventory?: LiteratureInventoryRecord[];
+  invitations?: any[];
 }
 
 export interface PublicFilteredData {
   congregation_id: string;
   congregation_name: string;
   updated_at: string;
+  settings?: Partial<CongregationSettings>;
+  invitations?: any[];
   publishers: Array<{
     id: string;
     name: string;
-    roles?: string[];
+    gender?: 'hermano' | 'hermana';
+    active?: boolean;
+    groupNumber?: number;
+    privilege?: string;
+    theocraticRole?: string;
+    personalPin?: string;
+    email?: string;
+    roles?: any;
   }>;
   weeks: WeekSchedule[];
   notices: CongregationNotice[];
@@ -204,6 +214,14 @@ export const supabaseSyncService = {
     try {
       const nowISO = new Date().toISOString();
 
+      let storedInvitations: any[] = params.data.invitations || [];
+      if (storedInvitations.length === 0 && typeof window !== 'undefined') {
+        try {
+          const rawInv = localStorage.getItem('kongre_theocratic_invitations_v1');
+          if (rawInv) storedInvitations = JSON.parse(rawInv);
+        } catch {}
+      }
+
       // 1. Preparar snapshot completo para ancianos
       const adminPayload = {
         version: '2.0',
@@ -221,17 +239,44 @@ export const supabaseSyncService = {
         literatureOrders: params.data.literatureOrders || [],
         literatureDistributions: params.data.literatureDistributions || [],
         literatureInventory: params.data.literatureInventory || [],
+        invitations: storedInvitations,
       };
 
-      // 2. Preparar payload público (sin datos sensibles como notas pastorales o NIP privado)
+      // 2. Preparar payload público (sin notas pastorales ni tarjetas S-21 confidenciales, pero con datos de acceso y directorio para verificar PIN personal en otros dispositivos)
       const publicPayload: PublicFilteredData = {
         congregation_id: cleanId,
         congregation_name: params.data.settings?.congregationName || 'Congregación',
         updated_at: nowISO,
+        settings: {
+          congregationName: params.data.settings?.congregationName || 'Congregación',
+          congregationNumber: cleanId,
+          congregationId: cleanId,
+          congregationPinHash: params.data.settings?.congregationPinHash,
+          circuitNumber: params.data.settings?.circuitNumber || '',
+          city: params.data.settings?.city || '',
+          country: params.data.settings?.country || '',
+          hallAddress: params.data.settings?.hallAddress || '',
+          midweekMeetingDay: params.data.settings?.midweekMeetingDay || 'Miércoles',
+          midweekMeetingTime: params.data.settings?.midweekMeetingTime || '19:00',
+          weekendMeetingDay: params.data.settings?.weekendMeetingDay || 'Domingo',
+          weekendMeetingTime: params.data.settings?.weekendMeetingTime || '10:00',
+          coordinatorName: params.data.settings?.coordinatorName || '',
+          coordinatorEmail: params.data.settings?.coordinatorEmail || '',
+          coordinatorPhotoURL: params.data.settings?.coordinatorPhotoURL || '',
+          isRegistered: true,
+        },
+        invitations: storedInvitations,
         publishers: (params.data.publishers || []).map((p) => ({
           id: p.id,
           name: p.name,
-          roles: p.theocraticRole ? [p.theocraticRole] : p.privilege ? [p.privilege] : [],
+          gender: p.gender,
+          active: p.active,
+          groupNumber: p.groupNumber,
+          privilege: p.privilege,
+          theocraticRole: p.theocraticRole,
+          personalPin: p.personalPin,
+          email: p.email,
+          roles: p.roles,
         })),
         weeks: params.data.weeks || [],
         notices: params.data.notices || [],

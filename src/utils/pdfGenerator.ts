@@ -2,118 +2,416 @@
 import { jsPDF } from 'jspdf';
 import { WeekSchedule, Publisher, CongregationSettings } from '../types';
 
-export function generateS89Pdf(
+export function buildS89PdfDoc(
   week: WeekSchedule,
   publishersMap: Map<string, Publisher>,
   congregationName: string,
-  pageSize: 'letter' | 'a4' = 'letter'
-) {
+  pageSize: 'letter' | 'a4' = 'letter',
+  orientation: 'portrait' | 'landscape' = 'portrait'
+): jsPDF {
   const doc = new jsPDF({
-    orientation: 'portrait',
+    orientation,
     unit: 'mm',
     format: pageSize === 'letter' ? 'letter' : 'a4',
   });
 
-  const slips = week.midweek.maestros.items.filter(item => item.publisherId);
-  if (slips.length === 0) {
-    // Also include bible reading
-    if (week.midweek.tesoros.lecturaBiblia.publisherId) {
-      slips.unshift(week.midweek.tesoros.lecturaBiblia);
-    }
-  } else if (week.midweek.tesoros.lecturaBiblia.publisherId) {
+  const slips = [...week.midweek.maestros.items.filter(item => item.publisherId)];
+  if (week.midweek.tesoros.lecturaBiblia.publisherId) {
     slips.unshift(week.midweek.tesoros.lecturaBiblia);
+  }
+  if (slips.length === 0) {
+    // Fallback to all items so preview/download is never blank
+    slips.push(...week.midweek.maestros.items);
   }
 
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
 
-  // 4 slips per page (2x2 grid)
-  const slipW = (pageWidth - 20) / 2;
-  const slipH = (pageHeight - 25) / 2;
+  // 4 slips per page (2x2 grid) adapted to portrait or landscape dimensions
+  const marginX = 8;
+  const marginY = 8;
+  const gapX = 6;
+  const gapY = 6;
+  const slipW = (pageWidth - marginX * 2 - gapX) / 2;
+  const slipH = (pageHeight - marginY * 2 - gapY) / 2;
 
   slips.forEach((item, index) => {
     if (index > 0 && index % 4 === 0) {
-      doc.addPage();
+      doc.addPage(pageSize === 'letter' ? 'letter' : 'a4', orientation);
     }
 
     const col = index % 2;
     const row = Math.floor((index % 4) / 2);
-    const x = 7 + col * (slipW + 6);
-    const y = 8 + row * (slipH + 6);
+    const x = marginX + col * (slipW + gapX);
+    const y = marginY + row * (slipH + gapY);
 
     const student = publishersMap.get(item.publisherId || '')?.name || 'Estudiante asignado';
     const assistant = item.assistantId ? publishersMap.get(item.assistantId)?.name || 'Ayudante asignado' : '---';
 
     // Outer border of S-89
-    doc.setDrawColor(80, 80, 80);
-    doc.setLineWidth(0.4);
+    doc.setDrawColor(76, 58, 237);
+    doc.setLineWidth(0.35);
     doc.rect(x, y, slipW, slipH);
 
     // Header box
     doc.setFillColor(243, 244, 246);
-    doc.rect(x, y, slipW, 14, 'F');
-    doc.setDrawColor(200, 200, 200);
-    doc.line(x, y + 14, x + slipW, y + 14);
+    doc.rect(x, y, slipW, 13, 'F');
+    doc.setDrawColor(203, 213, 225);
+    doc.line(x, y + 13, x + slipW, y + 13);
 
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
+    doc.setFontSize(9.5);
     doc.setTextColor(30, 41, 59);
-    doc.text('ASIGNACIÓN PARA LA REUNIÓN', x + slipW / 2, y + 6, { align: 'center' });
-    doc.setFontSize(8);
+    doc.text('ASIGNACIÓN PARA LA REUNIÓN', x + slipW / 2, y + 5.5, { align: 'center' });
+    doc.setFontSize(7.5);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(71, 85, 105);
-    doc.text('VIDA Y MINISTERIO CRISTIANOS (S-89)', x + slipW / 2, y + 11, { align: 'center' });
+    doc.text('VIDA Y MINISTERIO CRISTIANOS (S-89)', x + slipW / 2, y + 10.2, { align: 'center' });
 
     // Details body
-    let curY = y + 21;
-    doc.setFontSize(9);
+    const rowStep = orientation === 'landscape' ? 5.8 : 6.8;
+    let curY = y + 19;
+    doc.setFontSize(8.5);
 
     // Congregation & Date
     doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 85, 105);
     doc.text('Congregación:', x + 4, curY);
     doc.setFont('helvetica', 'normal');
-    doc.text(congregationName || 'Congregación local', x + 28, curY);
+    doc.setTextColor(15, 23, 42);
+    doc.text((congregationName || 'Congregación local').substring(0, 34), x + 28, curY);
 
-    curY += 7;
+    curY += rowStep;
     doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 85, 105);
     doc.text('Fecha:', x + 4, curY);
     doc.setFont('helvetica', 'normal');
+    doc.setTextColor(15, 23, 42);
     doc.text(week.midweek.date, x + 28, curY);
 
-    curY += 7;
+    curY += rowStep;
     doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 85, 105);
     doc.text('Estudiante:', x + 4, curY);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(15, 23, 42);
-    doc.text(student, x + 28, curY);
+    doc.setTextColor(76, 58, 237);
+    doc.text(student.substring(0, 34), x + 28, curY);
 
-    curY += 7;
+    curY += rowStep;
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(71, 85, 105);
     doc.text('Ayudante:', x + 4, curY);
     doc.setFont('helvetica', 'normal');
-    doc.text(assistant, x + 28, curY);
+    doc.setTextColor(15, 23, 42);
+    doc.text(assistant.substring(0, 34), x + 28, curY);
 
-    curY += 7;
+    curY += rowStep;
     doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 85, 105);
     doc.text('Asignación:', x + 4, curY);
     doc.setFont('helvetica', 'normal');
-    doc.text(item.title.substring(0, 32), x + 28, curY);
+    doc.setTextColor(15, 23, 42);
+    const maxTitleLen = orientation === 'landscape' ? 45 : 32;
+    doc.text(item.title.substring(0, maxTitleLen), x + 28, curY);
 
-    curY += 7;
+    curY += rowStep;
     doc.setFont('helvetica', 'bold');
+    doc.setTextColor(71, 85, 105);
     doc.text('Sala:', x + 4, curY);
     doc.setFont('helvetica', 'normal');
+    doc.setTextColor(15, 23, 42);
     const roomText = item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal';
     doc.text(roomText, x + 28, curY);
 
     // Footer note
     doc.setFontSize(7);
     doc.setTextColor(100, 116, 139);
-    doc.text('Presente esta hoja a su consejero con su libro Guía.', x + slipW / 2, y + slipH - 4, { align: 'center' });
+    doc.text('Presente esta hoja a su consejero con su libro Guía.', x + slipW / 2, y + slipH - 3.5, { align: 'center' });
   });
 
+  return doc;
+}
+
+export function generateS89Pdf(
+  week: WeekSchedule,
+  publishersMap: Map<string, Publisher>,
+  congregationName: string,
+  pageSize: 'letter' | 'a4' = 'letter',
+  orientation: 'portrait' | 'landscape' = 'portrait'
+) {
+  const doc = buildS89PdfDoc(week, publishersMap, congregationName, pageSize, orientation);
   doc.save(`Hojas_S89_${week.weekStartDate}.pdf`);
+}
+
+export function generateS89PdfBlobUrl(
+  week: WeekSchedule,
+  publishersMap: Map<string, Publisher>,
+  congregationName: string,
+  pageSize: 'letter' | 'a4' = 'letter',
+  orientation: 'portrait' | 'landscape' = 'portrait'
+): string {
+  const doc = buildS89PdfDoc(week, publishersMap, congregationName, pageSize, orientation);
+  const blob = doc.output('blob');
+  return URL.createObjectURL(blob);
+}
+
+export function buildProgramPdfDoc(
+  weeks: WeekSchedule[],
+  publishersMap: Map<string, Publisher>,
+  settings: CongregationSettings
+): jsPDF {
+  const orientation = settings.pdfOrientation || 'portrait';
+  const format = settings.pdfPageSize === 'letter' ? 'letter' : 'a4';
+  const template = settings.pdfTemplate || 'oficial';
+  const sections = settings.pdfSections || {
+    midweek: true,
+    weekend: true,
+    duties: true,
+    cleaning: true,
+  };
+
+  const doc = new jsPDF({
+    orientation,
+    unit: 'mm',
+    format,
+  });
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const marginX = 10;
+  const contentWidth = pageWidth - marginX * 2;
+  const fontFamily = template === 'clasica' ? 'times' : 'helvetica';
+
+  // Header Accent Bar based on Template
+  if (template === 'minimalista') {
+    doc.setFillColor(15, 23, 42);
+    doc.rect(marginX, 8, contentWidth, 1.2, 'F');
+  } else if (template === 'clasica') {
+    doc.setFillColor(30, 41, 59);
+    doc.rect(marginX, 8, contentWidth, 2, 'F');
+  } else if (template === 'color') {
+    doc.setFillColor(76, 58, 237);
+    doc.rect(marginX, 8, contentWidth, 2.5, 'F');
+  } else {
+    doc.setFillColor(49, 46, 129);
+    doc.rect(marginX, 8, contentWidth, 2.2, 'F');
+  }
+
+  // Document Header Title
+  doc.setFont(fontFamily, 'bold');
+  doc.setFontSize(15);
+  doc.setTextColor(15, 23, 42);
+  doc.text(
+    (settings.congregationName || 'CONGREGACIÓN LOCAL').toUpperCase(),
+    pageWidth / 2,
+    16,
+    { align: 'center' }
+  );
+
+  doc.setFontSize(9.5);
+  doc.setFont(fontFamily, 'bold');
+  doc.setTextColor(76, 58, 237);
+  doc.text('PROGRAMA DE ASIGNACIONES TEOCRÁTICAS', pageWidth / 2, 21, { align: 'center' });
+
+  doc.setFontSize(8);
+  doc.setFont(fontFamily, 'normal');
+  doc.setTextColor(100, 116, 139);
+  const scheduleMeta = `${settings.midweekMeetingDay || 'Entre Semana'} ${settings.midweekMeetingTime || ''} • ${settings.weekendMeetingDay || 'Fin de Semana'} ${settings.weekendMeetingTime || ''} • Formato ${format.toUpperCase()} (${orientation === 'landscape' ? 'Horizontal' : 'Vertical'})`;
+  doc.text(scheduleMeta, pageWidth / 2, 25.5, { align: 'center' });
+
+  doc.setDrawColor(226, 232, 240);
+  doc.line(marginX, 28, pageWidth - marginX, 28);
+
+  let curY = 32;
+
+  const getPub = (id?: string) => (id ? publishersMap.get(id)?.name || '---' : '---');
+
+  weeks.forEach((week) => {
+    const estimatedBlockHeight = orientation === 'landscape' ? 32 : 42;
+    if (curY + estimatedBlockHeight > pageHeight - 14) {
+      doc.addPage(format, orientation);
+      curY = 14;
+    }
+
+    // Week Header Bar
+    if (template === 'minimalista') {
+      doc.setDrawColor(30, 41, 59);
+      doc.setLineWidth(0.35);
+      doc.rect(marginX, curY, contentWidth, 6.5);
+      doc.setTextColor(15, 23, 42);
+    } else if (template === 'clasica') {
+      doc.setFillColor(51, 65, 85);
+      doc.rect(marginX, curY, contentWidth, 6.8, 'F');
+      doc.setTextColor(255, 255, 255);
+    } else if (template === 'color') {
+      doc.setFillColor(76, 58, 237);
+      doc.rect(marginX, curY, contentWidth, 6.8, 'F');
+      doc.setTextColor(255, 255, 255);
+    } else {
+      doc.setFillColor(30, 27, 75);
+      doc.rect(marginX, curY, contentWidth, 6.8, 'F');
+      doc.setTextColor(255, 255, 255);
+    }
+
+    doc.setFont(fontFamily, 'bold');
+    doc.setFontSize(9);
+    const weekTitle = `SEMANA DEL ${week.weekStartDate} AL ${week.weekEndDate}${
+      week.specialEvent?.isSpecial ? `  •  [${week.specialEvent.title}]` : ''
+    }`;
+    doc.text(weekTitle, marginX + 3, curY + 4.7);
+
+    curY += 9.5;
+
+    // Check Special Event (no meetings at all)
+    if (
+      week.specialEvent?.isSpecial &&
+      week.specialEvent.noMeetingMidweek &&
+      week.specialEvent.noMeetingWeekend
+    ) {
+      doc.setTextColor(180, 83, 9);
+      doc.setFont(fontFamily, 'bolditalic');
+      doc.setFontSize(8.5);
+      doc.text(
+        `* Sin reuniones regulares en el Salón del Reino con motivo de ${week.specialEvent.title}.`,
+        marginX + 3,
+        curY + 2
+      );
+      curY += 8;
+      return;
+    }
+
+    const printWrappedLine = (label: string, body: string, labelR = 30, labelG = 41, labelB = 59) => {
+      doc.setFont(fontFamily, 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(labelR, labelG, labelB);
+      doc.text(label, marginX + 2, curY);
+
+      const labelWidth = doc.getTextWidth(label) + 2;
+      doc.setFont(fontFamily, 'normal');
+      doc.setTextColor(51, 65, 85);
+      const wrapped = doc.splitTextToSize(body, contentWidth - labelWidth - 4);
+      doc.text(wrapped, marginX + 2 + labelWidth, curY);
+      curY += Math.max(1, wrapped.length) * 4.2 + 0.8;
+    };
+
+    // 1. Midweek Section
+    if (sections.midweek && !week.specialEvent?.noMeetingMidweek) {
+      const midPres = getPub(week.midweek.presidentId);
+      const midPrayers = `${getPub(week.midweek.initialPrayerId)} / ${getPub(week.midweek.finalPrayerId)}`;
+      const midDisc = `${week.midweek.tesoros.discurso.title} (${getPub(week.midweek.tesoros.discurso.publisherId)})`;
+      const midPerl = getPub(week.midweek.tesoros.perlas.publisherId);
+      const midLect = getPub(week.midweek.tesoros.lecturaBiblia.publisherId);
+      const maestrosSummary = week.midweek.maestros.items
+        .map(
+          m =>
+            `${m.title}: ${getPub(m.publisherId)}${
+              m.assistantId ? ` (Ayud: ${getPub(m.assistantId)})` : ''
+            }`
+        )
+        .join(' • ');
+      const cbsSummary = `Conductor: ${getPub(
+        week.midweek.vidaCristiana.estudioBiblico.conductorId
+      )} | Lector: ${getPub(week.midweek.vidaCristiana.estudioBiblico.lectorId)}`;
+
+      printWrappedLine(
+        `Vida y Ministerio (${week.midweek.date}):`,
+        `Presidente: ${midPres} | Oración: ${midPrayers} | Tesoros: ${midDisc} | Perlas: ${midPerl} | Lectura: ${midLect}`,
+        49,
+        46,
+        129
+      );
+
+      if (maestrosSummary) {
+        printWrappedLine('Seamos Mejores Maestros:', `${maestrosSummary} | Estudio Bíblico: ${cbsSummary}`, 180, 83, 9);
+      }
+    }
+
+    // 2. Weekend Section
+    if (sections.weekend && !week.specialEvent?.noMeetingWeekend) {
+      const fdsPres = getPub(week.weekend.presidentId);
+      const speakerName = week.weekend.isVisitingSpeaker
+        ? `${week.weekend.publicTalkSpeaker || '---'} (${week.weekend.visitingSpeakerCongregation || 'Visitante'})`
+        : publishersMap.get(week.weekend.publicTalkSpeaker || '')?.name ||
+          week.weekend.publicTalkSpeaker ||
+          '---';
+      const talkTitle = week.weekend.publicTalkTheme ? `"${week.weekend.publicTalkTheme}"` : '';
+      const fdsCond = getPub(week.weekend.atalayaConductorId);
+      const fdsLect = getPub(week.weekend.atalayaLectorId);
+
+      printWrappedLine(
+        `Fin de Semana (${week.weekend.date}):`,
+        `Presidente: ${fdsPres} | Discurso: ${talkTitle} (${speakerName}) | Estudio La Atalaya: Conductor: ${fdsCond} / Lector: ${fdsLect}`,
+        6,
+        95,
+        70
+      );
+    }
+
+    // 3. Operational Duties Section
+    if (sections.duties) {
+      const audioVideo =
+        Array.from(
+          new Set([
+            ...(week.midweek.duties.deber_audio || []),
+            ...(week.midweek.duties.deber_video || []),
+          ])
+        )
+          .map(id => publishersMap.get(id)?.name)
+          .filter(Boolean)
+          .join(', ') || '---';
+      const mics =
+        (week.midweek.duties.deber_microfonos || [])
+          .map(id => publishersMap.get(id)?.name)
+          .filter(Boolean)
+          .join(', ') || '---';
+      const attendants =
+        (week.midweek.duties.deber_acomodador || [])
+          .map(id => publishersMap.get(id)?.name)
+          .filter(Boolean)
+          .join(', ') || '---';
+
+      printWrappedLine(
+        'Deberes Operativos:',
+        `Audio/Video: ${audioVideo} | Micrófonos: ${mics} | Acomodadores: ${attendants}`,
+        71,
+        85,
+        105
+      );
+    }
+
+    // 4. Cleaning Section
+    if (sections.cleaning) {
+      const cleanGroups = week.cleaningGroupNumbers.join(', #');
+      doc.setFont(fontFamily, 'italic');
+      doc.setFontSize(7.8);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`Limpieza del Salón del Reino: Grupo(s) #${cleanGroups}`, marginX + 2, curY);
+      curY += 4.5;
+    }
+
+    // Subtle divider between weeks
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.2);
+    doc.line(marginX, curY, pageWidth - marginX, curY);
+    curY += 4.5;
+  });
+
+  // Page numbering footer
+  const totalPages = doc.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFont(fontFamily, 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(148, 163, 184);
+    doc.text(
+      `Kongre • ${settings.congregationName || 'Congregación'} • Página ${i} de ${totalPages}`,
+      pageWidth / 2,
+      pageHeight - 6,
+      { align: 'center' }
+    );
+  }
+
+  return doc;
 }
 
 export function generateProgramPdf(
@@ -121,91 +419,18 @@ export function generateProgramPdf(
   publishersMap: Map<string, Publisher>,
   settings: CongregationSettings
 ) {
-  const doc = new jsPDF({
-    orientation: 'landscape',
-    unit: 'mm',
-    format: settings.pdfPageSize === 'letter' ? 'letter' : 'a4',
-  });
+  const doc = buildProgramPdfDoc(weeks, publishersMap, settings);
+  const safeName = (settings.congregationName || 'Congregacion').replace(/\s+/g, '_');
+  const orientSuffix = settings.pdfOrientation === 'landscape' ? 'Horizontal' : 'Vertical';
+  doc.save(`Programa_${safeName}_${orientSuffix}.pdf`);
+}
 
-  const pageWidth = doc.internal.pageSize.getWidth();
-
-  // Header Title
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  doc.setTextColor(30, 41, 59);
-  doc.text(settings.congregationName || 'PROGRAMA DE ASIGNACIONES', pageWidth / 2, 14, { align: 'center' });
-
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(71, 85, 105);
-  doc.text(`Programa Mensual de Reuniones y Deberes - Generado el ${new Date().toLocaleDateString('es-ES')}`, pageWidth / 2, 20, { align: 'center' });
-
-  let curY = 28;
-
-  weeks.forEach((week, wIdx) => {
-    if (curY > doc.internal.pageSize.getHeight() - 40) {
-      doc.addPage();
-      curY = 16;
-    }
-
-    // Week header bar
-    doc.setFillColor(49, 46, 129); // Indigo 900
-    doc.rect(10, curY, pageWidth - 20, 7, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255);
-    doc.text(`SEMANA DEL ${week.weekStartDate} AL ${week.weekEndDate} ${week.specialEvent?.isSpecial ? `[${week.specialEvent.title}]` : ''}`, 14, curY + 5);
-
-    curY += 10;
-
-    // Check special event
-    if (week.specialEvent?.isSpecial && week.specialEvent.noMeetingMidweek && week.specialEvent.noMeetingWeekend) {
-      doc.setTextColor(180, 83, 9);
-      doc.setFont('helvetica', 'bold');
-      doc.text(`* Sin reuniones ordinarias esta semana: ${week.specialEvent.title}`, 14, curY + 2);
-      curY += 8;
-      return;
-    }
-
-    // Midweek block
-    const midPres = publishersMap.get(week.midweek.presidentId || '')?.name || '---';
-    const midDisc = publishersMap.get(week.midweek.tesoros.discurso.publisherId || '')?.name || '---';
-    const midPerl = publishersMap.get(week.midweek.tesoros.perlas.publisherId || '')?.name || '---';
-    const midLect = publishersMap.get(week.midweek.tesoros.lecturaBiblia.publisherId || '')?.name || '---';
-    const audioVideo = Array.from(new Set([...(week.midweek.duties.deber_audio || []), ...(week.midweek.duties.deber_video || [])])).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---';
-    const mics = (week.midweek.duties.deber_microfonos || []).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---';
-
-    doc.setFontSize(8.5);
-    doc.setTextColor(30, 41, 59);
-
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Entre Semana (${week.midweek.date}):`, 12, curY);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Pres: ${midPres} | Disc: ${midDisc} | Perlas: ${midPerl} | Lect: ${midLect} | Audio y Video: ${audioVideo} | Mics: ${mics}`, 58, curY);
-
-    curY += 6;
-
-    // Weekend block
-    const fdsPres = publishersMap.get(week.weekend.presidentId || '')?.name || '---';
-    const fdsLector = publishersMap.get(week.weekend.atalayaLectorId || '')?.name || '---';
-    const fdsAudioVideo = Array.from(new Set([...(week.weekend.duties.deber_audio || []), ...(week.weekend.duties.deber_video || [])])).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---';
-    const fdsMics = (week.weekend.duties.deber_microfonos || []).map(id => publishersMap.get(id)?.name).filter(Boolean).join(', ') || '---';
-
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Fin de Semana (${week.weekend.date}):`, 12, curY);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Pres: ${fdsPres} | Lector Atalaya: ${fdsLector} | Discurso: ${week.weekend.publicTalkSpeaker || '---'} | Audio y Video: ${fdsAudioVideo} | Mics: ${fdsMics}`, 58, curY);
-
-    curY += 6;
-
-    // Cleaning group
-    const cleanGroups = week.cleaningGroupNumbers.join(', ');
-    doc.setFont('helvetica', 'italic');
-    doc.setTextColor(75, 85, 99);
-    doc.text(`Limpieza Salón del Reino: Grupo(s) #${cleanGroups}`, 12, curY);
-
-    curY += 9;
-  });
-
-  doc.save(`Programa_Congregacion_${settings.congregationName.replace(/\s+/g, '_')}.pdf`);
+export function generateProgramPdfBlobUrl(
+  weeks: WeekSchedule[],
+  publishersMap: Map<string, Publisher>,
+  settings: CongregationSettings
+): string {
+  const doc = buildProgramPdfDoc(weeks, publishersMap, settings);
+  const blob = doc.output('blob');
+  return URL.createObjectURL(blob);
 }

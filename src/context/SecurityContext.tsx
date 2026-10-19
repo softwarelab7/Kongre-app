@@ -90,10 +90,23 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return DEFAULT_INITIAL_SESSIONS;
   });
 
-  // Sync invitations to localStorage
+  // Sync invitations to localStorage and listen for cloud updates
   useEffect(() => {
     localStorage.setItem(INVITATIONS_STORAGE_KEY, JSON.stringify(invitations));
   }, [invitations]);
+
+  useEffect(() => {
+    const handleInvitationsSynced = (e: Event) => {
+      try {
+        const detail = (e as CustomEvent)?.detail;
+        if (Array.isArray(detail)) {
+          setInvitations(detail);
+        }
+      } catch {}
+    };
+    window.addEventListener('kongre_invitations_updated', handleInvitationsSynced);
+    return () => window.removeEventListener('kongre_invitations_updated', handleInvitationsSynced);
+  }, []);
 
   // Sync sessions to localStorage
   useEffect(() => {
@@ -277,7 +290,14 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         status: 'active',
       };
 
-      setInvitations((prev) => [newInv, ...prev]);
+      setInvitations((prev) => {
+        const next = [newInv, ...prev];
+        try {
+          localStorage.setItem(INVITATIONS_STORAGE_KEY, JSON.stringify(next));
+          window.dispatchEvent(new CustomEvent('kongre_trigger_cloud_sync'));
+        } catch {}
+        return next;
+      });
       return newInv;
     },
     []
@@ -285,9 +305,14 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Revoke invitation
   const revokeInvitation = useCallback((id: string) => {
-    setInvitations((prev) =>
-      prev.map((inv) => (inv.id === id ? { ...inv, status: 'revoked' as const } : inv))
-    );
+    setInvitations((prev) => {
+      const next = prev.map((inv) => (inv.id === id ? { ...inv, status: 'revoked' as const } : inv));
+      try {
+        localStorage.setItem(INVITATIONS_STORAGE_KEY, JSON.stringify(next));
+        window.dispatchEvent(new CustomEvent('kongre_trigger_cloud_sync'));
+      } catch {}
+      return next;
+    });
   }, []);
 
   // Redeem invitation code
@@ -298,7 +323,17 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       userName?: string
     ): Promise<{ success: boolean; role?: TheocraticRole; message: string; targetName?: string }> => {
       const cleanCode = code.trim().toUpperCase();
-      const found = invitations.find((inv) => inv.code.toUpperCase() === cleanCode);
+      let currentList = invitations;
+      try {
+        const stored = localStorage.getItem(INVITATIONS_STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            currentList = parsed;
+          }
+        }
+      } catch {}
+      const found = currentList.find((inv) => inv.code.toUpperCase() === cleanCode);
 
       if (!found) {
         return {

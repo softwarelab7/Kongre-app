@@ -581,7 +581,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       </div>
 
       {/* Form Body */}
-      <div className={`${embedded ? 'p-0 pt-2 sm:pt-2.5 max-h-[calc(100vh-270px)] sm:max-h-[min(580px,calc(100vh-260px))] overflow-y-auto overscroll-contain pr-1 scrollbar-thin kg-form-enter' : 'p-3.5 sm:p-6 flex-1 overflow-y-auto'} text-xs space-y-2.5 sm:space-y-3`}>
+      <div className={`${embedded ? 'p-0 pt-2 sm:pt-2.5 kg-form-enter' : 'p-3.5 sm:p-6 flex-1'} text-xs space-y-2.5 sm:space-y-3`}>
         {error && (
           <div className="p-2.5 sm:p-3 rounded-xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200/80 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold flex items-center gap-2.5 shadow-2xs">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
@@ -1319,7 +1319,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
   if (isSuccessScreen) {
     const successCard = (
-      <div className="space-y-3 sm:space-y-4 animate-fade-in p-1 sm:p-2 max-h-[calc(100vh-230px)] overflow-y-auto overscroll-contain pr-1">
+      <div className="space-y-3 sm:space-y-4 animate-fade-in p-1 sm:p-2">
         {/* Banner de Éxito */}
         <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-emerald-500/15 via-emerald-500/5 to-transparent border border-emerald-500/30 text-center space-y-1.5">
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-md shadow-emerald-600/30">

@@ -25,19 +25,104 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.8.5';
-export const CURRENT_BUILD_CODE = '2026.10.19.285';
+export const CURRENT_APP_VERSION = '2.8.8';
+export const CURRENT_BUILD_CODE = '2026.10.19.288';
 export const BUILD_DATE = '19 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.8.8',
+    buildCode: '2026.10.19.288',
+    date: '19 de Octubre, 2026',
+    title: 'Optimización de Roles Teocráticos, Ingreso por ID/PIN entre Dispositivos y Códigos de Invitación QR',
+    isCurrent: true,
+    changes: [
+      {
+        type: 'security',
+        title: 'Conexión Multidispositivo con ID y PIN de Congregación',
+        description:
+          'Corregida la transferencia directa del PIN de Congregación y PIN Personal hacia loadCongregationFromCloud para permitir el descifrado inmediato desde teléfonos o navegadores nuevos y eliminar falsos positivos locales.',
+      },
+      {
+        type: 'improvement',
+        title: 'Verificación de PIN Personal y Roles en Payload Público',
+        description:
+          'Enriquecido el payload público cifrado con el PIN de Congregación para incluir de forma segura los roles teocráticos, privilegios e invitaciones activas, permitiendo que cada publicador se identifique con su PIN Personal en su propio dispositivo.',
+      },
+      {
+        type: 'feature',
+        title: 'Códigos de Invitación Portátiles y Autodetección por Código QR',
+        description:
+          'Sincronización automática de invitaciones con Supabase, soporte para códigos portátiles compuestos (ID::PIN::CODIGO) y detección automática del parámetro ?invite= al escanear el código QR con la cámara del celular.',
+      },
+      {
+        type: 'fix',
+        title: 'Asignación Exacta de Roles para Siervos Ministeriales',
+        description:
+          'Corregida la inferencia de rol por defecto para siervos ministeriales sin departamento asignado (evitando otorgar permisos de territorios por defecto) y eliminada la doble hidratación al iniciar sesión.',
+      },
+    ],
+  },
+  {
+    version: '2.8.7',
+    buildCode: '2026.10.19.287',
+    date: '19 de Octubre, 2026',
+    title: 'Vista Previa de Documentos PDF antes de Descargar y Orientación de Página',
+    isCurrent: false,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Selector de orientación de página (Vertical / Retrato y Horizontal / Paisaje) tanto para el Programa Mensual como para las Hojas de Asignación S-89, con dimensiones exactas en milímetros.',
+      },
+      {
+        category: 'feature',
+        text: 'Generación de vista previa real del documento PDF antes de la descarga mediante visor PDF integrado y modal de previsualización a pantalla completa con cambio rápido de orientación y tamaño (Carta / A4).',
+      },
+      {
+        category: 'improvement',
+        text: 'Maqueta de hoja interactiva con proporciones dinámicas según orientación, controles de zoom (75% a 120%) y soporte completo de modo oscuro.',
+      },
+      {
+        category: 'improvement',
+        text: 'Motor pdfGenerator actualizado con ajuste automático de líneas (splitTextToSize), numeración de páginas y estilos adaptados por plantilla y orientación.',
+      },
+    ],
+  },
+  {
+    version: '2.8.6',
+    buildCode: '2026.10.19.286',
+    date: '19 de Octubre, 2026',
+    title: 'Unificación de Barra Inferior, Términos Legales, Botón de Tema y Mejoras Móviles',
+    isCurrent: false,
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Redacción e integración del modal legal interactivo (TermsAndPrivacyModal) con los Términos de Uso Teocrático y la Política de Privacidad y Seguridad (arquitectura Zero-Knowledge AES-256-GCM).',
+      },
+      {
+        category: 'improvement',
+        text: 'Mejora y unificación del pie de página (AppFooter) tanto en la pantalla de bienvenida como dentro de la aplicación para PC y móvil, con estado de conexión en vivo, enlaces legales y acceso a Novedades.',
+      },
+      {
+        category: 'improvement',
+        text: 'Unificación del diseño del botón de modo oscuro (ThemeToggle) en cabecera móvil, bienvenida PC y barra de navegación principal con soporte para los 3 modos (Claro, Oscuro y Cabina A/V).',
+      },
+      {
+        category: 'improvement',
+        text: 'Pantalla de bienvenida móvil: incorporación de las Funciones de la App debajo de las opciones de inicio (ocultándose al entrar en subvistas) y eliminación del doble scroll en el registro de congregación.',
+      },
+    ],
+  },
+  {
     version: '2.8.5',
     buildCode: '2026.10.19.285',
     date: '19 de Octubre, 2026',
     title: 'Soporte Completo de Icono PWA en iPhone (iOS Apple Touch Icon)',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

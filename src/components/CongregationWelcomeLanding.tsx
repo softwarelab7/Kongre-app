@@ -48,6 +48,7 @@ import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
 import AnimatedLogo from '../AnimatedLogo';
 import ThemeToggle from './ThemeToggle';
+import { AppFooter } from './AppFooter';
 import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
 
 const NEXT_THEME: Record<string, 'light' | 'dark' | 'cabina'> = { light: 'dark', dark: 'cabina', cabina: 'light' };
@@ -333,12 +334,60 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   const [isActivatingCode, setIsActivatingCode] = useState(false);
   const [inviteCodeError, setInviteCodeError] = useState<string | null>(null);
   const [inviteCodeSuccess, setInviteCodeSuccess] = useState<string | null>(null);
+  const [isQrDetected, setIsQrDetected] = useState(false);
+
+  // Detectar automáticamente parámetro ?invite=... de un Código QR o enlace compartido
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const searchParams = new URLSearchParams(window.location.search);
+      const hashQuery = window.location.hash.includes('?') ? window.location.hash.split('?')[1] : '';
+      const hashParams = new URLSearchParams(hashQuery);
+
+      const inviteParam = searchParams.get('invite') || hashParams.get('invite');
+      const congParam = searchParams.get('cong') || hashParams.get('cong');
+      const cpinParam = searchParams.get('cpin') || hashParams.get('cpin');
+
+      if (inviteParam) {
+        const cleanInvite = inviteParam.trim();
+        const fullCode = congParam && cpinParam
+          ? `${formatCanonicalCongregationId(congParam)}::${cpinParam.trim()}::${cleanInvite}`
+          : cleanInvite;
+        setInviteCodeInput(fullCode);
+        setShowInviteCode(true);
+        setIsQrDetected(true);
+        if (congParam) setCongregationIdInput(formatCanonicalCongregationId(congParam));
+        if (cpinParam) setCongregationPinInput(cpinParam.trim());
+        setRawActiveTab('invite_code_login');
+      }
+    } catch {}
+  }, []);
+
+  const resolvePublisherRolesList = (matched: any): { primaryRole: TheocraticRole; allRoles: TheocraticRole[] } => {
+    const primaryRole: TheocraticRole = (
+      matched.theocraticRole ||
+      (matched.privilege === 'anciano' ? 'anciano' : 'publico')
+    ) as TheocraticRole;
+
+    const rolesSet = new Set<TheocraticRole>([primaryRole]);
+    if (matched.privilege === 'anciano') {
+      rolesSet.add('anciano');
+    }
+    if (Array.isArray(matched.theocraticRoles)) {
+      matched.theocraticRoles.forEach((r: string) => {
+        if (r && THEOCRATIC_ROLES[r as TheocraticRole]) {
+          rolesSet.add(r as TheocraticRole);
+        }
+      });
+    }
+    return { primaryRole, allRoles: Array.from(rolesSet) };
+  };
 
   const handleActivateWithInviteCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setInviteCodeError(null);
     setInviteCodeSuccess(null);
-    const cleanCode = inviteCodeInput.trim();
+    let cleanCode = inviteCodeInput.trim();
     if (!cleanCode) {
       setInviteCodeError('Por favor introduce el código de invitación.');
       return;
@@ -348,39 +397,128 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
     try {
       let finalRole: TheocraticRole | null = null;
+      let finalRolesList: TheocraticRole[] = [];
       let finalBrotherName = '';
       let publisherIdToSet: string | null = null;
       let targetCongregationId = settings.congregationNumber || settings.congregationId || '';
+      let targetCongPin = congregationPinInput.trim() || localStorage.getItem('kongre_registered_cong_pin') || '';
+      let codeToRedeem = cleanCode;
 
-      // 1. Verificar si el código contiene guion con formato CONG-PIN o similar (patrón Pocket de Organized)
-      if (cleanCode.includes('-')) {
-        const parts = cleanCode.split('-');
-        if (parts.length >= 2) {
-          const potentialCong = formatCanonicalCongregationId(parts[0].trim());
-          const potentialPin = parts.slice(1).join('-').trim();
+      // 0A. Si el hermano pegó un enlace completo (https://.../?invite=... o ?cong=...) extraer sus parámetros automáticamente
+      if (cleanCode.includes('invite=') || cleanCode.includes('cong=')) {
+        try {
+          const queryPart = cleanCode.includes('?') ? cleanCode.split('?')[1].split('#')[0] : cleanCode;
+          const urlParams = new URLSearchParams(queryPart);
+          const uCong = urlParams.get('cong');
+          const uCpin = urlParams.get('cpin');
+          const uInvite = urlParams.get('invite') || urlParams.get('pin');
+          if (uCong && uCpin && uInvite) {
+            cleanCode = `${formatCanonicalCongregationId(uCong)}::${uCpin.trim()}::${uInvite.trim()}`;
+            codeToRedeem = cleanCode;
+          } else if (uInvite) {
+            if (uCong) targetCongregationId = formatCanonicalCongregationId(uCong);
+            if (uCpin) targetCongPin = uCpin.trim();
+            codeToRedeem = uInvite.trim();
+          }
+        } catch {}
+      }
 
-          const cloudRes = await loadCongregationFromCloud(potentialCong, { skipHydrate: true });
+      // 0B. Soportar código portátil compuesto con '::': KGR-XXXX-XXXX::PINCONG::KONG-ROL-1234 (o PINPersonal)
+      if (cleanCode.includes('::')) {
+        const segments = cleanCode.split('::').map((s) => s.trim()).filter(Boolean);
+        if (segments.length >= 3) {
+          targetCongregationId = formatCanonicalCongregationId(segments[0]);
+          targetCongPin = segments[1];
+          codeToRedeem = segments.slice(2).join('::');
+
+          const cloudRes = await loadCongregationFromCloud(targetCongregationId, {
+            skipHydrate: true,
+            pin: targetCongPin,
+            personalPin: codeToRedeem,
+          });
           if (cloudRes?.success && cloudRes.data) {
-            targetCongregationId = potentialCong;
+            await hydrateCongregation(cloudRes.data);
+            localStorage.setItem('kongre_registered_cong_pin', targetCongPin);
+            localStorage.setItem('kongre_last_cong_pin', targetCongPin);
+
             const pubs = (cloudRes.data.publishers || []) as any[];
             const matched = pubs.find(
-              (p: any) => p.personalPin && String(p.personalPin).trim() === potentialPin
+              (p: any) => p.personalPin && String(p.personalPin).trim().toUpperCase() === codeToRedeem.toUpperCase()
             );
             if (matched) {
-              finalRole = (matched.theocraticRole || (matched.privilege === 'anciano' ? 'anciano' : matched.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+              const resolved = resolvePublisherRolesList(matched);
+              finalRole = resolved.primaryRole;
+              finalRolesList = resolved.allRoles;
               finalBrotherName = matched.name && !isGenericIdentityName(matched.name) ? matched.name.trim() : 'Hermano';
               publisherIdToSet = matched.id;
-              await hydrateCongregation(cloudRes.data);
             }
           }
         }
       }
 
-      // 2. Verificar si es un código de invitación local generado en InvitationManagerModal
+      // 1. Verificar si el código contiene guiones con formato compuesto ID-PINCONG-PINPERSONAL (ej: KGR-XXXX-XXXX-XXXX-XXXX-PIN o CONG-PINCONG-PIN)
+      if (!finalRole && codeToRedeem.includes('-') && !codeToRedeem.toUpperCase().startsWith('KONG-')) {
+        const parts = codeToRedeem.split('-').map((p) => p.trim()).filter(Boolean);
+        if (parts.length >= 2) {
+          let potentialCong = '';
+          let potentialPin = '';
+          let optionalCongPin = targetCongPin;
+          if (parts[0].toUpperCase() === 'KGR' && parts.length >= 4) {
+            potentialCong = formatCanonicalCongregationId(parts.slice(0, 3).join('-'));
+            if (parts.length >= 6) {
+              optionalCongPin = `${parts[3]}-${parts[4]}`;
+              potentialPin = parts.slice(5).join('-');
+            } else if (parts.length === 5 && parts[3].length === 8) {
+              optionalCongPin = `${parts[3].slice(0, 4)}-${parts[3].slice(4)}`;
+              potentialPin = parts[4];
+            } else {
+              potentialPin = parts.slice(3).join('-');
+            }
+          } else if (parts.length >= 3 && !parts[1].toUpperCase().startsWith('KONG')) {
+            potentialCong = formatCanonicalCongregationId(parts[0]);
+            optionalCongPin = parts[1];
+            potentialPin = parts.slice(2).join('-');
+          } else {
+            potentialCong = formatCanonicalCongregationId(parts[0]);
+            potentialPin = parts.slice(1).join('-');
+          }
+
+          const cloudRes = await loadCongregationFromCloud(potentialCong, {
+            skipHydrate: true,
+            pin: optionalCongPin || potentialPin,
+            personalPin: potentialPin,
+          });
+          if (cloudRes?.success && cloudRes.data) {
+            targetCongregationId = potentialCong;
+            if (optionalCongPin) {
+              targetCongPin = optionalCongPin;
+              localStorage.setItem('kongre_registered_cong_pin', optionalCongPin);
+              localStorage.setItem('kongre_last_cong_pin', optionalCongPin);
+            }
+            codeToRedeem = potentialPin;
+            await hydrateCongregation(cloudRes.data);
+
+            const pubs = (cloudRes.data.publishers || []) as any[];
+            const matched = pubs.find(
+              (p: any) => p.personalPin && String(p.personalPin).trim().toUpperCase() === potentialPin.toUpperCase()
+            );
+            if (matched) {
+              const resolved = resolvePublisherRolesList(matched);
+              finalRole = resolved.primaryRole;
+              finalRolesList = resolved.allRoles;
+              finalBrotherName = matched.name && !isGenericIdentityName(matched.name) ? matched.name.trim() : 'Hermano';
+              publisherIdToSet = matched.id;
+            }
+          }
+        }
+      }
+
+      // 2. Verificar si es un código de invitación generado en InvitationManagerModal (local o sincronizado desde la nube)
       if (!finalRole) {
-        const invRes = await redeemInvitationCode(cleanCode, user?.email || `hermano_${Date.now()}@kongre.org`, 'Hermano');
+        const invRes = await redeemInvitationCode(codeToRedeem, user?.email || `hermano_${Date.now()}@kongre.org`, 'Hermano');
         if (invRes.success && invRes.role) {
           finalRole = invRes.role;
+          finalRolesList = [invRes.role];
           finalBrotherName = invRes.targetName && !isGenericIdentityName(invRes.targetName) ? invRes.targetName : 'Hermano';
         }
       }
@@ -388,17 +526,19 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       // 3. Verificar si el código coincide con el PIN personal de algún publicador en la congregación activa
       if (!finalRole && publishers && publishers.length > 0) {
         const matched = publishers.find(
-          (p) => p.personalPin && String(p.personalPin).trim().toUpperCase() === cleanCode.toUpperCase()
+          (p) => p.personalPin && String(p.personalPin).trim().toUpperCase() === codeToRedeem.toUpperCase()
         );
         if (matched) {
-          finalRole = (matched.theocraticRole || (matched.privilege === 'anciano' ? 'anciano' : matched.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+          const resolved = resolvePublisherRolesList(matched);
+          finalRole = resolved.primaryRole;
+          finalRolesList = resolved.allRoles;
           finalBrotherName = matched.name && !isGenericIdentityName(matched.name) ? matched.name.trim() : 'Hermano';
           publisherIdToSet = matched.id;
         }
       }
 
       // 4. Si el código es 'DEMO', activar el modo de prueba
-      if (!finalRole && (cleanCode.toUpperCase() === 'DEMO' || cleanCode.toUpperCase() === 'DEMO-001' || cleanCode.toUpperCase() === 'INV-DEMO')) {
+      if (!finalRole && (codeToRedeem.toUpperCase() === 'DEMO' || codeToRedeem.toUpperCase() === 'DEMO-001' || codeToRedeem.toUpperCase() === 'INV-DEMO')) {
         loadDemoData();
         setActiveRole('coordinador');
         setIdentifiedBrother('Carlos Mendoza (Demo)');
@@ -411,42 +551,69 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
 
-      // 5. Verificar si coincide con algún publicador en la nube para la congregación activa
+      // 5. Verificar si coincide con algún publicador o invitación en la nube para la congregación activa
       if (!finalRole) {
-        const activeCongId = targetCongregationId || localStorage.getItem('kongre_congregation_number') || 'CENTRAL';
-        const cloudRes = await loadCongregationFromCloud(activeCongId, { skipHydrate: true });
-        if (cloudRes?.success && cloudRes.data?.publishers) {
-          const matched = cloudRes.data.publishers.find(
-            (p: any) => p.personalPin && String(p.personalPin).trim().toUpperCase() === cleanCode.toUpperCase()
-          );
-          if (matched) {
-            finalRole = (matched.theocraticRole || (matched.privilege === 'anciano' ? 'anciano' : matched.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
-            finalBrotherName = matched.name && !isGenericIdentityName(matched.name) ? matched.name.trim() : 'Hermano';
-            publisherIdToSet = matched.id;
+        const activeCongId = targetCongregationId || localStorage.getItem('kongre_congregation_number') || '';
+        if (activeCongId) {
+          const cloudRes = await loadCongregationFromCloud(activeCongId, {
+            skipHydrate: true,
+            pin: targetCongPin || codeToRedeem,
+            personalPin: codeToRedeem,
+          });
+          if (cloudRes?.success && cloudRes.data) {
             await hydrateCongregation(cloudRes.data);
+            if (cloudRes.data.publishers) {
+              const matched = cloudRes.data.publishers.find(
+                (p: any) => p.personalPin && String(p.personalPin).trim().toUpperCase() === codeToRedeem.toUpperCase()
+              );
+              if (matched) {
+                const resolved = resolvePublisherRolesList(matched);
+                finalRole = resolved.primaryRole;
+                finalRolesList = resolved.allRoles;
+                finalBrotherName = matched.name && !isGenericIdentityName(matched.name) ? matched.name.trim() : 'Hermano';
+                publisherIdToSet = matched.id;
+              }
+            }
+            if (!finalRole && Array.isArray(cloudRes.data.invitations)) {
+              const invRes = await redeemInvitationCode(codeToRedeem, user?.email || `hermano_${Date.now()}@kongre.org`, 'Hermano');
+              if (invRes.success && invRes.role) {
+                finalRole = invRes.role;
+                finalRolesList = [invRes.role];
+                finalBrotherName = invRes.targetName && !isGenericIdentityName(invRes.targetName) ? invRes.targetName : 'Hermano';
+              }
+            }
           }
         }
       }
 
       if (!finalRole) {
-        setInviteCodeError('Código de invitación no válido o expirado. Por favor verifica que esté bien escrito o solicita un nuevo código a los ancianos de tu congregación.');
+        setInviteCodeError('Código de invitación no válido o expirado. Verifica que esté bien escrito o solicita el código completo a los ancianos de tu congregación.');
         setIsActivatingCode(false);
         return;
       }
 
-      // Activación exitosa: Aplicar rol, identificar hermano y entrar a la app
-      setActiveRole(finalRole);
+      // Activación exitosa: Aplicar rol(es), identificar hermano y entrar a la app
+      if (finalRolesList.length > 0) {
+        setActiveRoles(finalRolesList);
+      } else {
+        setActiveRole(finalRole);
+      }
       setIdentifiedBrother(finalBrotherName || 'Hermano');
       if (publisherIdToSet) {
         setIdentifiedPublisher(publisherIdToSet, finalBrotherName);
       }
-      localStorage.setItem('kongre_session_pin_v2', cleanCode);
+      localStorage.setItem('kongre_session_pin_v2', codeToRedeem);
       localStorage.setItem('kongre_is_registered_congregation', 'true');
       localStorage.setItem('kongre_has_entered_app', 'true');
       localStorage.setItem('kongre_identified_brother', finalBrotherName || 'Hermano');
       if (targetCongregationId) {
         localStorage.setItem('kongre_congregation_number', targetCongregationId);
         localStorage.setItem('kongre_congregation_id', targetCongregationId);
+      }
+
+      // Limpiar parámetros ?invite=... de la URL para evitar re-ejecución al recargar
+      if (typeof window !== 'undefined' && window.location.search.includes('invite=')) {
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
 
       setInviteCodeSuccess(`¡Bienvenido, ${finalBrotherName}! Activando aplicación...`);
@@ -487,13 +654,22 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
 
-      // 1. Cargar datos actualizados de la congregación desde la nube en Firestore (sin hidratar aún)
-      const cloudRes = await loadCongregationFromCloud(cleanId, { skipHydrate: true });
+      // 1. Cargar y descifrar datos actualizados de la congregación desde la nube pasando el PIN provisto
+      const cloudRes = await loadCongregationFromCloud(cleanId, {
+        skipHydrate: true,
+        pin: cleanCongPin,
+        personalPin: cleanPersonalPin || undefined,
+      });
       const cloudData = cloudRes?.data;
-      const effectiveId = formatCanonicalCongregationId(cloudData?.congregationId || cloudData?.settings?.congregationId || cleanId);
+      const effectiveId = formatCanonicalCongregationId(
+        cloudData?.congregationId || cloudData?.congregation_id || cloudData?.settings?.congregationId || cleanId
+      );
 
       if (!cloudRes?.success || !cloudData) {
-        setCodeError(`No se encontró ninguna congregación registrada con el ID "${cleanId}". Verifica el ID o pulsa "Registrar mi Congregación".`);
+        setCodeError(
+          cloudRes?.message ||
+            `No se encontró ninguna congregación registrada con el ID "${cleanId}" o el PIN de Congregación es incorrecto.`
+        );
         setIsSubmittingCode(false);
         return;
       }
@@ -503,10 +679,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         cloudData?.settings?.congregationPinHash ||
         cloudData?.congregationPinHash;
 
-      let isCongPinValid = false;
+      let isCongPinValid = Boolean(cloudRes.isDecryptedFromCloud);
       if (effectivePinHash) {
         isCongPinValid = await verifyPasscode(cleanCongPin, effectivePinHash);
-      } else {
+      } else if (!isCongPinValid) {
         isCongPinValid = await verifyCongregationPin(cleanCongPin);
       }
 
@@ -515,6 +691,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         setIsSubmittingCode(false);
         return;
       }
+
+      // Persistir el PIN de congregación verificado para futuras sincronizaciones en este dispositivo
+      localStorage.setItem('kongre_registered_cong_pin', cleanCongPin);
+      localStorage.setItem('kongre_last_cong_pin', cleanCongPin);
 
       let identifiedRole: TheocraticRole | undefined;
 
@@ -533,34 +713,35 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             (p) => p.personalPin && String(p.personalPin).trim().length >= 4 && String(p.personalPin).trim() === cleanPersonalPin
           );
 
-        if (matchingPub) {
-          const finalRole: TheocraticRole =
-            matchingPub.theocraticRole ||
-            (matchingPub.privilege === 'anciano'
-              ? 'anciano'
-              : matchingPub.privilege === 'siervo_ministerial'
-              ? 'siervo_territorios'
-              : 'publico');
-          identifiedRole = finalRole;
-          nameToUse = matchingPub.name && !isGenericIdentityName(matchingPub.name) ? matchingPub.name.trim() : 'Hermano';
-          if (matchingPub.email) emailToUse = matchingPub.email;
-          setIdentifiedPublisher(matchingPub.id, nameToUse);
-          setIdentifiedBrother(nameToUse);
-        } else {
-          // Probar código de invitación generado por los ancianos
-          const invResult = await redeemInvitationCode(cleanPersonalPin, emailToUse, nameToUse || 'Hermano');
-          if (invResult.success && invResult.role) {
-            identifiedRole = invResult.role;
-            if (invResult.targetName && !isGenericIdentityName(invResult.targetName)) {
-              nameToUse = invResult.targetName;
-            }
+          if (matchingPub) {
+            const resolved = resolvePublisherRolesList(matchingPub);
+            identifiedRole = resolved.primaryRole;
+            nameToUse = matchingPub.name && !isGenericIdentityName(matchingPub.name) ? matchingPub.name.trim() : 'Hermano';
+            if (matchingPub.email) emailToUse = matchingPub.email;
+            setIdentifiedPublisher(matchingPub.id, nameToUse);
+            setIdentifiedBrother(nameToUse);
           } else {
-            setCodeError('El PIN Personal ingresado no coincide con ningún publicador en esta congregación. Verifica el PIN asignado por los ancianos o déjalo vacío para entrar en Modo Cartelera/Público.');
-            setIsSubmittingCode(false);
-            return;
+            // Sincronizar invitaciones descargadas de la nube antes de canjear
+            if (cloudData?.invitations && Array.isArray(cloudData.invitations)) {
+              try {
+                localStorage.setItem('kongre_theocratic_invitations_v1', JSON.stringify(cloudData.invitations));
+                window.dispatchEvent(new CustomEvent('kongre_invitations_updated', { detail: cloudData.invitations }));
+              } catch {}
+            }
+            // Probar código de invitación generado por los ancianos
+            const invResult = await redeemInvitationCode(cleanPersonalPin, emailToUse, nameToUse || 'Hermano');
+            if (invResult.success && invResult.role) {
+              identifiedRole = invResult.role;
+              if (invResult.targetName && !isGenericIdentityName(invResult.targetName)) {
+                nameToUse = invResult.targetName;
+              }
+            } else {
+              setCodeError('El PIN Personal ingresado no coincide con ningún publicador en esta congregación. Verifica el PIN asignado por los ancianos o déjalo vacío para entrar en Modo Cartelera/Público.');
+              setIsSubmittingCode(false);
+              return;
+            }
           }
         }
-      }
       }
 
       // Si solo ingresó PIN de congregación sin PIN personal, el rol es ESTRICTAMENTE 'publico' (nunca 'coordinador')
@@ -599,7 +780,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           ? settings.congregationName
           : (localStorage.getItem('kongre_congregation_name') || ''));
 
-      // Hidratar datos de la congregación de manera segura y controlada tras validar el PIN
+      // Hidratar datos de la congregación una sola vez de manera segura tras validar el PIN
       if (cloudData) {
         hydrateCongregation(cloudData);
       }
@@ -621,10 +802,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           localStorage.setItem('kongre_coordinator_name', nameToUse);
           newSettingsUpdate.coordinatorName = nameToUse;
         }
-      }
-
-      if (cloudData) {
-        hydrateCongregation(cloudData);
       }
 
       // Actualizar configuración local sin sobreescribir la nube recién descargada
@@ -784,7 +961,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       {/* 0. MOBILE HERO & SHEET VIEW (< md) - FIEL A BIENVENIDA-HTML*/}
       {/* ========================================================= */}
       {activeTab === 'home' && (
-        <div className="md:hidden flex flex-col min-h-screen bg-white dark:bg-slate-900 font-sans">
+        <div className="md:hidden flex flex-col flex-1 bg-white dark:bg-slate-900 font-sans">
           {/* Top Gradient Banner with Horizontal White Logo & Slogan */}
           <div
             className="relative px-5 pt-4 pb-12 sm:pb-14 flex flex-col items-center select-none text-white shrink-0"
@@ -802,14 +979,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 <span>Modo Demo</span>
               </button>
 
-              <button
-                type="button"
-                onClick={toggleTheme}
-                aria-label="Cambiar tema"
-                className="p-2 rounded-full text-white/90 hover:text-white hover:bg-white/20 transition-all cursor-pointer"
-              >
-                {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </button>
+              <ThemeToggle size={36} variant="onBrand" />
             </div>
 
             {/* Centered Horizontal Negative Logo */}
@@ -885,17 +1055,85 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               />
             </div>
 
-            {/* Offline note footer */}
-            <div className="mt-auto pt-6 pb-2 flex items-center justify-center gap-2 text-[12.5px] text-slate-500 dark:text-slate-400 text-center">
-              <CloudOff className="w-4 h-4 text-slate-400 shrink-0" />
-              <span>Funciona sin conexión y se sincroniza al volver</span>
+            {/* Mobile Features Section: Funciones Principales de la App */}
+            <div className="mt-7 pt-6 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-soft text-brand text-[11px] font-bold tracking-wide uppercase">
+                  <Sparkles className="w-3 h-3 text-brand" />
+                  Funciones de la App
+                </span>
+              </div>
+              <h2 className="text-[16px] sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                Toda la gestión teocrática en un solo lugar
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-3.5 leading-relaxed">
+                Herramienta integral para coordinadores, secretarios, superintendentes de servicio y publicadores.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-brand-soft text-brand flex items-center justify-center shrink-0">
+                    <CalendarDays className="w-5 h-5 text-brand" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white">
+                      Reuniones & Guía S-89
+                    </h3>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 leading-snug">
+                      Programación Vida y Ministerio, Fin de Semana y hojas S-89 oficiales automáticas.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-brand-soft text-brand flex items-center justify-center shrink-0">
+                    <MapPin className="w-5 h-5 text-brand" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white">
+                      Territorios & Carritos
+                    </h3>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 leading-snug">
+                      Manzanas con mapas, tarjetas digitales con código QR para publicadores y carritos.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-brand-soft text-brand flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-5 h-5 text-brand" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white">
+                      Seguridad por Roles & PIN
+                    </h3>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 leading-snug">
+                      ID y PIN de congregación, más PIN personal bajo confidencialidad teocrática.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-brand-soft text-brand flex items-center justify-center shrink-0">
+                    <Wifi className="w-5 h-5 text-brand" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white">
+                      PWA & Modo Offline
+                    </h3>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 leading-snug">
+                      Úsala en el Salón sin conexión; tus datos se sincronizan al recuperar internet.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {/* Main Container: Desktop view or Mobile active subviews */}
-      <div className={`${activeTab === 'home' ? 'hidden md:flex' : 'flex'} flex-col min-h-screen justify-between flex-1`}>
+      <div className={`${activeTab === 'home' ? 'hidden md:flex' : 'flex'} flex-col justify-between flex-1`}>
         {/* ========================================================= */}
         {/* 1. TOP HEADER                                            */}
         {/* ========================================================= */}
@@ -916,15 +1154,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               <Sparkles className="w-3.5 h-3.5 text-amber-300 group-hover:rotate-12 transition-transform" />
               <span>Modo Demo</span>
             </button>
-            <button
-              type="button"
-              onClick={() => setThemeMode(nextTheme)}
-              title={`Tema: ${THEME_NAMES[themeMode]} (cambiar a ${THEME_NAMES[nextTheme]})`}
-              aria-label={`Tema: ${THEME_NAMES[themeMode]}. Cambiar a ${THEME_NAMES[nextTheme]}`}
-              className="tbtn grid size-9 cursor-pointer place-items-center rounded-full bg-brand-soft text-brand transition-colors hover:opacity-90"
-            >
-              <CurrentThemeIcon size={18} aria-hidden />
-            </button>
+            <ThemeToggle size={36} />
           </div>
         </header>
 
@@ -939,10 +1169,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           }`}
         >
           {/* ========================================================= */}
-          {/* LEFT COLUMN: DESKTOP HERO & THEOCRATIC FEATURES          */}
+          {/* LEFT COLUMN: DESKTOP HERO & THEOCRATIC FEATURES (Only on Desktop) */}
           {/* ========================================================= */}
           {activeTab !== 'register' && (
-            <section className="space-y-0">
+            <section className="hidden lg:block space-y-0">
               <div
                 className="inline-flex items-center gap-2 rounded-full border border-bline bg-brand-soft px-3 py-1 text-[11.5px] sm:text-xs font-semibold text-brand mb-2.5 sm:mb-3 select-none"
               >
@@ -1565,9 +1795,21 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
               {/* VIEW: INICIAR SESIÓN CON CÓDIGO DE INVITACIÓN (Organized Pocket SignUp) */}
               {activeTab === 'invite_code_login' && (
-                <div className="space-y-6 pt-1 animate-in fade-in zoom-in-95 duration-150">
+                <div className="space-y-5 pt-1 animate-in fade-in zoom-in-95 duration-150">
+                  {isQrDetected && (
+                    <div className="p-3.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-xs text-indigo-800 dark:text-indigo-200 flex items-center gap-2.5 animate-in fade-in">
+                      <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                      <div>
+                        <span className="font-bold block">Código QR o enlace de invitación detectado</span>
+                        <span className="text-[11px] text-indigo-600/90 dark:text-indigo-300/90">
+                          Tus credenciales se han completado automáticamente. Presiona <strong>ACTIVAR</strong> para ingresar.
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Activation Form */}
-                  <form onSubmit={handleActivateWithInviteCode} className="space-y-5">
+                  <form onSubmit={handleActivateWithInviteCode} className="space-y-4">
                     {inviteCodeError && (
                       <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-700 dark:text-rose-300 flex items-start gap-2.5 animate-in fade-in">
                         <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
@@ -1589,24 +1831,29 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     )}
 
                     {/* Input with border & eye toggle matching Image 2 */}
-                    <div className="relative">
-                      <input
-                        type={showInviteCode ? 'text' : 'password'}
-                        autoComplete="off"
-                        value={inviteCodeInput}
-                        onChange={(e) => setInviteCodeInput(e.target.value)}
-                        placeholder="Código de invitación"
-                        className="w-full px-4 py-3.5 pr-12 rounded-xl border border-indigo-300 dark:border-indigo-700/80 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-2xs"
-                        autoFocus
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowInviteCode((prev) => !prev)}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 cursor-pointer"
-                        title={showInviteCode ? 'Ocultar código' : 'Mostrar código'}
-                      >
-                        {showInviteCode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
+                    <div className="space-y-1.5">
+                      <div className="relative">
+                        <input
+                          type={showInviteCode ? 'text' : 'password'}
+                          autoComplete="off"
+                          value={inviteCodeInput}
+                          onChange={(e) => setInviteCodeInput(e.target.value)}
+                          placeholder="Código de invitación (ej: KGR-XXXX-XXXX::PIN::CÓDIGO)"
+                          className="w-full px-4 py-3.5 pr-12 rounded-xl border border-indigo-300 dark:border-indigo-700/80 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 text-sm font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-2xs"
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowInviteCode((prev) => !prev)}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 cursor-pointer"
+                          title={showInviteCode ? 'Ocultar código' : 'Mostrar código'}
+                        >
+                          {showInviteCode ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
+                      <span className="text-[10.5px] text-slate-400 dark:text-slate-500 block px-1">
+                        Acepta código de invitación, código compuesto (<code className="font-mono">ID-PINCONG-PINPERSONAL</code>) o enlace QR.
+                      </span>
                     </div>
 
                     {/* Big Action Button "ACTIVAR" matching Image 2 */}
@@ -1743,62 +1990,13 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             </section>
           </div>
         </main>
-
-        {/* Footer Policy & Terms Notice */}
-        <footer className="w-full border-t border-line bg-card/60 backdrop-blur-xs py-2.5 px-4 sm:px-6 md:px-8 mt-auto select-none transition-colors">
-          <div className="max-w-[1240px] 2xl:max-w-[1360px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted">
-            <div className="text-center sm:text-left text-xs">
-              Más información sobre nuestros{' '}
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onOpenVersionModal?.();
-                }}
-                className="font-semibold text-brand hover:underline"
-              >
-                Términos de Uso
-              </a>{' '}
-              y{' '}
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onOpenVersionModal?.();
-                }}
-                className="font-semibold text-brand hover:underline"
-              >
-                Política de Privacidad
-              </a>
-              .
-            </div>
-
-            <div className="flex items-center gap-2 sm:gap-3 text-[11px]">
-              <span className="font-bold text-ink">Kongre</span>
-              <span>•</span>
-              <span className="text-muted">Gestor Teocrático Integral</span>
-              <span>•</span>
-              <span className="inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-full bg-okb text-okf font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                En línea
-              </span>
-              {onOpenVersionModal && (
-                <button
-                  type="button"
-                  onClick={onOpenVersionModal}
-                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-hover border border-line text-ink hover:text-brand transition-all cursor-pointer font-semibold text-xs"
-                  title="Ver registro de versiones y novedades"
-                >
-                  <span>v{CURRENT_APP_VERSION}</span>
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-brand-soft text-brand">
-                    Novedades
-                  </span>
-                </button>
-              )}
-            </div>
-          </div>
-        </footer>
       </div>
+
+      {/* Unified Bottom Bar across Mobile and Desktop */}
+      <AppFooter
+        variant="landing"
+        onOpenVersionModal={onOpenVersionModal}
+      />
 
       {/* Demo Mode Startup & Data Preparation Modal */}
       <DemoStartupModal isOpen={isStartingDemo} />

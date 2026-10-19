@@ -517,6 +517,7 @@ export interface CongregationSettings {
   conflictRules: ConflictRuleSettings;
   pdfTemplate: 'clasica' | 'moderna' | 'minimalista' | 'color' | 'oficial' | 'nw_scheduler';
   pdfPageSize: 'letter' | 'a4';
+  pdfOrientation?: 'portrait' | 'landscape';
   pdfSections: {
     midweek: boolean;
     weekend: boolean;

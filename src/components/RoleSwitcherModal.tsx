@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useSecurity } from '../context/SecurityContext';
 import { TheocraticRole, THEOCRATIC_ROLES } from '../utils/rbac';
-import { generateSecurePublisherPin } from '../utils/theocraticSecurity';
+import { generateSecurePublisherPin, formatCanonicalCongregationId } from '../utils/theocraticSecurity';
 import { ActiveTab } from './Navbar';
 import {
   ShieldCheck,
@@ -129,16 +129,23 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
   const [invBrotherName, setInvBrotherName] = useState('');
   const [copiedInvId, setCopiedInvId] = useState<string | null>(null);
 
-  // Complete official list of theocratic roles
+  // Complete official list of 16 theocratic roles
   const allTheocraticRoles: TheocraticRole[] = [
     'coordinador',
     'anciano',
     'superintendente_vym',
+    'superintendente_servicio',
     'secretario',
     'siervo_discursos',
     'siervo_territorios',
+    'siervo_carritos',
     'siervo_literatura',
     'siervo_cuentas',
+    'superintendente_grupo',
+    'encargado_mantenimiento',
+    'encargado_audiovideo',
+    'encargado_acomodadores',
+    'encargado_cartelera',
     'publico',
   ];
 
@@ -227,16 +234,23 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
           item.role === 'coordinador' ||
           item.role === 'anciano' ||
           item.role === 'secretario' ||
-          item.role === 'superintendente_vym'
+          item.role === 'superintendente_vym' ||
+          item.role === 'superintendente_servicio' ||
+          item.role === 'superintendente_grupo'
         );
       }
       if (filterCategory === 'siervos') {
         return (
           item.privilege === 'siervo_ministerial' ||
           item.role === 'siervo_territorios' ||
+          item.role === 'siervo_carritos' ||
           item.role === 'siervo_literatura' ||
           item.role === 'siervo_cuentas' ||
-          item.role === 'siervo_discursos'
+          item.role === 'siervo_discursos' ||
+          item.role === 'encargado_mantenimiento' ||
+          item.role === 'encargado_audiovideo' ||
+          item.role === 'encargado_acomodadores' ||
+          item.role === 'encargado_cartelera'
         );
       }
       if (filterCategory === 'publicadores') {
@@ -259,15 +273,22 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
         p.role === 'coordinador' ||
         p.role === 'anciano' ||
         p.role === 'secretario' ||
-        p.role === 'superintendente_vym'
+        p.role === 'superintendente_vym' ||
+        p.role === 'superintendente_servicio' ||
+        p.role === 'superintendente_grupo'
     ).length;
     const siervosCount = combinedPublishersList.filter(
       (p) =>
         p.privilege === 'siervo_ministerial' ||
         p.role === 'siervo_territorios' ||
+        p.role === 'siervo_carritos' ||
         p.role === 'siervo_literatura' ||
         p.role === 'siervo_cuentas' ||
-        p.role === 'siervo_discursos'
+        p.role === 'siervo_discursos' ||
+        p.role === 'encargado_mantenimiento' ||
+        p.role === 'encargado_audiovideo' ||
+        p.role === 'encargado_acomodadores' ||
+        p.role === 'encargado_cartelera'
     ).length;
     const withPin = combinedPublishersList.filter((p) => !!p.pin).length;
     const withoutPin = total - withPin;
@@ -412,38 +433,64 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     setTimeout(() => setFeedback(null), 3500);
   };
 
-  // Format theocratic WhatsApp invitation message with 1-click Pocket link
+  // Format theocratic WhatsApp invitation message with 1-click Pocket link and composite code
   const getTheocraticShareMessage = (name: string, role: TheocraticRole, pin: string, id: string) => {
     const roleTitle = THEOCRATIC_ROLES[role]?.name || role;
     const congName = settings.congregationName || 'la Congregación';
-    const congNumber =
+    const congNumber = formatCanonicalCongregationId(
       settings.congregationNumber ||
-      settings.congregationId ||
-      (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_number') || '' : '');
+        settings.congregationId ||
+        (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_number') || '' : '')
+    );
+    const congPin =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_registered_cong_pin') ||
+          localStorage.getItem('kongre_last_cong_pin') ||
+          ''
+        : '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const directLink = congNumber && id && pin
-      ? `${origin}?cong=${encodeURIComponent(congNumber)}&pub=${encodeURIComponent(id)}&pin=${encodeURIComponent(pin)}`
-      : '';
+    const params = new URLSearchParams();
+    if (congNumber) params.set('cong', congNumber);
+    if (congPin) params.set('cpin', congPin);
+    if (id) params.set('pub', id);
+    if (pin) params.set('pin', pin);
+    const directLink = congNumber && id && pin ? `${origin}/?${params.toString()}` : '';
+    const compositeCode = congNumber && congPin && pin ? `${congNumber}::${congPin}::${pin}` : pin;
 
     return `🏛️ *CREDENCIALES TEOCRÁTICAS KONGRE*\n` +
       `Congregación: *${congName}*\n` +
       `━━━━━━━━━━━━━━━━━━━━\n` +
       `👤 Hermano: *${name}*\n` +
       `📋 Responsabilidad: *${roleTitle}*\n` +
+      (congNumber ? `🏛️ ID Congregación: *${congNumber}*\n` : '') +
+      (congPin ? `🔒 PIN Congregación: *${congPin}*\n` : '') +
       `🔑 Tu PIN Personal Único: *${pin}*\n` +
+      `📋 Código Portátil: *${compositeCode}*\n` +
       (directLink ? `━━━━━━━━━━━━━━━━━━━━\n📲 *Enlace de Acceso Directo (un solo toque):*\n${directLink}\n` : '') +
       `━━━━━━━━━━━━━━━━━━━━\n` +
-      `_Abre el enlace o ingresa el PIN en Kongre para activar automáticamente tu perfil y departamentos asignados._`;
+      `_Abre el enlace o ingresa tus credenciales en Kongre para activar automáticamente tu perfil y departamentos asignados._`;
   };
 
   // Copy 1-click Pocket Direct Link to clipboard
   const handleCopyDirectLink = (name: string, _role: TheocraticRole, pin: string, id: string) => {
-    const congNumber =
+    const congNumber = formatCanonicalCongregationId(
       settings.congregationNumber ||
-      settings.congregationId ||
-      (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_number') || '' : '');
+        settings.congregationId ||
+        (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_number') || '' : '')
+    );
+    const congPin =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_registered_cong_pin') ||
+          localStorage.getItem('kongre_last_cong_pin') ||
+          ''
+        : '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const directLink = `${origin}?cong=${encodeURIComponent(congNumber)}&pub=${encodeURIComponent(id)}&pin=${encodeURIComponent(pin)}`;
+    const params = new URLSearchParams();
+    if (congNumber) params.set('cong', congNumber);
+    if (congPin) params.set('cpin', congPin);
+    if (id) params.set('pub', id);
+    if (pin) params.set('pin', pin);
+    const directLink = `${origin}/?${params.toString()}`;
     navigator.clipboard.writeText(directLink);
     setCopiedId(`link_${id}`);
     setTimeout(() => setCopiedId(null), 2500);
@@ -1365,49 +1412,82 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                   ) : (
                     invitations
                       .filter((i) => i.status === 'active')
-                      .map((inv) => (
-                        <div
-                          key={inv.id}
-                          className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 flex items-center justify-between gap-3 text-xs"
-                        >
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-mono font-extrabold text-sm text-indigo-600 dark:text-indigo-400">
-                                {inv.code}
-                              </span>
-                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${THEOCRATIC_ROLES[inv.role as TheocraticRole]?.badgeColor}`}>
-                                {THEOCRATIC_ROLES[inv.role as TheocraticRole]?.shortName}
+                      .map((inv) => {
+                        const congNumber = formatCanonicalCongregationId(
+                          settings.congregationNumber ||
+                            settings.congregationId ||
+                            (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_number') || '' : '')
+                        );
+                        const congPin =
+                          typeof window !== 'undefined'
+                            ? localStorage.getItem('kongre_registered_cong_pin') ||
+                              localStorage.getItem('kongre_last_cong_pin') ||
+                              ''
+                            : '';
+                        const portableCode = congNumber && congPin ? `${congNumber}::${congPin}::${inv.code}` : inv.code;
+                        const params = new URLSearchParams();
+                        params.set('invite', inv.code);
+                        if (congNumber) params.set('cong', congNumber);
+                        if (congPin) params.set('cpin', congPin);
+                        const directInviteUrl = `${window.location.origin}/?${params.toString()}#portal?view=invite_code_login`;
+
+                        return (
+                          <div
+                            key={inv.id}
+                            className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                          >
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-mono font-extrabold text-xs sm:text-sm text-indigo-600 dark:text-indigo-400">
+                                  {portableCode}
+                                </span>
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${THEOCRATIC_ROLES[inv.role as TheocraticRole]?.badgeColor}`}>
+                                  {THEOCRATIC_ROLES[inv.role as TheocraticRole]?.shortName}
+                                </span>
+                              </div>
+                              <span className="text-[11px] text-slate-500 block mt-0.5">
+                                Para: <strong>{inv.targetName || 'Hermano Asignado'}</strong>
                               </span>
                             </div>
-                            <span className="text-[11px] text-slate-500 block mt-0.5">
-                              Para: <strong>{inv.targetName || 'Hermano Asignado'}</strong>
-                            </span>
-                          </div>
 
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                navigator.clipboard.writeText(inv.code);
-                                setCopiedInvId(inv.id);
-                                setTimeout(() => setCopiedInvId(null), 2000);
-                              }}
-                              className="px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-bold text-xs hover:bg-indigo-100 flex items-center gap-1 cursor-pointer"
-                            >
-                              {copiedInvId === inv.id ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                              <span>{copiedInvId === inv.id ? 'Copiado' : 'Copiar'}</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => revokeInvitation(inv.id)}
-                              className="p-1 rounded-md text-slate-400 hover:text-rose-600 cursor-pointer"
-                              title="Revocar"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
+                            <div className="flex items-center gap-2 self-end sm:self-auto">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(portableCode);
+                                  setCopiedInvId(inv.id);
+                                  setTimeout(() => setCopiedInvId(null), 2000);
+                                }}
+                                className="px-2.5 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-bold text-xs hover:bg-indigo-100 flex items-center gap-1 cursor-pointer"
+                              >
+                                {copiedInvId === inv.id ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                                <span>{copiedInvId === inv.id ? 'Copiado' : 'Copiar'}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const roleTitle = THEOCRATIC_ROLES[inv.role as TheocraticRole]?.name || inv.role;
+                                  const msg = `Estimado hermano *${inv.targetName || ''}*, se le ha otorgado acceso teocrático a *${settings.congregationName || 'la congregación'}* con el rol de *${roleTitle}*.\n\nCódigo Portátil de Invitación: *${portableCode}*\n\nToque el siguiente enlace para activar automáticamente la aplicación en su dispositivo:\n${directInviteUrl}`;
+                                  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+                                }}
+                                className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center gap-1 cursor-pointer"
+                                title="Compartir por WhatsApp"
+                              >
+                                <Share2 className="w-3.5 h-3.5" />
+                                <span>WhatsApp</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => revokeInvitation(inv.id)}
+                                className="p-1 rounded-md text-slate-400 hover:text-rose-600 cursor-pointer"
+                                title="Revocar"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                   )}
                 </div>
               </div>

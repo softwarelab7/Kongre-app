@@ -320,7 +320,7 @@ interface CongregationContextType {
   restorePreviousRegistration: (congName?: string, coordName?: string, pin?: string) => Promise<void>;
   uploadLocalDataToGoogle: () => Promise<{ success: boolean; message: string }>;
   downloadDataFromGoogle: () => Promise<{ success: boolean; message: string }>;
-  loadCongregationFromCloud: (congId: string, options?: { skipHydrate?: boolean }) => Promise<{ success: boolean; congregationName?: string; message: string; data?: any }>;
+  loadCongregationFromCloud: (congId: string, options?: { skipHydrate?: boolean; pin?: string; personalPin?: string }) => Promise<{ success: boolean; congregationName?: string; message: string; data?: any; isDecryptedFromCloud?: boolean }>;
   hydrateCongregation: (data: any) => void;
 
   // Account Link Requests (Vinculación de Cuentas de Google)
@@ -1079,7 +1079,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           .map((p: any) => ({
             publisherId: p.id || p.nid,
             name: p.name || p.full_name || 'Publicador',
-            role: p.theocraticRole || (p.privilege === 'anciano' ? 'anciano' : p.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico'),
+            role: p.theocraticRole || (p.privilege === 'anciano' ? 'anciano' : 'publico'),
+            roles: Array.isArray(p.theocraticRoles) ? p.theocraticRoles : undefined,
             pin: String(p.personalPin).trim(),
             email: p.email,
             privilege: p.privilege,
@@ -1421,6 +1422,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setCongregationEvents(data.congregationEvents);
       latestCongregationEventsRef.current = data.congregationEvents;
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_congregation_events`, JSON.stringify(data.congregationEvents));
+    }
+    if (data.invitations && Array.isArray(data.invitations)) {
+      try {
+        localStorage.setItem('kongre_theocratic_invitations_v1', JSON.stringify(data.invitations));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('kongre_invitations_updated', { detail: data.invitations }));
+        }
+      } catch {}
     }
   };
 
@@ -1937,10 +1946,15 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       refreshQueueStats();
     };
 
+    const handleTriggerCloudSync = () => {
+      syncNowWithSupabase(true).catch(() => {});
+    };
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     window.addEventListener('kongre_indexeddb_queue_changed', handleQueueChanged);
     window.addEventListener('kongre_offline_sync_queued', handleQueueChanged);
+    window.addEventListener('kongre_trigger_cloud_sync', handleTriggerCloudSync);
 
     const intervalId = window.setInterval(() => {
       if (typeof navigator !== 'undefined' && navigator.onLine) {
@@ -1968,6 +1982,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('kongre_indexeddb_queue_changed', handleQueueChanged);
       window.removeEventListener('kongre_offline_sync_queued', handleQueueChanged);
+      window.removeEventListener('kongre_trigger_cloud_sync', handleTriggerCloudSync);
       window.clearInterval(intervalId);
     };
   }, []);
@@ -1975,8 +1990,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // Función para cargar los datos de una congregación existente desde Supabase
   const loadCongregationFromCloud = async (
     congId: string,
-    options?: { skipHydrate?: boolean }
-  ): Promise<{ success: boolean; congregationName?: string; message: string; data?: any }> => {
+    options?: { skipHydrate?: boolean; pin?: string; personalPin?: string }
+  ): Promise<{ success: boolean; congregationName?: string; message: string; data?: any; isDecryptedFromCloud?: boolean }> => {
     const rawClean = congId.trim().toUpperCase();
     if (!rawClean) return { success: false, message: 'ID de congregación no válido.' };
 
@@ -1989,6 +2004,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     const pinMaestro =
+      options?.personalPin?.trim() ||
+      options?.pin?.trim() ||
       (typeof window !== 'undefined'
         ? localStorage.getItem('kongre_session_pin_v2') ||
           localStorage.getItem('kongre_coordinator_pin') ||
@@ -1997,6 +2014,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         : '') || '';
 
     const pinCongregacion =
+      options?.pin?.trim() ||
       (typeof window !== 'undefined'
         ? localStorage.getItem('kongre_registered_cong_pin') ||
           localStorage.getItem('kongre_last_cong_pin') ||
@@ -2004,29 +2022,57 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         : '') || pinMaestro;
 
     try {
-      const res = await supabaseSyncService.fetchAndDecryptCongregation(rawClean, pinMaestro || pinCongregacion || '');
-      if (res.success && res.data) {
-        const data = res.data;
-        if (!options?.skipHydrate) {
-          hydrateAllFromData(data);
-          const effectiveId = data.congregationId || rawClean;
-          ensureCongregationIdPersisted(effectiveId);
-          setSyncStatus('synced');
+      // 1. Intentar descifrar primero con el PIN proporcionado (o PIN de Congregación)
+      const pinsToTry = Array.from(
+        new Set([options?.pin?.trim(), options?.personalPin?.trim(), pinCongregacion, pinMaestro].filter(Boolean))
+      ) as string[];
+
+      let lastCloudError = '';
+      for (const candidatePin of pinsToTry) {
+        const res = await supabaseSyncService.fetchAndDecryptCongregation(rawClean, candidatePin);
+        if (res.success && res.data) {
+          const data = res.data;
+          if (!options?.skipHydrate) {
+            hydrateAllFromData(data);
+            const effectiveId = data.congregationId || data.congregation_id || rawClean;
+            ensureCongregationIdPersisted(effectiveId);
+            setSyncStatus('synced');
+          }
+          return {
+            success: true,
+            data,
+            isDecryptedFromCloud: true,
+            congregationName: data.settings?.congregationName || data.congregation_name || 'Congregación',
+            message: '¡Datos de la congregación cargados exitosamente desde Supabase!',
+          };
         }
+        if (res.error) {
+          lastCloudError = res.error;
+        }
+      }
+
+      // 2. Respaldo local SOLO si este navegador ya tiene registrada exactamente esta misma congregación
+      const fresh = getFreshLocalCongregationData();
+      const localCongId = formatCanonicalCongregationId(
+        fresh.settings?.congregationNumber ||
+        fresh.settings?.congregationId ||
+        (typeof window !== 'undefined' ? localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_congregation_id') || '' : '')
+      );
+      const targetCanonicalId = formatCanonicalCongregationId(rawClean);
+
+      if (fresh.settings?.isRegistered && localCongId && localCongId === targetCanonicalId) {
         return {
           success: true,
-          data,
-          congregationName: data.settings?.congregationName || data.congregation_name || 'Congregación',
-          message: '¡Datos de la congregación cargados exitosamente desde Supabase!',
+          data: fresh,
+          isDecryptedFromCloud: false,
+          congregationName: fresh.settings?.congregationName || 'Congregación',
+          message: 'Datos de la congregación disponibles localmente.',
         };
       }
 
-      const fresh = getFreshLocalCongregationData();
       return {
-        success: true,
-        data: fresh,
-        congregationName: fresh.settings?.congregationName || 'Congregación',
-        message: 'Datos de la congregación disponibles localmente.',
+        success: false,
+        message: lastCloudError || `No se encontró ninguna congregación con el ID "${rawClean}" o el PIN de Congregación es incorrecto.`,
       };
     } catch (err: any) {
       return { success: false, message: err?.message || 'Error al conectar con la nube de Supabase.' };

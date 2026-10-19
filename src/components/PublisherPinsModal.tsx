@@ -26,7 +26,8 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { Publisher } from '../types';
-import { TheocraticRole } from '../utils/rbac';
+import { TheocraticRole, THEOCRATIC_ROLES } from '../utils/rbac';
+import { formatCanonicalCongregationId } from '../utils/theocraticSecurity';
 
 interface PublisherPinsModalProps {
   isOpen: boolean;
@@ -61,7 +62,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
   const [showCongPin, setShowCongPin] = useState(false);
 
   // Determine Congregation credentials
-  const congId = settings.congregationNumber || settings.congregationId || '10582';
+  const congId = formatCanonicalCongregationId(settings.congregationNumber || settings.congregationId || '10582');
   const congName = settings.congregationName || 'Congregación';
   
   // Resolve congregation PIN from settings, localStorage or default fallback
@@ -149,10 +150,28 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // Share via WhatsApp
+  // Share via WhatsApp with 1-click Direct Link and Portable Composite Code
   const handleShareWhatsApp = (pub: Publisher, pin: string) => {
     if (!pin) return;
-    const text = `Hola estimado hermano *${pub.name}*,\n\nTe comparto tus credenciales oficiales para la aplicación de la congregación *${congName}*:\n\n🏛️ *ID de la Congregación:* ${congId}\n🔒 *PIN de la Congregación:* ${congPin !== '••••••••' ? congPin : '(el PIN general de la congregación)'}\n🔑 *Tu PIN Personal:* *${pin}*\n\nAl ingresar, tu rol y responsabilidades teocráticas se activarán de inmediato.`;
+    const realCongPin = congPin !== '••••••••' ? congPin : '';
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const params = new URLSearchParams();
+    if (congId) params.set('cong', congId);
+    if (realCongPin) params.set('cpin', realCongPin);
+    if (pub.id) params.set('pub', pub.id);
+    params.set('pin', pin);
+    const directLink = congId ? `${origin}/?${params.toString()}` : '';
+    const compositeCode = congId && realCongPin ? `${congId}::${realCongPin}::${pin}` : pin;
+
+    const text =
+      `Hola estimado hermano *${pub.name}*,\n\n` +
+      `Te comparto tus credenciales oficiales para la aplicación de la congregación *${congName}*:\n\n` +
+      `🏛️ *ID de la Congregación:* *${congId}*\n` +
+      `🔒 *PIN de la Congregación:* *${realCongPin || '(el PIN general de la congregación)'}*\n` +
+      `🔑 *Tu PIN Personal Único:* *${pin}*\n` +
+      `📋 *Código Portátil de Invitación:* *${compositeCode}*\n` +
+      (directLink ? `\n📲 *Enlace de Acceso Directo (un solo toque):*\n${directLink}\n` : '') +
+      `\nAl tocar el enlace o ingresar tus credenciales, tu rol y responsabilidades teocráticas se activarán de inmediato.`;
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   };
@@ -519,7 +538,9 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
                           </span>
                         </div>
                         <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                          {pub.theocraticRole ? `Rol: ${pub.theocraticRole}` : pub.email || 'Sin correo asociado'}
+                          {pub.theocraticRole
+                            ? `Rol: ${THEOCRATIC_ROLES[pub.theocraticRole as TheocraticRole]?.name || pub.theocraticRole}`
+                            : pub.email || 'Sin correo asociado'}
                         </p>
                       </div>
                     </div>

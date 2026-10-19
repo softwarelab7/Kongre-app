@@ -451,15 +451,17 @@ const AppContent: React.FC = () => {
     }
   }, [effectiveRoleInfo.id, activeTab, setActiveTab]);
 
-  // Organized-style "Pocket Mode" Direct Invitation Link (?cong=...&pub=...&pin=...)
+  // Organized-style "Pocket Mode" Direct Invitation Link (?cong=...&cpin=...&pub=...&pin=...)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlCong = urlParams.get('cong');
+    const urlCpin = urlParams.get('cpin');
     const urlPub = urlParams.get('pub');
     const urlPin = urlParams.get('pin');
 
     if (urlCong && urlPub && urlPin) {
       const cleanCong = formatCanonicalCongregationId(urlCong);
+      const cleanCpin = urlCpin ? urlCpin.trim() : '';
       const cleanPub = urlPub.trim();
       const cleanPin = urlPin.trim();
 
@@ -469,22 +471,32 @@ const AppContent: React.FC = () => {
         );
 
         if (!matchingPub && cleanCong) {
-          const cloudRes = await loadCongregationFromCloud(cleanCong);
+          const cloudRes = await loadCongregationFromCloud(cleanCong, {
+            pin: cleanCpin || cleanPin,
+            personalPin: cleanPin,
+          });
           if (cloudRes?.success && cloudRes.data?.publishers) {
             matchingPub = cloudRes.data.publishers.find(
-              (p: any) => p.id === cleanPub && p.personalPin && String(p.personalPin).trim() === cleanPin
+              (p: any) =>
+                (p.id === cleanPub || String(p.personalPin).trim() === cleanPin) &&
+                p.personalPin &&
+                String(p.personalPin).trim() === cleanPin
             );
           }
         }
 
         if (matchingPub) {
-          const role = (matchingPub.theocraticRole || (matchingPub.privilege === 'anciano' ? 'anciano' : matchingPub.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+          const role = (matchingPub.theocraticRole || (matchingPub.privilege === 'anciano' ? 'anciano' : 'publico')) as TheocraticRole;
           const brotherName = matchingPub.name && !isGenericIdentityName(matchingPub.name) ? matchingPub.name.trim() : 'Hermano';
 
           setActiveRole(role);
           setIdentifiedPublisher(matchingPub.id, brotherName);
           setIdentifiedBrother(brotherName);
           localStorage.setItem('kongre_session_pin_v2', cleanPin);
+          if (cleanCpin) {
+            localStorage.setItem('kongre_registered_cong_pin', cleanCpin);
+            localStorage.setItem('kongre_last_cong_pin', cleanCpin);
+          }
           localStorage.setItem('kongre_is_registered_congregation', 'true');
           localStorage.setItem('kongre_has_entered_app', 'true');
           localStorage.setItem('kongre_congregation_number', cleanCong);

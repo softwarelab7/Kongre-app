@@ -3,7 +3,9 @@ import React, { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
 import { useSecurity } from '../context/SecurityContext';
 import { useAuth } from '../context/AuthContext';
+import { useCongregation } from '../context/CongregationContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
+import { formatCanonicalCongregationId } from '../utils/theocraticSecurity';
 import { CongregationInvitation } from '../types';
 import {
   QrCode,
@@ -44,6 +46,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
     verifyMasterPassphrase,
   } = useSecurity();
   const { user } = useAuth();
+  const { settings } = useCongregation();
 
   const [activeTab, setActiveTab] = useState<'generar' | 'invitaciones' | 'sesiones' | 'clave_maestra'>('generar');
 
@@ -62,10 +65,32 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
   const [masterPassFeedback, setMasterPassFeedback] = useState<string | null>(null);
   const [masterPassError, setMasterPassError] = useState<string | null>(null);
 
+  const getCongregationCredentials = () => {
+    const congId = formatCanonicalCongregationId(
+      settings.congregationNumber ||
+        settings.congregationId ||
+        (typeof window !== 'undefined'
+          ? localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_congregation_id') || ''
+          : '')
+    );
+    const congPin =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('kongre_registered_cong_pin') ||
+          localStorage.getItem('kongre_last_cong_pin') ||
+          ''
+        : '';
+    return { congId, congPin };
+  };
+
   // Generate QR when an invitation is selected or created
   useEffect(() => {
     if (generatedInvitation) {
-      const inviteUrl = `${window.location.origin}?invite=${generatedInvitation.code}`;
+      const { congId, congPin } = getCongregationCredentials();
+      const params = new URLSearchParams();
+      params.set('invite', generatedInvitation.code);
+      if (congId) params.set('cong', congId);
+      if (congPin) params.set('cpin', congPin);
+      const inviteUrl = `${window.location.origin}/?${params.toString()}#portal?view=invite_code_login`;
       QRCode.toDataURL(inviteUrl, {
         width: 200,
         margin: 1.5,
@@ -79,7 +104,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
     } else {
       setQrDataUrl(null);
     }
-  }, [generatedInvitation]);
+  }, [generatedInvitation, settings.congregationNumber, settings.congregationId]);
 
   if (!isOpen) return null;
 
@@ -89,16 +114,40 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
     setGeneratedInvitation(newInv);
   };
 
-  const handleCopy = (code: string) => {
-    const text = `Estimado hermano, aquí tienes tu código de invitación para la congregación:\n\nCódigo: ${code}\nRol asignado: ${THEOCRATIC_ROLES[selectedRole]?.name || selectedRole}\n\nIngresa en la app y pulsa en "Unirse a la Congregación" con este código.`;
+  const getFullPortableInviteCode = (baseCode: string) => {
+    const { congId, congPin } = getCongregationCredentials();
+    if (congId && congPin) {
+      return `${congId}::${congPin}::${baseCode}`;
+    }
+    return baseCode;
+  };
+
+  const handleCopy = (code: string, role?: TheocraticRole) => {
+    const { congId, congPin } = getCongregationCredentials();
+    const portableCode = getFullPortableInviteCode(code);
+    const effectiveRole = role || (generatedInvitation?.role as TheocraticRole) || selectedRole;
+    const params = new URLSearchParams();
+    params.set('invite', code);
+    if (congId) params.set('cong', congId);
+    if (congPin) params.set('cpin', congPin);
+    const directLink = `${window.location.origin}/?${params.toString()}#portal?view=invite_code_login`;
+    const text = `Estimado hermano, aquí tienes tu invitación para unirte a ${settings.congregationName || 'la congregación'} en Kongre:\n\nRol asignado: ${THEOCRATIC_ROLES[effectiveRole]?.name || effectiveRole}\nCódigo de Invitación: ${portableCode}\n\nEnlace directo de activación:\n${directLink}`;
     navigator.clipboard.writeText(text);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  const handleShareWhatsApp = (code: string) => {
-    const roleName = THEOCRATIC_ROLES[selectedRole]?.name || selectedRole;
-    const msg = `Estimado hermano, se le ha otorgado acceso teocrático a la congregación con el rol de *${roleName}*.\n\nCódigo de Invitación: *${code}*\n\nAbra la aplicación y seleccione "Unirse a la Congregación" con este código.`;
+  const handleShareWhatsApp = (code: string, role?: TheocraticRole) => {
+    const { congId, congPin } = getCongregationCredentials();
+    const portableCode = getFullPortableInviteCode(code);
+    const effectiveRole = role || (generatedInvitation?.role as TheocraticRole) || selectedRole;
+    const params = new URLSearchParams();
+    params.set('invite', code);
+    if (congId) params.set('cong', congId);
+    if (congPin) params.set('cpin', congPin);
+    const directLink = `${window.location.origin}/?${params.toString()}#portal?view=invite_code_login`;
+    const roleName = THEOCRATIC_ROLES[effectiveRole]?.name || effectiveRole;
+    const msg = `Estimado hermano, se le ha otorgado acceso teocrático a *${settings.congregationName || 'la congregación'}* con el rol de *${roleName}*.\n\nCódigo de Invitación: *${portableCode}*\n\nToque el siguiente enlace para activar automáticamente la aplicación en su dispositivo:\n${directLink}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
@@ -142,13 +191,21 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
   };
 
   const roleList: TheocraticRole[] = [
+    'coordinador',
+    'anciano',
     'superintendente_vym',
+    'superintendente_servicio',
     'secretario',
     'siervo_discursos',
     'siervo_territorios',
+    'siervo_carritos',
     'siervo_literatura',
     'siervo_cuentas',
-    'coordinador',
+    'superintendente_grupo',
+    'encargado_mantenimiento',
+    'encargado_audiovideo',
+    'encargado_acomodadores',
+    'encargado_cartelera',
     'publico',
   ];
 
@@ -358,16 +415,19 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
 
                     <div className="space-y-3 text-center sm:text-left">
                       <div>
-                        <span className="text-xs text-slate-400 block mb-1">Código de Invitación:</span>
-                        <div className="inline-block px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border-2 border-indigo-500 font-mono font-bold text-lg text-indigo-700 dark:text-indigo-400 tracking-widest shadow-xs">
-                          {generatedInvitation.code}
+                        <span className="text-xs text-slate-400 block mb-1">Código Portátil de Invitación (Multidispositivo):</span>
+                        <div className="inline-block px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border-2 border-indigo-500 font-mono font-bold text-sm sm:text-base text-indigo-700 dark:text-indigo-400 tracking-wider shadow-xs break-all">
+                          {getFullPortableInviteCode(generatedInvitation.code)}
                         </div>
+                        <span className="text-[10px] text-slate-400 block mt-1">
+                          Código corto local: <strong className="font-mono">{generatedInvitation.code}</strong>
+                        </span>
                       </div>
 
                       <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                         <button
                           type="button"
-                          onClick={() => handleCopy(generatedInvitation.code)}
+                          onClick={() => handleCopy(generatedInvitation.code, generatedInvitation.role as TheocraticRole)}
                           className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                         >
                           {copiedCode ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
@@ -376,7 +436,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
 
                         <button
                           type="button"
-                          onClick={() => handleShareWhatsApp(generatedInvitation.code)}
+                          onClick={() => handleShareWhatsApp(generatedInvitation.code, generatedInvitation.role as TheocraticRole)}
                           className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold flex items-center gap-1.5 cursor-pointer shadow-xs"
                         >
                           <Share2 className="w-4 h-4" />
@@ -422,9 +482,9 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                       className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                     >
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 text-xs">
-                            {inv.code}
+                            {getFullPortableInviteCode(inv.code)}
                           </span>
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
                             {THEOCRATIC_ROLES[inv.role as TheocraticRole]?.shortName || inv.role}
@@ -468,7 +528,16 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleShareWhatsApp(inv.code)}
+                              onClick={() => handleCopy(inv.code, inv.role as TheocraticRole)}
+                              className="px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 font-bold flex items-center gap-1 cursor-pointer"
+                              title="Copiar código portátil e invitación"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                              <span>Copiar</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleShareWhatsApp(inv.code, inv.role as TheocraticRole)}
                               className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold flex items-center gap-1 cursor-pointer"
                               title="Compartir por WhatsApp"
                             >

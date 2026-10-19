@@ -571,13 +571,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
     }
 
+    // Helper para resolver lista de roles de un publicador (incluyendo anciano + departamentos múltiples)
+    const resolveAllRoles = (primary: TheocraticRole, privilege?: string, extraRoles?: string[]): TheocraticRole[] => {
+      const set = new Set<TheocraticRole>([primary]);
+      if (privilege === 'anciano') set.add('anciano');
+      if (Array.isArray(extraRoles)) {
+        extraRoles.forEach((r) => {
+          if (r && THEOCRATIC_ROLES[r as TheocraticRole]) {
+            set.add(r as TheocraticRole);
+          }
+        });
+      }
+      return Array.from(set);
+    };
+
     // 1. Search in unique publisher PINs directory (Principal: Por Publicador)
     const foundPublisher = publisherPinsList.find(
       (entry) => entry.pin && entry.pin.trim().length >= 4 && entry.pin.trim() === cleanPin
     );
 
     if (foundPublisher) {
-      setActiveRole(foundPublisher.role);
+      const rolesList = resolveAllRoles(foundPublisher.role, foundPublisher.privilege, foundPublisher.roles);
+      setActiveRoles(rolesList);
       const brotherName =
         foundPublisher.name && !isGenericIdentityName(foundPublisher.name)
           ? foundPublisher.name.trim()
@@ -603,6 +618,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return {
         success: true,
         role: foundPublisher.role,
+        roles: rolesList,
         name: brotherName,
         publisherId: foundPublisher.publisherId,
         message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[foundPublisher.role]?.name}.`,
@@ -651,12 +667,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (Array.isArray(parsedPubs)) {
           const matchPub = parsedPubs.find((p: any) => p.personalPin && String(p.personalPin).trim() === cleanPin);
           if (matchPub) {
-            const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : matchPub.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+            const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : 'publico')) as TheocraticRole;
+            const rolesList = resolveAllRoles(role, matchPub.privilege, matchPub.theocraticRoles);
             const brotherName =
               matchPub.name && !isGenericIdentityName(matchPub.name)
                 ? matchPub.name.trim()
                 : resolveNonGenericName(matchPub.name, role) || 'Hermano';
-            setActiveRole(role);
+            setActiveRoles(rolesList);
             if (!isGenericIdentityName(brotherName)) {
               setCurrentBrotherName(brotherName);
               localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
@@ -678,6 +695,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return {
               success: true,
               role,
+              roles: rolesList,
               name: brotherName,
               publisherId: matchPub.id,
               message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[role]?.name || role}.`,
@@ -695,18 +713,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (congId && congId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congId)) {
         try {
-          const cloudRes = await supabaseSyncService.fetchAndDecryptCongregation(congId, cleanPin);
+          const congPinSaved = localStorage.getItem('kongre_registered_cong_pin') || localStorage.getItem('kongre_last_cong_pin') || cleanPin;
+          const cloudRes = await supabaseSyncService.fetchAndDecryptCongregation(congId, congPinSaved);
           if (cloudRes.success && cloudRes.data) {
             const cloudPubs = cloudRes.data.publishers;
             if (Array.isArray(cloudPubs)) {
               const matchPub = cloudPubs.find((p: any) => p.personalPin && String(p.personalPin).trim() === cleanPin);
               if (matchPub) {
-                const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : matchPub.privilege === 'siervo_ministerial' ? 'siervo_territorios' : 'publico')) as TheocraticRole;
+                const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : 'publico')) as TheocraticRole;
+                const rolesList = resolveAllRoles(role, matchPub.privilege, matchPub.theocraticRoles);
                 const brotherName =
                   matchPub.name && !isGenericIdentityName(matchPub.name)
                     ? matchPub.name.trim()
                     : resolveNonGenericName(matchPub.name, role) || 'Hermano';
-                setActiveRole(role);
+                setActiveRoles(rolesList);
                 if (!isGenericIdentityName(brotherName)) {
                   setCurrentBrotherName(brotherName);
                   localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
@@ -730,6 +750,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 return {
                   success: true,
                   role,
+                  roles: rolesList,
                   name: brotherName,
                   publisherId: matchPub.id,
                   message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[role]?.name || role}.`,

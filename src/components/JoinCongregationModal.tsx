@@ -4,7 +4,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
-import { verifyPasscode, isCongregationIdString, isGenericIdentityName } from '../utils/theocraticSecurity';
+import { verifyPasscode, isCongregationIdString, isGenericIdentityName, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput } from '../utils/theocraticSecurity';
 import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import { supabaseSyncService } from '../services/supabaseSyncService';
 import {
@@ -49,7 +49,11 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
   // 1. ID de la Congregación
   // 2. PIN de la Congregación
   // 3. PIN Personal suministrado por el Coordinador u otro anciano
-  const [congregationIdInput, setCongregationIdInput] = useState(settings.congregationNumber || '');
+  const [congregationIdInput, setCongregationIdInput] = useState(() => {
+    const defaultId = settings.congregationNumber || settings.congregationId || '';
+    if (defaultId === '1001-DEMO' && !settings.isRegistered) return '';
+    return defaultId ? formatCanonicalCongregationId(defaultId) : '';
+  });
   const [congregationPinInput, setCongregationPinInput] = useState('');
   const [personalPinInput, setPersonalPinInput] = useState('');
   const [showCongPin, setShowCongPin] = useState(false);
@@ -415,21 +419,48 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
             {/* DATO 1: ID DE LA CONGREGACIÓN */}
             <div className="space-y-1">
-              <label className="block font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                <span>1. ID de la Congregación: *</span>
-              </label>
-              <input
-                type="text"
-                value={congregationIdInput}
-                onChange={(e) => setCongregationIdInput(e.target.value)}
-                placeholder="Ej: 10582"
-                className="w-full p-2.5 font-mono font-bold text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-                required
-                autoFocus
-              />
+              <div className="flex items-center justify-between">
+                <label className="block font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 text-xs">
+                  <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <span>1. ID de la Congregación: *</span>
+                </label>
+                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-900/60">
+                  KGR-XXXX-XXXX
+                </span>
+              </div>
+              <div className="relative">
+                <input
+                  type="text"
+                  maxLength={13}
+                  value={congregationIdInput}
+                  onFocus={() => {
+                    if (!congregationIdInput) setCongregationIdInput('KGR-');
+                  }}
+                  onBlur={() => {
+                    if (congregationIdInput === 'KGR-' || congregationIdInput === 'KGR') {
+                      setCongregationIdInput('');
+                    }
+                  }}
+                  onChange={(e) => setCongregationIdInput(formatCongregationIdInput(e.target.value, congregationIdInput))}
+                  placeholder="KGR-XXXX-XXXX (ej: KGR-NQ5A-JQAA)"
+                  className="w-full p-2.5 pr-9 font-mono font-bold tracking-widest text-center text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                  required
+                  autoFocus
+                />
+                {congregationIdInput && (
+                  <button
+                    type="button"
+                    onClick={() => setCongregationIdInput('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors cursor-pointer"
+                    title="Borrar ID"
+                    tabIndex={-1}
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
               <span className="text-[10px] text-slate-400 block">
-                Número oficial asignado a tu congregación.
+                Estructura oficial asignada a tu congregación (formato KGR-XXXX-XXXX).
               </span>
             </div>
 
@@ -440,23 +471,28 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
                   <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   <span>2. PIN de la Congregación: *</span>
                 </label>
-                <button
-                  type="button"
-                  onClick={() => setShowCongPin(!showCongPin)}
-                  className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer font-medium"
-                >
-                  {showCongPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  <span>{showCongPin ? 'Ocultar' : 'Ver PIN'}</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-900/60">
+                    XXXX-XXXX
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowCongPin(!showCongPin)}
+                    className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer font-medium"
+                  >
+                    {showCongPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                    <span>{showCongPin ? 'Ocultar' : 'Ver PIN'}</span>
+                  </button>
+                </div>
               </div>
               <div className="relative">
                 <input
                   type={showCongPin ? 'text' : 'password'}
-                  maxLength={32}
+                  maxLength={9}
                   value={congregationPinInput}
-                  onChange={(e) => setCongregationPinInput(e.target.value)}
-                  placeholder="Clave / PIN de la congregación (ej: 8X4W-9M2K)"
-                  className="w-full p-2.5 pr-10 font-mono font-bold tracking-wider text-center text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                  onChange={(e) => setCongregationPinInput(formatCongregationPinInput(e.target.value, congregationPinInput))}
+                  placeholder="XXXX-XXXX (ej: 8X4W-9M2K)"
+                  className="w-full p-2.5 pr-10 font-mono font-bold tracking-widest text-center text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
                   required
                 />
                 <button
@@ -464,12 +500,13 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
                   onClick={() => setShowCongPin(!showCongPin)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                   tabIndex={-1}
+                  title={showCongPin ? 'Ocultar PIN' : 'Ver PIN'}
                 >
                   {showCongPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               <span className="text-[10px] text-slate-400 block">
-                Clave de acceso general de la congregación establecida al registrarla.
+                Clave de acceso general de 8 caracteres con guión (ej: 8X4W-9M2K).
               </span>
             </div>
 

@@ -267,6 +267,90 @@ export function formatCanonicalCongregationId(id: string | null | undefined): st
 }
 
 /**
+ * Formatea dinámicamente el ID de congregación mientras el usuario escribe o pega.
+ * Estructura estándar: KGR-XXXX-XXXX (ej: KGR-NQ5A-JQAA)
+ * - Mantiene el prefijo 'KGR-' y coloca los guiones en las posiciones correctas automáticamente.
+ * - Soporta borrado hacia atrás limpio (backspace) sin trabarse en los guiones.
+ * - Soporta pegado completo o parcial (con o sin 'KGR-', guiones, espacios o minúsculas).
+ * - Tolera identificadores de prueba o legados (ej: 1001-DEMO, números puros).
+ */
+export function formatCongregationIdInput(input: string, prev: string = ''): string {
+  if (!input) return '';
+
+  const isDeleting = prev && input.length < prev.length;
+
+  if (isDeleting) {
+    if (input.endsWith('-')) {
+      const stripped = input.slice(0, -1);
+      if (stripped === 'KGR' || stripped === 'KGR-') return '';
+      return stripped;
+    }
+    if (input === 'KGR' || input === 'KGR-') {
+      return '';
+    }
+  }
+
+  const raw = input.toUpperCase().trim();
+
+  // Preservar IDs de prueba o puramente numéricos (ej: 1001-DEMO)
+  if (/^\d{3,6}(-DEMO)?$/i.test(raw) || /^DEMO/i.test(raw)) {
+    return raw;
+  }
+
+  // Limpiar a caracteres alfanuméricos
+  const clean = raw.replace(/[^A-Z0-9]/g, '');
+  if (!clean) return '';
+
+  let payload = clean;
+  if (payload.startsWith('KGR')) {
+    payload = payload.slice(3);
+  } else if (clean === 'K' || clean === 'KG') {
+    return 'KGR-';
+  }
+
+  payload = payload.slice(0, 8);
+
+  if (payload.length === 0) {
+    return 'KGR-';
+  }
+
+  if (payload.length <= 4) {
+    return payload.length === 4 && !isDeleting
+      ? `KGR-${payload}-`
+      : `KGR-${payload}`;
+  }
+
+  return `KGR-${payload.slice(0, 4)}-${payload.slice(4)}`;
+}
+
+/**
+ * Formatea dinámicamente el PIN de congregación mientras el usuario escribe o pega.
+ * Estructura estándar: XXXX-XXXX (ej: 8X4W-9M2K)
+ * - Añade automáticamente el guión en la posición central tras 4 caracteres.
+ * - Soporta borrado hacia atrás limpio (backspace).
+ * - Convierte a mayúsculas y limita a 8 caracteres alfanuméricos (+ 1 guión = 9 total).
+ */
+export function formatCongregationPinInput(input: string, prev: string = ''): string {
+  if (!input) return '';
+
+  const isDeleting = prev && input.length < prev.length;
+  if (isDeleting && input.endsWith('-')) {
+    return input.slice(0, -1);
+  }
+
+  const clean = input.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+  if (!clean) return '';
+
+  if (clean.length <= 4) {
+    return clean.length === 4 && !isDeleting
+      ? `${clean}-`
+      : clean;
+  }
+
+  return `${clean.slice(0, 4)}-${clean.slice(4)}`;
+}
+
+/**
  * Genera una clave/PIN de Congregación de Alta Seguridad Criptográfica:
  * - Entropía criptográfica real de grado militar (CSPRNG vía Web Crypto API)
  * - Formato Alfanumérico estructurado de 8 caracteres: XXXX-XXXX (ej: 8X4W-9M2K)

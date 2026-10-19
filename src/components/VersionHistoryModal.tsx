@@ -114,7 +114,7 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
           <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-indigo-600/5 to-purple-500/10 border border-indigo-200 dark:border-indigo-800/80 shadow-xs">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+                <div className="px-3 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs font-mono shrink-0 shadow-xs whitespace-nowrap">
                   v{CURRENT_APP_VERSION}
                 </div>
                 <div>

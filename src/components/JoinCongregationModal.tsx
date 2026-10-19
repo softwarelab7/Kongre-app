@@ -51,9 +51,16 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
   // 3. PIN Personal suministrado por el Coordinador u otro anciano
   const [congregationIdInput, setCongregationIdInput] = useState(() => {
     const defaultId = settings.congregationNumber || settings.congregationId || '';
-    if (defaultId === '1001-DEMO' && !settings.isRegistered) return '';
-    return defaultId ? formatCanonicalCongregationId(defaultId) : '';
+    if (!defaultId || defaultId.toUpperCase().includes('DEMO')) return '';
+    return formatCanonicalCongregationId(defaultId);
   });
+
+  // Garantizar que '1001-DEMO' nunca persista en el modal
+  React.useEffect(() => {
+    if (congregationIdInput && congregationIdInput.toUpperCase().includes('DEMO')) {
+      setCongregationIdInput('');
+    }
+  }, [congregationIdInput]);
   const [congregationPinInput, setCongregationPinInput] = useState('');
   const [personalPinInput, setPersonalPinInput] = useState('');
   const [showCongPin, setShowCongPin] = useState(false);

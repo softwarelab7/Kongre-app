@@ -303,11 +303,18 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   // 3. PIN Personal suministrado por el Coordinador
   const [congregationIdInput, setCongregationIdInput] = useState(() => {
     const defaultId = settings.congregationNumber || settings.congregationId || '';
-    if (defaultId === '1001-DEMO' && !settings.isRegistered) {
+    if (!defaultId || defaultId.toUpperCase().includes('DEMO')) {
       return '';
     }
-    return defaultId ? formatCanonicalCongregationId(defaultId) : '';
+    return formatCanonicalCongregationId(defaultId);
   });
+
+  // Garantizar que '1001-DEMO' o cualquier texto de prueba nunca persista en el formulario
+  useEffect(() => {
+    if (congregationIdInput && congregationIdInput.toUpperCase().includes('DEMO')) {
+      setCongregationIdInput('');
+    }
+  }, [congregationIdInput]);
   const [congregationPinInput, setCongregationPinInput] = useState('');
   const [personalPinInput, setPersonalPinInput] = useState('');
   const [showCongPin, setShowCongPin] = useState(false);

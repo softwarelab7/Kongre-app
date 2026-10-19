@@ -292,8 +292,13 @@ export function formatCongregationIdInput(input: string, prev: string = ''): str
 
   const raw = input.toUpperCase().trim();
 
-  // Preservar IDs de prueba o puramente numéricos (ej: 1001-DEMO)
-  if (/^\d{3,6}(-DEMO)?$/i.test(raw) || /^DEMO/i.test(raw)) {
+  // Eliminar cualquier rastro de ID demo legado (1001-DEMO)
+  if (raw.includes('DEMO')) {
+    return '';
+  }
+
+  // Preservar IDs puramente numéricos legados si existen (ej: 10582)
+  if (/^\d{4,6}$/.test(raw)) {
     return raw;
   }
 

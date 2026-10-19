@@ -426,15 +426,10 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
             {/* DATO 1: ID DE LA CONGREGACIÓN */}
             <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <label className="block font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 text-xs">
-                  <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                  <span>1. ID de la Congregación: *</span>
-                </label>
-                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-900/60">
-                  KGR-XXXX-XXXX
-                </span>
-              </div>
+              <label className="block font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 text-xs">
+                <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span>1. ID de la Congregación: *</span>
+              </label>
               <div className="relative">
                 <input
                   type="text"
@@ -473,25 +468,10 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
             {/* DATO 2: PIN DE LA CONGREGACIÓN */}
             <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <label className="block font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 text-xs">
-                  <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                  <span>2. PIN de la Congregación: *</span>
-                </label>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-900/60">
-                    XXXX-XXXX
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setShowCongPin(!showCongPin)}
-                    className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer font-medium"
-                  >
-                    {showCongPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                    <span>{showCongPin ? 'Ocultar' : 'Ver PIN'}</span>
-                  </button>
-                </div>
-              </div>
+              <label className="block font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 text-xs">
+                <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span>2. PIN de la Congregación: *</span>
+              </label>
               <div className="relative">
                 <input
                   type={showCongPin ? 'text' : 'password'}
@@ -519,20 +499,10 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
 
             {/* DATO 3: PIN PERSONAL SUMINISTRADO POR EL COORDINADOR */}
             <div className="space-y-1 p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60">
-              <div className="flex items-center justify-between">
-                <label className="block font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5 text-xs">
-                  <KeyRound className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span>3. Tu PIN Personal (Suministrado por el Coordinador o anciano): *</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setShowPersPin(!showPersPin)}
-                  className="text-[11px] text-emerald-700 dark:text-emerald-300 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
-                >
-                  {showPersPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  <span>{showPersPin ? 'Ocultar' : 'Ver PIN'}</span>
-                </button>
-              </div>
+              <label className="block font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5 text-xs">
+                <KeyRound className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>3. Tu PIN Personal (Suministrado por el Coordinador o anciano): *</span>
+              </label>
               <div className="relative">
                 <input
                   type={showPersPin ? 'text' : 'password'}

@@ -9,7 +9,6 @@ import { ClmReplacementModal } from './ClmReplacementModal';
 import { ClmWeeklyConflictsModal } from './ClmWeeklyConflictsModal';
 import { ClmMonthlyBillboardModal } from './ClmMonthlyBillboardModal';
 import { ClmAuxiliaryCounselorModal } from './ClmAuxiliaryCounselorModal';
-import { ClmAiSuggestionsModal } from './ClmAiSuggestionsModal';
 import { SplashCheckbox } from './SplashCheckbox';
 import { generateCounselorSheetPdf } from '../utils/clmCounselorPdf';
 import { useCongregation } from '../context/CongregationContext';
@@ -281,7 +280,6 @@ export default function ClmScheduleView({
   const [isMonthlyBillboardModalOpen, setIsMonthlyBillboardModalOpen] = useState(false);
   const [isAuxCounselorModalOpen, setIsAuxCounselorModalOpen] = useState(false);
   const [isConfirmClearClmOpen, setIsConfirmClearClmOpen] = useState(false);
-  const [isAiSuggestionsModalOpen, setIsAiSuggestionsModalOpen] = useState(false);
   const [editingSongPart, setEditingSongPart] = useState<ClmParte | null>(null);
   const [songNumberInput, setSongNumberInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1712,17 +1710,6 @@ export default function ClmScheduleView({
                 <span>Auto-Asignar</span>
               </button>
 
-              {/* Sugerir con Gemini IA */}
-              <button
-                type="button"
-                onClick={() => setIsAiSuggestionsModalOpen(true)}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-linear-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-700 hover:to-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95"
-                title="Recibir sugerencias teocráticas de asignación con Gemini IA"
-              >
-                <Bot size={13} className="shrink-0" />
-                <span>Sugerir con IA</span>
-              </button>
-
               {/* Quitar Asignados */}
               <button
                 type="button"
@@ -2599,18 +2586,6 @@ export default function ClmScheduleView({
           </div>
         </div>
       )}
-
-      {/* MODAL DE SUGERENCIAS TEOCRÁTICAS CON GEMINI IA */}
-      <ClmAiSuggestionsModal
-        isOpen={isAiSuggestionsModalOpen}
-        onClose={() => setIsAiSuggestionsModalOpen(false)}
-        programa={programa}
-        publishers={publishers}
-        onApplySuggestions={(newProg) => {
-          setPrograma(newProg);
-          showToast('Sugerencias de Gemini aplicadas al programa.');
-        }}
-      />
     </div>
   );
 }

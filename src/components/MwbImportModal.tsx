@@ -2,17 +2,12 @@
 import React, { useState } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { parseMwbText, PRESET_SAMPLE_MWB_WEEKS, ParsedMwbWeek } from '../utils/mwbParser';
-import { parseMwbWithGemini, isGeminiConfigured, setGeminiApiKey, getGeminiApiKey } from '../services/geminiService';
 import { WeekSchedule } from '../types';
 import {
   X,
   Sparkles,
   BookOpen,
   Check,
-  Loader2,
-  AlertCircle,
-  Key,
-  ExternalLink,
   Music,
 } from 'lucide-react';
 
@@ -24,11 +19,6 @@ interface MwbImportModalProps {
 export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose }) => {
   const { currentWeek, updateWeek } = useCongregation();
   const [inputText, setInputText] = useState('');
-  const [isProcessingAi, setIsProcessingAi] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
-  const [showKeyInput, setShowKeyInput] = useState(false);
-  const [tempApiKey, setTempApiKey] = useState(() => getGeminiApiKey());
-  const [isAiExtracted, setIsAiExtracted] = useState(false);
 
   const [parsedData, setParsedData] = useState<ParsedMwbWeek | null>(() => {
     return PRESET_SAMPLE_MWB_WEEKS['salmos_80'];
@@ -44,8 +34,6 @@ export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose 
 
   const handleLocalParse = (textToParse: string) => {
     setInputText(textToParse);
-    setIsAiExtracted(false);
-    setAiError(null);
     if (textToParse.trim().length > 10) {
       const result = parseMwbText(textToParse);
       setParsedData(result);
@@ -57,61 +45,7 @@ export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose 
     if (preset) {
       setParsedData(preset);
       setInputText('');
-      setIsAiExtracted(false);
-      setAiError(null);
       setSongsData({});
-    }
-  };
-
-  const handleParseWithGemini = async () => {
-    if (!inputText.trim()) {
-      setAiError('Por favor pega primero el texto de la reunión para analizarlo.');
-      return;
-    }
-
-    if (!isGeminiConfigured() && !tempApiKey.trim()) {
-      setShowKeyInput(true);
-      setAiError('Ingresa tu clave de API de Gemini para procesar el programa con IA.');
-      return;
-    }
-
-    setIsProcessingAi(true);
-    setAiError(null);
-
-    try {
-      if (tempApiKey.trim()) {
-        setGeminiApiKey(tempApiKey.trim());
-      }
-
-      const geminiRes = await parseMwbWithGemini(inputText, tempApiKey.trim() || undefined);
-
-      const adapted: ParsedMwbWeek = {
-        discursoTitle: geminiRes.tesoros.discursoTitle || 'Discurso de Tesoros',
-        perlasTitle: geminiRes.tesoros.perlasTitle || 'Busquemos perlas escondidas',
-        lecturaBibliaTitle: geminiRes.tesoros.lecturaBibliaTitle || 'Lectura de la Biblia',
-        demonstrations: geminiRes.demonstrations.map((d) => ({
-          title: d.title + (d.lessonNumber ? ` (Lección ${d.lessonNumber})` : ''),
-          timeMinutes: d.timeMinutes || 3,
-        })),
-        vidaPartes: geminiRes.vidaPartes.map((v) => ({
-          title: v.title,
-          timeMinutes: v.timeMinutes || 15,
-        })),
-        estudioBiblicoTitle: geminiRes.estudioBiblicoTitle || '',
-        atalayaTheme: geminiRes.atalayaTheme,
-      };
-
-      setParsedData(adapted);
-      setIsAiExtracted(true);
-      setSongsData({
-        initial: geminiRes.initialSong,
-        middle: geminiRes.middleSong,
-        final: geminiRes.finalSong,
-      });
-    } catch (err: any) {
-      setAiError(err?.message || 'Error al procesar el texto con Gemini.');
-    } finally {
-      setIsProcessingAi(false);
     }
   };
 
@@ -191,12 +125,6 @@ export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose 
                 <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/80 px-2 py-0.5 rounded-full">
                   Guía de Actividades (MWB)
                 </span>
-                {isAiExtracted && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-fuchsia-700 dark:text-fuchsia-300 bg-fuchsia-100 dark:bg-fuchsia-950/80 px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-fuchsia-600 dark:text-fuchsia-400" />
-                    <span>Gemini AI</span>
-                  </span>
-                )}
               </div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white mt-0.5">
                 Importador Inteligente del Programa
@@ -254,24 +182,6 @@ export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose 
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Pega el texto copiado de JW.ORG / Guía de Actividades:
               </label>
-              <button
-                type="button"
-                onClick={handleParseWithGemini}
-                disabled={isProcessingAi || !inputText.trim()}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-linear-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-700 hover:to-indigo-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-              >
-                {isProcessingAi ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Analizando con IA...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>Procesar con Gemini IA</span>
-                  </>
-                )}
-              </button>
             </div>
 
             <textarea
@@ -283,56 +193,6 @@ export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose 
             />
           </div>
 
-          {/* Inline Gemini Key prompt if not configured */}
-          {showKeyInput && (
-            <div className="p-3.5 rounded-2xl bg-fuchsia-50/80 dark:bg-fuchsia-950/40 border border-fuchsia-200 dark:border-fuchsia-800/60 space-y-2 text-xs animate-fade-in">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 font-bold text-fuchsia-900 dark:text-fuchsia-200">
-                  <Key className="w-4 h-4 text-fuchsia-600" />
-                  <span>Configurar Clave de Gemini AI</span>
-                </div>
-                <a
-                  href="https://aistudio.google.com/app/apikey"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-fuchsia-600 dark:text-fuchsia-400 hover:underline inline-flex items-center gap-1 font-semibold text-[11px]"
-                >
-                  <span>Obtener clave gratis</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="password"
-                  value={tempApiKey}
-                  onChange={(e) => setTempApiKey(e.target.value)}
-                  placeholder="AIzaSy..."
-                  className="flex-1 p-2 rounded-xl border border-fuchsia-200 dark:border-fuchsia-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-mono"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (tempApiKey.trim()) {
-                      setGeminiApiKey(tempApiKey.trim());
-                      setShowKeyInput(false);
-                      handleParseWithGemini();
-                    }
-                  }}
-                  className="px-3 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold text-xs"
-                >
-                  Guardar y Continuar
-                </button>
-              </div>
-            </div>
-          )}
-
-          {aiError && (
-            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
-              <span>{aiError}</span>
-            </div>
-          )}
-
           {/* Extracted preview */}
           {parsedData && (
             <div className="p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 space-y-2.5 text-xs">
@@ -341,11 +201,6 @@ export const MwbImportModal: React.FC<MwbImportModalProps> = ({ isOpen, onClose 
                   <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                   <span>Estructura extraída para la reunión:</span>
                 </div>
-                {isAiExtracted && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-fuchsia-100 dark:bg-fuchsia-900/60 text-fuchsia-800 dark:text-fuchsia-200">
-                    Procesado con IA
-                  </span>
-                )}
               </div>
 
               {(songsData.initial || songsData.middle || songsData.final) && (

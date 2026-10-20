@@ -80,6 +80,8 @@ export interface AuditLogEntry {
   modulo: string;
   fecha?: string;
   detalles?: string;
+  prevHash?: string;
+  integrityHash?: string;
 }
 
 export const NO_PERMISSIONS: Permission = {

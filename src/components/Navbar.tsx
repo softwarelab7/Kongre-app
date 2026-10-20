@@ -13,6 +13,7 @@ import { isTabAllowedForRole } from '../utils/rbac';
 import { CURRENT_APP_VERSION } from '../utils/versionLog';
 import { OfflineSyncBadge } from './OfflineSyncBadge';
 import { DemoBanner } from './DemoBanner';
+import { insertAuditLog } from '../services/auditLogService';
 import {
   Calendar,
   Users,
@@ -210,6 +211,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   const pendingRequestsCount = accountLinkRequests.filter((r) => r.status === 'pending').length;
   const handleLogout = async () => {
     try {
+      await insertAuditLog({
+        accion: 'CIERRE_SESION',
+        hermano_nid: user?.email || activeRole || 'usuario',
+        hermano_nombre: displayBrotherName || user?.displayName || 'Hermano',
+        modulo: 'auth',
+        detalles: 'Sesión cerrada explícitamente por el usuario; tokens y PIN de sesión limpiados.',
+      });
+    } catch {}
+    try {
       await signOutUser();
     } catch {}
     try {
@@ -219,7 +229,12 @@ export const Navbar: React.FC<NavbarProps> = ({
       localStorage.removeItem('kongre_user_profile_guest');
       localStorage.removeItem('kongre_user_profile_active');
       localStorage.removeItem('kongre_identified_brother');
+      localStorage.removeItem('kongre_current_publisher_id_v2');
+      localStorage.removeItem('kongre_session_pin_v2');
       localStorage.removeItem('kongre_active_role_v1');
+      localStorage.removeItem('kongre_active_roles_v1');
+      localStorage.removeItem('kongre_role_session_sig_v1');
+      sessionStorage.removeItem('kongre_session_locked');
       sessionStorage.setItem('kongre_show_landing', 'true');
     } catch {}
     if (onOpenWelcomeLanding) {

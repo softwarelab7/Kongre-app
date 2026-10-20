@@ -1,5 +1,6 @@
 // src/utils/whatsapp.ts
 import { Publisher, WeekSchedule, AssignmentStatus } from '../types';
+import { computeAssignmentConfirmSignature, openSafeExternalUrl } from './theocraticSecurity';
 
 export interface WeeklyAssignmentEntry {
   id: string;
@@ -26,7 +27,8 @@ export function generateConfirmationUrl(
   if (typeof window === 'undefined') return '';
   const origin = window.location.origin;
   const pathname = window.location.pathname;
-  return `${origin}${pathname}?confirmar=1&semana=${encodeURIComponent(weekId)}&tipo=${encodeURIComponent(meetingType)}&path=${encodeURIComponent(assignmentPath)}&pub=${encodeURIComponent(publisherId)}`;
+  const sig = computeAssignmentConfirmSignature(weekId, meetingType, assignmentPath, publisherId);
+  return `${origin}${pathname}?confirmar=1&semana=${encodeURIComponent(weekId)}&tipo=${encodeURIComponent(meetingType)}&path=${encodeURIComponent(assignmentPath)}&pub=${encodeURIComponent(publisherId)}&sig=${encodeURIComponent(sig)}`;
 }
 
 export function createAssignmentWhatsAppMessage(
@@ -127,7 +129,7 @@ export function openWhatsAppLink(phone: string, text: string) {
   const cleanPhone = phone.replace(/[^0-9]/g, '');
   const encodedText = encodeURIComponent(text);
   const url = cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodedText}` : `https://wa.me/?text=${encodedText}`;
-  window.open(url, '_blank');
+  openSafeExternalUrl(url);
 }
 
 export function extractWeekAssignments(

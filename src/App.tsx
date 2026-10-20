@@ -9,7 +9,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CongregationProvider, useCongregation } from './context/CongregationContext';
 import { Navbar, ActiveTab } from './components/Navbar';
 import { isTabAllowedForRole, TheocraticRole } from './utils/rbac';
-import { formatCanonicalCongregationId, isGenericIdentityName } from './utils/theocraticSecurity';
+import { formatCanonicalCongregationId, isGenericIdentityName, getSecureLocalPin, setSecureLocalPin, verifySecureLocalPin, verifyPersonalPinMatch, decodeSecureShareToken, verifyAssignmentConfirmSignature } from './utils/theocraticSecurity';
 import { CongregationCalendar } from './components/CongregationCalendar';
 import { ScheduleTab } from './components/ScheduleTab';
 import ClmScheduleView from './components/ClmScheduleView';
@@ -167,7 +167,18 @@ const AppContent: React.FC = () => {
       const meetingType = (urlParams.get('tipo') as any) || 'midweek';
       const assignmentPath = urlParams.get('path') || '';
       const publisherId = urlParams.get('pub') || '';
-      if (weekId && assignmentPath && publisherId) {
+      const sig = urlParams.get('sig');
+      if (
+        weekId &&
+        assignmentPath &&
+        publisherId &&
+        verifyAssignmentConfirmSignature(weekId, meetingType, assignmentPath, publisherId, sig)
+      ) {
+        // Limpiar parámetros sensibles de la barra de direcciones inmediatamente
+        try {
+          const cleanUrl = window.location.pathname + (window.location.hash || '');
+          window.history.replaceState({}, document.title, cleanUrl);
+        } catch {}
         return { weekId, meetingType, assignmentPath, publisherId };
       }
     }
@@ -183,7 +194,9 @@ const AppContent: React.FC = () => {
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    return !!urlParams.get('invite');
+    if (urlParams.get('invite')) return true;
+    const tk = decodeSecureShareToken(urlParams.get('tk'));
+    return Boolean(tk?.invite && !tk?.pub);
   });
   const [isInviteManagerOpen, setIsInviteManagerOpen] = useState(false);
   const [isRegisterWizardOpen, setIsRegisterWizardOpen] = useState(false);
@@ -366,8 +379,12 @@ const AppContent: React.FC = () => {
 
       setRawActiveTab(targetTab);
 
-      // Sync modals with history
-      setIsConflictsModalOpen(targetModal === 'conflictos');
+      // Sync modals with history (enforcing RBAC guards for administrative modals)
+      const allowAdminModals = Boolean(canManageRoles || isDemoMode);
+      const allowAuditModal = Boolean(permissions.canViewAuditLog || canManageRoles || isDemoMode);
+      const allowConflictModal = Boolean(permissions.canSuperviseConflicts || canManageRoles || isDemoMode);
+
+      setIsConflictsModalOpen(targetModal === 'conflictos' && allowConflictModal);
       setIsQrModalOpen(targetModal === 'qr');
       setIsTimerModalOpen(targetModal === 'cronometro');
       setIsKioskModalOpen(targetModal === 'tablero_salon');
@@ -375,10 +392,10 @@ const AppContent: React.FC = () => {
       setIsRoleModalOpen(targetModal === 'roles');
       setIsThemeModalOpen(targetModal === 'tema');
       setIsJoinModalOpen(targetModal === 'unirse');
-      setIsInviteManagerOpen(targetModal === 'invitaciones');
-      setIsLinkRequestsModalOpen(targetModal === 'vinculacion');
-      setIsPinsModalOpen(targetModal === 'pines');
-      setIsAuditLogOpen(targetModal === 'auditoria');
+      setIsInviteManagerOpen(targetModal === 'invitaciones' && allowAdminModals);
+      setIsLinkRequestsModalOpen(targetModal === 'vinculacion' && allowAdminModals);
+      setIsPinsModalOpen(targetModal === 'pines' && allowAdminModals);
+      setIsAuditLogOpen(targetModal === 'auditoria' && allowAuditModal);
       setIsRegisterWizardOpen(targetModal === 'registro_congregacion');
       setIsVersionModalOpen(targetModal === 'versiones');
       setIsQueueModalOpen(targetModal === 'cola_offline' || targetModal === 'cola');
@@ -386,7 +403,7 @@ const AppContent: React.FC = () => {
 
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
-  }, [setCurrentWeekId]);
+  }, [setCurrentWeekId, canManageRoles, isDemoMode, permissions.canViewAuditLog, permissions.canSuperviseConflicts]);
 
   // Initial history state synchronization on app mount
   useEffect(() => {
@@ -420,7 +437,11 @@ const AppContent: React.FC = () => {
       }
 
       if (initialModal) {
-        if (initialModal === 'conflictos') setIsConflictsModalOpen(true);
+        const allowAdminModals = Boolean(canManageRoles || isDemoMode);
+        const allowAuditModal = Boolean(permissions.canViewAuditLog || canManageRoles || isDemoMode);
+        const allowConflictModal = Boolean(permissions.canSuperviseConflicts || canManageRoles || isDemoMode);
+
+        if (initialModal === 'conflictos' && allowConflictModal) setIsConflictsModalOpen(true);
         if (initialModal === 'qr') setIsQrModalOpen(true);
         if (initialModal === 'cronometro') setIsTimerModalOpen(true);
         if (initialModal === 'tablero_salon') setIsKioskModalOpen(true);
@@ -428,10 +449,10 @@ const AppContent: React.FC = () => {
         if (initialModal === 'roles') setIsRoleModalOpen(true);
         if (initialModal === 'tema') setIsThemeModalOpen(true);
         if (initialModal === 'unirse') setIsJoinModalOpen(true);
-        if (initialModal === 'invitaciones') setIsInviteManagerOpen(true);
-        if (initialModal === 'vinculacion') setIsLinkRequestsModalOpen(true);
-        if (initialModal === 'pines') setIsPinsModalOpen(true);
-        if (initialModal === 'auditoria') setIsAuditLogOpen(true);
+        if (initialModal === 'invitaciones' && allowAdminModals) setIsInviteManagerOpen(true);
+        if (initialModal === 'vinculacion' && allowAdminModals) setIsLinkRequestsModalOpen(true);
+        if (initialModal === 'pines' && allowAdminModals) setIsPinsModalOpen(true);
+        if (initialModal === 'auditoria' && allowAuditModal) setIsAuditLogOpen(true);
         if (initialModal === 'registro_congregacion') setIsRegisterWizardOpen(true);
         if (initialModal === 'versiones') setIsVersionModalOpen(true);
       }
@@ -451,13 +472,14 @@ const AppContent: React.FC = () => {
     }
   }, [effectiveRoleInfo.id, activeTab, setActiveTab]);
 
-  // Organized-style "Pocket Mode" Direct Invitation Link (?cong=...&cpin=...&pub=...&pin=...)
+  // Organized-style "Pocket Mode" Direct Invitation Link (?tk=... or legacy ?cong=...&cpin=...&pub=...&pin=...)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const urlCong = urlParams.get('cong');
-    const urlCpin = urlParams.get('cpin');
-    const urlPub = urlParams.get('pub');
-    const urlPin = urlParams.get('pin');
+    const decodedTk = decodeSecureShareToken(urlParams.get('tk'));
+    const urlCong = decodedTk?.cong || urlParams.get('cong');
+    const urlCpin = decodedTk?.cpin || urlParams.get('cpin');
+    const urlPub = decodedTk?.pub || urlParams.get('pub');
+    const urlPin = decodedTk?.pin || urlParams.get('pin');
 
     if (urlCong && urlPub && urlPin) {
       const cleanCong = formatCanonicalCongregationId(urlCong);
@@ -465,9 +487,13 @@ const AppContent: React.FC = () => {
       const cleanPub = urlPub.trim();
       const cleanPin = urlPin.trim();
 
+      // Scrub sensitive query parameters immediately from browser address bar & history
+      const cleanUrl = window.location.pathname + (window.location.hash || '');
+      window.history.replaceState({}, document.title, cleanUrl);
+
       (async () => {
         let matchingPub = (publishers || []).find(
-          (p) => p.id === cleanPub && p.personalPin && String(p.personalPin).trim() === cleanPin
+          (p) => p.id === cleanPub && verifyPersonalPinMatch(cleanPin, p)
         );
 
         if (!matchingPub && cleanCong) {
@@ -478,9 +504,8 @@ const AppContent: React.FC = () => {
           if (cloudRes?.success && cloudRes.data?.publishers) {
             matchingPub = cloudRes.data.publishers.find(
               (p: any) =>
-                (p.id === cleanPub || String(p.personalPin).trim() === cleanPin) &&
-                p.personalPin &&
-                String(p.personalPin).trim() === cleanPin
+                (p.id === cleanPub || verifyPersonalPinMatch(cleanPin, p)) &&
+                verifyPersonalPinMatch(cleanPin, p)
             );
           }
         }
@@ -492,10 +517,10 @@ const AppContent: React.FC = () => {
           setActiveRole(role);
           setIdentifiedPublisher(matchingPub.id, brotherName);
           setIdentifiedBrother(brotherName);
-          localStorage.setItem('kongre_session_pin_v2', cleanPin);
+          setSecureLocalPin('kongre_session_pin_v2', cleanPin);
           if (cleanCpin) {
-            localStorage.setItem('kongre_registered_cong_pin', cleanCpin);
-            localStorage.setItem('kongre_last_cong_pin', cleanCpin);
+            setSecureLocalPin('kongre_registered_cong_pin', cleanCpin);
+            setSecureLocalPin('kongre_last_cong_pin', cleanCpin);
           }
           localStorage.setItem('kongre_is_registered_congregation', 'true');
           localStorage.setItem('kongre_has_entered_app', 'true');
@@ -505,10 +530,6 @@ const AppContent: React.FC = () => {
 
           setShowWelcomeLanding(false);
           setActiveTab('mi_vista');
-
-          // Clean sensitive query credentials from browser address bar
-          const cleanUrl = window.location.pathname;
-          window.history.replaceState({}, document.title, cleanUrl);
         }
       })();
     }
@@ -547,21 +568,20 @@ const AppContent: React.FC = () => {
     if (!currentPublisherId || user) return;
     if (!publishers || publishers.length === 0) return;
 
-    const storedSessionPin = localStorage.getItem('kongre_session_pin_v2');
-    const savedCoordPin = localStorage.getItem('kongre_coordinator_pin');
+    const storedSessionPin = getSecureLocalPin('kongre_session_pin_v2');
 
     // NUNCA revocar la sesión del Coordinador a través del guardián de publicadores
     if (
       activeRole === 'coordinador' ||
       isCoordinator ||
-      (savedCoordPin && storedSessionPin === savedCoordPin)
+      (storedSessionPin && verifySecureLocalPin('kongre_coordinator_pin', storedSessionPin))
     ) {
       return;
     }
 
     let myPub = publishers.find((p) => p.id === currentPublisherId);
     if (!myPub && storedSessionPin) {
-      myPub = publishers.find((p) => p.personalPin && String(p.personalPin).trim() === storedSessionPin.trim());
+      myPub = publishers.find((p) => verifyPersonalPinMatch(storedSessionPin, p));
       if (myPub) {
         setIdentifiedPublisher(myPub.id, myPub.name);
       }
@@ -571,7 +591,7 @@ const AppContent: React.FC = () => {
     if (!myPub) {
       setIdentifiedPublisher(null);
       setIdentifiedBrother('');
-      localStorage.removeItem('kongre_session_pin_v2');
+      setSecureLocalPin('kongre_session_pin_v2', null);
       localStorage.removeItem('kongre_identified_brother');
       localStorage.removeItem('kongre_current_publisher_id_v2');
       setActiveRole('publico');
@@ -579,13 +599,16 @@ const AppContent: React.FC = () => {
       return;
     }
 
-    const currentServerPin = myPub.personalPin ? String(myPub.personalPin).trim() : '';
+    const hasServerPin = Boolean(
+      (myPub.personalPin && String(myPub.personalPin).trim()) ||
+      (myPub.personalPinHash && String(myPub.personalPinHash).trim())
+    );
 
     // 2. El PIN fue REVOCADO por los ancianos
-    if (!currentServerPin) {
+    if (!hasServerPin) {
       setIdentifiedPublisher(null);
       setIdentifiedBrother('');
-      localStorage.removeItem('kongre_session_pin_v2');
+      setSecureLocalPin('kongre_session_pin_v2', null);
       localStorage.removeItem('kongre_identified_brother');
       localStorage.removeItem('kongre_current_publisher_id_v2');
       setActiveRole('publico');
@@ -593,11 +616,11 @@ const AppContent: React.FC = () => {
       return;
     }
 
-    // 3. El PIN fue CAMBIADO o REGENERADO (el PIN local ya no coincide con el nuevo)
-    if (storedSessionPin && storedSessionPin.trim() !== currentServerPin) {
+    // 3. El PIN fue CAMBIADO o REGENERADO (el PIN local ya no coincide con el nuevo ni con su hash)
+    if (storedSessionPin && !verifyPersonalPinMatch(storedSessionPin, myPub)) {
       setIdentifiedPublisher(null);
       setIdentifiedBrother('');
-      localStorage.removeItem('kongre_session_pin_v2');
+      setSecureLocalPin('kongre_session_pin_v2', null);
       localStorage.removeItem('kongre_identified_brother');
       localStorage.removeItem('kongre_current_publisher_id_v2');
       setActiveRole('publico');
@@ -1030,15 +1053,13 @@ const AppContent: React.FC = () => {
       {/* Offline Connectivity & Cloud Sync Status Banner */}
       <OfflineSyncBanner onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)} />
 
-      {/* Role Switcher & Google Account Permissions Modal (Strictly Elders & Coordinator, or Demo Mode) */}
-      {(canManageRoles || isDemoMode) && (
-        <RoleSwitcherModal
-          isOpen={isRoleModalOpen}
-          onClose={() => closeModalWithHistory('roles', setIsRoleModalOpen)}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-        />
-      )}
+      {/* Role Switcher & Personal PIN Session Modal (Tab-level RBAC enforced inside RoleSwitcherModal) */}
+      <RoleSwitcherModal
+        isOpen={isRoleModalOpen}
+        onClose={() => closeModalWithHistory('roles', setIsRoleModalOpen)}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
 
       {/* Theocratic Session Lock Modal */}
       {!isDemoMode && <SessionLockModal />}

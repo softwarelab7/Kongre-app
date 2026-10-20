@@ -8,6 +8,7 @@ import {
   decryptTheocraticData,
   isCongregationIdString,
 } from '../utils/theocraticSecurity';
+import { insertAuditLog } from '../services/auditLogService';
 import {
   Settings,
   Shield,
@@ -57,15 +58,6 @@ import { SectionHeader } from './SectionHeader';
 import { JoinCongregationModal } from './JoinCongregationModal';
 import { InvitationManagerModal } from './InvitationManagerModal';
 import { SplashCheckbox } from './SplashCheckbox';
-import {
-  getGeminiApiKey,
-  setGeminiApiKey,
-  testGeminiConnection,
-  getGeminiModel,
-  setGeminiModel,
-  DEFAULT_GEMINI_MODEL,
-  isGeminiConfigured,
-} from '../services/geminiService';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 import { Select } from './Select';
 import { IosTimePicker } from './IosTimePicker';
@@ -75,7 +67,6 @@ export type SettingsCategoryTab =
   | 'all'
   | 'general'
   | 'reglas'
-  | 'ia'
   | 'invitaciones'
   | 'seguridad'
   | 'nube'
@@ -137,18 +128,6 @@ export const SETTINGS_TABS_CONFIG: Record<
     bgLight: 'bg-amber-50 dark:bg-amber-950/40',
     bgHover: 'hover:bg-amber-50/[0.3] dark:hover:bg-amber-500/[0.04]',
     pillBg: 'bg-amber-600 text-white',
-  },
-  ia: {
-    label: 'Inteligencia Artificial',
-    icon: Sparkles,
-    desc: 'Asistente teocrático con Google Gemini: extracción de Guía de Actividades, sugerencias y redacción',
-    badge: 'Gemini AI',
-    color: 'text-fuchsia-600 dark:text-fuchsia-400',
-    borderColor: 'border-fuchsia-200/60 dark:border-fuchsia-800/40',
-    hoverBorder: 'hover:border-fuchsia-500/50',
-    bgLight: 'bg-fuchsia-50 dark:bg-fuchsia-950/40',
-    bgHover: 'hover:bg-fuchsia-50/[0.3] dark:hover:bg-fuchsia-500/[0.04]',
-    pillBg: 'bg-fuchsia-600 text-white',
   },
   invitaciones: {
     label: 'Invitaciones y QR',
@@ -315,44 +294,6 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
   const [resetConfirmationText, setResetConfirmationText] = useState('');
   const [isCleaning, setIsCleaning] = useState(false);
 
-  // Gemini AI State
-  const [geminiApiKeyInput, setGeminiApiKeyInput] = useState<string>(() => getGeminiApiKey());
-  const [geminiModelSelect, setGeminiModelSelect] = useState<string>(() => getGeminiModel());
-  const [isTestingGemini, setIsTestingGemini] = useState(false);
-  const [showGeminiKey, setShowGeminiKey] = useState(false);
-  const [geminiStatus, setGeminiStatus] = useState<{
-    type: 'success' | 'error';
-    msg: string;
-  } | null>(null);
-
-  const handleSaveGeminiKey = () => {
-    setGeminiApiKey(geminiApiKeyInput);
-    setGeminiModel(geminiModelSelect);
-    setGeminiStatus({
-      type: 'success',
-      msg: geminiApiKeyInput.trim() ? 'Clave de Gemini guardada correctamente.' : 'Clave de Gemini removida.',
-    });
-  };
-
-  const handleTestGemini = async () => {
-    setIsTestingGemini(true);
-    setGeminiStatus(null);
-    try {
-      const res = await testGeminiConnection(geminiApiKeyInput);
-      setGeminiStatus({
-        type: res.success ? 'success' : 'error',
-        msg: res.message,
-      });
-    } catch (err: any) {
-      setGeminiStatus({
-        type: 'error',
-        msg: err?.message || 'Error probando la conexión con Gemini.',
-      });
-    } finally {
-      setIsTestingGemini(false);
-    }
-  };
-
   const handleUploadToGoogle = async () => {
     setIsSyncingCloud(true);
     setCloudActionStatus(null);
@@ -370,13 +311,6 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
   };
 
   const handleDownloadFromGoogle = async () => {
-    if (
-      !window.confirm(
-        '¿Deseas descargar y reemplazar los datos locales con la copia guardada en tu cuenta de Google?'
-      )
-    ) {
-      return;
-    }
     setIsSyncingCloud(true);
     setCloudActionStatus(null);
     try {
@@ -854,6 +788,13 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
       setConfirmExportPassphrase('');
       setSavedFeedback(true);
       setTimeout(() => setSavedFeedback(false), 2000);
+
+      insertAuditLog({
+        accion: 'EXPORTAR_RESPALDO_CIFRADO',
+        modulo: 'respaldos',
+        hermano_nid: user?.email || 'sistema',
+        detalles: 'Descarga de copia de seguridad cifrada con AES-256-GCM (.enc.json)',
+      }).catch(() => {});
     } catch {
       setEncryptExportError('Error al cifrar el archivo de respaldo.');
     } finally {
@@ -877,6 +818,13 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
         setDecryptPassphrase('');
         setImportStatus('¡Respaldo cifrado descifrado y restaurado con éxito!');
         setTimeout(() => setImportStatus(null), 3500);
+
+        insertAuditLog({
+          accion: 'RESTAURAR_RESPALDO_CIFRADO',
+          modulo: 'respaldos',
+          hermano_nid: user?.email || 'sistema',
+          detalles: 'Restauración exitosa de copia de seguridad cifrada AES-256-GCM',
+        }).catch(() => {});
       } else {
         setDecryptModalError('El archivo descifrado no tiene el formato de congregación esperado.');
       }
@@ -1308,50 +1256,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
               </div>
             </div>
 
-            {/* Tarjeta 8: Inteligencia Artificial Gemini */}
-            <div
-              onClick={() => setActiveTab('ia')}
-              className="bg-white dark:bg-[#0f1623] hover:bg-fuchsia-50/[0.3] dark:hover:bg-fuchsia-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-fuchsia-400/50 dark:hover:border-fuchsia-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="p-3 bg-fuchsia-50 dark:bg-fuchsia-500/10 rounded-2xl text-fuchsia-600 dark:text-fuchsia-400 group-hover:scale-110 transition-transform">
-                    <Sparkles size={22} />
-                  </div>
-                  <span className={`px-2.5 py-1 rounded-xl text-[10px] font-bold border ${
-                    isGeminiConfigured()
-                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200/60 dark:border-emerald-800/40'
-                      : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-200/60 dark:border-amber-800/40'
-                  }`}>
-                    {isGeminiConfigured() ? 'Activo' : 'Por Configurar'}
-                  </span>
-                </div>
-                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-fuchsia-600 dark:group-hover:text-fuchsia-400 transition-colors">
-                  Inteligencia Artificial
-                </h4>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
-                  Asistente inteligente con Google Gemini para importar la Guía de Actividades y redactar avisos.
-                </p>
-
-                <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
-                  <div className="flex justify-between">
-                    <span className="text-zinc-400">Modelo:</span>
-                    <span className="font-semibold text-fuchsia-600 dark:text-fuchsia-400 font-mono text-[11px]">{getGeminiModel()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-zinc-400">Funciones:</span>
-                    <span className="font-semibold">MWB, Asignaciones, Avisos</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-fuchsia-600 dark:text-fuchsia-400 group-hover:translate-x-1 transition-transform">
-                <span>Configurar Gemini AI</span>
-                <ChevronRight size={16} />
-              </div>
-            </div>
-
-            {/* Tarjeta 9: Registro de Versiones y Changelog */}
+            {/* Tarjeta 8: Registro de Versiones y Changelog */}
             <div
               onClick={() => onOpenVersionModal?.()}
               className="bg-white dark:bg-[#0f1623] hover:bg-indigo-50/[0.3] dark:hover:bg-indigo-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-indigo-400/50 dark:hover:border-indigo-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
@@ -2619,180 +2524,6 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                 >
                   Restablecer Todo a Cero
                 </button>
-              </div>
-            </div>
-          )}
-
-          {/* CONTENEDOR 8: INTELIGENCIA ARTIFICIAL GEMINI */}
-          {activeTab === 'ia' && (
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6 animate-fade-in">
-              <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-fuchsia-50 dark:bg-fuchsia-950 flex items-center justify-center text-fuchsia-600 dark:text-fuchsia-400 font-bold">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                      Asistente Teocrático con Google Gemini
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Potencia tu gestión con inteligencia artificial respetando las directrices teocráticas
-                    </p>
-                  </div>
-                </div>
-
-                <span
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                    isGeminiConfigured()
-                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                      : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
-                  }`}
-                >
-                  <span className={`w-2 h-2 rounded-full ${isGeminiConfigured() ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                  {isGeminiConfigured() ? 'API Key Configurada' : 'Sin Configurar'}
-                </span>
-              </div>
-
-              {geminiStatus && (
-                <div
-                  className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between gap-2.5 animate-fade-in ${
-                    geminiStatus.type === 'success'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
-                      : 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    {geminiStatus.type === 'success' ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    ) : (
-                      <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
-                    )}
-                    <span>{geminiStatus.msg}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setGeminiStatus(null)}
-                    className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-
-              {/* Formulario de configuración de API Key */}
-              <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                    <span>Clave de API de Gemini</span>
-                    <a
-                      href="https://aistudio.google.com/app/apikey"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-fuchsia-600 dark:text-fuchsia-400 hover:underline inline-flex items-center gap-1 font-semibold normal-case text-[11px]"
-                    >
-                      <span>Obtener API Key Gratis</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                      <Key className="w-4 h-4" />
-                    </div>
-                    <input
-                      type={showGeminiKey ? 'text' : 'password'}
-                      value={geminiApiKeyInput}
-                      onChange={(e) => setGeminiApiKeyInput(e.target.value)}
-                      placeholder="AIzaSy..."
-                      className="w-full pl-9 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono focus:ring-2 focus:ring-fuchsia-500 focus:outline-hidden"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowGeminiKey((prev) => !prev)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                    >
-                      {showGeminiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Tu clave se guarda de manera segura en tu navegador y nunca se comparte con terceros.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                      Modelo Recomendado
-                    </label>
-                    <select
-                      value={geminiModelSelect}
-                      onChange={(e) => setGeminiModelSelect(e.target.value)}
-                      className="w-full py-2.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:ring-2 focus:ring-fuchsia-500 focus:outline-hidden"
-                    >
-                      <option value="gemini-2.5-flash">Gemini 2.5 Flash (Ultrarrápido y Preciso - Recomendado)</option>
-                      <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-                      <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-                    </select>
-                  </div>
-
-                  <div className="flex items-end gap-2">
-                    <button
-                      type="button"
-                      onClick={handleSaveGeminiKey}
-                      className="flex-1 py-2.5 px-4 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
-                    >
-                      <Save className="w-4 h-4" />
-                      <span>Guardar Configuración</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleTestGemini}
-                      disabled={isTestingGemini || !geminiApiKeyInput.trim()}
-                      className="py-2.5 px-4 rounded-xl border border-fuchsia-200 dark:border-fuchsia-800 hover:bg-fuchsia-50 dark:hover:bg-fuchsia-950/40 text-fuchsia-700 dark:text-fuchsia-300 text-xs font-bold transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
-                    >
-                      {isTestingGemini ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                      <span>Probar Conexión</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tarjetas informativas de funcionalidades disponibles */}
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  Capacidades habilitadas con Gemini AI
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
-                    <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-400 flex items-center justify-center">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                    <h5 className="text-xs font-bold text-slate-900 dark:text-white">Importador MWB</h5>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                      Pega cualquier texto de JW.ORG y Gemini estructurará canciones, tesoros, lecciones y partes en un clic.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
-                    <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-400 flex items-center justify-center">
-                      <Bot className="w-4 h-4" />
-                    </div>
-                    <h5 className="text-xs font-bold text-slate-900 dark:text-white">Asignaciones Sabias</h5>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                      Sugerencias de publicadores basadas en equidad, privilegios teocráticos y lecciones pendientes del folleto.
-                    </p>
-                  </div>
-
-                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60 space-y-1.5">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
-                      <FileKey className="w-4 h-4" />
-                    </div>
-                    <h5 className="text-xs font-bold text-slate-900 dark:text-white">Redactor de Avisos</h5>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                      Redacción con tono teocrático, respetuoso y formal para el Tablero de Anuncios del Salón del Reino.
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
           )}

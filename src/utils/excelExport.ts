@@ -1,5 +1,6 @@
 // src/utils/excelExport.ts
 import { WeekSchedule, Publisher, CongregationSettings } from '../types';
+import { sanitizeCsvFormulaInjection } from './theocraticSecurity';
 
 export function exportScheduleToCsvExcel(
   weeks: WeekSchedule[],
@@ -279,7 +280,7 @@ export function exportScheduleToCsvExcel(
     }
   });
 
-  const escapeCell = (val: string) => `"${(val || '').replace(/"/g, '""')}"`;
+  const escapeCell = (val: string) => `"${sanitizeCsvFormulaInjection(val || '').replace(/"/g, '""')}"`;
 
   const csvContent =
     '\uFEFF' + // UTF-8 BOM so Excel opens accents cleanly!

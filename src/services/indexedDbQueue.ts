@@ -9,6 +9,12 @@
  */
 
 import { CongregationFullData } from './supabaseSyncService';
+import {
+  encryptPinAtRest,
+  decryptPinAtRest,
+  sanitizePublishersForLocalStorage,
+  restorePublishersFromLocalStorage,
+} from '../utils/theocraticSecurity';
 
 export type QueueActionType =
   | 'UPDATE_ATTENDANCE'
@@ -27,9 +33,62 @@ export interface OfflineQueueItem {
   createdAt: number;
   payload?: any;
   snapshotData?: CongregationFullData;
+  encryptedPayload?: string;
+  encryptedSnapshot?: string;
   status: 'pending' | 'syncing' | 'synced' | 'error';
   attempts: number;
   lastError?: string;
+}
+
+/**
+ * Cifra en reposo los campos sensibles (`snapshotData` y `payload`) antes de guardarlos en IndexedDB o localStorage
+ */
+function sealQueueItemForStorage(item: OfflineQueueItem): OfflineQueueItem {
+  const sealed: OfflineQueueItem = { ...item };
+  if (sealed.payload !== undefined) {
+    try {
+      sealed.encryptedPayload = encryptPinAtRest(JSON.stringify(sealed.payload));
+      delete sealed.payload;
+    } catch {}
+  }
+  if (sealed.snapshotData !== undefined) {
+    try {
+      const sanitizedSnapshot: CongregationFullData = {
+        ...sealed.snapshotData,
+        publishers: sanitizePublishersForLocalStorage(sealed.snapshotData.publishers || []),
+      };
+      sealed.encryptedSnapshot = encryptPinAtRest(JSON.stringify(sanitizedSnapshot));
+      delete sealed.snapshotData;
+    } catch {}
+  }
+  return sealed;
+}
+
+/**
+ * Descifra en memoria los campos `encryptedSnapshot` y `encryptedPayload` al leer de IndexedDB o localStorage
+ */
+function unsealQueueItemFromStorage(raw: OfflineQueueItem): OfflineQueueItem {
+  if (!raw || typeof raw !== 'object') return raw;
+  const restored: OfflineQueueItem = { ...raw };
+  if (!restored.payload && restored.encryptedPayload) {
+    try {
+      const dec = decryptPinAtRest(restored.encryptedPayload);
+      if (dec) restored.payload = JSON.parse(dec);
+    } catch {}
+  }
+  if (!restored.snapshotData && restored.encryptedSnapshot) {
+    try {
+      const dec = decryptPinAtRest(restored.encryptedSnapshot);
+      if (dec) {
+        const parsed: CongregationFullData = JSON.parse(dec);
+        if (parsed && Array.isArray(parsed.publishers)) {
+          parsed.publishers = restorePublishersFromLocalStorage(parsed.publishers);
+        }
+        restored.snapshotData = parsed;
+      }
+    } catch {}
+  }
+  return restored;
 }
 
 export interface QueueStats {
@@ -97,7 +156,7 @@ export function openIndexedDb(): Promise<IDBDatabase> {
 }
 
 /**
- * Encola una modificación en IndexedDB
+ * Encola una modificación en IndexedDB (cifrando los datos sensibles en reposo)
  */
 export async function enqueueOfflineOperation(params: {
   congregationId: string;
@@ -119,12 +178,14 @@ export async function enqueueOfflineOperation(params: {
     attempts: 0,
   };
 
+  const sealedForStorage = sealQueueItemForStorage(item);
+
   try {
     const db = await openIndexedDb();
     await new Promise<void>((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, 'readwrite');
       const store = tx.objectStore(STORE_NAME);
-      const req = store.add(item);
+      const req = store.add(sealedForStorage);
       req.onsuccess = () => resolve();
       req.onerror = () => reject(req.error);
     });
@@ -133,10 +194,10 @@ export async function enqueueOfflineOperation(params: {
     return item;
   } catch (err) {
     console.warn('Fallback a almacenamiento secundario por error en IndexedDB:', err);
-    // Respaldo de seguridad en localStorage si IndexedDB estuviera bloqueado por políticas del navegador
+    // Respaldo de seguridad cifrado en localStorage si IndexedDB estuviera bloqueado por políticas del navegador
     try {
       const fallbackKey = `kongre_idb_fallback_${item.id}`;
-      localStorage.setItem(fallbackKey, JSON.stringify(item));
+      localStorage.setItem(fallbackKey, JSON.stringify(sealedForStorage));
       notifyQueueChanged();
     } catch {}
     return item;
@@ -144,7 +205,7 @@ export async function enqueueOfflineOperation(params: {
 }
 
 /**
- * Obtiene todas las operaciones pendientes de sincronización
+ * Obtiene todas las operaciones pendientes de sincronización (descifradas en memoria)
  */
 export async function getPendingOfflineOperations(congregationId?: string): Promise<OfflineQueueItem[]> {
   try {
@@ -156,9 +217,9 @@ export async function getPendingOfflineOperations(congregationId?: string): Prom
       const req = index.getAll();
 
       req.onsuccess = () => {
-        let items: OfflineQueueItem[] = (req.result || []).filter(
-          (i) => i.status === 'pending' || i.status === 'error' || i.status === 'syncing'
-        );
+        let items: OfflineQueueItem[] = (req.result || [])
+          .filter((i) => i.status === 'pending' || i.status === 'error' || i.status === 'syncing')
+          .map(unsealQueueItemFromStorage);
         if (congregationId) {
           const cleanId = String(congregationId).trim().toUpperCase();
           items = items.filter((i) => !i.congregationId || i.congregationId === cleanId);
@@ -175,7 +236,7 @@ export async function getPendingOfflineOperations(congregationId?: string): Prom
         const k = localStorage.key(i);
         if (k && k.startsWith('kongre_idb_fallback_')) {
           const parsed = JSON.parse(localStorage.getItem(k) || '{}');
-          if (parsed && parsed.id) items.push(parsed);
+          if (parsed && parsed.id) items.push(unsealQueueItemFromStorage(parsed));
         }
       }
       return items.sort((a, b) => a.createdAt - b.createdAt);
@@ -186,7 +247,7 @@ export async function getPendingOfflineOperations(congregationId?: string): Prom
 }
 
 /**
- * Obtiene todas las operaciones registradas (pendientes y procesadas)
+ * Obtiene todas las operaciones registradas (pendientes y procesadas, descifradas en memoria)
  */
 export async function getAllOfflineOperations(): Promise<OfflineQueueItem[]> {
   try {
@@ -198,7 +259,7 @@ export async function getAllOfflineOperations(): Promise<OfflineQueueItem[]> {
       const req = index.getAll();
 
       req.onsuccess = () => {
-        const items: OfflineQueueItem[] = req.result || [];
+        const items: OfflineQueueItem[] = (req.result || []).map(unsealQueueItemFromStorage);
         resolve(items.reverse()); // Más recientes primero
       };
       req.onerror = () => reject(req.error);

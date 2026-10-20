@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
+import { insertAuditLog } from '../services/auditLogService';
 import {
   X,
   UserCheck,
@@ -27,17 +28,25 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
   isOpen,
   onClose,
 }) => {
-  const { accountLinkRequests, approveAccountLinkRequest, rejectAccountLinkRequest } = useCongregation();
-  const { user } = useAuth();
+  const { accountLinkRequests, approveAccountLinkRequest, rejectAccountLinkRequest, isDemoMode } = useCongregation();
+  const { user, isAdmin, isCoordinator, activeRole, currentBrotherName } = useAuth();
   const [activeTab, setActiveTab] = useState<'pending' | 'history'>('pending');
   const [rejectionReason, setRejectionReason] = useState<string>('');
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [processingId, setProcessingId] = useState<string | null>(null);
 
-  if (!isOpen) return null;
+  const canManageLinks =
+    isDemoMode ||
+    isAdmin ||
+    isCoordinator ||
+    activeRole === 'coordinador' ||
+    activeRole === 'secretario' ||
+    activeRole === 'anciano';
 
-  const reviewerEmail = user?.email || 'anciano_autorizado@kongre.org';
+  if (!isOpen || !canManageLinks) return null;
+
+  const reviewerEmail = user?.email || currentBrotherName || 'anciano_autorizado@kongre.org';
 
   const pendingRequests = accountLinkRequests.filter((r) => r.status === 'pending');
   const historyRequests = accountLinkRequests.filter((r) => r.status !== 'pending');
@@ -54,7 +63,15 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
   const handleApprove = async (id: string) => {
     setProcessingId(id);
     try {
+      const target = accountLinkRequests.find((r) => r.id === id);
       await approveAccountLinkRequest(id, reviewerEmail);
+      insertAuditLog({
+        accion: 'APROBAR_VINCULACION_GOOGLE',
+        hermano_nid: reviewerEmail,
+        hermano_nombre: currentBrotherName || reviewerEmail,
+        modulo: 'auth',
+        detalles: `Vinculación aprobada para ${target?.brotherName || id} (${target?.email || ''}, rol: ${target?.role || ''}).`,
+      }).catch(() => {});
     } finally {
       setProcessingId(null);
     }
@@ -64,11 +81,16 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
     if (!rejectingId) return;
     setProcessingId(rejectingId);
     try {
-      await rejectAccountLinkRequest(
-        rejectingId,
-        reviewerEmail,
-        rejectionReason.trim() || 'No aprobado por el cuerpo de ancianos'
-      );
+      const target = accountLinkRequests.find((r) => r.id === rejectingId);
+      const reason = rejectionReason.trim() || 'No aprobado por el cuerpo de ancianos';
+      await rejectAccountLinkRequest(rejectingId, reviewerEmail, reason);
+      insertAuditLog({
+        accion: 'RECHAZAR_VINCULACION_GOOGLE',
+        hermano_nid: reviewerEmail,
+        hermano_nombre: currentBrotherName || reviewerEmail,
+        modulo: 'auth',
+        detalles: `Vinculación rechazada para ${target?.brotherName || rejectingId} (${target?.email || ''}). Motivo: ${reason}`,
+      }).catch(() => {});
       setRejectingId(null);
       setRejectionReason('');
     } finally {

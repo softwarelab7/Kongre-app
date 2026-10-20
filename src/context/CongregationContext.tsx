@@ -99,7 +99,13 @@ import {
   sanitizePinRecordsForLocalStorage,
   getSecureLocalPin,
   setSecureLocalPin,
+  encryptPinAtRest,
+  decryptPinAtRest,
+  sanitizeImportedBackupObject,
+  computeBackupIntegritySeal,
+  verifyBackupIntegritySeal,
 } from '../utils/theocraticSecurity';
+import { insertAuditLog } from '../services/auditLogService';
 import {
   normalizePersonName,
   areNamesEquivalent,
@@ -1510,16 +1516,16 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       const pinMaestro =
         (typeof window !== 'undefined'
-          ? localStorage.getItem('kongre_session_pin_v2') ||
-            localStorage.getItem('kongre_coordinator_pin') ||
-            localStorage.getItem('kongre_registered_cong_pin') ||
-            localStorage.getItem('kongre_last_cong_pin')
+          ? getSecureLocalPin('kongre_session_pin_v2') ||
+            getSecureLocalPin('kongre_coordinator_pin') ||
+            getSecureLocalPin('kongre_registered_cong_pin') ||
+            getSecureLocalPin('kongre_last_cong_pin')
           : '') || '';
 
       const pinCongregacion =
         (typeof window !== 'undefined'
-          ? localStorage.getItem('kongre_registered_cong_pin') ||
-            localStorage.getItem('kongre_last_cong_pin') ||
+          ? getSecureLocalPin('kongre_registered_cong_pin') ||
+            getSecureLocalPin('kongre_last_cong_pin') ||
             pinMaestro
           : '') || pinMaestro;
 
@@ -1558,10 +1564,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             async () => {
               if (isCancelled) return;
               const currentPin =
-                localStorage.getItem('kongre_session_pin_v2') ||
-                localStorage.getItem('kongre_coordinator_pin') ||
-                localStorage.getItem('kongre_registered_cong_pin') ||
-                localStorage.getItem('kongre_last_cong_pin') ||
+                getSecureLocalPin('kongre_session_pin_v2') ||
+                getSecureLocalPin('kongre_coordinator_pin') ||
+                getSecureLocalPin('kongre_registered_cong_pin') ||
+                getSecureLocalPin('kongre_last_cong_pin') ||
                 '';
               if (currentPin) {
                 const refreshed = await supabaseSyncService.fetchAndDecryptCongregation(syncCongId, currentPin);
@@ -4742,11 +4748,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const exportBackupJSON = () => {
-    const backupData = {
+    const sanitizedPubs = sanitizePublishersForLocalStorage(publishers);
+    const baseData: Record<string, any> = {
       version: '3.0',
       exportedAt: new Date().toISOString(),
       congregationName: settings.congregationName,
-      publishers,
+      publishers: sanitizedPubs,
       weeks,
       preachingGroups,
       customDuties,
@@ -4768,18 +4775,31 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       groupDistributions,
       inventoryRecords,
     };
-    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+    baseData.integritySeal = computeBackupIntegritySeal(baseData);
+
+    const blob = new Blob([JSON.stringify(baseData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = `Respaldo_Kongre_${settings.congregationName.replace(/\s+/g, '_')}_${formatDateISO(new Date())}.json`;
     link.click();
     URL.revokeObjectURL(url);
+
+    insertAuditLog({
+      accion: 'EXPORTAR_RESPALDO',
+      modulo: 'respaldos',
+      hermano_nid: 'sistema',
+      detalles: `Descarga de respaldo JSON estándar firmado (${sanitizedPubs.length} publicadores, ${weeks.length} semanas)`,
+    }).catch(() => {});
   };
 
   const getBackupJSON = (): string => {
-    const backupData = {
-      publishers,
+    const sanitizedPubs = sanitizePublishersForLocalStorage(publishers);
+    const baseData: Record<string, any> = {
+      version: '3.0',
+      exportedAt: new Date().toISOString(),
+      congregationName: settings.congregationName,
+      publishers: sanitizedPubs,
       weeks,
       preachingGroups,
       customDuties,
@@ -4801,16 +4821,55 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       groupDistributions,
       inventoryRecords,
     };
-    return JSON.stringify(backupData, null, 2);
+    baseData.integritySeal = computeBackupIntegritySeal(baseData);
+    return JSON.stringify(baseData, null, 2);
   };
 
   const importBackupJSON = (jsonString: string): boolean => {
     try {
-      const data = JSON.parse(jsonString);
-      if (!data.publishers || !data.weeks) {
+      const rawParsed = JSON.parse(jsonString);
+      if (!rawParsed || typeof rawParsed !== 'object') {
         throw new Error('Formato de archivo inválido.');
       }
-      if (Array.isArray(data.publishers)) setPublishers(data.publishers);
+
+      // 1. Sanitizar contra Prototype Pollution (__proto__, constructor, prototype) y vectores XSS
+      const data = sanitizeImportedBackupObject(rawParsed);
+      if (!Array.isArray(data.publishers) || !Array.isArray(data.weeks)) {
+        throw new Error('Formato de archivo inválido.');
+      }
+
+      // 2. Verificar sello criptográfico de integridad SHA-256 (si el archivo está firmado)
+      const sealCheck = verifyBackupIntegritySeal(data);
+      if (sealCheck.isSigned && !sealCheck.valid) {
+        insertAuditLog({
+          accion: 'IMPORTAR_RESPALDO_RECHAZADO',
+          modulo: 'seguridad',
+          hermano_nid: 'sistema',
+          detalles: 'Se bloqueó la restauración de un respaldo JSON porque su sello criptográfico SHA-256 fue alterado.',
+        }).catch(() => {});
+        throw new Error('El sello de integridad del archivo de respaldo no coincide o fue manipulado.');
+      }
+
+      // 3. Restaurar y asegurar hash SHA-256 en los PINs de los publicadores importados
+      const restoredPubs: Publisher[] = restorePublishersFromLocalStorage(data.publishers).map((p: any) => {
+        const rawPin = p?.personalPin ? String(p.personalPin).trim() : '';
+        const pinHash = p?.personalPinHash || (rawPin ? hashPersonalPin(rawPin) : undefined);
+        const encryptedPin = p?.encryptedPin || (rawPin ? encryptPinAtRest(rawPin) : undefined);
+        return {
+          ...p,
+          ...(pinHash ? { personalPinHash: pinHash } : {}),
+          ...(encryptedPin ? { encryptedPin } : {}),
+        };
+      });
+
+      setPublishers(restoredPubs);
+      try {
+        localStorage.setItem(
+          `${LOCAL_STORAGE_KEY}_publishers`,
+          JSON.stringify(sanitizePublishersForLocalStorage(restoredPubs))
+        );
+      } catch {}
+
       if (Array.isArray(data.weeks)) setWeeks(unifyWeeksDuties(data.weeks));
       if (Array.isArray(data.preachingGroups)) setPreachingGroups(data.preachingGroups);
       if (Array.isArray(data.customDuties)) setCustomDuties(unifyAudioVideoDuties(data.customDuties));
@@ -4832,8 +4891,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if (Array.isArray(data.specialOrders)) setSpecialOrders(data.specialOrders);
       if (Array.isArray(data.groupDistributions)) setGroupDistributions(data.groupDistributions);
       if (Array.isArray(data.inventoryRecords)) setInventoryRecords(data.inventoryRecords);
+
       saveToFirestore(
-        data.publishers,
+        restoredPubs,
         data.weeks,
         data.preachingGroups,
         data.customDuties,
@@ -4855,6 +4915,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         data.groupDistributions,
         data.inventoryRecords
       );
+
+      insertAuditLog({
+        accion: 'IMPORTAR_RESPALDO',
+        modulo: 'respaldos',
+        hermano_nid: 'sistema',
+        detalles: `Restauración verificada de copia de seguridad (${restoredPubs.length} publicadores, ${data.weeks.length} semanas, sello=${sealCheck.isSigned ? 'verificado' : 'legado'})`,
+      }).catch(() => {});
+
       return true;
     } catch (err) {
       console.error('Error importing backup JSON:', err);
@@ -5118,12 +5186,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     ];
     keysToClear.forEach((k) => localStorage.removeItem(k));
 
-    // Eliminar el registro de la congregación de Supabase
-    const targetCongId = settings.congregationNumber || settings.congregationId;
-    if (targetCongId) {
-      const cleanId = targetCongId.trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-      supabase.from('sync_queue').delete().eq('id_congregacion', cleanId).then(() => {}, () => {});
-    }
+    // NOTA DE SEGURIDAD: Restablecer los datos locales del dispositivo jamás debe borrar
+    // automáticamente el registro de la congregación en Supabase (sync_queue), para evitar
+    // que un publicador al cerrar sesión o limpiar su teléfono destruya los datos en la nube.
 
     // Limpieza total del almacenamiento local del navegador
     try {
@@ -5133,7 +5198,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   /**
-   * Elimina completamente todas las congregaciones registradas de Supabase y del almacenamiento local.
+   * Elimina completamente todas las congregaciones registradas de Supabase (solo si se verifica
+   * criptográficamente el PIN maestro/congregación) y del almacenamiento local.
    */
   const deleteAllRegisteredCongregations = async (): Promise<{ success: boolean; message: string }> => {
     try {
@@ -5164,13 +5230,24 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         } catch {}
       }
 
-      // Eliminar registros de Supabase
-      for (const rawId of Array.from(candidateIds)) {
-        if (!rawId || rawId.trim().length === 0) continue;
-        const cleanId = rawId.trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-        try {
-          await supabase.from('sync_queue').delete().eq('id_congregacion', cleanId);
-        } catch {}
+      const activeMasterPin =
+        getSecureLocalPin('kongre_coordinator_pin') ||
+        getSecureLocalPin('kongre_session_pin_v2') ||
+        getSecureLocalPin('kongre_registered_cong_pin') ||
+        '';
+
+      // Eliminar registros de Supabase únicamente si este dispositivo posee el PIN capaz de descifrar la congregación
+      if (activeMasterPin) {
+        for (const rawId of Array.from(candidateIds)) {
+          if (!rawId || rawId.trim().length === 0) continue;
+          const cleanId = rawId.trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+          try {
+            const verifyCloud = await supabaseSyncService.fetchAndDecryptCongregation(cleanId, activeMasterPin);
+            if (verifyCloud.success) {
+              await supabase.from('sync_queue').delete().eq('id_congregacion', cleanId);
+            }
+          } catch {}
+        }
       }
 
       // Resetear estado reactivo completo en memoria
@@ -5264,7 +5341,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       id: `req_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       email: cleanEmail,
       brotherName: brotherName.trim(),
-      personalPin: personalPin.trim(),
+      personalPin: encryptPinAtRest(personalPin.trim()),
       role,
       congregationId,
       requestedAt: new Date().toISOString(),
@@ -5328,6 +5405,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const { email, brotherName, role, personalPin } = approvedReq;
     const cleanEmail = email.toLowerCase().trim();
+    const restoredPin = personalPin?.startsWith('kgr_v1:')
+      ? decryptPinAtRest(personalPin)
+      : personalPin;
 
     // 1. Update publisher profile email if publisher exists by name
     let updatedPubs = [...publishers];
@@ -5340,7 +5420,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     // 2. Assign role to email in AuthContext
-    assignRoleToEmail(cleanEmail, role as TheocraticRole, brotherName, personalPin);
+    assignRoleToEmail(cleanEmail, role as TheocraticRole, brotherName, restoredPin);
 
     // 3. Save to Firestore
     {

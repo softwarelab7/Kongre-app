@@ -17,11 +17,7 @@ import {
   Brush,
   FileText,
   X,
-  Send,
-  Loader2,
-  Bot,
 } from 'lucide-react';
-import { generateNoticeWithGemini, isGeminiConfigured } from '../services/geminiService';
 import { SplashCheckbox } from './SplashCheckbox';
 
 export const TableroAnunciosTab: React.FC = () => {
@@ -50,49 +46,6 @@ export const TableroAnunciosTab: React.FC = () => {
     pinned: false,
     author: 'Cuerpo de Ancianos',
   });
-
-  // AI draft state
-  const [showAiDraftBox, setShowAiDraftBox] = useState(false);
-  const [aiPromptTopic, setAiPromptTopic] = useState('');
-  const [isGeneratingAiDraft, setIsGeneratingAiDraft] = useState(false);
-  const [aiDraftError, setAiDraftError] = useState<string | null>(null);
-
-  const handleGenerateNoticeWithAi = async () => {
-    if (!aiPromptTopic.trim()) {
-      setAiDraftError('Por favor describe brevemente qué deseas anunciar.');
-      return;
-    }
-    setIsGeneratingAiDraft(true);
-    setAiDraftError(null);
-    try {
-      const categoryMap: Record<string, 'general' | 'limpieza' | 'mantenimiento' | 'visita' | 'asamblea' | 'predicacion'> = {
-        anuncio: 'general',
-        limpieza: 'limpieza',
-        circuito: 'visita',
-        asamblea: 'asamblea',
-        campana: 'predicacion',
-        carta: 'general',
-      };
-      const cat = categoryMap[formData.category] || 'general';
-      const result = await generateNoticeWithGemini(
-        aiPromptTopic.trim(),
-        cat,
-        settings.congregationName || undefined
-      );
-
-      setFormData((prev) => ({
-        ...prev,
-        title: result.title || prev.title,
-        content: result.content || prev.content,
-      }));
-      setShowAiDraftBox(false);
-      setAiPromptTopic('');
-    } catch (err: any) {
-      setAiDraftError(err?.message || 'Error al generar el borrador con Gemini.');
-    } finally {
-      setIsGeneratingAiDraft(false);
-    }
-  };
 
   const filteredNotices = notices.filter((n) => {
     if (selectedCategory !== 'todos' && n.category !== selectedCategory) return false;
@@ -365,14 +318,6 @@ export const TableroAnunciosTab: React.FC = () => {
               </h3>
               <div className="flex items-center gap-2">
                 <button
-                  type="button"
-                  onClick={() => setShowAiDraftBox((prev) => !prev)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-linear-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-700 hover:to-indigo-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-95"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Redactar con IA</span>
-                </button>
-                <button
                   onClick={() => setIsModalOpen(false)}
                   className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg"
                 >
@@ -380,54 +325,6 @@ export const TableroAnunciosTab: React.FC = () => {
                 </button>
               </div>
             </div>
-
-            {/* AI Assistant Drawer */}
-            {showAiDraftBox && (
-              <div className="p-3.5 rounded-2xl bg-fuchsia-50/80 dark:bg-fuchsia-950/40 border border-fuchsia-200 dark:border-fuchsia-800 space-y-2 animate-fade-in text-xs">
-                <div className="flex items-center justify-between font-bold text-fuchsia-900 dark:text-fuchsia-200">
-                  <div className="flex items-center gap-1.5">
-                    <Bot className="w-4 h-4 text-fuchsia-600" />
-                    <span>Asistente de Redacción Teocrática</span>
-                  </div>
-                  <span className="text-[10px] font-semibold text-fuchsia-700 dark:text-fuchsia-300">
-                    Google Gemini
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-600 dark:text-slate-300">
-                  Escribe en pocas palabras la idea o datos del aviso y Gemini redactará un comunicado formal, cálido y edificante:
-                </p>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={aiPromptTopic}
-                    onChange={(e) => setAiPromptTopic(e.target.value)}
-                    placeholder="Ej: Limpieza general este sábado 8 AM con refrigerio antes de la visita del SC"
-                    className="flex-1 p-2 rounded-xl border border-fuchsia-200 bg-white text-slate-900 text-xs focus:ring-2 focus:ring-fuchsia-500 focus:outline-hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleGenerateNoticeWithAi}
-                    disabled={isGeneratingAiDraft || !aiPromptTopic.trim()}
-                    className="px-3.5 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold text-xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-xs"
-                  >
-                    {isGeneratingAiDraft ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Redactando...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>Generar</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-                {aiDraftError && (
-                  <p className="text-[11px] text-rose-600 font-semibold">{aiDraftError}</p>
-                )}
-              </div>
-            )}
 
             <form onSubmit={handleSave} className="space-y-3.5">
               <div>

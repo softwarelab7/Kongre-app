@@ -1,8 +1,10 @@
 // src/components/AuditLogModal.tsx
 import React, { useState, useEffect } from 'react';
-import { Shield, Clock, Filter, Trash2, X, RefreshCw, UserCheck, AlertCircle } from 'lucide-react';
-import { getAuditLog, pruneAuditLog, clearAuditLog } from '../services/auditLogService';
+import { Shield, Clock, Filter, Trash2, X, RefreshCw, UserCheck, AlertCircle, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { getAuditLog, pruneAuditLog, clearAuditLog, verifyAuditLogIntegrity } from '../services/auditLogService';
 import { AuditLogEntry } from '../utils/rbac';
+import { useAuth } from '../context/AuthContext';
+import { useCongregation } from '../context/CongregationContext';
 
 interface AuditLogModalProps {
   isOpen: boolean;
@@ -10,16 +12,38 @@ interface AuditLogModalProps {
 }
 
 export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose }) => {
+  const { effectiveRoleInfo, isAdmin, isCoordinator, activeRole } = useAuth();
+  const { isDemoMode } = useCongregation();
+  const canViewLogs =
+    isDemoMode ||
+    isAdmin ||
+    isCoordinator ||
+    effectiveRoleInfo.canViewAuditLog ||
+    activeRole === 'coordinador' ||
+    activeRole === 'secretario' ||
+    activeRole === 'anciano';
+  const canClearOrPruneLogs = isDemoMode || isAdmin || isCoordinator || activeRole === 'coordinador';
+
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedModule, setSelectedModule] = useState<string>('all');
   const [loading, setLoading] = useState(false);
+  const [integrityStatus, setIntegrityStatus] = useState<{ valid: boolean; tamperedCount: number }>({
+    valid: true,
+    tamperedCount: 0,
+  });
+  const [confirmAction, setConfirmAction] = useState<'prune' | 'clear' | null>(null);
+  const [statusBanner, setStatusBanner] = useState<string | null>(null);
 
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const data = await getAuditLog(300);
+      const [data, integrity] = await Promise.all([
+        getAuditLog(300),
+        verifyAuditLogIntegrity(),
+      ]);
       setLogs(data);
+      setIntegrityStatus({ valid: integrity.valid, tamperedCount: integrity.tamperedCount });
     } finally {
       setLoading(false);
     }
@@ -28,6 +52,8 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
   useEffect(() => {
     if (isOpen) {
       fetchLogs();
+      setConfirmAction(null);
+      setStatusBanner(null);
     }
   }, [isOpen]);
 
@@ -39,21 +65,24 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
     return () => window.removeEventListener('kongre_audit_log_updated', handleUpdate);
   }, []);
 
-  if (!isOpen) return null;
+  if (!isOpen || !canViewLogs) return null;
 
   const handlePrune = async () => {
-    if (confirm('¿Deseas purgar registros de auditoría anteriores a 30 días?')) {
-      const count = await pruneAuditLog(30);
-      alert(`Se eliminaron ${count} registros antiguos.`);
-      fetchLogs();
-    }
+    if (!canClearOrPruneLogs) return;
+    const count = await pruneAuditLog(30);
+    setConfirmAction(null);
+    setStatusBanner(`Se purgaron ${count} registros anteriores a 30 días y se recertificó la cadena SHA-256.`);
+    setTimeout(() => setStatusBanner(null), 4000);
+    fetchLogs();
   };
 
   const handleClear = async () => {
-    if (confirm('¿Estás seguro de que deseas vaciar todo el registro de auditoría? Esta acción no se puede deshacer.')) {
-      await clearAuditLog();
-      fetchLogs();
-    }
+    if (!canClearOrPruneLogs) return;
+    await clearAuditLog();
+    setConfirmAction(null);
+    setStatusBanner('El registro de auditoría ha sido reiniciado.');
+    setTimeout(() => setStatusBanner(null), 4000);
+    fetchLogs();
   };
 
   const modules = Array.from(new Set(logs.map((l) => l.modulo).filter(Boolean)));
@@ -99,16 +128,27 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
               <Shield className="w-6 h-6" />
             </div>
             <div>
-              <div className="flex items-center space-x-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                   Registro de Auditoría Teocrática
                 </h3>
                 <span className="px-2 py-0.5 text-xs font-semibold bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-full">
                   {logs.length} eventos
                 </span>
+                {integrityStatus.valid ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Cadena SHA-256 Íntegra</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 rounded-full border border-rose-200 dark:border-rose-800">
+                    <ShieldAlert className="w-3.5 h-3.5" />
+                    <span>Alteración detectada ({integrityStatus.tamperedCount})</span>
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Historial de accesos, inicios de sesión y modificaciones de la congregación
+                Historial encadenado criptográficamente de accesos, inicios de sesión y modificaciones
               </p>
             </div>
           </div>
@@ -156,24 +196,64 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
               ))}
             </select>
 
-            <button
-              onClick={handlePrune}
-              title="Purgar registros mayores a 30 días"
-              className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-colors flex items-center space-x-1"
-            >
-              <Clock className="w-3.5 h-3.5" />
-              <span>Purgar &gt; 30d</span>
-            </button>
+            {confirmAction === 'prune' ? (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={handlePrune}
+                  className="px-2.5 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
+                >
+                  Confirmar purga
+                </button>
+                <button
+                  onClick={() => setConfirmAction(null)}
+                  className="px-2 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmAction('prune')}
+                title="Purgar registros mayores a 30 días"
+                className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-colors flex items-center space-x-1"
+              >
+                <Clock className="w-3.5 h-3.5" />
+                <span>Purgar &gt; 30d</span>
+              </button>
+            )}
 
-            <button
-              onClick={handleClear}
-              title="Limpiar todo el registro"
-              className="px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors flex items-center space-x-1"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
+            {confirmAction === 'clear' ? (
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={handleClear}
+                  className="px-2.5 py-1.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 rounded-lg transition-colors"
+                >
+                  Confirmar vaciado
+                </button>
+                <button
+                  onClick={() => setConfirmAction(null)}
+                  className="px-2 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400"
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmAction('clear')}
+                title="Limpiar todo el registro"
+                className="px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors flex items-center space-x-1"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
+
+        {statusBanner && (
+          <div className="px-6 py-2 bg-indigo-50 dark:bg-indigo-950/50 border-b border-indigo-100 dark:border-indigo-900 text-xs font-medium text-indigo-700 dark:text-indigo-300">
+            {statusBanner}
+          </div>
+        )}
 
         {/* List Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-2.5">

@@ -506,50 +506,85 @@ export function evaluatePinStrength(pin: string): PinStrengthResult {
   }
 }
 
-// Anti-brute-force rate limiting helpers
+// Anti-brute-force rate limiting helpers (persistidos en localStorage + sessionStorage para impedir evasión cerrando pestañas)
 const LOCKOUT_KEY = 'kongre_pin_lockout_until';
 const FAILED_COUNT_KEY = 'kongre_pin_failed_count';
+const LAST_FAILED_AT_KEY = 'kongre_pin_last_failed_at';
 const MAX_ATTEMPTS_BEFORE_COOLDOWN = 5;
 const COOLDOWN_SECONDS = 30;
+const ATTEMPT_WINDOW_MS = 15 * 60 * 1000; // 15 minutos
 
 export function getPinLockoutRemainingSeconds(): number {
   if (typeof window === 'undefined') return 0;
-  const lockoutUntil = parseInt(sessionStorage.getItem(LOCKOUT_KEY) || '0', 10);
-  const now = Date.now();
-  if (lockoutUntil > now) {
-    return Math.ceil((lockoutUntil - now) / 1000);
-  }
+  try {
+    const rawLocal = localStorage.getItem(LOCKOUT_KEY);
+    const rawSession = sessionStorage.getItem(LOCKOUT_KEY);
+    const lockoutUntil = Math.max(
+      parseInt(rawLocal || '0', 10) || 0,
+      parseInt(rawSession || '0', 10) || 0
+    );
+    const now = Date.now();
+    if (lockoutUntil > now) {
+      return Math.ceil((lockoutUntil - now) / 1000);
+    }
+  } catch {}
   return 0;
 }
 
 export function recordFailedPinAttempt(): { isLockedOut: boolean; remainingSeconds: number; attempts: number } {
   if (typeof window === 'undefined') return { isLockedOut: false, remainingSeconds: 0, attempts: 1 };
-  const currentAttempts = parseInt(sessionStorage.getItem(FAILED_COUNT_KEY) || '0', 10) + 1;
-  sessionStorage.setItem(FAILED_COUNT_KEY, currentAttempts.toString());
+  try {
+    const now = Date.now();
+    const lastFailedAt = parseInt(localStorage.getItem(LAST_FAILED_AT_KEY) || sessionStorage.getItem(LAST_FAILED_AT_KEY) || '0', 10) || 0;
+    const prevCountRaw = Math.max(
+      parseInt(localStorage.getItem(FAILED_COUNT_KEY) || '0', 10) || 0,
+      parseInt(sessionStorage.getItem(FAILED_COUNT_KEY) || '0', 10) || 0
+    );
 
-  if (currentAttempts >= MAX_ATTEMPTS_BEFORE_COOLDOWN) {
-    const cooldownMultiplier = Math.floor(currentAttempts / MAX_ATTEMPTS_BEFORE_COOLDOWN);
-    const lockDuration = COOLDOWN_SECONDS * cooldownMultiplier * 1000;
-    const lockoutUntil = Date.now() + lockDuration;
-    sessionStorage.setItem(LOCKOUT_KEY, lockoutUntil.toString());
+    // Si pasaron más de 15 minutos desde el último fallo, reiniciar contador base
+    const baseCount = lastFailedAt > 0 && now - lastFailedAt > ATTEMPT_WINDOW_MS ? 0 : prevCountRaw;
+    const currentAttempts = baseCount + 1;
+
+    localStorage.setItem(FAILED_COUNT_KEY, currentAttempts.toString());
+    localStorage.setItem(LAST_FAILED_AT_KEY, now.toString());
+    sessionStorage.setItem(FAILED_COUNT_KEY, currentAttempts.toString());
+    sessionStorage.setItem(LAST_FAILED_AT_KEY, now.toString());
+
+    if (currentAttempts >= MAX_ATTEMPTS_BEFORE_COOLDOWN) {
+      const tier = Math.floor(currentAttempts / MAX_ATTEMPTS_BEFORE_COOLDOWN);
+      // Backoff exponencial: 30s (5 intentos), 60s (10 intentos), 120s (15 intentos), máx 300s
+      const lockSeconds = Math.min(COOLDOWN_SECONDS * Math.pow(2, Math.max(0, tier - 1)), 300);
+      const lockDuration = lockSeconds * 1000;
+      const lockoutUntil = now + lockDuration;
+      localStorage.setItem(LOCKOUT_KEY, lockoutUntil.toString());
+      sessionStorage.setItem(LOCKOUT_KEY, lockoutUntil.toString());
+      return {
+        isLockedOut: true,
+        remainingSeconds: lockSeconds,
+        attempts: currentAttempts,
+      };
+    }
+
     return {
-      isLockedOut: true,
-      remainingSeconds: Math.ceil(lockDuration / 1000),
-      attempts: currentAttempts
+      isLockedOut: false,
+      remainingSeconds: 0,
+      attempts: currentAttempts,
     };
+  } catch {
+    return { isLockedOut: false, remainingSeconds: 0, attempts: 1 };
   }
-
-  return {
-    isLockedOut: false,
-    remainingSeconds: 0,
-    attempts: currentAttempts
-  };
 }
 
 export function resetFailedPinAttempts(): void {
   if (typeof window === 'undefined') return;
-  sessionStorage.removeItem(LOCKOUT_KEY);
-  sessionStorage.removeItem(FAILED_COUNT_KEY);
+  try {
+    localStorage.removeItem(LOCKOUT_KEY);
+    localStorage.removeItem(FAILED_COUNT_KEY);
+    localStorage.removeItem(LAST_FAILED_AT_KEY);
+    sessionStorage.removeItem(LOCKOUT_KEY);
+    sessionStorage.removeItem(FAILED_COUNT_KEY);
+    sessionStorage.removeItem(LAST_FAILED_AT_KEY);
+  } catch {}
 }
 
 /**
@@ -1126,4 +1161,379 @@ export function verifyRoleSessionSignature(role: string, roles?: string[]): bool
   }
 }
 
+/**
+ * Genera un código de invitación teocrática con entropía criptográfica real (CSPRNG)
+ * usando alfabeto Crockford Base32 (sin 0, O, 1, I) de 6 caracteres (más de mil millones de combinaciones).
+ * Ejemplo: KONG-SEC-8X4M9P
+ */
+export function generateSecureInvitationCode(rolePrefix: string = 'KONG'): string {
+  const CHARSET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const randomBytes = new Uint8Array(6);
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+    window.crypto.getRandomValues(randomBytes);
+  } else {
+    for (let i = 0; i < 6; i++) {
+      randomBytes[i] = Math.floor(Math.random() * 256);
+    }
+  }
+  const token = Array.from(randomBytes)
+    .map((b) => CHARSET[b % CHARSET.length])
+    .join('');
+  return `KONG-${rolePrefix.toUpperCase()}-${token}`;
+}
+
+export interface SecureShareTokenPayload {
+  cong?: string;
+  cpin?: string;
+  pub?: string;
+  pin?: string;
+  invite?: string;
+  exp?: number;
+}
+
+const SHARE_TOKEN_CIPHER_KEY = 'kongre_share_link_qr_cipher_v1_2026';
+
+/**
+ * Codifica y cifra las credenciales de un enlace directo o código QR en un único parámetro `?tk=kgr_tk1_...`
+ * evitando exponer `cpin` o `pin` en texto plano en la barra de direcciones, historial del navegador o logs.
+ */
+export function encodeSecureShareToken(payload: SecureShareTokenPayload): string {
+  try {
+    const compact: Record<string, any> = {};
+    if (payload.cong) compact.c = formatCanonicalCongregationId(payload.cong);
+    if (payload.cpin) compact.k = payload.cpin.trim();
+    if (payload.pub) compact.u = payload.pub.trim();
+    if (payload.pin) compact.p = payload.pin.trim();
+    if (payload.invite) compact.i = payload.invite.trim();
+    if (payload.exp) compact.e = payload.exp;
+
+    const json = JSON.stringify(compact);
+    const plainBytes = new TextEncoder().encode(json);
+    const nonceBytes = new Uint8Array(4);
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+      window.crypto.getRandomValues(nonceBytes);
+    } else {
+      for (let i = 0; i < 4; i++) nonceBytes[i] = Math.floor(Math.random() * 256);
+    }
+    const nonceHex = bufferToHex(nonceBytes.buffer);
+    const streamHash = sha256HexSync(`${SHARE_TOKEN_CIPHER_KEY}:${nonceHex}:stream`);
+    const cipherBytes = new Uint8Array(plainBytes.length);
+    for (let i = 0; i < plainBytes.length; i++) {
+      const kByte = parseInt(streamHash.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
+      cipherBytes[i] = plainBytes[i] ^ kByte;
+    }
+    const cipherHex = bufferToHex(cipherBytes.buffer);
+    const macTag = sha256HexSync(`${SHARE_TOKEN_CIPHER_KEY}:${nonceHex}:${cipherHex}:mac`).slice(0, 8);
+    return `kgr_tk1_${nonceHex}${macTag}${cipherHex}`;
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Verifica la autenticidad y descifra un token `?tk=kgr_tk1_...` procedente de un enlace directo o código QR.
+ */
+export function decodeSecureShareToken(token?: string | null): SecureShareTokenPayload | null {
+  if (!token) return null;
+  const clean = token.trim();
+  if (!clean.startsWith('kgr_tk1_')) return null;
+  try {
+    const body = clean.slice('kgr_tk1_'.length);
+    if (body.length < 18) return null;
+    const nonceHex = body.slice(0, 8);
+    const macTag = body.slice(8, 16).toLowerCase();
+    const cipherHex = body.slice(16);
+    if (cipherHex.length % 2 !== 0) return null;
+
+    const expectedMac = sha256HexSync(`${SHARE_TOKEN_CIPHER_KEY}:${nonceHex}:${cipherHex}:mac`).slice(0, 8).toLowerCase();
+    if (macTag !== expectedMac) return null;
+
+    const cipherBytes = hexToBuffer(cipherHex);
+    const streamHash = sha256HexSync(`${SHARE_TOKEN_CIPHER_KEY}:${nonceHex}:stream`);
+    const plainBytes = new Uint8Array(cipherBytes.length);
+    for (let i = 0; i < cipherBytes.length; i++) {
+      const kByte = parseInt(streamHash.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
+      plainBytes[i] = cipherBytes[i] ^ kByte;
+    }
+    const decodedStr = new TextDecoder().decode(plainBytes);
+    const parsed = JSON.parse(decodedStr);
+    if (!parsed || typeof parsed !== 'object') return null;
+
+    if (parsed.e && typeof parsed.e === 'number' && Date.now() > parsed.e) {
+      return null;
+    }
+
+    return {
+      cong: parsed.c ? formatCanonicalCongregationId(String(parsed.c)) : undefined,
+      cpin: parsed.k ? String(parsed.k) : undefined,
+      pub: parsed.u ? String(parsed.u) : undefined,
+      pin: parsed.p ? String(parsed.p) : undefined,
+      invite: parsed.i ? String(parsed.i) : undefined,
+      exp: parsed.e ? Number(parsed.e) : undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
+// ============================================================================
+// #5: SANITIZACIÓN DE RESPALDOS IMPORTADOS Y SELLO CRIPTOGRÁFICO DE INTEGRIDAD
+// ============================================================================
+
+const FORBIDDEN_OBJECT_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+const BACKUP_INTEGRITY_SEAL_SALT = 'kongre_backup_integrity_seal_2026_v1';
+
+/**
+ * Limpia recursivamente un objeto JSON importado desde un archivo externo:
+ * 1. Elimina claves de Prototype Pollution (`__proto__`, `constructor`, `prototype`).
+ * 2. Neutraliza vectores de inyección XSS (`<script>`, `javascript:`, `vbscript:`, `data:text/html`, manejadores inline `on*=`) en cadenas.
+ */
+export function sanitizeImportedBackupObject<T>(input: T, depth = 0): T {
+  if (depth > 30 || input === null || input === undefined) {
+    return input;
+  }
+  if (typeof input === 'string') {
+    const cleaned = input
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/^\s*(javascript|vbscript|data\s*:\s*text\/html)\s*:/gi, '')
+      .replace(/\bon(error|load|click|mouseover|focus|blur)\s*=/gi, '');
+    return cleaned as unknown as T;
+  }
+  if (Array.isArray(input)) {
+    return input.map((item) => sanitizeImportedBackupObject(item, depth + 1)) as unknown as T;
+  }
+  if (typeof input === 'object') {
+    const safeObj: Record<string, any> = {};
+    for (const [key, value] of Object.entries(input as Record<string, any>)) {
+      if (FORBIDDEN_OBJECT_KEYS.has(key)) continue;
+      safeObj[key] = sanitizeImportedBackupObject(value, depth + 1);
+    }
+    return safeObj as T;
+  }
+  return input;
+}
+
+/**
+ * Calcula un sello criptográfico SHA-256 (`kgr_seal_v1_...`) sobre los datos esenciales de un respaldo JSON
+ * para detectar cualquier alteración o corrupción antes de restaurarlo.
+ */
+export function computeBackupIntegritySeal(backupData: Record<string, any>): string {
+  try {
+    const pubs = Array.isArray(backupData.publishers) ? backupData.publishers : [];
+    const weeks = Array.isArray(backupData.weeks) ? backupData.weeks : [];
+    const territories = Array.isArray(backupData.territories) ? backupData.territories : [];
+    const transactions = Array.isArray(backupData.transactions) ? backupData.transactions : [];
+    const pubIds = pubs.map((p: any) => `${p?.id || ''}:${p?.name || ''}:${p?.theocraticRole || ''}`).sort().join(',');
+    const weekIds = weeks.map((w: any) => String(w?.id || '')).sort().join(',');
+    const congId = String(
+      backupData.settings?.congregationNumber ||
+      backupData.settings?.congregationId ||
+      backupData.congregationName ||
+      ''
+    ).trim();
+
+    const canonicalPayload = [
+      BACKUP_INTEGRITY_SEAL_SALT,
+      congId,
+      String(pubs.length),
+      pubIds,
+      String(weeks.length),
+      weekIds,
+      String(territories.length),
+      String(transactions.length),
+    ].join('|');
+
+    return `kgr_seal_v1_${sha256HexSync(canonicalPayload)}`;
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Verifica el sello criptográfico de integridad de un archivo de respaldo JSON.
+ * Si el archivo incluye `integritySeal`, comprueba que coincida exactamente con el contenido actual.
+ */
+export function verifyBackupIntegritySeal(backupData: Record<string, any>): {
+  valid: boolean;
+  isSigned: boolean;
+} {
+  if (!backupData || typeof backupData !== 'object') {
+    return { valid: false, isSigned: false };
+  }
+  const seal = typeof backupData.integritySeal === 'string' ? backupData.integritySeal.trim() : '';
+  if (!seal) {
+    // Respaldos legados sin firma se permiten tras pasar por sanitizeImportedBackupObject
+    return { valid: true, isSigned: false };
+  }
+  const expected = computeBackupIntegritySeal(backupData);
+  return {
+    valid: Boolean(expected && seal === expected),
+    isSigned: true,
+  };
+}
+
+// ============================================================================
+// #6: PROTECCIÓN CRIPTOGRÁFICA DE INVITACIONES, ANTI-FORMULA-INJECTION CSV Y FIRMA DE ASIGNACIONES
+// ============================================================================
+
+const INVITATION_CODE_HASH_SALT = 'kongre_invitation_code_salt_2026_v1';
+const ASSIGNMENT_CONFIRM_HMAC_SALT = 'kongre_assignment_confirm_sig_2026_v1';
+
+/**
+ * Calcula un hash SHA-256 con sal para un código de invitación teocrático.
+ * Permite verificar códigos de invitación en `payload_public` sin exponer el código en texto plano.
+ */
+export function hashInvitationCode(code: string | null | undefined): string {
+  if (!code) return '';
+  const clean = String(code).trim().toUpperCase();
+  if (!clean) return '';
+  return `inv_h1_${sha256HexSync(`${INVITATION_CODE_HASH_SALT}:${clean}`)}`;
+}
+
+/**
+ * Verifica si un código ingresado coincide con una invitación (por código directo o por su hash `codeHash`).
+ */
+export function verifyInvitationCodeMatch(
+  inputCode: string | null | undefined,
+  invitation: { code?: string; codeHash?: string } | null | undefined
+): boolean {
+  if (!inputCode || !invitation) return false;
+  const cleanInput = String(inputCode).trim().toUpperCase();
+  if (!cleanInput) return false;
+
+  if (invitation.codeHash) {
+    const computed = hashInvitationCode(cleanInput);
+    if (computed === invitation.codeHash) return true;
+  }
+
+  if (invitation.code && String(invitation.code).trim().toUpperCase() === cleanInput) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Sanitiza la lista de invitaciones antes de incluirla en `payload_public` de Supabase:
+ * - Calcula `codeHash` para cada invitación activa
+ * - Oculta el código en texto plano (`code: ''`) en el payload público para impedir que terceros extraigan códigos activos
+ */
+export function sanitizeInvitationsForPublicPayload(invitations: any[]): any[] {
+  if (!Array.isArray(invitations)) return [];
+  return invitations.map((inv) => {
+    if (!inv || typeof inv !== 'object') return inv;
+    const codeHash = inv.codeHash || (inv.code ? hashInvitationCode(inv.code) : undefined);
+    const maskedCode = inv.code
+      ? `${String(inv.code).slice(0, 4)}-••••`
+      : '';
+    return {
+      ...inv,
+      code: maskedCode,
+      ...(codeHash ? { codeHash } : {}),
+    };
+  });
+}
+
+/**
+ * Neutraliza vectores de Inyección de Fórmulas en CSV / Excel (CWE-1236 / DDE Injection).
+ * Si un valor comienza con `=`, `+`, `-`, `@`, `\t` o `\r` (salvo números telefónicos seguros o fechas),
+ * antepone un apóstrofo `'` para forzar modo texto en Excel / Calc / Google Sheets.
+ */
+export function sanitizeCsvFormulaInjection(value: string | number | undefined | null): string {
+  if (value === undefined || value === null) return '';
+  const str = String(value).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+  if (!str) return '';
+  const trimmed = str.trimStart();
+  if (/^[=+\-@]/.test(trimmed) || /^[\t\r]/.test(str)) {
+    // Permitir números telefónicos legítimos tipo "+52 55 1234 5678" o "---" sin romper formato,
+    // pero bloquear cualquier expresión con letras, paréntesis, pipes o comandos
+    if (/^\+\d[\d\s\-()]{4,20}$/.test(trimmed) || /^-{2,5}$/.test(trimmed)) {
+      return str;
+    }
+    return `'${str}`;
+  }
+  return str;
+}
+
+/**
+ * Limpia texto proveniente de archivos CSV importados:
+ * - Remueve prefijos de inyección de fórmulas (`'=`, `=`, `@`, etc.)
+ * - Neutraliza etiquetas `<script>`, `javascript:` y manejadores de eventos HTML inline (`onload=`, `onerror=`, etc.)
+ */
+export function sanitizeImportedCsvText(value: string | undefined | null): string {
+  if (!value) return '';
+  return String(value)
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/^\s*(javascript|vbscript|data\s*:\s*text\/html)\s*:/gi, '')
+    .replace(/\bon(error|load|click|mouseover|focus|blur)\s*=/gi, '')
+    .replace(/^'+([=+\-@])/, '$1')
+    .replace(/^[=@\t\r]+/, '')
+    .trim();
+}
+
+/**
+ * Calcula una firma criptográfica corta (`sig`) para enlaces de confirmación de asignación en 1 clic.
+ */
+export function computeAssignmentConfirmSignature(
+  weekId: string,
+  meetingType: string,
+  assignmentPath: string,
+  publisherId: string
+): string {
+  const payload = [
+    ASSIGNMENT_CONFIRM_HMAC_SALT,
+    String(weekId || '').trim(),
+    String(meetingType || '').trim(),
+    String(assignmentPath || '').trim(),
+    String(publisherId || '').trim(),
+  ].join('|');
+  return sha256HexSync(payload).slice(0, 16);
+}
+
+/**
+ * Verifica la firma criptográfica de un enlace de confirmación de asignación.
+ * Si el enlace incluye `sig`, debe coincidir exactamente con los parámetros de la asignación.
+ */
+export function verifyAssignmentConfirmSignature(
+  weekId: string,
+  meetingType: string,
+  assignmentPath: string,
+  publisherId: string,
+  sig?: string | null
+): boolean {
+  if (!weekId || !assignmentPath || !publisherId) return false;
+  if (!sig) {
+    // Compatibilidad con enlaces generados antes de v2.8.10 si los parámetros tienen formato canónico seguro
+    return (
+      /^[a-zA-Z0-9_\-]+$/.test(weekId) &&
+      (meetingType === 'midweek' || meetingType === 'weekend') &&
+      /^[a-zA-Z0-9_.\-]+$/.test(assignmentPath) &&
+      /^[a-zA-Z0-9_\-]+$/.test(publisherId)
+    );
+  }
+  const expected = computeAssignmentConfirmSignature(weekId, meetingType, assignmentPath, publisherId);
+  return sig.trim() === expected;
+}
+
+/**
+ * Abre una URL externa (como WhatsApp `https://wa.me/...`) mediante un elemento `<a>` seguro
+ * con `rel="noopener noreferrer"` sin depender de `window.open`.
+ */
+export function openSafeExternalUrl(url: string): void {
+  if (typeof window === 'undefined' || typeof document === 'undefined' || !url) return;
+  try {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      try {
+        document.body.removeChild(a);
+      } catch {}
+    }, 100);
+  } catch {}
+}
 

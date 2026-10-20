@@ -8,6 +8,13 @@
 import { supabase } from '../lib/supabase';
 import { encryptForSupabase, decryptFromSupabase, normalizePin } from '../utils/crypto';
 import {
+  hashPersonalPin,
+  encryptPinAtRest,
+  decryptPinAtRest,
+  sanitizeInvitationsForPublicPayload,
+  hashInvitationCode,
+} from '../utils/theocraticSecurity';
+import {
   Publisher,
   WeekSchedule,
   Territory,
@@ -218,9 +225,17 @@ export const supabaseSyncService = {
       if (storedInvitations.length === 0 && typeof window !== 'undefined') {
         try {
           const rawInv = localStorage.getItem('kongre_theocratic_invitations_v1');
-          if (rawInv) storedInvitations = JSON.parse(rawInv);
+          if (rawInv) {
+            const decInv = rawInv.startsWith('kgr_v1:') ? decryptPinAtRest(rawInv) : rawInv;
+            storedInvitations = JSON.parse(decInv || '[]');
+          }
         } catch {}
       }
+
+      const normalizedAdminInvitations = (storedInvitations || []).map((inv) => ({
+        ...inv,
+        codeHash: inv?.codeHash || (inv?.code && !String(inv.code).includes('••••') ? hashInvitationCode(inv.code) : undefined),
+      }));
 
       // 1. Preparar snapshot completo para ancianos
       const adminPayload = {
@@ -242,10 +257,10 @@ export const supabaseSyncService = {
         literatureOrders: params.data.literatureOrders || [],
         literatureDistributions: params.data.literatureDistributions || [],
         literatureInventory: params.data.literatureInventory || [],
-        invitations: storedInvitations,
+        invitations: normalizedAdminInvitations,
       };
 
-      // 2. Preparar payload público (sin notas pastorales, sin tarjetas S-21 confidenciales y SIN PINs personales en texto plano: solo su hash criptográfico SHA-256)
+      // 2. Preparar payload público (sin notas pastorales, sin tarjetas S-21 confidenciales y SIN PINs ni códigos de invitación en texto plano: solo hashes SHA-256)
       const publicPayload: PublicFilteredData = {
         congregation_id: cleanId,
         congregation_name: params.data.settings?.congregationName || 'Congregación',
@@ -268,7 +283,7 @@ export const supabaseSyncService = {
           coordinatorPhotoURL: params.data.settings?.coordinatorPhotoURL || '',
           isRegistered: true,
         },
-        invitations: storedInvitations,
+        invitations: sanitizeInvitationsForPublicPayload(normalizedAdminInvitations),
         publishers: (params.data.publishers || []).map((p) => {
           const pinHash = p.personalPin ? hashPersonalPin(p.personalPin) : p.personalPinHash;
           return {
@@ -295,11 +310,68 @@ export const supabaseSyncService = {
         })),
       };
 
-      // 3. Cifrar ambos payloads antes de enviarlos a la nube (Cero Conocimiento)
-      const encryptedAdmin = await encryptForSupabase(adminPayload, cleanMasterPin);
+      // 3. Verificación criptográfica de propiedad antes de sobrescribir un registro existente en Supabase
+      let preservedMasterPayload: string | null = null;
+      try {
+        const { data: existingRow } = await supabase
+          .from('sync_queue')
+          .select('payload, payload_public')
+          .eq('id_congregacion', cleanId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (existingRow && (existingRow.payload || existingRow.payload_public)) {
+          let canDecryptMaster = false;
+          let canDecryptPublic = false;
+
+          if (existingRow.payload) {
+            try {
+              const decM = await decryptFromSupabase(existingRow.payload, cleanMasterPin);
+              if (decM) canDecryptMaster = true;
+            } catch {}
+            if (!canDecryptMaster && cleanPublicPin && cleanPublicPin !== cleanMasterPin) {
+              try {
+                const decM2 = await decryptFromSupabase(existingRow.payload, cleanPublicPin);
+                if (decM2) canDecryptMaster = true;
+              } catch {}
+            }
+          }
+
+          if (existingRow.payload_public) {
+            try {
+              const decP = await decryptFromSupabase(existingRow.payload_public, cleanPublicPin);
+              if (decP) canDecryptPublic = true;
+            } catch {}
+            if (!canDecryptPublic && cleanMasterPin) {
+              try {
+                const decP2 = await decryptFromSupabase(existingRow.payload_public, cleanMasterPin);
+                if (decP2) canDecryptPublic = true;
+              } catch {}
+            }
+          }
+
+          if (!canDecryptMaster && !canDecryptPublic) {
+            return {
+              success: false,
+              error: 'Acceso denegado: Las credenciales criptográficas no coinciden con el registro existente de esta congregación en la nube.',
+            };
+          }
+
+          // Si el usuario tiene acceso público válido pero no posee la clave maestra del Coordinador, preservar el payload maestro intacto
+          if (!canDecryptMaster && existingRow.payload) {
+            preservedMasterPayload = existingRow.payload;
+          }
+        }
+      } catch {
+        // Si la verificación previa de red falla, continuar con el intento de upsert
+      }
+
+      // 4. Cifrar ambos payloads antes de enviarlos a la nube (Cero Conocimiento)
+      const encryptedAdmin = preservedMasterPayload || (await encryptForSupabase(adminPayload, cleanMasterPin));
       const encryptedPublic = await encryptForSupabase(publicPayload, cleanPublicPin);
 
-      // 4. Upsert en sync_queue en Supabase
+      // 5. Upsert en sync_queue en Supabase
       const { error } = await supabase.from('sync_queue').upsert(
         {
           id_congregacion: cleanId,
@@ -576,10 +648,10 @@ export const supabaseSyncService = {
         snapshotData: data,
       });
 
-      // Respaldo de compatibilidad
+      // Respaldo de compatibilidad cifrado en reposo
       const item = {
         congregationId: cleanId,
-        data,
+        encryptedData: encryptPinAtRest(JSON.stringify(data)),
         queuedAt: new Date().toISOString(),
       };
       localStorage.setItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY, JSON.stringify(item));
@@ -646,15 +718,18 @@ export const supabaseSyncService = {
       const pendingItems = await getPendingOfflineOperations();
 
       if (pendingItems.length === 0) {
-        // Verificar si queda algún elemento en el localStorage antiguo
+        // Verificar si queda algún elemento en el localStorage antiguo o cifrado
         const rawLegacy = localStorage.getItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY);
         if (rawLegacy) {
           try {
             const item = JSON.parse(rawLegacy);
-            if (item.congregationId && item.data && pinMaestro) {
+            const restoredData = item.encryptedData
+              ? JSON.parse(decryptPinAtRest(item.encryptedData) || 'null')
+              : item.data;
+            if (item.congregationId && restoredData && pinMaestro) {
               const res = await this.uploadCongregation({
                 congregationId: item.congregationId,
-                data: item.data,
+                data: restoredData,
                 pinMaestro,
                 pinCongregacion,
               });

@@ -27,7 +27,13 @@ import {
 } from 'lucide-react';
 import { Publisher } from '../types';
 import { TheocraticRole, THEOCRATIC_ROLES } from '../utils/rbac';
-import { formatCanonicalCongregationId, getSecureLocalPin } from '../utils/theocraticSecurity';
+import {
+  formatCanonicalCongregationId,
+  getSecureLocalPin,
+  encodeSecureShareToken,
+  openSafeExternalUrl,
+} from '../utils/theocraticSecurity';
+import { insertAuditLog } from '../services/auditLogService';
 
 interface PublisherPinsModalProps {
   isOpen: boolean;
@@ -44,11 +50,21 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
     generateUniquePublisherPin,
     removePublisherPin,
     activeRole,
+    isAdmin,
     isCoordinator,
+    currentBrotherName,
   } = useAuth();
 
-  const { settings, publishers, updatePublisher } = useCongregation();
+  const { settings, publishers, updatePublisher, isDemoMode } = useCongregation();
   const { showToast } = useToast();
+
+  const canManagePins =
+    isDemoMode ||
+    isAdmin ||
+    isCoordinator ||
+    activeRole === 'coordinador' ||
+    activeRole === 'secretario' ||
+    activeRole === 'anciano';
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterPrivilege, setFilterPrivilege] = useState<'all' | 'anciano' | 'siervo_ministerial' | 'precursor' | 'sin_pin'>('all');
@@ -123,7 +139,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
   const withPinCount = publisherEntries.filter((p) => p.hasPin).length;
   const withoutPinCount = totalCount - withPinCount;
 
-  if (!isOpen) return null;
+  if (!isOpen || !canManagePins) return null;
 
   // Toggle individual reveal
   const togglePinReveal = (id: string) => {
@@ -158,13 +174,18 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
     if (!pin) return;
     const realCongPin = congPin !== '••••••••' ? congPin : '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const params = new URLSearchParams();
-    if (congId) params.set('cong', congId);
-    if (realCongPin) params.set('cpin', realCongPin);
-    if (pub.id) params.set('pub', pub.id);
-    params.set('pin', pin);
-    const directLink = congId ? `${origin}/?${params.toString()}` : '';
-    const compositeCode = congId && realCongPin ? `${congId}::${realCongPin}::${pin}` : pin;
+    const token = encodeSecureShareToken({
+      cong: congId || undefined,
+      cpin: realCongPin || undefined,
+      pub: pub.id || undefined,
+      pin: pin || undefined,
+    });
+    const directLink = congId
+      ? token
+        ? `${origin}/?tk=${encodeURIComponent(token)}`
+        : `${origin}/?cong=${encodeURIComponent(congId)}&pub=${encodeURIComponent(pub.id)}&pin=${encodeURIComponent(pin)}`
+      : '';
+    const compositeCode = token || (congId && realCongPin ? `${congId}::${realCongPin}::${pin}` : pin);
 
     const text =
       `Hola estimado hermano *${pub.name}*,\n\n` +
@@ -172,11 +193,11 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
       `🏛️ *ID de la Congregación:* *${congId}*\n` +
       `🔒 *PIN de la Congregación:* *${realCongPin || '(el PIN general de la congregación)'}*\n` +
       `🔑 *Tu PIN Personal Único:* *${pin}*\n` +
-      `📋 *Código Portátil de Invitación:* *${compositeCode}*\n` +
+      `📋 *Código Portátil Cifrado:* *${compositeCode}*\n` +
       (directLink ? `\n📲 *Enlace de Acceso Directo (un solo toque):*\n${directLink}\n` : '') +
       `\nAl tocar el enlace o ingresar tus credenciales, tu rol y responsabilidades teocráticas se activarán de inmediato.`;
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
+    openSafeExternalUrl(url);
   };
 
   // Auto-generate missing PINs for all publishers without one
@@ -205,6 +226,14 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
       generatedCount++;
     }
 
+    insertAuditLog({
+      accion: 'GENERAR_PINS_FALTANTES_MASIVO',
+      hermano_nid: activeRole,
+      hermano_nombre: currentBrotherName || 'Coordinador / Secretario',
+      modulo: 'auth',
+      detalles: `Se generaron automáticamente ${generatedCount} PINs únicos para publicadores sin PIN.`,
+    }).catch(() => {});
+
     showToast(`¡Se han generado y asignado ${generatedCount} PINs únicos con éxito!`, 'success');
   };
 
@@ -228,6 +257,13 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
         ...pub,
         personalPin: undefined,
       });
+      insertAuditLog({
+        accion: 'REVOCAR_PIN_PUBLICADOR',
+        hermano_nid: activeRole,
+        hermano_nombre: currentBrotherName || 'Coordinador',
+        modulo: 'auth',
+        detalles: `PIN personal revocado para el publicador ${pub.name}.`,
+      }).catch(() => {});
       showToast(`PIN revocado para ${pub.name}`, 'info');
     } else {
       assignPersonalPinToPublisher(
@@ -242,6 +278,13 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
         ...pub,
         personalPin: cleanPin,
       });
+      insertAuditLog({
+        accion: 'ACTUALIZAR_PIN_PUBLICADOR',
+        hermano_nid: activeRole,
+        hermano_nombre: currentBrotherName || 'Coordinador',
+        modulo: 'auth',
+        detalles: `PIN personal actualizado para el publicador ${pub.name}.`,
+      }).catch(() => {});
       showToast(`PIN guardado para ${pub.name}`, 'success');
     }
 

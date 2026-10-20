@@ -513,7 +513,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       await insertAuditLog({
         modulo: 'seguridad',
         accion: 'REGISTRO_CONGREGACION',
-        hermano_nid: cleanPersonalPin,
+        hermano_nid: 'coordinador',
         hermano_nombre: coordinatorName.trim(),
         detalles: `Congregación ${congregationName.trim()} (${finalId}) registrada con seguridad Cero Conocimiento.`,
       });

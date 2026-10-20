@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { AssignmentStatus, Publisher, WeekSchedule } from '../types';
 import { OFFICIAL_STUDENT_LESSONS } from '../utils/theocraticData';
+import { insertAuditLog } from '../services/auditLogService';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -156,17 +157,32 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
   const handleConfirm = () => {
     updateAssignmentStatus(weekId, meetingType, assignmentPath, 'confirmada');
     setSubmittedStatus('confirmada');
+    insertAuditLog({
+      accion: 'CONFIRMAR_ASIGNACION_REUNION',
+      hermano_nid: targetPublisher.id,
+      hermano_nombre: targetPublisher.name,
+      modulo: 'reuniones',
+      detalles: `Asignación confirmada (${assignmentDetails.roleTitle} - ${assignmentDetails.meetingDate}).`,
+    }).catch(() => {});
   };
 
   const handleRequestReplacement = () => {
+    const reason = replacementReason.trim() || 'El hermano(a) solicitó reemplazo mediante enlace directo';
     updateAssignmentStatus(
       weekId,
       meetingType,
       assignmentPath,
       'rechazada',
-      replacementReason.trim() || 'El hermano(a) solicitó reemplazo mediante enlace directo'
+      reason
     );
     setSubmittedStatus('rechazada');
+    insertAuditLog({
+      accion: 'SOLICITAR_REEMPLAZO_ASIGNACION',
+      hermano_nid: targetPublisher.id,
+      hermano_nombre: targetPublisher.name,
+      modulo: 'reuniones',
+      detalles: `Solicitud de reemplazo (${assignmentDetails.roleTitle} - ${assignmentDetails.meetingDate}). Motivo: ${reason}`,
+    }).catch(() => {});
   };
 
   const effectiveStatus = submittedStatus || assignmentDetails.currentStatus;

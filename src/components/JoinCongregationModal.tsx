@@ -4,7 +4,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
-import { verifyPasscode, isCongregationIdString, isGenericIdentityName, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput, verifyPersonalPinMatch, setSecureLocalPin } from '../utils/theocraticSecurity';
+import { verifyPasscode, isCongregationIdString, isGenericIdentityName, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput, verifyPersonalPinMatch, setSecureLocalPin, getPinLockoutRemainingSeconds, recordFailedPinAttempt, resetFailedPinAttempts, decodeSecureShareToken } from '../utils/theocraticSecurity';
 import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import { supabaseSyncService } from '../services/supabaseSyncService';
 import {
@@ -66,6 +66,31 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
   const [showCongPin, setShowCongPin] = useState(false);
   const [showPersPin, setShowPersPin] = useState(false);
 
+  // Precargar credenciales si el modal se abrió desde un enlace cifrado (?tk=...) o invitación (?invite=...) y limpiar URL
+  React.useEffect(() => {
+    if (!isOpen || typeof window === 'undefined') return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const decodedTk = decodeSecureShareToken(urlParams.get('tk'));
+    const tkCong = decodedTk?.cong || urlParams.get('cong');
+    const tkCpin = decodedTk?.cpin || urlParams.get('cpin');
+    const tkInvite = decodedTk?.invite || urlParams.get('invite');
+
+    if (tkCong && !tkCong.toUpperCase().includes('DEMO')) {
+      setCongregationIdInput(formatCanonicalCongregationId(tkCong));
+    }
+    if (tkCpin) {
+      setCongregationPinInput(tkCpin);
+    }
+    if (tkInvite) {
+      setPersonalPinInput(tkInvite);
+    }
+
+    if (urlParams.has('tk') || urlParams.has('invite') || urlParams.has('cpin')) {
+      const cleanUrl = window.location.pathname + (window.location.hash || '');
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+  }, [isOpen]);
+
   const [error, setError] = useState<string | null>(null);
   const [successData, setSuccessData] = useState<{
     role: TheocraticRole;
@@ -82,6 +107,13 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
     setIsSubmitting(true);
 
     try {
+      const lockoutRem = getPinLockoutRemainingSeconds();
+      if (lockoutRem > 0) {
+        setError(`Demasiados intentos fallidos. Por seguridad, espera ${lockoutRem} segundos antes de volver a intentar.`);
+        setIsSubmitting(false);
+        return;
+      }
+
       const cleanId = congregationIdInput.trim();
       const cleanCongPin = congregationPinInput.trim();
       const cleanPersonalPin = personalPinInput.trim();
@@ -153,7 +185,12 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       }
 
       if (!isCongPinValid) {
-        setError('El PIN de la Congregación es incorrecto.');
+        const failInfo = recordFailedPinAttempt();
+        setError(
+          failInfo.lockedOut
+            ? `El PIN de la Congregación es incorrecto. Acceso bloqueado temporalmente por ${failInfo.remainingSeconds} segundos.`
+            : 'El PIN de la Congregación es incorrecto.'
+        );
         setIsSubmitting(false);
         return;
       }
@@ -213,10 +250,17 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       }
 
       if (!identifiedRole) {
-        setError('El PIN Personal no coincide con ningún publicador en esta congregación. Verifica el PIN asignado por los ancianos.');
+        const failInfo = recordFailedPinAttempt();
+        setError(
+          failInfo.lockedOut
+            ? `El PIN Personal no coincide con ningún publicador. Acceso bloqueado temporalmente por ${failInfo.remainingSeconds} segundos.`
+            : 'El PIN Personal no coincide con ningún publicador en esta congregación. Verifica el PIN asignado por los ancianos.'
+        );
         setIsSubmitting(false);
         return;
       }
+
+      resetFailedPinAttempts();
 
       // Resolver nombre no genérico con prioridad
       if (!finalBrotherName || isGenericIdentityName(finalBrotherName)) {

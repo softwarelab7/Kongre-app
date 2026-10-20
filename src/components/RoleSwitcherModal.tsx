@@ -4,7 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useSecurity } from '../context/SecurityContext';
 import { TheocraticRole, THEOCRATIC_ROLES } from '../utils/rbac';
-import { generateSecurePublisherPin, formatCanonicalCongregationId, getSecureLocalPin } from '../utils/theocraticSecurity';
+import { generateSecurePublisherPin, formatCanonicalCongregationId, getSecureLocalPin, encodeSecureShareToken } from '../utils/theocraticSecurity';
+import { insertAuditLog } from '../services/auditLogService';
 import { ActiveTab } from './Navbar';
 import {
   ShieldCheck,
@@ -72,6 +73,8 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
   useEffect(() => {
     if (isOpen && !isAllowedAccess) {
       setActiveTabMode('mi_sesion');
+    } else if (isOpen && isAllowedAccess && activeTabMode === 'mi_sesion') {
+      setActiveTabMode('directorio');
     }
   }, [isOpen, isAllowedAccess]);
 
@@ -159,6 +162,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
         name: string;
         role: TheocraticRole;
         pin: string;
+        hasPin: boolean;
         privilege?: string;
         email?: string;
         gender?: string;
@@ -175,6 +179,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
 
       const assignedRole = pub.theocraticRole || pinRec?.role || (pub.privilege === 'anciano' ? 'anciano' : 'publico');
       const assignedPin = pub.personalPin || pinRec?.pin || '';
+      const assignedPinHash = pub.personalPinHash || pinRec?.pinHash || '';
 
       map.set(pub.id, {
         id: pub.id,
@@ -182,6 +187,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
         name: pub.name,
         role: assignedRole,
         pin: assignedPin,
+        hasPin: Boolean(assignedPin || assignedPinHash),
         privilege: pub.privilege,
         email: pub.email || pinRec?.email,
         gender: pub.gender,
@@ -200,12 +206,15 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
             rec.publisherId === 'coord_principal' ||
             rec.name.toLowerCase().trim() === coordName.toLowerCase().trim()
         );
+        const cPin = pinRec?.pin || '';
+        const cHash = pinRec?.pinHash || '';
         map.set('coord_principal', {
           id: 'coord_principal',
           publisherId: 'coord_principal',
           name: coordName,
           role: 'coordinador',
-          pin: pinRec?.pin || '',
+          pin: cPin,
+          hasPin: Boolean(cPin || cHash),
           privilege: 'anciano',
           email: settings.coordinatorEmail,
           gender: 'hermano',
@@ -295,7 +304,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     return { total, ancianosCount, siervosCount, withPin, withoutPin };
   }, [combinedPublishersList]);
 
-  if (!isOpen || !isAllowedAccess) return null;
+  if (!isOpen) return null;
 
   // Toggle PIN visibility
   const togglePinVisibility = (id: string) => {
@@ -304,6 +313,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
 
   // Quick 1-click role change
   const handleChangePublisherRole = (publisherId: string, newRoleValue: TheocraticRole) => {
+    if (!isAllowedAccess) return;
     const item = combinedPublishersList.find((p) => p.publisherId === publisherId);
     if (!item) return;
 
@@ -327,12 +337,21 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       });
     }
 
+    insertAuditLog({
+      accion: 'CAMBIO_ROL_PUBLICADOR',
+      modulo: 'seguridad',
+      hermano_nid: publisherId,
+      hermano_nombre: currentBrotherName || 'Coordinador',
+      detalles: `Rol de ${item.name} actualizado a ${THEOCRATIC_ROLES[newRoleValue]?.shortName || newRoleValue}`,
+    }).catch(() => {});
+
     setFeedback(`Responsabilidad actualizada: ${item.name} es ahora ${THEOCRATIC_ROLES[newRoleValue]?.shortName}.`);
     setTimeout(() => setFeedback(null), 3000);
   };
 
   // Quick 1-click PIN generation
   const handleGeneratePinForPublisher = (publisherId: string) => {
+    if (!isAllowedAccess) return;
     const item = combinedPublishersList.find((p) => p.publisherId === publisherId);
     if (!item) return;
 
@@ -355,22 +374,23 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       });
     }
 
+    insertAuditLog({
+      accion: 'GENERAR_PIN_PUBLICADOR',
+      modulo: 'seguridad',
+      hermano_nid: publisherId,
+      hermano_nombre: currentBrotherName || 'Coordinador',
+      detalles: `Nuevo PIN personal generado para ${item.name}`,
+    }).catch(() => {});
+
     setFeedback(`PIN único asignado a ${item.name}: ${newGeneratedPin}`);
     setTimeout(() => setFeedback(null), 3000);
   };
 
   // Revocar PIN y cerrar todas las sesiones del publicador (ej. teléfono perdido o robo)
   const handleRevokePinForPublisher = (publisherId: string) => {
+    if (!isAllowedAccess) return;
     const item = combinedPublishersList.find((p) => p.publisherId === publisherId);
     if (!item) return;
-
-    if (
-      !confirm(
-        `¿Deseas revocar el PIN de ${item.name}?\n\nAl revocarlo, se cerrarán inmediatamente todas las sesiones activas en teléfonos o navegadores de este hermano (por ejemplo, si extravió su teléfono). Nadie podrá acceder hasta que se le asigne un nuevo PIN.`
-      )
-    ) {
-      return;
-    }
 
     removePublisherPin(publisherId);
 
@@ -382,23 +402,25 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       });
     }
 
+    insertAuditLog({
+      accion: 'REVOCAR_PIN_PUBLICADOR',
+      modulo: 'seguridad',
+      hermano_nid: publisherId,
+      hermano_nombre: currentBrotherName || 'Coordinador',
+      detalles: `PIN revocado y sesiones cerradas para ${item.name}`,
+    }).catch(() => {});
+
     setFeedback(`🔒 PIN revocado para ${item.name}. Todas las sesiones han sido cerradas.`);
     setTimeout(() => setFeedback(null), 4000);
   };
 
   // Auto-generate PINs for all publishers who don't have one
   const handleAutoAssignAllMissingPins = () => {
+    if (!isAllowedAccess) return;
     const missing = combinedPublishersList.filter((p) => !p.pin);
     if (missing.length === 0) {
-      alert('Todos los publicadores ya tienen su PIN personal asignado.');
-      return;
-    }
-
-    if (
-      !confirm(
-        `¿Deseas generar automáticamente un PIN personal único para los ${missing.length} publicadores que aún no tienen PIN?`
-      )
-    ) {
+      setFeedback('Todos los publicadores ya tienen su PIN personal asignado.');
+      setTimeout(() => setFeedback(null), 3000);
       return;
     }
 
@@ -429,6 +451,14 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       count++;
     });
 
+    insertAuditLog({
+      accion: 'AUTO_ASIGNAR_PINS_MASIVO',
+      modulo: 'seguridad',
+      hermano_nid: 'directorio',
+      hermano_nombre: currentBrotherName || 'Coordinador',
+      detalles: `Generación masiva de ${count} PINs personales únicos`,
+    }).catch(() => {});
+
     setFeedback(`¡Se generaron ${count} PINs personales únicos exitosamente!`);
     setTimeout(() => setFeedback(null), 3500);
   };
@@ -449,13 +479,19 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
           ''
         : '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const params = new URLSearchParams();
-    if (congNumber) params.set('cong', congNumber);
-    if (congPin) params.set('cpin', congPin);
-    if (id) params.set('pub', id);
-    if (pin) params.set('pin', pin);
-    const directLink = congNumber && id && pin ? `${origin}/?${params.toString()}` : '';
-    const compositeCode = congNumber && congPin && pin ? `${congNumber}::${congPin}::${pin}` : pin;
+    const token = encodeSecureShareToken({
+      cong: congNumber || undefined,
+      cpin: congPin || undefined,
+      pub: id || undefined,
+      pin: pin || undefined,
+    });
+    const directLink =
+      congNumber && id && pin
+        ? token
+          ? `${origin}/?tk=${encodeURIComponent(token)}`
+          : `${origin}/?cong=${encodeURIComponent(congNumber)}&pub=${encodeURIComponent(id)}&pin=${encodeURIComponent(pin)}`
+        : '';
+    const compositeCode = token || (congNumber && congPin && pin ? `${congNumber}::${congPin}::${pin}` : pin);
 
     return `🏛️ *CREDENCIALES TEOCRÁTICAS KONGRE*\n` +
       `Congregación: *${congName}*\n` +
@@ -465,7 +501,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       (congNumber ? `🏛️ ID Congregación: *${congNumber}*\n` : '') +
       (congPin ? `🔒 PIN Congregación: *${congPin}*\n` : '') +
       `🔑 Tu PIN Personal Único: *${pin}*\n` +
-      `📋 Código Portátil: *${compositeCode}*\n` +
+      `📋 Código Portátil Cifrado: *${compositeCode}*\n` +
       (directLink ? `━━━━━━━━━━━━━━━━━━━━\n📲 *Enlace de Acceso Directo (un solo toque):*\n${directLink}\n` : '') +
       `━━━━━━━━━━━━━━━━━━━━\n` +
       `_Abre el enlace o ingresa tus credenciales en Kongre para activar automáticamente tu perfil y departamentos asignados._`;
@@ -485,16 +521,19 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
           ''
         : '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
-    const params = new URLSearchParams();
-    if (congNumber) params.set('cong', congNumber);
-    if (congPin) params.set('cpin', congPin);
-    if (id) params.set('pub', id);
-    if (pin) params.set('pin', pin);
-    const directLink = `${origin}/?${params.toString()}`;
+    const token = encodeSecureShareToken({
+      cong: congNumber || undefined,
+      cpin: congPin || undefined,
+      pub: id || undefined,
+      pin: pin || undefined,
+    });
+    const directLink = token
+      ? `${origin}/?tk=${encodeURIComponent(token)}`
+      : `${origin}/?cong=${encodeURIComponent(congNumber)}&pub=${encodeURIComponent(id)}&pin=${encodeURIComponent(pin)}`;
     navigator.clipboard.writeText(directLink);
     setCopiedId(`link_${id}`);
     setTimeout(() => setCopiedId(null), 2500);
-    setFeedback(`Enlace directo copiado para ${name}.`);
+    setFeedback(`Enlace directo cifrado copiado para ${name}.`);
     setTimeout(() => setFeedback(null), 3000);
   };
 
@@ -506,7 +545,11 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     setTimeout(() => setCopiedId(null), 2500);
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-    window.open(whatsappUrl, '_blank');
+    const link = document.createElement('a');
+    link.href = whatsappUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.click();
   };
 
   // Verify PIN in "Mi Sesión"
@@ -541,7 +584,8 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
   // Simulator role selection (Coordinator only)
   const handleSelectRoleSimulation = (role: TheocraticRole) => {
     if (!isCoordinator && role !== 'publico') {
-      alert('Solo el Coordinador puede simular manualmente roles sin PIN.');
+      setFeedback('Solo el Coordinador puede simular manualmente roles sin PIN.');
+      setTimeout(() => setFeedback(null), 3000);
       return;
     }
     setActiveRole(role);
@@ -559,8 +603,10 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
   // Add Google email
   const handleAddEmail = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAllowedAccess) return;
     if (!newEmail.trim() || !newEmail.includes('@')) {
-      alert('Introduce un correo electrónico válido');
+      setFeedback('Introduce un correo electrónico válido.');
+      setTimeout(() => setFeedback(null), 3000);
       return;
     }
     assignRoleToEmail(newEmail.trim(), selectedRoleForEmail, newName.trim());
@@ -817,7 +863,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
           {/* ========================================================================= */}
           {/* TAB 1: DIRECTORIO DE RESPONSABILIDADES Y PINS */}
           {/* ========================================================================= */}
-          {activeTabMode === 'directorio' && (
+          {activeTabMode === 'directorio' && isAllowedAccess && (
             <div className="space-y-4">
               {/* Theocratic Guide Banner */}
               <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -1422,16 +1468,19 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                         );
                         const congPin =
                           typeof window !== 'undefined'
-                            ? localStorage.getItem('kongre_registered_cong_pin') ||
-                              localStorage.getItem('kongre_last_cong_pin') ||
+                            ? getSecureLocalPin('kongre_registered_cong_pin') ||
+                              getSecureLocalPin('kongre_last_cong_pin') ||
                               ''
                             : '';
-                        const portableCode = congNumber && congPin ? `${congNumber}::${congPin}::${inv.code}` : inv.code;
-                        const params = new URLSearchParams();
-                        params.set('invite', inv.code);
-                        if (congNumber) params.set('cong', congNumber);
-                        if (congPin) params.set('cpin', congPin);
-                        const directInviteUrl = `${window.location.origin}/?${params.toString()}#portal?view=invite_code_login`;
+                        const invToken = encodeSecureShareToken({
+                          cong: congNumber || undefined,
+                          cpin: congPin || undefined,
+                          invite: inv.code,
+                        });
+                        const portableCode = invToken || (congNumber && congPin ? `${congNumber}::${congPin}::${inv.code}` : inv.code);
+                        const directInviteUrl = invToken
+                          ? `${window.location.origin}/?tk=${encodeURIComponent(invToken)}#portal?view=invite_code_login`
+                          : `${window.location.origin}/?invite=${encodeURIComponent(inv.code)}#portal?view=invite_code_login`;
 
                         return (
                           <div
@@ -1470,7 +1519,11 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                                 onClick={() => {
                                   const roleTitle = THEOCRATIC_ROLES[inv.role as TheocraticRole]?.name || inv.role;
                                   const msg = `Estimado hermano *${inv.targetName || ''}*, se le ha otorgado acceso teocrático a *${settings.congregationName || 'la congregación'}* con el rol de *${roleTitle}*.\n\nCódigo Portátil de Invitación: *${portableCode}*\n\nToque el siguiente enlace para activar automáticamente la aplicación en su dispositivo:\n${directInviteUrl}`;
-                                  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+                                  const link = document.createElement('a');
+                                  link.href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+                                  link.target = '_blank';
+                                  link.rel = 'noopener noreferrer';
+                                  link.click();
                                 }}
                                 className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center gap-1 cursor-pointer"
                                 title="Compartir por WhatsApp"

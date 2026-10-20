@@ -1,15 +1,17 @@
 // src/utils/publisherExportImport.ts
 import { Publisher } from '../types';
+import { sanitizeCsvFormulaInjection, sanitizeImportedCsvText } from './theocraticSecurity';
 
 export interface ExportPublisherOptions {
   congregationName?: string;
   groupNameMap?: Record<string, string>;
+  includeConfidentialNotes?: boolean;
 }
 
 const escapeCell = (val: string | number | undefined | null) => {
   if (val === undefined || val === null) return '""';
-  const str = String(val);
-  return `"${str.replace(/"/g, '""')}"`;
+  const safeStr = sanitizeCsvFormulaInjection(val);
+  return `"${safeStr.replace(/"/g, '""')}"`;
 };
 
 export function exportPublishersToCsv(
@@ -80,8 +82,8 @@ export function exportPublishersToCsv(
       p.is_anointed ? 'Sí' : 'No',
       p.has_key ? 'Sí' : 'No',
       p.reports_to_branch ? 'Sí' : 'No',
-      p.spiritual_notes || '',
-      p.notes || ''
+      options.includeConfidentialNotes ? (p.spiritual_notes || '') : '',
+      options.includeConfidentialNotes ? (p.notes || '') : ''
     ];
   });
 
@@ -140,7 +142,7 @@ export function parsePublishersCsv(csvText: string): Partial<Publisher>[] {
 
     const rowObj: Record<string, string> = {};
     headers.forEach((h, idx) => {
-      rowObj[h] = values[idx] || '';
+      rowObj[h] = sanitizeImportedCsvText(values[idx] || '');
     });
 
     const fullName =

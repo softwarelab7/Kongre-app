@@ -5,8 +5,14 @@ import { useSecurity } from '../context/SecurityContext';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
-import { formatCanonicalCongregationId } from '../utils/theocraticSecurity';
+import {
+  formatCanonicalCongregationId,
+  getSecureLocalPin,
+  encodeSecureShareToken,
+  openSafeExternalUrl,
+} from '../utils/theocraticSecurity';
 import { CongregationInvitation } from '../types';
+import { insertAuditLog } from '../services/auditLogService';
 import {
   QrCode,
   KeyRound,
@@ -45,8 +51,16 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
     setMasterPassphrase,
     verifyMasterPassphrase,
   } = useSecurity();
-  const { user } = useAuth();
-  const { settings } = useCongregation();
+  const { user, isAdmin, isCoordinator, activeRole, currentBrotherName } = useAuth();
+  const { settings, isDemoMode } = useCongregation();
+
+  const canManageInvitations =
+    isDemoMode ||
+    isAdmin ||
+    isCoordinator ||
+    activeRole === 'coordinador' ||
+    activeRole === 'secretario' ||
+    activeRole === 'anciano';
 
   const [activeTab, setActiveTab] = useState<'generar' | 'invitaciones' | 'sesiones' | 'clave_maestra'>('generar');
 
@@ -75,22 +89,33 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
     );
     const congPin =
       typeof window !== 'undefined'
-        ? localStorage.getItem('kongre_registered_cong_pin') ||
-          localStorage.getItem('kongre_last_cong_pin') ||
+        ? getSecureLocalPin('kongre_registered_cong_pin') ||
+          getSecureLocalPin('kongre_last_cong_pin') ||
           ''
         : '';
     return { congId, congPin };
   };
 
+  const buildEncryptedInviteUrl = (code: string) => {
+    const { congId, congPin } = getCongregationCredentials();
+    const token = encodeSecureShareToken({
+      cong: congId || undefined,
+      cpin: congPin || undefined,
+      invite: code,
+    });
+    if (token) {
+      return `${window.location.origin}/?tk=${encodeURIComponent(token)}#portal?view=invite_code_login`;
+    }
+    const params = new URLSearchParams();
+    params.set('invite', code);
+    if (congId) params.set('cong', congId);
+    return `${window.location.origin}/?${params.toString()}#portal?view=invite_code_login`;
+  };
+
   // Generate QR when an invitation is selected or created
   useEffect(() => {
     if (generatedInvitation) {
-      const { congId, congPin } = getCongregationCredentials();
-      const params = new URLSearchParams();
-      params.set('invite', generatedInvitation.code);
-      if (congId) params.set('cong', congId);
-      if (congPin) params.set('cpin', congPin);
-      const inviteUrl = `${window.location.origin}/?${params.toString()}#portal?view=invite_code_login`;
+      const inviteUrl = buildEncryptedInviteUrl(generatedInvitation.code);
       QRCode.toDataURL(inviteUrl, {
         width: 200,
         margin: 1.5,
@@ -106,7 +131,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
     }
   }, [generatedInvitation, settings.congregationNumber, settings.congregationId]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !canManageInvitations) return null;
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,6 +141,12 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
 
   const getFullPortableInviteCode = (baseCode: string) => {
     const { congId, congPin } = getCongregationCredentials();
+    const token = encodeSecureShareToken({
+      cong: congId || undefined,
+      cpin: congPin || undefined,
+      invite: baseCode,
+    });
+    if (token) return token;
     if (congId && congPin) {
       return `${congId}::${congPin}::${baseCode}`;
     }
@@ -123,14 +154,9 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
   };
 
   const handleCopy = (code: string, role?: TheocraticRole) => {
-    const { congId, congPin } = getCongregationCredentials();
     const portableCode = getFullPortableInviteCode(code);
     const effectiveRole = role || (generatedInvitation?.role as TheocraticRole) || selectedRole;
-    const params = new URLSearchParams();
-    params.set('invite', code);
-    if (congId) params.set('cong', congId);
-    if (congPin) params.set('cpin', congPin);
-    const directLink = `${window.location.origin}/?${params.toString()}#portal?view=invite_code_login`;
+    const directLink = buildEncryptedInviteUrl(code);
     const text = `Estimado hermano, aquí tienes tu invitación para unirte a ${settings.congregationName || 'la congregación'} en Kongre:\n\nRol asignado: ${THEOCRATIC_ROLES[effectiveRole]?.name || effectiveRole}\nCódigo de Invitación: ${portableCode}\n\nEnlace directo de activación:\n${directLink}`;
     navigator.clipboard.writeText(text);
     setCopiedCode(true);
@@ -138,17 +164,12 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
   };
 
   const handleShareWhatsApp = (code: string, role?: TheocraticRole) => {
-    const { congId, congPin } = getCongregationCredentials();
     const portableCode = getFullPortableInviteCode(code);
     const effectiveRole = role || (generatedInvitation?.role as TheocraticRole) || selectedRole;
-    const params = new URLSearchParams();
-    params.set('invite', code);
-    if (congId) params.set('cong', congId);
-    if (congPin) params.set('cpin', congPin);
-    const directLink = `${window.location.origin}/?${params.toString()}#portal?view=invite_code_login`;
+    const directLink = buildEncryptedInviteUrl(code);
     const roleName = THEOCRATIC_ROLES[effectiveRole]?.name || effectiveRole;
     const msg = `Estimado hermano, se le ha otorgado acceso teocrático a *${settings.congregationName || 'la congregación'}* con el rol de *${roleName}*.\n\nCódigo de Invitación: *${portableCode}*\n\nToque el siguiente enlace para activar automáticamente la aplicación en su dispositivo:\n${directLink}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    openSafeExternalUrl(`https://wa.me/?text=${encodeURIComponent(msg)}`);
   };
 
   const handleSaveMasterPassphrase = async (e: React.FormEvent) => {
@@ -166,6 +187,13 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
 
     if (!newMasterPass) {
       await setMasterPassphrase(null);
+      insertAuditLog({
+        accion: 'DESACTIVAR_CLAVE_MAESTRA',
+        hermano_nid: user?.email || activeRole,
+        hermano_nombre: currentBrotherName || user?.displayName || 'Coordinador',
+        modulo: 'seguridad',
+        detalles: 'Clave Maestra Zero-Knowledge desactivada.',
+      }).catch(() => {});
       setMasterPassFeedback('Clave Maestra desactivada correctamente.');
       setCurrentMasterPass('');
       setNewMasterPass('');
@@ -184,6 +212,13 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
     }
 
     await setMasterPassphrase(newMasterPass);
+    insertAuditLog({
+      accion: 'ACTUALIZAR_CLAVE_MAESTRA',
+      hermano_nid: user?.email || activeRole,
+      hermano_nombre: currentBrotherName || user?.displayName || 'Coordinador',
+      modulo: 'seguridad',
+      detalles: 'Clave Maestra Zero-Knowledge configurada/actualizada.',
+    }).catch(() => {});
     setMasterPassFeedback('¡Clave Maestra de la Congregación actualizada exitosamente!');
     setCurrentMasterPass('');
     setNewMasterPass('');

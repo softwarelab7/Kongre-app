@@ -35,8 +35,13 @@ import {
   setSecureLocalPin,
   getSecureLocalPin,
   verifySecureLocalPin,
+  encryptPinAtRest,
+  decryptPinAtRest,
   signRoleSession,
   verifyRoleSessionSignature,
+  getPinLockoutRemainingSeconds,
+  recordFailedPinAttempt,
+  resetFailedPinAttempts,
 } from '../utils/theocraticSecurity';
 import { UserProfile, PreferredContactMethod, ContactTimePreference } from '../types';
 
@@ -245,7 +250,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   });
 
-  // Publisher Unique PINs Directory (Los PINs son únicos por hermano/publicador)
+  // Publisher Unique PINs Directory (Los PINs son únicos por hermano/publicador y se almacenan cifrados/con hash en localStorage)
   const [publisherPinsList, setPublisherPinsList] = useState<PublisherPinRecord[]>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_PUBLISHER_PINS_KEY);
@@ -262,7 +267,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               !p.publisherId?.startsWith('pub_cuen') &&
               !p.publisherId?.startsWith('pub_disc')
           );
-          return cleaned;
+          return restorePinRecordsFromLocalStorage(cleaned);
         }
       }
     } catch {
@@ -272,8 +277,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_PUBLISHER_PINS_KEY, JSON.stringify(publisherPinsList));
-    localStorage.setItem('kongre_publisher_unique_pins_v1', JSON.stringify(publisherPinsList));
+    try {
+      const sanitized = sanitizePinRecordsForLocalStorage(publisherPinsList);
+      localStorage.setItem(LOCAL_STORAGE_PUBLISHER_PINS_KEY, JSON.stringify(sanitized));
+      localStorage.setItem('kongre_publisher_unique_pins_v1', JSON.stringify(sanitized));
+    } catch {}
   }, [publisherPinsList]);
 
   // Sincronización en tiempo real de PINs de publicadores entre ventanas, pestañas y Firestore
@@ -282,7 +290,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const detail = (e as CustomEvent)?.detail;
         if (Array.isArray(detail) && detail.length > 0) {
-          setPublisherPinsList(detail);
+          setPublisherPinsList(restorePinRecordsFromLocalStorage(detail));
           return;
         }
         const saved =
@@ -291,7 +299,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            setPublisherPinsList(parsed);
+            setPublisherPinsList(restorePinRecordsFromLocalStorage(parsed));
           }
         }
       } catch {}
@@ -355,46 +363,95 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // User roles directory
+  // User roles directory (con PINs sanitizados/cifrados en reposo en localStorage)
   const [userRolesList, setUserRolesList] = useState<UserRoleRecord[]>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_ROLES_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.map((r: UserRoleRecord) => {
+            const restoredPin =
+              r.personalPin && !r.personalPin.startsWith('kgr_v1:')
+                ? r.personalPin
+                : r.encryptedPin
+                ? decryptPinAtRest(r.encryptedPin)
+                : r.personalPin
+                ? decryptPinAtRest(r.personalPin)
+                : undefined;
+            return {
+              ...r,
+              ...(restoredPin ? { personalPin: restoredPin } : { personalPin: undefined }),
+              ...(restoredPin && !r.personalPinHash ? { personalPinHash: hashPersonalPin(restoredPin) } : {}),
+            };
+          });
+        }
+      }
     } catch {
       // fallback
     }
     return DEFAULT_INITIAL_ROLES;
   });
 
-  // Save roles directory
+  // Save roles directory (sin exponer personalPin en texto plano en localStorage)
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_ROLES_KEY, JSON.stringify(userRolesList));
+    try {
+      const sanitized = userRolesList.map((r) => {
+        const rawPin = r.personalPin ? String(r.personalPin).trim() : '';
+        const encryptedPin = rawPin ? encryptPinAtRest(rawPin) : r.encryptedPin;
+        const pinHash = rawPin ? hashPersonalPin(rawPin) : r.personalPinHash;
+        const clone: UserRoleRecord = {
+          ...r,
+          personalPin: undefined,
+          ...(pinHash ? { personalPinHash: pinHash } : {}),
+          ...(encryptedPin ? { encryptedPin } : {}),
+        };
+        return clone;
+      });
+      localStorage.setItem(LOCAL_STORAGE_ROLES_KEY, JSON.stringify(sanitized));
+    } catch {}
   }, [userRolesList]);
 
-  // Active roles state (soporta asignación de múltiples roles teocráticos simultáneos)
+  // Active roles state (soporta asignación de múltiples roles teocráticos simultáneos verificados con firma criptográfica)
   const [activeRoles, setActiveRolesState] = useState<TheocraticRole[]>(() => {
     try {
       const saved = localStorage.getItem(LOCAL_STORAGE_ACTIVE_ROLES_KEY);
+      const savedPrimary = (localStorage.getItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY) as TheocraticRole) || 'publico';
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((r: any) => normalizeTheocraticRole(r));
+          const normalized = parsed.map((r: any) => normalizeTheocraticRole(r));
+          if (verifyRoleSessionSignature(savedPrimary, normalized)) {
+            return normalized;
+          }
+          // Si la firma fue manipulada en DevTools, degradar a publico
+          return ['publico'];
         }
       }
     } catch {}
     return [];
   });
 
-  // Active role state
+  // Active role state (protegido contra escalada de privilegios en localStorage)
   const [activeRole, setActiveRoleState] = useState<TheocraticRole>(() => {
     try {
-      const savedCoordPin = localStorage.getItem('kongre_coordinator_pin');
-      const sessionPin = localStorage.getItem('kongre_session_pin_v2');
-      const saved = localStorage.getItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY) as TheocraticRole;
-      if (savedCoordPin && (sessionPin === savedCoordPin || saved === 'coordinador')) {
+      const sessionPin = getSecureLocalPin('kongre_session_pin_v2');
+      const saved = normalizeTheocraticRole(
+        (localStorage.getItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY) as TheocraticRole) || 'publico'
+      );
+      const savedRolesRaw = localStorage.getItem(LOCAL_STORAGE_ACTIVE_ROLES_KEY);
+      const savedRoles = savedRolesRaw ? JSON.parse(savedRolesRaw) : [saved];
+
+      if (sessionPin && verifySecureLocalPin('kongre_coordinator_pin', sessionPin)) {
+        signRoleSession('coordinador', ['coordinador']);
         return 'coordinador';
       }
-      if (saved && THEOCRATIC_ROLES[saved]) return saved;
+
+      if (saved && THEOCRATIC_ROLES[saved]) {
+        if (verifyRoleSessionSignature(saved, Array.isArray(savedRoles) ? savedRoles : [saved])) {
+          return saved;
+        }
+      }
     } catch {
       // fallback
     }
@@ -408,9 +465,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (normalized.length > 0) {
       setActiveRoleState(normalized[0]);
       localStorage.setItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY, normalized[0]);
+      signRoleSession(normalized[0], normalized);
     } else {
       setActiveRoleState('publico');
       localStorage.setItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY, 'publico');
+      signRoleSession('publico', ['publico']);
     }
   };
 
@@ -420,6 +479,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY, norm);
     setActiveRolesState([norm]);
     localStorage.setItem(LOCAL_STORAGE_ACTIVE_ROLES_KEY, JSON.stringify([norm]));
+    signRoleSession(norm, [norm]);
   };
 
   /**
@@ -543,6 +603,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const identifyRoleByPersonalPin = async (
     pin: string
   ): Promise<{ success: boolean; role?: TheocraticRole; roles?: TheocraticRole[]; name?: string; publisherId?: string; message: string }> => {
+    const lockoutRemaining = getPinLockoutRemainingSeconds();
+    if (lockoutRemaining > 0) {
+      return {
+        success: false,
+        message: `Demasiados intentos fallidos. Por seguridad, espera ${lockoutRemaining} segundos antes de volver a intentar.`,
+      };
+    }
+
     const cleanPin = pin.trim();
     if (!cleanPin || cleanPin.length < 4) {
       return { success: false, message: 'El PIN Personal debe tener al menos 4 dígitos.' };
@@ -571,6 +639,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 0. Comprobar directamente contra el PIN de Coordinador guardado en este dispositivo (cifrado o hash)
     if (verifySecureLocalPin('kongre_coordinator_pin', cleanPin)) {
+      resetFailedPinAttempts();
       setActiveRole('coordinador');
       const savedCoord = localStorage.getItem('kongre_coordinator_name');
       const resolvedName = savedCoord || resolveNonGenericName(null, 'coordinador') || 'Coordinador';
@@ -613,6 +682,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const foundPublisher = publisherPinsList.find((entry) => verifyPersonalPinMatch(cleanPin, entry));
 
     if (foundPublisher) {
+      resetFailedPinAttempts();
       const rolesList = resolveAllRoles(foundPublisher.role, foundPublisher.privilege, foundPublisher.roles);
       setActiveRoles(rolesList);
       const brotherName =
@@ -651,6 +721,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const foundUserEntry = userRolesList.find((entry) => verifyPersonalPinMatch(cleanPin, entry));
 
     if (foundUserEntry) {
+      resetFailedPinAttempts();
       setActiveRole(foundUserEntry.role);
       const brotherName =
         foundUserEntry.name && !isGenericIdentityName(foundUserEntry.name)
@@ -687,6 +758,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (Array.isArray(parsedPubs)) {
           const matchPub = parsedPubs.find((p: any) => verifyPersonalPinMatch(cleanPin, p));
           if (matchPub) {
+            resetFailedPinAttempts();
             const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : 'publico')) as TheocraticRole;
             const rolesList = resolveAllRoles(role, matchPub.privilege, matchPub.theocraticRoles);
             const brotherName =
@@ -744,6 +816,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (Array.isArray(cloudPubs)) {
               const matchPub = cloudPubs.find((p: any) => verifyPersonalPinMatch(cleanPin, p));
               if (matchPub) {
+                resetFailedPinAttempts();
                 const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : 'publico')) as TheocraticRole;
                 const rolesList = resolveAllRoles(role, matchPub.privilege, matchPub.theocraticRoles);
                 const brotherName =
@@ -797,6 +870,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const isValid = await verifyPasscode(cleanPin, coordLockPinHash);
         if (isValid) {
+          resetFailedPinAttempts();
           setActiveRole('coordinador');
           setSecureLocalPin('kongre_session_pin_v2', cleanPin);
           const savedCoord = localStorage.getItem('kongre_coordinator_name');
@@ -827,9 +901,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
+    const lockout = recordFailedPinAttempt();
     return {
       success: false,
-      message: 'PIN Personal no reconocido. Introduce el PIN con el que registraste tu congregación o el asignado por los ancianos.',
+      message: lockout.isLockedOut
+        ? `PIN Personal no reconocido. Demasiados intentos: espera ${lockout.remainingSeconds}s.`
+        : 'PIN Personal no reconocido. Introduce el PIN con el que registraste tu congregación o el asignado por los ancianos.',
     };
   };
 

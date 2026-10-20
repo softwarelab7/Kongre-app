@@ -25,7 +25,47 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.8.8] - 19 de Octubre, 2026 (Compilación Activa)
+### [v2.8.11] - 20 de Octubre, 2026 (Compilación Activa)
+**Título:** Eliminación Completa de Funciones de IA Externa y Operación 100% Local Determinista
+- **Eliminación de Integración con Gemini AI:**
+  - Retirado por completo el servicio `geminiService.ts`, el modal `ClmAiSuggestionsModal`, la dependencia `@google/genai`, y la pestaña/configuración de clave API de Gemini en `SettingsTab`.
+- **Operación 100% Local y Determinista:**
+  - El Programa de Vida y Ministerio Cristianos (`ClmScheduleView`), el importador de la Guía de Actividades (`MwbImportModal`) y el Tablero de Anuncios (`TableroAnunciosTab`) funcionan íntegramente con algoritmos locales deterministas sin enviar datos a servicios de IA externos.
+
+---
+
+### [v2.8.10] - 20 de Octubre, 2026
+**Título:** Capa 6 de Seguridad: Invitaciones Hasheadas en Nube, Protección Anti-Formula-Injection CSV, Guardia RBAC de Modales y Enlaces Firmados
+- **Cifrado en Reposo y Hashing SHA-256 de Invitaciones (`SecurityContext` y `supabaseSyncService`):**
+  - Cifrado en reposo (`kgr_v1:`) de `kongre_theocratic_invitations_v1` y `kongre_device_sessions_v1` en `localStorage`.
+  - Sustitución de códigos de invitación en texto plano dentro de `payload_public` por su hash criptográfico con sal (`codeHash`) y protección anti-fuerza bruta en el canje de invitaciones (`redeemInvitationCode`).
+- **Guardia RBAC en Modales Administrativos y Rutas Hash (`#?modal=...`):**
+  - Bloqueo de apertura no autorizada mediante manipulación del hash de URL (`#?modal=pines`, `invitaciones`, `vinculacion`, `auditoria`, `conflictos`) en `App.tsx` y validación de permisos a nivel de componente en `PublisherPinsModal`, `InvitationManagerModal`, `AccountLinkRequestsModal` y `AuditLogModal`.
+- **Protección contra Inyección de Fórmulas CSV / Excel (CWE-1236) y Sanitización Anti-XSS:**
+  - Sanitización de celdas exportadas a CSV/Excel (`sanitizeCsvFormulaInjection`) e importadas desde CSV (`sanitizeImportedCsvText`), protegiendo además las notas espirituales confidenciales durante la exportación.
+- **Enlaces Firmados de Confirmación en 1-Clic y Limpieza Total al Cerrar Sesión:**
+  - Firma criptográfica `sig` (`computeAssignmentConfirmSignature` / `verifyAssignmentConfirmSignature`) en enlaces de confirmación de asignaciones por WhatsApp con limpieza inmediata de la barra de direcciones, y purga completa de tokens/firmas de sesión en `handleLogout`.
+
+---
+
+### [v2.8.9] - 20 de Octubre, 2026
+**Título:** Blindaje Integral de Seguridad Criptográfica en 5 Capas (Zero-Knowledge, Anti-Brute-Force, Tokens QR, Auditoría SHA-256 y Respaldos Firmados)
+- **Capa 1 y 2 — Hashing Criptográfico, Cifrado en Reposo y Protección Anti-Fuerza Bruta:**
+  - Sustitución de PINs en texto plano por hashes SHA-256 con sal (`personalPinHash`) en `payload_public` y cifrado en reposo (`kgr_v1:`) en `localStorage`.
+  - Bloqueo temporal exponencial anti-fuerza bruta persistido en `localStorage` y `sessionStorage` ante intentos fallidos de PIN.
+- **Capa 3 — Invitaciones CSPRNG, Tokens QR Cifrados y Firma de Sesión de Rol:**
+  - Códigos de invitación generados con `crypto.getRandomValues` (CSPRNG), enlaces directos y códigos QR protegidos con tokens autenticados `kgr_tk1_` y limpieza automática de la barra de direcciones.
+  - Firma criptográfica `kongre_role_session_sig_v1` para impedir escalada de privilegios editando `localStorage`.
+- **Capa 4 — Propiedad Criptográfica en la Nube, Cola Offline Cifrada y Cadena de Auditoría SHA-256:**
+  - Verificación obligatoria de descifrado antes de sobrescribir o borrar registros de congregación en Supabase (`sync_queue`).
+  - Cifrado en reposo de instantáneas en `indexedDbQueue` y solicitudes de vinculación, junto con encadenamiento criptográfico SHA-256 (`prevHash` + `integrityHash`) en `auditLogService`.
+- **Capa 5 — Sello de Integridad en Respaldos JSON, Sanitización Anti-Prototype-Pollution/XSS y Endurecimiento de Sesiones:**
+  - Firma criptográfica SHA-256 (`integritySeal`) y sanitización de PINs al exportar respaldos JSON estándar, más filtrado recursivo contra *Prototype Pollution* y vectores XSS al importar respaldos.
+  - Sanitización en reposo de `publisherPinsList` y `userRolesList`, verificación de firma de rol al inicializar `AuthContext` y controles estrictos de acceso por pestaña en `RoleSwitcherModal`.
+
+---
+
+### [v2.8.8] - 19 de Octubre, 2026
 **Título:** Optimización de Roles Teocráticos, Ingreso por ID/PIN entre Dispositivos y Códigos de Invitación QR
 - **Conexión Multidispositivo por ID y PIN de Congregación:**
   - Actualizado `loadCongregationFromCloud` para recibir directamente el PIN de Congregación y el PIN Personal ingresados por el usuario, permitiendo descifrar desde cero en navegadores o teléfonos móviles nuevos.

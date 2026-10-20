@@ -1,8 +1,20 @@
 // src/context/SecurityContext.tsx
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
-import { hashPasscode, verifyPasscode } from '../utils/theocraticSecurity';
+import {
+  hashPasscode,
+  verifyPasscode,
+  generateSecureInvitationCode,
+  encryptPinAtRest,
+  decryptPinAtRest,
+  hashInvitationCode,
+  verifyInvitationCodeMatch,
+  getPinLockoutRemainingSeconds,
+  recordFailedPinAttempt,
+  resetFailedPinAttempts,
+} from '../utils/theocraticSecurity';
 import { TheocraticRole } from '../utils/rbac';
 import { CongregationInvitation, ActiveDeviceSession } from '../types';
+import { insertAuditLog } from '../services/auditLogService';
 
 interface SecurityContextType {
   isLocked: boolean;
@@ -73,7 +85,20 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [invitations, setInvitations] = useState<CongregationInvitation[]>(() => {
     try {
       const saved = localStorage.getItem(INVITATIONS_STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const rawJson = saved.startsWith('kgr_v1:') ? decryptPinAtRest(saved) : saved;
+        const parsed = JSON.parse(rawJson || '[]');
+        if (Array.isArray(parsed)) {
+          const normalized = parsed.map((inv: CongregationInvitation) => ({
+            ...inv,
+            codeHash: inv.codeHash || (inv.code && !inv.code.includes('••••') ? hashInvitationCode(inv.code) : undefined),
+          }));
+          if (!saved.startsWith('kgr_v1:')) {
+            localStorage.setItem(INVITATIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(normalized)));
+          }
+          return normalized;
+        }
+      }
     } catch {
       // fallback
     }
@@ -83,16 +108,27 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [activeSessions, setActiveSessions] = useState<ActiveDeviceSession[]>(() => {
     try {
       const saved = localStorage.getItem(SESSIONS_STORAGE_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const rawJson = saved.startsWith('kgr_v1:') ? decryptPinAtRest(saved) : saved;
+        const parsed = JSON.parse(rawJson || '[]');
+        if (Array.isArray(parsed)) {
+          if (!saved.startsWith('kgr_v1:')) {
+            localStorage.setItem(SESSIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(parsed)));
+          }
+          return parsed;
+        }
+      }
     } catch {
       // fallback
     }
     return DEFAULT_INITIAL_SESSIONS;
   });
 
-  // Sync invitations to localStorage and listen for cloud updates
+  // Sync invitations to localStorage (encrypted at rest) and listen for cloud updates
   useEffect(() => {
-    localStorage.setItem(INVITATIONS_STORAGE_KEY, JSON.stringify(invitations));
+    try {
+      localStorage.setItem(INVITATIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(invitations)));
+    } catch {}
   }, [invitations]);
 
   useEffect(() => {
@@ -100,7 +136,25 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         const detail = (e as CustomEvent)?.detail;
         if (Array.isArray(detail)) {
-          setInvitations(detail);
+          setInvitations((prev) => {
+            // Preserve local plaintext code if local device created the invitation and remote public payload masked it
+            const localMap = new Map(prev.map((i) => [i.id, i]));
+            return detail.map((remoteInv: CongregationInvitation) => {
+              const localInv = localMap.get(remoteInv.id);
+              const effectiveCode =
+                remoteInv.code && !remoteInv.code.includes('••••')
+                  ? remoteInv.code
+                  : localInv?.code || remoteInv.code || '';
+              return {
+                ...remoteInv,
+                code: effectiveCode,
+                codeHash:
+                  remoteInv.codeHash ||
+                  localInv?.codeHash ||
+                  (effectiveCode && !effectiveCode.includes('••••') ? hashInvitationCode(effectiveCode) : undefined),
+              };
+            });
+          });
         }
       } catch {}
     };
@@ -108,9 +162,11 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return () => window.removeEventListener('kongre_invitations_updated', handleInvitationsSynced);
   }, []);
 
-  // Sync sessions to localStorage
+  // Sync sessions to localStorage (encrypted at rest)
   useEffect(() => {
-    localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(activeSessions));
+    try {
+      localStorage.setItem(SESSIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(activeSessions)));
+    } catch {}
   }, [activeSessions]);
 
   // Helper to check if demo mode is active
@@ -269,8 +325,7 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       };
 
       const prefix = rolePrefixMap[role] || 'KONG';
-      const randomDigits = Math.floor(1000 + Math.random() * 9000);
-      const code = `KONG-${prefix}-${randomDigits}`;
+      const code = generateSecureInvitationCode(prefix);
 
       const expiryDate = new Date();
       expiryDate.setDate(expiryDate.getDate() + expiresInDays);
@@ -278,6 +333,7 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const newInv: CongregationInvitation = {
         id: `inv_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
         code,
+        codeHash: hashInvitationCode(code),
         role,
         targetName: targetName?.trim() || undefined,
         createdByEmail:
@@ -293,11 +349,20 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setInvitations((prev) => {
         const next = [newInv, ...prev];
         try {
-          localStorage.setItem(INVITATIONS_STORAGE_KEY, JSON.stringify(next));
+          localStorage.setItem(INVITATIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(next)));
           window.dispatchEvent(new CustomEvent('kongre_trigger_cloud_sync'));
         } catch {}
         return next;
       });
+
+      insertAuditLog({
+        accion: 'CREAR_INVITACION_TEOCRATICA',
+        hermano_nid: newInv.createdByEmail,
+        hermano_nombre: newInv.createdByEmail,
+        modulo: 'auth',
+        detalles: `Invitación generada para rol ${role}${targetName ? ` (${targetName.trim()})` : ''}.`,
+      }).catch(() => {});
+
       return newInv;
     },
     []
@@ -306,11 +371,20 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Revoke invitation
   const revokeInvitation = useCallback((id: string) => {
     setInvitations((prev) => {
+      const target = prev.find((inv) => inv.id === id);
       const next = prev.map((inv) => (inv.id === id ? { ...inv, status: 'revoked' as const } : inv));
       try {
-        localStorage.setItem(INVITATIONS_STORAGE_KEY, JSON.stringify(next));
+        localStorage.setItem(INVITATIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(next)));
         window.dispatchEvent(new CustomEvent('kongre_trigger_cloud_sync'));
       } catch {}
+      if (target) {
+        insertAuditLog({
+          accion: 'REVOCAR_INVITACION_TEOCRATICA',
+          hermano_nid: 'admin',
+          modulo: 'auth',
+          detalles: `Invitación revocada (rol: ${target.role}${target.targetName ? `, destinatario: ${target.targetName}` : ''}).`,
+        }).catch(() => {});
+      }
       return next;
     });
   }, []);
@@ -322,23 +396,42 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       userEmail?: string,
       userName?: string
     ): Promise<{ success: boolean; role?: TheocraticRole; message: string; targetName?: string }> => {
+      const lockoutRem = getPinLockoutRemainingSeconds();
+      if (lockoutRem > 0) {
+        return {
+          success: false,
+          message: `Por seguridad contra fuerza bruta, espera ${lockoutRem} segundos antes de volver a intentar.`,
+        };
+      }
+
       const cleanCode = code.trim().toUpperCase();
       let currentList = invitations;
       try {
         const stored = localStorage.getItem(INVITATIONS_STORAGE_KEY);
         if (stored) {
-          const parsed = JSON.parse(stored);
+          const rawJson = stored.startsWith('kgr_v1:') ? decryptPinAtRest(stored) : stored;
+          const parsed = JSON.parse(rawJson || '[]');
           if (Array.isArray(parsed) && parsed.length > 0) {
             currentList = parsed;
           }
         }
       } catch {}
-      const found = currentList.find((inv) => inv.code.toUpperCase() === cleanCode);
+      const found = currentList.find((inv) => verifyInvitationCodeMatch(cleanCode, inv));
 
       if (!found) {
+        const lockState = recordFailedPinAttempt();
+        insertAuditLog({
+          accion: 'CANJE_INVITACION_FALLIDO',
+          hermano_nid: userEmail || userName || 'anonimo',
+          hermano_nombre: userName || userEmail || 'Desconocido',
+          modulo: 'auth',
+          detalles: `Intento fallido de canje de código de invitación (${lockState.attempts}/5).`,
+        }).catch(() => {});
         return {
           success: false,
-          message: 'Código de invitación no encontrado. Verifique que esté bien escrito o solicite un nuevo código al Coordinador.',
+          message: lockState.isLockedOut
+            ? `Demasiados intentos fallidos. Bloqueado temporalmente por ${lockState.remainingSeconds} segundos.`
+            : 'Código de invitación no encontrado. Verifique que esté bien escrito o solicite un nuevo código al Coordinador.',
         };
       }
 
@@ -363,9 +456,11 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         };
       }
 
-      // Mark invitation as used
-      setInvitations((prev) =>
-        prev.map((inv) =>
+      resetFailedPinAttempts();
+
+      // Mark invitation as used and immediately trigger cloud sync to prevent replay across devices
+      setInvitations((prev) => {
+        const next = prev.map((inv) =>
           inv.id === found.id
             ? {
                 ...inv,
@@ -374,13 +469,18 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 usedByEmail: userEmail || 'invitado_local@kongre.org',
               }
             : inv
-        )
-      );
+        );
+        try {
+          localStorage.setItem(INVITATIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(next)));
+          window.dispatchEvent(new CustomEvent('kongre_trigger_cloud_sync'));
+        } catch {}
+        return next;
+      });
 
       // Register new active device session
       const newSession: ActiveDeviceSession = {
         id: `sess_${Date.now()}`,
-        email: userEmail || `${found.code.toLowerCase()}@kongre.org`,
+        email: userEmail || `${found.id.toLowerCase()}@kongre.org`,
         name: userName || found.targetName || 'Hermano Autorizado',
         role: found.role,
         deviceInfo: navigator.userAgent.includes('Mobile') ? 'Dispositivo Móvil' : 'Navegador Web / PC',
@@ -390,6 +490,14 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       };
 
       setActiveSessions((prev) => [newSession, ...prev]);
+
+      insertAuditLog({
+        accion: 'CANJEAR_INVITACION_EXITOSO',
+        hermano_nid: userEmail || newSession.name,
+        hermano_nombre: newSession.name,
+        modulo: 'auth',
+        detalles: `Invitación canjeada con éxito para el rol: ${found.role}.`,
+      }).catch(() => {});
 
       return {
         success: true,
@@ -403,9 +511,19 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   // Revoke device session
   const revokeSession = useCallback((sessionId: string) => {
-    setActiveSessions((prev) =>
-      prev.map((s) => (s.id === sessionId ? { ...s, status: 'revoked' as const } : s))
-    );
+    setActiveSessions((prev) => {
+      const target = prev.find((s) => s.id === sessionId);
+      if (target) {
+        insertAuditLog({
+          accion: 'REVOCAR_SESION_DISPOSITIVO',
+          hermano_nid: target.email || target.id,
+          hermano_nombre: target.name,
+          modulo: 'auth',
+          detalles: `Sesión revocada para dispositivo (${target.deviceInfo}) con rol ${target.role}.`,
+        }).catch(() => {});
+      }
+      return prev.map((s) => (s.id === sessionId ? { ...s, status: 'revoked' as const } : s));
+    });
   }, []);
 
   // Inactivity detection for Auto-lock

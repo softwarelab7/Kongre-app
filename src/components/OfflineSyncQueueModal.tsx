@@ -34,6 +34,7 @@ import {
   getOfflineQueueStats,
 } from '../services/indexedDbQueue';
 import { supabaseSyncService } from '../services/supabaseSyncService';
+import { getSecureLocalPin } from '../utils/theocraticSecurity';
 
 interface OfflineSyncQueueModalProps {
   isOpen: boolean;
@@ -118,14 +119,14 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
         await onSyncNow();
       } else {
         const pinMaestro =
-          localStorage.getItem('kongre_session_pin_v2') ||
-          localStorage.getItem('kongre_coordinator_pin') ||
-          localStorage.getItem('kongre_registered_cong_pin') ||
-          localStorage.getItem('kongre_last_cong_pin') ||
+          getSecureLocalPin('kongre_session_pin_v2') ||
+          getSecureLocalPin('kongre_coordinator_pin') ||
+          getSecureLocalPin('kongre_registered_cong_pin') ||
+          getSecureLocalPin('kongre_last_cong_pin') ||
           '';
         const pinCong =
-          localStorage.getItem('kongre_registered_cong_pin') ||
-          localStorage.getItem('kongre_last_cong_pin') ||
+          getSecureLocalPin('kongre_registered_cong_pin') ||
+          getSecureLocalPin('kongre_last_cong_pin') ||
           pinMaestro;
 
         const res = await supabaseSyncService.flushOfflineQueue(pinMaestro, pinCong);

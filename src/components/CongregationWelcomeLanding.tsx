@@ -4,7 +4,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useTheme } from '../context/ThemeContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
-import { isCongregationIdString, getFriendlyCongregationName, verifyPasscode, isGenericIdentityName, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput, verifyPersonalPinMatch, getSecureLocalPin, setSecureLocalPin, verifySecureLocalPin } from '../utils/theocraticSecurity';
+import { isCongregationIdString, getFriendlyCongregationName, verifyPasscode, isGenericIdentityName, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput, verifyPersonalPinMatch, getSecureLocalPin, setSecureLocalPin, verifySecureLocalPin, getPinLockoutRemainingSeconds, recordFailedPinAttempt, resetFailedPinAttempts, decodeSecureShareToken } from '../utils/theocraticSecurity';
 import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import {
   Sun,
@@ -336,7 +336,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   const [inviteCodeSuccess, setInviteCodeSuccess] = useState<string | null>(null);
   const [isQrDetected, setIsQrDetected] = useState(false);
 
-  // Detectar automáticamente parámetro ?invite=... de un Código QR o enlace compartido
+  // Detectar automáticamente parámetro ?tk=... o ?invite=... de un Código QR o enlace compartido y limpiar la URL
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
@@ -344,9 +344,12 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       const hashQuery = window.location.hash.includes('?') ? window.location.hash.split('?')[1] : '';
       const hashParams = new URLSearchParams(hashQuery);
 
-      const inviteParam = searchParams.get('invite') || hashParams.get('invite');
-      const congParam = searchParams.get('cong') || hashParams.get('cong');
-      const cpinParam = searchParams.get('cpin') || hashParams.get('cpin');
+      const rawTk = searchParams.get('tk') || hashParams.get('tk');
+      const decodedTk = decodeSecureShareToken(rawTk);
+
+      const inviteParam = decodedTk?.invite || decodedTk?.pin || searchParams.get('invite') || hashParams.get('invite');
+      const congParam = decodedTk?.cong || searchParams.get('cong') || hashParams.get('cong');
+      const cpinParam = decodedTk?.cpin || searchParams.get('cpin') || hashParams.get('cpin');
 
       if (inviteParam) {
         const cleanInvite = inviteParam.trim();
@@ -359,6 +362,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         if (congParam) setCongregationIdInput(formatCanonicalCongregationId(congParam));
         if (cpinParam) setCongregationPinInput(cpinParam.trim());
         setRawActiveTab('invite_code_login');
+      }
+
+      if (searchParams.has('tk') || searchParams.has('invite') || searchParams.has('cpin') || searchParams.has('pin')) {
+        window.history.replaceState({}, document.title, window.location.pathname + (window.location.hash.split('?')[0] || ''));
       }
     } catch {}
   }, []);
@@ -396,29 +403,54 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     setIsActivatingCode(true);
 
     try {
+      const lockoutRem = getPinLockoutRemainingSeconds();
+      if (lockoutRem > 0) {
+        setInviteCodeError(`Demasiados intentos fallidos. Por seguridad, espera ${lockoutRem} segundos antes de volver a intentar.`);
+        setIsActivatingCode(false);
+        return;
+      }
+
       let finalRole: TheocraticRole | null = null;
       let finalRolesList: TheocraticRole[] = [];
       let finalBrotherName = '';
       let publisherIdToSet: string | null = null;
       let targetCongregationId = settings.congregationNumber || settings.congregationId || '';
-      let targetCongPin = congregationPinInput.trim() || localStorage.getItem('kongre_registered_cong_pin') || '';
+      let targetCongPin = congregationPinInput.trim() || getSecureLocalPin('kongre_registered_cong_pin') || '';
       let codeToRedeem = cleanCode;
 
-      // 0A. Si el hermano pegó un enlace completo (https://.../?invite=... o ?cong=...) extraer sus parámetros automáticamente
-      if (cleanCode.includes('invite=') || cleanCode.includes('cong=')) {
+      // 0A. Si el hermano pegó un enlace completo (https://.../?tk=... o ?invite=... o ?cong=...) o un token KTK1., extraer sus parámetros automáticamente
+      if (cleanCode.startsWith('KTK1.') || cleanCode.includes('tk=') || cleanCode.includes('invite=') || cleanCode.includes('cong=')) {
         try {
-          const queryPart = cleanCode.includes('?') ? cleanCode.split('?')[1].split('#')[0] : cleanCode;
-          const urlParams = new URLSearchParams(queryPart);
-          const uCong = urlParams.get('cong');
-          const uCpin = urlParams.get('cpin');
-          const uInvite = urlParams.get('invite') || urlParams.get('pin');
-          if (uCong && uCpin && uInvite) {
-            cleanCode = `${formatCanonicalCongregationId(uCong)}::${uCpin.trim()}::${uInvite.trim()}`;
-            codeToRedeem = cleanCode;
-          } else if (uInvite) {
-            if (uCong) targetCongregationId = formatCanonicalCongregationId(uCong);
-            if (uCpin) targetCongPin = uCpin.trim();
-            codeToRedeem = uInvite.trim();
+          if (cleanCode.startsWith('KTK1.')) {
+            const tkData = decodeSecureShareToken(cleanCode);
+            if (tkData) {
+              const uCong = tkData.cong;
+              const uCpin = tkData.cpin;
+              const uInvite = tkData.invite || tkData.pin;
+              if (uCong && uCpin && uInvite) {
+                cleanCode = `${formatCanonicalCongregationId(uCong)}::${uCpin.trim()}::${uInvite.trim()}`;
+                codeToRedeem = cleanCode;
+              } else if (uInvite) {
+                if (uCong) targetCongregationId = formatCanonicalCongregationId(uCong);
+                if (uCpin) targetCongPin = uCpin.trim();
+                codeToRedeem = uInvite.trim();
+              }
+            }
+          } else {
+            const queryPart = cleanCode.includes('?') ? cleanCode.split('?')[1].split('#')[0] : cleanCode;
+            const urlParams = new URLSearchParams(queryPart);
+            const tkData = decodeSecureShareToken(urlParams.get('tk'));
+            const uCong = tkData?.cong || urlParams.get('cong');
+            const uCpin = tkData?.cpin || urlParams.get('cpin');
+            const uInvite = tkData?.invite || tkData?.pin || urlParams.get('invite') || urlParams.get('pin');
+            if (uCong && uCpin && uInvite) {
+              cleanCode = `${formatCanonicalCongregationId(uCong)}::${uCpin.trim()}::${uInvite.trim()}`;
+              codeToRedeem = cleanCode;
+            } else if (uInvite) {
+              if (uCong) targetCongregationId = formatCanonicalCongregationId(uCong);
+              if (uCpin) targetCongPin = uCpin.trim();
+              codeToRedeem = uInvite.trim();
+            }
           }
         } catch {}
       }
@@ -438,13 +470,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           });
           if (cloudRes?.success && cloudRes.data) {
             await hydrateCongregation(cloudRes.data);
-            localStorage.setItem('kongre_registered_cong_pin', targetCongPin);
-            localStorage.setItem('kongre_last_cong_pin', targetCongPin);
+            setSecureLocalPin('kongre_registered_cong_pin', targetCongPin);
+            setSecureLocalPin('kongre_last_cong_pin', targetCongPin);
 
             const pubs = (cloudRes.data.publishers || []) as any[];
-            const matched = pubs.find(
-              (p: any) => p.personalPin && String(p.personalPin).trim().toUpperCase() === codeToRedeem.toUpperCase()
-            );
+            const matched = pubs.find((p: any) => verifyPersonalPinMatch(codeToRedeem, p));
             if (matched) {
               const resolved = resolvePublisherRolesList(matched);
               finalRole = resolved.primaryRole;
@@ -492,8 +522,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             targetCongregationId = potentialCong;
             if (optionalCongPin) {
               targetCongPin = optionalCongPin;
-              localStorage.setItem('kongre_registered_cong_pin', optionalCongPin);
-              localStorage.setItem('kongre_last_cong_pin', optionalCongPin);
+              setSecureLocalPin('kongre_registered_cong_pin', optionalCongPin);
+              setSecureLocalPin('kongre_last_cong_pin', optionalCongPin);
             }
             codeToRedeem = potentialPin;
             await hydrateCongregation(cloudRes.data);
@@ -581,10 +611,17 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       }
 
       if (!finalRole) {
-        setInviteCodeError('Código de invitación no válido o expirado. Verifica que esté bien escrito o solicita el código completo a los ancianos de tu congregación.');
+        const failInfo = recordFailedPinAttempt();
+        setInviteCodeError(
+          failInfo.lockedOut
+            ? `Código de invitación no válido. Acceso bloqueado temporalmente por ${failInfo.remainingSeconds} segundos.`
+            : 'Código de invitación no válido o expirado. Verifica que esté bien escrito o solicita el código completo a los ancianos de tu congregación.'
+        );
         setIsActivatingCode(false);
         return;
       }
+
+      resetFailedPinAttempts();
 
       // Activación exitosa: Aplicar rol(es), identificar hermano y entrar a la app
       if (finalRolesList.length > 0) {
@@ -596,7 +633,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       if (publisherIdToSet) {
         setIdentifiedPublisher(publisherIdToSet, finalBrotherName);
       }
-      localStorage.setItem('kongre_session_pin_v2', codeToRedeem);
+      setSecureLocalPin('kongre_session_pin_v2', codeToRedeem);
       localStorage.setItem('kongre_is_registered_congregation', 'true');
       localStorage.setItem('kongre_has_entered_app', 'true');
       localStorage.setItem('kongre_identified_brother', finalBrotherName || 'Hermano');
@@ -628,6 +665,13 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     setIsSubmittingCode(true);
 
     try {
+      const lockoutRem = getPinLockoutRemainingSeconds();
+      if (lockoutRem > 0) {
+        setCodeError(`Demasiados intentos fallidos. Por seguridad, espera ${lockoutRem} segundos antes de volver a intentar.`);
+        setIsSubmittingCode(false);
+        return;
+      }
+
       const rawInput = congregationIdInput.trim();
       const cleanId = formatCanonicalCongregationId(rawInput);
       const cleanCongPin = congregationPinInput.trim();
@@ -681,22 +725,26 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       }
 
       if (!isCongPinValid) {
-        setCodeError('El PIN de Congregación ingresado es incorrecto.');
+        const failInfo = recordFailedPinAttempt();
+        setCodeError(
+          failInfo.lockedOut
+            ? `El PIN de Congregación ingresado es incorrecto. Acceso bloqueado temporalmente por ${failInfo.remainingSeconds} segundos.`
+            : 'El PIN de Congregación ingresado es incorrecto.'
+        );
         setIsSubmittingCode(false);
         return;
       }
 
-      // Persistir el PIN de congregación verificado para futuras sincronizaciones en este dispositivo
-      localStorage.setItem('kongre_registered_cong_pin', cleanCongPin);
-      localStorage.setItem('kongre_last_cong_pin', cleanCongPin);
+      // Persistir el PIN de congregación verificado de forma cifrada para futuras sincronizaciones en este dispositivo
+      setSecureLocalPin('kongre_registered_cong_pin', cleanCongPin);
+      setSecureLocalPin('kongre_last_cong_pin', cleanCongPin);
 
       let identifiedRole: TheocraticRole | undefined;
 
       // 3. Probar PIN personal en el directorio de la congregación ÚNICAMENTE si el usuario lo ingresó
       let matchingPub: any = null;
-      const savedCoordPin = localStorage.getItem('kongre_coordinator_pin');
       if (cleanPersonalPin) {
-        if (savedCoordPin && savedCoordPin.trim() === cleanPersonalPin) {
+        if (verifySecureLocalPin('kongre_coordinator_pin', cleanPersonalPin)) {
           identifiedRole = 'coordinador';
           const savedCoord = localStorage.getItem('kongre_coordinator_name') || cloudData?.settings?.coordinatorName || settings.coordinatorName;
           nameToUse = savedCoord && !isGenericIdentityName(savedCoord) ? savedCoord.trim() : 'Coordinador';
@@ -728,13 +776,20 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 nameToUse = invResult.targetName;
               }
             } else {
-              setCodeError('El PIN Personal ingresado no coincide con ningún publicador en esta congregación. Verifica el PIN asignado por los ancianos o déjalo vacío para entrar en Modo Cartelera/Público.');
+              const failInfo = recordFailedPinAttempt();
+              setCodeError(
+                failInfo.lockedOut
+                  ? `El PIN Personal ingresado no coincide con ningún publicador. Acceso bloqueado temporalmente por ${failInfo.remainingSeconds} segundos.`
+                  : 'El PIN Personal ingresado no coincide con ningún publicador en esta congregación. Verifica el PIN asignado por los ancianos o déjalo vacío para entrar en Modo Cartelera/Público.'
+              );
               setIsSubmittingCode(false);
               return;
             }
           }
         }
       }
+
+      resetFailedPinAttempts();
 
       // Si solo ingresó PIN de congregación sin PIN personal, el rol es ESTRICTAMENTE 'publico' (nunca 'coordinador')
       const roleFinal: TheocraticRole = identifiedRole || 'publico';
@@ -817,7 +872,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       setActiveRole(roleFinal);
 
       if (cleanPersonalPin) {
-        localStorage.setItem('kongre_session_pin_v2', cleanPersonalPin);
+        setSecureLocalPin('kongre_session_pin_v2', cleanPersonalPin);
       }
 
       // Si se identificó un publicador coincidente en la lista, asegurar la vinculación exacta

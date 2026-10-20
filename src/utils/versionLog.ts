@@ -25,42 +25,106 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.8.8';
-export const CURRENT_BUILD_CODE = '2026.10.19.288';
-export const BUILD_DATE = '19 de Octubre, 2026';
+export const CURRENT_APP_VERSION = '2.8.11';
+export const CURRENT_BUILD_CODE = '2026.10.20.2811';
+export const BUILD_DATE = '20 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '2.8.11',
+    buildCode: '2026.10.20.2811',
+    date: '20 de Octubre, 2026',
+    title: 'Eliminación Completa de Funciones de IA Externa y Operación 100% Local Determinista',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Eliminación completa de la integración con Gemini AI (servicio, clave API y llamadas externas) para garantizar privacidad total sin envío de datos a modelos de IA externos.',
+      },
+      {
+        category: 'improvement',
+        text: 'Simplificación de Ajustes de la Congregación, Tablero de Anuncios, Programa VMC e Importador de Guía de Actividades (MWB) utilizando exclusivamente algoritmos deterministas locales.',
+      },
+    ],
+  },
+  {
+    version: '2.8.10',
+    buildCode: '2026.10.20.2810',
+    date: '20 de Octubre, 2026',
+    title: 'Capa 6 de Seguridad: Invitaciones Hasheadas en Nube, Protección Anti-Formula-Injection CSV, Guardia RBAC de Modales y Enlaces Firmados',
+    isCurrent: false,
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Cifrado en reposo (kgr_v1:) de invitaciones y sesiones de dispositivos en localStorage, y enmascaramiento con hash SHA-256 (codeHash) de invitaciones en payload_public de Supabase.',
+      },
+      {
+        category: 'security',
+        text: 'Guardia de control de acceso (RBAC) en rutas hash (#?modal=...) y dentro de PublisherPinsModal, InvitationManagerModal, AccountLinkRequestsModal y AuditLogModal.',
+      },
+      {
+        category: 'security',
+        text: 'Protección contra Inyección de Fórmulas CSV / Excel (CWE-1236) al exportar directorios y programas, y sanitización anti-XSS al importar archivos CSV.',
+      },
+      {
+        category: 'security',
+        text: 'Firma criptográfica SHA-256 (sig) y limpieza automática de URL en enlaces de confirmación de asignaciones en 1 clic, más limpieza integral de tokens al cerrar sesión.',
+      },
+    ],
+  },
+  {
+    version: '2.8.9',
+    buildCode: '2026.10.20.289',
+    date: '20 de Octubre, 2026',
+    title: 'Blindaje Integral de Seguridad Criptográfica en 5 Capas (Zero-Knowledge, Anti-Brute-Force, Tokens QR, Auditoría SHA-256 y Respaldos Firmados)',
+    isCurrent: false,
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Capa 1 y 2: Hashing criptográfico SHA-256/PBKDF2 de PINs personales, cifrado en reposo en localStorage (kgr_v1:) y protección anti-fuerza bruta con bloqueo exponencial.',
+      },
+      {
+        category: 'security',
+        text: 'Capa 3: Códigos de invitación con entropía CSPRNG, tokens de enlace/QR cifrados y autenticados (kgr_tk1_) con limpieza inmediata de URL, y firma criptográfica de sesiones de rol.',
+      },
+      {
+        category: 'security',
+        text: 'Capa 4: Verificación criptográfica de propiedad antes de sobrescribir o borrar registros en Supabase, cifrado en reposo de la cola offline IndexedDB, y cadena de integridad SHA-256 en el registro de auditoría.',
+      },
+      {
+        category: 'security',
+        text: 'Capa 5: Sello de integridad SHA-256 en copias de seguridad exportadas, sanitización anti-Prototype-Pollution/XSS al restaurar respaldos, y protección en reposo de directorios de roles y sesiones.',
+      },
+    ],
+  },
   {
     version: '2.8.8',
     buildCode: '2026.10.19.288',
     date: '19 de Octubre, 2026',
     title: 'Optimización de Roles Teocráticos, Ingreso por ID/PIN entre Dispositivos y Códigos de Invitación QR',
-    isCurrent: true,
+    isCurrent: false,
+    environment: 'Producción Cloud (Kongre)',
     changes: [
       {
-        type: 'security',
-        title: 'Conexión Multidispositivo con ID y PIN de Congregación',
-        description:
-          'Corregida la transferencia directa del PIN de Congregación y PIN Personal hacia loadCongregationFromCloud para permitir el descifrado inmediato desde teléfonos o navegadores nuevos y eliminar falsos positivos locales.',
+        category: 'security',
+        text: 'Conexión Multidispositivo con ID y PIN de Congregación: transferencia directa del PIN hacia loadCongregationFromCloud para permitir el descifrado inmediato desde teléfonos o navegadores nuevos.',
       },
       {
-        type: 'improvement',
-        title: 'Verificación de PIN Personal y Roles en Payload Público',
-        description:
-          'Enriquecido el payload público cifrado con el PIN de Congregación para incluir de forma segura los roles teocráticos, privilegios e invitaciones activas, permitiendo que cada publicador se identifique con su PIN Personal en su propio dispositivo.',
+        category: 'improvement',
+        text: 'Verificación de PIN Personal y Roles en Payload Público: enriquecido el payload público cifrado con el PIN de Congregación para incluir de forma segura los hashes de PINs personales, roles e invitaciones activas.',
       },
       {
-        type: 'feature',
-        title: 'Códigos de Invitación Portátiles y Autodetección por Código QR',
-        description:
-          'Sincronización automática de invitaciones con Supabase, soporte para códigos portátiles compuestos (ID::PIN::CODIGO) y detección automática del parámetro ?invite= al escanear el código QR con la cámara del celular.',
+        category: 'feature',
+        text: 'Códigos de Invitación Portátiles y Autodetección por Código QR: sincronización automática de invitaciones con Supabase y detección automática al escanear el código QR.',
       },
       {
-        type: 'fix',
-        title: 'Asignación Exacta de Roles para Siervos Ministeriales',
-        description:
-          'Corregida la inferencia de rol por defecto para siervos ministeriales sin departamento asignado (evitando otorgar permisos de territorios por defecto) y eliminada la doble hidratación al iniciar sesión.',
+        category: 'fix',
+        text: 'Asignación Exacta de Roles para Siervos Ministeriales: corregida la inferencia de rol por defecto para siervos ministeriales sin departamento asignado.',
       },
     ],
   },

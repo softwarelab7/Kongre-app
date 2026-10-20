@@ -1036,6 +1036,7 @@ export interface LiteratureInventoryRecord {
 export interface CongregationInvitation {
   id: string;
   code: string; // e.g. 'KONG-SEC-4819'
+  codeHash?: string; // SHA-256 salted hash for Zero-Knowledge verification in public payload
   role: string; // TheocraticRole
   targetName?: string;
   targetEmail?: string;

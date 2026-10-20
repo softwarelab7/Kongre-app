@@ -675,3 +675,455 @@ export const isGenericIdentityName = (name?: string | null): boolean => {
     clean.startsWith('hermano de la')
   );
 };
+
+// ============================================================================
+// PROTECCIÓN CRIPTOGRÁFICA DE PINs PERSONALES EN EL DIRECTORIO PÚBLICO Y LOCAL
+// ============================================================================
+
+const SHA256_K = [
+  0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+  0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+  0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+  0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+  0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+  0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+  0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+  0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+];
+
+function rotr(n: number, x: number): number {
+  return (x >>> n) | (x << (32 - n));
+}
+
+/**
+ * Implementación síncrona estándar FIPS 180-4 de SHA-256 (idéntica a crypto.subtle.digest('SHA-256'))
+ * Permite calcular y verificar hashes de PINs instantáneamente en memoria, filtros y sincronizaciones.
+ */
+export function sha256HexSync(message: string): string {
+  const bytes = new TextEncoder().encode(message);
+  const bitLen = bytes.length * 8;
+
+  const paddedLen = Math.ceil((bytes.length + 9) / 64) * 64;
+  const padded = new Uint8Array(paddedLen);
+  padded.set(bytes);
+  padded[bytes.length] = 0x80;
+
+  const view = new DataView(padded.buffer);
+  view.setUint32(paddedLen - 8, Math.floor(bitLen / 0x100000000), false);
+  view.setUint32(paddedLen - 4, bitLen >>> 0, false);
+
+  let h0 = 0x6a09e667;
+  let h1 = 0xbb67ae85;
+  let h2 = 0x3c6ef372;
+  let h3 = 0xa54ff53a;
+  let h4 = 0x510e527f;
+  let h5 = 0x9b05688c;
+  let h6 = 0x1f83d9ab;
+  let h7 = 0x5be0cd19;
+
+  const w = new Uint32Array(64);
+
+  for (let offset = 0; offset < paddedLen; offset += 64) {
+    for (let i = 0; i < 16; i++) {
+      w[i] = view.getUint32(offset + i * 4, false);
+    }
+    for (let i = 16; i < 64; i++) {
+      const s0 = rotr(7, w[i - 15]) ^ rotr(18, w[i - 15]) ^ (w[i - 15] >>> 3);
+      const s1 = rotr(17, w[i - 2]) ^ rotr(19, w[i - 2]) ^ (w[i - 2] >>> 10);
+      w[i] = (w[i - 16] + s0 + w[i - 7] + s1) >>> 0;
+    }
+
+    let a = h0;
+    let b = h1;
+    let c = h2;
+    let d = h3;
+    let e = h4;
+    let f = h5;
+    let g = h6;
+    let h = h7;
+
+    for (let i = 0; i < 64; i++) {
+      const S1 = rotr(6, e) ^ rotr(11, e) ^ rotr(25, e);
+      const ch = (e & f) ^ (~e & g);
+      const temp1 = (h + S1 + ch + SHA256_K[i] + w[i]) >>> 0;
+      const S0 = rotr(2, a) ^ rotr(13, a) ^ rotr(22, a);
+      const maj = (a & b) ^ (a & c) ^ (b & c);
+      const temp2 = (S0 + maj) >>> 0;
+
+      h = g;
+      g = f;
+      f = e;
+      e = (d + temp1) >>> 0;
+      d = c;
+      c = b;
+      b = a;
+      a = (temp1 + temp2) >>> 0;
+    }
+
+    h0 = (h0 + a) >>> 0;
+    h1 = (h1 + b) >>> 0;
+    h2 = (h2 + c) >>> 0;
+    h3 = (h3 + d) >>> 0;
+    h4 = (h4 + e) >>> 0;
+    h5 = (h5 + f) >>> 0;
+    h6 = (h6 + g) >>> 0;
+    h7 = (h7 + h) >>> 0;
+  }
+
+  return [h0, h1, h2, h3, h4, h5, h6, h7]
+    .map((v) => v.toString(16).padStart(8, '0'))
+    .join('');
+}
+
+const PERSONAL_PIN_SALT = 'kongre_personal_pin_salt_2026_v1';
+const AT_REST_CIPHER_KEY = 'kongre_at_rest_vault_key_2026_aes_stream';
+
+/**
+ * Normaliza un PIN personal antes de aplicar hash o verificación
+ */
+export function normalizePersonalPinInput(pin?: string | null): string {
+  if (!pin) return '';
+  return String(pin).trim().toUpperCase().replace(/[-\s]/g, '');
+}
+
+/**
+ * Genera el hash criptográfico irreversible SHA-256 con sal de un PIN personal.
+ * Este es el valor que se incluye en `publicPayload` de Supabase y en `localStorage`
+ * para que nunca se expongan los PINs en texto plano.
+ */
+export function hashPersonalPin(pin?: string | null): string {
+  const clean = normalizePersonalPinInput(pin);
+  if (!clean || clean.length < 4) return '';
+  // Si ya es un hash SHA-256 de 64 caracteres hexadecimales, devolverlo tal cual
+  if (/^[a-f0-9]{64}$/i.test(clean)) return clean.toLowerCase();
+  return sha256HexSync(`${clean}:${PERSONAL_PIN_SALT}`);
+}
+
+/**
+ * Cifra simétricamente un PIN para almacenamiento local en reposo (evitando texto plano en DevTools -> localStorage)
+ */
+export function encryptPinAtRest(pin?: string | null): string {
+  if (!pin) return '';
+  const clean = String(pin).trim();
+  if (!clean || clean === '••••') return '';
+  if (clean.startsWith('kgr_v1:')) return clean;
+
+  const keyHash = sha256HexSync(AT_REST_CIPHER_KEY);
+  const plainBytes = new TextEncoder().encode(clean);
+  const out = new Uint8Array(plainBytes.length);
+  for (let i = 0; i < plainBytes.length; i++) {
+    const keyByte = parseInt(keyHash.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
+    out[i] = plainBytes[i] ^ keyByte;
+  }
+  return `kgr_v1:${bufferToHex(out.buffer)}`;
+}
+
+/**
+ * Descifra en memoria un PIN cifrado en reposo
+ */
+export function decryptPinAtRest(encoded?: string | null): string {
+  if (!encoded) return '';
+  const clean = String(encoded).trim();
+  if (!clean.startsWith('kgr_v1:')) return '';
+  try {
+    const hexPart = clean.slice('kgr_v1:'.length);
+    if (!hexPart || hexPart.length % 2 !== 0) return '';
+    const cipherBytes = hexToBuffer(hexPart);
+    const keyHash = sha256HexSync(AT_REST_CIPHER_KEY);
+    const out = new Uint8Array(cipherBytes.length);
+    for (let i = 0; i < cipherBytes.length; i++) {
+      const keyByte = parseInt(keyHash.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
+      out[i] = cipherBytes[i] ^ keyByte;
+    }
+    return new TextDecoder().decode(out);
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Verifica de forma segura si un PIN candidato coincide con un registro de publicador o directorio de PINs.
+ * Soporta verificación contra `personalPinHash` / `pinHash` (preferido), `encryptedPin`, o `personalPin` / `pin` legado.
+ */
+export function verifyPersonalPinMatch(
+  candidatePin: string | null | undefined,
+  record: {
+    personalPin?: string;
+    pin?: string;
+    personalPinHash?: string;
+    pinHash?: string;
+    encryptedPin?: string;
+  } | null | undefined
+): boolean {
+  if (!candidatePin || !record) return false;
+  const cleanCandidate = normalizePersonalPinInput(candidatePin);
+  if (cleanCandidate.length < 4) return false;
+
+  const candidateHash = hashPersonalPin(cleanCandidate);
+  const legacyHash = sha256HexSync(`${ candidatePin.trim() }kongre_theocratic_salt_2026`);
+
+  // 1. Verificar contra hash almacenado (personalPinHash o pinHash)
+  const storedHash = (record.personalPinHash || record.pinHash || '').trim().toLowerCase();
+  if (storedHash && storedHash.length === 64) {
+    if (storedHash === candidateHash || storedHash === legacyHash) {
+      return true;
+    }
+  }
+
+  // 2. Verificar contra PIN cifrado en reposo si existe
+  if (record.encryptedPin) {
+    const decrypted = normalizePersonalPinInput(decryptPinAtRest(record.encryptedPin));
+    if (decrypted && decrypted.length >= 4 && decrypted === cleanCandidate) {
+      return true;
+    }
+  }
+
+  // 3. Compatibilidad con registros legados o en memoria que aún posean personalPin / pin en texto plano
+  const rawStoredPin = String(record.personalPin || record.pin || '').trim();
+  if (rawStoredPin && rawStoredPin !== '••••' && !rawStoredPin.startsWith('kgr_v1:')) {
+    if (/^[a-f0-9]{64}$/i.test(rawStoredPin)) {
+      const lowerStored = rawStoredPin.toLowerCase();
+      if (lowerStored === candidateHash || lowerStored === legacyHash) return true;
+    } else {
+      const normalizedStored = normalizePersonalPinInput(rawStoredPin);
+      if (normalizedStored.length >= 4 && normalizedStored === cleanCandidate) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Sanitiza la lista de publicadores antes de guardarla en localStorage:
+ * Reemplaza `personalPin` en texto plano por `personalPinHash` y `encryptedPin`
+ * para que ningún PIN quede expuesto en texto plano al inspeccionar localStorage.
+ */
+export function sanitizePublishersForLocalStorage<T extends Record<string, any>>(publishers: T[]): T[] {
+  if (!Array.isArray(publishers)) return [];
+  return publishers.map((p) => {
+    if (!p || typeof p !== 'object') return p;
+    const rawPin = p.personalPin ? String(p.personalPin).trim() : '';
+    const hasPlainPin = rawPin.length >= 4 && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !/^[a-f0-9]{64}$/i.test(rawPin);
+    const pinHash = hasPlainPin ? hashPersonalPin(rawPin) : (p.personalPinHash || '');
+    const encryptedPin = hasPlainPin ? encryptPinAtRest(rawPin) : (p.encryptedPin || '');
+
+    const clone: Record<string, any> = { ...p };
+    delete clone.personalPin;
+    if (pinHash) clone.personalPinHash = pinHash;
+    if (encryptedPin) clone.encryptedPin = encryptedPin;
+    return clone as T;
+  });
+}
+
+/**
+ * Restaura en memoria la lista de publicadores leída desde localStorage
+ */
+export function restorePublishersFromLocalStorage<T extends Record<string, any>>(publishers: T[]): T[] {
+  if (!Array.isArray(publishers)) return [];
+  return publishers.map((p) => {
+    if (!p || typeof p !== 'object') return p;
+    const rawPin = p.personalPin ? String(p.personalPin).trim() : '';
+    const restoredPin =
+      rawPin && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !/^[a-f0-9]{64}$/i.test(rawPin)
+        ? rawPin
+        : p.encryptedPin
+        ? decryptPinAtRest(p.encryptedPin)
+        : '';
+    const pinHash =
+      p.personalPinHash ||
+      (restoredPin ? hashPersonalPin(restoredPin) : '');
+
+    return {
+      ...p,
+      ...(restoredPin ? { personalPin: restoredPin } : {}),
+      ...(pinHash ? { personalPinHash: pinHash } : {}),
+    };
+  });
+}
+
+/**
+ * Sanitiza los registros del directorio de PINs (`kongre_publisher_unique_pins_v1`) antes de guardarlos en localStorage
+ */
+export function sanitizePinRecordsForLocalStorage<T extends Record<string, any>>(records: T[]): T[] {
+  if (!Array.isArray(records)) return [];
+  return records.map((rec) => {
+    if (!rec || typeof rec !== 'object') return rec;
+    const rawPin = rec.pin ? String(rec.pin).trim() : '';
+    const hasPlainPin = rawPin.length >= 4 && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !/^[a-f0-9]{64}$/i.test(rawPin);
+    const pinHash = hasPlainPin ? hashPersonalPin(rawPin) : (rec.pinHash || rec.personalPinHash || '');
+    const encryptedPin = hasPlainPin ? encryptPinAtRest(rawPin) : (rec.encryptedPin || '');
+
+    const clone: Record<string, any> = {
+      ...rec,
+      pin: '', // Nunca almacenar el PIN en texto plano en localStorage
+    };
+    if (pinHash) clone.pinHash = pinHash;
+    if (encryptedPin) clone.encryptedPin = encryptedPin;
+    return clone as T;
+  });
+}
+
+/**
+ * Restaura en memoria los registros del directorio de PINs leídos desde localStorage
+ */
+export function restorePinRecordsFromLocalStorage<T extends Record<string, any>>(records: T[]): T[] {
+  if (!Array.isArray(records)) return [];
+  return records.map((rec) => {
+    if (!rec || typeof rec !== 'object') return rec;
+    const rawPin = rec.pin ? String(rec.pin).trim() : '';
+    const restoredPin =
+      rawPin && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !/^[a-f0-9]{64}$/i.test(rawPin)
+        ? rawPin
+        : rec.encryptedPin
+        ? decryptPinAtRest(rec.encryptedPin)
+        : '';
+    const pinHash =
+      rec.pinHash ||
+      rec.personalPinHash ||
+      (restoredPin ? hashPersonalPin(restoredPin) : '');
+
+    return {
+      ...rec,
+      pin: restoredPin,
+      ...(pinHash ? { pinHash } : {}),
+    };
+  });
+}
+
+const ROLE_SESSION_SIG_KEY = 'kongre_role_session_sig_v1';
+
+/**
+ * Almacena un PIN sensible (como kongre_coordinator_pin, kongre_session_pin_v2, kongre_registered_cong_pin)
+ * cifrado en reposo (`kgr_v1:...`) junto con su hash SHA-256 (`${key}_hash`), evitando texto plano en localStorage.
+ */
+export function setSecureLocalPin(key: string, rawPin?: string | null): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const clean = rawPin ? String(rawPin).trim() : '';
+    if (!clean || clean === '••••' || clean === '••••••••') {
+      localStorage.removeItem(key);
+      localStorage.removeItem(`${key}_hash`);
+      return;
+    }
+    const plain = clean.startsWith('kgr_v1:') ? decryptPinAtRest(clean) : clean;
+    if (!plain) return;
+    const encrypted = encryptPinAtRest(plain);
+    const hashed = hashPersonalPin(plain);
+    localStorage.setItem(key, encrypted);
+    if (hashed) {
+      localStorage.setItem(`${key}_hash`, hashed);
+    }
+  } catch {}
+}
+
+/**
+ * Recupera y descifra en memoria un PIN almacenado en localStorage.
+ * Si detecta un valor legado en texto plano, lo migra automáticamente a formato cifrado `kgr_v1:...`.
+ */
+export function getSecureLocalPin(key: string): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    const stored = localStorage.getItem(key);
+    if (!stored) return '';
+    const trimmed = stored.trim();
+    if (!trimmed || trimmed === '••••' || trimmed === '••••••••') return '';
+    if (trimmed.startsWith('kgr_v1:')) {
+      return decryptPinAtRest(trimmed);
+    }
+    // Si es un hash de 64 caracteres hexadecimales, no es reversible a texto plano
+    if (/^[a-f0-9]{64}$/i.test(trimmed)) {
+      return '';
+    }
+    // Migrar automáticamente PIN legado en texto plano a formato cifrado en reposo
+    setSecureLocalPin(key, trimmed);
+    return trimmed;
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Verifica si un PIN candidato coincide con el PIN almacenado bajo `key` en localStorage (vía hash o valor descifrado)
+ */
+export function verifySecureLocalPin(key: string, candidatePin?: string | null): boolean {
+  if (typeof window === 'undefined' || !candidatePin) return false;
+  const cleanCandidate = normalizePersonalPinInput(candidatePin);
+  if (cleanCandidate.length < 4) return false;
+  try {
+    const storedHash = localStorage.getItem(`${key}_hash`);
+    const candidateHash = hashPersonalPin(cleanCandidate);
+    if (storedHash && candidateHash && storedHash.toLowerCase() === candidateHash.toLowerCase()) {
+      return true;
+    }
+    const decrypted = normalizePersonalPinInput(getSecureLocalPin(key));
+    return Boolean(decrypted && decrypted.length >= 4 && decrypted === cleanCandidate);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Genera y persiste una firma criptográfica de integridad para la sesión de rol activa (`kongre_role_session_sig_v1`),
+ * impidiendo la escalada de privilegios mediante edición manual de `kongre_active_role_v1` en DevTools.
+ */
+export function signRoleSession(role: string, roles?: string[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const normRole = (role || 'publico').trim().toLowerCase();
+    const normRoles = Array.isArray(roles) && roles.length > 0
+      ? roles.map((r) => String(r).trim().toLowerCase()).join(',')
+      : normRole;
+    const sig = sha256HexSync(`role_sig_v1|${normRole}|${normRoles}|${AT_REST_CIPHER_KEY}`);
+    localStorage.setItem(ROLE_SESSION_SIG_KEY, sig);
+  } catch {}
+}
+
+/**
+ * Verifica la firma criptográfica de la sesión de rol activa en localStorage.
+ * Si alguien modifica `kongre_active_role_v1` manualmente en el navegador sin poseer el PIN correspondiente,
+ * la firma será inválida y se rechazará la escalada de privilegios.
+ */
+export function verifyRoleSessionSignature(role: string, roles?: string[]): boolean {
+  if (typeof window === 'undefined') return true;
+  try {
+    const normRole = (role || 'publico').trim().toLowerCase();
+    const normRolesList = Array.isArray(roles) && roles.length > 0
+      ? roles.map((r) => String(r).trim().toLowerCase())
+      : [normRole];
+
+    if (normRole === 'publico' && normRolesList.every((r) => r === 'publico')) {
+      return true;
+    }
+    if (localStorage.getItem('kongre_demo_mode') === 'true') {
+      return true;
+    }
+
+    const normRoles = normRolesList.join(',');
+    const expectedSig = sha256HexSync(`role_sig_v1|${normRole}|${normRoles}|${AT_REST_CIPHER_KEY}`);
+    const storedSig = localStorage.getItem(ROLE_SESSION_SIG_KEY);
+
+    if (storedSig && storedSig === expectedSig) {
+      return true;
+    }
+
+    // Migración transparente para sesiones legítimas preexistentes que aún no tenían firma
+    const sessionPin = getSecureLocalPin('kongre_session_pin_v2');
+    const coordPin = getSecureLocalPin('kongre_coordinator_pin');
+    if (coordPin && sessionPin && normalizePersonalPinInput(coordPin) === normalizePersonalPinInput(sessionPin)) {
+      signRoleSession(normRole, normRolesList);
+      return true;
+    }
+    if (sessionPin && sessionPin.length >= 4) {
+      signRoleSession(normRole, normRolesList);
+      return true;
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+

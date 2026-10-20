@@ -4,7 +4,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useTheme } from '../context/ThemeContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
-import { isCongregationIdString, getFriendlyCongregationName, verifyPasscode, isGenericIdentityName, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput } from '../utils/theocraticSecurity';
+import { isCongregationIdString, getFriendlyCongregationName, verifyPasscode, isGenericIdentityName, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput, verifyPersonalPinMatch, getSecureLocalPin, setSecureLocalPin, verifySecureLocalPin } from '../utils/theocraticSecurity';
 import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import {
   Sun,
@@ -499,9 +499,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             await hydrateCongregation(cloudRes.data);
 
             const pubs = (cloudRes.data.publishers || []) as any[];
-            const matched = pubs.find(
-              (p: any) => p.personalPin && String(p.personalPin).trim().toUpperCase() === potentialPin.toUpperCase()
-            );
+            const matched = pubs.find((p: any) => verifyPersonalPinMatch(potentialPin, p));
             if (matched) {
               const resolved = resolvePublisherRolesList(matched);
               finalRole = resolved.primaryRole;
@@ -525,9 +523,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
       // 3. Verificar si el código coincide con el PIN personal de algún publicador en la congregación activa
       if (!finalRole && publishers && publishers.length > 0) {
-        const matched = publishers.find(
-          (p) => p.personalPin && String(p.personalPin).trim().toUpperCase() === codeToRedeem.toUpperCase()
-        );
+        const matched = publishers.find((p) => verifyPersonalPinMatch(codeToRedeem, p));
         if (matched) {
           const resolved = resolvePublisherRolesList(matched);
           finalRole = resolved.primaryRole;
@@ -563,9 +559,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           if (cloudRes?.success && cloudRes.data) {
             await hydrateCongregation(cloudRes.data);
             if (cloudRes.data.publishers) {
-              const matched = cloudRes.data.publishers.find(
-                (p: any) => p.personalPin && String(p.personalPin).trim().toUpperCase() === codeToRedeem.toUpperCase()
-              );
+              const matched = cloudRes.data.publishers.find((p: any) => verifyPersonalPinMatch(codeToRedeem, p));
               if (matched) {
                 const resolved = resolvePublisherRolesList(matched);
                 finalRole = resolved.primaryRole;
@@ -709,9 +703,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           setIdentifiedBrother(nameToUse);
         } else {
           const congPubs = (cloudData?.publishers || publishers) as any[];
-          matchingPub = congPubs.find(
-            (p) => p.personalPin && String(p.personalPin).trim().length >= 4 && String(p.personalPin).trim() === cleanPersonalPin
-          );
+          matchingPub = congPubs.find((p) => verifyPersonalPinMatch(cleanPersonalPin, p));
 
           if (matchingPub) {
             const resolved = resolvePublisherRolesList(matchingPub);

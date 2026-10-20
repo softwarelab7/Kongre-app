@@ -4,7 +4,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
-import { verifyPasscode, isCongregationIdString, isGenericIdentityName, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput } from '../utils/theocraticSecurity';
+import { verifyPasscode, isCongregationIdString, isGenericIdentityName, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput, verifyPersonalPinMatch, setSecureLocalPin } from '../utils/theocraticSecurity';
 import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import { supabaseSyncService } from '../services/supabaseSyncService';
 import {
@@ -158,19 +158,17 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         return;
       }
 
-      localStorage.setItem('kongre_registered_cong_pin', cleanCongPin);
-      localStorage.setItem('kongre_last_cong_pin', cleanCongPin);
+      setSecureLocalPin('kongre_registered_cong_pin', cleanCongPin);
+      setSecureLocalPin('kongre_last_cong_pin', cleanCongPin);
 
       // Verificar PIN Personal (Código de Identificación de Rol otorgado por el Coordinador)
       let identifiedRole: TheocraticRole | undefined;
       let identifiedRolesList: TheocraticRole[] = [];
       let finalBrotherName = '';
 
-      // A) Buscar estrictamente en la lista de publicadores de la congregación por PIN personal
+      // A) Buscar estrictamente en la lista de publicadores de la congregación por PIN personal o su hash SHA-256
       const congPubs = (cloudData?.publishers || publishers) as any[];
-      const matchingPub = congPubs.find(
-        (p) => p.personalPin && String(p.personalPin).trim().length >= 4 && String(p.personalPin).trim() === cleanPersonalPin
-      );
+      const matchingPub = congPubs.find((p) => verifyPersonalPinMatch(cleanPersonalPin, p));
 
       if (matchingPub) {
         const finalRole: TheocraticRole =
@@ -194,7 +192,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         if (matchingPub.email) emailToUse = matchingPub.email;
         if (matchingPub.id) {
           setIdentifiedPublisher(matchingPub.id, finalBrotherName);
-          localStorage.setItem('kongre_session_pin_v2', cleanPersonalPin);
+          setSecureLocalPin('kongre_session_pin_v2', cleanPersonalPin);
         }
       } else {
         if (cloudData?.invitations && Array.isArray(cloudData.invitations)) {
@@ -265,7 +263,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
         localStorage.removeItem('kongre_is_guest');
-        localStorage.setItem('kongre_session_pin_v2', cleanPersonalPin);
+        setSecureLocalPin('kongre_session_pin_v2', cleanPersonalPin);
         localStorage.removeItem('kongre_needs_cloud_upload');
         localStorage.setItem('kongre_last_local_update', cloudData?.updatedAt || new Date().toISOString());
 

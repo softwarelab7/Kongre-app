@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { Publisher } from '../types';
 import { TheocraticRole, THEOCRATIC_ROLES } from '../utils/rbac';
-import { formatCanonicalCongregationId } from '../utils/theocraticSecurity';
+import { formatCanonicalCongregationId, getSecureLocalPin } from '../utils/theocraticSecurity';
 
 interface PublisherPinsModalProps {
   isOpen: boolean;
@@ -65,12 +65,12 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
   const congId = formatCanonicalCongregationId(settings.congregationNumber || settings.congregationId || '10582');
   const congName = settings.congregationName || 'Congregación';
   
-  // Resolve congregation PIN from settings, localStorage or default fallback
+  // Resolve congregation PIN from settings, secure localStorage or default fallback
   const congPin = useMemo(() => {
     return (
       (settings as any).congregationPin ||
-      localStorage.getItem('kongre_registered_cong_pin') ||
-      localStorage.getItem('kongre_last_cong_pin') ||
+      getSecureLocalPin('kongre_registered_cong_pin') ||
+      getSecureLocalPin('kongre_last_cong_pin') ||
       '••••••••'
     );
   }, [settings]);
@@ -84,9 +84,12 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
           rec.name.toLowerCase().trim() === pub.name.toLowerCase().trim()
       );
       const effectivePin = pub.personalPin || pinRec?.pin || '';
+      const effectivePinHash = pub.personalPinHash || pinRec?.pinHash || '';
       return {
         publisher: pub,
         pin: effectivePin,
+        pinHash: effectivePinHash,
+        hasPin: Boolean(effectivePin || effectivePinHash),
         role: pub.theocraticRole || pinRec?.role || (pub.privilege === 'anciano' ? 'anciano' : 'publico'),
       };
     });
@@ -101,7 +104,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
 
       if (!matchesSearch) return false;
 
-      if (filterPrivilege === 'sin_pin') return !item.pin;
+      if (filterPrivilege === 'sin_pin') return !item.hasPin;
       if (filterPrivilege === 'anciano') return item.publisher.privilege === 'anciano';
       if (filterPrivilege === 'siervo_ministerial') return item.publisher.privilege === 'siervo_ministerial';
       if (filterPrivilege === 'precursor') {
@@ -117,7 +120,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
 
   // Stats
   const totalCount = publisherEntries.length;
-  const withPinCount = publisherEntries.filter((p) => Boolean(p.pin)).length;
+  const withPinCount = publisherEntries.filter((p) => p.hasPin).length;
   const withoutPinCount = totalCount - withPinCount;
 
   if (!isOpen) return null;
@@ -488,7 +491,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
                 <p className="text-xs mt-1">Prueba cambiando el término de búsqueda o el filtro</p>
               </div>
             ) : (
-              filteredEntries.map(({ publisher: pub, pin, role }) => {
+              filteredEntries.map(({ publisher: pub, pin, hasPin, role }) => {
                 const isRevealed = showAllPins || revealedPins[pub.id];
                 const isEditing = editingPublisherId === pub.id;
                 const isCopied = copiedId === pub.id;
@@ -586,43 +589,49 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
                             <X className="w-3.5 h-3.5" />
                           </button>
                         </div>
-                      ) : pin ? (
+                      ) : hasPin ? (
                         <>
                           {/* PIN Badge */}
                           <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-2xs">
                             <KeyRound className="w-3.5 h-3.5 text-amber-500" />
                             <span className="font-mono font-extrabold text-xs tracking-widest text-slate-800 dark:text-slate-100 min-w-[3.5rem] text-center">
-                              {isRevealed ? pin : '••••'}
+                              {pin ? (isRevealed ? pin : '••••') : '🔒 Hash'}
                             </span>
-                            <button
-                              type="button"
-                              onClick={() => togglePinReveal(pub.id)}
-                              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 cursor-pointer ml-1"
-                              title={isRevealed ? 'Ocultar PIN' : 'Ver PIN'}
-                            >
-                              {isRevealed ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                            </button>
+                            {pin && (
+                              <button
+                                type="button"
+                                onClick={() => togglePinReveal(pub.id)}
+                                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 cursor-pointer ml-1"
+                                title={isRevealed ? 'Ocultar PIN' : 'Ver PIN'}
+                              >
+                                {isRevealed ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                              </button>
+                            )}
                           </div>
 
                           {/* Copy button */}
-                          <button
-                            type="button"
-                            onClick={() => handleCopyPin(pub.name, pin, pub.id)}
-                            className="p-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-2xs cursor-pointer"
-                            title="Copiar PIN"
-                          >
-                            {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                          </button>
+                          {pin && (
+                            <button
+                              type="button"
+                              onClick={() => handleCopyPin(pub.name, pin, pub.id)}
+                              className="p-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-2xs cursor-pointer"
+                              title="Copiar PIN"
+                            >
+                              {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                            </button>
+                          )}
 
                           {/* Share via WhatsApp */}
-                          <button
-                            type="button"
-                            onClick={() => handleShareWhatsApp(pub, pin)}
-                            className="p-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors shadow-2xs cursor-pointer"
-                            title="Compartir por WhatsApp"
-                          >
-                            <MessageCircle className="w-3.5 h-3.5" />
-                          </button>
+                          {pin && (
+                            <button
+                              type="button"
+                              onClick={() => handleShareWhatsApp(pub, pin)}
+                              className="p-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors shadow-2xs cursor-pointer"
+                              title="Compartir por WhatsApp"
+                            >
+                              <MessageCircle className="w-3.5 h-3.5" />
+                            </button>
+                          )}
 
                           {/* Edit button */}
                           <button

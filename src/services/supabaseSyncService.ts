@@ -229,7 +229,10 @@ export const supabaseSyncService = {
         congregationId: cleanId,
         updatedAt: nowISO,
         settings: params.data.settings,
-        publishers: params.data.publishers,
+        publishers: (params.data.publishers || []).map((p) => ({
+          ...p,
+          personalPinHash: p.personalPin ? hashPersonalPin(p.personalPin) : p.personalPinHash,
+        })),
         weeks: params.data.weeks,
         territories: params.data.territories,
         notices: params.data.notices,
@@ -242,7 +245,7 @@ export const supabaseSyncService = {
         invitations: storedInvitations,
       };
 
-      // 2. Preparar payload público (sin notas pastorales ni tarjetas S-21 confidenciales, pero con datos de acceso y directorio para verificar PIN personal en otros dispositivos)
+      // 2. Preparar payload público (sin notas pastorales, sin tarjetas S-21 confidenciales y SIN PINs personales en texto plano: solo su hash criptográfico SHA-256)
       const publicPayload: PublicFilteredData = {
         congregation_id: cleanId,
         congregation_name: params.data.settings?.congregationName || 'Congregación',
@@ -266,18 +269,22 @@ export const supabaseSyncService = {
           isRegistered: true,
         },
         invitations: storedInvitations,
-        publishers: (params.data.publishers || []).map((p) => ({
-          id: p.id,
-          name: p.name,
-          gender: p.gender,
-          active: p.active,
-          groupNumber: p.groupNumber,
-          privilege: p.privilege,
-          theocraticRole: p.theocraticRole,
-          personalPin: p.personalPin,
-          email: p.email,
-          roles: p.roles,
-        })),
+        publishers: (params.data.publishers || []).map((p) => {
+          const pinHash = p.personalPin ? hashPersonalPin(p.personalPin) : p.personalPinHash;
+          return {
+            id: p.id,
+            name: p.name,
+            gender: p.gender,
+            active: p.active,
+            groupNumber: p.groupNumber,
+            privilege: p.privilege,
+            theocraticRole: p.theocraticRole,
+            theocraticRoles: (p as any).theocraticRoles,
+            ...(pinHash ? { personalPinHash: pinHash } : {}),
+            email: p.email,
+            roles: p.roles,
+          };
+        }),
         weeks: params.data.weeks || [],
         notices: params.data.notices || [],
         territories: (params.data.territories || []).map((t) => ({

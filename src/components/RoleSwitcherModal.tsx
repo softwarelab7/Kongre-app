@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useSecurity } from '../context/SecurityContext';
 import { TheocraticRole, THEOCRATIC_ROLES } from '../utils/rbac';
-import { generateSecurePublisherPin, formatCanonicalCongregationId } from '../utils/theocraticSecurity';
+import { generateSecurePublisherPin, formatCanonicalCongregationId, getSecureLocalPin } from '../utils/theocraticSecurity';
 import { ActiveTab } from './Navbar';
 import {
   ShieldCheck,
@@ -444,8 +444,8 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     );
     const congPin =
       typeof window !== 'undefined'
-        ? localStorage.getItem('kongre_registered_cong_pin') ||
-          localStorage.getItem('kongre_last_cong_pin') ||
+        ? getSecureLocalPin('kongre_registered_cong_pin') ||
+          getSecureLocalPin('kongre_last_cong_pin') ||
           ''
         : '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -480,8 +480,8 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     );
     const congPin =
       typeof window !== 'undefined'
-        ? localStorage.getItem('kongre_registered_cong_pin') ||
-          localStorage.getItem('kongre_last_cong_pin') ||
+        ? getSecureLocalPin('kongre_registered_cong_pin') ||
+          getSecureLocalPin('kongre_last_cong_pin') ||
           ''
         : '';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -976,7 +976,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                   filteredPublishers.map((item) => {
                     const roleInfo = THEOCRATIC_ROLES[item.role] || THEOCRATIC_ROLES.publico;
                     const isVisible = visiblePins[item.publisherId] || false;
-                    const hasPin = !!item.pin;
+                    const hasPin = item.hasPin;
 
                     return (
                       <div
@@ -1031,17 +1031,19 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                             <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-900/60 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/80">
                               <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                               <span className="font-mono font-black text-xs sm:text-sm text-indigo-700 dark:text-indigo-300 tracking-wider">
-                                {isVisible ? item.pin : '••••'}
+                                {item.pin ? (isVisible ? item.pin : '••••') : '🔒 Hash'}
                               </span>
 
-                              <button
-                                type="button"
-                                onClick={() => togglePinVisibility(item.publisherId)}
-                                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                                title={isVisible ? 'Ocultar PIN' : 'Ver PIN'}
-                              >
-                                {isVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                              </button>
+                              {item.pin && (
+                                <button
+                                  type="button"
+                                  onClick={() => togglePinVisibility(item.publisherId)}
+                                  className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                                  title={isVisible ? 'Ocultar PIN' : 'Ver PIN'}
+                                >
+                                  {isVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                                </button>
+                              )}
 
                               <button
                                 type="button"
@@ -1072,7 +1074,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                             </button>
                           )}
 
-                          {hasPin && (
+                          {item.pin && (
                             <div className="flex items-center gap-1.5">
                               <button
                                 type="button"

@@ -89,7 +89,10 @@ export interface Publisher {
   photoURL?: string;
   privilege?: TheocraticPrivilege;
   theocraticRole?: TheocraticRole;
+  theocraticRoles?: TheocraticRole[];
   personalPin?: string;
+  personalPinHash?: string;
+  encryptedPin?: string;
   notes?: string;
   active: boolean;
   groupNumber?: number; // Grupo de predicación

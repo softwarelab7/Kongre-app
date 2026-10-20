@@ -12,6 +12,8 @@ import {
   generateSecureCongregationPin,
   generateSecureRolePin,
   isCongregationIdString,
+  setSecureLocalPin,
+  signRoleSession,
 } from '../utils/theocraticSecurity';
 import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import { COUNTRIES_WITH_CITIES, COUNTRIES_LIST } from '../data/countriesAndCities';
@@ -367,11 +369,11 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       const congPinHashed = await hashPasscode(cleanCongPin);
       const finalId = formatCanonicalCongregationId(congregationNumber.trim()) || congregationNumber.trim().toUpperCase();
 
-      // 1. Guardar credenciales y PINs inmediatamente en almacenamiento local seguro
-      localStorage.setItem('kongre_session_pin_v2', cleanPersonalPin);
-      localStorage.setItem('kongre_coordinator_pin', cleanPersonalPin);
-      localStorage.setItem('kongre_registered_cong_pin', cleanCongPin);
-      localStorage.setItem('kongre_last_cong_pin', cleanCongPin);
+      // 1. Guardar credenciales y PINs inmediatamente en almacenamiento local cifrado
+      setSecureLocalPin('kongre_session_pin_v2', cleanPersonalPin);
+      setSecureLocalPin('kongre_coordinator_pin', cleanPersonalPin);
+      setSecureLocalPin('kongre_registered_cong_pin', cleanCongPin);
+      setSecureLocalPin('kongre_last_cong_pin', cleanCongPin);
       localStorage.setItem('kongre_is_registered_congregation', 'true');
       localStorage.setItem('kongre_has_entered_app', 'true');
       localStorage.removeItem('kongre_is_guest');
@@ -379,6 +381,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       localStorage.setItem('kongre_coordinator_name', coordinatorName.trim());
       localStorage.setItem('kongre_coordinator_email', coordinatorEmail.trim().toLowerCase());
       localStorage.setItem('theocratic_app_data_v1_active_role', 'coordinador');
+      signRoleSession('coordinador', ['coordinador']);
       localStorage.setItem('kongre_congregation_name', congregationName.trim());
       localStorage.setItem('kongre_congregation_number', finalId);
       localStorage.setItem('kongre_congregation_id', finalId);

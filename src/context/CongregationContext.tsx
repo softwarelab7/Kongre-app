@@ -86,7 +86,20 @@ import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganiz
 import { detectConflictsInWeek } from '../utils/conflictDetector';
 import { autoAssignWeek } from '../utils/autoAssigner';
 import { OFFICIAL_STUDENT_LESSONS } from '../utils/theocraticData';
-import { isCongregationIdString, getFriendlyCongregationName, sanitizeForFirestore, isGenericIdentityName, formatCanonicalCongregationId } from '../utils/theocraticSecurity';
+import {
+  isCongregationIdString,
+  getFriendlyCongregationName,
+  sanitizeForFirestore,
+  isGenericIdentityName,
+  formatCanonicalCongregationId,
+  hashPersonalPin,
+  verifyPersonalPinMatch,
+  sanitizePublishersForLocalStorage,
+  restorePublishersFromLocalStorage,
+  sanitizePinRecordsForLocalStorage,
+  getSecureLocalPin,
+  setSecureLocalPin,
+} from '../utils/theocraticSecurity';
 import {
   normalizePersonName,
   areNamesEquivalent,
@@ -774,18 +787,15 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const syncOfflineQueueNow = async (): Promise<{ success: boolean; syncedCount: number; message: string }> => {
     const pinMaestro =
-      (typeof window !== 'undefined'
-        ? localStorage.getItem('kongre_session_pin_v2') ||
-          localStorage.getItem('kongre_coordinator_pin') ||
-          localStorage.getItem('kongre_registered_cong_pin') ||
-          localStorage.getItem('kongre_last_cong_pin')
-        : '') || '';
+      getSecureLocalPin('kongre_session_pin_v2') ||
+      getSecureLocalPin('kongre_coordinator_pin') ||
+      getSecureLocalPin('kongre_registered_cong_pin') ||
+      getSecureLocalPin('kongre_last_cong_pin') ||
+      '';
     const pinCongregacion =
-      (typeof window !== 'undefined'
-        ? localStorage.getItem('kongre_registered_cong_pin') ||
-          localStorage.getItem('kongre_last_cong_pin') ||
-          pinMaestro
-        : '') || pinMaestro;
+      getSecureLocalPin('kongre_registered_cong_pin') ||
+      getSecureLocalPin('kongre_last_cong_pin') ||
+      pinMaestro;
 
     setIsSupabaseSyncing(true);
     try {
@@ -825,9 +835,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return weeks.find(w => w.id === currentWeekId) || weeks[0];
   }, [weeks, currentWeekId]);
 
-  // Cache locally
+  // Cache locally (sanitizing plain-text personalPin into personalPinHash + encryptedPin)
   useEffect(() => {
-    localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(publishers));
+    localStorage.setItem(
+      `${LOCAL_STORAGE_KEY}_publishers`,
+      JSON.stringify(sanitizePublishersForLocalStorage(publishers))
+    );
   }, [publishers]);
 
   useEffect(() => {
@@ -926,7 +939,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
     };
 
-    const savedPubs = parseKey<Publisher[]>('publishers', publishers);
+    const savedPubs = restorePublishersFromLocalStorage(parseKey<Publisher[]>('publishers', publishers));
     const savedWeeks = parseKey<WeekSchedule[]>('weeks', weeks);
     const savedSettings = parseKey<CongregationSettings>('settings', settings);
     const savedGroups = parseKey<PreachingGroup[]>('groups', preachingGroups);
@@ -1067,26 +1080,59 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       // Depuración automática de duplicados al hidratar datos desde la nube o caché
       const { cleanList, mergedCount, idMap } = deduplicatePublishersList(data.publishers);
       idMapFromPubs = idMap;
-      const pubsToUse = mergedCount > 0 ? cleanList : data.publishers;
+      const rawPubsToUse = mergedCount > 0 ? cleanList : data.publishers;
 
-      setPublishers(pubsToUse);
-      localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(pubsToUse));
+      // Preservar personalPin local si el payload hidratado es público (solo trae personalPinHash)
+      const localPubsById = new Map<string, Publisher>();
+      publishers.forEach((lp) => {
+        if (lp && lp.id) localPubsById.set(lp.id, lp);
+      });
 
-      // Sincronizar PINs personales únicos para que cualquier navegador o sesión los reconozca
+      const pubsToUse = rawPubsToUse.map((p: any) => {
+        const localExisting = p?.id ? localPubsById.get(p.id) : undefined;
+        const effectivePin = p.personalPin || localExisting?.personalPin || '';
+        const effectiveHash =
+          p.personalPinHash ||
+          (effectivePin ? hashPersonalPin(String(effectivePin)) : localExisting?.personalPinHash || '');
+        return {
+          ...p,
+          ...(effectivePin ? { personalPin: effectivePin } : {}),
+          ...(effectiveHash ? { personalPinHash: effectiveHash } : {}),
+        };
+      });
+
+      const restoredPubs = restorePublishersFromLocalStorage(pubsToUse);
+      setPublishers(restoredPubs);
+      localStorage.setItem(
+        `${LOCAL_STORAGE_KEY}_publishers`,
+        JSON.stringify(sanitizePublishersForLocalStorage(restoredPubs))
+      );
+
+      // Sincronizar PINs personales únicos (con hash criptográfico SHA-256 en localStorage)
       try {
-        const pinRecords = pubsToUse
-          .filter((p: any) => p.personalPin && String(p.personalPin).trim().length >= 4)
-          .map((p: any) => ({
-            publisherId: p.id || p.nid,
-            name: p.name || p.full_name || 'Publicador',
-            role: p.theocraticRole || (p.privilege === 'anciano' ? 'anciano' : 'publico'),
-            roles: Array.isArray(p.theocraticRoles) ? p.theocraticRoles : undefined,
-            pin: String(p.personalPin).trim(),
-            email: p.email,
-            privilege: p.privilege,
-          }));
-        localStorage.setItem('kongre_publisher_unique_pins_v1', JSON.stringify(pinRecords));
-        localStorage.setItem('kongre_publisher_personal_pins_v4', JSON.stringify(pinRecords));
+        const pinRecords = restoredPubs
+          .filter(
+            (p: any) =>
+              (p.personalPin && String(p.personalPin).trim().length >= 4) ||
+              (p.personalPinHash && String(p.personalPinHash).trim().length === 64)
+          )
+          .map((p: any) => {
+            const plainPin = p.personalPin ? String(p.personalPin).trim() : '';
+            const pinHash = plainPin ? hashPersonalPin(plainPin) : String(p.personalPinHash || '').trim();
+            return {
+              publisherId: p.id || p.nid,
+              name: p.name || p.full_name || 'Publicador',
+              role: p.theocraticRole || (p.privilege === 'anciano' ? 'anciano' : 'publico'),
+              roles: Array.isArray(p.theocraticRoles) ? p.theocraticRoles : undefined,
+              pin: plainPin,
+              pinHash,
+              email: p.email,
+              privilege: p.privilege,
+            };
+          });
+        const sanitizedPinRecords = sanitizePinRecordsForLocalStorage(pinRecords);
+        localStorage.setItem('kongre_publisher_unique_pins_v1', JSON.stringify(sanitizedPinRecords));
+        localStorage.setItem('kongre_publisher_personal_pins_v4', JSON.stringify(sanitizedPinRecords));
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('kongre_publisher_pins_updated', { detail: pinRecords }));
         }
@@ -1711,19 +1757,16 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         // Sincronización teocrática en Supabase (Cifrado AES-256-GCM / Cero Conocimiento)
         try {
           const pinMaestro =
-            (typeof window !== 'undefined'
-              ? localStorage.getItem('kongre_session_pin_v2') ||
-                localStorage.getItem('kongre_coordinator_pin') ||
-                localStorage.getItem('kongre_registered_cong_pin') ||
-                localStorage.getItem('kongre_last_cong_pin')
-              : '') || '';
+            getSecureLocalPin('kongre_session_pin_v2') ||
+            getSecureLocalPin('kongre_coordinator_pin') ||
+            getSecureLocalPin('kongre_registered_cong_pin') ||
+            getSecureLocalPin('kongre_last_cong_pin') ||
+            '';
 
           const pinCongregacion =
-            (typeof window !== 'undefined'
-              ? localStorage.getItem('kongre_registered_cong_pin') ||
-                localStorage.getItem('kongre_last_cong_pin') ||
-                pinMaestro
-              : '') || pinMaestro;
+            getSecureLocalPin('kongre_registered_cong_pin') ||
+            getSecureLocalPin('kongre_last_cong_pin') ||
+            pinMaestro;
 
           const isCurrentDemo =
             isDemoMode ||
@@ -1736,7 +1779,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
               congregationId: congDocId,
               data: {
                 settings: newSettings,
-                publishers: publishers,
+                publishers: newPubs,
                 weeks: newWeeks,
                 territories: newTerritories,
                 notices: newNotices,
@@ -1825,19 +1868,16 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     const pinMaestro =
-      (typeof window !== 'undefined'
-        ? localStorage.getItem('kongre_session_pin_v2') ||
-          localStorage.getItem('kongre_coordinator_pin') ||
-          localStorage.getItem('kongre_registered_cong_pin') ||
-          localStorage.getItem('kongre_last_cong_pin')
-        : '') || '';
+      getSecureLocalPin('kongre_session_pin_v2') ||
+      getSecureLocalPin('kongre_coordinator_pin') ||
+      getSecureLocalPin('kongre_registered_cong_pin') ||
+      getSecureLocalPin('kongre_last_cong_pin') ||
+      '';
 
     const pinCongregacion =
-      (typeof window !== 'undefined'
-        ? localStorage.getItem('kongre_registered_cong_pin') ||
-          localStorage.getItem('kongre_last_cong_pin') ||
-          pinMaestro
-        : '') || pinMaestro;
+      getSecureLocalPin('kongre_registered_cong_pin') ||
+      getSecureLocalPin('kongre_last_cong_pin') ||
+      pinMaestro;
 
     if (!pinMaestro && !pinCongregacion) {
       return { success: false, message: 'Se requiere el PIN de la congregación para cifrar los datos en Supabase.' };
@@ -1919,14 +1959,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         return;
       }
       const pinMaestro =
-        localStorage.getItem('kongre_session_pin_v2') ||
-        localStorage.getItem('kongre_coordinator_pin') ||
-        localStorage.getItem('kongre_registered_cong_pin') ||
-        localStorage.getItem('kongre_last_cong_pin') ||
+        getSecureLocalPin('kongre_session_pin_v2') ||
+        getSecureLocalPin('kongre_coordinator_pin') ||
+        getSecureLocalPin('kongre_registered_cong_pin') ||
+        getSecureLocalPin('kongre_last_cong_pin') ||
         '';
       const pinCongregacion =
-        localStorage.getItem('kongre_registered_cong_pin') ||
-        localStorage.getItem('kongre_last_cong_pin') ||
+        getSecureLocalPin('kongre_registered_cong_pin') ||
+        getSecureLocalPin('kongre_last_cong_pin') ||
         pinMaestro;
 
       if (pinMaestro) {
@@ -2006,20 +2046,17 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const pinMaestro =
       options?.personalPin?.trim() ||
       options?.pin?.trim() ||
-      (typeof window !== 'undefined'
-        ? localStorage.getItem('kongre_session_pin_v2') ||
-          localStorage.getItem('kongre_coordinator_pin') ||
-          localStorage.getItem('kongre_registered_cong_pin') ||
-          localStorage.getItem('kongre_last_cong_pin')
-        : '') || '';
+      getSecureLocalPin('kongre_session_pin_v2') ||
+      getSecureLocalPin('kongre_coordinator_pin') ||
+      getSecureLocalPin('kongre_registered_cong_pin') ||
+      getSecureLocalPin('kongre_last_cong_pin') ||
+      '';
 
     const pinCongregacion =
       options?.pin?.trim() ||
-      (typeof window !== 'undefined'
-        ? localStorage.getItem('kongre_registered_cong_pin') ||
-          localStorage.getItem('kongre_last_cong_pin') ||
-          pinMaestro
-        : '') || pinMaestro;
+      getSecureLocalPin('kongre_registered_cong_pin') ||
+      getSecureLocalPin('kongre_last_cong_pin') ||
+      pinMaestro;
 
     try {
       // 1. Intentar descifrar primero con el PIN proporcionado (o PIN de Congregación)
@@ -2142,15 +2179,17 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const needsCoordRole = existing.theocraticRole !== 'coordinador' || existing.privilege !== 'anciano';
       const needsPhone = !existing.phone && !!settings.coordinatorPhone;
       const needsEmail = !existing.email && !!settings.coordinatorEmail;
-      const coordPin = localStorage.getItem('kongre_coordinator_pin') || localStorage.getItem('kongre_session_pin_v2') || '';
+      const coordPin = getSecureLocalPin('kongre_coordinator_pin') || getSecureLocalPin('kongre_session_pin_v2') || '';
       const needsPin = !existing.personalPin && !!coordPin;
 
       if (needsCoordRole || needsPhone || needsEmail || needsPin) {
+        const finalPin = existing.personalPin || coordPin || undefined;
         const updatedCoord: Publisher = {
           ...existing,
           theocraticRole: 'coordinador',
           privilege: 'anciano',
-          personalPin: existing.personalPin || coordPin || undefined,
+          personalPin: finalPin,
+          ...(finalPin ? { personalPinHash: hashPersonalPin(finalPin) } : {}),
           phone: existing.phone || settings.coordinatorPhone || '',
           email: existing.email || settings.coordinatorEmail || '',
           notes: existing.notes || 'Coordinador del Cuerpo de Ancianos',
@@ -2159,19 +2198,23 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         updatedList[existingIndex] = updatedCoord;
         setPublishers(updatedList);
         try {
-          localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(updatedList));
+          localStorage.setItem(
+            `${LOCAL_STORAGE_KEY}_publishers`,
+            JSON.stringify(sanitizePublishersForLocalStorage(updatedList))
+          );
         } catch {}
         saveToFirestore(updatedList);
       }
       return;
     }
 
-    const coordPin = localStorage.getItem('kongre_coordinator_pin') || localStorage.getItem('kongre_session_pin_v2') || '';
+    const coordPin = getSecureLocalPin('kongre_coordinator_pin') || getSecureLocalPin('kongre_session_pin_v2') || '';
     const coordPub: Publisher = {
       id: `pub-coord-${Date.now()}`,
       name: coordName,
       gender: 'hermano',
       personalPin: coordPin || undefined,
+      ...(coordPin ? { personalPinHash: hashPersonalPin(coordPin) } : {}),
       phone: settings.coordinatorPhone || '',
       email: settings.coordinatorEmail || '',
       notes: 'Coordinador del Cuerpo de Ancianos',
@@ -2207,7 +2250,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setPublishers((prev) => {
       const next = [...prev, coordPub];
       try {
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(next));
+        localStorage.setItem(
+          `${LOCAL_STORAGE_KEY}_publishers`,
+          JSON.stringify(sanitizePublishersForLocalStorage(next))
+        );
       } catch {}
       return next;
     });
@@ -2236,18 +2282,24 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const existingIndex = publishers.findIndex(
       (p) =>
         isSamePublisher(p, pubData) ||
-        (pubData.personalPin && p.personalPin && String(p.personalPin).trim().length >= 4 && String(p.personalPin).trim() === String(pubData.personalPin).trim()) ||
+        (pubData.personalPin && verifyPersonalPinMatch(pubData.personalPin, p)) ||
         (pubData.name && areNamesEquivalent(p.name || (p as any).full_name, pubData.name))
     );
 
     if (existingIndex !== -1) {
       const existing = publishers[existingIndex];
       const merged = mergePublisherData(existing, pubData);
+      if (merged.personalPin) {
+        merged.personalPinHash = hashPersonalPin(merged.personalPin);
+      }
       const updated = [...publishers];
       updated[existingIndex] = merged;
       setPublishers(updated);
       try {
-        localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(updated));
+        localStorage.setItem(
+          `${LOCAL_STORAGE_KEY}_publishers`,
+          JSON.stringify(sanitizePublishersForLocalStorage(updated))
+        );
       } catch {}
       saveToFirestore(updated);
       return;
@@ -2255,28 +2307,37 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const newPub: Publisher = {
       ...pubData,
+      ...(pubData.personalPin ? { personalPinHash: hashPersonalPin(pubData.personalPin) } : {}),
       id: (pubData as any).id || `pub-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       createdAt: (pubData as any).createdAt || new Date().toISOString(),
     };
     const updated = [...publishers, newPub];
     setPublishers(updated);
     try {
-      localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(updated));
+      localStorage.setItem(
+        `${LOCAL_STORAGE_KEY}_publishers`,
+        JSON.stringify(sanitizePublishersForLocalStorage(updated))
+      );
     } catch {}
     saveToFirestore(updated);
   };
 
   const updatePublisher = (pub: Publisher) => {
-    const updated = publishers.map(p => (p.id === pub.id ? pub : p));
+    const enrichedPub: Publisher = {
+      ...pub,
+      personalPinHash: pub.personalPin ? hashPersonalPin(pub.personalPin) : (pub.personalPin === '' ? undefined : pub.personalPinHash),
+      encryptedPin: pub.personalPin === '' ? undefined : pub.encryptedPin,
+    };
+    const updated = publishers.map(p => (p.id === enrichedPub.id ? enrichedPub : p));
     setPublishers(updated);
 
     const congId = resolveCongregationDocId();
     if (congId && typeof navigator !== 'undefined' && !navigator.onLine) {
       supabaseSyncService.enqueueReportChange({
         congregationId: congId,
-        publisherId: pub.id,
-        description: `Modificación de informe/datos: ${pub.name}`,
-        reportPayload: { publisherId: pub.id, name: pub.name, s21_records: pub.s21_records },
+        publisherId: enrichedPub.id,
+        description: `Modificación de informe/datos: ${enrichedPub.name}`,
+        reportPayload: { publisherId: enrichedPub.id, name: enrichedPub.name, s21_records: enrichedPub.s21_records },
         fullData: {
           settings: latestSettingsRef.current,
           publishers: updated,
@@ -2305,7 +2366,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const updatedPubs = publishers.filter(p => !idSet.has(p.id));
     setPublishers(updatedPubs);
     try {
-      localStorage.setItem(`${LOCAL_STORAGE_KEY}_publishers`, JSON.stringify(updatedPubs));
+      localStorage.setItem(
+        `${LOCAL_STORAGE_KEY}_publishers`,
+        JSON.stringify(sanitizePublishersForLocalStorage(updatedPubs))
+      );
     } catch {}
 
     // 2. Limpiar asignaciones activas de todos estos publicadores en semanas (Weeks)

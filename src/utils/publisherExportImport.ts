@@ -1,6 +1,7 @@
 // src/utils/publisherExportImport.ts
 import { Publisher } from '../types';
 import { sanitizeCsvFormulaInjection, sanitizeImportedCsvText } from './theocraticSecurity';
+import { ensureImmutablePublisherCode } from './publisherDeduplication';
 
 export interface ExportPublisherOptions {
   congregationName?: string;
@@ -25,7 +26,7 @@ export function exportPublishersToCsv(
     'Segundo Nombre',
     'Primer Apellido',
     'Segundo Apellido',
-    'NID / Documento',
+    'ID Único Publicador',
     'Género',
     'Teléfono',
     'Teléfono Fijo',
@@ -55,15 +56,16 @@ export function exportPublishersToCsv(
     const groupName = groupStr
       ? options.groupNameMap?.[groupStr] || `Grupo ${groupStr}`
       : 'Sin asignar';
+    const immutableCode = ensureImmutablePublisherCode(p);
 
     return [
-      p.id || p.nid || '',
+      p.id || immutableCode,
       p.full_name || p.name || '',
       p.first_name || '',
       p.middle_name || '',
       p.last_name || '',
       p.second_last_name || '',
-      p.nid || '',
+      immutableCode,
       isFemale ? 'Hermana' : 'Hermano',
       p.phone || '',
       p.home_phone || '',

@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Publisher } from '../../../types';
+import { ensureImmutablePublisherCode } from '../../../utils/publisherDeduplication';
 
 const deterministicStringify = (obj: any): string => {
   if (obj === null || typeof obj !== 'object') return JSON.stringify(obj);
@@ -60,7 +61,7 @@ const mapRolesToAssignments = (roles: any = {}, existingAssignments: any = {}): 
   return assignments;
 };
 
-const normalizePublisher = (initial: any): Publisher => {
+const normalizePublisher = (initial: any, fallbackCode?: string): Publisher => {
   if (!initial || typeof initial !== 'object') initial = {};
 
   // 1. Resolver nombre completo
@@ -166,10 +167,16 @@ const normalizePublisher = (initial: any): Publisher => {
     : (initial.active !== undefined ? initial.active : true);
   const status = initial.status || (isActive ? 'active' : 'inactive');
 
+  // 11. ID Único Inmutable del Publicador
+  const immutableCode = ensureImmutablePublisherCode(
+    initial.id || initial.nid || initial.publisherCode ? initial : { publisherCode: fallbackCode }
+  );
+
   return {
     ...initial,
-    id: initial.id || '',
-    nid: initial.nid || initial.id || '',
+    id: initial.id || immutableCode,
+    nid: initial.nid || initial.id || immutableCode,
+    publisherCode: immutableCode,
     name: initial.name || resolvedFullName,
     full_name: resolvedFullName,
     first_name: firstName,
@@ -213,7 +220,10 @@ const normalizePublisher = (initial: any): Publisher => {
 };
 
 export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
-  const [formData, setFormData] = useState<Publisher>(() => normalizePublisher(initialPublisher));
+  const newPublisherCodeRef = useRef<string>(ensureImmutablePublisherCode(initialPublisher));
+  const [formData, setFormData] = useState<Publisher>(() =>
+    normalizePublisher(initialPublisher, newPublisherCodeRef.current)
+  );
 
   const [isDirty, setIsDirty] = useState(false);
 
@@ -223,19 +233,23 @@ export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
   // Sync form data if initialPublisher prop changes (e.g. after a successful save)
   useEffect(() => {
     const initial = JSON.parse(initialPublisherString);
-    setFormData(normalizePublisher(initial));
+    setFormData(normalizePublisher(initial, newPublisherCodeRef.current));
   }, [initialPublisherString]);
 
   // Track changes
   useEffect(() => {
     const initial = JSON.parse(initialPublisherString);
-    const normalizedInitial = normalizePublisher(initial);
+    const normalizedInitial = normalizePublisher(initial, newPublisherCodeRef.current);
 
     const hasChanged = deterministicStringify(formData) !== deterministicStringify(normalizedInitial);
     setIsDirty(hasChanged);
   }, [formData, initialPublisherString]);
 
   const handleChange = useCallback((field: keyof Publisher, value: any) => {
+    // El ID único del publicador (id, nid, publisherCode) es inmutable y nunca puede modificarse
+    if (field === 'id' || field === 'nid' || field === 'publisherCode') {
+      return;
+    }
     setFormData(prev => {
       const next = { ...prev, [field]: value };
       if (field === 'first_name' || field === 'middle_name' || field === 'last_name' || field === 'second_last_name') {

@@ -25,19 +25,45 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.8.11';
-export const CURRENT_BUILD_CODE = '2026.10.20.2811';
+export const CURRENT_APP_VERSION = '2.8.12';
+export const CURRENT_BUILD_CODE = '2026.10.20.2812';
 export const BUILD_DATE = '20 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.8.12',
+    buildCode: '2026.10.20.2812',
+    date: '20 de Octubre, 2026',
+    title: 'Rediseño del Menú Móvil y Optimización Integral de Interfaz para Teléfonos',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Rediseño completo del panel lateral de Menú en móvil: cabecera unificada en una sola fila, eliminación de bloques fijos redundantes y más del 80% de la pantalla dedicada a las secciones y departamentos.',
+      },
+      {
+        category: 'improvement',
+        text: 'Reubicación de Utilidades Rápidas (QR, PIN, Invitaciones, Auditoría) al final de la lista desplazable y compactación del pie del menú en una única barra inferior.',
+      },
+      {
+        category: 'improvement',
+        text: 'Optimización móvil de la barra superior (Navbar), franja de Modo Demo (DemoBanner) y barra de navegación inferior con soporte para área segura (safe-area-inset-bottom).',
+      },
+      {
+        category: 'improvement',
+        text: 'Adaptación responsiva del Programa VMC (ClmScheduleView), Calendario General (CalendarScheduleView y React Big Calendar), Panorama General y Directorio de Publicadores para pantallas de 360px–430px.',
+      },
+    ],
+  },
+  {
     version: '2.8.11',
     buildCode: '2026.10.20.2811',
     date: '20 de Octubre, 2026',
     title: 'Eliminación Completa de Funciones de IA Externa y Operación 100% Local Determinista',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

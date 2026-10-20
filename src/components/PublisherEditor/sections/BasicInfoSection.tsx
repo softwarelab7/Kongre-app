@@ -1,10 +1,10 @@
 // src/components/PublisherEditor/sections/BasicInfoSection.tsx
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Publisher } from '../../../types';
 import { PremiumDatePicker } from '../../PremiumDatePicker';
+import { ensureImmutablePublisherCode } from '../../../utils/publisherDeduplication';
 import {
   User,
-  FileText,
   Heart,
   Home,
   Calendar,
@@ -12,6 +12,10 @@ import {
   Languages,
   CheckCircle2,
   Sparkles,
+  Lock,
+  Copy,
+  Check,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface BasicInfoSectionProps {
@@ -20,6 +24,18 @@ interface BasicInfoSectionProps {
 }
 
 export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleChange }) => {
+  const [copiedId, setCopiedId] = useState(false);
+
+  const uniquePublisherId = useMemo(() => {
+    return ensureImmutablePublisherCode(formData);
+  }, [formData.publisherCode, formData.nid, formData.id]);
+
+  const handleCopyUniqueId = () => {
+    navigator.clipboard.writeText(uniquePublisherId);
+    setCopiedId(true);
+    setTimeout(() => setCopiedId(false), 2000);
+  };
+
   // Cálculo de edad cronológica
   const ageInfo = useMemo(() => {
     const rawBirthDate = formData.birth_date || formData.birthDate;
@@ -55,10 +71,13 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
             {formData.gender === 'female' || formData.gender === 'hermana' ? '♀' : '♂'}
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
                 Información Personal
               </h3>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800/40">
+                <Lock size={10} /> {uniquePublisherId}
+              </span>
               {formData.is_head_of_household && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800/40">
                   <Home size={10} /> Cabeza de familia
@@ -66,7 +85,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
               )}
             </div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Datos civiles, filiación y registro básico del publicador
+              Datos personales, filiación e identificador único congregacional del publicador
             </p>
           </div>
         </div>
@@ -115,27 +134,48 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
         </div>
       </div>
 
-      {/* Documento ID y Género */}
+      {/* ID Único Inmutable del Publicador y Género */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
         <div>
-          <label className="text-[11px] font-medium text-zinc-600 dark:text-zinc-400 mb-1.5 block">
-            Documento de Identidad / NID
-          </label>
-          <div className="relative">
-            <FileText
-              size={15}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400"
-            />
-            <input
-              type="text"
-              value={formData.nid || ''}
-              onChange={(e) => handleChange('nid', e.target.value)}
-              className="kf-input kf-input-icon w-full"
-              placeholder="Cédula, DNI o ID congregacional"
-            />
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-[11px] font-medium text-zinc-600 dark:text-zinc-400 flex items-center gap-1.5">
+              <span>ID Único del Publicador</span>
+            </label>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+              <Lock size={10} /> Permanente • No modificable
+            </span>
           </div>
-          <p className="text-[10px] text-zinc-400 mt-1 pl-1">
-            Identificador único para tarjetas de registro S-21 y sucursal
+          <div className="relative flex items-center">
+            <div className="w-full h-[42px] px-3.5 rounded-xl bg-zinc-100/80 dark:bg-white/[0.04] border border-zinc-200/80 dark:border-white/[0.08] flex items-center justify-between select-all cursor-not-allowed">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <ShieldCheck size={15} className="text-indigo-500 shrink-0" />
+                <span className="font-mono font-bold text-sm tracking-wider text-zinc-800 dark:text-zinc-100 truncate">
+                  {uniquePublisherId}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleCopyUniqueId}
+                title="Copiar ID único del publicador"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200/70 dark:border-white/[0.08] shadow-2xs transition-all cursor-pointer shrink-0 active:scale-95"
+              >
+                {copiedId ? (
+                  <>
+                    <Check size={12} className="text-emerald-500" />
+                    <span className="text-emerald-600 dark:text-emerald-400">Copiado</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy size={12} />
+                    <span>Copiar ID</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+          <p className="text-[10px] text-zinc-400 mt-1 pl-1 flex items-center gap-1">
+            <Lock size={10} className="shrink-0 text-zinc-400" />
+            <span>Generado automáticamente para este publicador. No se puede cambiar nunca.</span>
           </p>
         </div>
 

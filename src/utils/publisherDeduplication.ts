@@ -99,11 +99,78 @@ function countAccents(str: string): number {
   return (str.match(/[áéíóúÁÉÍÓÚñÑ]/g) || []).length;
 }
 
+const PUB_CODE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+
+/**
+ * Genera o resuelve el ID Único e Inmutable de un publicador (formato PUB-XXXXXX).
+ * - Si ya tiene publisherCode o un código PUB- válido, lo conserva intacto para siempre.
+ * - Si es un publicador existente con id interno (ej. pub-1729...), deriva determinísticamente su código único PUB-XXXXXX.
+ * - Si es un nuevo publicador sin id previo, genera un nuevo código criptográfico único PUB-XXXXXX.
+ */
+export function ensureImmutablePublisherCode(pub?: Partial<Publisher> | null): string {
+  if (pub?.publisherCode && typeof pub.publisherCode === 'string' && pub.publisherCode.trim()) {
+    return pub.publisherCode.trim().toUpperCase();
+  }
+
+  const rawNid = typeof pub?.nid === 'string' ? pub.nid.trim() : '';
+  const rawId = typeof pub?.id === 'string' ? pub.id.trim() : '';
+
+  if (/^PUB-[A-Z0-9]{2,12}$/i.test(rawNid)) {
+    return rawNid.toUpperCase();
+  }
+  if (/^PUB-[A-Z0-9]{2,12}$/i.test(rawId) && !rawId.toLowerCase().startsWith('pub-coord')) {
+    return rawId.toUpperCase();
+  }
+
+  const seed = rawId || rawNid;
+  if (seed) {
+    let h1 = 0x811c9dc5;
+    let h2 = 0x01000193;
+    for (let i = 0; i < seed.length; i++) {
+      const ch = seed.charCodeAt(i);
+      h1 ^= ch;
+      h1 = Math.imul(h1, 0x01000193);
+      h2 ^= ch + i * 31;
+      h2 = Math.imul(h2, 0x85ebca6b);
+    }
+    let code = '';
+    let v1 = h1 >>> 0;
+    let v2 = h2 >>> 0;
+    for (let i = 0; i < 6; i++) {
+      const idx = ((i % 2 === 0 ? v1 : v2) + i * 7) % PUB_CODE_ALPHABET.length;
+      code += PUB_CODE_ALPHABET[idx];
+      v1 = Math.floor(v1 / PUB_CODE_ALPHABET.length) ^ (v2 & 0xff);
+      v2 = Math.floor(v2 / PUB_CODE_ALPHABET.length) ^ (v1 & 0xff);
+    }
+    return `PUB-${code}`;
+  }
+
+  const randomBytes = new Uint8Array(6);
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    crypto.getRandomValues(randomBytes);
+  } else {
+    for (let i = 0; i < 6; i++) {
+      randomBytes[i] = Math.floor(Math.random() * 256);
+    }
+  }
+  let newCode = '';
+  for (let i = 0; i < 6; i++) {
+    newCode += PUB_CODE_ALPHABET[randomBytes[i] % PUB_CODE_ALPHABET.length];
+  }
+  return `PUB-${newCode}`;
+}
+
 /**
  * Fusión inteligente de dos registros de publicador conservando la mejor información.
  */
 export function mergePublisherData(target: Publisher, incoming: Partial<Publisher>): Publisher {
-  const merged: Publisher = { ...target };
+  const immutableCode = ensureImmutablePublisherCode(target);
+  const merged: Publisher = {
+    ...target,
+    id: target.id || immutableCode,
+    nid: target.nid || target.id || immutableCode,
+    publisherCode: immutableCode,
+  };
 
   // Nombre: preferir el que tenga más tildes / mejor ortografía, o el no genérico
   const tName = target.name || '';

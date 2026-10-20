@@ -113,6 +113,7 @@ import {
   mergePublisherData,
   deduplicatePublishersList,
   reassignWeeksForDeduplicatedPublishers,
+  ensureImmutablePublisherCode,
 } from '../utils/publisherDeduplication';
 export interface GranularSyncStats {
   publishersCount: number;
@@ -2311,10 +2312,14 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return;
     }
 
+    const immutableCode = ensureImmutablePublisherCode(pubData);
+    const resolvedId = (pubData as any).id || immutableCode;
     const newPub: Publisher = {
       ...pubData,
       ...(pubData.personalPin ? { personalPinHash: hashPersonalPin(pubData.personalPin) } : {}),
-      id: (pubData as any).id || `pub-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      id: resolvedId,
+      nid: (pubData as any).nid || resolvedId,
+      publisherCode: immutableCode,
       createdAt: (pubData as any).createdAt || new Date().toISOString(),
     };
     const updated = [...publishers, newPub];
@@ -2329,12 +2334,20 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const updatePublisher = (pub: Publisher) => {
+    const existingPub = publishers.find(p => p.id === pub.id || (p.nid && pub.nid && p.nid === pub.nid));
+    const lockedId = existingPub?.id || pub.id;
+    const lockedNid = existingPub?.nid || existingPub?.id || pub.nid || lockedId;
+    const lockedCode = ensureImmutablePublisherCode(existingPub || pub);
+
     const enrichedPub: Publisher = {
       ...pub,
+      id: lockedId,
+      nid: lockedNid,
+      publisherCode: lockedCode,
       personalPinHash: pub.personalPin ? hashPersonalPin(pub.personalPin) : (pub.personalPin === '' ? undefined : pub.personalPinHash),
       encryptedPin: pub.personalPin === '' ? undefined : pub.encryptedPin,
     };
-    const updated = publishers.map(p => (p.id === enrichedPub.id ? enrichedPub : p));
+    const updated = publishers.map(p => (p.id === lockedId ? enrichedPub : p));
     setPublishers(updated);
 
     const congId = resolveCongregationDocId();
@@ -2621,7 +2634,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         currentPubs[existingIndex] = mergePublisherData(currentPubs[existingIndex], item);
       } else {
         const isFemale = item.gender === 'hermana' || item.gender === 'female';
-        const newPub: Publisher = {
+          const immutableCode = ensureImmutablePublisherCode(item);
+          const resolvedId = item.id || immutableCode;
+          const newPub: Publisher = {
           name,
           full_name: name,
           gender: isFemale ? 'hermana' : 'hermano',
@@ -2657,7 +2672,9 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             deber_plataforma: !isFemale,
             deber_zoom: true,
           },
-          id: item.id || `pub-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+          id: resolvedId,
+          nid: item.nid || resolvedId,
+          publisherCode: immutableCode,
           createdAt: new Date().toISOString(),
         };
         currentPubs.push(newPub);

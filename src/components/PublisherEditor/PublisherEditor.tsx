@@ -412,7 +412,7 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
         icon={User}
         title="Ficha de"
         highlightWord={formData.full_name || formData.name || 'Nuevo Publicador'}
-        subtitle={`${publisherRoleLabel} • ${groupName || 'Congregación'}${isDirty ? ' • ⚠️ Cambios sin guardar' : ' • ✓ Sincronizado'}`}
+        subtitle={`ID: ${formData.publisherCode || formData.nid || formData.id} • ${publisherRoleLabel} • ${groupName || 'Congregación'}${isDirty ? ' • ⚠️ Cambios sin guardar' : ' • ✓ Sincronizado'}`}
         badgeText={publisherRoleLabel}
         colorTheme="indigo"
         actions={
@@ -562,10 +562,16 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                     Información Personal
                   </h4>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
-                    Datos civiles, fecha de nacimiento, edad exacta, estado civil y cabeza de familia.
+                    ID único inmutable del publicador, fecha de nacimiento, edad, estado civil y cabeza de familia.
                   </p>
                   
                   <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                    <div className="flex justify-between items-center">
+                      <span className="text-zinc-400">ID Único:</span>
+                      <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-md text-[11px]">
+                        {formData.publisherCode || formData.nid || formData.id}
+                      </span>
+                    </div>
                     <div className="flex justify-between">
                       <span className="text-zinc-400">Edad:</span>
                       <span className="font-semibold">{ageInfo?.age !== null && ageInfo?.age !== undefined ? `${ageInfo.age} años` : 'Sin fecha registrada'}</span>

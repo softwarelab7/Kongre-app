@@ -25,7 +25,19 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.8.11] - 20 de Octubre, 2026 (Compilación Activa)
+### [v2.8.12] - 20 de Octubre, 2026 (Compilación Activa)
+**Título:** Rediseño del Menú Móvil y Optimización Integral de Interfaz para Teléfonos
+- **Rediseño del Panel de Menú Móvil (`Navbar`):**
+  - Unificación de la cabecera del menú en una sola fila compacta con el avatar del usuario, rol activo, accesos rápidos a PIN/Perfil, selector de modo claro/oscuro y botón de cierre.
+  - Eliminación de bloques fijos redundantes en la parte superior para liberar **más del 80% de la altura de la pantalla** a la lista de departamentos y secciones (*Reuniones, Secretaría, Predicación, Salón, Supervisión*).
+  - Reubicación de la cuadrícula de *Utilidades Rápidas* (*Escáner QR, PINs, Invitaciones, Solicitudes, Conflictos, Auditoría*) al final del área desplazable y compactación del pie del menú en una única barra inferior con versión y cierre/bloqueo de sesión.
+- **Optimización Móvil de Cabecera, Barra Inferior y Vistas Principales:**
+  - Compactación de la barra superior (`Navbar`) y de la franja `DemoBanner` en pantallas pequeñas para evitar desbordamientos horizontales en teléfonos de `360px–430px`.
+  - Mejora ergonómica del `Programa de Reunión VMC` (`ClmScheduleView`), `Calendario General` (`CalendarScheduleView` y estilos móviles para `React Big Calendar`), `Panorama General` (`ResumenInicioTab`) y `Catálogo de Publicadores` (`PublishersTab`).
+
+---
+
+### [v2.8.11] - 20 de Octubre, 2026
 **Título:** Eliminación Completa de Funciones de IA Externa y Operación 100% Local Determinista
 - **Eliminación de Integración con Gemini AI:**
   - Retirado por completo el servicio `geminiService.ts`, el modal `ClmAiSuggestionsModal`, la dependencia `@google/genai`, y la pestaña/configuración de clave API de Gemini en `SettingsTab`.

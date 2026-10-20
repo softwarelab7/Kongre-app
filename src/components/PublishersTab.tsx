@@ -39,6 +39,7 @@ import {
   areNamesEquivalent,
   mergePublisherData,
   deduplicatePublishersList,
+  ensureImmutablePublisherCode,
 } from '../utils/publisherDeduplication';
 
 type ViewMode = 'list' | 'editor';
@@ -272,8 +273,10 @@ export const PublishersTab: React.FC = () => {
     return publishers
       .filter((p) => {
         const displayName = getPublisherDisplayName(p).toLowerCase();
+        const pubCode = ensureImmutablePublisherCode(p).toLowerCase();
         const matchesSearch =
           displayName.includes(searchTerm.toLowerCase()) ||
+          pubCode.includes(searchTerm.toLowerCase()) ||
           (p.phone && p.phone.includes(searchTerm)) ||
           (p.email && p.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
           (p.nid && p.nid.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -468,7 +471,12 @@ export const PublishersTab: React.FC = () => {
 
   const handleSave = async (data: Partial<Publisher>) => {
     const fullName = data.full_name || [data.first_name, data.last_name].filter(Boolean).join(' ') || data.name || '';
-    const nid = data.nid || data.id || `pub-${Date.now()}`;
+    const existingById = publishers.find(
+      (p) => (data.id && p.id === data.id) || (data.nid && p.nid && p.nid === data.nid)
+    );
+    const immutableCode = ensureImmutablePublisherCode(existingById || data);
+    const resolvedId = existingById?.id || data.id || immutableCode;
+    const resolvedNid = existingById?.nid || existingById?.id || data.nid || resolvedId;
     const groupNum = data.id_grupo ? parseInt(data.id_grupo, 10) : data.groupNumber || 1;
     const isFemale = data.gender === 'female' || data.gender === 'hermana';
 
@@ -499,14 +507,15 @@ export const PublishersTab: React.FC = () => {
 
     const targetPayload: Publisher = {
       ...(data as any),
-      id: data.id || nid,
+      id: resolvedId,
+      nid: resolvedNid,
+      publisherCode: immutableCode,
       name: fullName,
       full_name: fullName,
       first_name: data.first_name,
       middle_name: data.middle_name,
       last_name: data.last_name,
       second_last_name: data.second_last_name,
-      nid: nid,
       gender: isFemale ? 'hermana' : 'hermano',
       phone: data.phone || '',
       email: data.email || '',
@@ -836,7 +845,7 @@ export const PublishersTab: React.FC = () => {
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40 dark:text-white/40" />
               <input
                 className="kf-input kf-input-icon w-full"
-                placeholder="Buscar por nombre, teléfono, correo o documento..."
+                placeholder="Buscar por nombre, ID único, teléfono o correo..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -1031,9 +1040,17 @@ export const PublishersTab: React.FC = () => {
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <h4 className="font-bold text-sm text-zinc-900 dark:text-zinc-100 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                            {displayName}
-                          </h4>
+                          <div className="flex items-center justify-between gap-1.5">
+                            <h4 className="font-bold text-sm text-zinc-900 dark:text-zinc-100 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                              {displayName}
+                            </h4>
+                            <span
+                              title="ID Único Inmutable del Publicador"
+                              className="shrink-0 px-1.5 py-0.5 rounded-md text-[9px] font-mono font-bold bg-zinc-100 dark:bg-white/[0.06] text-zinc-500 dark:text-zinc-400 border border-zinc-200/70 dark:border-white/[0.08]"
+                            >
+                              {ensureImmutablePublisherCode(p)}
+                            </span>
+                          </div>
                           <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
                             <span
                               onClick={(e) => {
@@ -1423,6 +1440,9 @@ export const PublishersTab: React.FC = () => {
                             <div>
                               <div className="font-semibold text-sm text-black/90 dark:text-white/90 flex items-center gap-1.5">
                                 {displayName}
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-zinc-100 dark:bg-white/[0.06] text-zinc-500 dark:text-zinc-400">
+                                  {ensureImmutablePublisherCode(p)}
+                                </span>
                                 {isAbsent && (
                                   <span className="text-[10px] text-rose-500 font-semibold">(Ausente)</span>
                                 )}

@@ -31,12 +31,13 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="group flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-[10px] tracking-wider uppercase shadow-xs border border-purple-400/30 transition-all cursor-pointer select-none"
+        className="group flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-[9.5px] sm:text-[10px] tracking-wider uppercase shadow-xs border border-purple-400/30 transition-all cursor-pointer select-none active:scale-95"
         title="Modo de prueba activo - Clic para ver opciones"
       >
-        <Sparkles className="w-3 h-3 text-amber-300 group-hover:rotate-12 transition-transform" />
-        <span>MODO PRUEBA</span>
-        <ChevronDown className="w-3 h-3 text-purple-200 opacity-70 group-hover:opacity-100" />
+        <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-300 group-hover:rotate-12 transition-transform shrink-0" />
+        <span className="sm:hidden">DEMO</span>
+        <span className="hidden sm:inline">MODO PRUEBA</span>
+        <ChevronDown className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-purple-200 opacity-70 group-hover:opacity-100 shrink-0" />
       </button>
 
       {isOpen && (
@@ -45,7 +46,7 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-full left-0 mt-2 w-72 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+          <div className="fixed sm:absolute top-14 sm:top-full left-3 right-3 sm:left-0 sm:right-auto sm:mt-2 sm:w-72 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start gap-2.5 pb-2.5 mb-2 border-b border-slate-100 dark:border-slate-800">
               <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
                 <Sparkles className="w-4 h-4" />

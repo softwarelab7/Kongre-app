@@ -1142,25 +1142,25 @@ export default function ClmScheduleView({
 
     return (
       <div key={part.id} className="border-b border-slate-100 dark:border-white/[0.04]">
-        <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
           {/* Lado izquierdo: Ícono/Número + Título + Subtítulo */}
-          <div className="flex items-center gap-3.5 min-w-0 pr-4">
+          <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
             {badgeContent}
 
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100 leading-snug">
                   {part.titulo}
                 </h4>
                 {part.duracion_min && !part.titulo.includes('min') && (
-                  <span className="text-xs text-slate-400 font-normal">
+                  <span className="text-[11px] sm:text-xs text-slate-400 font-normal shrink-0">
                     ({part.duracion_min} min)
                   </span>
                 )}
               </div>
 
               {part.descripcion && (
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight leading-relaxed">
                   {part.descripcion}
                 </p>
               )}
@@ -1204,11 +1204,11 @@ export default function ClmScheduleView({
 
               {/* Barra de Lección de Estudiante (Folleto th / lmd) */}
               {isStudentPart && part.asignado_nombre && (
-                <div className="mt-2 flex items-center gap-2 flex-wrap">
+                <div className="mt-2 flex items-center gap-1.5 sm:gap-2 flex-wrap">
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50/90 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/60 text-[11px] text-indigo-900 dark:text-indigo-200">
-                    <BookOpen size={12} className="text-indigo-500" />
+                    <BookOpen size={12} className="text-indigo-500 shrink-0" />
                     <span className="font-bold">Lecc. #{assignedLessonNum}:</span>
-                    <span className="truncate max-w-[170px] sm:max-w-[240px]">
+                    <span className="truncate max-w-[160px] sm:max-w-[240px]">
                       {part.leccion_titulo || assignedLessonObj?.title || `Lección ${assignedLessonNum}`}
                     </span>
                   </div>
@@ -1236,7 +1236,7 @@ export default function ClmScheduleView({
                         e.stopPropagation();
                         handleCompleteLesson(part);
                       }}
-                      className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                      className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
                       title="Aprobar lección y avanzar al estudiante en el registro S-38"
                     >
                       <Check size={11} />
@@ -1248,7 +1248,7 @@ export default function ClmScheduleView({
                         e.stopPropagation();
                         handleRepeatLesson(part);
                       }}
-                      className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500 hover:bg-amber-600 text-white transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                      className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500 hover:bg-amber-600 text-white transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
                       title="Registrar para practicar de nuevo esta lección"
                     >
                       <RotateCcw size={11} />
@@ -1261,7 +1261,7 @@ export default function ClmScheduleView({
           </div>
 
           {/* Lado derecho: Estado / Botón de Asignación */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0 pl-8 sm:pl-0 flex-wrap">
             {isSong ? (
               <div className="flex items-center gap-1.5">
                 <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
@@ -1275,14 +1275,14 @@ export default function ClmScheduleView({
                     setSongNumberInput(numMatch ? numMatch[0] : '');
                     setEditingSongPart(part);
                   }}
-                  className="p-1 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                   title="Cambiar o corregir número de cántico"
                 >
                   <Edit3 size={13} />
                 </button>
               </div>
             ) : part.asignado_nombre ? (
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap justify-end">
                 {conflicts.length > 0 && (
                   <span
                     title={conflicts.map((c) => c.details).join(' | ')}
@@ -1299,11 +1299,11 @@ export default function ClmScheduleView({
 
                 <button
                   onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                  className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                  className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
                   title="Editar o cambiar asignación"
                 >
-                  <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
-                  <span>{part.asignado_nombre}</span>
+                  <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span className="truncate max-w-[160px] sm:max-w-none">{part.asignado_nombre}</span>
                 </button>
 
                 {/* Botón Rápido Quitar Titular */}
@@ -1313,7 +1313,7 @@ export default function ClmScheduleView({
                     e.stopPropagation();
                     handleAssignInline(part.id, '', 'main');
                   }}
-                  className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                  className="p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                   title={`Quitar a ${part.asignado_nombre} (dejar libre)`}
                   aria-label="Quitar asignado"
                 >
@@ -1325,11 +1325,11 @@ export default function ClmScheduleView({
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                      className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 hover:bg-indigo-100/90 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                      className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 hover:bg-indigo-100/90 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
                       title="Cambiar ayudante"
                     >
                       <span className="text-[10px] text-indigo-500 font-bold">Ayudante:</span>
-                      <span>{part.asignado_auxiliar_nombre}</span>
+                      <span className="truncate max-w-[130px] sm:max-w-none">{part.asignado_auxiliar_nombre}</span>
                     </button>
                     {/* Botón Rápido Quitar Ayudante */}
                     <button
@@ -1338,7 +1338,7 @@ export default function ClmScheduleView({
                         e.stopPropagation();
                         handleAssignInline(part.id, '', 'assistant');
                       }}
-                      className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                      className="p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                       title={`Quitar ayudante a ${part.asignado_auxiliar_nombre} (dejar libre)`}
                       aria-label="Quitar ayudante"
                     >
@@ -1355,7 +1355,7 @@ export default function ClmScheduleView({
                       e.stopPropagation();
                       setSelectedStudentForModal(studentPub);
                     }}
-                    className="p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer shadow-2xs"
+                    className="p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                     title={`Ver Ficha Oficial S-38 e historial de ${studentPub.full_name || studentPub.name}`}
                     aria-label="Ver Ficha S-38"
                   >
@@ -1370,7 +1370,7 @@ export default function ClmScheduleView({
                     e.stopPropagation();
                     setSelectedPartForReplacement(part);
                   }}
-                  className="p-1.5 rounded-full text-amber-600 hover:text-white hover:bg-amber-600 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-300 dark:hover:bg-amber-600 border border-amber-200 dark:border-amber-800 transition-all cursor-pointer shadow-2xs"
+                  className="p-1.5 rounded-full text-amber-600 hover:text-white hover:bg-amber-600 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-300 dark:hover:bg-amber-600 border border-amber-200 dark:border-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                   title={`Buscar sustituto para ${part.asignado_nombre}`}
                   aria-label="Sustituir asignación"
                 >
@@ -1384,7 +1384,7 @@ export default function ClmScheduleView({
                     e.stopPropagation();
                     handleSendWhatsAppSingle(part, 'main', false);
                   }}
-                  className="p-1.5 rounded-full text-emerald-600 hover:text-white hover:bg-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-300 dark:hover:bg-emerald-600 border border-emerald-200 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs"
+                  className="p-1.5 rounded-full text-emerald-600 hover:text-white hover:bg-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-300 dark:hover:bg-emerald-600 border border-emerald-200 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                   title={`Enviar asignación por WhatsApp a ${part.asignado_nombre}`}
                   aria-label="Enviar WhatsApp al titular"
                 >
@@ -1399,7 +1399,7 @@ export default function ClmScheduleView({
                       e.stopPropagation();
                       handleSendWhatsAppSingle(part, 'assistant', false);
                     }}
-                    className="p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer shadow-2xs"
+                    className="p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                     title={`Enviar asignación por WhatsApp al ayudante ${part.asignado_auxiliar_nombre}`}
                     aria-label="Enviar WhatsApp al ayudante"
                   >
@@ -1410,7 +1410,7 @@ export default function ClmScheduleView({
             ) : (
               <button
                 onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                className="px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-50 hover:bg-amber-100/80 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1"
+                className="px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-50 hover:bg-amber-100/80 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1 active:scale-95"
               >
                 + Sin Asignar
               </button>
@@ -1938,9 +1938,9 @@ export default function ClmScheduleView({
         </>
       ) : (
         /* ── ENCABEZADO VMC SUPER MINIMALISTA (MODO EMBEBIDO / UNIFICADO) ── */
-        <div className="px-5 py-2.5 bg-slate-50/70 dark:bg-slate-800/30 border-b border-slate-200/70 dark:border-white/[0.05] flex items-center justify-between gap-3 flex-wrap text-xs">
+        <div className="px-3.5 sm:px-5 py-2.5 bg-slate-50/70 dark:bg-slate-800/30 border-b border-slate-200/70 dark:border-white/[0.05] flex items-center justify-between gap-2.5 sm:gap-3 flex-wrap text-xs">
           {/* Lectura bíblica y semana */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
             <span className="font-bold text-slate-800 dark:text-zinc-200">
               Reunión Entre Semana (VMC)
             </span>

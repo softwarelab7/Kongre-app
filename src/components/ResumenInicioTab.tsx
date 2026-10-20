@@ -152,21 +152,21 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
   const [chartRange, setChartRange] = useState<'6 meses' | '12 meses'>('6 meses');
 
   return (
-    <div className="space-y-6 animate-fade-in select-none">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in select-none">
       {/* =========================================================================
           1. HEADER TITLE (EXACT REFERENCE: Panorama General)
          ========================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-2xs">
+      <div className="flex items-center justify-between gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-2xs shrink-0">
             <LayoutGrid className="w-4 h-4 text-slate-600 dark:text-slate-300" />
           </div>
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5 leading-tight">
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5 leading-tight">
               <span>Panorama</span>
               <span className="text-indigo-600 dark:text-indigo-400">General</span>
             </h2>
-            <p className="text-xs text-slate-400 font-medium">
+            <p className="text-[11px] sm:text-xs text-slate-400 font-medium truncate">
               Sincronización activa • Datos en tiempo real
             </p>
           </div>
@@ -175,15 +175,15 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
         <button
           type="button"
           onClick={handleOpenPins}
-          className="self-start sm:self-auto flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-xs font-bold shadow-2xs transition-all cursor-pointer group"
+          className="flex items-center gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-xs font-bold shadow-2xs transition-all cursor-pointer group active:scale-95 shrink-0"
           title="Ver directorio de PINs de los publicadores y la congregación"
         >
-          <div className="w-6 h-6 rounded-lg bg-amber-500 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
-            <KeyRound className="w-3.5 h-3.5" />
+          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-amber-500 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+            <KeyRound className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           </div>
-          <span>Ver PINs</span>
-          <span className="bg-amber-200/80 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full">
-            {publisherPinsCount} activos
+          <span>PINs</span>
+          <span className="bg-amber-200/80 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[10px] font-mono font-bold px-1.5 sm:px-2 py-0.5 rounded-full">
+            {publisherPinsCount}
           </span>
         </button>
       </div>
@@ -191,11 +191,11 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
       {/* =========================================================================
           2. TOP 5 KPI SUMMARY CARDS (EXACT REFERENCE DESIGN)
          ========================================================================= */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-4">
         {/* Card 1: TOTAL */}
         <div
           onClick={() => setActiveTab('publicadores')}
-          className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-xs hover:shadow-md transition-all cursor-pointer group"
+          className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-3.5 sm:p-5 shadow-xs hover:shadow-md transition-all cursor-pointer group active:scale-[0.98]"
         >
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-400 tracking-wider uppercase">

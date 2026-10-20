@@ -63,37 +63,39 @@ const CustomToolbar = (toolbar: any) => {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={goToCurrent}
-          className="px-3.5 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-colors shadow-2xs cursor-pointer"
-        >
-          Hoy
-        </button>
-        <div className="flex items-center gap-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-0.5 shadow-2xs">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 mb-3.5 sm:mb-4">
+      <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             type="button"
-            onClick={goToBack}
-            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 transition-colors cursor-pointer"
-            title="Anterior"
+            onClick={goToCurrent}
+            className="px-3 sm:px-3.5 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/60 transition-colors shadow-2xs cursor-pointer active:scale-95"
           >
-            <ChevronLeft size={16} />
+            Hoy
           </button>
-          <button
-            type="button"
-            onClick={goToNext}
-            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 transition-colors cursor-pointer"
-            title="Siguiente"
-          >
-            <ChevronRight size={16} />
-          </button>
+          <div className="flex items-center gap-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-0.5 shadow-2xs">
+            <button
+              type="button"
+              onClick={goToBack}
+              className="p-1.5 sm:p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 transition-colors cursor-pointer active:scale-95"
+              title="Anterior"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={goToNext}
+              className="p-1.5 sm:p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500 transition-colors cursor-pointer active:scale-95"
+              title="Siguiente"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
         {label()}
       </div>
 
-      <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-2xs">
+      <div className="grid grid-cols-4 sm:flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-2xs">
         {[
           { key: 'month', label: 'Mes' },
           { key: 'week', label: 'Semana' },
@@ -104,7 +106,7 @@ const CustomToolbar = (toolbar: any) => {
             key={key}
             type="button"
             onClick={() => toolbar.onView(key)}
-            className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+            className={`px-2 sm:px-3 py-1.5 sm:py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer text-center active:scale-95 ${
               toolbar.view === key
                 ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold'
                 : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
@@ -956,13 +958,7 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
       }
     }
 
-    // Check if it is a virtual theocratic event (Assembly or SC Visit)
-    if (resource.id.startsWith('virtual-')) {
-      alert(`Evento Teocrático: ${resource.title}\n${resource.description || ''}`);
-      return;
-    }
-
-    // Manual custom event: open edit modal
+    // Manual custom event or virtual theocratic event: open detail/edit modal
     setEventToEdit(resource);
     setShowAddModal(true);
   };
@@ -1128,12 +1124,12 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
         </div>
       </div>
 
-      {/* Main Layout: Sidebar & Calendar */}
-      <div className="flex flex-col lg:flex-row gap-5 items-start">
-        {/* Left Sidebar */}
-        <div className="w-full lg:w-72 shrink-0 flex flex-col gap-4">
-          {/* Mini Calendar Widget */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+      {/* Main Layout: Sidebar & Calendar (Calendar first on mobile for immediate access) */}
+      <div className="flex flex-col lg:flex-row gap-4 sm:gap-5 items-start">
+        {/* Left Sidebar (Rendered below main calendar on mobile, left on desktop) */}
+        <div className="w-full lg:w-72 shrink-0 flex flex-col gap-4 order-2 lg:order-1">
+          {/* Mini Calendar Widget (Desktop only since main calendar is directly above on mobile) */}
+          <div className="hidden lg:block bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
             <div className="flex items-center justify-between mb-3 px-1">
               <span className="text-xs font-bold text-slate-800 dark:text-slate-200 capitalize">
                 {miniDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
@@ -1296,8 +1292,8 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
           </div>
         </div>
 
-        {/* Main Calendar View */}
-        <div className="flex-1 w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-4 sm:p-6 flex flex-col min-h-[640px] overflow-hidden rbc-custom-theme">
+        {/* Main Calendar View (First on mobile, right column on desktop) */}
+        <div className="flex-1 w-full bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-3 sm:p-6 flex flex-col min-h-[480px] sm:min-h-[640px] overflow-hidden rbc-custom-theme order-1 lg:order-2">
           <DnDCalendar
             localizer={localizer}
             events={formatEventsForCalendar()}

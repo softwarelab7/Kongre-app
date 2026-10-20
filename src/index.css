@@ -85,6 +85,26 @@
   min-height: 520px;
 }
 
+@media (max-width: 640px) {
+  .rbc-custom-theme .rbc-calendar {
+    min-height: 430px;
+  }
+  .rbc-custom-theme .rbc-header {
+    padding: 6px 2px !important;
+    font-size: 0.65rem !important;
+    letter-spacing: 0.02em !important;
+  }
+  .rbc-custom-theme .rbc-date-cell {
+    padding: 2px 4px !important;
+    font-size: 0.7rem !important;
+  }
+  .rbc-custom-theme .rbc-event {
+    padding: 1px 3px !important;
+    font-size: 0.65rem !important;
+    line-height: 1.2 !important;
+  }
+}
+
 .rbc-custom-theme .rbc-month-view {
   border-radius: 1rem;
   border-color: rgba(226, 232, 240, 0.8);

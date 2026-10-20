@@ -861,8 +861,8 @@ const AppContent: React.FC = () => {
         onOpenRegisterModal={() => openModalWithHistory('registro_congregacion', setIsRegisterWizardOpen)}
       />
 
-      <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200 flex flex-col justify-between`}>
-        <div className="w-full mx-auto px-3 sm:px-6 lg:px-8 2xl:px-12 py-3 sm:py-6 pb-6">
+      <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200 flex flex-col justify-between overflow-x-hidden`}>
+        <div className="w-full mx-auto px-2.5 sm:px-6 lg:px-8 2xl:px-12 py-2.5 sm:py-6 pb-6">
           {!isTabAllowedForRole(effectiveRoleInfo.id, activeTab) ? (
           <AccessRestrictedView
             requiredRoleName={

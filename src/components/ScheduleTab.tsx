@@ -539,7 +539,7 @@ export const ScheduleTab: React.FC = () => {
                     onClick={() => setIsWeekPickerOpen(false)}
                   />
 
-                  <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 z-50 w-[320px] sm:w-[380px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="fixed sm:absolute top-24 sm:top-full left-3 right-3 sm:left-auto sm:right-0 sm:mt-2 z-50 sm:w-[380px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/5">
                       <div className="flex items-center gap-2">
                         <CalendarDays className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -997,8 +997,8 @@ export const ScheduleTab: React.FC = () => {
             }`}
           >
             {/* ── ENCABEZADO FDS SUPER MINIMALISTA (MODO EMBEBIDO / UNIFICADO) ── */}
-            <div className="px-5 py-2.5 bg-slate-50/70 dark:bg-slate-800/30 border-b border-slate-200/70 dark:border-white/[0.05] flex items-center justify-between gap-3 flex-wrap text-xs">
-              <div className="flex items-center gap-2">
+            <div className="px-3.5 sm:px-5 py-2.5 bg-slate-50/70 dark:bg-slate-800/30 border-b border-slate-200/70 dark:border-white/[0.05] flex items-center justify-between gap-2.5 sm:gap-3 flex-wrap text-xs">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                 <span className="font-bold text-slate-800 dark:text-zinc-200">
                   Reunión del Fin de Semana
                 </span>
@@ -1008,15 +1008,15 @@ export const ScheduleTab: React.FC = () => {
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 {!isReadOnly && (
                   <button
                     type="button"
                     onClick={() => handleQuickSyncOrganized('weekend')}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-medium text-xs transition shadow-2xs cursor-pointer"
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-medium text-xs transition shadow-2xs cursor-pointer active:scale-95"
                     title="Traer de Organized el bosquejo oficial y canciones del fin de semana"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <span>Sincronizar Bosquejo</span>
                   </button>
                 )}
@@ -1027,10 +1027,10 @@ export const ScheduleTab: React.FC = () => {
                     setOrganizedModalTab('bosquejos');
                     setIsOrganizedModalOpen(true);
                   }}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-medium text-xs transition shadow-2xs cursor-pointer"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-medium text-xs transition shadow-2xs cursor-pointer active:scale-95"
                   title="Ver catálogo oficial de 194 bosquejos"
                 >
-                  <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
                   <span>Catálogo (#1-194)</span>
                 </button>
               </div>
@@ -1041,24 +1041,24 @@ export const ScheduleTab: React.FC = () => {
               {/* 1. MARCO INICIAL: Presidente, Cántico 1, Oración Inicial */}
               {/* FILA: Presidente */}
               <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
-                  <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
+                  <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">
                       P.
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
                           Presidente de la reunión
                         </h4>
                       </div>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight">
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight leading-relaxed">
                         Preside la reunión, presenta al orador visitante/local y da los anuncios finales
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
                     {currentWeek.weekend.presidentId ? (
                       <div className="flex items-center gap-1.5">
                         <button
@@ -1083,10 +1083,10 @@ export const ScheduleTab: React.FC = () => {
                               }
                             )
                           }
-                          className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                          className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
                           title="Cambiar presidente"
                         >
-                          <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                          <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                           <span>{publishersMap.get(currentWeek.weekend.presidentId)?.name || 'Hno. Asignado'}</span>
                         </button>
 
@@ -1100,7 +1100,7 @@ export const ScheduleTab: React.FC = () => {
                               currentWeek.weekend.date
                             )
                           }
-                          className="p-1 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs"
+                          className="p-1.5 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                           title="Enviar recordatorio por WhatsApp"
                         >
                           <MessageCircle size={13} />
@@ -1114,7 +1114,7 @@ export const ScheduleTab: React.FC = () => {
                               u.weekend.presidentId = undefined;
                               updateWeek(u);
                             }}
-                            className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                            className="p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                             title="Quitar presidente asignado"
                           >
                             <X size={13} />
@@ -1140,7 +1140,7 @@ export const ScheduleTab: React.FC = () => {
                             () => {}
                           )
                         }
-                        className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer"
+                        className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer active:scale-95"
                       >
                         + Asignar Presidente
                       </button>
@@ -1151,12 +1151,12 @@ export const ScheduleTab: React.FC = () => {
 
               {/* FILA: Cántico Inicial */}
               <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
-                  <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2 sm:gap-4">
+                  <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
                       <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
                           Cántico {currentWeek.weekend.openingSong || 12}
@@ -1168,7 +1168,7 @@ export const ScheduleTab: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                       Congregación
                     </span>
@@ -1179,7 +1179,7 @@ export const ScheduleTab: React.FC = () => {
                           setWeekendEditTab('canciones');
                           setIsWeekendEditModalOpen(true);
                         }}
-                        className="p-1 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                         title="Cambiar número de cántico"
                       >
                         <Edit3 size={13} />
@@ -1191,12 +1191,12 @@ export const ScheduleTab: React.FC = () => {
 
               {/* FILA: Oración Inicial */}
               <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
-                  <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
+                  <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
                           Oración de apertura
@@ -1208,7 +1208,7 @@ export const ScheduleTab: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
                     {currentWeek.weekend.initialPrayerId ? (
                       <div className="flex items-center gap-1.5">
                         <button
@@ -1233,10 +1233,10 @@ export const ScheduleTab: React.FC = () => {
                               }
                             )
                           }
-                          className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                          className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
                           title="Cambiar hermano asignado"
                         >
-                          <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                          <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                           <span>{publishersMap.get(currentWeek.weekend.initialPrayerId)?.name || 'Hno. Asignado'}</span>
                         </button>
 
@@ -1250,7 +1250,7 @@ export const ScheduleTab: React.FC = () => {
                               currentWeek.weekend.date
                             )
                           }
-                          className="p-1 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs"
+                          className="p-1.5 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                           title="Enviar recordatorio por WhatsApp"
                         >
                           <MessageCircle size={13} />
@@ -1264,7 +1264,7 @@ export const ScheduleTab: React.FC = () => {
                               u.weekend.initialPrayerId = undefined;
                               updateWeek(u);
                             }}
-                            className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                            className="p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                             title="Quitar asignación"
                           >
                             <X size={13} />
@@ -1290,7 +1290,7 @@ export const ScheduleTab: React.FC = () => {
                             () => {}
                           )
                         }
-                        className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer"
+                        className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer active:scale-95"
                       >
                         + Asignar Oración
                       </button>
@@ -1303,14 +1303,14 @@ export const ScheduleTab: React.FC = () => {
               <div className="mt-2">
                 <div
                   style={{ backgroundColor: '#204d74' }}
-                  className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
+                  className="w-full text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
                 >
                   DISCURSO PÚBLICO (30 MIN)
                 </div>
 
                 <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-4 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-3">
-                    <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3.5 sm:py-4 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-3">
+                    <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                       <div className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
                         <Mic className="w-3.5 h-3.5" />
                       </div>
@@ -1356,7 +1356,7 @@ export const ScheduleTab: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                    <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
                       {currentWeek.weekend.publicTalkSpeaker ? (
                         <div className="flex items-center gap-1.5">
                           <button
@@ -1365,10 +1365,10 @@ export const ScheduleTab: React.FC = () => {
                               setWeekendEditTab('discurso');
                               setIsWeekendEditModalOpen(true);
                             }}
-                            className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                            className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
                             title="Modificar orador o congregación"
                           >
-                            <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                            <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                             <span>{currentWeek.weekend.publicTalkSpeaker}</span>
                           </button>
 
@@ -1381,7 +1381,7 @@ export const ScheduleTab: React.FC = () => {
                                 u.weekend.visitingSpeakerCongregation = '';
                                 updateWeek(u);
                               }}
-                              className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                              className="p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                               title="Limpiar orador"
                             >
                               <X size={13} />
@@ -1395,7 +1395,7 @@ export const ScheduleTab: React.FC = () => {
                             setWeekendEditTab('discurso');
                             setIsWeekendEditModalOpen(true);
                           }}
-                          className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer"
+                          className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer active:scale-95"
                         >
                           + Asignar Orador
                         </button>
@@ -1407,12 +1407,12 @@ export const ScheduleTab: React.FC = () => {
 
               {/* 3. CÁNTICO INTERMEDIO */}
               <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
-                  <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2 sm:gap-4">
+                  <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
                       <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
                           Cántico {currentWeek.weekend.middleSong || 68}
@@ -1424,7 +1424,7 @@ export const ScheduleTab: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                       Congregación
                     </span>
@@ -1435,7 +1435,7 @@ export const ScheduleTab: React.FC = () => {
                           setWeekendEditTab('canciones');
                           setIsWeekendEditModalOpen(true);
                         }}
-                        className="p-1 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                         title="Cambiar número de cántico intermedio"
                       >
                         <Edit3 size={13} />
@@ -1449,19 +1449,19 @@ export const ScheduleTab: React.FC = () => {
               <div className="mt-2">
                 <div
                   style={{ backgroundColor: '#1d6349' }}
-                  className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
+                  className="w-full text-white py-2.5 px-4 sm:px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
                 >
                   ESTUDIO DE LA ATALAYA (60 MIN)
                 </div>
 
                 {/* Sub-fila: Tema del artículo de La Atalaya */}
                 <div className="border-b border-slate-100 dark:border-white/[0.04] bg-emerald-50/20 dark:bg-emerald-950/10">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-3.5 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 transition-colors gap-2">
-                    <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 transition-colors gap-2">
+                    <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
                       <div className="w-6 h-6 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
                         <BookOpen className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 font-bold text-[10px] tracking-wide shrink-0">
                             Artículo Oficial
@@ -1500,12 +1500,12 @@ export const ScheduleTab: React.FC = () => {
 
                 {/* FILA: Conductor de La Atalaya */}
                 <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                  <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
-                    <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
+                    <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                       <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center shrink-0">
                         <BookOpen className="w-3.5 h-3.5" />
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
                             Quién dirige La Atalaya (Conductor)
@@ -1517,7 +1517,7 @@ export const ScheduleTab: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
                       {currentWeek.weekend.atalayaConductorId ? (
                         <div className="flex items-center gap-1.5">
                           <button
@@ -1542,10 +1542,10 @@ export const ScheduleTab: React.FC = () => {
                                 }
                               )
                             }
-                            className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                            className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
                             title="Cambiar conductor"
                           >
-                            <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                            <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                             <span>{publishersMap.get(currentWeek.weekend.atalayaConductorId)?.name || 'Hno. Asignado'}</span>
                           </button>
 
@@ -1559,7 +1559,7 @@ export const ScheduleTab: React.FC = () => {
                                 currentWeek.weekend.date
                               )
                             }
-                            className="p-1 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs"
+                            className="p-1.5 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                             title="Enviar recordatorio por WhatsApp"
                           >
                             <MessageCircle size={13} />
@@ -1573,7 +1573,7 @@ export const ScheduleTab: React.FC = () => {
                                 u.weekend.atalayaConductorId = undefined;
                                 updateWeek(u);
                               }}
-                              className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                              className="p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                               title="Quitar conductor"
                             >
                               <X size={13} />
@@ -1599,7 +1599,7 @@ export const ScheduleTab: React.FC = () => {
                               () => {}
                             )
                           }
-                          className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer"
+                          className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer active:scale-95"
                         >
                           + Asignar Conductor
                         </button>
@@ -1610,12 +1610,12 @@ export const ScheduleTab: React.FC = () => {
 
                 {/* FILA: Lector de La Atalaya */}
                 <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                  <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
-                    <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
+                    <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                       <div className="w-6 h-6 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 flex items-center justify-center shrink-0">
                         <FileText className="w-3.5 h-3.5" />
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
                             Lector de La Atalaya
@@ -1627,7 +1627,7 @@ export const ScheduleTab: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
                       {currentWeek.weekend.atalayaLectorId ? (
                         <div className="flex items-center gap-1.5">
                           <button
@@ -1652,10 +1652,10 @@ export const ScheduleTab: React.FC = () => {
                                 }
                               )
                             }
-                            className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                            className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
                             title="Cambiar lector"
                           >
-                            <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                            <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                             <span>{publishersMap.get(currentWeek.weekend.atalayaLectorId)?.name || 'Hno. Asignado'}</span>
                           </button>
 
@@ -1669,7 +1669,7 @@ export const ScheduleTab: React.FC = () => {
                                 currentWeek.weekend.date
                               )
                             }
-                            className="p-1 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs"
+                            className="p-1.5 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                             title="Enviar recordatorio por WhatsApp"
                           >
                             <MessageCircle size={13} />
@@ -1683,7 +1683,7 @@ export const ScheduleTab: React.FC = () => {
                                 u.weekend.atalayaLectorId = undefined;
                                 updateWeek(u);
                               }}
-                              className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                              className="p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                               title="Quitar lector"
                             >
                               <X size={13} />
@@ -1709,7 +1709,7 @@ export const ScheduleTab: React.FC = () => {
                               () => {}
                             )
                           }
-                          className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer"
+                          className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer active:scale-95"
                         >
                           + Asignar Lector
                         </button>
@@ -1722,12 +1722,12 @@ export const ScheduleTab: React.FC = () => {
               {/* 5. MARCO FINAL: Cántico Final, Oración Final */}
               {/* FILA: Cántico Final */}
               <div className="border-b border-slate-100 dark:border-white/[0.04]">
-                <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
-                  <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2 sm:gap-4">
+                  <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
                       <Music className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
                           Cántico {currentWeek.weekend.closingSong || 138}
@@ -1739,7 +1739,7 @@ export const ScheduleTab: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
                     <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                       Congregación
                     </span>
@@ -1750,7 +1750,7 @@ export const ScheduleTab: React.FC = () => {
                           setWeekendEditTab('canciones');
                           setIsWeekendEditModalOpen(true);
                         }}
-                        className="p-1 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                         title="Cambiar número de cántico de conclusión"
                       >
                         <Edit3 size={13} />
@@ -1762,12 +1762,12 @@ export const ScheduleTab: React.FC = () => {
 
               {/* FILA: Oración Final */}
               <div>
-                <div className="flex items-center justify-between px-6 py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
-                  <div className="flex items-center gap-3.5 min-w-0 pr-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
+                  <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
                     <div className="w-6 h-6 flex items-center justify-center shrink-0">
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <h4 className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100">
                           Oración de conclusión
@@ -1779,7 +1779,7 @@ export const ScheduleTab: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center justify-end gap-2 shrink-0 pl-8 sm:pl-0">
                     {currentWeek.weekend.finalPrayerId ? (
                       <div className="flex items-center gap-1.5">
                         <button
@@ -1804,10 +1804,10 @@ export const ScheduleTab: React.FC = () => {
                               }
                             )
                           }
-                          className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                          className="px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
                           title="Cambiar hermano asignado"
                         >
-                          <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400" />
+                          <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                           <span>{publishersMap.get(currentWeek.weekend.finalPrayerId)?.name || 'Hno. Asignado'}</span>
                         </button>
 
@@ -1821,7 +1821,7 @@ export const ScheduleTab: React.FC = () => {
                               currentWeek.weekend.date
                             )
                           }
-                          className="p-1 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs"
+                          className="p-1.5 rounded-full text-emerald-600 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 dark:bg-emerald-950/50 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                           title="Enviar recordatorio por WhatsApp"
                         >
                           <MessageCircle size={13} />
@@ -1835,7 +1835,7 @@ export const ScheduleTab: React.FC = () => {
                               u.weekend.finalPrayerId = undefined;
                               updateWeek(u);
                             }}
-                            className="p-1 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs"
+                            className="p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
                             title="Quitar asignación"
                           >
                             <X size={13} />
@@ -1861,7 +1861,7 @@ export const ScheduleTab: React.FC = () => {
                             () => {}
                           )
                         }
-                        className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer"
+                        className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-dashed border-slate-300 dark:border-white/20 transition-all cursor-pointer active:scale-95"
                       >
                         + Asignar Oración
                       </button>

@@ -39,6 +39,10 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
   - Inclusión de `safari-pinned-tab.svg` monocromo para pestañas fijadas en macOS / Safari.
 - **Iconos Monocromáticos para Notificaciones Push en Android:**
   - Integración de `notification-badge-72.png` y `notification-badge-96.png` para iconos limpios en la barra de estado de Android.
+  - Actualización de fallbacks en `src/services/notificationService.ts` y en el Service Worker de segundo plano `public/push-sw.js`.
+- **Limpieza de Archivos y Correcciones de Tipado Estricto (TypeScript):**
+  - Eliminación de `scripts/generate-icons.js` para proteger la nueva identidad visual contra sobrescrituras accidentales.
+  - Corrección de tipos en `LocalOfficialFormsCenter.tsx`, `notificationService.ts` (detección de turnos de carritos y publicadores asignados), `PublishersTab.tsx` (actualización de grupos de predicación) y `usePublisherForm.ts`.
 
 ### [v2.10.0] - 21 de Octubre, 2026
 **Título:** Suite de Funciones para Publicadores, Gestos Táctiles (Swipe) y Menú Independiente de Panorama General

@@ -35,6 +35,9 @@ import {
   Wrench,
   Zap,
   ShieldCheck,
+  Timer,
+  LayoutGrid,
+  Compass,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -42,7 +45,11 @@ export type Motion = 'tilt' | 'rise' | 'wiggle' | 'drop' | 'pulse' | 'flash' | '
 
 /** Iconos del menu de Kongre, por id de departamento o apartado (los ids de Navbar.tsx). */
 export const NAV_ICONS: Record<string, LucideIcon> = {
-  inicio: House,
+  inicio: Compass,
+  panorama_general: LayoutGrid,
+  cronometro_ministerio: Timer,
+  revisitas: Map,
+  estudios_biblicos: BookOpenText,
   calendario: CalendarCheck,
   clm_vmc: BookOpenText,
   reuniones: CalendarDays,
@@ -82,6 +89,10 @@ export const NAV_ICONS: Record<string, LucideIcon> = {
 
 /** Movimiento de cada icono al pasar el cursor o tocarlo. */
 export const NAV_MOTION: Record<string, Motion> = {
+  panorama_general: 'rise',
+  cronometro_ministerio: 'pulse',
+  revisitas: 'drop',
+  estudios_biblicos: 'rise',
   calendario: 'tilt',
   clm_vmc: 'rise',
   programacion: 'tilt',

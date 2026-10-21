@@ -844,7 +844,19 @@ export function getPermissionsForRoles(roles: (TheocraticRole | string)[]): Perm
 }
 
 export function isTabAllowedForRole(roleOrRoles: string | string[], tab: ActiveTab): boolean {
-  if (tab === 'inicio' || tab === 'perfil' || tab === 'calendario' || tab === 'roles') return true;
+  if (
+    tab === 'inicio' ||
+    tab === 'panorama_general' ||
+    tab === 'cronometro_ministerio' ||
+    tab === 'revisitas' ||
+    tab === 'estudios_biblicos' ||
+    tab === 'mi_vista' ||
+    tab === 'perfil' ||
+    tab === 'calendario' ||
+    tab === 'roles'
+  ) {
+    return true;
+  }
   const list = Array.isArray(roleOrRoles) ? roleOrRoles : [roleOrRoles];
   return list.some((r) => {
     const normalized = normalizeTheocraticRole(r);

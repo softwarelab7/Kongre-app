@@ -75,6 +75,10 @@ import {
 
 export type ActiveTab =
   | 'inicio'
+  | 'panorama_general'
+  | 'cronometro_ministerio'
+  | 'revisitas'
+  | 'estudios_biblicos'
   | 'calendario'
   | 'programacion'
   | 'clm_vmc'
@@ -388,6 +392,60 @@ export const Navbar: React.FC<NavbarProps> = ({
   // Full raw departments catalogue
   const allDepartments: Department[] = [
     {
+      id: 'ministerio_publicador',
+      title: 'Menú Principal • Publicador',
+      shortTitle: 'Publicador',
+      icon: NAV_ICONS.inicio,
+      tabIds: ['inicio', 'cronometro_ministerio', 'revisitas', 'estudios_biblicos', 'mi_vista'],
+      items: [
+        {
+          id: 'inicio',
+          label: 'Mi Ministerio (Panel Principal)',
+          description: 'Vista principal del publicador con cronómetro, horas, revisitas y estudios',
+          icon: NAV_ICONS.inicio,
+        },
+        {
+          id: 'cronometro_ministerio',
+          label: 'Cronómetro de Predicación',
+          description: 'Llevar el tiempo en vivo, sesiones diarias y meta mensual de horas',
+          icon: NAV_ICONS.cronometro_ministerio,
+        },
+        {
+          id: 'revisitas',
+          label: 'Revisitas y Personas Interesadas',
+          description: 'Agenda de direcciones, temas conversados, preguntas y visitas',
+          icon: NAV_ICONS.revisitas,
+        },
+        {
+          id: 'estudios_biblicos',
+          label: 'Estudios Bíblicos (Cursos)',
+          description: 'Control de estudiantes, lección actual, sesiones del mes y metas',
+          icon: NAV_ICONS.estudios_biblicos,
+        },
+        {
+          id: 'mi_vista',
+          label: 'Mis Asignaciones y Portal',
+          description: 'Confirmar partes en reuniones, informe mensual S-4 y ausencias',
+          icon: NAV_ICONS.mi_vista,
+        },
+      ],
+    },
+    {
+      id: 'panorama',
+      title: 'Panorama General',
+      shortTitle: 'Panorama',
+      icon: NAV_ICONS.panorama_general,
+      tabIds: ['panorama_general'],
+      items: [
+        {
+          id: 'panorama_general',
+          label: 'Panorama General de la Congregación',
+          description: 'Estadísticas generales, asistencia, publicadores, precursores y gráficos',
+          icon: NAV_ICONS.panorama_general,
+        },
+      ],
+    },
+    {
       id: 'reuniones',
       title: 'Reuniones',
       shortTitle: 'Reuniones',
@@ -631,14 +689,25 @@ export const Navbar: React.FC<NavbarProps> = ({
   const rawCategoriesList = [
     {
       id: 'inicio',
-      title: 'Panorama General',
+      title: 'Menú Principal • Publicador',
       icon: NAV_ICONS.inicio,
       primaryTab: 'inicio' as ActiveTab,
-      tabIds: ['inicio'] as ActiveTab[],
+      tabIds: ['inicio', 'cronometro_ministerio', 'revisitas', 'estudios_biblicos'] as ActiveTab[],
       badge: undefined,
       badgeColor: undefined,
       colorClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400',
-      items: [] as NavSubItem[],
+      items: allDepartments.find((d) => d.id === 'ministerio_publicador')?.items || [],
+    },
+    {
+      id: 'panorama_general',
+      title: 'Panorama General',
+      icon: NAV_ICONS.panorama_general,
+      primaryTab: 'panorama_general' as ActiveTab,
+      tabIds: ['panorama_general'] as ActiveTab[],
+      badge: undefined,
+      badgeColor: undefined,
+      colorClass: 'bg-violet-50 text-violet-600 dark:bg-violet-950/80 dark:text-violet-400',
+      items: allDepartments.find((d) => d.id === 'panorama')?.items || [],
     },
     {
       id: 'reuniones',
@@ -649,7 +718,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       badge: undefined,
       badgeColor: undefined,
       colorClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-400',
-      items: allDepartments[0]?.items || [],
+      items: allDepartments.find((d) => d.id === 'reuniones')?.items || [],
     },
     {
       id: 'secretaria',
@@ -660,7 +729,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       badge: undefined,
       badgeColor: undefined,
       colorClass: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/80 dark:text-emerald-400',
-      items: allDepartments[1]?.items || [],
+      items: allDepartments.find((d) => d.id === 'secretaria')?.items || [],
     },
     {
       id: 'predicacion',
@@ -671,7 +740,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       badge: overdueTerritoriesCount || undefined,
       badgeColor: 'bg-rose-500 text-white',
       colorClass: 'bg-sky-50 text-sky-600 dark:bg-sky-950/80 dark:text-sky-400',
-      items: allDepartments[2]?.items || [],
+      items: allDepartments.find((d) => d.id === 'predicacion')?.items || [],
     },
     {
       id: 'salon',
@@ -682,7 +751,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       badge: pinnedNoticesCount || undefined,
       badgeColor: 'bg-indigo-600 text-white',
       colorClass: 'bg-amber-50 text-amber-600 dark:bg-amber-950/80 dark:text-amber-400',
-      items: allDepartments[3]?.items || [],
+      items: allDepartments.find((d) => d.id === 'salon')?.items || [],
     },
     {
       id: 'supervision',
@@ -693,7 +762,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       badge: conflicts.length || undefined,
       badgeColor: 'bg-amber-500 text-white',
       colorClass: 'bg-rose-50 text-rose-600 dark:bg-rose-950/80 dark:text-rose-400',
-      items: allDepartments[4]?.items || [],
+      items: allDepartments.find((d) => d.id === 'supervision')?.items || [],
     },
   ];
 
@@ -715,7 +784,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         items: allowedItems,
       };
     })
-    .filter((cat) => cat.id === 'inicio' || cat.items.length > 0);
+    .filter((cat) => cat.id === 'inicio' || cat.id === 'panorama_general' || cat.items.length > 0);
 
   const handleSelectTab = (tabId: ActiveTab) => {
     setActiveTab(tabId);
@@ -729,7 +798,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   const getCurrentTabSubtitle = (tab: ActiveTab): string => {
     switch (tab) {
       case 'inicio':
-        return 'Resumen';
+        return 'Mi Ministerio (Publicador)';
+      case 'panorama_general':
+        return 'Panorama General';
+      case 'cronometro_ministerio':
+        return 'Cronómetro de Predicación';
+      case 'revisitas':
+        return 'Agenda de Revisitas';
+      case 'estudios_biblicos':
+        return 'Estudios Bíblicos';
       case 'calendario':
         return 'Calendario de la Congregación';
       case 'programacion':
@@ -1479,6 +1556,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
                 {[
                   { id: 'all', label: 'Todos' },
+                  { id: 'ministerio_publicador', label: 'Publicador' },
+                  { id: 'panorama', label: 'Panorama General' },
                   { id: 'reuniones', label: 'Reuniones' },
                   { id: 'secretaria', label: 'Secretaría' },
                   { id: 'predicacion', label: 'Predicación' },
@@ -1783,12 +1862,29 @@ export const Navbar: React.FC<NavbarProps> = ({
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-slate-800/80 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] pb-[calc(env(safe-area-inset-bottom,0px)+4px)] pt-1.5 px-2 select-none"
       >
         <div className="grid grid-cols-5 items-center justify-around max-w-md mx-auto gap-1">
-          {/* 1. Inicio */}
+          {/* 1. Ministerio (Menú Principal del Publicador) */}
           <button
             type="button"
             onClick={() => handleSelectTab('inicio')}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
-              activeTab === 'inicio'
+              activeTab === 'inicio' ||
+              activeTab === 'cronometro_ministerio' ||
+              activeTab === 'revisitas' ||
+              activeTab === 'estudios_biblicos'
+                ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+            }`}
+          >
+            <Compass className="w-5 h-5 stroke-[2]" />
+            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Ministerio</span>
+          </button>
+
+          {/* 2. Panorama General (Vista general aparte) */}
+          <button
+            type="button"
+            onClick={() => handleSelectTab('panorama_general')}
+            className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
+              activeTab === 'panorama_general'
                 ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
             }`}
@@ -1799,10 +1895,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
               )}
             </div>
-            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Inicio</span>
+            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Panorama</span>
           </button>
 
-          {/* 2. Reuniones (Programación) */}
+          {/* 3. Reuniones (Programación) */}
           <button
             type="button"
             onClick={() => handleSelectTab('programacion')}
@@ -1816,7 +1912,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Reuniones</span>
           </button>
 
-          {/* 3. Calendario (Ubicación fija en móvil en barra inferior) */}
+          {/* 4. Calendario */}
           <button
             type="button"
             onClick={() => handleSelectTab('calendario')}
@@ -1834,35 +1930,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Calendario</span>
           </button>
-
-          {/* 4. Hermanos o Mi Portal según rol */}
-          {isTabAllowedForRole(effectiveRoleInfo.id, 'publicadores') ? (
-            <button
-              type="button"
-              onClick={() => handleSelectTab('publicadores')}
-              className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
-                activeTab === 'publicadores' || activeTab === 'grupos_servicio' || activeTab === 'precursores_auxiliares'
-                  ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
-            >
-              <Users className="w-5 h-5 stroke-[2]" />
-              <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Hermanos</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => handleSelectTab('mi_vista')}
-              className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
-                activeTab === 'mi_vista'
-                  ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
-            >
-              <UserCheck className="w-5 h-5 stroke-[2]" />
-              <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Mi Portal</span>
-            </button>
-          )}
 
           {/* 5. Menú (Abre Drawer completo de departamentos) */}
           <button

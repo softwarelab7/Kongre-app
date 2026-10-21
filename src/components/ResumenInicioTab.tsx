@@ -172,20 +172,32 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleOpenPins}
-          className="flex items-center gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-xs font-bold shadow-2xs transition-all cursor-pointer group active:scale-95 shrink-0"
-          title="Ver directorio de PINs de los publicadores y la congregación"
-        >
-          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-amber-500 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
-            <KeyRound className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-          </div>
-          <span>PINs</span>
-          <span className="bg-amber-200/80 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[10px] font-mono font-bold px-1.5 sm:px-2 py-0.5 rounded-full">
-            {publisherPinsCount}
-          </span>
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => setActiveTab('inicio')}
+            className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold shadow-2xs transition-all cursor-pointer active:scale-95"
+            title="Ir al Menú Principal del Publicador (Cronómetro, Revisitas y Estudios)"
+          >
+            <Timer className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <span>Mi Ministerio</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleOpenPins}
+            className="flex items-center gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-xs font-bold shadow-2xs transition-all cursor-pointer group active:scale-95 shrink-0"
+            title="Ver directorio de PINs de los publicadores y la congregación"
+          >
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-amber-500 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
+              <KeyRound className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            </div>
+            <span>PINs</span>
+            <span className="bg-amber-200/80 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[10px] font-mono font-bold px-1.5 sm:px-2 py-0.5 rounded-full">
+              {publisherPinsCount}
+            </span>
+          </button>
+        </div>
       </div>
 
       {/* =========================================================================

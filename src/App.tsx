@@ -49,6 +49,7 @@ import { DigitalTerritoryModal } from './components/DigitalTerritoryModal';
 import { ThemeToggleModal } from './components/ThemeToggleModal';
 import { OfflineSyncBanner } from './components/OfflineSyncBanner';
 import { ResumenInicioTab } from './components/ResumenInicioTab';
+import { MinisterioPublicadorTab } from './components/MinisterioPublicadorTab';
 import { RolesManagerTab } from './components/RolesManagerTab';
 import { AccessRestrictedView } from './components/AccessRestrictedView';
 import { SecurityProvider } from './context/SecurityContext';
@@ -79,6 +80,13 @@ import { ModalProvider } from './context/ModalContext';
 
 export const VALID_TABS_MAP: Record<string, ActiveTab> = {
   inicio: 'inicio',
+  ministerio: 'inicio',
+  panorama_general: 'panorama_general',
+  panorama: 'panorama_general',
+  cronometro_ministerio: 'cronometro_ministerio',
+  revisitas: 'revisitas',
+  estudios_biblicos: 'estudios_biblicos',
+  estudios: 'estudios_biblicos',
   calendario: 'calendario',
   programacion: 'programacion',
   clm_vmc: 'clm_vmc',
@@ -966,7 +974,25 @@ const AppContent: React.FC = () => {
               </div>
             )}
 
-            {activeTab === 'inicio' && (
+            {(activeTab === 'inicio' ||
+              activeTab === 'cronometro_ministerio' ||
+              activeTab === 'revisitas' ||
+              activeTab === 'estudios_biblicos') && (
+              <MinisterioPublicadorTab
+                setActiveTab={setActiveTab}
+                initialSubTab={
+                  activeTab === 'cronometro_ministerio'
+                    ? 'cronometro'
+                    : activeTab === 'revisitas'
+                    ? 'revisitas'
+                    : activeTab === 'estudios_biblicos'
+                    ? 'estudios'
+                    : 'resumen'
+                }
+                onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
+              />
+            )}
+            {activeTab === 'panorama_general' && (
               <ResumenInicioTab
                 setActiveTab={setActiveTab}
                 onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}

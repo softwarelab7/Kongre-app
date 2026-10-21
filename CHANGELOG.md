@@ -25,7 +25,22 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.10.0] - 21 de Octubre, 2026 (Compilación Activa)
+### [v2.10.1] - 21 de Octubre, 2026 (Compilación Activa)
+**Título:** Iconos PWA, Pantallas de Carga iOS y Nuevo Selector de Tema Animado (2 Modos: Claro y Oscuro)
+- **Selector de Tema Dinámico con Animación Sol ⇄ Luna (`ThemeToggle.tsx` / `ThemeToggleIcon.tsx`):**
+  - Implementación del nuevo icono SVG interactivo con transición animada entre Sol (rayos radiantes) y Luna creciente (mordida geométrica con estrellas titilantes).
+  - Restricción estricta a dos modos teocráticos optimizados (**Claro** y **Oscuro**), eliminando modos innecesarios para una experiencia más rápida e intuitiva.
+  - Compatibilidad total con barras de navegación (`variant="onBrand"` y `--tt-bg`) y prevención de parpadeo (FOUC) en el script inicial de `index.html`.
+- **Accesos Directos Nativos de la Aplicación (PWA Shortcuts):**
+  - 4 accesos directos al mantener presionado el icono instalado en móviles: **Programación**, **Territorios**, **Asistencia (S-88)** y **Tablero de Anuncios**.
+  - Registro sincronizado en `vite.config.ts` y `manifest.webmanifest` con iconos en alta resolución (`96px` y `192px`).
+- **Pantallas de Inicio Nativas para iOS y iPadOS (`public/splash/`):**
+  - Cobertura completa de imágenes de bienvenida (Splash screens) para toda la gama de iPhone (desde iPhone SE hasta iPhone 16 Pro Max) y iPad Pro/Air/mini.
+  - Inclusión de `safari-pinned-tab.svg` monocromo para pestañas fijadas en macOS / Safari.
+- **Iconos Monocromáticos para Notificaciones Push en Android:**
+  - Integración de `notification-badge-72.png` y `notification-badge-96.png` para iconos limpios en la barra de estado de Android.
+
+### [v2.10.0] - 21 de Octubre, 2026
 **Título:** Suite de Funciones para Publicadores, Gestos Táctiles (Swipe) y Menú Independiente de Panorama General
 - **Suite de Funciones para Publicadores en el Menú Principal (`MinisterioPublicadorTab.tsx` / `inicio`):**
   - **Cronómetro de Predicación en Vivo y Persistente:** Reloj digital `HH:MM:SS` que continúa contando incluso si se cierra la pestaña o se bloquea el teléfono. Controles de ajuste rápido (`+15m`, `+30m`, `+1h`, `-5m`), selector de modalidad (*De casa en casa*, *Carritos*, *Revisitas*, *Curso bíblico*, *Informal*) y contadores en vivo de revisitas y publicaciones dejadas.

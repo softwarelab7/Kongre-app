@@ -352,7 +352,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
         setInspectorFields(nextInspectorValues);
 
         // Crear URL de vista previa local
-        const blob = new Blob([filledBytes], { type: 'application/pdf' });
+        const blob = new Blob([filledBytes as any], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         setPreviewBlobUrl((prev) => {
           if (prev) URL.revokeObjectURL(prev);
@@ -799,7 +799,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
                       className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-900 dark:text-white"
                     >
                       {preachingGroups.map((g) => (
-                        <option key={g.id} value={g.number}>
+                        <option key={g.number} value={g.number}>
                           {g.name || `Grupo ${g.number}`}
                         </option>
                       ))}
@@ -842,7 +842,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
                   >
                     {weeks.map((w) => (
                       <option key={w.id} value={w.id}>
-                        Semana del {w.weekStartDate} al {w.weekEndDate} ({w.midweek.bibleReadingText || 'VMC'})
+                        Semana del {w.weekStartDate} al {w.weekEndDate} ({w.midweek.bibleReading || 'VMC'})
                       </option>
                     ))}
                   </select>

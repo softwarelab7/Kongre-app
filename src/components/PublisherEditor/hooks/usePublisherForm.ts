@@ -482,7 +482,7 @@ export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
         next.birth_date = value;
         next.birthDate = value;
       }
-      if (field === 'last_shepherding_visit' || field === 'last_visit_date') {
+      if ((field as string) === 'last_shepherding_visit' || (field as string) === 'last_visit_date') {
         next.last_shepherding_visit = value;
         next.last_visit_date = value;
       }
@@ -623,8 +623,8 @@ export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
       const nextList = [...(prev.ausencias || []), normalized];
       return {
         ...prev,
-        ausencias: nextList,
-        absences: nextList,
+        ausencias: nextList as any,
+        absences: nextList as any,
       };
     });
   }, []);
@@ -634,8 +634,8 @@ export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
       const nextList = (prev.ausencias || []).filter(a => a.id !== id);
       return {
         ...prev,
-        ausencias: nextList,
-        absences: nextList,
+        ausencias: nextList as any,
+        absences: nextList as any,
       };
     });
   }, []);

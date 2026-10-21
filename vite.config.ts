@@ -14,6 +14,9 @@ export default defineConfig(() => {
         includeAssets: [
           'favicon.ico',
           'favicon.svg',
+          'safari-pinned-tab.svg',
+          'notification-badge-72.png',
+          'notification-badge-96.png',
           'apple-touch-icon.png',
           'apple-touch-icon-180x180.png',
           'apple-touch-icon-152x152.png',
@@ -41,6 +44,48 @@ export default defineConfig(() => {
             { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
             { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
             { src: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png', purpose: 'any' },
+          ],
+          shortcuts: [
+            {
+              name: 'Programación',
+              short_name: 'Programación',
+              description: 'Reuniones y programa semanal',
+              url: '/#/programacion',
+              icons: [
+                { src: '/shortcuts/programacion-96.png', sizes: '96x96', type: 'image/png' },
+                { src: '/shortcuts/programacion-192.png', sizes: '192x192', type: 'image/png' },
+              ],
+            },
+            {
+              name: 'Territorios',
+              short_name: 'Territorios',
+              description: 'Mapas y territorios',
+              url: '/#/territorios',
+              icons: [
+                { src: '/shortcuts/territorios-96.png', sizes: '96x96', type: 'image/png' },
+                { src: '/shortcuts/territorios-192.png', sizes: '192x192', type: 'image/png' },
+              ],
+            },
+            {
+              name: 'Asistencia',
+              short_name: 'Asistencia',
+              description: 'Registro S-88',
+              url: '/#/asistencia',
+              icons: [
+                { src: '/shortcuts/asistencia-96.png', sizes: '96x96', type: 'image/png' },
+                { src: '/shortcuts/asistencia-192.png', sizes: '192x192', type: 'image/png' },
+              ],
+            },
+            {
+              name: 'Anuncios',
+              short_name: 'Anuncios',
+              description: 'Tablero de anuncios',
+              url: '/#/tablero_anuncios',
+              icons: [
+                { src: '/shortcuts/tablero_anuncios-96.png', sizes: '96x96', type: 'image/png' },
+                { src: '/shortcuts/tablero_anuncios-192.png', sizes: '192x192', type: 'image/png' },
+              ],
+            },
           ],
         },
         workbox: {

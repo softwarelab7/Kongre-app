@@ -1,7 +1,7 @@
 // src/components/ThemeToggleModal.tsx
 import React from 'react';
 import { useTheme, ThemeMode } from '../context/ThemeContext';
-import { Sun, Moon, Tv, Check, X, ShieldAlert, Sparkles, Sliders } from 'lucide-react';
+import { Sun, Moon, Check, X, Sparkles, Sliders } from 'lucide-react';
 
 interface ThemeToggleModalProps {
   isOpen: boolean;
@@ -42,16 +42,6 @@ export const ThemeToggleModal: React.FC<ThemeToggleModalProps> = ({ isOpen, onCl
       previewBg: 'bg-slate-900',
       previewBorder: 'border-slate-700',
       accentColor: 'text-indigo-400 bg-indigo-950/60 border-indigo-800',
-    },
-    {
-      id: 'cabina',
-      title: 'Modo Cabina & Acomodadores (Auditorio)',
-      subtitle: 'Negro OLED ultra-profundo con contraste suave y mínimo deslumbramiento lumínico.',
-      icon: Tv,
-      recommendedFor: 'Cabina de audio/vídeo, consola Zoom y acomodadores en la penumbra del Salón',
-      previewBg: 'bg-[#020408]',
-      previewBorder: 'border-emerald-900/60',
-      accentColor: 'text-emerald-400 bg-emerald-950/60 border-emerald-800',
     },
   ];
 
@@ -113,11 +103,6 @@ export const ThemeToggleModal: React.FC<ThemeToggleModalProps> = ({ isOpen, onCl
                     <h4 className="text-sm font-bold text-slate-900 dark:text-white">
                       {opt.title}
                     </h4>
-                    {opt.id === 'cabina' && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                        Recomendado Salón
-                      </span>
-                    )}
                   </div>
                   <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
                     {opt.subtitle}

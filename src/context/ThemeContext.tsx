@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { applyTheme, Theme as BrandTheme } from '../theme';
 
-export type ThemeMode = 'light' | 'dark' | 'cabina';
+export type ThemeMode = 'light' | 'dark';
 
 interface ThemeContextType {
   themeMode: ThemeMode;
@@ -16,8 +16,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [themeMode, setThemeModeState] = useState<ThemeMode>(() => {
     try {
-      const saved = (localStorage.getItem('kongre-theme') || localStorage.getItem('kongre_theme')) as ThemeMode;
-      if (saved && (saved === 'light' || saved === 'dark' || saved === 'cabina')) {
+      const saved = (localStorage.getItem('kongre-theme') || localStorage.getItem('kongre_theme')) as string;
+      if (saved === 'dark' || saved === 'light') {
         return saved;
       }
       if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -36,6 +36,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     try {
       localStorage.setItem('kongre_theme', themeMode);
+      localStorage.setItem('kongre-theme', themeMode);
     } catch (e) {
       // ignore
     }
@@ -43,26 +44,18 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [themeMode]);
 
   const setThemeMode = (mode: ThemeMode) => {
+    const cleanMode: ThemeMode = mode === 'dark' ? 'dark' : 'light';
     try {
-      localStorage.setItem('kongre_theme', mode);
+      localStorage.setItem('kongre_theme', cleanMode);
+      localStorage.setItem('kongre-theme', cleanMode);
     } catch (e) {}
-    applyThemeToDOM(mode);
-    setThemeModeState(mode);
+    applyThemeToDOM(cleanMode);
+    setThemeModeState(cleanMode);
   };
 
   const toggleTheme = () => {
     setThemeModeState((prev) => {
-      let nextMode: ThemeMode = 'dark';
-      if (prev === 'light') {
-        nextMode = 'dark';
-      } else if (prev === 'dark') {
-        nextMode = 'cabina';
-      } else if (prev === 'cabina') {
-        nextMode = 'light';
-      } else {
-        nextMode = 'dark';
-      }
-
+      const nextMode: ThemeMode = prev === 'dark' ? 'light' : 'dark';
       try {
         localStorage.setItem('kongre_theme', nextMode);
         localStorage.setItem('kongre-theme', nextMode);
@@ -79,8 +72,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         themeMode,
         setThemeMode,
         toggleTheme,
-        isDark: themeMode === 'dark' || themeMode === 'cabina',
-        isCabinaMode: themeMode === 'cabina',
+        isDark: themeMode === 'dark',
+        isCabinaMode: false,
       }}
     >
       {children}

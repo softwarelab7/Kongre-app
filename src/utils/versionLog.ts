@@ -25,19 +25,45 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.10.0';
-export const CURRENT_BUILD_CODE = '2026.10.21.3000';
+export const CURRENT_APP_VERSION = '2.10.1';
+export const CURRENT_BUILD_CODE = '2026.10.21.3100';
 export const BUILD_DATE = '21 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.10.1',
+    buildCode: '2026.10.21.3100',
+    date: '21 de Octubre, 2026',
+    title: 'Iconos PWA, Pantallas de Carga iOS y Nuevo Selector de Tema Animado (2 Modos: Claro y Oscuro)',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Conmutador de Tema Animado Sol ⇄ Luna: Transición SVG dinámica y fluida entre sol y luna creciente con estrellas, enfocado exclusivamente en dos modos óptimos (Claro y Oscuro).',
+      },
+      {
+        category: 'feature',
+        text: 'Accesos Directos Nativos PWA (App Shortcuts): Atajos en icono instalado para Programación, Territorios, Asistencia y Anuncios.',
+      },
+      {
+        category: 'improvement',
+        text: 'Pantallas de Carga para iOS (Splash Screens): Cobertura completa para todos los modelos de iPhone y iPad con iconos monocromáticos y safari-pinned-tab.',
+      },
+      {
+        category: 'improvement',
+        text: 'Badges monocromáticos optimizados para notificaciones Web Push y Service Worker en segundo plano.',
+      },
+    ],
+  },
+  {
     version: '2.10.0',
     buildCode: '2026.10.21.3000',
     date: '21 de Octubre, 2026',
     title: 'Suite de Funciones para Publicadores, Gestos Táctiles (Swipe) y Menú Independiente de Panorama General',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

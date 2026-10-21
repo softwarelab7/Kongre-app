@@ -887,18 +887,27 @@ export const extractPublisherUpcomingReminders = (params: {
   // --- C. TURNOS DE PREDICACIÓN PÚBLICA (CARRITOS) ---
   if (prefs.notifyCarts && Array.isArray(params.cartShifts)) {
     for (const shift of params.cartShifts) {
-      if (!shift.date || !Array.isArray(shift.assignedPublisherIds)) continue;
-      const isAssigned = shift.assignedPublisherIds.some((id) => matchesPublisher(id));
+      if (!shift.date) continue;
+      const shiftPubIds: string[] = [
+        ...(shift.publisher1Id ? [shift.publisher1Id] : []),
+        ...(shift.publisher2Id ? [shift.publisher2Id] : []),
+        ...(((shift as any).assignedPublisherIds as string[]) || []),
+      ];
+      if (shiftPubIds.length === 0) continue;
+      const isAssigned = shiftPubIds.some((id) => matchesPublisher(id));
       if (isAssigned) {
         const loc = params.cartLocations?.find((l) => l.id === shift.locationId);
         const locName = loc?.name || 'Punto de Carrito';
-        const shiftStartTime = (shift.timeSlot || '09:00').split('-')[0].trim() || '09:00';
+        const timeSlotStr =
+          (shift as any).timeSlot ||
+          (shift.startTime && shift.endTime ? `${shift.startTime} - ${shift.endTime}` : shift.startTime || '09:00');
+        const shiftStartTime = shift.startTime || timeSlotStr.split('-')[0].trim() || '09:00';
         addAssignmentReminders({
           baseId: `cart_shift_${shift.id}_${targetId || targetName}`,
           weekId: shift.id,
           category: 'cart',
           meetingName: `Predicación con Carritos (${locName})`,
-          assignmentTitle: `Turno de Carrito (${shift.timeSlot || 'Horario asignado'})`,
+          assignmentTitle: `Turno de Carrito (${timeSlotStr})`,
           meetingDate: shift.date,
           meetingTime: shiftStartTime,
         });
@@ -1068,7 +1077,7 @@ export const sendLocalNotification = async (
   }
 
   const iconUrl = options.icon || '/icon-192.png';
-  const badgeUrl = options.badge || '/favicon-32.png';
+  const badgeUrl = options.badge || '/notification-badge-96.png';
 
   // 1. Intentar mostrar a través del Service Worker de la PWA si está disponible
   if ('serviceWorker' in navigator) {
@@ -1112,9 +1121,11 @@ export const sendLocalNotification = async (
 /**
  * Enviar notificación de prueba para verificar funcionamiento
  */
-export const sendTestNotification = async (): Promise<boolean> => {
+export const sendTestNotification = async (publisherName?: string): Promise<boolean> => {
   return await sendLocalNotification('🏛️ Notificaciones Push de Kongre Activas', {
-    body: '¡Todo listo! Recibirás recordatorios automáticos de tus asignaciones incluso si la aplicación no está abierta.',
+    body: publisherName
+      ? `¡Todo listo, ${publisherName}! Recibirás recordatorios automáticos de tus asignaciones incluso si la aplicación no está abierta.`
+      : '¡Todo listo! Recibirás recordatorios automáticos de tus asignaciones incluso si la aplicación no está abierta.',
     tag: 'test-notification',
   });
 };

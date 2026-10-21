@@ -189,7 +189,7 @@ async function scheduleOsAndMemoryTriggers() {
           await self.registration.showNotification(rem.title, {
             body: rem.body,
             icon: '/icon-192.png',
-            badge: '/favicon-32.png',
+            badge: '/notification-badge-96.png',
             tag: rem.id,
             showTrigger: new self.TimestampTrigger(rem.triggerTimestamp),
             vibrate: config?.soundEnabled !== false ? [200, 100, 200] : undefined,
@@ -236,7 +236,7 @@ async function fireReminderNotification(rem, config) {
     await self.registration.showNotification(rem.title, {
       body: rem.body,
       icon: '/icon-192.png',
-      badge: '/favicon-32.png',
+      badge: '/notification-badge-96.png',
       tag: rem.id,
       renotify: true,
       requireInteraction: true,
@@ -331,7 +331,7 @@ self.addEventListener('push', (event) => {
         await self.registration.showNotification(payload.title, {
           body: payload.body || 'Tienes una asignación teocrática próximamente.',
           icon: payload.icon || '/icon-192.png',
-          badge: payload.badge || '/favicon-32.png',
+          badge: payload.badge || '/notification-badge-96.png',
           tag,
           renotify: true,
           requireInteraction: true,
@@ -505,7 +505,7 @@ self.addEventListener('message', (event) => {
             await self.registration.showNotification(payload.title, {
               body: payload.body,
               icon: '/icon-192.png',
-              badge: '/favicon-32.png',
+              badge: '/notification-badge-96.png',
               tag: payload.tag || `kongre-sim-push-${Date.now()}`,
               renotify: true,
               requireInteraction: true,

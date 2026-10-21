@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./kongre-theme.css";
+@import "./kongre-theme-toggle.css";
 @import "./kongre-indigo.css";
 @import "./kongre-welcome.css";
 @import "leaflet/dist/leaflet.css";

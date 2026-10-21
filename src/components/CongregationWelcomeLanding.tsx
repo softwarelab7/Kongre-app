@@ -51,9 +51,9 @@ import ThemeToggle from './ThemeToggle';
 import { AppFooter } from './AppFooter';
 import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
 
-const NEXT_THEME: Record<string, 'light' | 'dark' | 'cabina'> = { light: 'dark', dark: 'cabina', cabina: 'light' };
-const THEME_NAMES: Record<string, string> = { light: 'Claro', dark: 'Oscuro', cabina: 'Cabina A/V' };
-const THEME_ICONS: Record<string, any> = { light: Sun, dark: Moon, cabina: MonitorSpeaker };
+const NEXT_THEME: Record<string, 'light' | 'dark'> = { light: 'dark', dark: 'light' };
+const THEME_NAMES: Record<string, string> = { light: 'Claro', dark: 'Oscuro' };
+const THEME_ICONS: Record<string, any> = { light: Sun, dark: Moon };
 
 interface CongregationWelcomeLandingProps {
   onEnterApp: () => void;

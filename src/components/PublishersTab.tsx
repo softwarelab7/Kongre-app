@@ -56,13 +56,19 @@ export const PublishersTab: React.FC = () => {
     updatePublisher,
     deletePublisher,
     preachingGroups,
-    updatePreachingGroup,
+    updatePreachingGroups,
     monthlyReports,
     updateMonthlyReport,
     settings,
     importPublishersBatch,
     cleanDuplicatePublishers,
   } = useCongregation();
+
+  const updatePreachingGroup = (group: any) => {
+    if (updatePreachingGroups) {
+      updatePreachingGroups(preachingGroups.map((g) => (g.number === group.number ? group : g)));
+    }
+  };
 
   const { showToast } = useToast();
   const { confirm } = useModal();

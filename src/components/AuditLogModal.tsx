@@ -172,7 +172,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
         {/* Filter Toolbar */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-3 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div className="flex items-center flex-1 min-w-[200px] space-x-2">
-            <Filter className="w-4 h-4 text-slate-400" />
+            <Filter className="w-4 h-4 text-slate-400 dark:text-slate-300" />
             <input
               type="text"
               placeholder="Buscar por hermano, acción o detalle..."

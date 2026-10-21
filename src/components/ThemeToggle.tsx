@@ -69,7 +69,7 @@ export default function ThemeToggle({
   }
 
   // Escalar el tamaño proporcional del SVG
-  const iconSize = size === 48 ? 24 : Math.max(14, Math.round(size * 0.56));
+  const iconSize = Math.max(18, Math.round(size * 0.58));
 
   const isBrand = variant === "onBrand";
 
@@ -77,22 +77,23 @@ export default function ThemeToggle({
     light: {
       title: "Tema: Claro • Clic para cambiar a Modo Oscuro",
       aria: "Modo Claro activo. Cambiar a Modo Oscuro",
-      bg: isBrand ? "rgba(255, 255, 255, 0.2)" : "#F4F3FE",
-      color: isBrand ? "#FFFFFF" : "#4C3AED",
-      border: isBrand ? "rgba(255, 255, 255, 0.35)" : "rgba(76, 58, 237, 0.18)",
-      biteBg: isBrand ? "#4332D6" : "#F4F3FE",
+      biteBg: isBrand ? "#4332D6" : "#ffffff",
     },
     dark: {
       title: "Tema: Oscuro • Clic para cambiar a Modo Claro",
       aria: "Modo Oscuro activo. Cambiar a Modo Claro",
-      bg: isBrand ? "rgba(15, 23, 42, 0.7)" : "#1E293B",
-      color: isBrand ? "#C7D2FE" : "#9085F4",
-      border: isBrand ? "rgba(199, 210, 254, 0.4)" : "rgba(144, 133, 244, 0.3)",
-      biteBg: isBrand ? "#24186B" : "#1E293B",
+      biteBg: isBrand ? "#24186B" : "#0f172a",
     },
   };
 
   const currentConfig = modeConfig[activeMode];
+
+  // Sin contenedor: sin borde, sin fondo permanente, sin sombra de caja
+  const variantClasses = isBrand
+    ? "text-white hover:text-white hover:bg-white/10"
+    : activeMode === "dark"
+    ? "text-white hover:text-slate-100 hover:bg-slate-800/60"
+    : "text-amber-500 hover:text-amber-600 hover:bg-slate-100/80 dark:text-amber-400 dark:hover:bg-slate-800/60";
 
   return (
     <button
@@ -107,27 +108,13 @@ export default function ThemeToggle({
       onMouseUp={() => setIsActive(false)}
       aria-label={currentConfig.aria}
       title={currentConfig.title}
-      className={`relative inline-flex items-center justify-center select-none outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#4C3AED] cursor-pointer transition-all shrink-0 backdrop-blur-xs ${className}`}
+      className={`relative inline-flex items-center justify-center p-1.5 rounded-xl bg-transparent border-0 shadow-none outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 cursor-pointer shrink-0 ${variantClasses} ${className}`}
       style={{
         width: size,
         height: size,
-        borderRadius: "9999px",
-        border: `1.5px solid ${currentConfig.border}`,
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        cursor: "pointer",
-        background: currentConfig.bg,
-        color: currentConfig.color,
-        boxShadow: isHovered
-          ? activeMode === "dark"
-            ? "0 4px 16px rgba(144, 133, 244, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.12)"
-            : "0 4px 16px rgba(76, 58, 237, 0.22), 0 0 0 1px rgba(76, 58, 237, 0.12)"
-          : "0 1px 3px rgba(0, 0, 0, 0.05)",
         ["--tt-bg" as string]: currentConfig.biteBg,
-        transform: isActive ? "scale(0.92)" : isHovered ? "scale(1.06)" : "scale(1)",
-        transition:
-          "background 250ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 250ms ease, border-color 250ms ease",
+        transform: isActive ? "scale(0.92)" : isHovered ? "scale(1.08)" : "scale(1)",
+        transition: "transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), color 200ms ease, background-color 200ms ease",
         ...style,
       }}
     >

@@ -25,19 +25,41 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.10.4';
-export const CURRENT_BUILD_CODE = '2026.10.21.3400';
+export const CURRENT_APP_VERSION = '2.10.5';
+export const CURRENT_BUILD_CODE = '2026.10.21.3410';
 export const BUILD_DATE = '21 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.10.5',
+    buildCode: '2026.10.21.3410',
+    date: '21 de Octubre, 2026',
+    title: 'Botón de Modo Oscuro Sin Contenedor, Animación Fluida y Luna Blanca Nítida',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Luna Blanca Brillante y Clara en Modo Oscuro: Se cambió el color de la luna y las estrellas en modo nocturno a blanco nítido (#FFFFFF), logrando alto contraste y visibilidad perfecta sobre la barra de navegación y páginas oscuras.',
+      },
+      {
+        category: 'improvement',
+        text: 'Eliminación del Contenedor de Modo Oscuro: Se retiró el fondo fijo, la cápsula, el borde y las sombras del botón, integrándolo limpiamente como icono de acción directa.',
+      },
+      {
+        category: 'feature',
+        text: 'Animación Original Preservada al 100%: Transiciones con física bezier completa, expansión del disco solar a lunar, desvanecimiento angular de rayos y aparición sutil de estrellas.',
+      },
+    ],
+  },
+  {
     version: '2.10.4',
     buildCode: '2026.10.21.3400',
     date: '21 de Octubre, 2026',
     title: 'Auditoría Integral y Persistencia Total de Configuraciones y Datos en Supabase',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

@@ -598,36 +598,36 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
       {/* Modal Dialog */}
       <div
-        className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[82vh] z-10 animate-in fade-in zoom-in-95 duration-150"
+        className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[82vh] z-10 animate-in fade-in zoom-in-95 duration-150"
         onKeyDown={handleKeyDown}
       >
         {/* Top Search Bar */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-200 bg-slate-50/70">
-          <Search className="w-5 h-5 text-indigo-600 shrink-0" />
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/90">
+          <Search className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar publicador, territorio, bosquejo de discurso (#1..200), fecha o módulo..."
-            className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 font-medium text-sm sm:text-base focus:outline-hidden"
+            className="w-full bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium text-sm sm:text-base focus:outline-hidden"
           />
           {query ? (
             <button
               onClick={() => setQuery('')}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+              className="p-1 rounded-lg text-slate-400 dark:text-slate-300 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           ) : (
-            <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 text-[11px] font-semibold text-slate-500 bg-white border border-slate-300 rounded shadow-2xs">
+            <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded shadow-2xs">
               ESC
             </kbd>
           )}
         </div>
 
         {/* Category Filter Pills */}
-        <div className="flex items-center gap-1.5 px-4 py-2 border-b border-slate-100 overflow-x-auto scrollbar-none bg-white text-xs">
+        <div className="flex items-center gap-1.5 px-4 py-2 border-b border-slate-100 dark:border-slate-800 overflow-x-auto scrollbar-none bg-white dark:bg-slate-900 text-xs">
           {[
             { id: 'todos', label: 'Todos' },
             { id: 'publicadores', label: 'Publicadores' },
@@ -639,16 +639,16 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id as SearchCategory)}
-              className={`px-2.5 py-1 rounded-full font-medium transition-colors whitespace-nowrap ${
+              className={`px-2.5 py-1 rounded-full font-medium transition-colors whitespace-nowrap cursor-pointer ${
                 activeCategory === cat.id
                   ? 'bg-indigo-600 text-white shadow-2xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               {cat.label}
             </button>
           ))}
-          <span className="ml-auto text-[11px] text-slate-400 font-normal pl-2 shrink-0">
+          <span className="ml-auto text-[11px] text-slate-400 dark:text-slate-400 font-normal pl-2 shrink-0">
             {filteredResults.length} {filteredResults.length === 1 ? 'resultado' : 'resultados'}
           </span>
         </div>
@@ -656,7 +656,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         {/* Results List */}
         <div
           ref={resultsContainerRef}
-          className="flex-1 overflow-y-auto p-2 space-y-1 divide-y divide-slate-100"
+          className="flex-1 overflow-y-auto p-2 space-y-1 divide-y divide-slate-100 dark:divide-slate-800/60"
         >
           {filteredResults.length > 0 ? (
             filteredResults.map((item, index) => {
@@ -669,47 +669,51 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                   onClick={() => item.action()}
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={`w-full flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors text-left ${
-                    isSelected ? 'bg-indigo-50/90 text-indigo-950 ring-1 ring-indigo-200' : 'hover:bg-slate-50 text-slate-800'
+                    isSelected
+                      ? 'bg-indigo-50/90 dark:bg-indigo-950/60 text-indigo-950 dark:text-indigo-200 ring-1 ring-indigo-200 dark:ring-indigo-800'
+                      : 'hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-800 dark:text-slate-200'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0 pr-2">
                     <div
                       className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                        isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600'
+                        isSelected
+                          ? 'bg-indigo-600 text-white shadow-xs'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-200'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs uppercase font-bold tracking-wider text-indigo-600">
+                        <span className="text-xs uppercase font-bold tracking-wider text-indigo-600 dark:text-indigo-400">
                           {item.categoryLabel}
                         </span>
                         {item.badge && (
                           <span
                             className={`px-1.5 py-0.2 rounded-md text-[10px] font-semibold ${
-                              item.badgeColor || 'bg-slate-100 text-slate-700'
+                              item.badgeColor || 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                             }`}
                           >
                             {item.badge}
                           </span>
                         )}
                       </div>
-                      <p className="text-sm font-semibold truncate leading-snug">{item.title}</p>
-                      <p className="text-xs text-slate-500 truncate">{item.subtitle}</p>
+                      <p className="text-sm font-semibold truncate leading-snug text-slate-900 dark:text-white">{item.title}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{item.subtitle}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0 pl-2">
                     {isSelected && (
-                      <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold text-indigo-700 bg-indigo-100">
+                      <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-900/60">
                         <span>Ir</span>
                         <CornerDownLeft className="w-3 h-3" />
                       </span>
                     )}
                     <ChevronRight
                       className={`w-4 h-4 ${
-                        isSelected ? 'text-indigo-600 translate-x-0.5' : 'text-slate-300'
+                        isSelected ? 'text-indigo-600 dark:text-indigo-400 translate-x-0.5' : 'text-slate-300 dark:text-slate-600'
                       } transition-transform`}
                     />
                   </div>
@@ -718,9 +722,9 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             })
           ) : (
             <div className="text-center py-12 px-4">
-              <Search className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <h4 className="text-sm font-bold text-slate-800">No se encontraron resultados</h4>
-              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+              <Search className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">No se encontraron resultados</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
                 No hay coincidencias para &ldquo;{query}&rdquo;. Prueba buscando por nombre de publicador, número de territorio o bosquejo de discurso.
               </p>
             </div>
@@ -728,26 +732,26 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         </div>
 
         {/* Footer shortcuts hint */}
-        <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+        <div className="px-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-semibold text-slate-700 shadow-2xs">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
                 ↑
               </kbd>
-              <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-semibold text-slate-700 shadow-2xs">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
                 ↓
               </kbd>
               <span>Navegar</span>
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-semibold text-slate-700 shadow-2xs">
+              <kbd className="px-1.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
                 ↵
               </kbd>
               <span>Abrir</span>
             </span>
           </div>
-          <span className="hidden sm:inline text-slate-400">
-            Consejo: Escribe <span className="font-semibold text-indigo-600">#12</span> para el discurso 12
+          <span className="hidden sm:inline text-slate-400 dark:text-slate-500">
+            Consejo: Escribe <span className="font-semibold text-indigo-600 dark:text-indigo-400">#12</span> para el discurso 12
           </span>
         </div>
       </div>

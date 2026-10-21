@@ -3,11 +3,8 @@ import type { ThemeMode } from '../context/ThemeContext';
 const RAYS = [0, 45, 90, 135, 180, 225, 270, 315];
 
 /**
- * Sol -> Luna animado con micro-transiciones suaves.
- * Los estilos y transformaciones provienen de kongre-theme-toggle.css; el color es currentColor.
- * Requiere que el contenedor defina --tt-bg (color de fondo del botón) para la 'mordida' de la luna.
- *
- * <ThemeToggleIcon mode={themeMode} size={20} />
+ * Sol -> Luna animado con micro-transiciones suaves y física bezier.
+ * Utiliza --tt-bg para el recorte de la luna, garantizando compatibilidad y fluidez total.
  */
 export default function ThemeToggleIcon({
   mode,

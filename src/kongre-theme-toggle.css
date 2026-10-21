@@ -1,6 +1,4 @@
-/* Kongre - icono de tema: el sol se convierte en luna (y pasa a Cabina A/V).
-   La 'mordida' de la luna usa el color de fondo del boton: define --tt-bg en el boton (ThemeToggle ya lo hace).
-   En src/index.css, despues de kongre-theme.css:  @import "./kongre-theme-toggle.css"; */
+/* Kongre - icono de tema: animación suave de sol a luna con curvas de física cúbica */
 .tt{--tt-ease:cubic-bezier(.34,1.3,.64,1);position:relative;display:inline-block}
 .tt svg{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
 .tt-sun{transform-origin:50% 50%;transition:opacity .25s ease,transform .5s var(--tt-ease)}

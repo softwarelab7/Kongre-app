@@ -25,7 +25,17 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.10.4] - 21 de Octubre, 2026 (Compilación Activa)
+### [v2.10.5] - 21 de Octubre, 2026 (Compilación Activa)
+**Título:** Botón de Modo Oscuro Sin Contenedor, Animación Fluida y Luna Blanca Nítida
+- **Luna Blanca Brillante en Modo Oscuro:**
+  - Se configuró el color de la luna y las estrellas en modo oscuro a blanco nítido (`text-white hover:text-slate-100`), garantizando alto contraste y máxima visibilidad sobre el fondo grafito/slate de la barra superior.
+- **Eliminación del Contenedor del Botón de Modo Oscuro:**
+  - Se eliminó el contenedor circular envolvente (fondo opaco, borde perimetral, cápsula redondeada y sombras pesadas) del componente `ThemeToggle`.
+  - El botón se presenta ahora como un botón de icono unificado con el resto de la barra de navegación y la pantalla de bienvenida (`bg-transparent border-0 shadow-none`), con interacción sutil al pasar el cursor y responder al clic.
+- **Animación Original Completa Restaurada:**
+  - Se mantiene la física bezier suave original (`cubic-bezier(0.34, 1.3, 0.64, 1)`), con transición de sol a luna, giro de rayos y aparición escalonada de estrellas.
+
+### [v2.10.4] - 21 de Octubre, 2026
 **Título:** Auditoría Integral y Persistencia Total de Configuraciones y Datos en Supabase
 - **Persistencia Completa de Configuración en Supabase:**
   - Se corrigió el proceso de guardado para transmitir siempre el objeto de configuración resuelto, unificado y validado (`resolvedSettings`), garantizando que días y horarios de reunión, nombre de congregación, PIN hashes, dirección del salón, reglas de conflicto y parámetros de PDF se guarden íntegramente en Supabase sin omisiones ni sobreescrituras parciales.

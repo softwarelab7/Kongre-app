@@ -959,7 +959,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
                         : isHovered
                         ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white'
-                        : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                        : 'text-slate-400 dark:text-slate-300 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                     title={cat.title}
                   >
@@ -1115,7 +1115,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                 activeTab === 'perfil'
                   ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/70 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
-                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                  : 'text-slate-400 dark:text-slate-300 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
               }`}
               title="Mi Perfil y Contacto"
             >
@@ -1128,7 +1128,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                   activeTab === 'ajustes'
                     ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/70 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                    : 'text-slate-400 dark:text-slate-300 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
                 title="Ajustes de la Congregación"
               >
@@ -1167,7 +1167,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onToggleSidebar();
                 }
               }}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 active:scale-95"
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-200 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 active:scale-95"
               title={isSidebarVisible ? 'Ocultar barra lateral' : 'Mostrar barra lateral'}
             >
               <PanelLeft className="w-4 h-4" />
@@ -1190,7 +1190,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => window.history.back()}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-400 dark:text-slate-300 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 title="Atrás (Navegador)"
                 aria-label="Atrás"
               >
@@ -1199,7 +1199,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => window.history.forward()}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg text-slate-400 dark:text-slate-300 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 title="Adelante (Navegador)"
                 aria-label="Adelante"
               >
@@ -1240,7 +1240,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={onOpenSearchModal}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-200 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               title="Buscar en la congregación (Ctrl+K)"
             >
               <Search className="w-4 h-4" />
@@ -1254,7 +1254,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className={`w-9 h-9 rounded-xl hidden sm:flex items-center justify-center transition-all cursor-pointer ${
                   activeTab === 'publicadores'
                     ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 shadow-2xs font-bold'
-                    : 'text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    : 'text-slate-400 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
                 title="Catálogo y Directorio de Publicadores"
               >
@@ -1269,7 +1269,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className={`h-9 px-2.5 rounded-xl hidden md:flex items-center gap-1.5 transition-all cursor-pointer text-xs font-semibold ${
                 activeTab === 'calendario'
                   ? 'bg-indigo-600 text-white shadow-xs font-bold'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 border border-slate-200/60 dark:border-slate-700/60'
+                  : 'text-slate-600 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 border border-slate-200/60 dark:border-slate-700/60'
               }`}
               title="Calendario de la Congregación (Fijo)"
             >
@@ -1282,7 +1282,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={onOpenQrModal}
-                className="w-9 h-9 rounded-xl hidden sm:flex items-center justify-center text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="w-9 h-9 rounded-xl hidden sm:flex items-center justify-center text-slate-400 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                 title="App Móvil y Código QR"
               >
                 <Smartphone className="w-4 h-4" />
@@ -1298,7 +1298,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={onOpenPinsModal}
-                className="w-9 h-9 rounded-xl hidden sm:flex items-center justify-center text-slate-400 hover:text-amber-500 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer"
+                className="w-9 h-9 rounded-xl hidden sm:flex items-center justify-center text-slate-400 dark:text-slate-200 hover:text-amber-500 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer"
                 title="Directorio de PINs de los Publicadores y la Congregación"
               >
                 <KeyRound className="w-4 h-4" />
@@ -1309,7 +1309,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={onOpenConflictsModal}
-              className="relative w-9 h-9 rounded-xl flex items-center justify-center text-amber-500 hover:text-amber-600 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer"
+              className="relative w-9 h-9 rounded-xl flex items-center justify-center text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer"
               title="Notificaciones & Cruces"
             >
               <Bell className="w-4 h-4" />
@@ -1377,7 +1377,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="hidden xl:inline-block max-w-[100px] truncate text-xs font-semibold text-slate-700 dark:text-slate-200 text-left">
                   {effectiveDisplayName?.split(' ')[0] || 'Mi Cuenta'}
                 </span>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:inline-block" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-slate-300 hidden sm:inline-block" />
               </button>
 
               {/* Dropdown Menu Modal */}
@@ -1622,7 +1622,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* 2. Compact Search & Category Filter Bar */}
             <div className="px-3.5 pt-2 pb-2 border-b border-slate-100 dark:border-slate-800 shrink-0 space-y-2 bg-white dark:bg-slate-900">
               <div className="relative">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Search className="w-3.5 h-3.5 text-slate-400 dark:text-slate-300 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   placeholder="Buscar sección (ej. Cuentas, S-89, Territorios...)"
@@ -1634,7 +1634,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <button
                     type="button"
                     onClick={() => setDrawerSearch('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-300 hover:text-slate-600 dark:hover:text-white p-0.5 cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -1763,7 +1763,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                               {dept.items.length}
                             </span>
                             <ChevronDown
-                              className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                              className={`w-3.5 h-3.5 text-slate-400 dark:text-slate-300 transition-transform duration-200 ${
                                 isCollapsed ? '-rotate-90' : 'rotate-0'
                               }`}
                             />
@@ -1960,7 +1960,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               activeTab === 'revisitas' ||
               activeTab === 'estudios_biblicos'
                 ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white'
             }`}
           >
             <Compass className="w-5 h-5 stroke-[2]" />
@@ -1974,7 +1974,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'panorama_general'
                 ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white'
             }`}
           >
             <div className="relative">
@@ -1993,7 +1993,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'programacion' || activeTab === 'clm_vmc' || activeTab === 's89' || activeTab === 'discursos' || activeTab === 'hospitalidad'
                 ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white'
             }`}
           >
             <ClipboardList className="w-5 h-5 stroke-[2]" />
@@ -2007,7 +2007,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'calendario'
                 ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white'
             }`}
           >
             <div className="relative">
@@ -2026,7 +2026,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               isMobileMenuOpen
                 ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white'
             }`}
           >
             <div className="relative">

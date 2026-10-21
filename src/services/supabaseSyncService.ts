@@ -27,6 +27,24 @@ import {
   LiteratureGroupDistribution,
   LiteratureInventoryRecord,
   CongregationSettings,
+  PreachingGroup,
+  CustomDuty,
+  OutgoingSpeakerAssignment,
+  FieldServiceMeeting,
+  CartLocation,
+  CartShift,
+  MonthlyServiceReport,
+  CircuitOverseerVisit,
+  MemorialPlan,
+  TheocraticAssembly,
+  CongregationEvent,
+  AccountLinkRequest,
+  ClmPrograma,
+  HospitalityHost,
+  Breaker,
+  MaintenanceSheet,
+  AuxPioneerRequest,
+  BranchReportS1,
 } from '../types';
 
 export function normalizeCongregationId(rawId: string): string {
@@ -72,6 +90,24 @@ export interface CongregationFullData {
   literatureDistributions?: LiteratureGroupDistribution[];
   literatureInventory?: LiteratureInventoryRecord[];
   invitations?: any[];
+  preachingGroups?: PreachingGroup[];
+  customDuties?: CustomDuty[];
+  outgoingSpeakers?: OutgoingSpeakerAssignment[];
+  fieldServiceMeetings?: FieldServiceMeeting[];
+  cartLocations?: CartLocation[];
+  cartShifts?: CartShift[];
+  monthlyReports?: MonthlyServiceReport[];
+  circuitVisit?: CircuitOverseerVisit | null;
+  memorialPlans?: MemorialPlan[];
+  theocraticAssemblies?: TheocraticAssembly[];
+  congregationEvents?: CongregationEvent[];
+  accountLinkRequests?: AccountLinkRequest[];
+  clmProgramas?: Record<string, ClmPrograma>;
+  hospitalityHosts?: HospitalityHost[];
+  breakers?: Breaker[];
+  maintenanceSheets?: MaintenanceSheet[];
+  auxPioneerRequests?: AuxPioneerRequest[];
+  branchReportsS1?: BranchReportS1[];
 }
 
 export interface PublicFilteredData {
@@ -102,6 +138,15 @@ export interface PublicFilteredData {
     name: string;
     status: string;
   }>;
+  fieldServiceMeetings?: FieldServiceMeeting[];
+  cartLocations?: CartLocation[];
+  cartShifts?: CartShift[];
+  preachingGroups?: PreachingGroup[];
+  customDuties?: CustomDuty[];
+  clmProgramas?: Record<string, ClmPrograma>;
+  congregationEvents?: CongregationEvent[];
+  memorialPlans?: MemorialPlan[];
+  theocraticAssemblies?: TheocraticAssembly[];
 }
 
 import {
@@ -180,6 +225,26 @@ function mergeDistributions(
     }
   }
   return Array.from(map.values());
+}
+
+/**
+ * Función auxiliar para fusionar grupos de predicación por número de grupo
+ */
+function mergePreachingGroups(
+  local: PreachingGroup[] = [],
+  remote: PreachingGroup[] = []
+): PreachingGroup[] {
+  const map = new Map<number, PreachingGroup>();
+  for (const item of remote) {
+    if (item && typeof item.number === 'number') map.set(item.number, item);
+  }
+  for (const item of local) {
+    if (item && typeof item.number === 'number') {
+      const existing = map.get(item.number);
+      map.set(item.number, existing ? { ...existing, ...item } : item);
+    }
+  }
+  return Array.from(map.values()).sort((a, b) => a.number - b.number);
 }
 
 export const supabaseSyncService = {
@@ -262,6 +327,24 @@ export const supabaseSyncService = {
         literatureDistributions: params.data.literatureDistributions || [],
         literatureInventory: params.data.literatureInventory || [],
         invitations: normalizedAdminInvitations,
+        preachingGroups: params.data.preachingGroups || [],
+        customDuties: params.data.customDuties || [],
+        outgoingSpeakers: params.data.outgoingSpeakers || [],
+        fieldServiceMeetings: params.data.fieldServiceMeetings || [],
+        cartLocations: params.data.cartLocations || [],
+        cartShifts: params.data.cartShifts || [],
+        monthlyReports: params.data.monthlyReports || [],
+        circuitVisit: params.data.circuitVisit || null,
+        memorialPlans: params.data.memorialPlans || [],
+        theocraticAssemblies: params.data.theocraticAssemblies || [],
+        congregationEvents: params.data.congregationEvents || [],
+        accountLinkRequests: params.data.accountLinkRequests || [],
+        clmProgramas: params.data.clmProgramas || {},
+        hospitalityHosts: params.data.hospitalityHosts || [],
+        breakers: params.data.breakers || [],
+        maintenanceSheets: params.data.maintenanceSheets || [],
+        auxPioneerRequests: params.data.auxPioneerRequests || [],
+        branchReportsS1: params.data.branchReportsS1 || [],
       };
 
       // 2. Preparar payload público (sin notas pastorales, sin tarjetas S-21 confidenciales y SIN PINs ni códigos de invitación en texto plano: solo hashes SHA-256)
@@ -286,6 +369,10 @@ export const supabaseSyncService = {
           coordinatorEmail: params.data.settings?.coordinatorEmail || '',
           coordinatorPhotoURL: params.data.settings?.coordinatorPhotoURL || '',
           isRegistered: true,
+          pdfOrientation: params.data.settings?.pdfOrientation,
+          pdfPageSize: params.data.settings?.pdfPageSize,
+          pdfTemplate: params.data.settings?.pdfTemplate,
+          conflictRules: params.data.settings?.conflictRules,
         },
         invitations: sanitizeInvitationsForPublicPayload(normalizedAdminInvitations),
         publishers: (params.data.publishers || []).map((p) => {
@@ -312,6 +399,15 @@ export const supabaseSyncService = {
           name: t.name,
           status: t.status,
         })),
+        fieldServiceMeetings: params.data.fieldServiceMeetings || [],
+        cartLocations: params.data.cartLocations || [],
+        cartShifts: params.data.cartShifts || [],
+        preachingGroups: params.data.preachingGroups || [],
+        customDuties: params.data.customDuties || [],
+        clmProgramas: params.data.clmProgramas || {},
+        congregationEvents: params.data.congregationEvents || [],
+        memorialPlans: params.data.memorialPlans || [],
+        theocraticAssemblies: params.data.theocraticAssemblies || [],
       };
 
       // 3. Verificación criptográfica de propiedad antes de sobrescribir un registro existente en Supabase
@@ -592,6 +688,25 @@ export const supabaseSyncService = {
             literatureOrders: mergeById(params.currentData.literatureOrders || [], rData.literatureOrders || []),
             literatureDistributions: mergeDistributions(params.currentData.literatureDistributions || [], rData.literatureDistributions || []),
             literatureInventory: mergeById(params.currentData.literatureInventory || [], rData.literatureInventory || []),
+            preachingGroups: (rData.preachingGroups && rData.preachingGroups.length > 0) ? mergePreachingGroups(params.currentData.preachingGroups || [], rData.preachingGroups) : (params.currentData.preachingGroups || []),
+            customDuties: (rData.customDuties && rData.customDuties.length > 0) ? mergeById(params.currentData.customDuties || [], rData.customDuties) : (params.currentData.customDuties || []),
+            outgoingSpeakers: mergeById(params.currentData.outgoingSpeakers || [], rData.outgoingSpeakers || []),
+            fieldServiceMeetings: mergeById(params.currentData.fieldServiceMeetings || [], rData.fieldServiceMeetings || []),
+            cartLocations: mergeById(params.currentData.cartLocations || [], rData.cartLocations || []),
+            cartShifts: mergeById(params.currentData.cartShifts || [], rData.cartShifts || []),
+            monthlyReports: mergeById(params.currentData.monthlyReports || [], rData.monthlyReports || []),
+            circuitVisit: rData.circuitVisit !== undefined ? rData.circuitVisit : params.currentData.circuitVisit,
+            memorialPlans: mergeById(params.currentData.memorialPlans || [], rData.memorialPlans || []),
+            theocraticAssemblies: mergeById(params.currentData.theocraticAssemblies || [], rData.theocraticAssemblies || []),
+            congregationEvents: mergeById(params.currentData.congregationEvents || [], rData.congregationEvents || []),
+            accountLinkRequests: mergeById(params.currentData.accountLinkRequests || [], rData.accountLinkRequests || []),
+            clmProgramas: { ...(params.currentData.clmProgramas || {}), ...(rData.clmProgramas || {}) },
+            hospitalityHosts: mergeById(params.currentData.hospitalityHosts || [], rData.hospitalityHosts || []),
+            breakers: (rData.breakers && rData.breakers.length > 0) ? mergeById(params.currentData.breakers || [], rData.breakers) : (params.currentData.breakers || []),
+            maintenanceSheets: (rData.maintenanceSheets && rData.maintenanceSheets.length > 0) ? mergeById(params.currentData.maintenanceSheets || [], rData.maintenanceSheets) : (params.currentData.maintenanceSheets || []),
+            auxPioneerRequests: mergeById(params.currentData.auxPioneerRequests || [], rData.auxPioneerRequests || []),
+            branchReportsS1: mergeById(params.currentData.branchReportsS1 || [], rData.branchReportsS1 || []),
+            invitations: rData.invitations && rData.invitations.length > 0 ? rData.invitations : (params.currentData.invitations || []),
           };
 
           if (params.onDataUpdated) {

@@ -1288,7 +1288,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Smartphone className="w-4 h-4" />
               </button>
             ) : (
-              <div className="hidden lg:flex items-center">
+              <div className="flex items-center">
                 <PWAInstallButton />
               </div>
             )}

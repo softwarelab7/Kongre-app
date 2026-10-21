@@ -11,6 +11,7 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
+        useCredentials: true,
         includeAssets: [
           'favicon.ico',
           'favicon.svg',
@@ -40,10 +41,16 @@ export default defineConfig(() => {
           start_url: '/',
           scope: '/',
           icons: [
-            { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-            { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-            { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
-            { src: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png', purpose: 'any' },
+            {
+              src: 'data:image/png;base64,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',
+              sizes: '180x180',
+              type: 'image/png',
+              purpose: 'any',
+            },
+            { src: '/icon-192.png?v=2.10.2', sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: '/icon-512.png?v=2.10.2', sizes: '512x512', type: 'image/png', purpose: 'any' },
+            { src: '/icon-maskable-512.png?v=2.10.2', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+            { src: '/apple-touch-icon.png?v=2.10.2', sizes: '180x180', type: 'image/png', purpose: 'any' },
           ],
           shortcuts: [
             {

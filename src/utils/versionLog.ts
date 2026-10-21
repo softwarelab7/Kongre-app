@@ -25,19 +25,81 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.10.1';
-export const CURRENT_BUILD_CODE = '2026.10.21.3100';
+export const CURRENT_APP_VERSION = '2.10.4';
+export const CURRENT_BUILD_CODE = '2026.10.21.3400';
 export const BUILD_DATE = '21 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.10.4',
+    buildCode: '2026.10.21.3400',
+    date: '21 de Octubre, 2026',
+    title: 'Auditoría Integral y Persistencia Total de Configuraciones y Datos en Supabase',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'fix',
+        text: 'Persistencia Completa de Configuración en Supabase: Se corrigió el proceso de guardado para enviar siempre la configuración resuelta y validada completa (resolvedSettings), evitando pérdida de parámetros como días, horarios, PIN hash, dirección o preferencias de PDF.',
+      },
+      {
+        category: 'improvement',
+        text: 'Sincronización Total de Todos los Módulos Teocráticos: Se integraron en el payload cifrado AES-256-GCM y en la sincronización bidireccional de Supabase todos los datos de grupos de predicación, deberes, discursantes salientes, salidas al servicio, turnos de carritos, informes mensuales, visita del superintendente, memorial, asambleas, eventos, programas CLM, panel eléctrico (breakers), fichas de mantenimiento, solicitudes de precursores e informes S-1 a la sucursal.',
+      },
+      {
+        category: 'improvement',
+        text: 'Guardado Automático en Tiempo Real: Las acciones de Mantenimiento del Salón, Panel Eléctrico, Hospitalidad, Precursores Auxiliares e Informes Sucursal ahora disparan inmediatamente persistencia sincronizada a Supabase con debounce inteligente.',
+      },
+      {
+        category: 'security',
+        text: 'Cola Offline Robusta con Respaldo Fidedigno: Las modificaciones encoladas sin internet ahora capturan el estado completo consolidado de la congregación, garantizando que al reconectar se transfieran fielmente a Supabase.',
+      },
+    ],
+  },
+  {
+    version: '2.10.3',
+    buildCode: '2026.10.21.3300',
+    date: '21 de Octubre, 2026',
+    title: 'Eliminación del Diálogo "¿Quién eres?" al Acceder con PIN',
+    isCurrent: false,
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Eliminación del Modal "¿Quién eres?": Se removió por completo el diálogo emergente que solicitaba el nombre tras iniciar sesión con PIN personal o genérico, permitiendo un acceso directo, ágil y sin interrupciones.',
+      },
+    ],
+  },
+  {
+    version: '2.10.2',
+    buildCode: '2026.10.21.3200',
+    date: '21 de Octubre, 2026',
+    title: 'Corrección Definitiva del Icono Oficial de Kongre en Pantalla de Inicio de iPhone (iOS Safari)',
+    isCurrent: false,
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'fix',
+        text: 'Icono Oficial en iPhone / iPad (iOS SpringBoard): Regeneración de todos los iconos de inicio (apple-touch-icon, 180x180, 192x192, 512x512) en formato PNG RGB de 24 bits (colorType 2, sin canal alfa ni paleta indexada) con las proporciones exactas del isotipo oficial de la Guía de Marca.',
+      },
+      {
+        category: 'fix',
+        text: 'Incrustación Base64 en Memoria (Zero-Network Fetch): Los enlaces <link rel="apple-touch-icon"> y el manifiesto PWA incluyen ahora el PNG oficial en formato data:image/png;base64 y useCredentials: true, evitando que el proxy de autenticación bloquee la descarga del icono cuando iOS Safari crea el acceso directo.',
+      },
+      {
+        category: 'improvement',
+        text: 'Asistente de Instalación iOS Inteligente (PWAInstallButton): Detección automática cuando la app se abre dentro del iframe de vista previa (aistudio.google.com) con botón directo para abrir Kongre en Safari a pantalla completa antes de agregar a inicio.',
+      },
+    ],
+  },
+  {
     version: '2.10.1',
     buildCode: '2026.10.21.3100',
     date: '21 de Octubre, 2026',
     title: 'Iconos PWA, Pantallas de Carga iOS y Nuevo Selector de Tema Animado (2 Modos: Claro y Oscuro)',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

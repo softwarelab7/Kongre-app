@@ -61,7 +61,6 @@ import { RegisterCongregationWizard } from './components/RegisterCongregationWiz
 import { AppLockPinSuggestionModal } from './components/AppLockPinSuggestionModal';
 import { AccountLinkRequestsModal } from './components/AccountLinkRequestsModal';
 import { PendingApprovalView } from './components/PendingApprovalView';
-import { IdentityNamePrompt } from './components/IdentityNamePrompt';
 import { PublisherPinsModal } from './components/PublisherPinsModal';
 import { AuditLogModal } from './components/AuditLogModal';
 import { AppFooter } from './components/AppFooter';
@@ -1180,9 +1179,6 @@ const AppContent: React.FC = () => {
           onClose={() => closeModalWithHistory('auditoria', setIsAuditLogOpen)}
         />
       )}
-
-      {/* Modal para solicitar nombre e identidad si se inició con PIN sin nombre reconocido */}
-      <IdentityNamePrompt />
 
       {/* Registro de Versiones y Control de Cambios */}
       <VersionHistoryModal

@@ -25,7 +25,33 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.10.1] - 21 de Octubre, 2026 (Compilación Activa)
+### [v2.10.4] - 21 de Octubre, 2026 (Compilación Activa)
+**Título:** Auditoría Integral y Persistencia Total de Configuraciones y Datos en Supabase
+- **Persistencia Completa de Configuración en Supabase:**
+  - Se corrigió el proceso de guardado para transmitir siempre el objeto de configuración resuelto, unificado y validado (`resolvedSettings`), garantizando que días y horarios de reunión, nombre de congregación, PIN hashes, dirección del salón, reglas de conflicto y parámetros de PDF se guarden íntegramente en Supabase sin omisiones ni sobreescrituras parciales.
+- **Sincronización Total de Todos los Módulos Teocráticos:**
+  - Se integraron al payload cifrado AES-256-GCM y al proceso de sincronización bidireccional los 20 modelos de datos: grupos de predicación, deberes personalizados, discursantes salientes, salidas al servicio del campo, turnos y puntos de carritos, informes mensuales de servicio, visita del superintendente de circuito, conmemoración (memorial), asambleas regionales/circuito, eventos de congregación, programas VMC (CLM), panel eléctrico (breakers), fichas de mantenimiento, solicitudes de precursores auxiliares e informes mensuales S-1 a la sucursal.
+- **Guardado Automático en Tiempo Real:**
+  - Las acciones en Mantenimiento del Salón, Panel Eléctrico, Hospitalidad, Precursores Auxiliares e Informes Sucursal ahora actualizan sus referencias en memoria y disparan guardado automático debounced directamente a Supabase.
+- **Cola Offline con Snapshot Fidedigno en IndexedDB:**
+  - Las operaciones registradas sin conexión (asistencia, informes de servicio, territorios) ahora capturan el estado completo de la congregación antes de su almacenamiento sellado en IndexedDB, asegurando una subida íntegra a Supabase cuando se restablece la conexión.
+
+### [v2.10.3] - 21 de Octubre, 2026
+**Título:** Eliminación del Pop-up "¿Quién eres?" al Iniciar con PIN
+- **Eliminación Total del Modal de Identidad (`IdentityNamePrompt`):**
+  - Se eliminó el diálogo emergente que solicitaba "¿Quién eres? Entraste con tu PIN pero aún no tenemos tu nombre" al iniciar sesión con PIN.
+  - El acceso mediante PIN ahora es completamente directo, limpio y sin interrupciones ni pantallas secundarias de confirmación de nombre.
+
+### [v2.10.2] - 21 de Octubre, 2026
+**Título:** Corrección Definitiva del Icono Oficial de Kongre en Pantalla de Inicio de iPhone (iOS Safari)
+- **Iconos Oficiales en PNG RGB de 24 bits (`colorType: 2`, Cuadrado Completo sin Alfa):**
+  - Regeneración de `apple-touch-icon.png`, `apple-touch-icon-180x180.png`, `apple-touch-icon-167x167.png`, `apple-touch-icon-152x152.png`, `apple-touch-icon-120x120.png`, `apple-touch-icon-precomposed.png`, `icon-192.png`, `icon-512.png` e `icon-maskable-512.png` respetando estrictamente la geometría oficial del isotipo de la Guía de Marca (`rect x=25 y=26 width=13 height=48 rx=6.5` y chevrón `stroke-width=13` sobre fondo `#4C3AED`).
+- **Incrustación Base64 Directa en `<head>` y `manifest.webmanifest`:**
+  - En entornos protegidos por proxy o cookies de sesión, el proceso `SpringBoard` / `WebBookmark` de iOS realiza peticiones sin cookies al descargar `/apple-touch-icon.png`, provocando que iPhone no muestre el icono oficial. Ahora `index.html` y `manifest.webmanifest` incluyen el icono oficial de 180x180 directamente en `data:image/png;base64,...` junto con `crossorigin="use-credentials"`, garantizando que iPhone cargue siempre el icono oficial de Kongre de forma instantánea.
+- **Detección de Vista Previa (`aistudio.google.com`) en iPhone (`PWAInstallButton.tsx`):**
+  - Si el usuario abre la app dentro del contenedor de Google AI Studio en Safari y toca *Compartir → Agregar a inicio*, iOS toma el icono de Google AI Studio en lugar del de Kongre. El asistente de instalación en iPhone ahora es visible en la barra superior móvil, detecta si está dentro de un `iframe` y ofrece un botón directo para abrir la URL exclusiva de Kongre en Safari antes de instalarla.
+
+### [v2.10.1] - 21 de Octubre, 2026
 **Título:** Iconos PWA, Pantallas de Carga iOS y Nuevo Selector de Tema Animado (2 Modos: Claro y Oscuro)
 - **Selector de Tema Dinámico con Animación Sol ⇄ Luna (`ThemeToggle.tsx` / `ThemeToggleIcon.tsx`):**
   - Implementación del nuevo icono SVG interactivo con transición animada entre Sol (rayos radiantes) y Luna creciente (mordida geométrica con estrellas titilantes).

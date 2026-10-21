@@ -582,6 +582,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return INITIAL_HOSPITALITY_HOSTS;
     }
   });
+  const latestHospitalityHostsRef = useRef<HospitalityHost[]>(hospitalityHosts);
+  useEffect(() => {
+    latestHospitalityHostsRef.current = hospitalityHosts;
+  }, [hospitalityHosts]);
 
   const [breakers, setBreakers] = useState<Breaker[]>(() => {
     try {
@@ -603,6 +607,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return INITIAL_BREAKERS;
     }
   });
+  const latestBreakersRef = useRef<Breaker[]>(breakers);
+  useEffect(() => {
+    latestBreakersRef.current = breakers;
+  }, [breakers]);
 
   const [maintenanceSheets, setMaintenanceSheets] = useState<MaintenanceSheet[]>(() => {
     try {
@@ -624,6 +632,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return INITIAL_MAINTENANCE_SHEETS;
     }
   });
+  const latestMaintenanceSheetsRef = useRef<MaintenanceSheet[]>(maintenanceSheets);
+  useEffect(() => {
+    latestMaintenanceSheetsRef.current = maintenanceSheets;
+  }, [maintenanceSheets]);
 
   const [auxPioneerRequests, setAuxPioneerRequests] = useState<AuxPioneerRequest[]>(() => {
     try {
@@ -633,6 +645,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return INITIAL_AUX_PIONEER_REQUESTS;
     }
   });
+  const latestAuxPioneerRef = useRef<AuxPioneerRequest[]>(auxPioneerRequests);
+  useEffect(() => {
+    latestAuxPioneerRef.current = auxPioneerRequests;
+  }, [auxPioneerRequests]);
 
   const [branchReportsS1, setBranchReportsS1] = useState<BranchReportS1[]>(() => {
     try {
@@ -642,6 +658,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return INITIAL_BRANCH_REPORTS_S1;
     }
   });
+  const latestBranchS1Ref = useRef<BranchReportS1[]>(branchReportsS1);
+  useEffect(() => {
+    latestBranchS1Ref.current = branchReportsS1;
+  }, [branchReportsS1]);
 
   const [fieldServiceMeetings, setFieldServiceMeetings] = useState<FieldServiceMeeting[]>(() => {
     const saved = localStorage.getItem(`${LOCAL_STORAGE_KEY}_field_service`);
@@ -1740,11 +1760,11 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       inventoryRecords: newInventoryRecords,
       accountLinkRequests: newAccountLinkRequests,
       clmProgramas: newClm,
-      hospitalityHosts,
-      breakers,
-      maintenanceSheets,
-      auxPioneerRequests,
-      branchReportsS1,
+      hospitalityHosts: latestHospitalityHostsRef.current,
+      breakers: latestBreakersRef.current,
+      maintenanceSheets: latestMaintenanceSheetsRef.current,
+      auxPioneerRequests: latestAuxPioneerRef.current,
+      branchReportsS1: latestBranchS1Ref.current,
       congregationEvents: resolvedEvents,
       congregationId: congDocId,
       updatedAt: nowISO,
@@ -1785,7 +1805,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             await supabaseSyncService.uploadCongregation({
               congregationId: congDocId,
               data: {
-                settings: newSettings,
+                settings: resolvedSettings,
                 publishers: newPubs,
                 weeks: newWeeks,
                 territories: newTerritories,
@@ -1796,6 +1816,24 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 literatureOrders: newSpecialOrders,
                 literatureDistributions: newGroupDistributions,
                 literatureInventory: newInventoryRecords,
+                preachingGroups: resolvedGroups || [],
+                customDuties: newDuties,
+                outgoingSpeakers: newOutgoing,
+                fieldServiceMeetings: newFieldService,
+                cartLocations: newCartLocs,
+                cartShifts: newCartShifts,
+                monthlyReports: newReports,
+                circuitVisit: newCircuitVisit,
+                memorialPlans: newMemorialPlans,
+                theocraticAssemblies: newAssemblies,
+                congregationEvents: resolvedEvents,
+                accountLinkRequests: newAccountLinkRequests,
+                clmProgramas: newClm,
+                hospitalityHosts: latestHospitalityHostsRef.current,
+                breakers: latestBreakersRef.current,
+                maintenanceSheets: latestMaintenanceSheetsRef.current,
+                auxPioneerRequests: latestAuxPioneerRef.current,
+                branchReportsS1: latestBranchS1Ref.current,
               },
               pinMaestro,
               pinCongregacion,
@@ -1907,6 +1945,24 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           literatureOrders: fresh.specialOrders,
           literatureDistributions: fresh.groupDistributions,
           literatureInventory: fresh.inventoryRecords,
+          preachingGroups: fresh.preachingGroups,
+          customDuties: fresh.customDuties,
+          outgoingSpeakers: fresh.outgoingSpeakers,
+          fieldServiceMeetings: fresh.fieldServiceMeetings,
+          cartLocations: fresh.cartLocations,
+          cartShifts: fresh.cartShifts,
+          monthlyReports: fresh.monthlyReports,
+          circuitVisit: fresh.circuitVisit,
+          memorialPlans: fresh.memorialPlans,
+          theocraticAssemblies: fresh.theocraticAssemblies,
+          congregationEvents: fresh.congregationEvents,
+          accountLinkRequests: fresh.accountLinkRequests,
+          clmProgramas: fresh.clmProgramas,
+          hospitalityHosts: fresh.hospitalityHosts,
+          breakers: fresh.breakers,
+          maintenanceSheets: fresh.maintenanceSheets,
+          auxPioneerRequests: fresh.auxPioneerRequests,
+          branchReportsS1: fresh.branchReportsS1,
         },
         pinMaestro,
         pinCongregacion,
@@ -2361,17 +2417,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         description: `Modificación de informe/datos: ${enrichedPub.name}`,
         reportPayload: { publisherId: enrichedPub.id, name: enrichedPub.name, s21_records: enrichedPub.s21_records },
         fullData: {
-          settings: latestSettingsRef.current,
+          ...getFreshLocalCongregationData(),
           publishers: updated,
-          weeks,
-          territories,
-          notices,
-          transactions,
-          audits: quarterlyAudits,
-          literatureItems,
-          literatureOrders: specialOrders,
-          literatureDistributions: groupDistributions,
-          literatureInventory: inventoryRecords,
         },
       }).catch(() => {});
       refreshQueueStats();
@@ -3220,17 +3267,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         description: attDesc,
         attendancePayload: attendance,
         fullData: {
-          settings: latestSettingsRef.current,
-          publishers,
+          ...getFreshLocalCongregationData(),
           weeks: updated,
-          territories,
-          notices,
-          transactions,
-          audits: quarterlyAudits,
-          literatureItems,
-          literatureOrders: specialOrders,
-          literatureDistributions: groupDistributions,
-          literatureInventory: inventoryRecords,
         },
       }).catch(() => {});
       refreshQueueStats();
@@ -3369,26 +3407,32 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       id: `hosp-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
     };
     const updated = [...hospitalityHosts, newHost];
+    latestHospitalityHostsRef.current = updated;
     setHospitalityHosts(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_hospitality_hosts`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const updateHospitalityHost = (host: HospitalityHost) => {
     const updated = hospitalityHosts.map(h => (h.id === host.id ? host : h));
+    latestHospitalityHostsRef.current = updated;
     setHospitalityHosts(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_hospitality_hosts`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const deleteHospitalityHost = (id: string) => {
     const updated = hospitalityHosts.filter(h => h.id !== id);
+    latestHospitalityHostsRef.current = updated;
     setHospitalityHosts(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_hospitality_hosts`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   // Panel Eléctrico (Breakers) Actions
@@ -3400,26 +3444,32 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       order_idx: breakerData.order_idx !== undefined ? breakerData.order_idx : colBreakers.length,
     };
     const updated = [...breakers, newBreaker];
+    latestBreakersRef.current = updated;
     setBreakers(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const updateBreaker = (breaker: Breaker) => {
     const updated = breakers.map(b => (b.id === breaker.id ? breaker : b));
+    latestBreakersRef.current = updated;
     setBreakers(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const deleteBreaker = (id: string) => {
     const updated = breakers.filter(b => b.id !== id);
+    latestBreakersRef.current = updated;
     setBreakers(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const toggleBreakerStatus = (id: string) => {
@@ -3427,10 +3477,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (!breaker || breaker.status === 'always') return;
     const newStatus = breaker.status === 'off' ? 'on' : 'off';
     const updated = breakers.map(b => (b.id === id ? { ...b, status: newStatus as Breaker['status'] } : b));
+    latestBreakersRef.current = updated;
     setBreakers(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const setMeetingBreakersPower = (turnOn: boolean) => {
@@ -3440,17 +3492,21 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
       return b;
     });
+    latestBreakersRef.current = updated;
     setBreakers(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const reorderBreakers = (newBreakers: Breaker[]) => {
+    latestBreakersRef.current = newBreakers;
     setBreakers(newBreakers);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_breakers`, JSON.stringify(newBreakers));
     } catch {}
+    saveToFirestore();
   };
 
   // Fichas de Mantenimiento del Salón Actions
@@ -3461,36 +3517,44 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       orderIndex: sheetData.orderIndex !== undefined ? sheetData.orderIndex : maintenanceSheets.length,
     };
     const updated = [...maintenanceSheets, newSheet];
+    latestMaintenanceSheetsRef.current = updated;
     setMaintenanceSheets(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const updateMaintenanceSheet = (sheet: MaintenanceSheet) => {
     const updated = maintenanceSheets.map(s => (s.id === sheet.id ? sheet : s));
+    latestMaintenanceSheetsRef.current = updated;
     setMaintenanceSheets(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const deleteMaintenanceSheet = (id: string) => {
     const updated = maintenanceSheets.filter(s => s.id !== id);
+    latestMaintenanceSheetsRef.current = updated;
     setMaintenanceSheets(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const toggleMaintenanceSheetActive = (id: string) => {
     const sheet = maintenanceSheets.find(s => s.id === id);
     if (!sheet) return;
     const updated = maintenanceSheets.map(s => (s.id === id ? { ...s, isActive: !s.isActive } : s));
+    latestMaintenanceSheetsRef.current = updated;
     setMaintenanceSheets(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const markMaintenanceSheetCompleted = (id: string, notes?: string) => {
@@ -3521,17 +3585,21 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
       return s;
     });
+    latestMaintenanceSheetsRef.current = updated;
     setMaintenanceSheets(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const reorderMaintenanceSheets = (newSheets: MaintenanceSheet[]) => {
+    latestMaintenanceSheetsRef.current = newSheets;
     setMaintenanceSheets(newSheets);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_maintenance_sheets`, JSON.stringify(newSheets));
     } catch {}
+    saveToFirestore();
   };
 
   // Solicitudes de Precursor Auxiliar Actions
@@ -3547,26 +3615,32 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       fecha_solicitud: reqData.fecha_solicitud || reqData.requestDate || new Date().toISOString(),
     };
     const updated = [newReq, ...auxPioneerRequests];
+    latestAuxPioneerRef.current = updated;
     setAuxPioneerRequests(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const updateAuxPioneerRequest = (req: AuxPioneerRequest) => {
     const updated = auxPioneerRequests.map((r) => (r.id === req.id ? req : r));
+    latestAuxPioneerRef.current = updated;
     setAuxPioneerRequests(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const deleteAuxPioneerRequest = (id: string) => {
     const updated = auxPioneerRequests.filter((r) => r.id !== id);
+    latestAuxPioneerRef.current = updated;
     setAuxPioneerRequests(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const setAuxPioneerRequestStatus = (id: string, status: 'aprobada' | 'rechazada', reviewedBy?: string) => {
@@ -3584,10 +3658,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       }
       return r;
     });
+    latestAuxPioneerRef.current = updated;
     setAuxPioneerRequests(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   // Formulario S-1 (Informe a la Sucursal) Actions
@@ -3601,10 +3677,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } else {
       updated = [report, ...branchReportsS1];
     }
+    latestBranchS1Ref.current = updated;
     setBranchReportsS1(updated);
     try {
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_branch_reports_s1`, JSON.stringify(updated));
     } catch {}
+    saveToFirestore();
   };
 
   const markBranchReportS1Status = (
@@ -4979,10 +5057,13 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setInventoryRecords([]);
     localStorage.removeItem(`${LOCAL_STORAGE_KEY}_inventory_records`);
     setHospitalityHosts([]);
+    latestHospitalityHostsRef.current = [];
     localStorage.removeItem(`${LOCAL_STORAGE_KEY}_hospitality_hosts`);
     setAuxPioneerRequests([]);
+    latestAuxPioneerRef.current = [];
     localStorage.removeItem(`${LOCAL_STORAGE_KEY}_aux_pioneer_requests`);
     setBranchReportsS1([]);
+    latestBranchS1Ref.current = [];
     localStorage.removeItem(`${LOCAL_STORAGE_KEY}_branch_reports_s1`);
     setCartLocations([]);
     localStorage.removeItem(`${LOCAL_STORAGE_KEY}_cart_locations`);

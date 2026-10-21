@@ -401,9 +401,9 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
 
       list.push({
         id: cantoInicial?.id || 'midweek-opening-song',
-        title: `${cantoInicial?.titulo || `Cántico ${currentWeek.midweek.openingSong || ''}`.trim()} y Oración`,
+        title: `${cantoInicial?.titulo || `Cántico ${(currentWeek.midweek as any).openingSong || currentWeek.midweek.songFirst || ''}`.trim()} y Oración`,
         subtitle: `Presidente: ${presidentPart?.asignado_nombre || getPubName(currentWeek.midweek.presidentId)}`,
-        speaker: openingPrayerPart?.asignado_nombre || getPubName(currentWeek.midweek.openingPrayerId),
+        speaker: openingPrayerPart?.asignado_nombre || getPubName(currentWeek.midweek.initialPrayerId),
         defaultMinutes: 5,
         section: 'marco',
         sectionLabel: 'APERTURA',
@@ -563,9 +563,9 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
 
       list.push({
         id: cantoFinal?.id || 'midweek-closing-song',
-        title: `${cantoFinal?.titulo || `Cántico ${currentWeek.midweek.closingSong || ''}`.trim()} y Oración`,
+        title: `${cantoFinal?.titulo || `Cántico ${(currentWeek.midweek as any).closingSong || currentWeek.midweek.songConclude || ''}`.trim()} y Oración`,
         subtitle: 'Cierre de la reunión',
-        speaker: closingPrayerPart?.asignado_nombre || getPubName(currentWeek.midweek.closingPrayerId),
+        speaker: closingPrayerPart?.asignado_nombre || getPubName(currentWeek.midweek.finalPrayerId),
         defaultMinutes: 5,
         section: 'marco',
         sectionLabel: 'CONCLUSIÓN',
@@ -574,10 +574,10 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
       });
     } else {
       const presidentName = getPubName(currentWeek.weekend.presidentId);
-      const openingPrayerName = currentWeek.weekend.openingPrayerId
-        ? getPubName(currentWeek.weekend.openingPrayerId)
+      const openingPrayerName = currentWeek.weekend.initialPrayerId
+        ? getPubName(currentWeek.weekend.initialPrayerId)
         : presidentName;
-      const closingPrayerName = getPubName(currentWeek.weekend.closingPrayerId);
+      const closingPrayerName = getPubName(currentWeek.weekend.finalPrayerId);
 
       list.push({
         id: 'weekend-opening',
@@ -591,19 +591,22 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
         room: 'principal',
       });
 
+      const publicTalkTitle = currentWeek.weekend.publicTalkTheme || (currentWeek.weekend as any).publicTalkTitle;
+      const talkCongregation = currentWeek.weekend.visitingSpeakerCongregation || (currentWeek.weekend as any).publicTalkCongregation;
+
       list.push({
         id: 'weekend-public-talk',
         partNumber: 1,
-        title: currentWeek.weekend.publicTalkTitle
-          ? `Discurso Público: "${currentWeek.weekend.publicTalkTitle}"`
+        title: publicTalkTitle
+          ? `Discurso Público: "${publicTalkTitle}"`
           : 'Discurso Público',
         subtitle: currentWeek.weekend.publicTalkOutlineNumber
           ? `Bosquejo #${currentWeek.weekend.publicTalkOutlineNumber}${
-              currentWeek.weekend.publicTalkCongregation
-                ? ` · ${currentWeek.weekend.publicTalkCongregation}`
+              talkCongregation
+                ? ` · ${talkCongregation}`
                 : ''
             }`
-          : currentWeek.weekend.publicTalkCongregation || 'Discurso bíblico de 30 minutos',
+          : talkCongregation || 'Discurso bíblico de 30 minutos',
         speaker: currentWeek.weekend.publicTalkSpeaker || 'Orador asignado',
         defaultMinutes: 30,
         section: 'weekend',
@@ -626,12 +629,13 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
 
       const conductorName = getPubName(currentWeek.weekend.atalayaConductorId);
       const readerName = getPubName(currentWeek.weekend.atalayaLectorId);
+      const watchtowerTitle = currentWeek.weekend.watchtowerTheme || (currentWeek.weekend as any).watchtowerStudyTitle;
 
       list.push({
         id: 'weekend-watchtower',
         partNumber: 2,
-        title: currentWeek.weekend.watchtowerStudyTitle
-          ? `Estudio de La Atalaya: "${currentWeek.weekend.watchtowerStudyTitle}"`
+        title: watchtowerTitle
+          ? `Estudio de La Atalaya: "${watchtowerTitle}"`
           : 'Estudio de La Atalaya',
         subtitle: `Lector: ${readerName}`,
         speaker: conductorName,

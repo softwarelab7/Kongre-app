@@ -25,7 +25,28 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.9.2] - 21 de Octubre, 2026 (Compilación Activa)
+### [v2.10.0] - 21 de Octubre, 2026 (Compilación Activa)
+**Título:** Suite de Funciones para Publicadores, Gestos Táctiles (Swipe) y Menú Independiente de Panorama General
+- **Suite de Funciones para Publicadores en el Menú Principal (`MinisterioPublicadorTab.tsx` / `inicio`):**
+  - **Cronómetro de Predicación en Vivo y Persistente:** Reloj digital `HH:MM:SS` que continúa contando incluso si se cierra la pestaña o se bloquea el teléfono. Controles de ajuste rápido (`+15m`, `+30m`, `+1h`, `-5m`), selector de modalidad (*De casa en casa*, *Carritos*, *Revisitas*, *Curso bíblico*, *Informal*) y contadores en vivo de revisitas y publicaciones dejadas.
+  - **Meta Mensual de Horas y Progreso:** Barra de progreso con selector de metas (*Publicador*, *Precursor Auxiliar 15h/30h*, *Precursor Regular 50h*, *Precursor Especial 100h*) y formulario modal para añadir tiempo manual de salidas anteriores.
+  - **Agenda de Revisitas y Personas Interesadas:** Tarjetas completas de contacto con botón directo a Google Maps, enlace a chat de WhatsApp, tema conversado, preguntas pendientes, publicaciones dejadas, horario idóneo, registro en 1 clic de *"✓ Visité hoy"* y conversión inmediata a Estudio Bíblico en 1 clic.
+  - **Control de Cursos Bíblicos:** Seguimiento por lección con barra de progreso (*¡Disfrute de la vida para siempre!* de 60 o 3 lecciones), sesiones realizadas en el mes actual, metas espirituales y botón de avance rápido de lección.
+  - **Sincronización Automática con el Informe Mensual (S-4):** Traspaso directo de horas acumuladas y estudios bíblicos activos al informe oficial y compartición del informe formateado por WhatsApp.
+- **Gestos Táctiles (Swipe) para Menú Lateral en Móviles:**
+  - **Swipe-to-Open:** Deslizar desde el borde izquierdo ($\le 45\text{ px}$) hacia la derecha abre el menú lateral suavemente sin tocar la hamburguesa.
+  - **Swipe-to-Close:** Deslizar hacia la izquierda en cualquier parte del menú o fondo translúcido cierra el panel de forma instantánea.
+  - Tirador visual con icono de flecha en el lateral del cajón y sensor táctil pasivo de borde.
+- **Separación de Panorama General (`panorama_general`):**
+  - La vista estadística global de la congregación (`ResumenInicioTab`) se ha trasladado a su propio apartado independiente en la barra lateral, menú deslizable y barra inferior móvil, distinguiendo con claridad el ministerio personal del publicador de la supervisión congregacional.
+- **Modo Atril con API de Pantalla Completa:**
+  - Integración nativa con la API de Fullscreen del navegador con botón etiquetado *"Pantalla completa"* / *"Salir de pantalla completa"* y sincronización bidireccional con eventos nativos del sistema (tecla `Esc`).
+- **Optimizaciones Ergonómicas en Dispositivos Móviles:**
+  - Rediseño táctil de la consola de presidencia con navegación inferior por pestañas (`Cronómetro`, `Programa`, `Notas`, `Tiempos`), mini-cronómetro sticky y selectores táctiles tipo bottom-sheet.
+
+---
+
+### [v2.9.2] - 21 de Octubre, 2026
 **Título:** Suscripción a Notificaciones Web Push en Segundo Plano (Con App Cerrada)
 - **Service Worker de Notificaciones en Segundo Plano (`public/push-sw.js`):**
   - Integración completa de `PushManager.subscribe` (estándar Web Push VAPID), `PeriodicSyncManager` (`kongre-assignment-reminders`), `SyncManager` y `TimestampTrigger` junto con una base de datos `IndexedDB` autónoma (`kongre_push_sw_db_v1`) dentro del Service Worker para disparar recordatorios aunque la pestaña o la aplicación estén cerradas.

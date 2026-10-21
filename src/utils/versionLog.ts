@@ -25,19 +25,56 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.9.2';
-export const CURRENT_BUILD_CODE = '2026.10.21.2902';
+export const CURRENT_APP_VERSION = '2.10.0';
+export const CURRENT_BUILD_CODE = '2026.10.21.3000';
 export const BUILD_DATE = '21 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.10.0',
+    buildCode: '2026.10.21.3000',
+    date: '21 de Octubre, 2026',
+    title: 'Suite de Funciones para Publicadores, Gestos Táctiles (Swipe) y Menú Independiente de Panorama General',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Suite de Funciones para Publicadores en el Menú Principal (Mi Ministerio): Nuevo cronómetro de predicación persistente en vivo (sigue contando con la pantalla apagada o pestaña cerrada), registro de horas y minutos, meta mensual configurable (10h, 15h, 30h, 50h, 100h) y registro manual de salidas.',
+      },
+      {
+        category: 'feature',
+        text: 'Agenda de Revisitas y Personas Interesadas: Tarjetas de seguimiento con ubicación directa a Google Maps, enlace a WhatsApp, tema conversado, preguntas pendientes, publicaciones dejadas, botón de registro rápido de visitas hoy y conversión a Estudio Bíblico en 1 clic.',
+      },
+      {
+        category: 'feature',
+        text: 'Control de Cursos Bíblicos: Registro detallado de estudiantes, publicación de estudio (¡Disfrute de la vida para siempre!), control de lección actual con barra de avance, horario fijo, registro de sesiones del mes y metas espirituales.',
+      },
+      {
+        category: 'feature',
+        text: 'Gestos Táctiles (Swipe) en Dispositivos Móviles: Deslizamiento desde el borde izquierdo (<= 45px) hacia la derecha para abrir el menú lateral (swipe-to-open) y deslizamiento hacia la izquierda para cerrarlo (swipe-to-close), con sensor táctil de borde y tirador visual con icono de flecha.',
+      },
+      {
+        category: 'improvement',
+        text: 'Menú Aparte para Panorama General: La vista estadística de la congregación (ResumenInicioTab) ahora cuenta con su propio apartado independiente en la barra lateral, cajón móvil y barra inferior, separando las estadísticas congregacionales del ministerio personal del publicador.',
+      },
+      {
+        category: 'feature',
+        text: 'Modo Atril con API de Pantalla Completa: Integración nativa con Fullscreen API del navegador con botón dedicado de "Pantalla completa" y sincronización automática de estado al salir con la tecla Esc o gestos del sistema.',
+      },
+      {
+        category: 'improvement',
+        text: 'Ergonomía Móvil en Pantallas Clave: Navegación inferior táctil por secciones en el cronómetro de presidencia, mini-cronómetro sticky al consultar notas o el programa, selectores con bottom-sheet táctil y limpieza de elementos redundantes en las filas del programa.',
+      },
+    ],
+  },
+  {
     version: '2.9.2',
     buildCode: '2026.10.21.2902',
     date: '21 de Octubre, 2026',
     title: 'Suscripción a Notificaciones Web Push en Segundo Plano (Con App Cerrada)',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

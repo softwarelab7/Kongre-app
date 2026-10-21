@@ -276,6 +276,73 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Gestos táctiles (Swipe) para abrir y cerrar el menú lateral en dispositivos móviles
+  useEffect(() => {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isTrackingSwipe = false;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (window.innerWidth >= 768) return;
+      if (e.touches.length !== 1) return;
+
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+
+      if (!isMobileMenuOpen) {
+        // Solo iniciar gesto de apertura si el toque se origina en el borde izquierdo (<= 45px)
+        if (touchStartX <= 45) {
+          isTrackingSwipe = true;
+        } else {
+          isTrackingSwipe = false;
+        }
+      } else {
+        // Menú abierto: rastrear swipe hacia la izquierda en el panel o backdrop
+        isTrackingSwipe = true;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isTrackingSwipe || e.touches.length !== 1) return;
+
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - touchStartX;
+      const deltaY = touch.clientY - touchStartY;
+
+      if (!isMobileMenuOpen) {
+        // Deslizar desde el borde izquierdo hacia la derecha para abrir (> 45px)
+        if (deltaX > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+          setIsMobileMenuOpen(true);
+          isTrackingSwipe = false;
+        }
+      } else {
+        // Deslizar hacia la izquierda para cerrar (<-45px)
+        if (deltaX < -45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+          setIsMobileMenuOpen(false);
+          setDrawerSearch('');
+          isTrackingSwipe = false;
+        }
+      }
+    };
+
+    const handleTouchEnd = () => {
+      isTrackingSwipe = false;
+    };
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchcancel', handleTouchEnd);
+    };
+  }, [isMobileMenuOpen]);
+
   const overdueTerritoriesCount = territories.filter(
     (t) =>
       t.status === 'vencido' ||
@@ -1417,6 +1484,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </header>
 
+      {/* Sensor táctil del borde izquierdo en móvil para facilitar el gesto de apertura (swipe-to-open) */}
+      {!isMobileMenuOpen && (
+        <div
+          aria-hidden="true"
+          className="md:hidden fixed left-0 top-14 bottom-16 w-5 z-20 pointer-events-auto touch-pan-y"
+          title="Desliza desde el borde izquierdo para abrir el menú"
+        />
+      )}
+
       {/* =========================================================================
           3. FULL SLIDE-OVER DRAWER (STRICTLY MOBILE ONLY: md:hidden)
          ========================================================================= */}
@@ -1431,8 +1507,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             }}
           />
 
-          {/* Drawer content */}
-          <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col z-10 border-r border-slate-200 dark:border-slate-800 pb-[env(safe-area-inset-bottom,0px)]">
+          {/* Drawer content with slide-in animation */}
+          <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col z-10 border-r border-slate-200 dark:border-slate-800 pb-[env(safe-area-inset-bottom,0px)] animate-in slide-in-from-left duration-200 ease-out">
+            {/* Tirador visual para deslizar o tocar hacia la izquierda para cerrar */}
+            <div
+              className="absolute -right-3.5 top-1/2 -translate-y-1/2 w-7 h-14 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-700/90 rounded-r-2xl flex items-center justify-center shadow-lg cursor-pointer text-slate-400 active:scale-95 transition-transform"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                setDrawerSearch('');
+              }}
+              title="Desliza a la izquierda o toca aquí para cerrar el menú"
+            >
+              <ChevronLeft className="w-4 h-4 text-slate-600 dark:text-slate-300 animate-pulse" />
+            </div>
+
             {/* 1. Compact Single-Row Header: User Profile + Theme + Close */}
             <div className="px-3.5 py-2.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 bg-slate-50/70 dark:bg-slate-800/40 shrink-0">
               <div className="flex items-center gap-2.5 min-w-0 flex-1">

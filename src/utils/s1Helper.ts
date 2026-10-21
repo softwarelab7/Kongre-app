@@ -247,9 +247,17 @@ export function calculateS1Metrics(
     const rep = reportsMap.get(pub.id);
     const hasReport = !!rep && rep.participated;
 
-    const isRegularPioneer = pub.privilege === 'precursor_regular';
-    const isSpecialPioneer = pub.privilege === 'precursor_especial';
-    const isAuxPioneer = approvedAuxPubIdSet.has(pub.id) || rep?.isAuxiliaryPioneer === true;
+    const pType = String(pub.pioneer_type || pub.pioneerStatus || '').toLowerCase();
+    const isRegularPioneer =
+      pub.privilege === 'precursor_regular' || pType === 'regular';
+    const isSpecialPioneer =
+      pub.privilege === 'precursor_especial' || pType === 'special' || pType === 'especial';
+    const isAuxPioneer =
+      approvedAuxPubIdSet.has(pub.id) ||
+      rep?.isAuxiliaryPioneer === true ||
+      pType === 'auxiliary' ||
+      pType === 'auxiliary_continuous' ||
+      pType === 'auxiliar_continuo';
 
     if (isRegularPioneer) {
       pioneersCount++;

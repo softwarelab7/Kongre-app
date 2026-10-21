@@ -33,7 +33,10 @@ import {
   sendTestNotification,
   getNotificationPreferences,
   saveNotificationPreferences,
+  subscribeToPushNotifications,
+  getPushSubscriptionRecord,
 } from '../services/notificationService';
+import { PushSubscriptionModal } from './PushSubscriptionModal';
 
 // Preset avatar styles with clean SVG iconography and theocratic themes
 const AVATAR_PRESETS = [
@@ -96,8 +99,8 @@ const AVATAR_PRESETS = [
 ];
 
 export const UserProfileSettingsView: React.FC = () => {
-  const { user, userProfile, updateUserProfile, effectiveRoleInfo, signInWithGoogle } = useAuth();
-  const { settings, updateSettings, isDemoMode } = useCongregation();
+  const { user, userProfile, updateUserProfile, effectiveRoleInfo, signInWithGoogle, currentPublisherId, currentBrotherName } = useAuth();
+  const { settings, updateSettings, isDemoMode, weeks, cartShifts, cartLocations, publishersMap } = useCongregation();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -114,15 +117,27 @@ export const UserProfileSettingsView: React.FC = () => {
   // Web Push Notification State
   const [browserPermission, setBrowserPermission] = useState<NotificationPermission>(() => getNotificationPermission());
   const [notifPrefs, setNotifPrefs] = useState(() => getNotificationPreferences());
+  const [pushSubRecord, setPushSubRecord] = useState(() => getPushSubscriptionRecord());
+  const [isPushModalOpen, setIsPushModalOpen] = useState(false);
   const [isSendingTestNotif, setIsSendingTestNotif] = useState(false);
   const [testNotifResult, setTestNotifResult] = useState<{ success: boolean; msg: string } | null>(null);
 
   const handleRequestBrowserPermission = async () => {
-    const perm = await requestNotificationPermission();
-    setBrowserPermission(perm);
-    if (perm === 'granted') {
-      saveNotificationPreferences({ enabled: true });
-      setNotifPrefs((prev) => ({ ...prev, enabled: true }));
+    const res = await subscribeToPushNotifications({
+      publisherId: currentPublisherId || user?.uid || 'usuario',
+      publisherName: displayName || currentBrotherName || user?.displayName || 'Hermano',
+      congregationName: settings?.congregationName,
+      weeks,
+      cartShifts,
+      cartLocations,
+      settings,
+      publishersMap,
+    });
+    setBrowserPermission(res.permission);
+    if (res.success && res.subscription) {
+      setPushSubRecord(res.subscription);
+      setNotifPrefs(getNotificationPreferences());
+      setNotificationsEnabled(true);
     }
   };
 
@@ -925,16 +940,29 @@ export const UserProfileSettingsView: React.FC = () => {
                 </span>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 {browserPermission !== 'granted' && isNotificationSupported() && (
                   <button
                     type="button"
                     onClick={handleRequestBrowserPermission}
                     className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer"
                   >
-                    Activar en este Navegador
+                    Suscribir este Navegador
                   </button>
                 )}
+
+                <button
+                  type="button"
+                  onClick={() => setIsPushModalOpen(true)}
+                  className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/50 dark:hover:bg-purple-900/70 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                  <span>
+                    {pushSubRecord?.active
+                      ? `Cola en Segundo Plano (${pushSubRecord.scheduledCount || 0})`
+                      : 'Configurar Push (App Cerrada)'}
+                  </span>
+                </button>
 
                 <button
                   type="button"
@@ -1044,6 +1072,29 @@ export const UserProfileSettingsView: React.FC = () => {
           </div>
         </div>
       </form>
+
+      <PushSubscriptionModal
+        isOpen={isPushModalOpen}
+        onClose={() => {
+          setIsPushModalOpen(false);
+          setBrowserPermission(getNotificationPermission());
+          setNotifPrefs(getNotificationPreferences());
+          setPushSubRecord(getPushSubscriptionRecord());
+        }}
+        publisherId={currentPublisherId || user?.uid || 'usuario'}
+        publisherName={displayName || currentBrotherName || user?.displayName || 'Hermano'}
+        congregationName={settings?.congregationName}
+        weeks={weeks}
+        cartShifts={cartShifts}
+        cartLocations={cartLocations}
+        settings={settings}
+        publishersMap={publishersMap}
+        onSubscriptionChange={(sub) => {
+          setPushSubRecord(sub);
+          setBrowserPermission(getNotificationPermission());
+          setNotifPrefs(getNotificationPreferences());
+        }}
+      />
     </div>
   );
 };

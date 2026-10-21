@@ -9,6 +9,7 @@ import { ClmReplacementModal } from './ClmReplacementModal';
 import { ClmWeeklyConflictsModal } from './ClmWeeklyConflictsModal';
 import { ClmMonthlyBillboardModal } from './ClmMonthlyBillboardModal';
 import { ClmAuxiliaryCounselorModal } from './ClmAuxiliaryCounselorModal';
+import { MeetingTimerModal } from './MeetingTimerModal';
 import { SplashCheckbox } from './SplashCheckbox';
 import { generateCounselorSheetPdf } from '../utils/clmCounselorPdf';
 import { useCongregation } from '../context/CongregationContext';
@@ -280,6 +281,8 @@ export default function ClmScheduleView({
   const [isMonthlyBillboardModalOpen, setIsMonthlyBillboardModalOpen] = useState(false);
   const [isAuxCounselorModalOpen, setIsAuxCounselorModalOpen] = useState(false);
   const [isConfirmClearClmOpen, setIsConfirmClearClmOpen] = useState(false);
+  const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
+  const [timerInitialPartId, setTimerInitialPartId] = useState<string | undefined>(undefined);
   const [editingSongPart, setEditingSongPart] = useState<ClmParte | null>(null);
   const [songNumberInput, setSongNumberInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1153,9 +1156,19 @@ export default function ClmScheduleView({
                   {part.titulo}
                 </h4>
                 {part.duracion_min && !part.titulo.includes('min') && (
-                  <span className="text-[11px] sm:text-xs text-slate-400 font-normal shrink-0">
-                    ({part.duracion_min} min)
-                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTimerInitialPartId(part.id);
+                      setIsTimerModalOpen(true);
+                    }}
+                    title="Abrir esta intervención en Modo Atril y Cronómetro de Presidencia"
+                    className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-normal shrink-0 cursor-pointer transition-colors"
+                  >
+                    <Clock size={11} />
+                    <span>({part.duracion_min} min)</span>
+                  </button>
                 )}
               </div>
 
@@ -1163,26 +1176,6 @@ export default function ClmScheduleView({
                 <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 tracking-tight leading-relaxed">
                   {part.descripcion}
                 </p>
-              )}
-
-              {part.asignado_auxiliar_nombre && (
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">
-                    Ayudante: <strong>{part.asignado_auxiliar_nombre}</strong>
-                  </p>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAssignInline(part.id, '', 'assistant');
-                    }}
-                    className="p-0.5 rounded-md text-rose-500 hover:text-white hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer"
-                    title={`Quitar a ${part.asignado_auxiliar_nombre} como ayudante`}
-                    aria-label="Quitar ayudante"
-                  >
-                    <X size={11} />
-                  </button>
-                </div>
               )}
 
               {/* Distintivo de Consejero de la Sala Auxiliar */}
@@ -1208,7 +1201,7 @@ export default function ClmScheduleView({
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50/90 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/60 text-[11px] text-indigo-900 dark:text-indigo-200">
                     <BookOpen size={12} className="text-indigo-500 shrink-0" />
                     <span className="font-bold">Lecc. #{assignedLessonNum}:</span>
-                    <span className="truncate max-w-[160px] sm:max-w-[240px]">
+                    <span className="truncate max-w-[170px] sm:max-w-[240px]">
                       {part.leccion_titulo || assignedLessonObj?.title || `Lección ${assignedLessonNum}`}
                     </span>
                   </div>
@@ -1236,7 +1229,7 @@ export default function ClmScheduleView({
                         e.stopPropagation();
                         handleCompleteLesson(part);
                       }}
-                      className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
+                      className="px-2.5 py-1 sm:px-2 sm:py-0.5 rounded-md text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
                       title="Aprobar lección y avanzar al estudiante en el registro S-38"
                     >
                       <Check size={11} />
@@ -1248,7 +1241,7 @@ export default function ClmScheduleView({
                         e.stopPropagation();
                         handleRepeatLesson(part);
                       }}
-                      className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500 hover:bg-amber-600 text-white transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
+                      className="px-2.5 py-1 sm:px-2 sm:py-0.5 rounded-md text-[10px] font-bold bg-amber-500 hover:bg-amber-600 text-white transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
                       title="Registrar para practicar de nuevo esta lección"
                     >
                       <RotateCcw size={11} />
@@ -1260,8 +1253,8 @@ export default function ClmScheduleView({
             </div>
           </div>
 
-          {/* Lado derecho: Estado / Botón de Asignación */}
-          <div className="flex items-center justify-end gap-1.5 sm:gap-2 shrink-0 pl-8 sm:pl-0 flex-wrap">
+          {/* Lado derecho: Estado / Botón de Asignación (Optimizado para táctil en móvil) */}
+          <div className="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-2 shrink-0 pl-8 sm:pl-0 flex-wrap">
             {isSong ? (
               <div className="flex items-center gap-1.5">
                 <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
@@ -1275,142 +1268,145 @@ export default function ClmScheduleView({
                     setSongNumberInput(numMatch ? numMatch[0] : '');
                     setEditingSongPart(part);
                   }}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="p-2 sm:p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                   title="Cambiar o corregir número de cántico"
                 >
-                  <Edit3 size={13} />
+                  <Edit3 size={14} />
                 </button>
               </div>
             ) : part.asignado_nombre ? (
-              <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                {conflicts.length > 0 && (
-                  <span
-                    title={conflicts.map((c) => c.details).join(' | ')}
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 cursor-help ${
-                      hasStrict
-                        ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
-                        : 'bg-amber-100 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
-                    }`}
-                  >
-                    <AlertTriangle size={11} />
-                    {hasStrict ? 'Cruce' : 'Saturación'}
-                  </span>
-                )}
-
-                <button
-                  onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                  className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
-                  title="Editar o cambiar asignación"
-                >
-                  <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span className="truncate max-w-[160px] sm:max-w-none">{part.asignado_nombre}</span>
-                </button>
-
-                {/* Botón Rápido Quitar Titular */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAssignInline(part.id, '', 'main');
-                  }}
-                  className="p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
-                  title={`Quitar a ${part.asignado_nombre} (dejar libre)`}
-                  aria-label="Quitar asignado"
-                >
-                  <X size={13} />
-                </button>
-
-                {/* Asignado Ayudante si aplica */}
-                {part.asignado_auxiliar_nombre && (
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                      className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 hover:bg-indigo-100/90 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
-                      title="Cambiar ayudante"
+              <div className="flex items-center gap-1.5 flex-wrap w-full sm:w-auto justify-between sm:justify-end">
+                <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                  {conflicts.length > 0 && (
+                    <span
+                      title={conflicts.map((c) => c.details).join(' | ')}
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 cursor-help ${
+                        hasStrict
+                          ? 'bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300 border border-rose-300 dark:border-rose-800'
+                          : 'bg-amber-100 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300 border border-amber-300 dark:border-amber-800'
+                      }`}
                     >
-                      <span className="text-[10px] text-indigo-500 font-bold">Ayudante:</span>
-                      <span className="truncate max-w-[130px] sm:max-w-none">{part.asignado_auxiliar_nombre}</span>
-                    </button>
-                    {/* Botón Rápido Quitar Ayudante */}
+                      <AlertTriangle size={11} />
+                      {hasStrict ? 'Cruce' : 'Saturación'}
+                    </span>
+                  )}
+
+                  <button
+                    onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
+                    className="min-h-[36px] sm:min-h-0 px-3 py-1.5 sm:py-1 rounded-full text-xs font-semibold bg-emerald-50 hover:bg-emerald-100/90 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-95"
+                    title="Toca para editar o cambiar asignación"
+                  >
+                    <CheckCircle2 size={13} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span className="truncate max-w-[175px] sm:max-w-none">{part.asignado_nombre}</span>
+                  </button>
+
+                  {/* Botón Rápido Quitar Titular (visible en sm+ para evitar toques accidentales en móvil; en móvil está dentro del panel al tocar el nombre) */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAssignInline(part.id, '', 'main');
+                    }}
+                    className="hidden sm:inline-flex p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    title={`Quitar a ${part.asignado_nombre} (dejar libre)`}
+                    aria-label="Quitar asignado"
+                  >
+                    <X size={13} />
+                  </button>
+
+                  {/* Asignado Ayudante si aplica */}
+                  {part.asignado_auxiliar_nombre && (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
+                        className="min-h-[34px] sm:min-h-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 hover:bg-indigo-100/90 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800 transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-95"
+                        title="Cambiar ayudante"
+                      >
+                        <span className="text-[10px] text-indigo-500 font-bold">Ayud.:</span>
+                        <span className="truncate max-w-[135px] sm:max-w-none">{part.asignado_auxiliar_nombre}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAssignInline(part.id, '', 'assistant');
+                        }}
+                        className="hidden sm:inline-flex p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                        title={`Quitar ayudante a ${part.asignado_auxiliar_nombre} (dejar libre)`}
+                        aria-label="Quitar ayudante"
+                      >
+                        <X size={13} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {/* Botón Ficha S-38 Estudiante */}
+                  {isStudentPart && studentPub && (
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleAssignInline(part.id, '', 'assistant');
+                        setSelectedStudentForModal(studentPub);
                       }}
-                      className="p-1.5 rounded-full text-rose-500 hover:text-white hover:bg-rose-600 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300 dark:hover:bg-rose-600 border border-rose-200 dark:border-rose-800 transition-all cursor-pointer shadow-2xs active:scale-95"
-                      title={`Quitar ayudante a ${part.asignado_auxiliar_nombre} (dejar libre)`}
-                      aria-label="Quitar ayudante"
+                      className="p-2 sm:p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                      title={`Ver Ficha Oficial S-38 e historial de ${studentPub.full_name || studentPub.name}`}
+                      aria-label="Ver Ficha S-38"
                     >
-                      <X size={13} />
+                      <Award size={14} />
                     </button>
-                  </div>
-                )}
+                  )}
 
-                {/* Botón Ficha S-38 Estudiante */}
-                {isStudentPart && studentPub && (
+                  {/* Botón Sustituir Asignación */}
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelectedStudentForModal(studentPub);
+                      setSelectedPartForReplacement(part);
                     }}
-                    className="p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer shadow-2xs active:scale-95"
-                    title={`Ver Ficha Oficial S-38 e historial de ${studentPub.full_name || studentPub.name}`}
-                    aria-label="Ver Ficha S-38"
+                    className="p-2 sm:p-1.5 rounded-full text-amber-600 hover:text-white hover:bg-amber-600 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-300 dark:hover:bg-amber-600 border border-amber-200 dark:border-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    title={`Buscar sustituto para ${part.asignado_nombre}`}
+                    aria-label="Sustituir asignación"
                   >
-                    <Award size={14} />
+                    <ArrowRightLeft size={14} />
                   </button>
-                )}
 
-                {/* Botón Sustituir Asignación */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedPartForReplacement(part);
-                  }}
-                  className="p-1.5 rounded-full text-amber-600 hover:text-white hover:bg-amber-600 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-300 dark:hover:bg-amber-600 border border-amber-200 dark:border-amber-800 transition-all cursor-pointer shadow-2xs active:scale-95"
-                  title={`Buscar sustituto para ${part.asignado_nombre}`}
-                  aria-label="Sustituir asignación"
-                >
-                  <ArrowRightLeft size={14} />
-                </button>
-
-                {/* Botón WhatsApp Titular */}
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSendWhatsAppSingle(part, 'main', false);
-                  }}
-                  className="p-1.5 rounded-full text-emerald-600 hover:text-white hover:bg-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-300 dark:hover:bg-emerald-600 border border-emerald-200 dark:border-emerald-800 transition-all cursor-pointer shadow-2xs active:scale-95"
-                  title={`Enviar asignación por WhatsApp a ${part.asignado_nombre}`}
-                  aria-label="Enviar WhatsApp al titular"
-                >
-                  <MessageCircle size={14} />
-                </button>
-
-                {/* Botón WhatsApp Ayudante si aplica */}
-                {part.asignado_auxiliar_nombre && (
+                  {/* Botón WhatsApp Titular */}
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleSendWhatsAppSingle(part, 'assistant', false);
+                      handleSendWhatsAppSingle(part, 'main', false);
                     }}
-                    className="p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer shadow-2xs active:scale-95"
-                    title={`Enviar asignación por WhatsApp al ayudante ${part.asignado_auxiliar_nombre}`}
-                    aria-label="Enviar WhatsApp al ayudante"
+                    className="p-2 sm:p-1.5 rounded-full text-emerald-600 hover:text-white hover:bg-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 dark:text-emerald-300 dark:hover:bg-emerald-600 border border-emerald-200 dark:border-indigo-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                    title={`Enviar asignación por WhatsApp a ${part.asignado_nombre}`}
+                    aria-label="Enviar WhatsApp al titular"
                   >
                     <MessageCircle size={14} />
                   </button>
-                )}
+
+                  {/* Botón WhatsApp Ayudante si aplica (en desktop) */}
+                  {part.asignado_auxiliar_nombre && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSendWhatsAppSingle(part, 'assistant', false);
+                      }}
+                      className="hidden sm:inline-flex p-1.5 rounded-full text-indigo-600 hover:text-white hover:bg-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer shadow-2xs active:scale-95"
+                      title={`Enviar asignación por WhatsApp al ayudante ${part.asignado_auxiliar_nombre}`}
+                      aria-label="Enviar WhatsApp al ayudante"
+                    >
+                      <MessageCircle size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
             ) : (
               <button
                 onClick={() => setExpandedPartId(isExpanded ? null : part.id)}
-                className="px-3.5 py-1 rounded-full text-xs font-semibold bg-amber-50 hover:bg-amber-100/80 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1 active:scale-95"
+                className="min-h-[36px] sm:min-h-0 px-4 py-1.5 sm:px-3.5 sm:py-1 rounded-full text-xs font-semibold bg-amber-50 hover:bg-amber-100/80 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/60 transition-all cursor-pointer shadow-2xs flex items-center gap-1 active:scale-95"
               >
                 + Sin Asignar
               </button>
@@ -2019,6 +2015,20 @@ export default function ClmScheduleView({
                 </span>
               </button>
             )}
+
+            {/* Acceso directo a Modo Atril / Cronómetro */}
+            <button
+              type="button"
+              onClick={() => {
+                setTimerInitialPartId(undefined);
+                setIsTimerModalOpen(true);
+              }}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 transition-all cursor-pointer shadow-2xs"
+              title="Iniciar Modo Atril y Cronómetro de Presidencia para esta sala"
+            >
+              <Clock size={12} className="shrink-0 text-amber-400 dark:text-white" />
+              <span>Cronómetro / Atril</span>
+            </button>
           </div>
         </div>
       )}
@@ -2586,6 +2596,15 @@ export default function ClmScheduleView({
           </div>
         </div>
       )}
+
+      {/* Modal Modo Atril y Cronómetro de Presidencia */}
+      <MeetingTimerModal
+        isOpen={isTimerModalOpen}
+        onClose={() => setIsTimerModalOpen(false)}
+        initialMeetingType="midweek"
+        initialRoom={currentRoom}
+        initialPartId={timerInitialPartId}
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Publisher } from '../../../types';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Publisher, MonthlyServiceReport, PreachingGroup } from '../../../types';
 import { ensureImmutablePublisherCode } from '../../../utils/publisherDeduplication';
+import { useCongregation } from '../../../context/CongregationContext';
 
 const deterministicStringify = (obj: any): string => {
   if (obj === null || typeof obj !== 'object') return JSON.stringify(obj);
@@ -9,18 +10,127 @@ const deterministicStringify = (obj: any): string => {
   return `{${keys.map(k => `"${k}":${deterministicStringify(obj[k])}`).join(',')}}`;
 };
 
-const mapRolesToAssignments = (roles: any = {}, existingAssignments: any = {}): Record<string, boolean> => {
+const S21_MONTH_NAMES = [
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+];
+
+/**
+ * Construye o fusiona s21_records del publicador a partir de los informes mensuales reales (monthlyReports)
+ * para que la pestaña Registro S-21 dentro del editor muestre los mismos datos que TarjetasS21Tab e InformesServicioTab.
+ */
+function hydrateS21RecordsFromMonthlyReports(
+  publisherId: string | undefined,
+  existingS21Records: Record<string, any[]> = {},
+  monthlyReports: MonthlyServiceReport[] = []
+): Record<string, any[]> {
+  const result: Record<string, any[]> = { ...existingS21Records };
+  if (!publisherId) return result;
+
+  const pubReports = monthlyReports.filter(r => r.publisherId === publisherId);
+  if (pubReports.length === 0) return result;
+
+  const reportByMonth = new Map<string, MonthlyServiceReport>();
+  pubReports.forEach(r => reportByMonth.set(r.month, r));
+
+  // Años de servicio soportados en la vista ('2025' = 2024-2025, '2026' = 2025-2026, '2027' = 2026-2027)
+  const serviceYearEndYears = ['2025', '2026', '2027'];
+
+  for (const endYrStr of serviceYearEndYears) {
+    const endYear = parseInt(endYrStr, 10);
+    const startYear = endYear - 1;
+    const monthKeys = [
+      `${startYear}-09`,
+      `${startYear}-10`,
+      `${startYear}-11`,
+      `${startYear}-12`,
+      `${endYear}-01`,
+      `${endYear}-02`,
+      `${endYear}-03`,
+      `${endYear}-04`,
+      `${endYear}-05`,
+      `${endYear}-06`,
+      `${endYear}-07`,
+      `${endYear}-08`,
+    ];
+
+    const baseYearArray = existingS21Records[endYrStr]
+      ? [...existingS21Records[endYrStr]]
+      : S21_MONTH_NAMES.map(m => ({
+          month: m,
+          participated: false,
+          bible_studies: 0,
+          auxiliary_pioneer: false,
+          hours: 0,
+          credit: 0,
+          late: false,
+          comments: '',
+        }));
+
+    let hasAnyUpdate = false;
+    monthKeys.forEach((mKey, idx) => {
+      const rep = reportByMonth.get(mKey);
+      if (rep) {
+        hasAnyUpdate = true;
+        baseYearArray[idx] = {
+          ...(baseYearArray[idx] || {}),
+          month: S21_MONTH_NAMES[idx],
+          participated: Boolean(rep.participated),
+          bible_studies: rep.bibleStudies || 0,
+          auxiliary_pioneer: Boolean(rep.isAuxiliaryPioneer),
+          hours: rep.hours || 0,
+          credit: baseYearArray[idx]?.credit || 0,
+          late: Boolean(baseYearArray[idx]?.late),
+          comments: rep.notes || baseYearArray[idx]?.comments || '',
+        };
+      }
+    });
+
+    if (hasAnyUpdate || existingS21Records[endYrStr]) {
+      result[endYrStr] = baseYearArray;
+    }
+  }
+
+  return result;
+}
+
+const mapRolesToAssignments = (
+  roles: any = {},
+  existingAssignments: any = {},
+  isFemale = false,
+  isCartApproved = false
+): Record<string, boolean> => {
   const assignments: Record<string, boolean> = { ...(existingAssignments || {}) };
   if (!roles || typeof roles !== 'object') return assignments;
 
   // Vida y Ministerio Cristianos (Entre semana)
   if (roles.vym_presidente && assignments.chairman === undefined) assignments.chairman = true;
+  if (roles.vym_consejero_aux && assignments.aux_counselor === undefined) assignments.aux_counselor = true;
   if (roles.vym_oracion && assignments.prayers === undefined) assignments.prayers = true;
   if (roles.vym_tesoros_discurso && assignments.talk === undefined) assignments.talk = true;
   if (roles.vym_tesoros_perlas && assignments.gems === undefined) assignments.gems = true;
   if (roles.vym_tesoros_lectura && assignments.reading === undefined) assignments.reading = true;
-  if (roles.vym_maestros_titular && assignments.student === undefined) assignments.student = true;
-  if (roles.vym_maestros_ayudante && assignments.assistant_student === undefined) assignments.assistant_student = true;
+  if (roles.vym_maestros_titular) {
+    if (assignments.student === undefined) assignments.student = true;
+    if (assignments.conversations === undefined) assignments.conversations = true;
+    if (assignments.return_visits === undefined) assignments.return_visits = true;
+    if (assignments.disciples === undefined) assignments.disciples = true;
+    if (assignments.beliefs === undefined) assignments.beliefs = true;
+    if (!isFemale && assignments.talk_student === undefined) assignments.talk_student = true;
+  }
+  if (roles.vym_maestros_ayudante && assignments.assistant_student === undefined) {
+    assignments.assistant_student = true;
+  }
   if (roles.vym_vida_partes && assignments.living_parts === undefined) assignments.living_parts = true;
   if (roles.vym_estudio_conductor && assignments.bible_study === undefined) assignments.bible_study = true;
   if (roles.vym_estudio_lector && assignments.reader_living === undefined) assignments.reader_living = true;
@@ -35,11 +145,7 @@ const mapRolesToAssignments = (roles: any = {}, existingAssignments: any = {}): 
     if (assignments.attendants_midweek === undefined) assignments.attendants_midweek = true;
     if (assignments.attendants_weekend === undefined) assignments.attendants_weekend = true;
   }
-  if (roles.deber_audio) {
-    if (assignments.audio_video_midweek === undefined) assignments.audio_video_midweek = true;
-    if (assignments.audio_video_weekend === undefined) assignments.audio_video_weekend = true;
-  }
-  if (roles.deber_video) {
+  if (roles.deber_audio || roles.deber_video) {
     if (assignments.audio_video_midweek === undefined) assignments.audio_video_midweek = true;
     if (assignments.audio_video_weekend === undefined) assignments.audio_video_weekend = true;
   }
@@ -54,14 +160,19 @@ const mapRolesToAssignments = (roles: any = {}, existingAssignments: any = {}): 
   if (roles.deber_mantenimiento || roles.mantenimiento) {
     if (assignments.maintenance === undefined) assignments.maintenance = true;
   }
-  if (roles.predicacion_publica || roles.carritos) {
+  if (roles.predicacion_publica || roles.carritos || isCartApproved) {
     if (assignments.public_witnessing === undefined) assignments.public_witnessing = true;
   }
 
   return assignments;
 };
 
-const normalizePublisher = (initial: any, fallbackCode?: string): Publisher => {
+const normalizePublisher = (
+  initial: any,
+  fallbackCode?: string,
+  monthlyReports: MonthlyServiceReport[] = [],
+  preachingGroups: PreachingGroup[] = []
+): Publisher => {
   if (!initial || typeof initial !== 'object') initial = {};
 
   // 1. Resolver nombre completo
@@ -99,8 +210,8 @@ const normalizePublisher = (initial: any, fallbackCode?: string): Publisher => {
 
   // 3. Normalizar Género ('hermano' / 'male' -> 'male', 'hermana' / 'female' -> 'female')
   const rawGender = String(initial.gender || '').toLowerCase();
-  const normalizedGender: 'male' | 'female' = 
-    (rawGender === 'female' || rawGender === 'hermana') ? 'female' : 'male';
+  const normalizedGender: 'male' | 'female' =
+    rawGender === 'female' || rawGender === 'hermana' ? 'female' : 'male';
 
   // 4. Normalizar Rol y Privilegio Teocrático
   const rawPriv = String(initial.privilege || '').toLowerCase();
@@ -117,6 +228,15 @@ const normalizePublisher = (initial: any, fallbackCode?: string): Publisher => {
     }
   }
 
+  // 5. Precursorado
+  let resolvedPioneerType = initial.pioneer_type || 'none';
+  if (resolvedPioneerType === 'none' && (initial.pioneerStatus || rawPriv.includes('precursor'))) {
+    const pStat = String(initial.pioneerStatus || rawPriv).toLowerCase();
+    if (pStat.includes('regular')) resolvedPioneerType = 'regular';
+    else if (pStat.includes('auxiliar')) resolvedPioneerType = 'auxiliary';
+    else if (pStat.includes('especial') || pStat.includes('special')) resolvedPioneerType = 'special';
+  }
+
   const resolvedPrivilege =
     resolvedRole === 'elder'
       ? 'anciano'
@@ -124,58 +244,98 @@ const normalizePublisher = (initial: any, fallbackCode?: string): Publisher => {
       ? 'siervo_ministerial'
       : resolvedRole === 'unbaptized'
       ? 'publicador_no_bautizado'
-      : (initial.privilege || 'publicador_bautizado');
-
-  // 5. Precursorado
-  let resolvedPioneerType = initial.pioneer_type || 'none';
-  if (resolvedPioneerType === 'none' && initial.pioneerStatus) {
-    const pStat = String(initial.pioneerStatus).toLowerCase();
-    if (pStat === 'regular') resolvedPioneerType = 'regular';
-    else if (pStat === 'auxiliar_continuo') resolvedPioneerType = 'auxiliary_continuous';
-    else if (pStat === 'especial') resolvedPioneerType = 'special';
-  }
+      : resolvedPioneerType === 'regular'
+      ? 'precursor_regular'
+      : resolvedPioneerType === 'auxiliary' || resolvedPioneerType === 'auxiliary_continuous'
+      ? 'precursor_auxiliar'
+      : initial.privilege || 'publicador_bautizado';
 
   // 6. Fechas
   const resolvedBirthDate = initial.birth_date || initial.birthDate || '';
   const resolvedBaptismDate = initial.baptism_date || initial.baptismDate || '';
+  const resolvedLastVisit = initial.last_shepherding_visit || initial.last_visit_date || '';
 
-  // 7. Grupo
-  const groupNum = initial.groupNumber !== undefined && initial.groupNumber !== null 
-    ? initial.groupNumber 
-    : (initial.id_grupo ? parseInt(initial.id_grupo, 10) : 1);
-  const idGrupo = initial.id_grupo || String(groupNum);
+  // 7. Grupo y Responsabilidad de Grupo sincronizada con preachingGroups
+  const hasUnassignedGroup = initial.id_grupo === null || initial.groupNumber === 0;
+  const groupNum = hasUnassignedGroup
+    ? 0
+    : initial.groupNumber !== undefined && initial.groupNumber !== null
+    ? initial.groupNumber
+    : initial.id_grupo
+    ? parseInt(initial.id_grupo, 10)
+    : 1;
+  const idGrupo = hasUnassignedGroup ? null : initial.id_grupo || String(groupNum);
+
+  let resolvedGroupResp = initial.group_responsibility || 'miembro';
+  if (initial.id && preachingGroups.length > 0 && groupNum > 0) {
+    const matchingGroup = preachingGroups.find(g => g.number === groupNum);
+    if (matchingGroup) {
+      if (matchingGroup.overseerId === initial.id) resolvedGroupResp = 'overseer';
+      else if (matchingGroup.assistantId === initial.id) resolvedGroupResp = 'assistant';
+    }
+  }
 
   // 8. Asignaciones y Privilegios
-  const resolvedAssignments = mapRolesToAssignments(initial.roles, initial.assignments);
+  const resolvedAssignments = mapRolesToAssignments(
+    initial.roles,
+    initial.assignments,
+    normalizedGender === 'female',
+    Boolean(initial.is_cart_approved)
+  );
 
   // 9. Contactos de emergencia
   let emergencyContacts = initial.emergency_contacts || [];
   if (emergencyContacts.length === 0 && (initial.emergencyContactName || initial.emergencyContactPhone)) {
-    emergencyContacts = [{
-      id: 'em-1',
-      name: initial.emergencyContactName || 'Contacto Principal',
-      relationship: 'Familiar',
-      phone: initial.emergencyContactPhone || '',
-      alt_phone: '',
-      email: ''
-    }];
+    emergencyContacts = [
+      {
+        id: 'em-1',
+        name: initial.emergencyContactName || 'Contacto Principal',
+        relationship: 'Familiar',
+        phone: initial.emergencyContactPhone || '',
+        alt_phone: '',
+        email: '',
+      },
+    ];
   }
 
   // 10. Estados y actividad
-  const isActive = initial.is_active !== undefined 
-    ? initial.is_active 
-    : (initial.active !== undefined ? initial.active : true);
-  const status = initial.status || (isActive ? 'active' : 'inactive');
+  const isExplicitlyInactive =
+    initial.status === 'inactive' ||
+    initial.status === 'deleted' ||
+    initial.is_active === false ||
+    initial.active === false;
+  const isActive = !isExplicitlyInactive;
+  const status = initial.status === 'deleted' ? 'deleted' : isActive ? 'active' : 'inactive';
 
   // 11. ID Único Inmutable del Publicador
   const immutableCode = ensureImmutablePublisherCode(
     initial.id || initial.nid || initial.publisherCode ? initial : { publisherCode: fallbackCode }
   );
+  const resolvedId = initial.id || immutableCode;
+
+  // 12. Ausencias normalizadas (ambos formatos start_date y startDate)
+  const rawAbsences = initial.ausencias || initial.absences || [];
+  const normalizedAbsences = rawAbsences.map((a: any) => ({
+    ...a,
+    id: a.id || `abs-${Date.now()}`,
+    start_date: a.start_date || a.startDate || '',
+    end_date: a.end_date || a.endDate || '',
+    startDate: a.startDate || a.start_date || '',
+    endDate: a.endDate || a.end_date || '',
+    reason: a.reason || '',
+  }));
+
+  // 13. Registros S-21 hidratados desde monthlyReports
+  const hydratedS21Records = hydrateS21RecordsFromMonthlyReports(
+    resolvedId,
+    initial.s21_records || {},
+    monthlyReports
+  );
 
   return {
     ...initial,
-    id: initial.id || immutableCode,
-    nid: initial.nid || initial.id || immutableCode,
+    id: resolvedId,
+    nid: initial.nid || resolvedId,
     publisherCode: immutableCode,
     name: initial.name || resolvedFullName,
     full_name: resolvedFullName,
@@ -198,10 +358,16 @@ const normalizePublisher = (initial: any, fallbackCode?: string): Publisher => {
     baptism_date: resolvedBaptismDate,
     baptismDate: resolvedBaptismDate,
     pioneer_type: resolvedPioneerType,
-    pioneerStatus: initial.pioneerStatus || (resolvedPioneerType === 'regular' ? 'regular' : resolvedPioneerType === 'auxiliary_continuous' ? 'auxiliar_continuo' : 'ninguno'),
-    group_responsibility: initial.group_responsibility || 'none',
+    pioneerStatus:
+      resolvedPioneerType === 'regular'
+        ? 'regular'
+        : resolvedPioneerType === 'auxiliary' || resolvedPioneerType === 'auxiliary_continuous'
+        ? 'auxiliar_continuo'
+        : 'ninguno',
+    group_responsibility: resolvedGroupResp,
     publisher_date: initial.publisher_date || '',
-    last_visit_date: initial.last_visit_date || '',
+    last_visit_date: resolvedLastVisit,
+    last_shepherding_visit: resolvedLastVisit,
     is_anointed: initial.is_anointed !== undefined ? !!initial.is_anointed : initial.hope === 'ungido',
     hope: initial.hope || (initial.is_anointed ? 'ungido' : 'otras_ovejas'),
     has_key: !!initial.has_key,
@@ -212,17 +378,18 @@ const normalizePublisher = (initial: any, fallbackCode?: string): Publisher => {
     notes: initial.notes || initial.spiritual_notes || '',
     marital_status: initial.marital_status || 'soltero',
     emergency_contacts: emergencyContacts,
-    s21_records: initial.s21_records || {},
-    ausencias: initial.ausencias || initial.absences || [],
-    absences: initial.absences || initial.ausencias || [],
+    s21_records: hydratedS21Records,
+    ausencias: normalizedAbsences,
+    absences: normalizedAbsences,
     assignments: resolvedAssignments,
   } as Publisher;
 };
 
 export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
+  const { monthlyReports, preachingGroups } = useCongregation();
   const newPublisherCodeRef = useRef<string>(ensureImmutablePublisherCode(initialPublisher));
   const [formData, setFormData] = useState<Publisher>(() =>
-    normalizePublisher(initialPublisher, newPublisherCodeRef.current)
+    normalizePublisher(initialPublisher, newPublisherCodeRef.current, monthlyReports, preachingGroups)
   );
 
   const [isDirty, setIsDirty] = useState(false);
@@ -233,17 +400,24 @@ export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
   // Sync form data if initialPublisher prop changes (e.g. after a successful save)
   useEffect(() => {
     const initial = JSON.parse(initialPublisherString);
-    setFormData(normalizePublisher(initial, newPublisherCodeRef.current));
+    setFormData(
+      normalizePublisher(initial, newPublisherCodeRef.current, monthlyReports, preachingGroups)
+    );
   }, [initialPublisherString]);
 
   // Track changes
   useEffect(() => {
     const initial = JSON.parse(initialPublisherString);
-    const normalizedInitial = normalizePublisher(initial, newPublisherCodeRef.current);
+    const normalizedInitial = normalizePublisher(
+      initial,
+      newPublisherCodeRef.current,
+      monthlyReports,
+      preachingGroups
+    );
 
     const hasChanged = deterministicStringify(formData) !== deterministicStringify(normalizedInitial);
     setIsDirty(hasChanged);
-  }, [formData, initialPublisherString]);
+  }, [formData, initialPublisherString, monthlyReports, preachingGroups]);
 
   const handleChange = useCallback((field: keyof Publisher, value: any) => {
     // El ID único del publicador (id, nid, publisherCode) es inmutable y nunca puede modificarse
@@ -251,7 +425,7 @@ export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
       return;
     }
     setFormData(prev => {
-      const next = { ...prev, [field]: value };
+      const next: any = { ...prev, [field]: value };
       if (field === 'first_name' || field === 'middle_name' || field === 'last_name' || field === 'second_last_name') {
         const parts = [
           next.first_name || '',
@@ -270,14 +444,52 @@ export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
         next.full_name = value;
       }
 
-      // Mutually exclusive flags for Active / Inactive
-      if (field === 'is_active' && value === true) {
-        next.is_regular = false;
-        next.is_inactive = false;
-      } else if ((field === 'is_regular' || field === 'is_inactive') && value === true) {
-        next.is_active = false;
-        if (field === 'is_regular') next.is_inactive = false;
-        if (field === 'is_inactive') next.is_regular = false;
+      // Sincronizar banderas de Activo / Inactivo
+      if (field === 'is_active') {
+        const act = Boolean(value);
+        next.active = act;
+        next.is_active = act;
+        next.status = act ? 'active' : 'inactive';
+      } else if (field === 'status') {
+        const act = value === 'active';
+        next.active = act;
+        next.is_active = act;
+      }
+
+      // Sincronizar tipo de precursor con pioneerStatus
+      if (field === 'pioneer_type') {
+        next.pioneerStatus =
+          value === 'regular'
+            ? 'regular'
+            : value === 'auxiliary' || value === 'auxiliary_continuous'
+            ? 'auxiliar_continuo'
+            : 'ninguno';
+      }
+
+      // Sincronizar Ungido / Esperanza
+      if (field === 'is_anointed') {
+        next.hope = value ? 'ungido' : 'otras_ovejas';
+      } else if (field === 'hope') {
+        next.is_anointed = value === 'ungido';
+      }
+
+      // Sincronizar fechas en ambos formatos (snake_case y camelCase)
+      if (field === 'baptism_date' || field === 'baptismDate') {
+        next.baptism_date = value;
+        next.baptismDate = value;
+      }
+      if (field === 'birth_date' || field === 'birthDate') {
+        next.birth_date = value;
+        next.birthDate = value;
+      }
+      if (field === 'last_shepherding_visit' || field === 'last_visit_date') {
+        next.last_shepherding_visit = value;
+        next.last_visit_date = value;
+      }
+
+      // Sincronizar id_grupo y groupNumber
+      if (field === 'id_grupo') {
+        next.groupNumber = value ? parseInt(String(value), 10) : 0;
       }
 
       return next;
@@ -326,12 +538,10 @@ export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
   }, []);
 
   const handleS21Change = useCallback((selectedServiceYear: string, monthIdx: number, field: string, value: any) => {
-    const months = ['septiembre', 'octubre', 'noviembre', 'diciembre', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto'];
-    
     setFormData(prev => {
       const currentRecords = prev.s21_records || {};
       const yearData = [...(currentRecords[selectedServiceYear] || Array(12).fill(null).map((_, i) => ({
-        month: months[i],
+        month: S21_MONTH_NAMES[i],
         participated: false,
         bible_studies: 0,
         auxiliary_pioneer: false,
@@ -341,7 +551,11 @@ export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
         comments: ''
       })))];
 
-      yearData[monthIdx] = { ...yearData[monthIdx], [field]: value };
+      const updatedMonth = { ...yearData[monthIdx], [field]: value };
+      if (field === 'hours' && Number(value) > 0) {
+        updatedMonth.participated = true;
+      }
+      yearData[monthIdx] = updatedMonth;
 
       return {
         ...prev,
@@ -355,43 +569,75 @@ export const usePublisherForm = (initialPublisher: Partial<Publisher> = {}) => {
 
   const addEmergencyContact = useCallback((contact: any, editingId?: string) => {
     setFormData(prev => {
-        const contacts = prev.emergency_contacts || [];
-        const nextContacts = editingId 
-            ? contacts.map(c => c.id === editingId ? contact : c)
-            : [...contacts, contact];
-            
-        return { ...prev, emergency_contacts: nextContacts };
+      const contacts = prev.emergency_contacts || [];
+      const nextContacts = editingId
+        ? contacts.map(c => c.id === editingId ? contact : c)
+        : [...contacts, contact];
+
+      return {
+        ...prev,
+        emergency_contacts: nextContacts,
+        emergencyContactName: nextContacts[0]?.name || '',
+        emergencyContactPhone: nextContacts[0]?.phone || '',
+      };
     });
   }, []);
 
   const deleteEmergencyContact = useCallback((id: string) => {
-    setFormData(prev => ({
+    setFormData(prev => {
+      const nextContacts = (prev.emergency_contacts || []).filter(c => c.id !== id);
+      return {
         ...prev,
-        emergency_contacts: (prev.emergency_contacts || []).filter(c => c.id !== id)
-    }));
+        emergency_contacts: nextContacts,
+        emergencyContactName: nextContacts[0]?.name || '',
+        emergencyContactPhone: nextContacts[0]?.phone || '',
+      };
+    });
   }, []);
 
   const handleEmergencyContactChange = useCallback((id: string, field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      emergency_contacts: (prev.emergency_contacts || []).map(c => 
+    setFormData(prev => {
+      const nextContacts = (prev.emergency_contacts || []).map(c =>
         c.id === id ? { ...c, [field]: value } : c
-      )
-    }));
+      );
+      return {
+        ...prev,
+        emergency_contacts: nextContacts,
+        emergencyContactName: nextContacts[0]?.name || '',
+        emergencyContactPhone: nextContacts[0]?.phone || '',
+      };
+    });
   }, []);
 
   const addAbsence = useCallback((absence: any) => {
-    setFormData(prev => ({
-      ...prev,
-      ausencias: [...(prev.ausencias || []), absence]
-    }));
+    const normalized = {
+      ...absence,
+      id: absence.id || `abs-${Date.now()}`,
+      start_date: absence.start_date || absence.startDate || '',
+      end_date: absence.end_date || absence.endDate || '',
+      startDate: absence.startDate || absence.start_date || '',
+      endDate: absence.endDate || absence.end_date || '',
+      reason: absence.reason || '',
+    };
+    setFormData(prev => {
+      const nextList = [...(prev.ausencias || []), normalized];
+      return {
+        ...prev,
+        ausencias: nextList,
+        absences: nextList,
+      };
+    });
   }, []);
 
   const deleteAbsence = useCallback((id: string) => {
-    setFormData(prev => ({
-      ...prev,
-      ausencias: (prev.ausencias || []).filter(a => a.id !== id)
-    }));
+    setFormData(prev => {
+      const nextList = (prev.ausencias || []).filter(a => a.id !== id);
+      return {
+        ...prev,
+        ausencias: nextList,
+        absences: nextList,
+      };
+    });
   }, []);
 
   const togglePrivilege = useCallback((priv: string) => {

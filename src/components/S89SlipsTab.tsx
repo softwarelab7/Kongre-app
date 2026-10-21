@@ -28,7 +28,9 @@ import {
   MessageCircle,
   X,
   Check,
+  ShieldCheck,
 } from 'lucide-react';
+import { LocalOfficialFormsCenter } from './LocalOfficialFormsCenter';
 
 export const S89SlipsTab: React.FC = () => {
   const {
@@ -47,7 +49,7 @@ export const S89SlipsTab: React.FC = () => {
   const [selectedRoom, setSelectedRoom] = useState<'todos' | 'principal' | 'auxiliar'>('todos');
   const [filterDelivered, setFilterDelivered] = useState<'todos' | 'pendiente' | 'confirmada'>('todos');
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [printLayout, setPrintLayout] = useState<'cards' | 'sheet4'>('cards');
+  const [printLayout, setPrintLayout] = useState<'cards' | 'sheet4' | 'formato_local'>('cards');
   const [isBatchWhatsAppOpen, setIsBatchWhatsAppOpen] = useState(false);
 
   // Student history modal
@@ -192,11 +194,11 @@ export const S89SlipsTab: React.FC = () => {
             </button>
           )}
 
-          {/* Toggle between 4-per-page grid print vs Cards view */}
-          <div className="inline-flex p-1 bg-slate-100 rounded-xl text-xs font-semibold">
+          {/* Toggle between 4-per-page grid print, Cards view, and Local Official PDF Filler */}
+          <div className="inline-flex p-1 bg-slate-100 rounded-xl text-xs font-semibold flex-wrap">
             <button
               onClick={() => setPrintLayout('cards')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 printLayout === 'cards'
                   ? 'bg-white text-indigo-700 shadow-xs font-bold'
                   : 'text-slate-600 hover:text-slate-900'
@@ -206,13 +208,24 @@ export const S89SlipsTab: React.FC = () => {
             </button>
             <button
               onClick={() => setPrintLayout('sheet4')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 printLayout === 'sheet4'
                   ? 'bg-white text-indigo-700 shadow-xs font-bold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Hoja Impresión 4x1
+            </button>
+            <button
+              onClick={() => setPrintLayout('formato_local')}
+              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1 cursor-pointer ${
+                printLayout === 'formato_local'
+                  ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                  : 'text-emerald-700 hover:text-emerald-900'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>PDF S-89 Oficial (Local)</span>
             </button>
           </div>
 
@@ -298,6 +311,12 @@ export const S89SlipsTab: React.FC = () => {
             Programa de la Reunión para generar automáticamente sus hojas S-89.
           </p>
         </div>
+      ) : printLayout === 'formato_local' ? (
+        <LocalOfficialFormsCenter
+          initialFormCode="S-89"
+          initialWeekId={activeWeek?.id}
+          compactHeader={true}
+        />
       ) : printLayout === 'sheet4' ? (
         /* PRINT-READY 4-UP SHEET (Standard S-89 Official Paper Layout) */
         <div className="bg-slate-100 p-4 sm:p-6 rounded-2xl border border-slate-200 overflow-x-auto">

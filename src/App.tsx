@@ -69,7 +69,11 @@ import { OfflineSyncQueueModal } from './components/OfflineSyncQueueModal';
 import { DemoNoticeModal } from './components/DemoNoticeModal';
 import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
-import { checkUpcomingAssignmentsAndNotify } from './services/notificationService';
+import {
+  checkUpcomingAssignmentsAndNotify,
+  ensurePushServiceWorker,
+  getPushSubscriptionRecord,
+} from './services/notificationService';
 import { ToastProvider, useToast } from './context/ToastContext';
 import { ModalProvider } from './context/ModalContext';
 
@@ -106,6 +110,8 @@ export const VALID_TABS_MAP: Record<string, ActiveTab> = {
   conflictos: 'conflictos',
   equidad: 'equidad',
   exportar_pdf: 'exportar_pdf',
+  formatos_oficiales: 'exportar_pdf',
+  formatos: 'exportar_pdf',
   mi_vista: 'mi_vista',
   perfil: 'perfil',
   ajustes: 'ajustes',
@@ -233,7 +239,10 @@ const AppContent: React.FC = () => {
     settings,
     accountLinkRequests,
     publishers,
+    publishersMap,
     weeks,
+    cartShifts,
+    cartLocations,
     loadCongregationFromCloud,
     isOnline,
     syncOfflineQueueNow,
@@ -636,18 +645,55 @@ const AppContent: React.FC = () => {
     }
   }, [publishers, currentPublisherId, user, setIdentifiedPublisher, setIdentifiedBrother, setActiveRole, showToast]);
 
-  // Escaneo automático de asignaciones teocráticas próximas para notificaciones nativas/push
+  // Registro global del Service Worker de Notificaciones Push y escucha de clics en notificaciones
+  useEffect(() => {
+    ensurePushServiceWorker().catch(() => {});
+
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
+    const handleSwMessage = (event: MessageEvent) => {
+      const data = event.data;
+      if (!data || !data.type) return;
+      if (data.type === 'NAVIGATE_TO_PORTAL') {
+        setShowWelcomeLanding(false);
+        setActiveTab('mi_vista');
+      } else if (data.type === 'REMINDER_INTERACTION' && data.action === 'confirm_ack') {
+        showToast('Recordatorio de asignación marcado como enterado.', 'success');
+      }
+    };
+    navigator.serviceWorker.addEventListener('message', handleSwMessage);
+    return () => {
+      navigator.serviceWorker.removeEventListener('message', handleSwMessage);
+    };
+  }, [setActiveTab, showToast]);
+
+  // Escaneo automático y sincronización en segundo plano de asignaciones próximas para notificaciones Web Push
   useEffect(() => {
     if (!weeks || weeks.length === 0) return;
-    const brotherName = currentBrotherName || user?.displayName;
-    if (!brotherName && !currentPublisherId) return;
+    const savedSub = getPushSubscriptionRecord();
+    const brotherName =
+      currentBrotherName || user?.displayName || savedSub?.publisherName || '';
+    const pubId = currentPublisherId || savedSub?.publisherId || undefined;
+    if (!brotherName && !pubId) return;
 
     checkUpcomingAssignmentsAndNotify({
-      publisherName: brotherName || '',
-      publisherId: currentPublisherId || undefined,
+      publisherName: brotherName,
+      publisherId: pubId,
       weeks,
+      cartShifts,
+      cartLocations,
+      settings,
+      publishersMap,
     }).catch((err) => console.warn('Error al verificar recordatorios de asignaciones:', err));
-  }, [weeks, currentBrotherName, currentPublisherId, user?.displayName]);
+  }, [
+    weeks,
+    cartShifts,
+    cartLocations,
+    settings,
+    publishersMap,
+    currentBrotherName,
+    currentPublisherId,
+    user?.displayName,
+  ]);
   const [isSidebarVisible, setIsSidebarVisible] = useState<boolean>(() => {
     try {
       return localStorage.getItem('kongre_sidebar_visible') !== 'false';

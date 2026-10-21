@@ -99,9 +99,9 @@ const SelectComponent: React.FC<SelectProps> = ({
     }
   }, [isOpen, options.length, isSearchActive, placement]);
 
-  // Focus search input on open
+  // Focus search input on open (only on desktop >= 640px to avoid jarring virtual keyboard jump on mobile)
   useEffect(() => {
-    if (isOpen && isSearchActive && searchInputRef.current) {
+    if (isOpen && isSearchActive && searchInputRef.current && window.innerWidth >= 640) {
       setTimeout(() => {
         searchInputRef.current?.focus();
       }, 50);
@@ -194,83 +194,107 @@ const SelectComponent: React.FC<SelectProps> = ({
         />
       </button>
 
-      {/* Modern Floating Menu */}
+      {/* Modern Floating Menu (Fixed Bottom-Sheet on Mobile <sm, Floating Popover on Desktop >=sm) */}
       {isOpen && !disabled && (
-        <div
-          className={`absolute z-50 left-0 right-0 min-w-full w-full rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl shadow-slate-900/20 dark:shadow-black/70 border border-slate-200/90 dark:border-slate-800 overflow-hidden text-xs sm:text-sm animate-in fade-in zoom-in-95 duration-150 ${
-            openUpward
-              ? 'bottom-full mb-1.5 origin-bottom'
-              : 'top-full mt-1.5 origin-top'
-          }`}
-        >
-          {/* Search Bar (when options > 7 or searchable=true) */}
-          {isSearchActive && (
-            <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 relative">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder="Buscar opción..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-7 pr-7 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              />
-              {searchTerm && (
-                <button
-                  type="button"
-                  onClick={() => setSearchTerm('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 rounded cursor-pointer"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              )}
+        <>
+          {/* Mobile backdrop to prevent accidental outside taps and highlight sheet */}
+          <div
+            className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-[1px] sm:hidden animate-in fade-in duration-150"
+            onClick={() => setIsOpen(false)}
+          />
+          <div
+            className={`fixed inset-x-3 bottom-4 z-50 sm:Generate sm:absolute sm:inset-x-0 sm:bottom-auto min-w-full sm:w-full rounded-2xl bg-white dark:bg-slate-900 shadow-2xl shadow-slate-900/30 dark:shadow-black/80 border border-slate-200/90 dark:border-slate-800 overflow-hidden text-xs sm:text-sm animate-in fade-in zoom-in-95 duration-150 ${
+              openUpward
+                ? 'sm:bottom-full sm:mb-1.5 origin-bottom'
+                : 'sm:top-full sm:mt-1.5 origin-top'
+            }`}
+          >
+            {/* Mobile Sheet Header */}
+            <div className="flex sm:hidden items-center justify-between px-3.5 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60">
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">
+                {placeholder}
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                aria-label="Cerrar selector"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-          )}
 
-          {/* Options List */}
-          <div className="max-h-60 overflow-y-auto p-1.5 scrollbar-thin space-y-0.5">
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option) => {
-                const isSelected = String(option.value) === String(value);
-                return (
+            {/* Search Bar (when options > 7 or searchable=true) */}
+            {isSearchActive && (
+              <div className="p-2.5 sm:p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 relative">
+                <Search className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Buscar por nombre..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-8 sm:pl-7 pr-8 py-2 sm:py-1.5 rounded-xl sm:rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs sm:text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                {searchTerm && (
                   <button
-                    key={option.value}
                     type="button"
-                    onClick={() => handleSelect(option.value)}
-                    className={`group relative flex w-full select-none items-center justify-between py-2.5 px-3 cursor-pointer transition-all rounded-xl text-left ${
-                      isSelected
-                        ? 'bg-indigo-600 text-white font-bold shadow-xs'
-                        : 'text-slate-700 dark:text-slate-200 hover:bg-indigo-50/70 dark:hover:bg-slate-800/90 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium'
-                    }`}
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded cursor-pointer"
                   >
-                    <div className="flex items-center gap-2 truncate">
-                      {option.icon && (
-                        <span
-                          className={`shrink-0 ${
-                            isSelected ? 'text-white' : 'text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
-                          }`}
-                        >
-                          {option.icon}
-                        </span>
-                      )}
-                      <span className="block truncate">{option.label}</span>
-                    </div>
-
-                    {isSelected && (
-                      <span className="flex items-center shrink-0 ml-2 text-white">
-                        <Check size={15} strokeWidth={2.5} />
-                      </span>
-                    )}
+                    <X className="w-3.5 h-3.5" />
                   </button>
-                );
-              })
-            ) : (
-              <div className="py-4 px-4 text-center text-slate-400 text-xs font-medium">
-                No se encontraron opciones
+                )}
               </div>
             )}
+
+            {/* Options List */}
+            <div className="max-h-[55dvh] sm:max-h-60 overflow-y-auto p-1.5 scrollbar-thin space-y-0.5">
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((option) => {
+                  const isSelected = String(option.value) === String(value);
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => handleSelect(option.value)}
+                      className={`group relative flex w-full select-none items-center justify-between min-h-[42px] py-2.5 px-3 cursor-pointer transition-all rounded-xl text-left ${
+                        isSelected
+                          ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                          : 'text-slate-700 dark:text-slate-200 hover:bg-indigo-50/70 dark:hover:bg-slate-800/90 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium'
+                      }`}
+                    >
+                      <div className="flex items-start sm:items-center gap-2 min-w-0 flex-1 pr-2">
+                        {option.icon && (
+                          <span
+                            className={`shrink-0 mt-0.5 sm:mt-0 ${
+                              isSelected ? 'text-white' : 'text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+                            }`}
+                          >
+                            {option.icon}
+                          </span>
+                        )}
+                        <span className="block whitespace-normal sm:truncate leading-snug">
+                          {option.label}
+                        </span>
+                      </div>
+
+                      {isSelected && (
+                        <span className="flex items-center shrink-0 ml-1 text-white">
+                          <Check size={16} strokeWidth={2.5} />
+                        </span>
+                      )}
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="py-5 px-4 text-center text-slate-400 text-xs font-medium">
+                  No se encontraron opciones
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

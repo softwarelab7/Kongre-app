@@ -96,8 +96,15 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
   // Available Service Years
   const availableYears = useMemo(() => getAvailableServiceYears(), []);
 
-  // Dashboard Chart Mode
-  const [chartView, setChartView] = useState<'trends' | 'channels' | 'weekly' | 'table'>('trends');
+  // Dashboard Chart Mode ('last4weeks' default to highlight the 4-week LineChart comparison)
+  const [chartView, setChartView] = useState<
+    'last4weeks' | 'trends' | 'channels' | 'weekly' | 'table'
+  >('last4weeks');
+
+  // Line series mode for the 4-week comparison LineChart
+  const [fourWeeksLineMode, setFourWeeksLineMode] = useState<
+    'meetings' | 'channels' | 'all'
+  >('meetings');
 
   // Meeting Filter for Charts
   const [meetingFilter, setMeetingFilter] = useState<'both' | 'midweek' | 'weekend'>('both');
@@ -314,6 +321,188 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
       };
     });
   }, [weeks, selectedServiceYear]);
+
+  // Compute Last 4 Weeks Comparative Dataset for Recharts LineChart
+  const lastFourWeeksComparison = useMemo(() => {
+    const sorted = [...weeks].sort((a, b) =>
+      (a.weekStartDate || a.id).localeCompare(b.weekStartDate || b.id)
+    );
+
+    // Prefer weeks that have recorded attendance; otherwise take the 4 most recent weeks up to today/latest
+    const weeksWithAttendance = sorted.filter(
+      (w) =>
+        (w.attendance?.midweek?.total || 0) > 0 ||
+        (w.attendance?.weekend?.total || 0) > 0
+    );
+
+    let selectedFour: WeekSchedule[] = [];
+    const isUsingSamplePreview = weeksWithAttendance.length === 0;
+
+    if (weeksWithAttendance.length >= 4) {
+      selectedFour = weeksWithAttendance.slice(-4);
+    } else if (weeksWithAttendance.length > 0) {
+      const lastRecordedIdx = sorted.findIndex(
+        (w) => w.id === weeksWithAttendance[weeksWithAttendance.length - 1].id
+      );
+      const startIdx = Math.max(0, lastRecordedIdx - 3);
+      selectedFour = sorted.slice(startIdx, startIdx + 4);
+      if (selectedFour.length < 4) {
+        selectedFour = sorted.slice(-4);
+      }
+    } else {
+      selectedFour = sorted.slice(0, 4);
+    }
+
+    // Fallback baseline values when no attendance has been entered yet so the LineChart is immediately informative
+    const sampleFallback = [
+      { mwP: 54, mwZ: 16, weP: 66, weZ: 16 },
+      { mwP: 57, mwZ: 15, weP: 69, weZ: 17 },
+      { mwP: 55, mwZ: 17, weP: 68, weZ: 16 },
+      { mwP: 61, mwZ: 15, weP: 74, weZ: 17 },
+    ];
+
+    const SHORT_MONTHS = [
+      'Ene',
+      'Feb',
+      'Mar',
+      'Abr',
+      'May',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dic',
+    ];
+
+    const items = selectedFour.map((w, idx) => {
+      const rawMwP = w.attendance?.midweek?.inPerson || 0;
+      const rawMwZ = w.attendance?.midweek?.zoom || 0;
+      const rawMwTotal = w.attendance?.midweek?.total || rawMwP + rawMwZ;
+
+      const rawWeP = w.attendance?.weekend?.inPerson || 0;
+      const rawWeZ = w.attendance?.weekend?.zoom || 0;
+      const rawWeTotal = w.attendance?.weekend?.total || rawWeP + rawWeZ;
+
+      const fb = sampleFallback[idx % sampleFallback.length];
+
+      const midweekInPerson = isUsingSamplePreview ? fb.mwP : rawMwP;
+      const midweekZoom = isUsingSamplePreview ? fb.mwZ : rawMwZ;
+      const midweek = isUsingSamplePreview ? fb.mwP + fb.mwZ : rawMwTotal;
+
+      const weekendInPerson = isUsingSamplePreview ? fb.weP : rawWeP;
+      const weekendZoom = isUsingSamplePreview ? fb.weZ : rawWeZ;
+      const weekend = isUsingSamplePreview ? fb.weP + fb.weZ : rawWeTotal;
+
+      const inPersonTotal = midweekInPerson + weekendInPerson;
+      const zoomTotal = midweekZoom + weekendZoom;
+      const combinedTotal = midweek + weekend;
+      const activeMeetingsCount = (midweek > 0 ? 1 : 0) + (weekend > 0 ? 1 : 0);
+      const avgOverall =
+        activeMeetingsCount > 0 ? Math.round(combinedTotal / activeMeetingsCount) : 0;
+
+      let shortDate = w.weekStartDate || `Sem ${idx + 1}`;
+      if (w.weekStartDate) {
+        const parts = w.weekStartDate.split('-');
+        if (parts.length === 3) {
+          const mIdx = Math.max(0, Math.min(11, parseInt(parts[1], 10) - 1));
+          shortDate = `${parts[2]} ${SHORT_MONTHS[mIdx]}`;
+        }
+      }
+
+      return {
+        weekId: w.id,
+        weekNumberLabel: `Semana ${idx + 1}`,
+        shortDate,
+        axisLabel: `Sem ${idx + 1} (${shortDate})`,
+        fullDateRange: w.weekEndDate
+          ? `${w.weekStartDate} al ${w.weekEndDate}`
+          : w.weekStartDate,
+        midweek,
+        midweekInPerson,
+        midweekZoom,
+        weekend,
+        weekendInPerson,
+        weekendZoom,
+        avgOverall,
+        inPersonTotal,
+        zoomTotal,
+        combinedTotal,
+        deltaFromPrev: 0,
+      };
+    });
+
+    // Compute week-over-week delta
+    for (let i = 1; i < items.length; i++) {
+      items[i].deltaFromPrev = items[i].avgOverall - items[i - 1].avgOverall;
+    }
+
+    const validMidweeks = items.filter((i) => i.midweek > 0);
+    const validWeekends = items.filter((i) => i.weekend > 0);
+    const validOveralls = items.filter((i) => i.avgOverall > 0);
+
+    const avg4Midweek =
+      validMidweeks.length > 0
+        ? Math.round(validMidweeks.reduce((acc, i) => acc + i.midweek, 0) / validMidweeks.length)
+        : 0;
+    const avg4Weekend =
+      validWeekends.length > 0
+        ? Math.round(validWeekends.reduce((acc, i) => acc + i.weekend, 0) / validWeekends.length)
+        : 0;
+    const avg4Overall =
+      validOveralls.length > 0
+        ? Math.round(validOveralls.reduce((acc, i) => acc + i.avgOverall, 0) / validOveralls.length)
+        : 0;
+
+    const firstWeek = items[0];
+    const lastWeek = items[items.length - 1];
+    const netChange =
+      firstWeek && lastWeek ? lastWeek.avgOverall - firstWeek.avgOverall : 0;
+    const netChangePct =
+      firstWeek && firstWeek.avgOverall > 0
+        ? Number(((netChange / firstWeek.avgOverall) * 100).toFixed(1))
+        : 0;
+
+    const peakItem = items.reduce(
+      (best, cur) =>
+        Math.max(cur.midweek, cur.weekend) > Math.max(best?.midweek || 0, best?.weekend || 0)
+          ? cur
+          : best,
+      items[0]
+    );
+
+    return {
+      items,
+      isUsingSamplePreview,
+      avg4Midweek,
+      avg4Weekend,
+      avg4Overall,
+      netChange,
+      netChangePct,
+      peakValue: peakItem ? Math.max(peakItem.midweek, peakItem.weekend) : 0,
+      peakWeekLabel: peakItem ? `${peakItem.weekNumberLabel} (${peakItem.shortDate})` : '—',
+    };
+  }, [weeks]);
+
+  const handleApplyFourWeekSampleToState = () => {
+    if (!onUpdateAttendance) return;
+    lastFourWeeksComparison.items.forEach((item) => {
+      onUpdateAttendance(item.weekId, {
+        weekId: item.weekId,
+        midweek: {
+          inPerson: item.midweekInPerson,
+          zoom: item.midweekZoom,
+          total: item.midweek,
+        },
+        weekend: {
+          inPerson: item.weekendInPerson,
+          zoom: item.weekendZoom,
+          total: item.weekend,
+        },
+      });
+    });
+  };
 
   // Color palette for charts adapting to light / dark
   const chartColors = useMemo(() => {
@@ -653,6 +842,19 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
         <div className="flex flex-wrap items-center gap-1.5">
           <button
             type="button"
+            onClick={() => setChartView('last4weeks')}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              chartView === 'last4weeks'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <TrendingUp className="w-3.5 h-3.5" />
+            <span>Comparativa Últimas 4 Semanas (Líneas)</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setChartView('trends')}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               chartView === 'trends'
@@ -660,7 +862,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                 : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
-            <TrendingUp className="w-3.5 h-3.5" />
+            <BarChart3 className="w-3.5 h-3.5" />
             <span>Tendencia Mensual (Área)</span>
           </button>
 
@@ -706,6 +908,44 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
 
         {/* Chart View Secondary Filters */}
         <div className="flex items-center gap-2 self-end sm:self-center">
+          {chartView === 'last4weeks' && (
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs">
+              <button
+                type="button"
+                onClick={() => setFourWeeksLineMode('meetings')}
+                className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
+                  fourWeeksLineMode === 'meetings'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Por Reunión
+              </button>
+              <button
+                type="button"
+                onClick={() => setFourWeeksLineMode('channels')}
+                className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
+                  fourWeeksLineMode === 'channels'
+                    ? 'bg-emerald-600 text-white shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Presencial vs Zoom
+              </button>
+              <button
+                type="button"
+                onClick={() => setFourWeeksLineMode('all')}
+                className={`px-2.5 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
+                  fourWeeksLineMode === 'all'
+                    ? 'bg-indigo-600 text-white shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Todas las Series
+              </button>
+            </div>
+          )}
+
           {chartView === 'trends' && (
             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs">
               <button
@@ -744,7 +984,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
             </div>
           )}
 
-          {chartView === 'trends' && (
+          {(chartView === 'trends' || chartView === 'last4weeks') && (
             <button
               type="button"
               onClick={() => setShowAverageLine(!showAverageLine)}
@@ -753,7 +993,7 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
                   ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-transparent'
               }`}
-              title="Alternar línea de promedio anual"
+              title="Alternar línea de promedio"
             >
               Línea Meta
             </button>
@@ -775,6 +1015,316 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
 
       {/* Main Chart Canvas Area */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800/90 p-4 sm:p-6 shadow-xs">
+        {/* VIEW 0: COMPARATIVA DE LAS ÚLTIMAS 4 SEMANAS (RECHARTS LINECHART) */}
+        {chartView === 'last4weeks' && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg">
+                    Tendencia Histórica: Comparativa de las Últimas 4 Semanas
+                  </h3>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    Recharts LineChart
+                  </span>
+                  {lastFourWeeksComparison.isUsingSamplePreview && (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                      Vista Previa de Muestra
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Evolución comparativa semana a semana entre la Reunión de Entre Semana ({settings.midweekMeetingDay}), Fin de Semana ({settings.weekendMeetingDay}) y el promedio general.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 text-xs">
+                {(fourWeeksLineMode === 'meetings' || fourWeeksLineMode === 'all') && (
+                  <>
+                    <span className="flex items-center gap-1.5 font-semibold text-indigo-600 dark:text-indigo-400">
+                      <span className="w-3 h-3 rounded-full bg-indigo-500" />
+                      Entre Semana ({settings.midweekMeetingDay})
+                    </span>
+                    <span className="flex items-center gap-1.5 font-semibold text-sky-600 dark:text-sky-400">
+                      <span className="w-3 h-3 rounded-full bg-sky-500" />
+                      Fin de Semana ({settings.weekendMeetingDay})
+                    </span>
+                    <span className="flex items-center gap-1.5 font-semibold text-emerald-600 dark:text-emerald-400">
+                      <span className="w-3 h-1 bg-emerald-500 rounded-full" />
+                      Promedio Semanal
+                    </span>
+                  </>
+                )}
+                {(fourWeeksLineMode === 'channels' || fourWeeksLineMode === 'all') && (
+                  <>
+                    <span className="flex items-center gap-1.5 font-semibold text-teal-600 dark:text-teal-400">
+                      <span className="w-3 h-3 rounded-full bg-teal-500" />
+                      Total Presencial
+                    </span>
+                    <span className="flex items-center gap-1.5 font-semibold text-purple-600 dark:text-purple-400">
+                      <span className="w-3 h-3 rounded-full bg-purple-500" />
+                      Total Zoom
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* 4-Week Summary KPI Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="p-3.5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/25 border border-indigo-100 dark:border-indigo-900/40">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
+                  Prom. 4 Semanas (Entre Semana)
+                </span>
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">
+                  {lastFourWeeksComparison.avg4Midweek}
+                </div>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Reunión Vida y Ministerio ({settings.midweekMeetingDay})
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-sky-50/50 dark:bg-sky-950/25 border border-sky-100 dark:border-sky-900/40">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400 block">
+                  Prom. 4 Semanas (Fin de Semana)
+                </span>
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">
+                  {lastFourWeeksComparison.avg4Weekend}
+                </div>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Discurso Público y Atalaya ({settings.weekendMeetingDay})
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/25 border border-emerald-100 dark:border-emerald-900/40">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">
+                  Variación (Sem 1 vs Sem 4)
+                </span>
+                <div className="flex items-center gap-1.5 text-2xl font-black mt-0.5">
+                  {lastFourWeeksComparison.netChange >= 0 ? (
+                    <>
+                      <ArrowUpRight className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-emerald-600 dark:text-emerald-400">
+                        +{lastFourWeeksComparison.netChange} ({lastFourWeeksComparison.netChangePct}%)
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <ArrowDownRight className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+                      <span className="text-rose-600 dark:text-rose-400">
+                        {lastFourWeeksComparison.netChange} ({lastFourWeeksComparison.netChangePct}%)
+                      </span>
+                    </>
+                  )}
+                </div>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                  Promedio 4 semanas: <strong>{lastFourWeeksComparison.avg4Overall}</strong>
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-amber-50/50 dark:bg-amber-950/25 border border-amber-100 dark:border-amber-900/40">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 block">
+                  Mayor Asistencia (4 Semanas)
+                </span>
+                <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">
+                  {lastFourWeeksComparison.peakValue}
+                </div>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate block">
+                  {lastFourWeeksComparison.peakWeekLabel}
+                </span>
+              </div>
+            </div>
+
+            {/* Recharts LineChart Comparing the Last 4 Weeks */}
+            <div className="h-[340px] sm:h-[390px] w-full pt-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={lastFourWeeksComparison.items}
+                  margin={{ top: 20, right: 24, left: 0, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} vertical={false} />
+                  <XAxis
+                    dataKey="axisLabel"
+                    stroke={chartColors.text}
+                    fontSize={12}
+                    fontWeight={600}
+                    tickLine={false}
+                    axisLine={{ stroke: chartColors.grid }}
+                  />
+                  <YAxis
+                    stroke={chartColors.text}
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={{ stroke: chartColors.grid }}
+                    domain={[0, (dataMax: number) => Math.max(90, Math.ceil(dataMax * 1.15))]}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+
+                  {showAverageLine && lastFourWeeksComparison.avg4Overall > 0 && (
+                    <ReferenceLine
+                      y={lastFourWeeksComparison.avg4Overall}
+                      stroke="#10b981"
+                      strokeDasharray="4 4"
+                      label={{
+                        value: `Meta Promedio 4 Sem: ${lastFourWeeksComparison.avg4Overall}`,
+                        position: 'insideTopRight',
+                        fill: '#10b981',
+                        fontSize: 11,
+                        fontWeight: 'bold',
+                      }}
+                    />
+                  )}
+
+                  {(fourWeeksLineMode === 'meetings' || fourWeeksLineMode === 'all') && (
+                    <>
+                      <Line
+                        type="monotone"
+                        dataKey="midweek"
+                        name={`Entre Semana (${settings.midweekMeetingDay})`}
+                        stroke={chartColors.midweek}
+                        strokeWidth={3.5}
+                        dot={{ r: 5, strokeWidth: 2, fill: chartColors.midweek }}
+                        activeDot={{ r: 7 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="weekend"
+                        name={`Fin de Semana (${settings.weekendMeetingDay})`}
+                        stroke={chartColors.weekend}
+                        strokeWidth={3.5}
+                        dot={{ r: 5, strokeWidth: 2, fill: chartColors.weekend }}
+                        activeDot={{ r: 7 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="avgOverall"
+                        name="Promedio Semanal"
+                        stroke={chartColors.overall}
+                        strokeWidth={2.5}
+                        strokeDasharray="5 5"
+                        dot={{ r: 4, strokeWidth: 2, fill: chartColors.overall }}
+                        activeDot={{ r: 6 }}
+                      />
+                    </>
+                  )}
+
+                  {(fourWeeksLineMode === 'channels' || fourWeeksLineMode === 'all') && (
+                    <>
+                      <Line
+                        type="monotone"
+                        dataKey="inPersonTotal"
+                        name="Total Presencial (Salón)"
+                        stroke={chartColors.inPerson}
+                        strokeWidth={3}
+                        dot={{ r: 5, strokeWidth: 2, fill: chartColors.inPerson }}
+                        activeDot={{ r: 7 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="zoomTotal"
+                        name="Total Zoom (Conexiones)"
+                        stroke={chartColors.zoom}
+                        strokeWidth={3}
+                        dot={{ r: 5, strokeWidth: 2, fill: chartColors.zoom }}
+                        activeDot={{ r: 7 }}
+                      />
+                    </>
+                  )}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* 4-Week Comparative Cards Breakdown */}
+            <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                  Desglose Comparativo de las Últimas 4 Semanas
+                </h4>
+                {lastFourWeeksComparison.isUsingSamplePreview && onUpdateAttendance && (
+                  <button
+                    type="button"
+                    onClick={handleApplyFourWeekSampleToState}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-xs cursor-pointer self-start sm:self-auto"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Guardar estos datos de 4 semanas en el registro</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {lastFourWeeksComparison.items.map((wItem, idx) => (
+                  <div
+                    key={wItem.weekId || idx}
+                    className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5"
+                  >
+                    <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-700/60 pb-2">
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
+                          {wItem.weekNumberLabel}
+                        </span>
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">
+                          Semana del {wItem.shortDate}
+                        </span>
+                      </div>
+                      {idx > 0 && (
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            wItem.deltaFromPrev >= 0
+                              ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300'
+                              : 'bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300'
+                          }`}
+                        >
+                          {wItem.deltaFromPrev >= 0
+                            ? `+${wItem.deltaFromPrev}`
+                            : wItem.deltaFromPrev}{' '}
+                          vs sem. ant.
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">
+                          Entre Semana:
+                        </span>
+                        <span className="font-bold text-indigo-600 dark:text-indigo-400">
+                          {wItem.midweek}{' '}
+                          <span className="text-[10px] font-normal text-slate-400">
+                            ({wItem.midweekInPerson}P / {wItem.midweekZoom}Z)
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">
+                          Fin de Semana:
+                        </span>
+                        <span className="font-bold text-sky-600 dark:text-sky-400">
+                          {wItem.weekend}{' '}
+                          <span className="text-[10px] font-normal text-slate-400">
+                            ({wItem.weekendInPerson}P / {wItem.weekendZoom}Z)
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className="pt-1.5 border-t border-slate-200/50 dark:border-slate-700/50 flex items-center justify-between">
+                        <span className="font-semibold text-slate-700 dark:text-slate-300">
+                          Promedio Semanal:
+                        </span>
+                        <span className="font-black text-emerald-600 dark:text-emerald-400 text-sm">
+                          {wItem.avgOverall}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* VIEW 1: TRENDS (AREA + COMPOSED) */}
         {chartView === 'trends' && (
           <div className="space-y-4">

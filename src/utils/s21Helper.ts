@@ -289,7 +289,11 @@ export function computeSecretaryMetrics(
       });
     }
 
-    if (pub.privilege === 'precursor_regular' || pub.pioneerStatus === 'regular') {
+    if (
+      pub.privilege === 'precursor_regular' ||
+      pub.pioneerStatus === 'regular' ||
+      pub.pioneer_type === 'regular'
+    ) {
       regularPioneersCount++;
     }
 

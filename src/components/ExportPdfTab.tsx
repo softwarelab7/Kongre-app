@@ -31,7 +31,9 @@ import {
   Maximize2,
   X,
   Sparkles,
+  ShieldCheck,
 } from 'lucide-react';
+import { LocalOfficialFormsCenter } from './LocalOfficialFormsCenter';
 
 export const ExportPdfTab: React.FC = () => {
   const { weeks, publishersMap, settings, updateSettings, currentWeek } = useCongregation();
@@ -54,7 +56,13 @@ export const ExportPdfTab: React.FC = () => {
   const [showWeekend, setShowWeekend] = useState(settings.pdfSections.weekend);
   const [showDuties, setShowDuties] = useState(settings.pdfSections.duties);
   const [showCleaning, setShowCleaning] = useState(settings.pdfSections.cleaning);
-  const [activeTab, setActiveTab] = useState<'programa' | 's89' | 'whatsapp'>('programa');
+  const [activeTab, setActiveTab] = useState<'programa' | 's89' | 'whatsapp' | 'formatos_oficiales'>(() => {
+    if (typeof window !== 'undefined') {
+      const h = window.location.hash.toLowerCase();
+      if (h.includes('formatos')) return 'formatos_oficiales';
+    }
+    return 'programa';
+  });
   const [notifiedKeys, setNotifiedKeys] = useState<Record<string, boolean>>({});
   const [copiedSummary, setCopiedSummary] = useState(false);
   const [pdfCongregationName, setPdfCongregationName] = useState(settings.congregationName || '');
@@ -284,18 +292,18 @@ export const ExportPdfTab: React.FC = () => {
       <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
         <div>
           <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-            Exportación Oficial • Vista Previa e Impresión
+            Exportación y Plantillas Oficiales • 100% Local
           </span>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-0.5">
-            Exportar Programa y Hojas S-89
+            Exportar Programa, Hojas S-89 y Formatos Oficiales (Local)
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Previsualiza el documento en orientación vertical u horizontal antes de descargarlo o compartirlo.
+            Previsualiza el programa o carga tus archivos oficiales (S-21, S-89, S-140, S-88, S-13) para rellenarlos 100% en local sin servidores privados.
           </p>
         </div>
 
-        {/* Tab switch between Monthly Program, S-89 Slips, and WhatsApp Center */}
-        <div className="grid grid-cols-3 sm:flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl text-xs font-semibold w-full sm:w-auto">
+        {/* Tab switch between Monthly Program, S-89 Slips, Local Official Forms, and WhatsApp Center */}
+        <div className="grid grid-cols-2 sm:flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl text-xs font-semibold w-full sm:w-auto">
           <button
             type="button"
             onClick={() => setActiveTab('programa')}
@@ -324,6 +332,19 @@ export const ExportPdfTab: React.FC = () => {
 
           <button
             type="button"
+            onClick={() => setActiveTab('formatos_oficiales')}
+            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+              activeTab === 'formatos_oficiales'
+                ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4 shrink-0" />
+            <span className="truncate">Formatos Oficiales (Local)</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveTab('whatsapp')}
             className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 'whatsapp'
@@ -336,6 +357,11 @@ export const ExportPdfTab: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* TAB 4: FORMATOS OFICIALES 100% EN LOCAL */}
+      {activeTab === 'formatos_oficiales' && (
+        <LocalOfficialFormsCenter />
+      )}
 
       {/* TAB 1: PROGRAMA MENSUAL */}
       {activeTab === 'programa' && (

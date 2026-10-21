@@ -25,19 +25,69 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.9.0';
-export const CURRENT_BUILD_CODE = '2026.10.20.2900';
-export const BUILD_DATE = '20 de Octubre, 2026';
+export const CURRENT_APP_VERSION = '2.9.2';
+export const CURRENT_BUILD_CODE = '2026.10.21.2902';
+export const BUILD_DATE = '21 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '2.9.2',
+    buildCode: '2026.10.21.2902',
+    date: '21 de Octubre, 2026',
+    title: 'Suscripción a Notificaciones Web Push en Segundo Plano (Con App Cerrada)',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Nuevo Service Worker dedicado (/push-sw.js) con soporte para Web Push API (PushManager + VAPID), Periodic Background Sync, Notification Triggers del sistema operativo y almacenamiento autónomo en IndexedDB para enviar recordatorios incluso cuando la aplicación o pestaña está cerrada.',
+      },
+      {
+        category: 'feature',
+        text: 'Nuevo Centro de Suscripción Push (PushSubscriptionModal) en el Portal del Publicador y en Mi Perfil: permite suscribir o pausar el navegador actual, personalizar días de anticipación (24h, 48h, 72h, 7 días), elegir la hora exacta de aviso, activar recordatorio adicional el mismo día (3h antes) y visualizar la cola de disparos programados.',
+      },
+      {
+        category: 'feature',
+        text: 'Simulador interactivo "Probar con App Cerrada (5s)" con cuenta regresiva para que el publicador minimice el navegador o bloquee su pantalla y verifique la recepción en segundo plano con botones de acción ("Ver mis asignaciones" y "Enterado").',
+      },
+      {
+        category: 'improvement',
+        text: 'Cobertura integral de recordatorios automáticos: ahora abarca partes de Entre Semana (titular, ayudante, sala auxiliar, presidente y oraciones), Fin de Semana (presidente, discurso público, conductor y lector de La Atalaya), deberes/aseo del Salón y turnos de predicación pública con carritos.',
+      },
+    ],
+  },
+  {
+    version: '2.9.1',
+    buildCode: '2026.10.21.2901',
+    date: '21 de Octubre, 2026',
+    title: 'Bóveda y Rellenador 100% Local de Formatos Oficiales (S-21, S-89, S-140, S-88) y Conexión Integral de Publicadores',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Nuevo Centro de Formatos Oficiales 100% en Local (LocalOfficialFormsCenter): en cumplimiento con la directriz de la sucursal, ningún formato oficial se guarda ni sincroniza en servidores privados ni en la nube; se cargan desde el dispositivo del hermano y se rellenan exclusivamente en memoria local.',
+      },
+      {
+        category: 'feature',
+        text: 'Rellenado automático local (pdf-lib) de tarjetas S-21 (por publicador individual, por grupo de servicio o toda la congregación en lote), hojas de asignación S-89 (1x1 y 4x1), programa S-140, asistencia S-88 y territorios S-13 con vista previa integrada.',
+      },
+      {
+        category: 'feature',
+        text: 'Inspector y Editor Universal de Campos AcroForm en tiempo real para revisar o personalizar cualquier campo de texto o casilla de verificación de cualquier formulario PDF oficial cargado.',
+      },
+      {
+        category: 'improvement',
+        text: 'Sincronización bidireccional integral de la ficha del publicador (PublisherEditor) con el resto de la app: tarjetas S-21 (s21_records ↔ monthlyReports), responsabilidades en Grupos de Servicio (Capitán/Auxiliar ↔ preachingGroups), estados de precursorado en S-1/S-21, ausencias y contactos de emergencia.',
+      },
+    ],
+  },
   {
     version: '2.9.0',
     buildCode: '2026.10.20.2900',
     date: '20 de Octubre, 2026',
     title: 'Gestor Dedicado de Roles Teocráticos a Pantalla Completa y Nuevo Sistema de Íconos',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

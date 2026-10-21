@@ -578,8 +578,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         },
         {
           id: 'exportar_pdf',
-          label: 'Exportar a PDF',
-          description: 'Generación de programas imprimibles en A4/Carta',
+          label: 'Formatos Oficiales (Local) y PDF',
+          description: 'Carga y rellenado 100% local de S-21, S-89, S-140, S-88 y exportación',
           icon: NAV_ICONS.exportar_pdf,
         },
         {

@@ -25,7 +25,32 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.9.0] - 20 de Octubre, 2026 (Compilación Activa)
+### [v2.9.2] - 21 de Octubre, 2026 (Compilación Activa)
+**Título:** Suscripción a Notificaciones Web Push en Segundo Plano (Con App Cerrada)
+- **Service Worker de Notificaciones en Segundo Plano (`public/push-sw.js`):**
+  - Integración completa de `PushManager.subscribe` (estándar Web Push VAPID), `PeriodicSyncManager` (`kongre-assignment-reminders`), `SyncManager` y `TimestampTrigger` junto con una base de datos `IndexedDB` autónoma (`kongre_push_sw_db_v1`) dentro del Service Worker para disparar recordatorios aunque la pestaña o la aplicación estén cerradas.
+  - Botones interactivos en cada notificación nativa (**"📅 Ver mis asignaciones"** y **"✅ Enterado"**) que abren o enfocan automáticamente el Portal del Publicador al tocarlos.
+- **Gestor de Suscripción Push para Publicadores (`PushSubscriptionModal.tsx`):**
+  - Disponible desde el **Portal del Publicador** y **Mi Perfil**, mostrando el estado en vivo del permiso del navegador, el motor del Service Worker y la cola de próximos recordatorios agendados con su fecha y hora de disparo.
+  - Configuración personalizada de anticipación (`24h`, `48h`, `72h` o `7 días`), hora preferida del día (`07:00` a `20:00`), segundo recordatorio el mismo día de la reunión (`3h antes`), inclusión de turnos de audio/micrófonos/acomodador/aseo y turnos de carritos.
+  - **Modo de Prueba con App Cerrada (5 segundos):** Permite disparar un evento push real con retardo de 5 segundos para minimizar el navegador o bloquear el teléfono y comprobar la alerta en segundo plano.
+
+---
+
+### [v2.9.1] - 21 de Octubre, 2026
+**Título:** Bóveda y Rellenador 100% Local de Formatos Oficiales (S-21, S-89, S-140, S-88) y Conexión Integral de Publicadores
+- **Centro de Formatos Oficiales 100% en Local (`LocalOfficialFormsCenter` / `localOfficialFormsService.ts`):**
+  - En estricto apego a la directriz de la sucursal de no almacenar formatos oficiales en servidores privados ni en la nube, se incorporó un módulo dedicado (disponible en *Formatos Oficiales (Local) y PDF*, *Tarjetas S-21* y *Hojas S-89*) donde el usuario carga los archivos PDF oficiales desde su propio dispositivo.
+  - Los archivos se procesan exclusivamente en el navegador (con opción de guardado local en `IndexedDB` del dispositivo o modo exclusivo en memoria RAM temporal de la sesión, más botón de purga inmediata).
+  - **Rellenado Automático con `pdf-lib`:** Completa en local **S-21** (individual, por Grupo de Servicio o toda la Congregación en lote multipágina), **S-89** (detectando automáticamente si es plantilla 1x1 o 4x1), **S-140**, **S-88**, **S-13** y **S-26/S-30**.
+  - **Inspector AcroForm Interactivo y Vista Previa en Vivo:** Permite buscar y editar manualmente cualquier campo o casilla detectada en el PDF oficial con previsualización inmediata antes de descargar.
+- **Conexión y Sincronización Integral del Editor de Publicadores (`PublisherEditor` / `PublishersTab`):**
+  - Sincronización bidireccional entre el historial **S-21** del editor (`s21_records`) y los informes mensuales globales (`monthlyReports`).
+  - Sincronización automática de **Capitán / Auxiliar de Grupo** (`group_responsibility`) con `preachingGroups`, estados **Activo / Inactivo**, **Precursorado** (`pioneer_type` ↔ `pioneerStatus` en S-1 y S-21 incluso para ancianos y siervos ministeriales), **Ausencias**, **Contactos de Emergencia** y fecha de **Último Pastoreo**.
+
+---
+
+### [v2.9.0] - 20 de Octubre, 2026
 **Título:** Gestor Dedicado de Roles Teocráticos a Pantalla Completa y Nuevo Sistema de Íconos
 - **Gestor de Roles y PINs a Pantalla Completa (`RolesManagerTab` / `#roles`):**
   - Transformación integral de `RoleSwitcherModal` a una vista dedicada de página completa (`activeTab === 'roles'`), eliminando las restricciones de espacio y barras de desplazamiento anidadas.

@@ -56,6 +56,9 @@ export const PublishersTab: React.FC = () => {
     updatePublisher,
     deletePublisher,
     preachingGroups,
+    updatePreachingGroup,
+    monthlyReports,
+    updateMonthlyReport,
     settings,
     importPublishersBatch,
     cleanDuplicatePublishers,
@@ -470,24 +473,47 @@ export const PublishersTab: React.FC = () => {
   };
 
   const handleSave = async (data: Partial<Publisher>) => {
-    const fullName = data.full_name || [data.first_name, data.last_name].filter(Boolean).join(' ') || data.name || '';
+    const fullName =
+      data.full_name ||
+      [data.first_name, data.middle_name, data.last_name, data.second_last_name]
+        .filter(Boolean)
+        .join(' ') ||
+      data.name ||
+      '';
     const existingById = publishers.find(
       (p) => (data.id && p.id === data.id) || (data.nid && p.nid && p.nid === data.nid)
     );
     const immutableCode = ensureImmutablePublisherCode(existingById || data);
     const resolvedId = existingById?.id || data.id || immutableCode;
     const resolvedNid = existingById?.nid || existingById?.id || data.nid || resolvedId;
-    const groupNum = data.id_grupo ? parseInt(data.id_grupo, 10) : data.groupNumber || 1;
+
+    const isUnassignedGroup = data.id_grupo === null || data.groupNumber === 0;
+    const groupNum = isUnassignedGroup
+      ? 0
+      : data.id_grupo
+      ? parseInt(String(data.id_grupo), 10)
+      : data.groupNumber || 1;
     const isFemale = data.gender === 'female' || data.gender === 'hermana';
 
     const currentAssignments = data.assignments || {};
+    const hasStudentAssignment = Boolean(
+      currentAssignments.student ||
+        currentAssignments.conversations ||
+        currentAssignments.return_visits ||
+        currentAssignments.disciples ||
+        currentAssignments.beliefs ||
+        currentAssignments.talk_student
+    );
+
     const rolesSynced = {
+      ...(data.roles || {}),
       vym_presidente: !!currentAssignments.chairman,
+      vym_consejero_aux: !!currentAssignments.aux_counselor,
       vym_oracion: !!currentAssignments.prayers,
       vym_tesoros_discurso: !!currentAssignments.talk,
       vym_tesoros_perlas: !!currentAssignments.gems,
       vym_tesoros_lectura: !!currentAssignments.reading,
-      vym_maestros_titular: !!currentAssignments.student,
+      vym_maestros_titular: hasStudentAssignment,
       vym_maestros_ayudante: !!currentAssignments.assistant_student,
       vym_vida_partes: !!currentAssignments.living_parts,
       vym_estudio_conductor: !!currentAssignments.bible_study,
@@ -496,14 +522,46 @@ export const PublishersTab: React.FC = () => {
       fds_atalaya_lector: !!currentAssignments.watchtower_reader,
       fds_oracion: !!currentAssignments.final_prayer,
       deber_acomodador: !!currentAssignments.attendants_midweek || !!currentAssignments.attendants_weekend,
-      deber_seguridad: false,
+      deber_seguridad: !!(data.roles as any)?.deber_seguridad,
       deber_audio: !!currentAssignments.audio_video_midweek || !!currentAssignments.audio_video_weekend,
       deber_video: !!currentAssignments.audio_video_midweek || !!currentAssignments.audio_video_weekend,
       deber_microfonos: !!currentAssignments.microphones_midweek || !!currentAssignments.microphones_weekend,
       deber_plataforma: !!currentAssignments.platform_task_midweek || !!currentAssignments.platform_task_weekend,
-      deber_zoom: false,
-      ...(data.roles || {}),
+      deber_zoom: !!(data.roles as any)?.deber_zoom,
     };
+
+    const isPubActive =
+      data.status === 'deleted'
+        ? false
+        : data.is_active !== undefined
+        ? Boolean(data.is_active)
+        : data.status !== 'inactive' && data.active !== false;
+    const resolvedStatus =
+      data.status === 'deleted' ? 'deleted' : isPubActive ? 'active' : 'inactive';
+
+    const resolvedPioneerType = data.pioneer_type || 'none';
+    const resolvedPioneerStatus =
+      resolvedPioneerType === 'regular'
+        ? 'regular'
+        : resolvedPioneerType === 'auxiliary' || resolvedPioneerType === 'auxiliary_continuous'
+        ? 'auxiliar_continuo'
+        : 'ninguno';
+
+    const rawAbsences = data.ausencias || data.absences || [];
+    const normalizedAbsences = rawAbsences.map((a: any) => ({
+      ...a,
+      id: a.id || `abs-${Date.now()}`,
+      start_date: a.start_date || a.startDate || '',
+      end_date: a.end_date || a.endDate || '',
+      startDate: a.startDate || a.start_date || '',
+      endDate: a.endDate || a.end_date || '',
+      reason: a.reason || '',
+    }));
+
+    const emergencyList = data.emergency_contacts || [];
+    const primaryEmName = emergencyList[0]?.name || data.emergencyContactName || '';
+    const primaryEmPhone = emergencyList[0]?.phone || data.emergencyContactPhone || '';
+    const lastVisit = (data as any).last_shepherding_visit || data.last_visit_date || '';
 
     const targetPayload: Publisher = {
       ...(data as any),
@@ -532,21 +590,28 @@ export const PublishersTab: React.FC = () => {
           ? 'siervo_ministerial'
           : data.role === 'unbaptized'
           ? 'publicador_no_bautizado'
+          : resolvedPioneerType === 'regular'
+          ? 'precursor_regular'
+          : resolvedPioneerType === 'auxiliary' || resolvedPioneerType === 'auxiliary_continuous'
+          ? 'precursor_auxiliar'
           : (data.privilege as any) || 'publicador_bautizado',
       groupNumber: groupNum,
-      id_grupo: data.id_grupo || String(groupNum),
-      active: data.status !== 'inactive' && data.status !== 'deleted' && data.is_active !== false,
-      status: data.status || 'active',
-      is_active: data.status !== 'inactive' && data.status !== 'deleted' && data.is_active !== false,
-      notes: data.notes || '',
-      spiritual_notes: data.spiritual_notes || '',
-      absences: data.absences || [],
-      ausencias: data.ausencias || [],
+      id_grupo: isUnassignedGroup ? null : String(groupNum),
+      active: isPubActive,
+      status: resolvedStatus,
+      is_active: isPubActive,
+      notes: data.notes || data.spiritual_notes || '',
+      spiritual_notes: data.spiritual_notes || data.notes || '',
+      absences: normalizedAbsences,
+      ausencias: normalizedAbsences,
       assignments: currentAssignments,
       assignment_metadata: data.assignment_metadata || {},
       s21_records: data.s21_records || {},
-      emergency_contacts: data.emergency_contacts || [],
+      emergency_contacts: emergencyList,
+      emergencyContactName: primaryEmName,
+      emergencyContactPhone: primaryEmPhone,
       roles: rolesSynced,
+      is_cart_approved: Boolean(currentAssignments.public_witnessing || data.is_cart_approved),
       is_elderly: !!data.is_elderly,
       is_infirm: !!data.is_infirm,
       is_deaf: !!data.is_deaf,
@@ -555,12 +620,17 @@ export const PublishersTab: React.FC = () => {
       is_head_of_household: !!data.is_head_of_household,
       is_child: !!data.is_child,
       is_moved: !!data.is_moved,
-      pioneer_type: data.pioneer_type || 'none',
+      pioneer_type: resolvedPioneerType,
+      pioneerStatus: resolvedPioneerStatus,
+      is_anointed: Boolean(data.is_anointed || data.hope === 'ungido'),
+      hope: data.is_anointed || data.hope === 'ungido' ? 'ungido' : 'otras_ovejas',
       has_key: !!data.has_key,
       reports_to_branch: !!data.reports_to_branch,
       is_disfellowshipped: !!data.is_disfellowshipped,
       is_reinstated: !!data.is_reinstated,
-      group_responsibility: data.group_responsibility || 'none',
+      group_responsibility: data.group_responsibility || 'miembro',
+      last_visit_date: lastVisit,
+      last_shepherding_visit: lastVisit,
       printed_guide: !!data.printed_guide,
     };
 
@@ -570,15 +640,88 @@ export const PublishersTab: React.FC = () => {
         updatePublisher(targetPayload);
         showToast('¡Cambios guardados con éxito!', 'success');
       } else {
-        const nameMatch = publishers.find((p) => areNamesEquivalent(p.name || (p as any).full_name, targetPayload.name));
+        const nameMatch = publishers.find((p) =>
+          areNamesEquivalent(p.name || (p as any).full_name, targetPayload.name)
+        );
         if (nameMatch) {
           updatePublisher(mergePublisherData(nameMatch, targetPayload));
-          showToast(`¡Se actualizaron los datos existentes de ${targetPayload.name || 'publicador'}!`, 'success');
+          showToast(
+            `¡Se actualizaron los datos existentes de ${targetPayload.name || 'publicador'}!`,
+            'success'
+          );
         } else {
           addPublisher(targetPayload);
           showToast('¡Nuevo publicador creado con éxito!', 'success');
         }
       }
+
+      // 1. Sincronizar responsabilidad de grupo (Capitán / Auxiliar) con preachingGroups
+      if (groupNum > 0 && preachingGroups.length > 0 && updatePreachingGroup) {
+        const targetGroup = preachingGroups.find((g) => g.number === groupNum);
+        if (targetGroup) {
+          if (
+            targetPayload.group_responsibility === 'overseer' &&
+            targetGroup.overseerId !== targetPayload.id
+          ) {
+            updatePreachingGroup({ ...targetGroup, overseerId: targetPayload.id });
+          } else if (
+            targetPayload.group_responsibility === 'assistant' &&
+            targetGroup.assistantId !== targetPayload.id
+          ) {
+            updatePreachingGroup({ ...targetGroup, assistantId: targetPayload.id });
+          }
+        }
+      }
+
+      // 2. Sincronizar s21_records editados en el editor con monthlyReports de la congregación
+      if (targetPayload.s21_records && updateMonthlyReport) {
+        for (const [yrKey, monthsArr] of Object.entries(targetPayload.s21_records)) {
+          if (!Array.isArray(monthsArr) || monthsArr.length !== 12) continue;
+          const parsedEndYear = parseInt(yrKey.split('-').pop() || yrKey, 10);
+          if (isNaN(parsedEndYear)) continue;
+          const startYear = parsedEndYear - 1;
+          const monthIsoKeys = [
+            `${startYear}-09`,
+            `${startYear}-10`,
+            `${startYear}-11`,
+            `${startYear}-12`,
+            `${parsedEndYear}-01`,
+            `${parsedEndYear}-02`,
+            `${parsedEndYear}-03`,
+            `${parsedEndYear}-04`,
+            `${parsedEndYear}-05`,
+            `${parsedEndYear}-06`,
+            `${parsedEndYear}-07`,
+            `${parsedEndYear}-08`,
+          ];
+
+          monthsArr.forEach((mRec: any, idx: number) => {
+            if (!mRec) return;
+            const mKey = monthIsoKeys[idx];
+            const existingRep = monthlyReports.find(
+              (r) => r.publisherId === targetPayload.id && r.month === mKey
+            );
+            const hasActivity = Boolean(
+              mRec.participated || mRec.hours > 0 || mRec.bible_studies > 0 || mRec.comments
+            );
+            if (hasActivity || existingRep) {
+              updateMonthlyReport({
+                id: existingRep?.id || `rep-${targetPayload.id}-${mKey}`,
+                publisherId: targetPayload.id,
+                month: mKey,
+                participated: Boolean(mRec.participated || mRec.hours > 0),
+                hours: Number(mRec.hours || 0),
+                bibleStudies: Number(mRec.bible_studies || 0),
+                isAuxiliaryPioneer: Boolean(mRec.auxiliary_pioneer),
+                isPioneer: resolvedPioneerStatus === 'regular',
+                notes: mRec.comments || '',
+                reportedAt: existingRep?.reportedAt || new Date().toISOString().slice(0, 10),
+              });
+            }
+          });
+        }
+      }
+
       setViewMode('list');
       setEditingPublisher(null);
     } catch (err: any) {

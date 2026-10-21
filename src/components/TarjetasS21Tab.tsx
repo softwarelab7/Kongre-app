@@ -34,6 +34,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { SplashCheckbox } from './SplashCheckbox';
+import { LocalOfficialFormsCenter } from './LocalOfficialFormsCenter';
 
 export const TarjetasS21Tab: React.FC = () => {
   const {
@@ -52,8 +53,8 @@ export const TarjetasS21Tab: React.FC = () => {
     return '2025-2026';
   });
 
-  // Active view: 'fichero' (tarjetero general), 'tarjeta' (detalle S-21), 'pastoral' (irregulares/inactivos)
-  const [activeView, setActiveView] = useState<'fichero' | 'tarjeta' | 'pastoral'>('fichero');
+  // Active view: 'fichero' (tarjetero general), 'tarjeta' (detalle S-21), 'pastoral' (irregulares/inactivos), 'formato_local' (rellenador PDF oficial en local)
+  const [activeView, setActiveView] = useState<'fichero' | 'tarjeta' | 'pastoral' | 'formato_local'>('fichero');
 
   // Selected publisher for single S-21 card view
   const [selectedPublisherId, setSelectedPublisherId] = useState<string>(() => {
@@ -187,12 +188,18 @@ export const TarjetasS21Tab: React.FC = () => {
   const handleOpenEditPersonal = () => {
     if (!currentPublisher) return;
     setPersonalForm({
-      birthDate: currentPublisher.birthDate || '',
-      baptismDate: currentPublisher.baptismDate || '',
-      hope: currentPublisher.hope || 'otras_ovejas',
+      birthDate: currentPublisher.birthDate || currentPublisher.birth_date || '',
+      baptismDate: currentPublisher.baptismDate || currentPublisher.baptism_date || '',
+      hope: currentPublisher.hope || (currentPublisher.is_anointed ? 'ungido' : 'otras_ovejas'),
       address: currentPublisher.address || '',
-      emergencyContactName: currentPublisher.emergencyContactName || '',
-      emergencyContactPhone: currentPublisher.emergencyContactPhone || '',
+      emergencyContactName:
+        currentPublisher.emergencyContactName ||
+        currentPublisher.emergency_contacts?.[0]?.name ||
+        '',
+      emergencyContactPhone:
+        currentPublisher.emergencyContactPhone ||
+        currentPublisher.emergency_contacts?.[0]?.phone ||
+        '',
       phone: currentPublisher.phone || '',
     });
     setIsEditPersonalModalOpen(true);
@@ -200,14 +207,34 @@ export const TarjetasS21Tab: React.FC = () => {
 
   const handleSavePersonal = () => {
     if (!currentPublisher) return;
+    const existingEm = currentPublisher.emergency_contacts || [];
+    const syncedEmergencyContacts =
+      personalForm.emergencyContactName || personalForm.emergencyContactPhone
+        ? [
+            {
+              id: existingEm[0]?.id || 'em-1',
+              name: personalForm.emergencyContactName || existingEm[0]?.name || 'Contacto Principal',
+              relationship: existingEm[0]?.relationship || 'Familiar',
+              phone: personalForm.emergencyContactPhone || existingEm[0]?.phone || '',
+              alt_phone: existingEm[0]?.alt_phone || '',
+              email: existingEm[0]?.email || '',
+            },
+            ...existingEm.slice(1),
+          ]
+        : existingEm;
+
     updatePublisher({
       ...currentPublisher,
       birthDate: personalForm.birthDate,
+      birth_date: personalForm.birthDate,
       baptismDate: personalForm.baptismDate,
+      baptism_date: personalForm.baptismDate,
       hope: personalForm.hope,
+      is_anointed: personalForm.hope === 'ungido',
       address: personalForm.address,
       emergencyContactName: personalForm.emergencyContactName,
       emergencyContactPhone: personalForm.emergencyContactPhone,
+      emergency_contacts: syncedEmergencyContacts,
       phone: personalForm.phone,
     });
     setIsEditPersonalModalOpen(false);
@@ -271,8 +298,16 @@ export const TarjetasS21Tab: React.FC = () => {
           </div>
 
           <button
+            onClick={() => setActiveView('formato_local')}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+          >
+            <ShieldCheck className="w-4 h-4" />
+            <span>Rellenar S-21 Oficial (Local)</span>
+          </button>
+
+          <button
             onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-xs transition"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
           >
             <Printer className="w-4 h-4" />
             <span>Imprimir Tarjetas S-21</span>
@@ -358,7 +393,7 @@ export const TarjetasS21Tab: React.FC = () => {
 
           <button
             onClick={() => setActiveView('pastoral')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
               activeView === 'pastoral'
                 ? 'bg-amber-600 text-white shadow-xs'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -366,6 +401,18 @@ export const TarjetasS21Tab: React.FC = () => {
           >
             <AlertTriangle className="w-3.5 h-3.5" />
             <span>Pastoreo: Irregulares e Inactivos ({metrics.irregularCount + metrics.inactiveCount})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveView('formato_local')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+              activeView === 'formato_local'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+            }`}
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Cargar y Rellenar PDF Oficial (Local)</span>
           </button>
         </div>
 
@@ -1182,6 +1229,16 @@ export const TarjetasS21Tab: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* VIEW 4: RELLENADOR LOCAL DE FORMATO OFICIAL S-21 */}
+      {activeView === 'formato_local' && (
+        <LocalOfficialFormsCenter
+          initialFormCode="S-21"
+          initialPublisherId={selectedPublisherId}
+          initialServiceYear={selectedServiceYear}
+          compactHeader={true}
+        />
       )}
     </div>
   );

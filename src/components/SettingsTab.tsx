@@ -50,6 +50,12 @@ import {
   Users,
   MapPin,
   Bell,
+  BellRing,
+  BellOff,
+  Send,
+  Volume2,
+  VolumeX,
+  Smartphone,
   CreditCard,
   BookOpen,
   RefreshCw,
@@ -61,10 +67,25 @@ import { SplashCheckbox } from './SplashCheckbox';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 import { Select } from './Select';
 import { IosTimePicker } from './IosTimePicker';
+import { PushSubscriptionModal } from './PushSubscriptionModal';
+import {
+  isNotificationSupported,
+  getNotificationPermission,
+  requestNotificationPermission,
+  getNotificationPreferences,
+  saveNotificationPreferences,
+  getPushSubscriptionRecord,
+  subscribeToPushNotifications,
+  syncAssignmentsWithServiceWorker,
+  sendTestNotification,
+  NotificationPreferences,
+  PushSubscriptionRecord,
+} from '../services/notificationService';
 import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
 
 export type SettingsCategoryTab =
   | 'all'
+  | 'notificaciones'
   | 'general'
   | 'reglas'
   | 'invitaciones'
@@ -105,6 +126,18 @@ export const SETTINGS_TABS_CONFIG: Record<
     bgLight: 'bg-indigo-50 dark:bg-indigo-950/40',
     bgHover: 'hover:bg-indigo-50/[0.3] dark:hover:bg-indigo-500/[0.04]',
     pillBg: 'bg-indigo-600 text-white',
+  },
+  notificaciones: {
+    label: 'Preferencias de Notificación',
+    icon: BellRing,
+    desc: 'Configura cuántos días antes deseas recibir recordatorios automáticos de tus asignaciones (1, 3 o 7 días antes)',
+    badge: 'Recordatorios',
+    color: 'text-violet-600 dark:text-violet-400',
+    borderColor: 'border-violet-200/60 dark:border-violet-800/40',
+    hoverBorder: 'hover:border-violet-500/50',
+    bgLight: 'bg-violet-50 dark:bg-violet-950/40',
+    bgHover: 'hover:bg-violet-50/[0.3] dark:hover:bg-violet-500/[0.04]',
+    pillBg: 'bg-violet-600 text-white',
   },
   general: {
     label: 'Horarios y Salón',
@@ -206,6 +239,9 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
     resetAllCongregationData,
     deleteAllRegisteredCongregations,
     publishers,
+    publishersMap,
+    cartShifts,
+    cartLocations,
     weeks,
     territories,
     notices,
@@ -225,6 +261,142 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
   const { user, signOutUser } = useAuth();
 
   const [activeTab, setActiveTab] = useState<SettingsCategoryTab>('all');
+
+  // Preferencias de Notificación de Asignaciones
+  const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences>(() =>
+    getNotificationPreferences()
+  );
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>(() =>
+    getNotificationPermission()
+  );
+  const [pushSubRecord, setPushSubRecord] = useState<PushSubscriptionRecord | null>(() =>
+    getPushSubscriptionRecord()
+  );
+  const [isPushModalOpen, setIsPushModalOpen] = useState(false);
+  const [isSubscribingPush, setIsSubscribingPush] = useState(false);
+  const [notifFeedbackMsg, setNotifFeedbackMsg] = useState<{
+    type: 'success' | 'info' | 'error';
+    text: string;
+  } | null>(null);
+
+  const [selectedNotifPubId, setSelectedNotifPubId] = useState<string>(() => {
+    if (typeof window === 'undefined') return '';
+    return localStorage.getItem('kongre_my_publisher_id') || '';
+  });
+
+  const activeNotifPublisher = React.useMemo(() => {
+    if (selectedNotifPubId) {
+      const found = publishers.find((p) => p.id === selectedNotifPubId);
+      if (found) return found;
+    }
+    return publishers[0] || null;
+  }, [publishers, selectedNotifPubId]);
+
+  const handleUpdateNotifPrefs = useCallback(
+    async (partial: Partial<NotificationPreferences>, feedbackText?: string) => {
+      const updated = saveNotificationPreferences(partial);
+      setNotifPrefs(updated);
+
+      const pubId = activeNotifPublisher?.id || selectedNotifPubId || 'pub-local';
+      const pubName =
+        activeNotifPublisher?.name ||
+        (typeof window !== 'undefined' ? localStorage.getItem('kongre_my_publisher_name') : '') ||
+        'Publicador';
+
+      try {
+        await syncAssignmentsWithServiceWorker({
+          publisherId: pubId,
+          publisherName: pubName,
+          congregationName: settings.congregationName,
+          weeks,
+          cartShifts,
+          cartLocations,
+          settings,
+          publishersMap,
+          preferences: updated,
+        });
+        setPushSubRecord(getPushSubscriptionRecord());
+      } catch {}
+
+      if (feedbackText) {
+        setNotifFeedbackMsg({ type: 'success', text: feedbackText });
+        setTimeout(() => setNotifFeedbackMsg(null), 3500);
+      }
+    },
+    [
+      activeNotifPublisher,
+      selectedNotifPubId,
+      settings,
+      weeks,
+      cartShifts,
+      cartLocations,
+      publishersMap,
+    ]
+  );
+
+  const handleEnablePushFromSettings = async () => {
+    setIsSubscribingPush(true);
+    setNotifFeedbackMsg(null);
+    const pubId = activeNotifPublisher?.id || selectedNotifPubId || 'pub-local';
+    const pubName =
+      activeNotifPublisher?.name ||
+      (typeof window !== 'undefined' ? localStorage.getItem('kongre_my_publisher_name') : '') ||
+      'Publicador';
+    try {
+      const res = await subscribeToPushNotifications({
+        publisherId: pubId,
+        publisherName: pubName,
+        congregationName: settings.congregationName,
+        weeks,
+        cartShifts,
+        cartLocations,
+        settings,
+        publishersMap,
+      });
+      setNotifPermission(res.permission);
+      setPushSubRecord(res.subscription);
+      setNotifPrefs(getNotificationPreferences());
+      if (res.success) {
+        setNotifFeedbackMsg({
+          type: 'success',
+          text: `¡Recordatorios automáticos activados (${notifPrefs.notifyDaysBefore === 1 ? '1 día antes' : `${notifPrefs.notifyDaysBefore} días antes`})!`,
+        });
+      } else {
+        setNotifFeedbackMsg({
+          type: 'error',
+          text: res.error || 'No se pudo activar el permiso de notificaciones en el navegador.',
+        });
+      }
+    } finally {
+      setIsSubscribingPush(false);
+    }
+  };
+
+  const handleTestNotifFromSettings = async () => {
+    const pubName =
+      activeNotifPublisher?.name ||
+      (typeof window !== 'undefined' ? localStorage.getItem('kongre_my_publisher_name') : '') ||
+      'Publicador';
+    if (notifPermission !== 'granted') {
+      const perm = await requestNotificationPermission();
+      setNotifPermission(perm);
+      if (perm !== 'granted') {
+        setNotifFeedbackMsg({
+          type: 'error',
+          text: 'Debes permitir las notificaciones en tu navegador para probar el recordatorio.',
+        });
+        return;
+      }
+    }
+    const ok = await sendTestNotification(pubName);
+    if (ok) {
+      setNotifFeedbackMsg({
+        type: 'info',
+        text: `Recordatorio de prueba enviado (${notifPrefs.notifyDaysBefore === 1 ? '1 día antes' : `${notifPrefs.notifyDaysBefore} días antes`} a las ${notifPrefs.preferredHour}).`,
+      });
+      setTimeout(() => setNotifFeedbackMsg(null), 3500);
+    }
+  };
 
   const [isSyncingCloud, setIsSyncingCloud] = useState(false);
   const [cloudActionStatus, setCloudActionStatus] = useState<{
@@ -949,7 +1121,287 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
       {/* 3. VISTA PRINCIPAL: PANEL DE TARJETAS (HUB) */}
       {activeTab === 'all' && (
         <div className="space-y-6 animate-in fade-in duration-300">
+          {/* SECCIÓN DESTACADA: PREFERENCIAS DE NOTIFICACIÓN DE ASIGNACIONES */}
+          <div className="bg-white dark:bg-[#0f1623] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-violet-200/80 dark:border-violet-500/30 shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-white/[0.06]">
+              <div className="flex items-start sm:items-center gap-3">
+                <div className="p-3 bg-violet-50 dark:bg-violet-500/15 rounded-2xl text-violet-600 dark:text-violet-400 shrink-0">
+                  <BellRing size={22} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white">
+                      Preferencias de Notificación
+                    </h3>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${
+                        notifPrefs.enabled
+                          ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60'
+                          : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'
+                      }`}
+                    >
+                      {notifPrefs.enabled
+                        ? `Activo • ${notifPrefs.notifyDaysBefore === 1 ? '1 día antes' : `${notifPrefs.notifyDaysBefore} días antes`}`
+                        : 'Pausado'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                    Configura cuántos días antes deseas recibir el recordatorio automático de tus asignaciones (ej. 1, 3 o 7 días antes), hora del aviso y alertas en segundo plano.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleUpdateNotifPrefs(
+                      { enabled: !notifPrefs.enabled },
+                      !notifPrefs.enabled
+                        ? 'Recordatorios automáticos activados.'
+                        : 'Recordatorios automáticos pausados.'
+                    )
+                  }
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border ${
+                    notifPrefs.enabled
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60 hover:bg-emerald-100'
+                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-200'
+                  }`}
+                >
+                  {notifPrefs.enabled ? <BellRing size={14} /> : <BellOff size={14} />}
+                  <span>{notifPrefs.enabled ? 'Recordatorios Activos' : 'Activar Recordatorios'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('notificaciones')}
+                  className="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                >
+                  <Sliders size={14} />
+                  <span>Opciones Avanzadas</span>
+                </button>
+              </div>
+            </div>
+
+            {notifFeedbackMsg && (
+              <div
+                className={`p-3 rounded-2xl text-xs font-semibold flex items-center justify-between gap-2 animate-in fade-in duration-200 ${
+                  notifFeedbackMsg.type === 'success'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                    : notifFeedbackMsg.type === 'error'
+                    ? 'bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+                    : 'bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 text-indigo-800 dark:text-indigo-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>{notifFeedbackMsg.text}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setNotifFeedbackMsg(null)}
+                  className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            {/* Selector principal de días de anticipación (1, 2, 3, 5 o 7 días antes) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+              <div className="lg:col-span-7 space-y-2">
+                <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                  ¿Cuántos días antes deseas recibir el recordatorio automático?
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  {[
+                    { days: 1, label: '1 día antes', sub: '24 horas' },
+                    { days: 2, label: '2 días antes', sub: '48 horas' },
+                    { days: 3, label: '3 días antes', sub: '72 horas' },
+                    { days: 5, label: '5 días antes', sub: 'Preparación' },
+                    { days: 7, label: '7 días antes', sub: '1 semana' },
+                  ].map((opt) => {
+                    const isSelected = notifPrefs.notifyDaysBefore === opt.days;
+                    return (
+                      <button
+                        key={opt.days}
+                        type="button"
+                        onClick={() =>
+                          handleUpdateNotifPrefs(
+                            { notifyDaysBefore: opt.days, enabled: true },
+                            `Recordatorio automático configurado para ${opt.label} (${opt.sub}) a las ${notifPrefs.preferredHour}.`
+                          )
+                        }
+                        className={`p-2.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                          isSelected
+                            ? 'bg-violet-600 text-white border-violet-600 shadow-sm ring-2 ring-violet-500/30'
+                            : 'bg-zinc-50 dark:bg-white/[0.03] text-zinc-700 dark:text-zinc-200 border-zinc-200/80 dark:border-white/[0.08] hover:border-violet-400'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-xs font-extrabold">{opt.label}</span>
+                          {isSelected && <Check size={13} className="text-white shrink-0" />}
+                        </div>
+                        <span
+                          className={`text-[10px] mt-0.5 ${
+                            isSelected ? 'text-violet-100' : 'text-zinc-400 dark:text-zinc-500'
+                          }`}
+                        >
+                          {opt.sub}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200/70 dark:border-white/[0.06]">
+                  <label className="block text-[11px] font-bold text-zinc-600 dark:text-zinc-300 mb-1 flex items-center gap-1.5">
+                    <Clock size={13} className="text-violet-600 dark:text-violet-400" />
+                    <span>Hora del Recordatorio</span>
+                  </label>
+                  <select
+                    value={notifPrefs.preferredHour || '09:00'}
+                    onChange={(e) =>
+                      handleUpdateNotifPrefs(
+                        { preferredHour: e.target.value },
+                        `Hora preferida actualizada a las ${e.target.value}.`
+                      )
+                    }
+                    className="w-full px-2.5 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-slate-800 text-zinc-900 dark:text-white text-xs font-bold focus:outline-hidden focus:ring-2 focus:ring-violet-500"
+                  >
+                    <option value="07:00">07:00 AM (Mañana temprano)</option>
+                    <option value="08:00">08:00 AM (Mañana)</option>
+                    <option value="09:00">09:00 AM (Recomendado)</option>
+                    <option value="12:00">12:00 PM (Mediodía)</option>
+                    <option value="18:00">06:00 PM (Tarde)</option>
+                    <option value="20:00">08:00 PM (Noche)</option>
+                  </select>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-200/70 dark:border-white/[0.06] flex flex-col justify-between">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-zinc-700 dark:text-zinc-200">
+                      Aviso el mismo día
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={notifPrefs.notifySameDay}
+                      onChange={(e) =>
+                        handleUpdateNotifPrefs(
+                          { notifySameDay: e.target.checked },
+                          e.target.checked
+                            ? 'Recordatorio adicional el mismo día (3h antes) activado.'
+                            : 'Recordatorio del mismo día desactivado.'
+                        )
+                      }
+                      className="w-4 h-4 accent-violet-600 rounded cursor-pointer"
+                    />
+                  </div>
+                  <span className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">
+                    Envía una alerta extra 3 horas antes de iniciar la reunión.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Barra inferior de estado y prueba rápida */}
+            <div className="pt-3 border-t border-zinc-100 dark:border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300 flex-wrap">
+                <span className="inline-flex items-center gap-1.5 font-semibold text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/50 px-2.5 py-1 rounded-xl border border-violet-200/60 dark:border-violet-800/40">
+                  <Calendar size={13} />
+                  <span>
+                    Anticipación actual:{' '}
+                    <strong>
+                      {notifPrefs.notifyDaysBefore === 1
+                        ? '1 día antes'
+                        : `${notifPrefs.notifyDaysBefore} días antes`}
+                    </strong>{' '}
+                    a las <strong>{notifPrefs.preferredHour}</strong>
+                  </span>
+                </span>
+                {pushSubRecord?.active && (
+                  <span className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                    <CheckCircle2 size={13} />
+                    <span>
+                      Push en segundo plano activo ({pushSubRecord.scheduledCount || 0} en cola)
+                    </span>
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleTestNotifFromSettings}
+                  className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.06] dark:hover:bg-white/[0.12] text-zinc-700 dark:text-zinc-200 font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Send size={13} className="text-violet-600 dark:text-violet-400" />
+                  <span>Probar Recordatorio</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsPushModalOpen(true)}
+                  className="px-3 py-1.5 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/50 dark:hover:bg-violet-900/50 text-violet-700 dark:text-violet-300 border border-violet-200/70 dark:border-violet-800/50 font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Smartphone size={13} />
+                  <span>Suscripción Push (App Cerrada)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {/* Tarjeta 0: Preferencias de Notificación */}
+            <div
+              onClick={() => setActiveTab('notificaciones')}
+              className="bg-white dark:bg-[#0f1623] hover:bg-violet-50/[0.3] dark:hover:bg-violet-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-violet-400/50 dark:hover:border-violet-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="p-3 bg-violet-50 dark:bg-violet-500/10 rounded-2xl text-violet-600 dark:text-violet-400 group-hover:scale-110 transition-transform">
+                    <BellRing size={22} />
+                  </div>
+                  <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-800/40">
+                    {notifPrefs.notifyDaysBefore === 1
+                      ? '1 día antes'
+                      : `${notifPrefs.notifyDaysBefore} días antes`}
+                  </span>
+                </div>
+                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                  Preferencias de Notificación
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
+                  Configura cuántos días antes deseas recibir el recordatorio automático de tus asignaciones (1, 3 o 7 días antes) y alertas Push.
+                </p>
+
+                <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Anticipación:</span>
+                    <span className="font-semibold text-violet-600 dark:text-violet-400">
+                      {notifPrefs.notifyDaysBefore === 1
+                        ? '1 día antes'
+                        : `${notifPrefs.notifyDaysBefore} días antes`}{' '}
+                      ({notifPrefs.preferredHour})
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400"> Categorías:</span>
+                    <span className="font-semibold">
+                      Partes{notifPrefs.notifyDuties ? ', Deberes' : ''}
+                      {notifPrefs.notifyCarts ? ', Carritos' : ''}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-violet-600 dark:text-violet-400 group-hover:translate-x-1 transition-transform">
+                <span>Configurar preferencias de notificación</span>
+                <ChevronRight size={16} />
+              </div>
+            </div>
+
             {/* Tarjeta 1: Información y Horarios */}
             <div
               onClick={() => setActiveTab('general')}
@@ -1317,6 +1769,377 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
               Ajustes • {SETTINGS_TABS_CONFIG[activeTab]?.label}
             </span>
           </div>
+
+          {/* CONTENEDOR 0: PREFERENCIAS DE NOTIFICACIÓN */}
+          {activeTab === 'notificaciones' && (
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
+              <div className="pb-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-violet-50 dark:bg-violet-950 flex items-center justify-center text-violet-600 dark:text-violet-400 font-bold shrink-0">
+                    <BellRing className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                      Preferencias de Notificación de Asignaciones
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Personaliza con cuántos días de anticipación deseas recibir los recordatorios automáticos en este dispositivo
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  {notifPermission !== 'granted' ? (
+                    <button
+                      type="button"
+                      onClick={handleEnablePushFromSettings}
+                      disabled={isSubscribingPush}
+                      className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer disabled:opacity-50"
+                    >
+                      <BellRing className="w-4 h-4" />
+                      <span>
+                        {isSubscribingPush ? 'Activando...' : 'Permitir Notificaciones del Navegador'}
+                      </span>
+                    </button>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>Permiso del Navegador Activo</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {notifFeedbackMsg && (
+                <div
+                  className={`p-3.5 rounded-2xl text-xs font-semibold flex items-center justify-between gap-2.5 animate-in fade-in duration-200 ${
+                    notifFeedbackMsg.type === 'success'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+                      : notifFeedbackMsg.type === 'error'
+                      ? 'bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+                      : 'bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-indigo-800 dark:text-indigo-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" />
+                    <span>{notifFeedbackMsg.text}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setNotifFeedbackMsg(null)}
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Interruptor General + Selección de Publicador */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-4">
+                  <div>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white block mb-0.5">
+                      Recordatorios Automáticos de Asignaciones
+                    </span>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Recibe avisos automáticos antes de tus discursos, partes estudiantiles, lecturas, oraciones, deberes o turnos de predicación.
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={notifPrefs.enabled}
+                      onChange={(e) =>
+                        handleUpdateNotifPrefs(
+                          { enabled: e.target.checked },
+                          e.target.checked
+                            ? 'Recordatorios automáticos activados.'
+                            : 'Recordatorios automáticos desactivados.'
+                        )
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600"></div>
+                  </label>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5 flex items-center gap-1.5">
+                    <User className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                    <span>Publicador asociado para los recordatorios:</span>
+                  </label>
+                  <select
+                    value={activeNotifPublisher?.id || ''}
+                    onChange={(e) => {
+                      const pubId = e.target.value;
+                      setSelectedNotifPubId(pubId);
+                      const pubObj = publishers.find((p) => p.id === pubId);
+                      if (typeof window !== 'undefined' && pubObj) {
+                        localStorage.setItem('kongre_my_publisher_id', pubObj.id);
+                        localStorage.setItem('kongre_my_publisher_name', pubObj.name);
+                      }
+                      handleUpdateNotifPrefs(
+                        {},
+                        pubObj
+                          ? `Recordatorios sincronizados para ${pubObj.name}.`
+                          : undefined
+                      );
+                    }}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold"
+                  >
+                    {publishers.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Días de anticipación (1, 2, 3, 5 o 7 días antes) */}
+              <div className="p-5 rounded-2xl bg-violet-50/40 dark:bg-violet-950/20 border border-violet-200/70 dark:border-violet-800/40 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                      <span>Días de Anticipación del Recordatorio Automático</span>
+                    </h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Elige cuántos días antes de la fecha de tu asignación quieres que el sistema envíe el recordatorio.
+                    </p>
+                  </div>
+                  <span className="px-3 py-1 rounded-xl bg-violet-600 text-white text-xs font-extrabold self-start sm:self-auto">
+                    Seleccionado:{' '}
+                    {notifPrefs.notifyDaysBefore === 1
+                      ? '1 día antes'
+                      : `${notifPrefs.notifyDaysBefore} días antes`}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {[
+                    {
+                      days: 1,
+                      title: '1 día antes',
+                      subtitle: '24 horas antes',
+                      desc: 'Ideal para repasar la noche o mañana previa a la reunión.',
+                    },
+                    {
+                      days: 2,
+                      title: '2 días antes',
+                      subtitle: '48 horas antes',
+                      desc: 'Aviso intermedio para coordinar con tu ayudante.',
+                    },
+                    {
+                      days: 3,
+                      title: '3 días antes',
+                      subtitle: '72 horas antes (Recomendado)',
+                      desc: 'Tiempo óptimo para preparar partes estudiantiles y discursos.',
+                    },
+                    {
+                      days: 5,
+                      title: '5 días antes',
+                      subtitle: 'Inicio de semana',
+                      desc: 'Para organizar tu semana teocrática con antelación.',
+                    },
+                    {
+                      days: 7,
+                      title: '7 días antes',
+                      subtitle: '1 semana antes',
+                      desc: 'Máxima anticipación para discursos públicos y conducciones.',
+                    },
+                  ].map((option) => {
+                    const isSelected = notifPrefs.notifyDaysBefore === option.days;
+                    return (
+                      <button
+                        key={option.days}
+                        type="button"
+                        onClick={() =>
+                          handleUpdateNotifPrefs(
+                            { notifyDaysBefore: option.days, enabled: true },
+                            `Preferencia guardada: recibirás el recordatorio ${option.title} a las ${notifPrefs.preferredHour}.`
+                          )
+                        }
+                        className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                          isSelected
+                            ? 'bg-violet-600 text-white border-violet-600 shadow-md ring-2 ring-violet-500/30'
+                            : 'bg-white dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 border-slate-200 dark:border-slate-700 hover:border-violet-400'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <span className="text-sm font-extrabold">{option.title}</span>
+                            {isSelected && <CheckCircle2 className="w-4 h-4 text-white shrink-0" />}
+                          </div>
+                          <span
+                            className={`text-[11px] font-bold block mb-1.5 ${
+                              isSelected ? 'text-violet-100' : 'text-violet-600 dark:text-violet-400'
+                            }`}
+                          >
+                            {option.subtitle}
+                          </span>
+                        </div>
+                        <p
+                          className={`text-[11px] leading-snug ${
+                            isSelected ? 'text-violet-100/90' : 'text-slate-500 dark:text-slate-400'
+                          }`}
+                        >
+                          {option.desc}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Hora preferida y recordatorio del mismo día */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
+                    <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1 flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+                      <span>Hora preferida para recibir el aviso anticipado:</span>
+                    </label>
+                    <select
+                      value={notifPrefs.preferredHour || '09:00'}
+                      onChange={(e) =>
+                        handleUpdateNotifPrefs(
+                          { preferredHour: e.target.value },
+                          `Hora del recordatorio actualizada a las ${e.target.value}.`
+                        )
+                      }
+                      className="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-bold mt-1"
+                    >
+                      <option value="07:00">07:00 AM (Mañana temprano)</option>
+                      <option value="08:00">08:00 AM (Mañana)</option>
+                      <option value="09:00">09:00 AM (Recomendado)</option>
+                      <option value="12:00">12:00 PM (Mediodía)</option>
+                      <option value="18:00">06:00 PM (Tarde)</option>
+                      <option value="20:00">08:00 PM (Noche)</option>
+                    </select>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
+                    <div>
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
+                        Recordatorio adicional el mismo día de la reunión
+                      </span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Envía una segunda notificación 3 horas antes de que comience tu reunión o turno.
+                      </span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={notifPrefs.notifySameDay}
+                      onChange={(e) =>
+                        handleUpdateNotifPrefs(
+                          { notifySameDay: e.target.checked },
+                          e.target.checked
+                            ? 'Recordatorio del mismo día activado.'
+                            : 'Recordatorio del mismo día desactivado.'
+                        )
+                      }
+                      className="w-5 h-5 accent-violet-600 rounded cursor-pointer shrink-0"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Categorías de asignaciones incluidas */}
+              <div className="space-y-3 text-xs">
+                <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  Tipos de Asignaciones a Notificar
+                </h4>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <SplashCheckbox
+                    checked={notifPrefs.notifyDuties}
+                    onChange={(e) =>
+                      handleUpdateNotifPrefs(
+                        { notifyDuties: e.target.checked },
+                        e.target.checked
+                          ? 'Notificaciones de Deberes y Aseo incluidas.'
+                          : 'Notificaciones de Deberes y Aseo desactivadas.'
+                      )
+                    }
+                    label="Incluir Deberes del Salón (Acomodadores, Micrófonos, Audio/Video) y Aseo"
+                    description="Recibe recordatorios cuando tu grupo tenga limpieza del Salón del Reino o tengas turno técnico."
+                  />
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <SplashCheckbox
+                    checked={notifPrefs.notifyCarts}
+                    onChange={(e) =>
+                      handleUpdateNotifPrefs(
+                        { notifyCarts: e.target.checked },
+                        e.target.checked
+                          ? 'Notificaciones de Predicación Pública (Carritos) incluidas.'
+                          : 'Notificaciones de Carritos desactivadas.'
+                      )
+                    }
+                    label="Incluir Turnos de Predicación Pública (Carritos / Exhibidores)"
+                    description="Te avisa con los días de anticipación configurados sobre tus turnos confirmados en puntos de predicación pública."
+                  />
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <SplashCheckbox
+                    checked={notifPrefs.soundEnabled}
+                    onChange={(e) =>
+                      handleUpdateNotifPrefs(
+                        { soundEnabled: e.target.checked },
+                        e.target.checked
+                          ? 'Sonido y vibración activados en las notificaciones.'
+                          : 'Modo silencioso activado para las notificaciones.'
+                      )
+                    }
+                    label="Reproducir sonido y vibración al mostrar el recordatorio"
+                    description="Permite que el sistema operativo emita alerta sonora cuando llegue la notificación push."
+                  />
+                </div>
+              </div>
+
+              {/* Pie de acciones */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={handleTestNotifFromSettings}
+                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <Send className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+                    <span>Enviar Recordatorio de Prueba</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsPushModalOpen(true)}
+                    className="px-4 py-2.5 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/60 dark:hover:bg-violet-900/60 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                    <span>Configurar Push en Segundo Plano (App Cerrada)</span>
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleUpdateNotifPrefs(
+                      {},
+                      `¡Preferencias guardadas! Recibirás recordatorios ${
+                        notifPrefs.notifyDaysBefore === 1
+                          ? '1 día antes'
+                          : `${notifPrefs.notifyDaysBefore} días antes`
+                      } a las ${notifPrefs.preferredHour}.`
+                    )
+                  }
+                  className="px-5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>Guardar Preferencias de Notificación</span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* CONTENEDOR 1: HORARIOS Y SALÓN */}
           {activeTab === 'general' && (
@@ -3057,6 +3880,34 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
       <JoinCongregationModal
         isOpen={isSettingsJoinModalOpen}
         onClose={() => setIsSettingsJoinModalOpen(false)}
+      />
+
+      {/* Push Subscription & Background Reminders Modal */}
+      <PushSubscriptionModal
+        isOpen={isPushModalOpen}
+        onClose={() => {
+          setIsPushModalOpen(false);
+          setNotifPrefs(getNotificationPreferences());
+          setNotifPermission(getNotificationPermission());
+          setPushSubRecord(getPushSubscriptionRecord());
+        }}
+        publisherId={activeNotifPublisher?.id || selectedNotifPubId || 'pub-local'}
+        publisherName={
+          activeNotifPublisher?.name ||
+          (typeof window !== 'undefined' ? localStorage.getItem('kongre_my_publisher_name') : '') ||
+          'Publicador'
+        }
+        congregationName={settings.congregationName}
+        weeks={weeks}
+        cartShifts={cartShifts}
+        cartLocations={cartLocations}
+        settings={settings}
+        publishersMap={publishersMap}
+        onSubscriptionChange={(sub) => {
+          setPushSubRecord(sub);
+          setNotifPrefs(getNotificationPreferences());
+          setNotifPermission(getNotificationPermission());
+        }}
       />
     </div>
   );

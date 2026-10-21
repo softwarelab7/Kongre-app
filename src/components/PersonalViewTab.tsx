@@ -56,7 +56,12 @@ import {
   requestNotificationPermission,
   sendTestNotification,
   checkUpcomingAssignmentsAndNotify,
+  subscribeToPushNotifications,
+  getPushSubscriptionRecord,
+  syncAssignmentsWithServiceWorker,
+  PushSubscriptionRecord,
 } from '../services/notificationService';
+import { PushSubscriptionModal } from './PushSubscriptionModal';
 
 export type PublisherPortalTab = 'asignaciones' | 'informe' | 'ausencias' | 'grupo' | 'avisos';
 export type NWPublisherTab = PublisherPortalTab;
@@ -131,10 +136,14 @@ export const PersonalViewTab: React.FC = () => {
     reason: '',
   });
 
-  // Notification permission and testing state
+  // Notification permission, Web Push subscription, and modal state
   const [notifPermission, setNotifPermission] = useState<NotificationPermission>(() =>
     getNotificationPermission()
   );
+  const [pushSubscription, setPushSubscription] = useState<PushSubscriptionRecord | null>(() =>
+    getPushSubscriptionRecord()
+  );
+  const [isPushModalOpen, setIsPushModalOpen] = useState(false);
   const [isActivatingNotif, setIsActivatingNotif] = useState(false);
   const [isSendingTestNotif, setIsSendingTestNotif] = useState(false);
   const [notifBannerDismissed, setNotifBannerDismissed] = useState(() => {
@@ -149,19 +158,29 @@ export const PersonalViewTab: React.FC = () => {
   const handleEnableNotifications = async () => {
     setIsActivatingNotif(true);
     try {
-      const perm = await requestNotificationPermission();
-      setNotifPermission(perm);
-      if (perm === 'granted') {
-        setNotifSuccessToast('¡Recordatorios activos! Te avisaremos antes de tus asignaciones.');
-        setTimeout(() => setNotifSuccessToast(null), 4000);
+      const pubId = selectedPublisherId || currentPublisherId || 'publicador';
+      const pubName =
+        publishersMap.get(pubId)?.name || currentBrotherName || 'Publicador';
+      const res = await subscribeToPushNotifications({
+        publisherId: pubId,
+        publisherName: pubName,
+        congregationName: settings.congregationName,
+        weeks,
+        cartShifts,
+        cartLocations,
+        settings,
+        publishersMap,
+      });
+      setNotifPermission(res.permission);
+      if (res.success && res.subscription) {
+        setPushSubscription(res.subscription);
+        setNotifSuccessToast(
+          '¡Suscripción Push activa! Recibirás recordatorios automáticos incluso con la aplicación cerrada.'
+        );
+        setTimeout(() => setNotifSuccessToast(null), 5000);
         await sendTestNotification();
-        if (selectedPublisher) {
-          await checkUpcomingAssignmentsAndNotify({
-            publisherName: selectedPublisher.name,
-            publisherId: selectedPublisher.id,
-            weeks,
-          });
-        }
+      } else if (res.permission === 'denied') {
+        setIsPushModalOpen(true);
       }
     } finally {
       setIsActivatingNotif(false);
@@ -206,6 +225,31 @@ export const PersonalViewTab: React.FC = () => {
   }, [currentPublisherId, publishersMap]);
 
   const selectedPublisher = publishersMap.get(selectedPublisherId);
+
+  // Sincronizar automáticamente la cola del Service Worker cuando cambian las semanas o el publicador
+  useEffect(() => {
+    if (!selectedPublisher || notifPermission !== 'granted') return;
+    syncAssignmentsWithServiceWorker({
+      publisherId: selectedPublisher.id,
+      publisherName: selectedPublisher.name,
+      congregationName: settings.congregationName,
+      weeks,
+      cartShifts,
+      cartLocations,
+      settings,
+      publishersMap,
+    }).then(() => {
+      setPushSubscription(getPushSubscriptionRecord());
+    });
+  }, [
+    selectedPublisher,
+    notifPermission,
+    weeks,
+    cartShifts,
+    cartLocations,
+    settings,
+    publishersMap,
+  ]);
 
   // Is user in supervisor / elder mode?
   const canSupervise = useMemo(() => {
@@ -983,16 +1027,30 @@ export const PersonalViewTab: React.FC = () => {
             </button>
           )}
 
-          {isNotificationSupported() && notifPermission === 'granted' && (
+          {isNotificationSupported() && (
             <button
               type="button"
-              onClick={handleSendTestNotification}
-              disabled={isSendingTestNotif}
-              className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border border-purple-200/60 dark:border-purple-800/40"
-              title="Probar notificación en este dispositivo"
+              onClick={() => setIsPushModalOpen(true)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border ${
+                notifPermission === 'granted' && pushSubscription?.active
+                  ? 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border-emerald-200/70 dark:border-emerald-800/50'
+                  : 'bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border-purple-200/60 dark:border-purple-800/40'
+              }`}
+              title="Configurar suscripción a notificaciones push en segundo plano"
             >
-              <BellRing size={14} className={isSendingTestNotif ? 'animate-bounce' : 'text-purple-600 dark:text-purple-400'} />
-              <span>{isSendingTestNotif ? 'Enviando...' : 'Avisos Activos'}</span>
+              <BellRing
+                size={14}
+                className={
+                  notifPermission === 'granted' && pushSubscription?.active
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-purple-600 dark:text-purple-400'
+                }
+              />
+              <span>
+                {notifPermission === 'granted' && pushSubscription?.active
+                  ? `Push Activo (${pushSubscription.scheduledCount || 0})`
+                  : 'Suscribir Push'}
+              </span>
             </button>
           )}
 
@@ -1025,52 +1083,63 @@ export const PersonalViewTab: React.FC = () => {
         </div>
       )}
 
-      {/* Banner de Solicitud de Notificaciones Web Push / Nativas */}
-      {isNotificationSupported() && notifPermission !== 'granted' && !notifBannerDismissed && (
-        <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-blue-500/10 border border-purple-200/80 dark:border-purple-800/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm animate-in fade-in">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-500/20">
-              <Bell className="animate-pulse" size={20} />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full">
-                  Recordatorios Teocráticos
-                </span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400">
-                  {notifPermission === 'denied' ? 'Permiso bloqueado en navegador' : 'Web Push & Notificaciones'}
-                </span>
+      {/* Banner de Suscripción a Notificaciones Web Push con App Cerrada */}
+      {isNotificationSupported() &&
+        (notifPermission !== 'granted' || !pushSubscription?.active) &&
+        !notifBannerDismissed && (
+          <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-blue-500/10 border border-purple-200/80 dark:border-purple-800/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm animate-in fade-in">
+            <div className="flex items-start sm:items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-500/20">
+                <Bell className="animate-pulse" size={20} />
               </div>
-              <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mt-0.5">
-                ¿Deseas recibir avisos oportunos antes de tus asignaciones?
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xl">
-                Kongre te recordará automáticamente 24h a 48h antes de tus partes en la reunión del fin de semana, entre semana o tus turnos de audio, micrófonos y aseo.
-              </p>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/60 px-2 py-0.5 rounded-full">
+                    Suscripción Push en Segundo Plano
+                  </span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                    {notifPermission === 'denied'
+                      ? 'Permiso bloqueado en navegador'
+                      : 'Funciona incluso con la app cerrada'}
+                  </span>
+                </div>
+                <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mt-0.5">
+                  Recibe recordatorios automáticos de tus asignaciones sin abrir la app
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xl">
+                  Suscríbete a las notificaciones push del navegador para que tu dispositivo te avise automáticamente antes de tus partes estudiantiles, discursos, turnos de audio/micrófonos, aseo o carritos aunque tengas Kongre cerrado.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 w-full md:w-auto self-end md:self-center flex-wrap">
+              <button
+                type="button"
+                onClick={handleEnableNotifications}
+                disabled={isActivatingNotif}
+                className="flex-1 md:flex-initial px-4 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-md shadow-purple-600/25 flex items-center justify-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50"
+              >
+                <Sparkles size={15} />
+                <span>{isActivatingNotif ? 'Suscribiendo...' : 'Suscribirme Ahora'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsPushModalOpen(true)}
+                className="px-3.5 py-2.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer"
+              >
+                Configurar
+              </button>
+              <button
+                type="button"
+                onClick={handleDismissBanner}
+                className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-700 dark:text-slate-400 transition-all cursor-pointer"
+                title="Cerrar por ahora"
+              >
+                <X size={16} />
+              </button>
             </div>
           </div>
-
-          <div className="flex items-center gap-2 w-full md:w-auto self-end md:self-center">
-            <button
-              type="button"
-              onClick={handleEnableNotifications}
-              disabled={isActivatingNotif}
-              className="flex-1 md:flex-initial px-4 py-2.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-md shadow-purple-600/25 flex items-center justify-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50"
-            >
-              <Sparkles size={15} />
-              <span>{isActivatingNotif ? 'Activando...' : 'Activar Recordatorios'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleDismissBanner}
-              className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-700 dark:text-slate-400 transition-all cursor-pointer"
-              title="Cerrar por ahora"
-            >
-              <X size={16} />
-            </button>
-          </div>
-        </div>
-      )}
+        )}
 
       {/* Selector supervisor desplegable para ancianos */}
       {canSupervise && showSupervisorSelect && (
@@ -1996,6 +2065,28 @@ export const PersonalViewTab: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* MODAL DE SUSCRIPCIÓN Y GESTIÓN DE NOTIFICACIONES PUSH EN SEGUNDO PLANO */}
+      <PushSubscriptionModal
+        isOpen={isPushModalOpen}
+        onClose={() => {
+          setIsPushModalOpen(false);
+          setNotifPermission(getNotificationPermission());
+          setPushSubscription(getPushSubscriptionRecord());
+        }}
+        publisherId={selectedPublisher?.id || currentPublisherId || 'publicador'}
+        publisherName={selectedPublisher?.name || currentBrotherName || 'Publicador'}
+        congregationName={settings.congregationName}
+        weeks={weeks}
+        cartShifts={cartShifts}
+        cartLocations={cartLocations}
+        settings={settings}
+        publishersMap={publishersMap}
+        onSubscriptionChange={(sub) => {
+          setPushSubscription(sub);
+          setNotifPermission(getNotificationPermission());
+        }}
+      />
     </div>
   );
 };

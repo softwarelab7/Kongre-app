@@ -786,6 +786,17 @@ export const ScheduleTab: React.FC = () => {
               <span>S-38</span>
             </button>
 
+            {/* Modo Atril y Cronómetro de Presidencia */}
+            <button
+              type="button"
+              onClick={() => setIsTimerModalOpen(true)}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-amber-800 dark:text-amber-300 bg-amber-50/70 hover:bg-amber-100/80 dark:bg-amber-950/40 dark:hover:bg-amber-900/50 border border-amber-200/80 dark:border-amber-800/60 font-semibold transition-all cursor-pointer"
+              title="Abrir Modo Atril y Cronómetro de Presidencia"
+            >
+              <Timer className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+              <span>Modo Atril</span>
+            </button>
+
             {/* Cruces */}
             <button
               type="button"
@@ -2073,6 +2084,7 @@ export const ScheduleTab: React.FC = () => {
       <MeetingTimerModal
         isOpen={isTimerModalOpen}
         onClose={() => setIsTimerModalOpen(false)}
+        initialMeetingType={viewMode === 'weekend' ? 'weekend' : 'midweek'}
       />
 
       {/* MODAL: BATCH WHATSAPP REMINDERS */}

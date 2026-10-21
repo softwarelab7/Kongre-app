@@ -338,7 +338,7 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { id: 'is_active', label: 'Activo', icon: <UserCheck size={16} />, color: COLORS.green },
-              { id: 'is_regular', label: 'Inactivo', icon: <UserMinus size={16} />, color: COLORS.zinc },
+              { id: 'is_inactive', label: 'Inactivo', icon: <UserMinus size={16} />, color: COLORS.zinc },
               { id: 'is_anointed', label: 'Ungido', icon: <Star size={16} />, color: COLORS.orange },
               { id: 'has_key', label: 'Llave del Salón', icon: <Key size={16} />, color: COLORS.blue },
               { id: 'reports_to_branch', label: 'Betel', icon: <Briefcase size={16} />, color: COLORS.blue },
@@ -346,14 +346,22 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
               { id: 'is_reinstated', label: 'Readmitido', icon: <UserPlus size={16} />, color: { bg: 'bg-teal-500', shadow: 'shadow-teal-500/30' } },
               { id: 'is_reproved', label: 'Censurado', icon: <ShieldAlert size={16} />, color: { bg: 'bg-orange-600', shadow: 'shadow-orange-600/30' } }
             ].map(item => {
-              const isActive = !!formData[item.id];
+              const isActive =
+                item.id === 'is_inactive'
+                  ? formData.is_active === false || formData.status === 'inactive'
+                  : !!formData[item.id];
               return (
                 <button
                   key={item.id}
+                  type="button"
                   onClick={() => {
-                    handleChange(item.id, !isActive);
+                    if (item.id === 'is_inactive') {
+                      handleChange('is_active', isActive ? true : false);
+                    } else {
+                      handleChange(item.id, !isActive);
+                    }
                   }}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all border ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all border cursor-pointer ${
                     isActive ? `${item.color.bg} text-white border-transparent shadow-lg scale-105` : 'bg-[#fcfcfd] dark:bg-zinc-800/40 border-zinc-100 dark:border-white/[0.06] text-zinc-400'
                   }`}
                 >
@@ -376,7 +384,14 @@ export const PrivilegesSection: React.FC<PrivilegesSectionProps> = ({
             <div className="space-y-2">
               <label className="text-[12px] font-bold text-zinc-500 dark:text-zinc-400 mb-1 px-1">Fecha de Registro</label>
               <div className="flex-1">
-                <PremiumDatePicker value={formData.last_shepherding_visit} onChange={v => handleChange('last_shepherding_visit', v)} allowFutureYears={false} />
+                <PremiumDatePicker
+                  value={formData.last_shepherding_visit || formData.last_visit_date || ''}
+                  onChange={v => {
+                    handleChange('last_shepherding_visit', v);
+                    handleChange('last_visit_date', v);
+                  }}
+                  allowFutureYears={false}
+                />
               </div>
             </div>
             <p className="text-[10px] text-zinc-400 leading-relaxed font-medium px-1">

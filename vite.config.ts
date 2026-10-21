@@ -23,6 +23,7 @@ export default defineConfig(() => {
           'favicon-16.png',
           'favicon-32.png',
           'favicon-48.png',
+          'push-sw.js',
         ],
         manifest: {
           id: '/',
@@ -43,6 +44,7 @@ export default defineConfig(() => {
           ],
         },
         workbox: {
+          importScripts: ['/push-sw.js'],
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
           runtimeCaching: [

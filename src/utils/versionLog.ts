@@ -25,19 +25,61 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.8.12';
-export const CURRENT_BUILD_CODE = '2026.10.20.2812';
+export const CURRENT_APP_VERSION = '2.9.0';
+export const CURRENT_BUILD_CODE = '2026.10.20.2900';
 export const BUILD_DATE = '20 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.9.0',
+    buildCode: '2026.10.20.2900',
+    date: '20 de Octubre, 2026',
+    title: 'Gestor Dedicado de Roles Teocráticos a Pantalla Completa y Nuevo Sistema de Íconos',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Transformación del Gestor de Roles de ventana emergente (modal) a una vista dedicada de página completa (#roles), eliminando bordes limitados y barras de desplazamiento internas.',
+      },
+      {
+        category: 'feature',
+        text: 'Incorporación de 5 tarjetas interactivas de estadísticas KPI que funcionan como filtros inmediatos por categoría (Total Hermanos, Ancianos, Siervos Ministeriales, Con PIN y Sin PIN).',
+      },
+      {
+        category: 'improvement',
+        text: 'Selectores de los 16 roles teocráticos sin recorte de texto, píldoras de PIN con alternador de visibilidad (••••), regeneración de 4-6 dígitos y copiado de credenciales portátiles.',
+      },
+      {
+        category: 'feature',
+        text: 'Nuevo submódulo de Cambio Rápido de Sesión (Mi Sesión) con teclado numérico para entrega ágil de turnos durante reuniones presenciales en el Salón.',
+      },
+      {
+        category: 'feature',
+        text: 'Panel de Cuentas Nube & QR con gestión de aprobaciones de cuentas vinculadas y Matriz interactiva de permisos departamentales teocráticos.',
+      },
+      {
+        category: 'improvement',
+        text: 'Integración del nuevo catálogo de íconos SVG temáticos y animados para departamentos y secciones (modo claro, oscuro e índigo).',
+      },
+      {
+        category: 'fix',
+        text: 'Corrección del selector de día de reunión entre semana y fin de semana en el asistente de bienvenida y registro de congregación.',
+      },
+      {
+        category: 'fix',
+        text: 'Ajuste del servicio de sincronización offline con Supabase en Modo Demo para evitar alertas intrusivas.',
+      },
+    ],
+  },
+  {
     version: '2.8.12',
     buildCode: '2026.10.20.2812',
     date: '20 de Octubre, 2026',
     title: 'Rediseño del Menú Móvil y Optimización Integral de Interfaz para Teléfonos',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

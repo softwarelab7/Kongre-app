@@ -25,7 +25,29 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.8.12] - 20 de Octubre, 2026 (Compilación Activa)
+### [v2.9.0] - 20 de Octubre, 2026 (Compilación Activa)
+**Título:** Gestor Dedicado de Roles Teocráticos a Pantalla Completa y Nuevo Sistema de Íconos
+- **Gestor de Roles y PINs a Pantalla Completa (`RolesManagerTab` / `#roles`):**
+  - Transformación integral de `RoleSwitcherModal` a una vista dedicada de página completa (`activeTab === 'roles'`), eliminando las restricciones de espacio y barras de desplazamiento anidadas.
+  - Implementación de 5 tarjetas interactivas KPI (*Total Hermanos*, *Ancianos*, *Siervos Ministeriales*, *Con PIN Activo*, *Sin PIN*) que funcionan como filtros inmediatos por categoría.
+  - Píldoras de PIN individuales con alternador de visibilidad (`••••`), regeneración segura de 4–6 dígitos y copiado de credenciales portátiles.
+  - Integración de formato de envío teocrático directo por WhatsApp con detalles de rol y credenciales cifradas E2EE.
+  - Selectores de los 16 roles teocráticos con ancho completo y etiquetas sin recorte de texto.
+- **Panel "Mi Sesión / Cambiar con PIN":**
+  - Módulo de cambio ágil de turno de usuario mediante teclado numérico para entrega de mostrador en el Salón del Reino sin cerrar la app ni perder contexto.
+- **Cuentas Nube & QR y Matriz de Permisos Teocráticos:**
+  - Panel para aprobación y rechazo en vivo de solicitudes de vinculación de cuentas Google (`accountLinkRequests`).
+  - Generación de invitaciones temporales con códigos protegidos contra ataques de fuerza bruta.
+  - Matriz interactiva de permisos departamentales que detalla privilegios sección por sección para cada rol.
+- **Nuevo Catálogo de Íconos Temáticos y Animados (`NavIcons`):**
+  - Incorporación de paquetes de íconos temáticos para departamentos y secciones en modos claro, oscuro e índigo con micro-animaciones SVG.
+- **Correcciones de Onboarding y Modo Demo:**
+  - Corrección del selector de día de reunión entre semana y fin de semana en `CongregationWelcomeLanding`, `RegisterCongregationWizard` y `JoinCongregationModal`.
+  - Refinamiento de la sincronización offline con Supabase en Modo Demo para evitar alertas y mensajes intrusivos.
+
+---
+
+### [v2.8.12] - 20 de Octubre, 2026
 **Título:** Rediseño del Menú Móvil y Optimización Integral de Interfaz para Teléfonos
 - **Rediseño del Panel de Menú Móvil (`Navbar`):**
   - Unificación de la cabecera del menú en una sola fila compacta con el avatar del usuario, rol activo, accesos rápidos a PIN/Perfil, selector de modo claro/oscuro y botón de cierre.

@@ -220,6 +220,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     signInWithGoogle,
     signOutUser,
     setActiveRole,
+    setActiveRoles,
     setIdentifiedBrother,
     setIdentifiedPublisher,
     assignRoleToEmail,
@@ -246,6 +247,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     hydrateCongregation,
     findUserCongregationId,
     loadDemoData,
+    exitDemoMode,
   } = useCongregation();
   const { themeMode, setThemeMode, isDark, toggleTheme } = useTheme();
   const nextTheme = NEXT_THEME[themeMode] || 'dark';
@@ -463,6 +465,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           targetCongPin = segments[1];
           codeToRedeem = segments.slice(2).join('::');
 
+          if (!targetCongregationId.toUpperCase().includes('DEMO')) {
+            try {
+              localStorage.removeItem('kongre_demo_mode');
+              localStorage.removeItem('kongre_is_guest');
+            } catch {}
+            if (exitDemoMode) exitDemoMode();
+          }
+
           const cloudRes = await loadCongregationFromCloud(targetCongregationId, {
             skipHydrate: true,
             pin: targetCongPin,
@@ -511,6 +521,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           } else {
             potentialCong = formatCanonicalCongregationId(parts[0]);
             potentialPin = parts.slice(1).join('-');
+          }
+
+          if (potentialCong && !potentialCong.toUpperCase().includes('DEMO')) {
+            try {
+              localStorage.removeItem('kongre_demo_mode');
+              localStorage.removeItem('kongre_is_guest');
+            } catch {}
+            if (exitDemoMode) exitDemoMode();
           }
 
           const cloudRes = await loadCongregationFromCloud(potentialCong, {
@@ -613,7 +631,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       if (!finalRole) {
         const failInfo = recordFailedPinAttempt();
         setInviteCodeError(
-          failInfo.lockedOut
+          failInfo.isLockedOut
             ? `Código de invitación no válido. Acceso bloqueado temporalmente por ${failInfo.remainingSeconds} segundos.`
             : 'Código de invitación no válido o expirado. Verifica que esté bien escrito o solicita el código completo a los ancianos de tu congregación.'
         );
@@ -692,6 +710,16 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         return;
       }
 
+      // Si el ID ingresado no es de demostración, desactivar banderas previas de modo demo
+      const isInputDemo = cleanId.toUpperCase().includes('DEMO') || cleanId === '1001';
+      if (!isInputDemo) {
+        try {
+          localStorage.removeItem('kongre_demo_mode');
+          localStorage.removeItem('kongre_is_guest');
+        } catch {}
+        if (exitDemoMode) exitDemoMode();
+      }
+
       // 1. Cargar y descifrar datos actualizados de la congregación desde la nube pasando el PIN provisto
       const cloudRes = await loadCongregationFromCloud(cleanId, {
         skipHydrate: true,
@@ -727,7 +755,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       if (!isCongPinValid) {
         const failInfo = recordFailedPinAttempt();
         setCodeError(
-          failInfo.lockedOut
+          failInfo.isLockedOut
             ? `El PIN de Congregación ingresado es incorrecto. Acceso bloqueado temporalmente por ${failInfo.remainingSeconds} segundos.`
             : 'El PIN de Congregación ingresado es incorrecto.'
         );
@@ -778,7 +806,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             } else {
               const failInfo = recordFailedPinAttempt();
               setCodeError(
-                failInfo.lockedOut
+                failInfo.isLockedOut
                   ? `El PIN Personal ingresado no coincide con ningún publicador. Acceso bloqueado temporalmente por ${failInfo.remainingSeconds} segundos.`
                   : 'El PIN Personal ingresado no coincide con ningún publicador en esta congregación. Verifica el PIN asignado por los ancianos o déjalo vacío para entrar en Modo Cartelera/Público.'
               );
@@ -1271,16 +1299,16 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             <section
               key={activeTab === 'register' ? 'register-box' : `portal-${activeTab}`}
               aria-label="Portal de acceso"
-              className={`card rounded-3xl border border-line bg-card relative overflow-hidden ${
+              className={`card rounded-3xl border border-line bg-card relative ${
                 activeTab === 'register'
-                  ? 'p-3.5 sm:p-5 lg:p-6 kg-register-box-enter shadow-2xl'
-                  : 'p-4 sm:p-5 lg:p-6 kg-home-box-enter shadow-xl'
+                  ? 'p-3.5 sm:p-5 lg:p-6 kg-register-box-enter shadow-2xl overflow-visible'
+                  : 'p-4 sm:p-5 lg:p-6 kg-home-box-enter shadow-xl overflow-hidden'
               } transition-all`}
               style={{ boxShadow: 'var(--card-shadow)' }}
             >
               {/* Vibrant glowing gradient line at top for register mode */}
               {activeTab === 'register' && (
-                <div className="absolute top-0 left-0 right-0 h-1 kg-shimmer-bar z-10" />
+                <div className="absolute top-0 left-0 right-0 h-1 kg-shimmer-bar z-10 rounded-t-3xl" />
               )}
 
               {/* UNIFIED CARD HEADER ACROSS ALL VIEWS */}

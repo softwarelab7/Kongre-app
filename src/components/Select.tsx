@@ -17,6 +17,7 @@ export interface SelectProps {
   iconClassName?: string;
   disabled?: boolean;
   searchable?: boolean;
+  placement?: 'auto' | 'top' | 'bottom';
 }
 
 function optionsEqual(a: Option[], b: Option[]): boolean {
@@ -36,6 +37,7 @@ function selectPropsEqual(prev: SelectProps, next: SelectProps): boolean {
     prev.iconClassName === next.iconClassName &&
     prev.disabled === next.disabled &&
     prev.searchable === next.searchable &&
+    prev.placement === next.placement &&
     optionsEqual(prev.options, next.options)
   );
 }
@@ -50,8 +52,10 @@ const SelectComponent: React.FC<SelectProps> = ({
   iconClassName = '',
   disabled = false,
   searchable,
+  placement = 'auto',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [openUpward, setOpenUpward] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -61,6 +65,39 @@ const SelectComponent: React.FC<SelectProps> = ({
   const isSearchActive = searchable !== undefined ? searchable : options.length > 7;
 
   const selectedOption = options.find((opt) => String(opt.value) === String(value));
+
+  // Auto-detect placement: open upward if limited space below
+  useEffect(() => {
+    if (isOpen && containerRef.current) {
+      if (placement === 'top') {
+        setOpenUpward(true);
+        return;
+      }
+      if (placement === 'bottom') {
+        setOpenUpward(false);
+        return;
+      }
+
+      const rect = containerRef.current.getBoundingClientRect();
+      let spaceBelow = window.innerHeight - rect.bottom;
+      let spaceAbove = rect.top;
+
+      // Check closest scrollable or bounded container (card, modal, dialog, etc.)
+      const boundaryContainer = containerRef.current.closest<HTMLElement>(
+        '.card, [role="dialog"], .kg-form-enter, .overflow-hidden, .overflow-y-auto, .overflow-auto'
+      );
+      if (boundaryContainer) {
+        const bRect = boundaryContainer.getBoundingClientRect();
+        const bSpaceBelow = bRect.bottom - rect.bottom;
+        const bSpaceAbove = rect.top - bRect.top;
+        spaceBelow = Math.min(spaceBelow, bSpaceBelow);
+        spaceAbove = Math.max(0, Math.min(spaceAbove, bSpaceAbove));
+      }
+
+      const estimatedMenuHeight = Math.min(options.length * 44 + (isSearchActive ? 52 : 16), 260);
+      setOpenUpward(spaceBelow < estimatedMenuHeight && spaceAbove >= 120);
+    }
+  }, [isOpen, options.length, isSearchActive, placement]);
 
   // Focus search input on open
   useEffect(() => {
@@ -112,7 +149,7 @@ const SelectComponent: React.FC<SelectProps> = ({
   };
 
   return (
-    <div className={`relative ${className}`} ref={containerRef}>
+    <div className={`relative ${isOpen ? 'z-50' : 'z-auto'} ${className}`} ref={containerRef}>
       {/* Modern Trigger Button */}
       <button
         type="button"
@@ -159,7 +196,13 @@ const SelectComponent: React.FC<SelectProps> = ({
 
       {/* Modern Floating Menu */}
       {isOpen && !disabled && (
-        <div className="absolute z-50 left-0 right-0 mt-1.5 min-w-full w-full rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-xl shadow-slate-900/10 dark:shadow-black/50 border border-slate-200/90 dark:border-slate-800 overflow-hidden text-xs sm:text-sm animate-in fade-in zoom-in-95 duration-150 origin-top">
+        <div
+          className={`absolute z-50 left-0 right-0 min-w-full w-full rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-2xl shadow-slate-900/20 dark:shadow-black/70 border border-slate-200/90 dark:border-slate-800 overflow-hidden text-xs sm:text-sm animate-in fade-in zoom-in-95 duration-150 ${
+            openUpward
+              ? 'bottom-full mb-1.5 origin-bottom'
+              : 'top-full mt-1.5 origin-top'
+          }`}
+        >
           {/* Search Bar (when options > 7 or searchable=true) */}
           {isSearchActive && (
             <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 relative">

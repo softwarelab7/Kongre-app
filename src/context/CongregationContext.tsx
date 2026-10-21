@@ -1108,7 +1108,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         };
       });
 
-      const restoredPubs = restorePublishersFromLocalStorage(pubsToUse);
+      const restoredPubs = restorePublishersFromLocalStorage(pubsToUse as Publisher[]);
       setPublishers(restoredPubs);
       localStorage.setItem(
         `${LOCAL_STORAGE_KEY}_publishers`,
@@ -2042,11 +2042,13 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const rawClean = congId.trim().toUpperCase();
     if (!rawClean) return { success: false, message: 'ID de congregación no válido.' };
 
-    if (
-      isDemoMode ||
-      (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true') ||
-      rawClean.startsWith('DEMO')
-    ) {
+    const isDemoId =
+      rawClean.startsWith('DEMO') ||
+      rawClean === '1001' ||
+      rawClean === '1001-DEMO' ||
+      rawClean === 'CENTRAL';
+
+    if (isDemoId) {
       return { success: false, message: 'El modo demo opera de manera 100% local sin conexión a Supabase.' };
     }
 
@@ -2077,6 +2079,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (res.success && res.data) {
           const data = res.data;
           if (!options?.skipHydrate) {
+            exitDemoMode();
             hydrateAllFromData(data);
             const effectiveId = data.congregationId || data.congregation_id || rawClean;
             ensureCongregationIdPersisted(effectiveId);

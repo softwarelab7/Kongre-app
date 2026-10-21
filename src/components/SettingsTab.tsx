@@ -76,6 +76,7 @@ export type SettingsCategoryTab =
 interface SettingsTabProps {
   onNavigateToProfile?: () => void;
   onOpenVersionModal?: () => void;
+  onNavigateToRoles?: () => void;
 }
 
 export const SETTINGS_TABS_CONFIG: Record<
@@ -191,7 +192,7 @@ export const SETTINGS_TABS_CONFIG: Record<
   },
 };
 
-export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, onOpenVersionModal }) => {
+export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, onOpenVersionModal, onNavigateToRoles }) => {
   const {
     settings,
     updateSettings,
@@ -1764,6 +1765,36 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                   <Lock className="w-3.5 h-3.5" />
                   <span>Cifrado Local AES-256</span>
                 </span>
+              </div>
+
+              {/* Banner de acceso directo a Roles Teocráticos */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                      Roles Teocráticos y PINs de Acceso
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                        Vista Dedicada
+                      </span>
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-300">
+                      Asigna responsabilidades teocráticas, gestiona PINs individuales por hermano y administra solicitudes de cuentas vinculadas a pantalla completa.
+                    </p>
+                  </div>
+                </div>
+                {onNavigateToRoles && (
+                  <button
+                    type="button"
+                    onClick={onNavigateToRoles}
+                    className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xs hover:shadow whitespace-nowrap self-stretch sm:self-auto cursor-pointer"
+                  >
+                    <span>Abrir Gestor de Roles</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                )}
               </div>
 
               {/* PIN Security Row */}

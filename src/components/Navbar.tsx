@@ -14,6 +14,7 @@ import { CURRENT_APP_VERSION } from '../utils/versionLog';
 import { OfflineSyncBadge } from './OfflineSyncBadge';
 import { DemoBanner } from './DemoBanner';
 import { insertAuditLog } from '../services/auditLogService';
+import { NAV_ICONS } from '../NavIcons';
 import {
   Calendar,
   Users,
@@ -102,7 +103,8 @@ export type ActiveTab =
   | 'exportar_pdf'
   | 'mi_vista'
   | 'perfil'
-  | 'ajustes';
+  | 'ajustes'
+  | 'roles';
 
 interface NavbarProps {
   activeTab: ActiveTab;
@@ -214,7 +216,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       await insertAuditLog({
         accion: 'CIERRE_SESION',
         hermano_nid: user?.email || activeRole || 'usuario',
-        hermano_nombre: displayBrotherName || user?.displayName || 'Hermano',
+        hermano_nombre: effectiveDisplayName || user?.displayName || 'Hermano',
         modulo: 'auth',
         detalles: 'Sesión cerrada explícitamente por el usuario; tokens y PIN de sesión limpiados.',
       });
@@ -226,6 +228,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       localStorage.removeItem('kongre_has_entered_app');
       localStorage.removeItem('kongre_is_registered_congregation');
       localStorage.removeItem('kongre_is_guest');
+      localStorage.removeItem('kongre_demo_mode');
       localStorage.removeItem('kongre_user_profile_guest');
       localStorage.removeItem('kongre_user_profile_active');
       localStorage.removeItem('kongre_identified_brother');
@@ -388,32 +391,32 @@ export const Navbar: React.FC<NavbarProps> = ({
       id: 'reuniones',
       title: 'Reuniones',
       shortTitle: 'Reuniones',
-      icon: ClipboardList,
+      icon: NAV_ICONS.reuniones,
       tabIds: ['programacion', 's89', 'discursos', 'hospitalidad'],
       items: [
         {
           id: 'programacion',
           label: 'Reunión Entre Semana y Fin de Semana',
           description: 'Vida y Ministerio Cristianos y Fin de Semana en un solo programa',
-          icon: ClipboardList,
+          icon: NAV_ICONS.programacion,
         },
         {
           id: 's89',
           label: 'Hojas S-89',
           description: 'Hojas de asignación para estudiantes',
-          icon: Award,
+          icon: NAV_ICONS.s89,
         },
         {
           id: 'discursos',
           label: 'Discursos Públicos',
           description: 'Catálogo de bosquejos y oradores visitantes',
-          icon: Mic,
+          icon: NAV_ICONS.discursos,
         },
         {
           id: 'hospitalidad',
           label: 'Hospitalidad de Oradores',
           description: 'Familias anfitrionas y comidas para oradores',
-          icon: Coffee,
+          icon: NAV_ICONS.hospitalidad,
         },
       ],
     },
@@ -421,20 +424,20 @@ export const Navbar: React.FC<NavbarProps> = ({
       id: 'secretaria',
       title: 'Secretaría y Registros',
       shortTitle: 'Secretaría',
-      icon: FileText,
+      icon: NAV_ICONS.secretaria,
       tabIds: ['publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'informe_s1', 'cuentas'],
       items: [
         {
           id: 'publicadores',
           label: 'Directorio de Publicadores',
           description: 'Privilegios, teléfonos y responsabilidades',
-          icon: Users,
+          icon: NAV_ICONS.publicadores,
         },
         {
           id: 'precursores_auxiliares',
           label: 'Precursores Auxiliares',
           description: 'Solicitudes S-205 y aprobación del comité',
-          icon: Target,
+          icon: NAV_ICONS.precursores_auxiliares,
           badge: pendingAuxPioneersCount || undefined,
           badgeColor: 'bg-amber-500 text-white',
         },
@@ -442,31 +445,31 @@ export const Navbar: React.FC<NavbarProps> = ({
           id: 'informe_s1',
           label: 'Informe S-1 Sucursal',
           description: 'Consolidación mensual de asistencia y predicación para JW Hub',
-          icon: FileBarChart,
+          icon: NAV_ICONS.informe_s1,
         },
         {
           id: 'tarjetas_s21',
           label: 'Tarjetas S-21',
           description: 'Registro oficial de publicador de la congregación',
-          icon: FileText,
+          icon: NAV_ICONS.tarjetas_s21,
         },
         {
           id: 'informes_servicio',
           label: 'Informes S-4',
           description: 'Recolección mensual y resumen para sucursal',
-          icon: FileCheck,
+          icon: NAV_ICONS.informes_servicio,
         },
         {
           id: 'asistencia',
           label: 'Asistencia S-88',
           description: 'Registro de asistencia a reuniones y promedios',
-          icon: BarChart3,
+          icon: NAV_ICONS.asistencia,
         },
         {
           id: 'cuentas',
           label: 'Cuentas S-26',
           description: 'Registro financiero, donaciones y sucursal',
-          icon: Landmark,
+          icon: NAV_ICONS.cuentas,
         },
       ],
     },
@@ -474,14 +477,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       id: 'predicacion',
       title: 'Predicación',
       shortTitle: 'Predicación',
-      icon: Map,
+      icon: NAV_ICONS.predicacion,
       tabIds: ['territorios', 'grupos_servicio', 'carritos', 'literatura'],
       items: [
         {
           id: 'territorios',
           label: 'Territorios S-13',
           description: 'Asignaciones, mapas, vencimientos y no visitas',
-          icon: Map,
+          icon: NAV_ICONS.territorios,
           badge: overdueTerritoriesCount || undefined,
           badgeColor: 'bg-rose-500 text-white',
         },
@@ -489,19 +492,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           id: 'grupos_servicio',
           label: 'Grupos de Servicio',
           description: 'Superintendentes de grupo y lista de familias',
-          icon: Compass,
+          icon: NAV_ICONS.grupos_servicio,
         },
         {
           id: 'carritos',
           label: 'Carritos de Testimonio',
           description: 'Puntos metropolitanos, turnos y parejas',
-          icon: MapPin,
+          icon: NAV_ICONS.carritos,
         },
         {
           id: 'literatura',
           label: 'Literatura S-14',
           description: 'Inventario de publicaciones, revistas y pedidos',
-          icon: Package,
+          icon: NAV_ICONS.literatura,
         },
       ],
     },
@@ -509,44 +512,44 @@ export const Navbar: React.FC<NavbarProps> = ({
       id: 'salon',
       title: 'Salón y Organización',
       shortTitle: 'Salón',
-      icon: Brush,
+      icon: NAV_ICONS.salon,
       tabIds: ['limpieza_deberes', 'panel_electrico', 'mantenimiento', 'visita_sc', 'memorial_asambleas', 'tablero_anuncios'],
       items: [
         {
           id: 'limpieza_deberes',
           label: 'Servicios de la Congregación',
           description: 'Deberes y turnos (audio, video, micrófonos, acomodadores) y limpieza',
-          icon: ShieldCheck,
+          icon: NAV_ICONS.limpieza_deberes,
         },
         {
           id: 'panel_electrico',
           label: 'Panel Eléctrico',
           description: 'Tablero de breakers, circuitos y control de energía',
-          icon: Zap,
+          icon: NAV_ICONS.panel_electrico,
         },
         {
           id: 'mantenimiento',
           label: 'Mantenimiento del Salón',
           description: 'Fichas operativas, plan preventivo y extintores',
-          icon: Wrench,
+          icon: NAV_ICONS.mantenimiento,
         },
         {
           id: 'visita_sc',
           label: 'Visita del SC',
           description: 'Semana del superintendente de circuito y comidas',
-          icon: Briefcase,
+          icon: NAV_ICONS.visita_sc,
         },
         {
           id: 'memorial_asambleas',
           label: 'Memorial & Asambleas',
           description: 'Preparativos de Conmemoración y comités',
-          icon: Flame,
+          icon: NAV_ICONS.memorial_asambleas,
         },
         {
           id: 'tablero_anuncios',
           label: 'Tablero de Anuncios',
           description: 'Cartas, avisos de la congregación y circulares',
-          icon: Bell,
+          icon: NAV_ICONS.tablero_anuncios,
           badge: pinnedNoticesCount || undefined,
           badgeColor: 'bg-indigo-600 text-white',
         },
@@ -556,14 +559,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       id: 'supervision',
       title: 'Supervisión & Control',
       shortTitle: 'Supervisión',
-      icon: AlertTriangle,
-      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'ajustes'],
+      icon: NAV_ICONS.supervision,
+      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'ajustes', 'roles'],
       items: [
         {
           id: 'conflictos',
           label: 'Centro de Conflictos',
           description: 'Cruces de hermanos, dobles partes o no asignados',
-          icon: AlertTriangle,
+          icon: NAV_ICONS.conflictos,
           badge: conflicts.length || undefined,
           badgeColor: 'bg-amber-500 text-white',
         },
@@ -571,31 +574,37 @@ export const Navbar: React.FC<NavbarProps> = ({
           id: 'equidad',
           label: 'Panel de Equidad',
           description: 'Distribución justa de asignaciones y estadísticas',
-          icon: BarChart3,
+          icon: NAV_ICONS.equidad,
         },
         {
           id: 'exportar_pdf',
           label: 'Exportar a PDF',
           description: 'Generación de programas imprimibles en A4/Carta',
-          icon: FileText,
+          icon: NAV_ICONS.exportar_pdf,
         },
         {
           id: 'mi_vista',
           label: 'Portal del Publicador',
           description: 'Asignaciones, informe mensual S-4 y ausencias con PIN personal',
-          icon: UserCheck,
+          icon: NAV_ICONS.mi_vista,
         },
         {
           id: 'perfil',
           label: 'Mi Perfil de Usuario',
           description: 'Foto de perfil, nombre visible y canales de contacto',
-          icon: User,
+          icon: NAV_ICONS.perfil,
         },
         {
           id: 'ajustes',
           label: 'Ajustes de Congregación',
           description: 'Horarios, respaldo y configuración general',
-          icon: Settings,
+          icon: NAV_ICONS.ajustes,
+        },
+        {
+          id: 'roles',
+          label: 'Roles Teocráticos y PINs',
+          description: 'Asignación de cargos, PINs personales y acceso por departamentos',
+          icon: NAV_ICONS.roles,
         },
       ],
     },
@@ -623,7 +632,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     {
       id: 'inicio',
       title: 'Panorama General',
-      icon: LayoutGrid,
+      icon: NAV_ICONS.inicio,
       primaryTab: 'inicio' as ActiveTab,
       tabIds: ['inicio'] as ActiveTab[],
       badge: undefined,
@@ -634,7 +643,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     {
       id: 'reuniones',
       title: 'Reuniones',
-      icon: ClipboardList,
+      icon: NAV_ICONS.reuniones,
       primaryTab: 'programacion' as ActiveTab,
       tabIds: ['programacion', 's89', 'discursos', 'hospitalidad'] as ActiveTab[],
       badge: undefined,
@@ -645,7 +654,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     {
       id: 'secretaria',
       title: 'Secretaría y Registros',
-      icon: FileText,
+      icon: NAV_ICONS.secretaria,
       primaryTab: 'publicadores' as ActiveTab,
       tabIds: ['publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'informe_s1', 'cuentas'] as ActiveTab[],
       badge: undefined,
@@ -656,7 +665,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     {
       id: 'predicacion',
       title: 'Predicación',
-      icon: Map,
+      icon: NAV_ICONS.predicacion,
       primaryTab: 'territorios' as ActiveTab,
       tabIds: ['territorios', 'grupos_servicio', 'carritos', 'literatura'] as ActiveTab[],
       badge: overdueTerritoriesCount || undefined,
@@ -667,7 +676,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     {
       id: 'salon',
       title: 'Salón y Organización',
-      icon: Brush,
+      icon: NAV_ICONS.salon,
       primaryTab: 'limpieza_deberes' as ActiveTab,
       tabIds: ['limpieza_deberes', 'visita_sc', 'memorial_asambleas', 'tablero_anuncios'] as ActiveTab[],
       badge: pinnedNoticesCount || undefined,
@@ -678,9 +687,9 @@ export const Navbar: React.FC<NavbarProps> = ({
     {
       id: 'supervision',
       title: 'Supervisión & Control',
-      icon: AlertTriangle,
+      icon: NAV_ICONS.supervision,
       primaryTab: 'conflictos' as ActiveTab,
-      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'ajustes'] as ActiveTab[],
+      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'ajustes', 'roles'] as ActiveTab[],
       badge: conflicts.length || undefined,
       badgeColor: 'bg-amber-500 text-white',
       colorClass: 'bg-rose-50 text-rose-600 dark:bg-rose-950/80 dark:text-rose-400',
@@ -757,6 +766,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         return 'Mi Perfil';
       case 'ajustes':
         return 'Ajustes de la Congregación';
+      case 'roles':
+        return 'Roles Teocráticos y PINs';
       default:
         return 'Kongre';
     }
@@ -1264,23 +1275,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </button>
                     )}
 
-                    {onOpenRoleModal && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOpenDropdown(null);
-                          onOpenRoleModal();
-                        }}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl transition cursor-pointer text-left ${
-                          activeRole === 'publico'
-                            ? 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100'
-                            : 'text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/50'
-                        }`}
-                      >
-                        <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                        <span>{canManageRoles ? 'Directorio de Roles y PINs' : '🔑 Activar Rol / Ingresar PIN'}</span>
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenDropdown(null);
+                        handleSelectTab('roles');
+                      }}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl transition cursor-pointer text-left ${
+                        activeRole === 'publico'
+                          ? 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100'
+                          : 'text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/50'
+                      }`}
+                    >
+                      <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                      <span>{canManageRoles ? 'Roles Teocráticos y PINs' : '🔑 Activar Rol / Ingresar PIN'}</span>
+                    </button>
 
                     {permissions.canViewAuditLog && onOpenAuditLog && (
                       <button
@@ -1401,29 +1410,23 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </button>
                   </div>
                   <div className="flex items-center gap-1 mt-0.5">
-                    {onOpenRoleModal ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsMobileMenuOpen(false);
-                          onOpenRoleModal();
-                        }}
-                        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded transition cursor-pointer flex items-center gap-1 truncate max-w-[190px] ${
-                          activeRole === 'publico'
-                            ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 font-bold'
-                            : 'bg-purple-50 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300'
-                        }`}
-                      >
-                        <Shield className="w-2.5 h-2.5 shrink-0" />
-                        <span className="truncate">
-                          {activeRole === 'publico' ? 'Activar Rol (PIN)' : effectiveRoleInfo?.name || 'Publicador'}
-                        </span>
-                      </button>
-                    ) : (
-                      <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 truncate">
-                        {effectiveRoleInfo?.name || 'Publicador'}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleSelectTab('roles');
+                      }}
+                      className={`text-[10px] font-semibold px-1.5 py-0.5 rounded transition cursor-pointer flex items-center gap-1 truncate max-w-[190px] ${
+                        activeRole === 'publico'
+                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 font-bold'
+                          : 'bg-purple-50 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300'
+                      }`}
+                    >
+                      <Shield className="w-2.5 h-2.5 shrink-0" />
+                      <span className="truncate">
+                        {activeRole === 'publico' ? 'Activar Rol (PIN)' : effectiveRoleInfo?.name || 'Publicador'}
                       </span>
-                    )}
+                    </button>
                   </div>
                 </div>
               </div>

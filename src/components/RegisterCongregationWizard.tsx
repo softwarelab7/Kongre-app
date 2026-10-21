@@ -584,7 +584,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       </div>
 
       {/* Form Body */}
-      <div className={`${embedded ? 'p-0 pt-2 sm:pt-2.5 kg-form-enter' : 'p-3.5 sm:p-6 flex-1'} text-xs space-y-2.5 sm:space-y-3`}>
+      <div className={`relative z-20 ${embedded ? 'p-0 pt-2 sm:pt-2.5 kg-form-enter' : 'p-3.5 sm:p-6 flex-1'} text-xs space-y-2.5 sm:space-y-3`}>
         {error && (
           <div className="p-2.5 sm:p-3 rounded-xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200/80 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-semibold flex items-center gap-2.5 shadow-2xs">
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
@@ -776,7 +776,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
             {/* 2-Column Responsive Grid: Midweek & Weekend Side-by-Side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
               {/* Midweek Meeting Card */}
-              <div className="p-2.5 sm:p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 sm:space-y-2.5 shadow-2xs flex flex-col justify-between">
+              <div className="relative z-20 p-2.5 sm:p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 sm:space-y-2.5 shadow-2xs flex flex-col justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                     <Calendar className="w-3.5 h-3.5" />
@@ -822,7 +822,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               </div>
 
               {/* Weekend Meeting Card */}
-              <div className="p-2.5 sm:p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 sm:space-y-2.5 shadow-2xs flex flex-col justify-between">
+              <div className="relative z-10 p-2.5 sm:p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-2 sm:space-y-2.5 shadow-2xs flex flex-col justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
                     <Calendar className="w-3.5 h-3.5" />
@@ -1274,7 +1274,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       </div>
 
       {/* Footer Navigation Buttons */}
-      <div className={`${embedded ? 'pt-2.5 sm:pt-3 kg-actions-enter' : 'p-3.5 sm:p-4 bg-slate-50/50 dark:bg-slate-900/50'} border-t border-slate-100 dark:border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 shrink-0`}>
+      <div className={`relative z-10 ${embedded ? 'pt-2.5 sm:pt-3 kg-actions-enter' : 'p-3.5 sm:p-4 bg-slate-50/50 dark:bg-slate-900/50'} border-t border-slate-100 dark:border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 shrink-0`}>
         <div className="flex items-center gap-2">
           <button
             type="button"

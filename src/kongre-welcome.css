@@ -125,11 +125,15 @@
 }
 
 .kg-form-enter {
+  position: relative;
+  z-index: 20;
   animation: kg-fade-slide-up 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: 0.14s;
 }
 
 .kg-actions-enter {
+  position: relative;
+  z-index: 10;
   animation: kg-fade-slide-up 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: 0.18s;
 }

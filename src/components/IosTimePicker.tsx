@@ -95,8 +95,20 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
   const updatePosition = useCallback(() => {
     if (containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
+      let spaceBelow = window.innerHeight - rect.bottom;
+      let spaceAbove = rect.top;
+
+      // Check closest scrollable or bounded container (card, modal, dialog, etc.)
+      const boundaryContainer = containerRef.current.closest<HTMLElement>(
+        '.card, [role="dialog"], .kg-form-enter, .overflow-hidden, .overflow-y-auto, .overflow-auto'
+      );
+      if (boundaryContainer) {
+        const bRect = boundaryContainer.getBoundingClientRect();
+        const bSpaceBelow = bRect.bottom - rect.bottom;
+        const bSpaceAbove = rect.top - bRect.top;
+        spaceBelow = Math.min(spaceBelow, bSpaceBelow);
+        spaceAbove = Math.max(0, Math.min(spaceAbove, bSpaceAbove));
+      }
 
       // El popover ultra-compacto mide ~185px de alto.
       // Si el espacio inferior es inferior a 220px y arriba hay espacio, abrir hacia arriba.
@@ -371,7 +383,7 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
   );
 
   return (
-    <div className={`relative ${className}`} ref={containerRef}>
+    <div className={`relative ${isOpen ? 'z-50' : 'z-auto'} ${className}`} ref={containerRef}>
       {/* Trigger Button - Estilo Cápsula Moderna iOS */}
       <button
         type="button"

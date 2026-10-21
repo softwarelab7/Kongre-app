@@ -43,6 +43,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
     createAccountLinkRequest,
     loadCongregationFromCloud,
     hydrateCongregation,
+    exitDemoMode,
   } = useCongregation();
 
   // Exactly three required theocratic credentials:
@@ -140,6 +141,16 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         return;
       }
 
+      // Si el ID ingresado no es de demostración, desactivar banderas previas de modo demo
+      const isInputDemo = cleanId.toUpperCase().includes('DEMO') || cleanId === '1001';
+      if (!isInputDemo) {
+        try {
+          localStorage.removeItem('kongre_demo_mode');
+          localStorage.removeItem('kongre_is_guest');
+        } catch {}
+        if (exitDemoMode) exitDemoMode();
+      }
+
       // 1. Cargar datos actualizados de la congregación desde Supabase pasando los PINs provistos (sin hidratar aún)
       const cloudRes = await loadCongregationFromCloud(cleanId, {
         skipHydrate: true,
@@ -187,7 +198,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       if (!isCongPinValid) {
         const failInfo = recordFailedPinAttempt();
         setError(
-          failInfo.lockedOut
+          failInfo.isLockedOut
             ? `El PIN de la Congregación es incorrecto. Acceso bloqueado temporalmente por ${failInfo.remainingSeconds} segundos.`
             : 'El PIN de la Congregación es incorrecto.'
         );
@@ -252,7 +263,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       if (!identifiedRole) {
         const failInfo = recordFailedPinAttempt();
         setError(
-          failInfo.lockedOut
+          failInfo.isLockedOut
             ? `El PIN Personal no coincide con ningún publicador. Acceso bloqueado temporalmente por ${failInfo.remainingSeconds} segundos.`
             : 'El PIN Personal no coincide con ningún publicador en esta congregación. Verifica el PIN asignado por los ancianos.'
         );

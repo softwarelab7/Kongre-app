@@ -204,7 +204,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
       'publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informe_s1', 'informes_servicio',
       'asistencia', 'cuentas', 'territorios', 'grupos_servicio', 'carritos', 'literatura',
       'limpieza_deberes', 'mantenimiento', 'panel_electrico', 'visita_sc', 'memorial_asambleas',
-      'tablero_anuncios', 'conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'ajustes'
+      'tablero_anuncios', 'conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'ajustes', 'roles'
     ],
     canEditCLM: true,
     canEditWeekend: true,
@@ -244,7 +244,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
       'inicio', 'calendario', 'programacion', 'clm_vmc', 's89', 'discursos', 'hospitalidad',
       'publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia',
       'grupos_servicio', 'territorios', 'carritos', 'limpieza_deberes', 'visita_sc',
-      'memorial_asambleas', 'tablero_anuncios', 'conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil'
+      'memorial_asambleas', 'tablero_anuncios', 'conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'roles'
     ],
     canEditCLM: true,
     canEditWeekend: true,
@@ -844,7 +844,7 @@ export function getPermissionsForRoles(roles: (TheocraticRole | string)[]): Perm
 }
 
 export function isTabAllowedForRole(roleOrRoles: string | string[], tab: ActiveTab): boolean {
-  if (tab === 'inicio' || tab === 'perfil' || tab === 'calendario') return true;
+  if (tab === 'inicio' || tab === 'perfil' || tab === 'calendario' || tab === 'roles') return true;
   const list = Array.isArray(roleOrRoles) ? roleOrRoles : [roleOrRoles];
   return list.some((r) => {
     const normalized = normalizeTheocraticRole(r);

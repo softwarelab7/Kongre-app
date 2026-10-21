@@ -49,7 +49,7 @@ import { DigitalTerritoryModal } from './components/DigitalTerritoryModal';
 import { ThemeToggleModal } from './components/ThemeToggleModal';
 import { OfflineSyncBanner } from './components/OfflineSyncBanner';
 import { ResumenInicioTab } from './components/ResumenInicioTab';
-import { RoleSwitcherModal } from './components/RoleSwitcherModal';
+import { RolesManagerTab } from './components/RolesManagerTab';
 import { AccessRestrictedView } from './components/AccessRestrictedView';
 import { SecurityProvider } from './context/SecurityContext';
 import { SessionLockModal } from './components/SessionLockModal';
@@ -109,6 +109,10 @@ export const VALID_TABS_MAP: Record<string, ActiveTab> = {
   mi_vista: 'mi_vista',
   perfil: 'perfil',
   ajustes: 'ajustes',
+  roles: 'roles',
+  'roles-permisos': 'roles',
+  'roles_permisos': 'roles',
+  seguridad_roles: 'roles',
 };
 
 export function parseAppHash(hashString: string) {
@@ -389,7 +393,10 @@ const AppContent: React.FC = () => {
       setIsTimerModalOpen(targetModal === 'cronometro');
       setIsKioskModalOpen(targetModal === 'tablero_salon');
       setIsSearchModalOpen(targetModal === 'buscar');
-      setIsRoleModalOpen(targetModal === 'roles');
+      if (targetModal === 'roles') {
+        setRawActiveTab('roles');
+      }
+      setIsRoleModalOpen(false);
       setIsThemeModalOpen(targetModal === 'tema');
       setIsJoinModalOpen(targetModal === 'unirse');
       setIsInviteManagerOpen(targetModal === 'invitaciones' && allowAdminModals);
@@ -446,7 +453,7 @@ const AppContent: React.FC = () => {
         if (initialModal === 'cronometro') setIsTimerModalOpen(true);
         if (initialModal === 'tablero_salon') setIsKioskModalOpen(true);
         if (initialModal === 'buscar') setIsSearchModalOpen(true);
-        if (initialModal === 'roles') setIsRoleModalOpen(true);
+        if (initialModal === 'roles') setActiveTab('roles');
         if (initialModal === 'tema') setIsThemeModalOpen(true);
         if (initialModal === 'unirse') setIsJoinModalOpen(true);
         if (initialModal === 'invitaciones' && allowAdminModals) setIsInviteManagerOpen(true);
@@ -845,7 +852,7 @@ const AppContent: React.FC = () => {
         onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
         onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
         onOpenSearchModal={() => openModalWithHistory('buscar', setIsSearchModalOpen)}
-        onOpenRoleModal={() => openModalWithHistory('roles', setIsRoleModalOpen)}
+        onOpenRoleModal={() => setActiveTab('roles')}
         onOpenThemeModal={() => openModalWithHistory('tema', setIsThemeModalOpen)}
         onOpenJoinModal={() => openModalWithHistory('unirse', setIsJoinModalOpen)}
         onOpenInviteManager={() => openModalWithHistory('invitaciones', setIsInviteManagerOpen)}
@@ -881,7 +888,7 @@ const AppContent: React.FC = () => {
                 : 'un hermano con privilegios autorizados'
             }
             onNavigateHome={() => setActiveTab('inicio')}
-            onOpenRoleSwitcher={() => setIsRoleModalOpen(true)}
+            onOpenRoleSwitcher={() => setActiveTab('roles')}
           />
         ) : (
           <>
@@ -959,10 +966,14 @@ const AppContent: React.FC = () => {
             {activeTab === 'exportar_pdf' && <ExportPdfTab />}
             {activeTab === 'mi_vista' && <PersonalViewTab />}
             {activeTab === 'perfil' && <UserProfileSettingsView />}
+            {activeTab === 'roles' && (
+              <RolesManagerTab setActiveTab={setActiveTab} />
+            )}
             {activeTab === 'ajustes' && (
               <SettingsTab
                 onNavigateToProfile={() => setActiveTab('perfil')}
                 onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
+                onNavigateToRoles={() => setActiveTab('roles')}
               />
             )}
           </>
@@ -1053,13 +1064,7 @@ const AppContent: React.FC = () => {
       {/* Offline Connectivity & Cloud Sync Status Banner */}
       <OfflineSyncBanner onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)} />
 
-      {/* Role Switcher & Personal PIN Session Modal (Tab-level RBAC enforced inside RoleSwitcherModal) */}
-      <RoleSwitcherModal
-        isOpen={isRoleModalOpen}
-        onClose={() => closeModalWithHistory('roles', setIsRoleModalOpen)}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
+      {/* Roles & Theocratic Permissions are now a dedicated full-page view (activeTab === 'roles') */}
 
       {/* Theocratic Session Lock Modal */}
       {!isDemoMode && <SessionLockModal />}

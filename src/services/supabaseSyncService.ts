@@ -16,6 +16,7 @@ import {
 } from '../utils/theocraticSecurity';
 import {
   Publisher,
+  Gender,
   WeekSchedule,
   Territory,
   CongregationNotice,
@@ -40,17 +41,18 @@ export function normalizeCongregationId(rawId: string): string {
  * para desactivar absolutamente cualquier intento de conexión con Supabase.
  */
 export function isDemoModeActive(congregationId?: string): boolean {
+  if (congregationId) {
+    const clean = normalizeCongregationId(congregationId);
+    if (!clean || clean.startsWith('DEMO') || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(clean)) {
+      return true;
+    }
+    return false;
+  }
   if (typeof window !== 'undefined') {
     if (
       localStorage.getItem('kongre_demo_mode') === 'true' ||
       localStorage.getItem('kongre_is_guest') === 'true'
     ) {
-      return true;
-    }
-  }
-  if (congregationId) {
-    const clean = normalizeCongregationId(congregationId);
-    if (!clean || clean.startsWith('DEMO') || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(clean)) {
       return true;
     }
   }
@@ -81,12 +83,14 @@ export interface PublicFilteredData {
   publishers: Array<{
     id: string;
     name: string;
-    gender?: 'hermano' | 'hermana';
+    gender?: Gender;
     active?: boolean;
     groupNumber?: number;
     privilege?: string;
     theocraticRole?: string;
     personalPin?: string;
+    personalPinHash?: string;
+    theocraticRoles?: any;
     email?: string;
     roles?: any;
   }>;

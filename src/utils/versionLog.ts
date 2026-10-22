@@ -25,19 +25,45 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.10.8';
-export const CURRENT_BUILD_CODE = '2026.10.21.3501';
+export const CURRENT_APP_VERSION = '2.10.9';
+export const CURRENT_BUILD_CODE = '2026.10.21.3601';
 export const BUILD_DATE = '21 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.10.9',
+    buildCode: '2026.10.21.3601',
+    date: '21 de Octubre, 2026',
+    title: 'Nuevo Cronómetro de Predicación Circular de Precisión y Chip Navbar',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Esfera Circular de Precisión con Gradiente Dinámico: Nuevo cuadrante de cronómetro inspirado en la mecánica del reloj de bloqueo, con dial SVG de 220px, marcas perimetrales graduadas a 6° y 30°, arco de progreso animado, micro-halo ambiental y satélite de luz orbitante.',
+      },
+      {
+        category: 'feature',
+        text: 'Chip Activo en Barra Superior (Navbar): Cápsula viva sincronizada en tiempo real con anillo de progreso SVG de 22px que acompaña al publicador por toda la aplicación, permitiendo ver el tiempo acumulado desde cualquier sección y volver al ministerio con un clic.',
+      },
+      {
+        category: 'improvement',
+        text: 'Micro-Etiquetas y Tipografía de Alta Legibilidad: Formato monoespaciado HH:MM:SS con sub-rótulos (HRS, MIN, SEG) y cápsula de estado dinámico (● EN VIVO verde esmeralda, ❚❚ EN PAUSA ámbar, LISTO).',
+      },
+      {
+        category: 'improvement',
+        text: 'Controles Ergonómicos Táctiles: Píldoras de ajuste rápido (-5m, +15m, +30m, +1h), botones de incremento táctil circular para revisitas y publicaciones, y selector de modalidad contextual con iconos estilizados.',
+      },
+    ],
+  },
+  {
     version: '2.10.8',
     buildCode: '2026.10.21.3501',
     date: '21 de Octubre, 2026',
     title: 'Optimización Global de Interfaz: Arranque Directo con Contenido (Opción 1) en Toda la App',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

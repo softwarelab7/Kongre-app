@@ -42,6 +42,7 @@ import {
   PlusCircle,
   MinusCircle,
 } from 'lucide-react';
+import { MinistryStopwatchDial } from './MinistryStopwatchDial';
 
 export type MinistrySubTab =
   | 'resumen'
@@ -232,10 +233,11 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
   const [displaySeconds, setDisplaySeconds] = useState<number>(0);
 
-  // Save timer state to localStorage
+  // Save timer state to localStorage and broadcast update
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY_TIMER, JSON.stringify(timerState));
+      window.dispatchEvent(new CustomEvent('kongre_ministry_timer_updated', { detail: timerState }));
     } catch {}
   }, [timerState]);
 
@@ -1119,221 +1121,41 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
          ========================================================================= */}
       {(activeSubTab === 'resumen' || activeSubTab === 'cronometro') && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
-          {/* Izquierda: Cronómetro de Predicación en Vivo */}
-          <div className="lg:col-span-7 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-5 sm:p-7 shadow-xl border border-indigo-500/20 flex flex-col justify-between gap-5">
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <div className="flex items-center gap-2.5">
-                <div
-                  className={`w-3 h-3 rounded-full ${
-                    timerState.isRunning
-                      ? 'bg-emerald-400 animate-ping'
-                      : displaySeconds > 0
-                      ? 'bg-amber-400'
-                      : 'bg-slate-500'
-                  }`}
-                />
-                <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-300">
-                  {timerState.isRunning
-                    ? 'Cronómetro de Ministerio en Curso'
-                    : displaySeconds > 0
-                    ? 'Sesión en Pausa'
-                    : 'Cronómetro para Llevar el Tiempo'}
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setIsManualLogOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-indigo-100 transition cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Añadir Horas Manualmente</span>
-              </button>
-            </div>
-
-            {/* Dígitos grandes del cronómetro */}
-            <div className="py-3 sm:py-5 text-center">
-              <div className="inline-flex items-baseline justify-center font-mono font-black tracking-tight text-5xl sm:text-7xl text-white drop-shadow">
-                <span>{hrs}</span>
-                <span className="text-indigo-400 mx-1">:</span>
-                <span>{mins}</span>
-                <span className="text-indigo-400 mx-1">:</span>
-                <span className="text-3xl sm:text-5xl text-indigo-300">{secs}</span>
-              </div>
-              <p className="text-xs text-indigo-200/80 mt-2">
-                El tiempo sigue corriendo aunque cierres la pestaña o apagues la pantalla del teléfono
-              </p>
-            </div>
-
-            {/* Botones de ajuste rápido de minutos */}
-            <div className="flex items-center justify-center gap-2 flex-wrap">
-              <button
-                type="button"
-                onClick={() => handleAdjustTimerMinutes(-5)}
-                className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-mono font-bold text-slate-300 cursor-pointer"
-              >
-                -5m
-              </button>
-              <button
-                type="button"
-                onClick={() => handleAdjustTimerMinutes(15)}
-                className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-mono font-bold text-emerald-300 cursor-pointer"
-              >
-                +15m
-              </button>
-              <button
-                type="button"
-                onClick={() => handleAdjustTimerMinutes(30)}
-                className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-mono font-bold text-emerald-300 cursor-pointer"
-              >
-                +30m
-              </button>
-              <button
-                type="button"
-                onClick={() => handleAdjustTimerMinutes(60)}
-                className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-mono font-bold text-emerald-300 cursor-pointer"
-              >
-                +1h
-              </button>
-            </div>
-
-            {/* Modalidad y Contadores de la Sesión */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white/5 p-3.5 rounded-2xl border border-white/10">
-              <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-indigo-300 block mb-1">
-                  Modalidad
-                </label>
-                <select
-                  value={timerState.modality}
-                  onChange={(e) =>
-                    setTimerState((prev) => ({
-                      ...prev,
-                      modality: e.target.value as MinistryTimeLog['modality'],
-                    }))
-                  }
-                  className="w-full rounded-xl bg-slate-900/90 border border-white/15 px-2.5 py-2 text-xs font-bold text-white focus:outline-none"
-                >
-                  {Object.entries(MODALITY_LABELS).map(([k, label]) => (
-                    <option key={k} value={k}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-indigo-300 block mb-1">
-                  Revisitas en esta salida
-                </label>
-                <div className="flex items-center justify-between bg-slate-900/80 rounded-xl px-2.5 py-1.5 border border-white/15">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setTimerState((p) => ({
-                        ...p,
-                        sessionReturnVisits: Math.max(0, p.sessionReturnVisits - 1),
-                      }))
-                    }
-                    className="p-1 text-slate-400 hover:text-white cursor-pointer"
-                  >
-                    <MinusCircle className="w-4 h-4" />
-                  </button>
-                  <span className="font-mono font-bold text-sm">{timerState.sessionReturnVisits}</span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setTimerState((p) => ({
-                        ...p,
-                        sessionReturnVisits: p.sessionReturnVisits + 1,
-                      }))
-                    }
-                    className="p-1 text-emerald-400 hover:text-emerald-300 cursor-pointer"
-                  >
-                    <PlusCircle className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[10px] font-bold uppercase tracking-wider text-indigo-300 block mb-1">
-                  Publicaciones / Videos
-                </label>
-                <div className="flex items-center justify-between bg-slate-900/80 rounded-xl px-2.5 py-1.5 border border-white/15">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setTimerState((p) => ({
-                        ...p,
-                        sessionPlacements: Math.max(0, p.sessionPlacements - 1),
-                      }))
-                    }
-                    className="p-1 text-slate-400 hover:text-white cursor-pointer"
-                  >
-                    <MinusCircle className="w-4 h-4" />
-                  </button>
-                  <span className="font-mono font-bold text-sm">{timerState.sessionPlacements}</span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setTimerState((p) => ({
-                        ...p,
-                        sessionPlacements: p.sessionPlacements + 1,
-                      }))
-                    }
-                    className="p-1 text-emerald-400 hover:text-emerald-300 cursor-pointer"
-                  >
-                    <PlusCircle className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Botones de Acción del Cronómetro */}
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <button
-                type="button"
-                onClick={handleStartPauseTimer}
-                className={`flex-1 py-3.5 px-5 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer active:scale-95 ${
-                  timerState.isRunning
-                    ? 'bg-amber-500 hover:bg-amber-600 text-slate-950'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-slate-950'
-                }`}
-              >
-                {timerState.isRunning ? (
-                  <>
-                    <Pause className="w-5 h-5 fill-current" />
-                    <span>Pausar Tiempo</span>
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-5 h-5 fill-current" />
-                    <span>{displaySeconds > 0 ? 'Reanudar Predicación' : 'Iniciar Predicación'}</span>
-                  </>
-                )}
-              </button>
-
-              {displaySeconds > 0 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleFinishAndSaveSession}
-                    className="flex-1 py-3.5 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer active:scale-95"
-                  >
-                    <Square className="w-4 h-4 fill-current" />
-                    <span>Guardar Sesión</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleResetTimer}
-                    className="p-3.5 rounded-2xl bg-white/10 hover:bg-rose-500/30 text-slate-300 hover:text-rose-200 transition cursor-pointer"
-                    title="Reiniciar a cero"
-                  >
-                    <RotateCcw className="w-5 h-5" />
-                  </button>
-                </>
-              )}
-            </div>
+          {/* Izquierda: Cronómetro de Predicación en Vivo con Anillo Circular */}
+          <div className="lg:col-span-7">
+            <MinistryStopwatchDial
+              displaySeconds={displaySeconds}
+              isRunning={timerState.isRunning}
+              modality={timerState.modality}
+              onStartPause={handleStartPauseTimer}
+              onFinish={handleFinishAndSaveSession}
+              onReset={handleResetTimer}
+              onAdjustMinutes={handleAdjustTimerMinutes}
+              sessionReturnVisits={timerState.sessionReturnVisits}
+              onUpdateReturnVisits={(updater) =>
+                setTimerState((prev) => ({
+                  ...prev,
+                  sessionReturnVisits:
+                    typeof updater === 'function' ? updater(prev.sessionReturnVisits) : updater,
+                }))
+              }
+              sessionPlacements={timerState.sessionPlacements}
+              onUpdatePlacements={(updater) =>
+                setTimerState((prev) => ({
+                  ...prev,
+                  sessionPlacements:
+                    typeof updater === 'function' ? updater(prev.sessionPlacements) : updater,
+                }))
+              }
+              onUpdateModality={(newModality) =>
+                setTimerState((prev) => ({
+                  ...prev,
+                  modality: newModality,
+                }))
+              }
+              onOpenManualLog={() => setIsManualLogOpen(true)}
+              modalityLabels={MODALITY_LABELS}
+            />
           </div>
 
           {/* Derecha: Resumen del Mes y Meta de Horas */}

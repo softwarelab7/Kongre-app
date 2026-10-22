@@ -9,6 +9,7 @@ import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
 import ThemeToggle from './ThemeToggle';
 import { AutoLockTimerChip } from './AutoLockTimerChip';
+import { MinistryTimerNavbarChip } from './MinistryTimerNavbarChip';
 import { getFriendlyCongregationName, isGenericIdentityName } from '../utils/theocraticSecurity';
 import { isTabAllowedForRole } from '../utils/rbac';
 import { CURRENT_APP_VERSION } from '../utils/versionLog';
@@ -1327,6 +1328,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* Divider */}
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 hidden sm:block" />
+
+            {/* Cronómetro de Ministerio en Vivo (Chip con anillo SVG) */}
+            <MinistryTimerNavbarChip onNavigateToMinistry={() => setActiveTab('inicio')} />
 
             {/* Reloj de Bloqueo por Inactividad (Chip con anillo SVG) */}
             <AutoLockTimerChip />

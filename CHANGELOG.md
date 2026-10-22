@@ -25,7 +25,32 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.10.8] - 21 de Octubre, 2026 (Compilación Activa)
+### [v2.10.9] - 21 de Octubre, 2026 (Compilación Activa)
+**Título:** Rediseño del Cronómetro de Predicación: Esfera Circular de Precisión Inspirada en el Reloj de Bloqueo y Chip en Navbar
+- **Esfera Circular de Alta Precisión (`MinistryStopwatchDial.tsx`):**
+  - Implementación de un cuadrante circular SVG de 220px inspirado en la mecánica del reloj de bloqueo por inactividad (`AutoLockRing`).
+  - Marcas perimetrales graduadas estilo cronómetro suizo (marcas de grado a intervalos de 6° y marcas principales acentuadas cada 30°).
+  - Arco de progreso con barrido continuo y gradientes dinámicos según el estado:
+    - **En Marcha (Verde Esmeralda/Cyan):** Gradiente activo con micro-halo radial y satélite orbital de luz que recorre el perímetro.
+    - **En Pausa (Ámbar Cálido):** Tonalidad de espera con pulso suave de atención.
+    - **En Espera / Listo (Slate/Índigo):** Líneas sobrias y elegantes con fondo de cristal ahumado.
+- **Tipografía y Micro-Lectura Clara:**
+  - Dígitos monoespaciados `HH:MM:SS` de gran tamaño acompañados de sub-rótulos proporcionales (`HRS`, `MIN`, `SEG`) para evitar cualquier confusión durante la predicación.
+  - Cápsula de estado superior con indicador LED vivo: `● EN VIVO`, `❚❚ EN PAUSA` o `LISTO`.
+- **Acompañante Global en Barra Superior (`MinistryTimerNavbarChip.tsx`):**
+  - Nuevo chip animado integrado en la cabecera fija de la aplicación, situado junto al botón de tema y el chip de bloqueo por inactividad.
+  - Cuenta con un mini anillo SVG de 22px con progreso circular y contador de tiempo vivo, permitiendo al publicador navegar por Territorios, Asistencia o el Programa sin perder el control de su servicio.
+  - Al presionar el chip, navega inmediatamente a la vista de Ministerio y enfoca el cronómetro.
+- **Controles Táctiles y Contadores de Salida:**
+  - Píldoras de compensación rápida de tiempo (`-5m`, `+15m`, `+30m`, `+1h`) con respuesta táctil y bordes bioluminiscentes.
+  - Contadores rápidos de *Revisitas en esta salida* y *Publicaciones / Videos entregados* con pulsadores táctiles circulares (+ / -).
+  - Selector de modalidad de predicación (De casa en casa, Carritos, Informal, Telefónica, etc.) con iconografía contextual.
+- **Botones de Acción Inteligentes según Estado:**
+  - Estado Inicial: Botón destacado *Iniciar Predicación* con icono de reproducción.
+  - Estado Activo: Botón dual con *Pausar* y *Finalizar y Guardar Registro*.
+  - Estado Pausado: Botones de *Reanudar Predicación*, *Terminar Salida* y botón protegido de *Reiniciar*.
+
+### [v2.10.8] - 21 de Octubre, 2026
 **Título:** Optimización Global de Interfaz: Eliminación de Banner Redundante y Arranque Directo con Contenido (Opción 1) en Toda la App
 - **Implementación Global de la Opción 1 (27 Secciones y Vistas Refactorizadas):**
   - Se completó la auditoría y refactorización integral de todos los módulos de la aplicación, eliminando tarjetas de encabezado redundantes (`SectionHeader` y contenedores con gradientes pesados) que duplicaban el nombre del departamento o sección.

@@ -119,7 +119,12 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Registro de auditoría teocrática"
+    >
       <div className="flex flex-col w-full max-w-4xl max-h-[90vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
@@ -156,12 +161,14 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
             <button
               onClick={fetchLogs}
               title="Refrescar"
+              aria-label="Actualizar registro de auditoría"
               className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-colors"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
             <button
               onClick={onClose}
+              aria-label="Cerrar registro de auditoría"
               className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-colors"
             >
               <X className="w-5 h-5" />
@@ -176,6 +183,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
             <input
               type="text"
               placeholder="Buscar por hermano, acción o detalle..."
+              aria-label="Buscar en el registro de auditoría por hermano, acción o detalle"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white placeholder-slate-400"
@@ -186,6 +194,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
             <select
               value={selectedModule}
               onChange={(e) => setSelectedModule(e.target.value)}
+              aria-label="Filtrar eventos por módulo"
               className="px-3 py-1.5 text-sm bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white"
             >
               <option value="all">Todos los módulos</option>
@@ -215,6 +224,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
               <button
                 onClick={() => setConfirmAction('prune')}
                 title="Purgar registros mayores a 30 días"
+                aria-label="Purgar registros de auditoría anteriores a 30 días"
                 className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-colors flex items-center space-x-1"
               >
                 <Clock className="w-3.5 h-3.5" />
@@ -241,6 +251,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({ isOpen, onClose })
               <button
                 onClick={() => setConfirmAction('clear')}
                 title="Limpiar todo el registro"
+                aria-label="Limpiar todo el registro de auditoría"
                 className="px-2.5 py-1.5 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors flex items-center space-x-1"
               >
                 <Trash2 className="w-3.5 h-3.5" />

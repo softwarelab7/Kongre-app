@@ -191,7 +191,12 @@ export const DigitalTerritoryModal: React.FC<DigitalTerritoryModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/70 backdrop-blur-xs animate-fade-in overflow-y-auto">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/70 backdrop-blur-xs animate-fade-in overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Tarjeta digital del territorio ${territory.number}`}
+    >
       <div
         className="w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto max-h-[95vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
@@ -202,6 +207,7 @@ export const DigitalTerritoryModal: React.FC<DigitalTerritoryModalProps> = ({
             onClick={onClose}
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
             title="Cerrar tarjeta"
+            aria-label="Cerrar tarjeta digital de territorio"
           >
             <X className="w-5 h-5" />
           </button>

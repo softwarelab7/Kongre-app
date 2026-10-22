@@ -102,6 +102,24 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   // System navigation modules index
   const navigationModules: SearchResultItem[] = useMemo(() => [
     {
+      id: 'mod-panorama-general',
+      category: 'modulos',
+      categoryLabel: 'Mi Congregación',
+      title: 'Mi Congregación y Cartelera',
+      subtitle: 'Informe mensual, próximos privilegios, tablero de anuncios y eventos',
+      icon: Compass,
+      action: () => onNavigate('panorama_general'),
+    },
+    {
+      id: 'mod-estadisticas-secretaria',
+      category: 'modulos',
+      categoryLabel: 'Secretaría',
+      title: 'Resumen de Secretaría y Gráficos',
+      subtitle: 'Métricas generales, asistencia, publicadores, precursores y gráficos',
+      icon: BarChart3,
+      action: () => onNavigate('estadisticas_secretaria'),
+    },
+    {
       id: 'mod-calendario',
       category: 'modulos',
       categoryLabel: 'Reuniones',
@@ -598,6 +616,9 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
       {/* Modal Dialog */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Buscador global de la congregación"
         className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[82vh] z-10 animate-in fade-in zoom-in-95 duration-150"
         onKeyDown={handleKeyDown}
       >
@@ -610,11 +631,14 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar publicador, territorio, bosquejo de discurso (#1..200), fecha o módulo..."
+            aria-label="Buscar publicador, territorio, bosquejo de discurso, fecha o módulo"
             className="w-full bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium text-sm sm:text-base focus:outline-hidden"
           />
           {query ? (
             <button
+              type="button"
               onClick={() => setQuery('')}
+              aria-label="Limpiar búsqueda"
               className="p-1 rounded-lg text-slate-400 dark:text-slate-300 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
             >
               <X className="w-4 h-4" />

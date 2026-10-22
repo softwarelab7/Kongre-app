@@ -208,6 +208,9 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Cola de sincronización offline"
     >
       <div
         className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden"
@@ -236,6 +239,7 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Cerrar cola de sincronización offline"
             className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -382,6 +386,7 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
                         onClick={() => handleRemove(item.id)}
                         className="p-1 rounded text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                         title="Descartar de la cola"
+                        aria-label={`Descartar de la cola: ${item.description}`}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>

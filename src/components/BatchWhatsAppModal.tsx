@@ -140,7 +140,12 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] z-10 animate-in fade-in zoom-in-95 duration-150">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Recordatorios y Confirmaciones de Asignación por WhatsApp"
+        className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] z-10 animate-in fade-in zoom-in-95 duration-150"
+      >
         {/* Header */}
         <div className="px-5 py-4 border-b border-slate-200 bg-linear-to-r from-emerald-50 via-teal-50 to-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -163,7 +168,9 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
           </div>
 
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Cerrar recordatorios de WhatsApp"
             className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -225,6 +232,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
             <select
               value={meetingFilter}
               onChange={(e) => setMeetingFilter(e.target.value as any)}
+              aria-label="Filtrar por tipo de reunión"
               className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-700 focus:outline-hidden"
             >
               <option value="todas">Todas las reuniones</option>
@@ -236,6 +244,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
+              aria-label="Filtrar por estado de confirmación"
               className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white font-medium text-slate-700 focus:outline-hidden"
             >
               <option value="todos">Todos los estados</option>

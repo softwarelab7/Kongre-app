@@ -111,7 +111,12 @@ export const SessionLockModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-950/95 backdrop-blur-md p-4 animate-fade-in select-none">
+    <div
+      className="fixed inset-0 z-100 flex items-center justify-center bg-slate-950/95 backdrop-blur-md p-4 animate-fade-in select-none"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Pantalla de bloqueo de seguridad"
+    >
       <div
         className={`w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-center text-white shadow-2xl transition-transform ${
           shake ? 'animate-bounce' : ''
@@ -155,6 +160,7 @@ export const SessionLockModal: React.FC = () => {
             maxLength={8}
             value={enteredPin}
             onChange={(e) => setEnteredPin(e.target.value.replace(/\D/g, ''))}
+            aria-label="PIN de desbloqueo de sesión"
             className="sr-only"
             autoFocus
           />
@@ -193,6 +199,7 @@ export const SessionLockModal: React.FC = () => {
             type="button"
             disabled={lockoutSeconds > 0}
             onClick={handleClear}
+            aria-label="Limpiar todo el PIN ingresado"
             className="h-12 rounded-2xl bg-slate-800/40 hover:bg-slate-800 text-slate-400 font-semibold text-xs border border-slate-700/40 active:scale-95 transition-all disabled:opacity-40"
           >
             C
@@ -211,6 +218,7 @@ export const SessionLockModal: React.FC = () => {
             onClick={handleDelete}
             className="h-12 rounded-2xl bg-slate-800/40 hover:bg-slate-800 text-slate-400 flex items-center justify-center border border-slate-700/40 active:scale-95 transition-all disabled:opacity-40"
             title="Borrar"
+            aria-label="Borrar último dígito"
           >
             <Delete className="w-5 h-5" />
           </button>

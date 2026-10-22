@@ -1,5 +1,6 @@
 import {
   Armchair,
+  BarChart3,
   BookOpenText,
   BriefcaseBusiness,
   BrushCleaning,
@@ -58,6 +59,7 @@ export const NAV_ICONS: Record<string, LucideIcon> = {
   discursos: MicVocal,
   hospitalidad: Coffee,
   secretaria: FolderArchive,
+  estadisticas_secretaria: BarChart3,
   publicadores: Users,
   precursores_auxiliares: Target,
   tarjetas_s21: IdCard,
@@ -99,6 +101,7 @@ export const NAV_MOTION: Record<string, Motion> = {
   discursos: 'wiggle',
   hospitalidad: 'rise',
   secretaria: 'drop',
+  estadisticas_secretaria: 'rise',
   precursores_auxiliares: 'pulse',
   informes_servicio: 'pulse',
   informe_s1: 'rise',

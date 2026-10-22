@@ -90,7 +90,12 @@ export const AppLockPinSuggestionModal: React.FC<AppLockPinSuggestionModalProps>
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Configurar PIN de bloqueo de la aplicación"
+    >
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-slate-950/75 backdrop-blur-xs transition-opacity"
@@ -119,6 +124,7 @@ export const AppLockPinSuggestionModal: React.FC<AppLockPinSuggestionModalProps>
             onClick={handleDismiss}
             className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             title="Cerrar y omitir por ahora"
+            aria-label="Cerrar y omitir configuración de PIN por ahora"
           >
             <X className="w-5 h-5" />
           </button>
@@ -178,6 +184,7 @@ export const AppLockPinSuggestionModal: React.FC<AppLockPinSuggestionModalProps>
                   <button
                     type="button"
                     onClick={() => setShowPin(!showPin)}
+                    aria-label={showPin ? 'Ocultar PIN de bloqueo' : 'Mostrar PIN de bloqueo'}
                     className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
                   >
                     {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

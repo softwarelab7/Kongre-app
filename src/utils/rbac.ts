@@ -201,7 +201,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     description: 'Acceso total y supervisión general de todos los departamentos, ajustes y permisos.',
     allowedTabs: [
       'inicio', 'calendario', 'programacion', 'clm_vmc', 's89', 'discursos', 'hospitalidad',
-      'publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informe_s1', 'informes_servicio',
+      'estadisticas_secretaria', 'publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informe_s1', 'informes_servicio',
       'asistencia', 'cuentas', 'territorios', 'grupos_servicio', 'carritos', 'literatura',
       'limpieza_deberes', 'mantenimiento', 'panel_electrico', 'visita_sc', 'memorial_asambleas',
       'tablero_anuncios', 'conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'ajustes', 'roles'
@@ -242,7 +242,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     description: 'Supervisión espiritual general, reuniones, oradores y visitas de pastoreo.',
     allowedTabs: [
       'inicio', 'calendario', 'programacion', 'clm_vmc', 's89', 'discursos', 'hospitalidad',
-      'publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia',
+      'estadisticas_secretaria', 'publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia',
       'grupos_servicio', 'territorios', 'carritos', 'limpieza_deberes', 'visita_sc',
       'memorial_asambleas', 'tablero_anuncios', 'conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'roles'
     ],
@@ -319,7 +319,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     badgeColor: 'bg-cyan-600 text-white shadow-xs',
     description: 'Supervisa la predicación, grupos de servicio, territorios, carritos y actividad.',
     allowedTabs: [
-      'inicio', 'calendario', 'territorios', 'grupos_servicio', 'carritos', 'publicadores',
+      'inicio', 'calendario', 'territorios', 'grupos_servicio', 'carritos', 'estadisticas_secretaria', 'publicadores',
       'precursores_auxiliares', 'informes_servicio', 'tablero_anuncios', 'mi_vista', 'perfil'
     ],
     canEditCLM: false,
@@ -357,7 +357,7 @@ export const THEOCRATIC_ROLES: Record<TheocraticRole, TheocraticRoleInfo> = {
     badgeColor: 'bg-blue-600 text-white shadow-xs',
     description: 'Administra tarjetas S-21, informes S-4, asistencia S-88 y directorio de hermanos.',
     allowedTabs: [
-      'inicio', 'calendario', 'publicadores', 'tarjetas_s21', 'informe_s1', 'informes_servicio',
+      'inicio', 'calendario', 'estadisticas_secretaria', 'publicadores', 'tarjetas_s21', 'informe_s1', 'informes_servicio',
       'asistencia', 'precursores_auxiliares', 'grupos_servicio', 'visita_sc', 'tablero_anuncios', 'exportar_pdf', 'mi_vista', 'perfil'
     ],
     canEditCLM: false,

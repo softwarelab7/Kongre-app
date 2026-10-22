@@ -117,7 +117,12 @@ export const ClmWeeklyConflictsModal: React.FC<ClmWeeklyConflictsModalProps> = (
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Panel de conflictos de asignaciones de la semana"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in"
+    >
       <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between">
@@ -151,6 +156,7 @@ export const ClmWeeklyConflictsModal: React.FC<ClmWeeklyConflictsModalProps> = (
           <button
             type="button"
             onClick={onClose}
+            aria-label="Cerrar panel de conflictos de la semana"
             className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X size={18} />

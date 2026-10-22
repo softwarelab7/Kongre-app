@@ -752,7 +752,12 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       />
 
       {/* Main Dialog */}
-      <div className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[92vh] z-10 animate-in fade-in zoom-in-95 duration-150">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Roles Teocráticos y PINs de Acceso"
+        className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[92vh] z-10 animate-in fade-in zoom-in-95 duration-150"
+      >
         {/* Header */}
         <div className="px-6 py-4 bg-linear-to-r from-slate-900 via-indigo-950 to-blue-950 text-white flex items-center justify-between border-b border-indigo-900/50">
           <div className="flex items-center gap-3">
@@ -784,7 +789,9 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
             </div>
 
             <button
+              type="button"
               onClick={onClose}
+              aria-label="Cerrar ventana de roles y PINs"
               className="p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               title="Cerrar modal"
             >
@@ -957,6 +964,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Buscar hermano por nombre o responsabilidad asignada..."
+                    aria-label="Buscar hermano por nombre o responsabilidad asignada"
                     className="w-full pl-10 pr-3 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                   />
                 </div>
@@ -1084,6 +1092,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => togglePinVisibility(item.publisherId)}
+                                  aria-label={isVisible ? `Ocultar PIN de ${item.name}` : `Ver PIN de ${item.name}`}
                                   className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                                   title={isVisible ? 'Ocultar PIN' : 'Ver PIN'}
                                 >
@@ -1094,6 +1103,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleGeneratePinForPublisher(item.publisherId)}
+                                aria-label={`Generar nuevo PIN aleatorio para ${item.name}`}
                                 className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer"
                                 title="Generar otro PIN aleatorio"
                               >
@@ -1103,6 +1113,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleRevokePinForPublisher(item.publisherId)}
+                                aria-label={`Revocar PIN y cerrar sesiones de ${item.name}`}
                                 className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-colors"
                                 title="Revocar PIN y cerrar sesiones activas (teléfono perdido)"
                               >
@@ -1125,6 +1136,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleCopyDirectLink(item.name, item.role, item.pin, item.publisherId)}
+                                aria-label={`Copiar enlace directo de acceso para ${item.name}`}
                                 className="px-2 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
                                 title="Copiar enlace directo de publicador (un solo toque)"
                               >
@@ -1139,6 +1151,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                               <button
                                 type="button"
                                 onClick={() => handleShareWhatsApp(item.name, item.role, item.pin, item.publisherId)}
+                                aria-label={`Enviar credenciales de ${item.name} por WhatsApp`}
                                 className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/70 dark:hover:bg-emerald-900/80 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-2xs"
                                 title="Copiar y enviar por WhatsApp"
                               >
@@ -1159,6 +1172,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                               setCustomPinInput(item.pin || generateUniquePublisherPin());
                               setEditError(null);
                             }}
+                            aria-label={`Personalizar PIN o rol de ${item.name}`}
                             className="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                             title="Personalizar datos o PIN a mano"
                           >
@@ -1361,6 +1375,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                     </select>
                     <button
                       type="submit"
+                      aria-label="Vincular cuenta de correo Google"
                       className="px-3.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shrink-0 cursor-pointer"
                     >
                       <Plus className="w-4 h-4" />
@@ -1394,6 +1409,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                           <button
                             type="button"
                             onClick={() => removeRoleFromEmail(rec.email)}
+                            aria-label={`Eliminar vinculación de ${rec.email}`}
                             className="p-1 rounded-md text-slate-400 hover:text-rose-600 cursor-pointer"
                             title="Eliminar vinculación"
                           >
@@ -1534,6 +1550,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                               <button
                                 type="button"
                                 onClick={() => revokeInvitation(inv.id)}
+                                aria-label={`Revocar código de invitación para ${inv.targetName || 'hermano'}`}
                                 className="p-1 rounded-md text-slate-400 hover:text-rose-600 cursor-pointer"
                                 title="Revocar"
                               >
@@ -1556,6 +1573,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
             Kongre • Seguridad y Asignaciones Teocráticas
           </span>
           <button
+            type="button"
             onClick={onClose}
             className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-bold transition-colors cursor-pointer"
           >
@@ -1566,7 +1584,12 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
 
       {/* EDIT MODAL: PERSONALIZAR PIN O ROL DE UN HERMANO */}
       {editingPublisher && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Editar credenciales de ${editingPublisher.name}`}
+          className="fixed inset-0 z-60 flex items-center justify-center p-4"
+        >
           <div
             className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs"
             onClick={() => setEditingPublisher(null)}
@@ -1582,6 +1605,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
               <button
                 type="button"
                 onClick={() => setEditingPublisher(null)}
+                aria-label="Cerrar edición de credenciales"
                 className="text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -1663,7 +1687,12 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
 
       {/* ADD MODAL: ASIGNAR ROL Y PIN A OTRO HERMANO */}
       {showAddModal && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Asignar Rol y PIN a un Hermano"
+          className="fixed inset-0 z-60 flex items-center justify-center p-4"
+        >
           <div
             className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs"
             onClick={() => setShowAddModal(false)}
@@ -1679,6 +1708,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
+                aria-label="Cerrar asignación de hermano"
                 className="text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 <X className="w-5 h-5" />

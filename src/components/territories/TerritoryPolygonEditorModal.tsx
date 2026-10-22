@@ -395,7 +395,12 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Delimitar polígono del territorio ${territory.name}`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm animate-fade-in"
+    >
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-6xl h-[94vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Top Header */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/70">
@@ -418,14 +423,19 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
 
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => setShowHelp(!showHelp)}
+              aria-label="Instrucciones y ayuda para delimitar territorio"
+              aria-expanded={showHelp}
               className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               title="Instrucciones y ayuda"
             >
               <HelpCircle className="w-5 h-5" />
             </button>
             <button
+              type="button"
               onClick={onClose}
+              aria-label="Cerrar editor de polígono de territorio"
               className="p-2 rounded-xl text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               <X className="w-5 h-5" />
@@ -447,7 +457,9 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
               </ul>
             </div>
             <button
+              type="button"
               onClick={() => setShowHelp(false)}
+              aria-label="Ocultar instrucciones de ayuda"
               className="text-indigo-500 hover:text-indigo-800 dark:hover:text-indigo-200"
             >
               <X className="w-4 h-4" />
@@ -463,6 +475,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
+                aria-label="Buscar calle, barrio o ciudad en el mapa"
                 placeholder="Buscar calle, barrio o ciudad..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -487,6 +500,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
                 type="button"
                 onClick={() => setSelectedColor(c.value)}
                 title={c.label}
+                aria-label={`Seleccionar color ${c.label}`}
                 style={{ backgroundColor: c.value }}
                 className={`w-5 h-5 rounded-full transition-transform ${
                   selectedColor === c.value ? 'scale-125 ring-2 ring-offset-2 ring-indigo-500' : 'opacity-80 hover:opacity-100'
@@ -558,6 +572,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
               type="button"
               onClick={handleUndo}
               disabled={vertices.length === 0}
+              aria-label="Deshacer último punto del polígono"
               className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 shadow-md backdrop-blur-md border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 transition-colors disabled:opacity-40"
               title="Deshacer último punto"
             >
@@ -567,6 +582,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
               type="button"
               onClick={handleFitBounds}
               disabled={vertices.length === 0}
+              aria-label="Centrar mapa en el polígono"
               className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 shadow-md backdrop-blur-md border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 transition-colors disabled:opacity-40"
               title="Centrar en polígono"
             >
@@ -576,6 +592,7 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
               type="button"
               onClick={handleClear}
               disabled={vertices.length === 0}
+              aria-label="Limpiar todo el polígono"
               className="p-2.5 rounded-xl bg-white/90 dark:bg-slate-800/90 text-rose-600 dark:text-rose-400 shadow-md backdrop-blur-md border border-rose-200 dark:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors disabled:opacity-40"
               title="Limpiar todo el polígono"
             >
@@ -624,14 +641,21 @@ export const TerritoryPolygonEditorModal: React.FC<TerritoryPolygonEditorModalPr
 
         {/* Modal GeoJSON Import/Export */}
         {showGeoJsonModal && (
-          <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Importar o exportar coordenadas GeoJSON"
+            className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+          >
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 max-w-lg w-full shadow-2xl space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">
                   Importar o Exportar GeoJSON
                 </h3>
                 <button
+                  type="button"
                   onClick={() => setShowGeoJsonModal(false)}
+                  aria-label="Cerrar ventana de GeoJSON"
                   className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
                   <X className="w-5 h-5" />

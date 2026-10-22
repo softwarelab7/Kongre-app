@@ -43,6 +43,9 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 backdrop-blur-xs p-3 sm:p-5 animate-fade-in"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Términos de uso y política de privacidad"
     >
       <div
         className="w-full max-w-3xl max-h-[90vh] rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden"

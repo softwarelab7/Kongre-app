@@ -196,11 +196,18 @@ export const AssignmentConfirmationModal: React.FC<AssignmentConfirmationModalPr
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col z-10 animate-in fade-in zoom-in-95 duration-150">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Confirmación de Asignación"
+        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col z-10 animate-in fade-in zoom-in-95 duration-150"
+      >
         {/* Top Header Card */}
         <div className="px-6 py-5 bg-linear-to-br from-indigo-700 via-indigo-800 to-slate-900 text-white relative">
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Cerrar ventana de confirmación de asignación"
             className="absolute top-4 right-4 p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-colors"
           >
             <X className="w-5 h-5" />

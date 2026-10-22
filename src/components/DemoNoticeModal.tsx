@@ -32,7 +32,12 @@ export const DemoNoticeModal: React.FC<DemoNoticeModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Bienvenida al modo de prueba de Kongre"
+    >
       <div className="relative w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-7 space-y-5 animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
@@ -54,6 +59,7 @@ export const DemoNoticeModal: React.FC<DemoNoticeModalProps> = ({
             onClick={onClose}
             className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
             title="Cerrar"
+            aria-label="Cerrar aviso del modo de prueba"
           >
             <X className="w-5 h-5" />
           </button>

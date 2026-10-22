@@ -95,6 +95,7 @@ export type ActiveTab =
   | 'hospitalidad'
   | 'carritos'
   | 'asistencia'
+  | 'estadisticas_secretaria'
   | 'informe_s1'
   | 'informes_servicio'
   | 'tarjetas_s21'
@@ -501,15 +502,15 @@ export const Navbar: React.FC<NavbarProps> = ({
     },
     {
       id: 'panorama',
-      title: 'Panorama General',
-      shortTitle: 'Panorama',
+      title: 'Mi Congregación',
+      shortTitle: 'Congregación',
       icon: NAV_ICONS.panorama_general,
       tabIds: ['panorama_general'],
       items: [
         {
           id: 'panorama_general',
-          label: 'Panorama General de la Congregación',
-          description: 'Estadísticas generales, asistencia, publicadores, precursores y gráficos',
+          label: 'Mi Congregación y Cartelera',
+          description: 'Informe mensual, próximas asignaciones, tablero de anuncios y eventos',
           icon: NAV_ICONS.panorama_general,
         },
       ],
@@ -552,8 +553,14 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Secretaría y Registros',
       shortTitle: 'Secretaría',
       icon: NAV_ICONS.secretaria,
-      tabIds: ['publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'informe_s1', 'cuentas'],
+      tabIds: ['estadisticas_secretaria', 'publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'informe_s1', 'cuentas'],
       items: [
+        {
+          id: 'estadisticas_secretaria',
+          label: 'Resumen de Secretaría y Gráficos',
+          description: 'Métricas generales, asistencia, publicadores, precursores y gráficos',
+          icon: NAV_ICONS.estadisticas_secretaria,
+        },
         {
           id: 'publicadores',
           label: 'Directorio de Publicadores',
@@ -769,7 +776,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     },
     {
       id: 'panorama_general',
-      title: 'Panorama General',
+      title: 'Mi Congregación',
       icon: NAV_ICONS.panorama_general,
       primaryTab: 'panorama_general' as ActiveTab,
       tabIds: ['panorama_general'] as ActiveTab[],
@@ -793,8 +800,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       id: 'secretaria',
       title: 'Secretaría y Registros',
       icon: NAV_ICONS.secretaria,
-      primaryTab: 'publicadores' as ActiveTab,
-      tabIds: ['publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'informe_s1', 'cuentas'] as ActiveTab[],
+      primaryTab: 'estadisticas_secretaria' as ActiveTab,
+      tabIds: ['estadisticas_secretaria', 'publicadores', 'precursores_auxiliares', 'tarjetas_s21', 'informes_servicio', 'asistencia', 'informe_s1', 'cuentas'] as ActiveTab[],
       badge: undefined,
       badgeColor: undefined,
       colorClass: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/80 dark:text-emerald-400',
@@ -861,7 +868,10 @@ export const Navbar: React.FC<NavbarProps> = ({
     setIsMobileMenuOpen(false);
   };
 
-  const displayCongregationName = getFriendlyCongregationName(settings.congregationName, 'Congregación Central');
+  const rawCongregationName = getFriendlyCongregationName(settings.congregationName, 'Congregación Central');
+  const displayCongregationName = rawCongregationName
+    .replace(/\s*\((?:Demostración|Demo|Prueba)\)/gi, '')
+    .trim() || 'Congregación Central';
 
   // Friendly title for the active tab under the congregation name
   const getCurrentTabSubtitle = (tab: ActiveTab): string => {
@@ -869,7 +879,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       case 'inicio':
         return 'Mi Ministerio (Publicador)';
       case 'panorama_general':
-        return 'Panorama General';
+        return 'Mi Congregación';
       case 'cronometro_ministerio':
         return 'Cronómetro de Predicación';
       case 'revisitas':
@@ -881,7 +891,9 @@ export const Navbar: React.FC<NavbarProps> = ({
       case 'programacion':
         return 'Programa de Reuniones';
       case 'asistencia':
-        return 'Estadísticas';
+        return 'Estadísticas de Asistencia';
+      case 'estadisticas_secretaria':
+        return 'Resumen de Secretaría y Gráficos';
       case 'informe_s1':
         return 'Informe S-1 Sucursal';
       case 'publicadores':
@@ -925,13 +937,17 @@ export const Navbar: React.FC<NavbarProps> = ({
           1. SLIM LEFT VERTICAL SIDEBAR (DESKTOP / TABLET - CATEGORIES & FLYOUT)
          ========================================================================= */}
       {isSidebarVisible && (
-        <aside className="hidden md:flex flex-col items-center fixed left-0 top-0 bottom-0 w-16 z-40 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 py-3 select-none transition-all duration-200 overflow-visible">
+        <aside
+          aria-label="Barra lateral de navegación por departamentos"
+          className="hidden md:flex flex-col items-center fixed left-0 top-0 bottom-0 w-16 z-40 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 py-3 select-none transition-all duration-200 overflow-visible"
+        >
           {/* Top Brand Squircle Logo Button */}
           <button
             type="button"
             onClick={() => handleSelectTab('inicio')}
+            aria-label="Ir al inicio - Mi Ministerio"
             className="w-10 h-10 flex items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95 mb-4 shrink-0 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 rounded-2xl"
-            title="Kongre - Panorama General"
+            title="Kongre - Mi Ministerio"
           >
             <Logo variant="isotipo" className="w-10 h-10 object-contain shadow-xs hover:shadow-md transition-shadow" />
           </button>
@@ -956,6 +972,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                       handleSelectTab(cat.primaryTab);
                       setHoveredCategory(null);
                     }}
+                    aria-label={cat.title}
+                    aria-current={isCatActive ? 'page' : undefined}
+                    aria-expanded={hasSubItems ? isHovered : undefined}
                     className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
                       isCatActive
                         ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
@@ -972,11 +991,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
                     )}
 
-                    {/* Active Chevron Indicator Badge (matching reference design) */}
+                    {/* Active Accent Indicator */}
                     {isCatActive && (
-                      <span className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[10px] text-slate-400 shadow-xs z-20 pointer-events-none">
-                        <ChevronRight className="w-2.5 h-2.5" />
-                      </span>
+                      <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-indigo-600 dark:bg-indigo-400 pointer-events-none" />
                     )}
                   </button>
 
@@ -1033,6 +1050,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                                 handleSelectTab(sub.id);
                                 setHoveredCategory(null);
                               }}
+                              aria-label={`${sub.label}: ${sub.description}`}
+                              aria-current={isSubActive ? 'page' : undefined}
                               className={`group relative p-3 rounded-2xl text-left transition-all duration-200 cursor-pointer flex flex-col justify-between border ${
                                 isLastOdd ? 'col-span-2' : ''
                               } ${
@@ -1114,6 +1133,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => handleSelectTab('perfil')}
+              aria-label="Mi Perfil y Contacto"
+              aria-current={activeTab === 'perfil' ? 'page' : undefined}
               className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                 activeTab === 'perfil'
                   ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/70 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
@@ -1127,6 +1148,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectTab('ajustes')}
+                aria-label="Ajustes de la Congregación"
+                aria-current={activeTab === 'ajustes' ? 'page' : undefined}
                 className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                   activeTab === 'ajustes'
                     ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/70 dark:text-indigo-400 font-bold border border-indigo-100 dark:border-indigo-800/60 shadow-2xs'
@@ -1142,6 +1165,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={onOpenVersionModal}
+                aria-label={`Versión actual Kongre v${CURRENT_APP_VERSION}, ver historial de versiones`}
                 className="px-1.5 py-0.5 mt-0.5 rounded text-[10px] font-mono font-bold text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-colors cursor-pointer select-none"
                 title={`Kongre v${CURRENT_APP_VERSION} - Clic para ver historial de versiones y cambios`}
               >
@@ -1169,6 +1193,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onToggleSidebar();
                 }
               }}
+              aria-label={isSidebarVisible ? 'Ocultar barra lateral de navegación' : 'Mostrar barra lateral de navegación'}
+              aria-expanded={isSidebarVisible}
               className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-200 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 active:scale-95"
               title={isSidebarVisible ? 'Ocultar barra lateral' : 'Mostrar barra lateral'}
             >
@@ -1180,59 +1206,37 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectTab('inicio')}
+                aria-label="Ir al inicio - Mi Ministerio"
                 className="shrink-0 cursor-pointer transition-transform hover:scale-105 active:scale-95 hidden md:block"
-                title="Kongre - Panorama General"
+                title="Kongre - Mi Ministerio"
               >
                 <Logo variant="isotipo" className="w-7 h-7 object-contain" />
               </button>
             )}
 
-            {/* Browser Back / Forward Controls (hidden on mobile where native swipe gestures apply) */}
-            <div className="hidden sm:flex items-center gap-0.5 shrink-0">
-              <button
-                type="button"
-                onClick={() => window.history.back()}
-                className="p-1.5 rounded-lg text-slate-400 dark:text-slate-300 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                title="Atrás (Navegador)"
-                aria-label="Atrás"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => window.history.forward()}
-                className="p-1.5 rounded-lg text-slate-400 dark:text-slate-300 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                title="Adelante (Navegador)"
-                aria-label="Adelante"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-
             {/* Congregation title & breadcrumb navigation */}
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 flex items-center gap-2 sm:gap-3">
               <div className="flex items-center gap-1.5 sm:gap-2 text-xs min-w-0">
                 <h1 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight truncate">
                   {displayCongregationName}
                 </h1>
-                {isDemoMode && (
-                  <div className="shrink-0">
-                    <DemoBanner
-                      onOpenRoleModal={onOpenRoleModal}
-                      onOpenRegisterModal={onOpenRegisterModal}
-                      onExitDemo={handleExitDemo}
-                      onResetDemo={handleResetDemo}
-                    />
-                  </div>
-                )}
-                <span className="text-slate-300 dark:text-slate-600 font-normal hidden sm:inline">/</span>
-                <span className="text-indigo-600 dark:text-indigo-400 font-semibold truncate hidden sm:inline text-xs">
+                <span className="text-slate-300 dark:text-slate-600 font-normal">/</span>
+                <span className="text-indigo-600 dark:text-indigo-400 font-semibold truncate text-xs">
                   {getCurrentTabSubtitle(activeTab)}
                 </span>
               </div>
-              <p className="text-[10.5px] text-indigo-600/90 dark:text-indigo-400/90 font-semibold sm:hidden truncate mt-0.5 leading-tight">
-                {getCurrentTabSubtitle(activeTab)}
-              </p>
+
+              {/* Demo Mode Badge placed gracefully after the breadcrumb */}
+              {isDemoMode && (
+                <div className="shrink-0 inline-flex">
+                  <DemoBanner
+                    onOpenRoleModal={onOpenRoleModal}
+                    onOpenRegisterModal={onOpenRegisterModal}
+                    onExitDemo={handleExitDemo}
+                    onResetDemo={handleResetDemo}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -1242,6 +1246,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={onOpenSearchModal}
+              aria-label="Buscar en la congregación"
               className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-200 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               title="Buscar en la congregación (Ctrl+K)"
             >
@@ -1253,6 +1258,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectTab('publicadores')}
+                aria-label="Catálogo y Directorio de Publicadores"
+                aria-current={activeTab === 'publicadores' ? 'page' : undefined}
                 className={`w-9 h-9 rounded-xl hidden sm:flex items-center justify-center transition-all cursor-pointer ${
                   activeTab === 'publicadores'
                     ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 shadow-2xs font-bold'
@@ -1268,6 +1275,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => handleSelectTab('calendario')}
+              aria-label="Calendario de la Congregación"
+              aria-current={activeTab === 'calendario' ? 'page' : undefined}
               className={`h-9 px-2.5 rounded-xl hidden md:flex items-center gap-1.5 transition-all cursor-pointer text-xs font-semibold ${
                 activeTab === 'calendario'
                   ? 'bg-indigo-600 text-white shadow-xs font-bold'
@@ -1284,6 +1293,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={onOpenQrModal}
+                aria-label="App Móvil y Código QR"
                 className="w-9 h-9 rounded-xl hidden sm:flex items-center justify-center text-slate-400 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                 title="App Móvil y Código QR"
               >
@@ -1300,6 +1310,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={onOpenPinsModal}
+                aria-label="Directorio de PINs de los Publicadores y la Congregación"
                 className="w-9 h-9 rounded-xl hidden sm:flex items-center justify-center text-slate-400 dark:text-slate-200 hover:text-amber-500 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer"
                 title="Directorio de PINs de los Publicadores y la Congregación"
               >
@@ -1311,6 +1322,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={onOpenConflictsModal}
+              aria-label={`Notificaciones y cruces de horario${conflicts.length > 0 ? ` (${conflicts.length} alertas)` : ''}`}
               className="relative w-9 h-9 rounded-xl flex items-center justify-center text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer"
               title="Notificaciones & Cruces"
             >
@@ -1346,6 +1358,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => setOpenDropdown((prev) => (prev === 'user' ? null : 'user'))}
+                aria-label="Menú de cuenta y perfil de usuario"
+                aria-expanded={openDropdown === 'user'}
                 className="flex items-center gap-2 p-1 pl-1 pr-1.5 sm:pr-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700/60 transition cursor-pointer"
                 title="Menú de cuenta y perfil"
               >
@@ -1505,7 +1519,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           3. FULL SLIDE-OVER DRAWER (STRICTLY MOBILE ONLY: md:hidden)
          ========================================================================= */}
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex animate-in fade-in duration-150">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menú de navegación móvil"
+          className="md:hidden fixed inset-0 z-50 flex animate-in fade-in duration-150"
+        >
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity"
@@ -1519,10 +1538,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col z-10 border-r border-slate-200 dark:border-slate-800 pb-[env(safe-area-inset-bottom,0px)] animate-in slide-in-from-left duration-200 ease-out">
             {/* Tirador visual para deslizar o tocar hacia la izquierda para cerrar */}
             <div
+              role="button"
+              tabIndex={0}
+              aria-label="Cerrar menú lateral"
               className="absolute -right-3.5 top-1/2 -translate-y-1/2 w-7 h-14 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-700/90 rounded-r-2xl flex items-center justify-center shadow-lg cursor-pointer text-slate-400 active:scale-95 transition-transform"
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 setDrawerSearch('');
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  setIsMobileMenuOpen(false);
+                  setDrawerSearch('');
+                }
               }}
               title="Desliza a la izquierda o toca aquí para cerrar el menú"
             >
@@ -1535,6 +1563,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   type="button"
                   onClick={() => handleSelectTab('perfil')}
+                  aria-label="Ver Mi Perfil"
                   className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold flex items-center justify-center text-xs shadow-2xs shrink-0 overflow-hidden ring-2 ring-indigo-500/20 cursor-pointer"
                   title="Ver Mi Perfil"
                 >
@@ -1608,6 +1637,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   type="button"
                   onClick={toggleTheme}
+                  aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
                   className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition cursor-pointer"
                   title={isDark ? 'Modo Claro' : 'Modo Oscuro'}
                 >
@@ -1619,6 +1649,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setIsMobileMenuOpen(false);
                     setDrawerSearch('');
                   }}
+                  aria-label="Cerrar menú de navegación"
                   className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition cursor-pointer"
                   title="Cerrar menú"
                 >
@@ -1634,6 +1665,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <input
                   type="text"
                   placeholder="Buscar sección (ej. Cuentas, S-89, Territorios...)"
+                  aria-label="Buscar sección en el menú"
                   value={drawerSearch}
                   onChange={(e) => setDrawerSearch(e.target.value)}
                   className="w-full pl-8 pr-7 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white"
@@ -1642,6 +1674,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <button
                     type="button"
                     onClick={() => setDrawerSearch('')}
+                    aria-label="Limpiar búsqueda de sección"
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-300 hover:text-slate-600 dark:hover:text-white p-0.5 cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
@@ -1653,7 +1686,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {[
                   { id: 'all', label: 'Todos' },
                   { id: 'ministerio_publicador', label: 'Publicador' },
-                  { id: 'panorama', label: 'Panorama General' },
+                  { id: 'panorama', label: 'Congregación' },
                   { id: 'reuniones', label: 'Reuniones' },
                   { id: 'secretaria', label: 'Secretaría' },
                   { id: 'predicacion', label: 'Predicación' },
@@ -1755,11 +1788,44 @@ export const Navbar: React.FC<NavbarProps> = ({
                   ).map((dept) => {
                     const DeptIcon = dept.icon;
                     const isCollapsed = collapsedDepts[dept.id] && drawerCategory === 'all';
+                    const isSingleDirectDept = dept.id === 'panorama' && dept.items.length === 1;
+
+                    if (isSingleDirectDept) {
+                      const singleItem = dept.items[0];
+                      const SingleIcon = singleItem.icon;
+                      const isSubActive = activeTab === singleItem.id;
+                      return (
+                        <div key={dept.id} className="space-y-0.5">
+                          <button
+                            type="button"
+                            onClick={() => handleSelectTab(singleItem.id)}
+                            aria-current={isSubActive ? 'page' : undefined}
+                            className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-left text-xs transition cursor-pointer ${
+                              isSubActive
+                                ? 'bg-indigo-600 text-white font-bold shadow-2xs'
+                                : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100/80 dark:hover:bg-slate-800/60'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 truncate">
+                              <SingleIcon
+                                className={`w-4 h-4 shrink-0 ${
+                                  isSubActive ? 'text-white' : 'text-indigo-500 dark:text-indigo-400'
+                                }`}
+                              />
+                              <span className="truncate font-semibold">{dept.title}</span>
+                            </div>
+                          </button>
+                        </div>
+                      );
+                    }
+
                     return (
                       <div key={dept.id} className="space-y-0.5">
                         <button
                           type="button"
                           onClick={() => toggleDeptCollapse(dept.id)}
+                          aria-expanded={!isCollapsed}
+                          aria-label={`${dept.title}, ${isCollapsed ? 'expandir' : 'contraer'} departamento`}
                           className="w-full flex items-center justify-between text-[10.5px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 py-1 hover:bg-slate-100/60 dark:hover:bg-slate-800/60 rounded-lg transition-colors cursor-pointer"
                         >
                           <span className="flex items-center gap-1.5">
@@ -1787,6 +1853,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                                   key={sub.id}
                                   type="button"
                                   onClick={() => handleSelectTab(sub.id)}
+                                  aria-current={isSubActive ? 'page' : undefined}
                                   className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-left text-xs transition cursor-pointer ${
                                     isSubActive
                                       ? 'bg-indigo-600 text-white font-bold shadow-2xs'
@@ -1962,6 +2029,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={() => handleSelectTab('inicio')}
+            aria-label="Ir a Mi Ministerio"
+            aria-current={activeTab === 'inicio' ? 'page' : undefined}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'inicio' ||
               activeTab === 'cronometro_ministerio' ||
@@ -1975,10 +2044,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Ministerio</span>
           </button>
 
-          {/* 2. Panorama General (Vista general aparte) */}
+          {/* 2. Mi Congregación (Informe, próximos privilegios, anuncios y eventos) */}
           <button
             type="button"
             onClick={() => handleSelectTab('panorama_general')}
+            aria-label="Ir a Mi Congregación"
+            aria-current={activeTab === 'panorama_general' ? 'page' : undefined}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'panorama_general'
                 ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
@@ -1991,13 +2062,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
               )}
             </div>
-            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Panorama</span>
+            <span className="text-[10.5px] mt-0.5 leading-tight font-semibold">Congregación</span>
           </button>
 
           {/* 3. Reuniones (Programación) */}
           <button
             type="button"
             onClick={() => handleSelectTab('programacion')}
+            aria-label="Ir a Programación de Reuniones"
+            aria-current={activeTab === 'programacion' ? 'page' : undefined}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'programacion' || activeTab === 'clm_vmc' || activeTab === 's89' || activeTab === 'discursos' || activeTab === 'hospitalidad'
                 ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
@@ -2012,6 +2085,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={() => handleSelectTab('calendario')}
+            aria-label="Ir a Calendario de la Congregación"
+            aria-current={activeTab === 'calendario' ? 'page' : undefined}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               activeTab === 'calendario'
                 ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'
@@ -2031,6 +2106,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(true)}
+            aria-label="Abrir menú completo de departamentos"
+            aria-expanded={isMobileMenuOpen}
             className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all cursor-pointer relative min-h-[46px] active:scale-95 ${
               isMobileMenuOpen
                 ? 'text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/80 dark:bg-indigo-950/60'

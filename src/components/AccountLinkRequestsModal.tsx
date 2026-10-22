@@ -99,7 +99,12 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in duration-150">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in duration-150"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Vinculación de cuentas Google"
+    >
       <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden">
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900/70">
@@ -126,6 +131,7 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
           <button
             type="button"
             onClick={onClose}
+            aria-label="Cerrar solicitudes de vinculación de cuentas"
             className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -168,6 +174,7 @@ export const AccountLinkRequestsModal: React.FC<AccountLinkRequestsModalProps> =
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar por nombre o correo..."
+              aria-label="Buscar solicitudes por nombre o correo"
               className="w-full sm:w-64 pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-2 focus:ring-amber-500/20"
             />
           </div>

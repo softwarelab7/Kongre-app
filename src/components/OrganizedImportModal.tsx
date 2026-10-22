@@ -188,7 +188,12 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
     : OFFICIAL_PUBLIC_TALK_OUTLINES;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-xs animate-fade-in overflow-y-auto">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-xs animate-fade-in overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Traer bosquejos y programa semanal"
+    >
       <div
         className="w-full max-w-3xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-auto max-h-[95vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
@@ -197,6 +202,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
         <div className="bg-linear-to-r from-indigo-700 via-indigo-800 to-slate-900 p-5 sm:p-6 text-white shrink-0 relative">
           <button
             onClick={onClose}
+            aria-label="Cerrar importador de bosquejos y programa semanal"
             className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -595,6 +601,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
                     value={outlineQuery}
                     onChange={(e) => setOutlineQuery(e.target.value)}
                     placeholder="Buscar por número (#1 al 194), tema o categoría..."
+                    aria-label="Buscar bosquejo público por número, tema o categoría"
                     className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-indigo-500"
                   />
                 </div>

@@ -123,7 +123,12 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[250] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={request ? 'Editar solicitud de precursorado auxiliar' : 'Nueva solicitud de precursor auxiliar S-205'}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[250] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150"
+    >
       <div className="bg-white dark:bg-[#131d2e] rounded-3xl shadow-2xl w-full max-w-2xl max-h-[92vh] border border-zinc-200 dark:border-white/[0.08] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-white/[0.08] bg-zinc-50/70 dark:bg-white/[0.02]">
@@ -141,7 +146,9 @@ export const AuxPioneerModal: React.FC<AuxPioneerModalProps> = ({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Cerrar ventana de solicitud de precursor auxiliar"
             className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors"
           >
             <X size={20} />

@@ -260,7 +260,12 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Suscripción a recordatorios Push automáticos"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200"
+    >
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         {/* HEADER */}
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-start justify-between gap-4 bg-gradient-to-r from-purple-600/10 via-indigo-600/10 to-blue-600/10">
@@ -301,6 +306,7 @@ export const PushSubscriptionModal: React.FC<PushSubscriptionModalProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Cerrar ventana de notificaciones Push"
             className="p-2 rounded-xl bg-white/80 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-all cursor-pointer"
           >
             <X size={18} />

@@ -381,7 +381,12 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
   if (!isOpen || !programa) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-fade-in">
+    <div
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 overflow-y-auto animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Consejero de la sala auxiliar"
+    >
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
         {/* ── HEADER DEL MODAL ── */}
         <div className="px-6 py-4 border-b border-slate-200 dark:border-white/[0.08] flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/50">
@@ -412,6 +417,7 @@ export const ClmAuxiliaryCounselorModal: React.FC<ClmAuxiliaryCounselorModalProp
             onClick={onClose}
             className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
             title="Cerrar"
+            aria-label="Cerrar panel del consejero de la sala auxiliar"
           >
             <X size={18} />
           </button>

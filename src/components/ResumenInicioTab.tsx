@@ -157,26 +157,15 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
           1. HEADER TITLE (EXACT REFERENCE: Panorama General)
          ========================================================================= */}
       <div className="flex items-center justify-between gap-2.5 flex-wrap">
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-2xs shrink-0">
-            <LayoutGrid className="w-4 h-4 text-slate-600 dark:text-slate-300" />
-          </div>
-          <div className="min-w-0">
-            <h2 className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-1.5 leading-tight">
-              <span>Panorama</span>
-              <span className="text-indigo-600 dark:text-indigo-400">General</span>
-            </h2>
-            <p className="text-[11px] sm:text-xs text-slate-400 font-medium truncate">
-              Sincronización activa • Datos en tiempo real
-            </p>
-          </div>
-        </div>
+        <p className="text-xs text-slate-400 font-medium truncate">
+          Sincronización activa • Datos en tiempo real
+        </p>
 
         <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab('inicio')}
-            className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold shadow-2xs transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-1.5 h-8 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold shadow-2xs transition-all cursor-pointer active:scale-95"
             title="Ir al Menú Principal del Publicador (Cronómetro, Revisitas y Estudios)"
           >
             <Timer className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -186,14 +175,12 @@ export const ResumenInicioTab: React.FC<ResumenInicioTabProps> = ({
           <button
             type="button"
             onClick={handleOpenPins}
-            className="flex items-center gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-xs font-bold shadow-2xs transition-all cursor-pointer group active:scale-95 shrink-0"
+            className="flex items-center gap-1.5 h-8 px-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-xs font-bold shadow-2xs transition-all cursor-pointer group active:scale-95 shrink-0"
             title="Ver directorio de PINs de los publicadores y la congregación"
           >
-            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-amber-500 text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xs">
-              <KeyRound className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            </div>
+            <KeyRound className="w-3.5 h-3.5 text-amber-500" />
             <span>PINs</span>
-            <span className="bg-amber-200/80 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[10px] font-mono font-bold px-1.5 sm:px-2 py-0.5 rounded-full">
+            <span className="bg-amber-200/80 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full">
               {publisherPinsCount}
             </span>
           </button>

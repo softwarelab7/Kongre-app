@@ -1240,6 +1240,9 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
   return (
     <div
       ref={modalContainerRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Consola de Presidencia y Cronómetro de Reunión"
       className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-md select-none ${
         isFullscreen || displayMode === 'atril' ? 'p-0' : 'p-0 sm:p-3 md:p-4'
       }`}
@@ -1360,6 +1363,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
             <button
               type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
+              aria-label={soundEnabled ? 'Silenciar alertas de sonido' : 'Activar alertas de sonido'}
               className={`p-2.5 rounded-xl border transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center ${
                 soundEnabled
                   ? 'bg-slate-800 border-slate-700 text-emerald-400 hover:bg-slate-700'
@@ -1486,6 +1490,7 @@ export const MeetingTimerModal: React.FC<MeetingTimerModalProps> = ({
                   type="time"
                   value={meetingStartTime}
                   onChange={(e) => setMeetingStartTime(e.target.value)}
+                  aria-label="Hora de inicio de la reunión"
                   className="bg-transparent text-white font-mono font-bold text-xs focus:outline-none cursor-pointer"
                 />
               </div>

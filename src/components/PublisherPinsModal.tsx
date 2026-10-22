@@ -310,7 +310,12 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Directorio de PINs de la congregación"
+    >
       <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-3xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[92vh] overflow-hidden">
         {/* Modal Header */}
         <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-gradient-to-r from-amber-500/10 via-indigo-500/5 to-transparent">
@@ -333,6 +338,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Cerrar directorio de PINs"
             className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -449,6 +455,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
               <input
                 type="text"
                 placeholder="Buscar por hermano o número de PIN..."
+                aria-label="Buscar por hermano o número de PIN"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-9 pr-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
@@ -457,6 +464,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setSearchTerm('')}
+                  aria-label="Limpiar búsqueda"
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -601,6 +609,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
                             value={editingPinValue}
                             onChange={(e) => setEditingPinValue(e.target.value.replace(/\D/g, ''))}
                             placeholder="Nuevo PIN"
+                            aria-label={`Nuevo PIN para ${pub.name}`}
                             className="w-24 px-2 py-1 text-xs font-mono font-bold text-center rounded-lg border border-amber-400 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none"
                             autoFocus
                           />
@@ -612,6 +621,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
                             }}
                             className="p-1 rounded-lg text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/50"
                             title="Generar PIN aleatorio"
+                            aria-label={`Generar PIN aleatorio para ${pub.name}`}
                           >
                             <Sparkles className="w-3.5 h-3.5" />
                           </button>
@@ -620,6 +630,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
                             onClick={() => handleSaveEditPin(pub, role)}
                             className="p-1 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/50"
                             title="Guardar PIN"
+                            aria-label={`Guardar PIN de ${pub.name}`}
                           >
                             <Check className="w-3.5 h-3.5" />
                           </button>
@@ -628,6 +639,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
                             onClick={() => setEditingPublisherId(null)}
                             className="p-1 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
                             title="Cancelar"
+                            aria-label="Cancelar edición de PIN"
                           >
                             <X className="w-3.5 h-3.5" />
                           </button>
@@ -646,6 +658,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
                                 onClick={() => togglePinReveal(pub.id)}
                                 className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 cursor-pointer ml-1"
                                 title={isRevealed ? 'Ocultar PIN' : 'Ver PIN'}
+                                aria-label={isRevealed ? `Ocultar PIN de ${pub.name}` : `Ver PIN de ${pub.name}`}
                               >
                                 {isRevealed ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                               </button>
@@ -659,6 +672,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
                               onClick={() => handleCopyPin(pub.name, pin, pub.id)}
                               className="p-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-2xs cursor-pointer"
                               title="Copiar PIN"
+                              aria-label={`Copiar PIN de ${pub.name}`}
                             >
                               {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                             </button>
@@ -671,6 +685,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
                               onClick={() => handleShareWhatsApp(pub, pin)}
                               className="p-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors shadow-2xs cursor-pointer"
                               title="Compartir por WhatsApp"
+                              aria-label={`Compartir PIN de ${pub.name} por WhatsApp`}
                             >
                               <MessageCircle className="w-3.5 h-3.5" />
                             </button>
@@ -682,6 +697,7 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
                             onClick={() => handleStartEdit(pub.id, pin)}
                             className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                             title="Editar o regenerar PIN"
+                            aria-label={`Editar o regenerar PIN de ${pub.name}`}
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>

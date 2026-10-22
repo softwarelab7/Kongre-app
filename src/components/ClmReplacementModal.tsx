@@ -209,7 +209,12 @@ export const ClmReplacementModal: React.FC<ClmReplacementModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-xs animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Sustitución de última hora VMC"
+    >
       <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
         {/* Cabecera */}
         <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between">
@@ -229,6 +234,7 @@ export const ClmReplacementModal: React.FC<ClmReplacementModalProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Cerrar asistente de reemplazos VMC"
             className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
           >
             <X size={18} />
@@ -326,6 +332,7 @@ export const ClmReplacementModal: React.FC<ClmReplacementModalProps> = ({
                   onClick={() => handleCopyWhatsApp(replacedPublisher.pub)}
                   className="p-2 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:text-zinc-200 transition-colors cursor-pointer"
                   title="Copiar texto del mensaje"
+                  aria-label="Copiar texto del mensaje de WhatsApp"
                 >
                   {copiedWhatsApp ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} />}
                 </button>
@@ -351,6 +358,7 @@ export const ClmReplacementModal: React.FC<ClmReplacementModalProps> = ({
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Buscar hermano disponible..."
+                  aria-label="Buscar hermano disponible para reemplazo"
                   className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-2xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                 />
               </div>

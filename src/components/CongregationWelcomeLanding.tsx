@@ -61,26 +61,81 @@ interface CongregationWelcomeLandingProps {
   onOpenVersionModal?: () => void;
 }
 
+type FeatureAccent = 'indigo' | 'emerald' | 'amber' | 'sky';
+
+const FEATURE_ACCENT_STYLES: Record<
+  FeatureAccent,
+  {
+    card: string;
+    iconBox: string;
+    kicker: string;
+    titleHover: string;
+  }
+> = {
+  indigo: {
+    card: 'bg-linear-to-br from-indigo-50/90 via-white to-violet-50/40 dark:from-indigo-950/50 dark:via-slate-800/90 dark:to-slate-900 border-indigo-200/80 dark:border-indigo-800/70 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-xs hover:shadow-md hover:shadow-indigo-500/10',
+    iconBox: 'bg-linear-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-600/25 ring-2 ring-indigo-500/15',
+    kicker: 'text-indigo-600 dark:text-indigo-400',
+    titleHover: 'group-hover:text-indigo-600 dark:group-hover:text-indigo-300',
+  },
+  emerald: {
+    card: 'bg-linear-to-br from-emerald-50/90 via-white to-teal-50/40 dark:from-emerald-950/50 dark:via-slate-800/90 dark:to-slate-900 border-emerald-200/80 dark:border-emerald-800/70 hover:border-emerald-400 dark:hover:border-emerald-500 shadow-xs hover:shadow-md hover:shadow-emerald-500/10',
+    iconBox: 'bg-linear-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-600/25 ring-2 ring-emerald-500/15',
+    kicker: 'text-emerald-600 dark:text-emerald-400',
+    titleHover: 'group-hover:text-emerald-600 dark:group-hover:text-emerald-300',
+  },
+  amber: {
+    card: 'bg-linear-to-br from-amber-50/90 via-white to-orange-50/40 dark:from-amber-950/45 dark:via-slate-800/90 dark:to-slate-900 border-amber-200/80 dark:border-amber-800/70 hover:border-amber-400 dark:hover:border-amber-500 shadow-xs hover:shadow-md hover:shadow-amber-500/10',
+    iconBox: 'bg-linear-to-br from-amber-500 to-orange-600 text-white shadow-md shadow-amber-500/25 ring-2 ring-amber-500/15',
+    kicker: 'text-amber-600 dark:text-amber-400',
+    titleHover: 'group-hover:text-amber-600 dark:group-hover:text-amber-300',
+  },
+  sky: {
+    card: 'bg-linear-to-br from-sky-50/90 via-white to-blue-50/40 dark:from-sky-950/50 dark:via-slate-800/90 dark:to-slate-900 border-sky-200/80 dark:border-sky-800/70 hover:border-sky-400 dark:hover:border-sky-500 shadow-xs hover:shadow-md hover:shadow-sky-500/10',
+    iconBox: 'bg-linear-to-br from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/25 ring-2 ring-sky-500/15',
+    kicker: 'text-sky-600 dark:text-sky-400',
+    titleHover: 'group-hover:text-sky-600 dark:group-hover:text-sky-300',
+  },
+};
+
 function LandingFeatureCard({
   icon: Icon,
   title,
   text,
+  kicker,
+  accent = 'indigo',
 }: {
   icon: any;
   title: string;
   text: string;
+  kicker?: string;
+  accent?: FeatureAccent;
 }) {
+  const styles = FEATURE_ACCENT_STYLES[accent];
   return (
-    <article className="border-t border-line py-3 lg:py-3.5 cursor-default group transition-colors">
-      <div className="flex items-center gap-2.5">
-        <Icon size={22} className="text-brand shrink-0" strokeWidth={2} aria-hidden />
-        <h3 className="text-sm lg:text-[14.5px] font-bold text-ink group-hover:text-brand transition-colors">
+    <article
+      className={`group relative rounded-2xl border p-3.5 sm:p-4 transition-all duration-200 hover:-translate-y-0.5 flex items-start gap-3.5 ${styles.card}`}
+    >
+      <div
+        className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 ${styles.iconBox}`}
+      >
+        <Icon className="w-5 h-5 text-white" strokeWidth={2.1} aria-hidden />
+      </div>
+      <div className="min-w-0 flex-1">
+        {kicker && (
+          <div className={`text-[10.5px] font-bold tracking-wider uppercase mb-0.5 ${styles.kicker}`}>
+            {kicker}
+          </div>
+        )}
+        <h3
+          className={`text-[14px] sm:text-[14.5px] font-extrabold text-slate-900 dark:text-white leading-snug transition-colors ${styles.titleHover}`}
+        >
           {title}
         </h3>
+        <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+          {text}
+        </p>
       </div>
-      <p className="mt-1 text-xs sm:text-[12.5px] leading-relaxed text-muted line-clamp-2 xl:line-clamp-none">
-        {text}
-      </p>
     </article>
   );
 }
@@ -1134,77 +1189,84 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             </div>
 
             {/* Mobile Features Section: Funciones Principales de la App */}
-            <div className="mt-7 pt-6 border-t border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-brand-soft text-brand text-[11px] font-bold tracking-wide uppercase">
-                  <Sparkles className="w-3 h-3 text-brand" />
-                  Funciones de la App
-                </span>
+            <div className="mt-8 pt-7 relative">
+              {/* Glowing gradient divider */}
+              <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-indigo-400/60 dark:via-indigo-500/60 to-transparent" />
+
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-1.5 text-[11px] font-extrabold tracking-wider uppercase text-indigo-600 dark:text-indigo-400">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <span>Funciones de la App</span>
+                  <span aria-hidden="true">·</span>
+                  <span className="text-slate-500 dark:text-slate-400 font-semibold">4 Pilares</span>
+                </div>
               </div>
-              <h2 className="text-[16px] sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
-                Toda la gestión teocrática en un solo lugar
+
+              <h2 className="text-[19px] sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
+                Toda la gestión teocrática{' '}
+                <span className="bg-linear-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent">
+                  en un solo lugar
+                </span>
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-3.5 leading-relaxed">
-                Herramienta integral para coordinadores, secretarios, superintendentes de servicio y publicadores.
+              <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 mt-1 mb-4 leading-relaxed">
+                Diseñada para coordinadores, secretarios, superintendentes de servicio y publicadores.
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-brand-soft text-brand flex items-center justify-center shrink-0">
-                    <CalendarDays className="w-5 h-5 text-brand" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white">
-                      Reuniones & Guía S-89
-                    </h3>
-                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 leading-snug">
-                      Programación Vida y Ministerio, Fin de Semana y hojas S-89 oficiales automáticas.
-                    </p>
-                  </div>
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <LandingFeatureCard
+                  icon={CalendarDays}
+                  accent="indigo"
+                  kicker="Programación · S-89"
+                  title="Reuniones & Guía S-89"
+                  text="Programación Vida y Ministerio, Fin de Semana y hojas S-89 oficiales automáticas."
+                />
 
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-brand-soft text-brand flex items-center justify-center shrink-0">
-                    <MapPin className="w-5 h-5 text-brand" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white">
-                      Territorios & Carritos
-                    </h3>
-                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 leading-snug">
-                      Manzanas con mapas, tarjetas digitales con código QR para publicadores y carritos.
-                    </p>
-                  </div>
-                </div>
+                <LandingFeatureCard
+                  icon={MapPin}
+                  accent="emerald"
+                  kicker="Mapas · Código QR"
+                  title="Territorios & Carritos"
+                  text="Manzanas con mapas interactivos, tarjetas digitales con QR para publicadores y carritos."
+                />
 
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-brand-soft text-brand flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-5 h-5 text-brand" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white">
-                      Seguridad por Roles & PIN
-                    </h3>
-                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 leading-snug">
-                      ID y PIN de congregación, más PIN personal bajo confidencialidad teocrática.
-                    </p>
-                  </div>
-                </div>
+                <LandingFeatureCard
+                  icon={ShieldCheck}
+                  accent="amber"
+                  kicker="Cifrado · Confidencial"
+                  title="Seguridad por Roles & PIN"
+                  text="ID y PIN de congregación, más PIN personal bajo estricta confidencialidad teocrática."
+                />
 
-                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-brand-soft text-brand flex items-center justify-center shrink-0">
-                    <Wifi className="w-5 h-5 text-brand" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-[13.5px] font-bold text-slate-900 dark:text-white">
-                      PWA & Modo Offline
-                    </h3>
-                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 leading-snug">
-                      Úsala en el Salón sin conexión; tus datos se sincronizan al recuperar internet.
-                    </p>
-                  </div>
-                </div>
+                <LandingFeatureCard
+                  icon={Wifi}
+                  accent="sky"
+                  kicker="Sin Conexión · Nube"
+                  title="PWA & Modo Offline"
+                  text="Úsala en el Salón sin conexión; tus datos se sincronizan al recuperar internet."
+                />
               </div>
+
+              {/* Interactive Demo Action Banner inside Features Section */}
+              <button
+                type="button"
+                onClick={handleEnterDemoMode}
+                className="mt-4 w-full group flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl bg-linear-to-r from-indigo-600 via-violet-600 to-purple-600 hover:from-indigo-500 hover:via-violet-500 hover:to-purple-500 text-white shadow-lg shadow-indigo-600/20 transition-all cursor-pointer active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-3 text-left min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                    <Sparkles className="w-4 h-4 text-amber-300" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs sm:text-[13.5px] font-extrabold leading-tight truncate">
+                      Explorar todas las funciones en vivo
+                    </div>
+                    <div className="text-[11px] text-indigo-100 truncate mt-0.5">
+                      Entra al Modo Demo interactivo sin registrarte
+                    </div>
+                  </div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-white shrink-0 transition-transform group-hover:translate-x-1" />
+              </button>
             </div>
           </div>
         </div>
@@ -1265,29 +1327,37 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 </em>
               </h1>
 
-              <p className="max-w-[520px] text-xs sm:text-[13.5px] lg:text-[14.5px] leading-relaxed text-muted mb-4 sm:mb-5">
+              <p className="max-w-[520px] text-xs sm:text-[13.5px] lg:text-[14.5px] leading-relaxed text-muted mb-5">
                 Plataforma digital especializada para coordinadores, secretarios, superintendentes de servicio y publicadores. Organiza programas semanales, hojas S-89, asignaciones de limpieza y territorios con soporte offline PWA.
               </p>
 
               {/* Feature Cards Grid (2x2 on Desktop) */}
-              <div className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
+              <div className="grid gap-3.5 sm:grid-cols-2">
                 <LandingFeatureCard
                   icon={CalendarDays}
+                  accent="indigo"
+                  kicker="Programación · S-89"
                   title="Reuniones & Guía S-89"
                   text="Programación Vida y Ministerio, Fin de Semana, generación automática e impresión de hojas S-89 oficiales."
                 />
                 <LandingFeatureCard
                   icon={MapPin}
+                  accent="emerald"
+                  kicker="Mapas · Código QR"
                   title="Territorios & Carritos"
                   text="Manzanas georreferenciadas, enlaces digitales por QR para publicadores y control de turnos en carritos."
                 />
                 <LandingFeatureCard
                   icon={ShieldCheck}
+                  accent="amber"
+                  kicker="Cifrado · Confidencial"
                   title="Seguridad por Roles & PIN"
                   text="Autenticación con ID de congregación, PIN de congregación y PIN personal bajo estrictas directrices."
                 />
                 <LandingFeatureCard
                   icon={Wifi}
+                  accent="sky"
+                  kicker="Sin Conexión · Nube"
                   title="PWA & Modo Offline"
                   text="Úsala en el Salón sin conexión a internet; tus datos se sincronizan al volver a tener red."
                 />

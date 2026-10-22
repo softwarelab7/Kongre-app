@@ -160,7 +160,12 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[250] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={sheet ? 'Editar ficha de mantenimiento' : 'Nueva ficha de mantenimiento'}
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[250] flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150"
+    >
       <div className="bg-white dark:bg-[#131d2e] rounded-3xl shadow-2xl w-full max-w-4xl max-h-[92vh] border border-zinc-200 dark:border-white/[0.08] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-white/[0.08] bg-zinc-50/70 dark:bg-white/[0.02]">
@@ -178,7 +183,9 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Cerrar ventana de ficha de mantenimiento"
             className="p-2 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/[0.06] transition-colors"
           >
             <X size={20} />
@@ -391,6 +398,7 @@ export const MaintenanceSheetModal: React.FC<MaintenanceSheetModalProps> = ({
                         <button
                           type="button"
                           onClick={() => handleRemoveChecklistItem(item.id)}
+                          aria-label={`Quitar paso: ${item.text}`}
                           className="p-1 text-zinc-400 hover:text-rose-500 transition-colors"
                           title="Quitar paso"
                         >

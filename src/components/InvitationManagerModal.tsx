@@ -245,7 +245,12 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Registro teocrático e invitaciones"
+    >
       {/* Backdrop */}
       <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity" onClick={onClose} />
 
@@ -268,6 +273,7 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Cerrar gestor de invitaciones"
             className="p-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
           >
             <X className="w-5 h-5" />

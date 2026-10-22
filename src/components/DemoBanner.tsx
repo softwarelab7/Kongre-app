@@ -31,13 +31,12 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="group flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-[9.5px] sm:text-[10px] tracking-wider uppercase shadow-xs border border-purple-400/30 transition-all cursor-pointer select-none active:scale-95"
+        className="group inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80 font-bold text-[10.5px] tracking-wide transition-all cursor-pointer select-none active:scale-95 shadow-2xs"
         title="Modo de prueba activo - Clic para ver opciones"
       >
-        <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-300 group-hover:rotate-12 transition-transform shrink-0" />
-        <span className="sm:hidden">DEMO</span>
-        <span className="hidden sm:inline">MODO PRUEBA</span>
-        <ChevronDown className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-purple-200 opacity-70 group-hover:opacity-100 shrink-0" />
+        <Sparkles className="w-3 h-3 text-indigo-500 dark:text-indigo-400 group-hover:rotate-12 transition-transform shrink-0" />
+        <span>Modo Prueba</span>
+        <ChevronDown className="w-3 h-3 text-indigo-400 dark:text-indigo-400 opacity-70 group-hover:opacity-100 shrink-0 transition-opacity" />
       </button>
 
       {isOpen && (

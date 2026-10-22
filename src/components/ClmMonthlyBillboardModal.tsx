@@ -127,7 +127,12 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/75 backdrop-blur-xs animate-fade-in">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/75 backdrop-blur-xs animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Programa mensual para la cartelera"
+    >
       <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-6xl w-full max-h-[94vh] flex flex-col shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
         {/* Cabecera del Modal */}
         <div className="px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between gap-4">
@@ -152,6 +157,7 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
               onClick={handleDownloadPdf}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
               title="Descargar documento PDF oficial apaisado para imprimir"
+              aria-label="Descargar PDF apaisado del programa mensual"
             >
               <Download size={14} />
               <span className="hidden sm:inline">Descargar PDF Apaisado</span>
@@ -162,6 +168,7 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
               onClick={handlePrint}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/20 text-xs font-bold transition-colors cursor-pointer"
               title="Imprimir directamente"
+              aria-label="Imprimir programa mensual"
             >
               <Printer size={14} />
               <span className="hidden sm:inline">Imprimir</span>
@@ -172,6 +179,7 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
               onClick={handlePublish}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
               title="Publicar en el tablero digital de la congregación"
+              aria-label="Publicar programa mensual en cartelera digital"
             >
               <Share2 size={14} />
               <span className="hidden sm:inline">Publicar en Cartelera</span>
@@ -180,6 +188,7 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
             <button
               type="button"
               onClick={onClose}
+              aria-label="Cerrar programa mensual para la cartelera"
               className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer"
             >
               <X size={18} />
@@ -195,6 +204,7 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
               onClick={handlePrevMonth}
               className="p-1 rounded-lg text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10 cursor-pointer"
               title="Mes anterior"
+              aria-label="Mes anterior"
             >
               <ChevronLeft size={18} />
             </button>
@@ -208,6 +218,7 @@ export const ClmMonthlyBillboardModal: React.FC<ClmMonthlyBillboardModalProps> =
               onClick={handleNextMonth}
               className="p-1 rounded-lg text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10 cursor-pointer"
               title="Mes siguiente"
+              aria-label="Mes siguiente"
             >
               <ChevronRight size={18} />
             </button>

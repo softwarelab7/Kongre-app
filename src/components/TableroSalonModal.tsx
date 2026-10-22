@@ -87,7 +87,12 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
   });
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950 text-white flex flex-col overflow-y-auto">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Tablero Mural Digital del Salón del Reino"
+      className="fixed inset-0 z-50 bg-slate-950 text-white flex flex-col overflow-y-auto"
+    >
       {/* Top Bar with Clock and Controls */}
       <header className="px-3 sm:px-6 py-3 sm:py-4 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between gap-2 backdrop-blur-md sticky top-0 z-20">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -110,7 +115,9 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
           </div>
 
           <button
+            type="button"
             onClick={() => window.print()}
+            aria-label="Imprimir Tablero Mural para el Salón"
             className="p-2 sm:p-2.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center gap-1.5 px-3 font-semibold text-xs cursor-pointer"
             title="Imprimir Tablero Mural para el Salón"
           >
@@ -119,7 +126,9 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
           </button>
 
           <button
+            type="button"
             onClick={toggleFullscreen}
+            aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Ver en pantalla completa'}
             className="p-2 sm:p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center cursor-pointer"
             title="Pantalla Completa"
           >
@@ -127,7 +136,9 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
           </button>
 
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Cerrar Tablero del Salón"
             className="p-2 sm:p-2.5 rounded-xl bg-rose-600/20 hover:bg-rose-600/40 text-rose-300 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center cursor-pointer"
             title="Cerrar Tablero"
           >

@@ -49,6 +49,7 @@ import { DigitalTerritoryModal } from './components/DigitalTerritoryModal';
 import { ThemeToggleModal } from './components/ThemeToggleModal';
 import { OfflineSyncBanner } from './components/OfflineSyncBanner';
 import { ResumenInicioTab } from './components/ResumenInicioTab';
+import { PanoramaGeneralTab } from './components/PanoramaGeneralTab';
 import { MinisterioPublicadorTab } from './components/MinisterioPublicadorTab';
 import { RolesManagerTab } from './components/RolesManagerTab';
 import { AccessRestrictedView } from './components/AccessRestrictedView';
@@ -106,6 +107,8 @@ export const VALID_TABS_MAP: Record<string, ActiveTab> = {
   hospitalidad: 'hospitalidad',
   carritos: 'carritos',
   asistencia: 'asistencia',
+  estadisticas_secretaria: 'estadisticas_secretaria',
+  estadisticas: 'estadisticas_secretaria',
   informe_s1: 'informe_s1',
   informes_servicio: 'informes_servicio',
   tarjetas_s21: 'tarjetas_s21',
@@ -993,6 +996,9 @@ const AppContent: React.FC = () => {
               />
             )}
             {activeTab === 'panorama_general' && (
+              <PanoramaGeneralTab setActiveTab={setActiveTab} />
+            )}
+            {activeTab === 'estadisticas_secretaria' && (
               <ResumenInicioTab
                 setActiveTab={setActiveTab}
                 onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}

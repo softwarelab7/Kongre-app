@@ -989,27 +989,23 @@ export const PersonalViewTab: React.FC = () => {
   // 2. PORTAL PRINCIPAL DEL PUBLICADOR
   return (
     <div className="w-full space-y-5 animate-in fade-in duration-300">
-      {/* 2.1 BARRA SUPERIOR DE IDENTIDAD DEL PUBLICADOR (HEADER) */}
-      <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+      {/* 2.1 BARRA SUPERIOR DE IDENTIDAD DEL PUBLICADOR (COMPACTA) */}
+      <div className="bg-white dark:bg-slate-900 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-2xs shrink-0">
             {selectedPublisher?.name ? selectedPublisher.name[0].toUpperCase() : 'P'}
           </div>
-          <div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/70 px-2.5 py-0.5 rounded-full border border-purple-200/60 dark:border-purple-800/60">
-                Portal del Publicador
-              </span>
-              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/40 flex items-center gap-1">
-                <CheckCircle2 size={10} /> PIN Verificado
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight truncate">
+                {selectedPublisher?.name || 'Publicador'}
+              </h2>
+              <span className="text-[9.5px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.2 rounded-full border border-emerald-200/60 dark:border-emerald-800/40 flex items-center gap-1">
+                <CheckCircle2 size={9} /> PIN Verificado
               </span>
             </div>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mt-0.5">
-              {selectedPublisher?.name || 'Publicador'}
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Congregación: <strong className="text-slate-700 dark:text-slate-300">{settings.congregationName || 'Central'}</strong>
-              {myPreachingGroup && ` • Grupo ${myPreachingGroup.number}`}
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5 leading-tight">
+              {settings.congregationName || 'Central'}{myPreachingGroup ? ` • Grupo ${myPreachingGroup.number}` : ''}
             </p>
           </div>
         </div>

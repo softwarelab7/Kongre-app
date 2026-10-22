@@ -420,7 +420,12 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Unirse a la congregación"
+    >
       {/* Backdrop */}
       <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity" onClick={onClose} />
 
@@ -444,6 +449,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Cerrar ventana para unirse a la congregación"
             className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -541,6 +547,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
                     onClick={() => setCongregationIdInput('')}
                     className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors cursor-pointer"
                     title="Borrar ID"
+                    aria-label="Borrar ID de la congregación"
                     tabIndex={-1}
                   >
                     <X className="w-3.5 h-3.5" />
@@ -574,6 +581,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                   tabIndex={-1}
                   title={showCongPin ? 'Ocultar PIN' : 'Ver PIN'}
+                  aria-label={showCongPin ? 'Ocultar PIN de la congregación' : 'Ver PIN de la congregación'}
                 >
                   {showCongPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -604,6 +612,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
                   onClick={() => setShowPersPin(!showPersPin)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600/70 hover:text-emerald-800 dark:hover:text-emerald-200 cursor-pointer"
                   tabIndex={-1}
+                  aria-label={showPersPin ? 'Ocultar PIN personal' : 'Ver PIN personal'}
                 >
                   {showPersPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>

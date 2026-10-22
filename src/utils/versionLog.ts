@@ -25,19 +25,45 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.11.0';
-export const CURRENT_BUILD_CODE = '2026.10.22.3701';
+export const CURRENT_APP_VERSION = '2.11.1';
+export const CURRENT_BUILD_CODE = '2026.10.22.3801';
 export const BUILD_DATE = '22 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.11.1',
+    buildCode: '2026.10.22.3801',
+    date: '22 de Octubre, 2026',
+    title: 'Blindaje de Invitaciones por QR y PIN, Asignación Inmediata de Rol Teocrático y Aislamiento de Modo Demo',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Verificación y Canje Multidispositivo de Invitaciones por QR y PIN: Reconocimiento flexible de códigos completos (KONG-ROL-...), códigos cortos, tokens cifrados (kgr_tk1_...) y formato portátil compuesto (CONG::CPIN::INVITE) tanto en memoria local como sincronizados con Supabase.',
+      },
+      {
+        category: 'fix',
+        text: 'Activación Inmediata del Rol Teocrático Asignado: Al canjear una invitación válida generada por los ancianos o escanear su código QR, el rol otorgado (Secretario, Superintendente de Servicio, Siervo de Discursos, etc.) se activa y firma criptográficamente al instante sin bloquear a usuarios con cuenta de Google en solicitudes pendientes.',
+      },
+      {
+        category: 'security',
+        text: 'Control Anti-Reutilización y Sincronización Cloud: Las invitaciones canjeadas se marcan automáticamente como utilizadas (used), se cifran en reposo con AES-GCM y disparan sincronización automática con la nube.',
+      },
+      {
+        category: 'fix',
+        text: 'Aislamiento Estricto de Datos de Demostración: Las congregaciones recién registradas inician completamente limpias en el menú "Mi Congregación" y módulos asociados, reservando los datos de muestra exclusivamente para el Modo Demo activo.',
+      },
+    ],
+  },
+  {
     version: '2.11.0',
     buildCode: '2026.10.22.3701',
     date: '22 de Octubre, 2026',
     title: 'Nuevo Panel "Mi Congregación", Estadísticas de Secretaría y Auditoría de Accesibilidad ARIA',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

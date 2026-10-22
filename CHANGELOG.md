@@ -25,7 +25,21 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.11.0] - 22 de Octubre, 2026 (Compilación Activa)
+### [v2.11.1] - 22 de Octubre, 2026 (Compilación Activa)
+**Título:** Blindaje de Invitaciones por QR y PIN, Asignación Inmediata de Rol Teocrático y Aislamiento de Modo Demo
+- **Verificación y Canje Multidispositivo por QR y PIN (`theocraticSecurity.ts`, `SecurityContext.tsx`):**
+  - Reconocimiento integral en `verifyInvitationCodeMatch` para códigos completos (`KONG-SEC-...`), códigos cortos (`SEC-...`), tokens seguros (`kgr_tk1_...`) y códigos compuestos portátiles (`CONG::CPIN::INVITE`).
+  - Soporte para validar y canjear invitaciones tanto almacenadas localmente como descargadas en tiempo real desde Supabase (`externalInvitations`).
+- **Activación Inmediata y Persistente del Rol Asignado (`AuthContext.tsx`, `JoinCongregationModal.tsx`, `CongregationWelcomeLanding.tsx`, `App.tsx`):**
+  - Al canjear una invitación generada por los ancianos o escanear su código QR directo (`?tk=...`), el sistema asigna y activa de inmediato el rol teocrático otorgado (`setActiveRole`, `setActiveRoles`, `assignRoleToEmail`) y redirige a la pestaña principal del departamento correspondiente.
+  - Se corrigió la validación en `JoinCongregationModal` (`isInvitationApproved`) para que los hermanos con sesión de Google activa reciban su nombramiento de forma inmediata al usar un código de invitación oficial, sin quedar retenidos en solicitudes de vinculación pendientes.
+  - Preservación de la sesión criptográfica del rol en `onAuthStateChange` para evitar degradaciones accidentales al rol `publico`.
+- **Control Anti-Reutilización y Cifrado en Reposo:**
+  - Al redimir una invitación por cualquiera de las vías (QR directo, modal de unión, pantalla de bienvenida o cambio de sesión con PIN), se marca instantáneamente como `used`, se cifra con AES-GCM en `localStorage` y se dispara la sincronización cloud (`kongre_trigger_cloud_sync`).
+- **Aislamiento Estricto de Datos en Congregaciones Recién Registradas (`CongregationContext.tsx`, `PanoramaGeneralTab.tsx`):**
+  - Garantizado que al registrar una congregación nueva todos los módulos y el panel *Mi Congregación* inicien completamente limpios, mostrando datos de ejemplo únicamente cuando el Modo Demo (`isDemoMode`) está explícitamente activo.
+
+### [v2.11.0] - 22 de Octubre, 2026
 **Título:** Nuevo Panel "Mi Congregación", Estadísticas de Secretaría y Auditoría de Accesibilidad ARIA
 - **Nuevo Panel "Mi Congregación" (`PanoramaGeneralTab.tsx`):**
   - Nuevo centro de resumen personal y congregacional accesible desde la categoría principal *Mi Ministerio*.

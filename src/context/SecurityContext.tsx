@@ -40,7 +40,7 @@ interface SecurityContextType {
   verifyMasterPassphrase: (passphrase: string) => Promise<boolean>;
   createInvitation: (role: TheocraticRole, targetName?: string, expiresInDays?: number) => Promise<CongregationInvitation>;
   revokeInvitation: (id: string) => void;
-  redeemInvitationCode: (code: string, userEmail?: string, userName?: string) => Promise<{ success: boolean; role?: TheocraticRole; message: string; targetName?: string }>;
+  redeemInvitationCode: (code: string, userEmail?: string, userName?: string, externalInvitations?: CongregationInvitation[]) => Promise<{ success: boolean; role?: TheocraticRole; message: string; targetName?: string }>;
   revokeSession: (sessionId: string) => void;
   // Reloj de Bloqueo Automático por Inactividad
   remainingSeconds: number;
@@ -407,7 +407,8 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     async (
       code: string,
       userEmail?: string,
-      userName?: string
+      userName?: string,
+      externalInvitations?: CongregationInvitation[]
     ): Promise<{ success: boolean; role?: TheocraticRole; message: string; targetName?: string }> => {
       const lockoutRem = getPinLockoutRemainingSeconds();
       if (lockoutRem > 0) {
@@ -429,6 +430,23 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           }
         }
       } catch {}
+
+      // Combinar con invitaciones remotas/externas provistas directamente (ej: desde Supabase)
+      if (Array.isArray(externalInvitations) && externalInvitations.length > 0) {
+        const map = new Map(currentList.map((i) => [i.id, i]));
+        for (const ext of externalInvitations) {
+          if (ext && ext.id) {
+            const existing = map.get(ext.id);
+            map.set(ext.id, {
+              ...ext,
+              code: (ext.code && !ext.code.includes('••••')) ? ext.code : (existing?.code || ext.code || ''),
+              codeHash: ext.codeHash || existing?.codeHash || (ext.code && !ext.code.includes('••••') ? hashInvitationCode(ext.code) : undefined),
+            });
+          }
+        }
+        currentList = Array.from(map.values());
+      }
+
       const found = currentList.find((inv) => verifyInvitationCodeMatch(cleanCode, inv));
 
       if (!found) {
@@ -473,16 +491,16 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       // Mark invitation as used and immediately trigger cloud sync to prevent replay across devices
       setInvitations((prev) => {
-        const next = prev.map((inv) =>
-          inv.id === found.id
-            ? {
-                ...inv,
-                status: 'used' as const,
-                usedAt: new Date().toISOString(),
-                usedByEmail: userEmail || 'invitado_local@kongre.org',
-              }
-            : inv
-        );
+        const exists = prev.some((i) => i.id === found.id);
+        const updatedFound = {
+          ...found,
+          status: 'used' as const,
+          usedAt: new Date().toISOString(),
+          usedByEmail: userEmail || 'invitado_local@kongre.org',
+        };
+        const next = exists
+          ? prev.map((inv) => (inv.id === found.id ? updatedFound : inv))
+          : [updatedFound, ...prev];
         try {
           localStorage.setItem(INVITATIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(next)));
           window.dispatchEvent(new CustomEvent('kongre_trigger_cloud_sync'));

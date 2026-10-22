@@ -209,14 +209,25 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       setSecureLocalPin('kongre_registered_cong_pin', cleanCongPin);
       setSecureLocalPin('kongre_last_cong_pin', cleanCongPin);
 
-      // Verificar PIN Personal (Código de Identificación de Rol otorgado por el Coordinador)
+      // Verificar PIN Personal (Código de Identificación de Rol otorgado por el Coordinador o código de invitación)
       let identifiedRole: TheocraticRole | undefined;
       let identifiedRolesList: TheocraticRole[] = [];
       let finalBrotherName = '';
 
+      let codeToRedeem = cleanPersonalPin;
+      if (cleanPersonalPin.startsWith('kgr_tk1_')) {
+        const decoded = decodeSecureShareToken(cleanPersonalPin);
+        if (decoded?.invite) codeToRedeem = decoded.invite.trim();
+        else if (decoded?.pin) codeToRedeem = decoded.pin.trim();
+      } else if (cleanPersonalPin.includes('::')) {
+        const parts = cleanPersonalPin.split('::').map((s) => s.trim()).filter(Boolean);
+        if (parts.length >= 3) codeToRedeem = parts.slice(2).join('::');
+      }
+
       // A) Buscar estrictamente en la lista de publicadores de la congregación por PIN personal o su hash SHA-256
       const congPubs = (cloudData?.publishers || publishers) as any[];
-      const matchingPub = congPubs.find((p) => verifyPersonalPinMatch(cleanPersonalPin, p));
+      const matchingPub = congPubs.find((p) => verifyPersonalPinMatch(codeToRedeem, p));
+      let isInvitationApproved = false;
 
       if (matchingPub) {
         const finalRole: TheocraticRole =
@@ -240,7 +251,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         if (matchingPub.email) emailToUse = matchingPub.email;
         if (matchingPub.id) {
           setIdentifiedPublisher(matchingPub.id, finalBrotherName);
-          setSecureLocalPin('kongre_session_pin_v2', cleanPersonalPin);
+          setSecureLocalPin('kongre_session_pin_v2', codeToRedeem);
         }
       } else {
         if (cloudData?.invitations && Array.isArray(cloudData.invitations)) {
@@ -250,10 +261,11 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
           } catch {}
         }
         // B) Verificar si es un código de invitación generado por los ancianos
-        const invResult = await redeemInvitationCode(cleanPersonalPin, emailToUse, 'Hermano');
+        const invResult = await redeemInvitationCode(codeToRedeem, emailToUse, 'Hermano', cloudData?.invitations);
         if (invResult.success && invResult.role) {
           identifiedRole = invResult.role;
           identifiedRolesList = [invResult.role];
+          isInvitationApproved = true;
           if (invResult.targetName && !isGenericIdentityName(invResult.targetName)) {
             finalBrotherName = invResult.targetName;
           }
@@ -265,7 +277,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         setError(
           failInfo.isLockedOut
             ? `El PIN Personal no coincide con ningún publicador. Acceso bloqueado temporalmente por ${failInfo.remainingSeconds} segundos.`
-            : 'El PIN Personal no coincide con ningún publicador en esta congregación. Verifica el PIN asignado por los ancianos.'
+            : 'El PIN Personal o Código de Invitación no coincide con ningún registro en esta congregación. Verifica los datos provistos por los ancianos.'
         );
         setIsSubmitting(false);
         return;
@@ -297,7 +309,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         }
       }
 
-      // Verificar si el correo ya fue registrado por el coordinador o ya está aprobado (usando cloudData o datos locales)
+      // Verificar si el correo ya fue registrado por el coordinador, ya está aprobado o es una invitación oficial
       const effectiveCoordEmail = (cloudData?.settings?.coordinatorEmail || settings.coordinatorEmail || '').toLowerCase().trim();
       const effectiveRequests = (cloudData?.accountLinkRequests || accountLinkRequests) as any[];
       const isCoordinator =
@@ -310,7 +322,8 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         (r) => r.email && r.email.toLowerCase().trim() === emailToUse.toLowerCase().trim() && r.status === 'approved'
       );
 
-      if (isCoordinator || isPreRegisteredPublisher || isAlreadyApproved || !user?.email) {
+      // Una invitación oficial canjeada exitosamente o credenciales reconocidas otorgan acceso inmediato con el rol asignado
+      if (isInvitationApproved || isCoordinator || isPreRegisteredPublisher || isAlreadyApproved || !user?.email) {
         // Los 3 datos teocráticos son válidos y reconocidos
         if (cloudData) {
           hydrateCongregation(cloudData);
@@ -318,7 +331,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         localStorage.setItem('kongre_is_registered_congregation', 'true');
         localStorage.setItem('kongre_has_entered_app', 'true');
         localStorage.removeItem('kongre_is_guest');
-        setSecureLocalPin('kongre_session_pin_v2', cleanPersonalPin);
+        setSecureLocalPin('kongre_session_pin_v2', codeToRedeem);
         localStorage.removeItem('kongre_needs_cloud_upload');
         localStorage.setItem('kongre_last_local_update', cloudData?.updatedAt || new Date().toISOString());
 
@@ -372,7 +385,11 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
           }
         }
 
-        assignRoleToEmail(emailToUse, identifiedRole, finalBrotherName, cleanPersonalPin);
+        assignRoleToEmail(emailToUse, identifiedRole, finalBrotherName, codeToRedeem);
+        if (user?.email && user.email.toLowerCase().trim() !== emailToUse.toLowerCase().trim()) {
+          assignRoleToEmail(user.email, identifiedRole, finalBrotherName, codeToRedeem);
+        }
+
         if (identifiedRolesList.length > 0) {
           setActiveRoles(identifiedRolesList);
         } else {
@@ -389,16 +406,12 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         setSuccessData({
           role: identifiedRole,
           identifiedBrother: finalBrotherName,
-          message: `¡Conexión exitosa a ${cleanCongName || 'la congregación'}! Tu identidad y nombramiento teocrático han sido verificados.`,
+          message: `¡Conexión exitosa a ${cleanCongName || 'la congregación'}! Tu nombramiento como ${THEOCRATIC_ROLES[identifiedRole]?.name || identifiedRole} ha sido verificado y activado.`,
         });
-
-        if (onSuccessRole) {
-          onSuccessRole(identifiedRole);
-        }
       } else {
-        // El publicador NO tiene el correo registrado por el coordinador:
+        // El publicador NO tiene el correo registrado por el coordinador ni invitación activa:
         // Se genera la solicitud para que los ancianos la aprueben
-        await createAccountLinkRequest(emailToUse, finalBrotherName, cleanPersonalPin, identifiedRole, cleanId);
+        await createAccountLinkRequest(emailToUse, finalBrotherName, codeToRedeem, identifiedRole, cleanId);
         setSuccessData({
           role: identifiedRole,
           identifiedBrother: finalBrotherName,
@@ -413,9 +426,13 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
   };
 
   const handleFinish = () => {
+    const role = successData?.role;
     setSuccessData(null);
     setCongregationPinInput('');
     setPersonalPinInput('');
+    if (role && onSuccessRole) {
+      onSuccessRole(role);
+    }
     onClose();
   };
 

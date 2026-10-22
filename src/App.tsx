@@ -8,8 +8,8 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { CongregationProvider, useCongregation } from './context/CongregationContext';
 import { Navbar, ActiveTab } from './components/Navbar';
-import { isTabAllowedForRole, TheocraticRole } from './utils/rbac';
-import { formatCanonicalCongregationId, isGenericIdentityName, getSecureLocalPin, setSecureLocalPin, verifySecureLocalPin, verifyPersonalPinMatch, decodeSecureShareToken, verifyAssignmentConfirmSignature } from './utils/theocraticSecurity';
+import { isTabAllowedForRole, TheocraticRole, THEOCRATIC_ROLES } from './utils/rbac';
+import { formatCanonicalCongregationId, isGenericIdentityName, getSecureLocalPin, setSecureLocalPin, verifySecureLocalPin, verifyPersonalPinMatch, decodeSecureShareToken, verifyAssignmentConfirmSignature, verifyInvitationCodeMatch, decryptPinAtRest, encryptPinAtRest } from './utils/theocraticSecurity';
 import { CongregationCalendar } from './components/CongregationCalendar';
 import { ScheduleTab } from './components/ScheduleTab';
 import ClmScheduleView from './components/ClmScheduleView';
@@ -150,6 +150,8 @@ const AppContent: React.FC = () => {
     user,
     activeRole,
     setActiveRole,
+    setActiveRoles,
+    assignRoleToEmail,
     effectiveRoleInfo,
     signOutUser,
     currentBrotherName,
@@ -499,15 +501,112 @@ const AppContent: React.FC = () => {
     }
   }, [effectiveRoleInfo.id, activeTab, setActiveTab]);
 
-  // Organized-style "Pocket Mode" Direct Invitation Link (?tk=... or legacy ?cong=...&cpin=...&pub=...&pin=...)
+  // Organized-style "Pocket Mode" Direct Invitation Link (?tk=... or legacy ?cong=...&cpin=...&pub=...&pin=... or ?invite=...)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const decodedTk = decodeSecureShareToken(urlParams.get('tk'));
-    const urlCong = decodedTk?.cong || urlParams.get('cong');
-    const urlCpin = decodedTk?.cpin || urlParams.get('cpin');
-    const urlPub = decodedTk?.pub || urlParams.get('pub');
-    const urlPin = decodedTk?.pin || urlParams.get('pin');
+    let urlCong = (decodedTk?.cong || urlParams.get('cong') || '').trim();
+    let urlCpin = (decodedTk?.cpin || urlParams.get('cpin') || '').trim();
+    const urlPub = (decodedTk?.pub || urlParams.get('pub') || '').trim();
+    const urlPin = (decodedTk?.pin || urlParams.get('pin') || '').trim();
+    let urlInvite = (decodedTk?.invite || urlParams.get('invite') || '').trim();
 
+    // Soportar código compuesto: CONG::CPIN::INVITE
+    if (urlInvite.includes('::')) {
+      const parts = urlInvite.split('::');
+      if (parts.length === 3) {
+        if (!urlCong) urlCong = parts[0].trim();
+        if (!urlCpin) urlCpin = parts[1].trim();
+        urlInvite = parts[2].trim();
+      }
+    }
+
+    // A) Enlace Directo por Código de Invitación Teocrático (QR o URL)
+    if (urlInvite) {
+      const cleanCong = urlCong
+        ? formatCanonicalCongregationId(urlCong)
+        : (localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_congregation_id') || '').trim();
+      const cleanCpin = urlCpin || getSecureLocalPin('kongre_registered_cong_pin') || getSecureLocalPin('kongre_last_cong_pin') || '';
+      const cleanInvite = urlInvite.trim();
+
+      // Limpiar URL sensible de la barra de direcciones
+      const cleanUrl = window.location.pathname + (window.location.hash || '');
+      window.history.replaceState({}, document.title, cleanUrl);
+
+      (async () => {
+        let invList: any[] = [];
+        try {
+          const stored = localStorage.getItem('kongre_theocratic_invitations_v1');
+          if (stored) {
+            const rawJson = stored.startsWith('kgr_v1:') ? decryptPinAtRest(stored) : stored;
+            const parsed = JSON.parse(rawJson || '[]');
+            if (Array.isArray(parsed)) invList = parsed;
+          }
+        } catch {}
+
+        let matchInv = invList.find((inv: any) => verifyInvitationCodeMatch(cleanInvite, inv));
+
+        // Si no se encuentra en el almacenamiento local y hay congregación, consultar Supabase
+        if (!matchInv && cleanCong) {
+          const cloudRes = await loadCongregationFromCloud(cleanCong, {
+            pin: cleanCpin || cleanInvite,
+            personalPin: cleanInvite,
+          });
+
+          if (cloudRes?.success && cloudRes.data) {
+            const cloudInvs = Array.isArray(cloudRes.data.invitations) ? cloudRes.data.invitations : [];
+            matchInv = cloudInvs.find((inv: any) => verifyInvitationCodeMatch(cleanInvite, inv));
+            if (matchInv) {
+              invList = cloudInvs;
+            }
+          }
+        }
+
+        if (matchInv && matchInv.status !== 'revoked' && matchInv.status !== 'used') {
+          const role = matchInv.role as TheocraticRole;
+          const brotherName = matchInv.targetName && !isGenericIdentityName(matchInv.targetName) ? matchInv.targetName.trim() : 'Hermano';
+
+          // Marcar invitación como utilizada
+          matchInv.status = 'used';
+          matchInv.usedAt = new Date().toISOString();
+          matchInv.usedByEmail = user?.email || 'invitado_directo@kongre.org';
+          try {
+            localStorage.setItem('kongre_theocratic_invitations_v1', encryptPinAtRest(JSON.stringify(invList)));
+            window.dispatchEvent(new CustomEvent('kongre_invitations_updated', { detail: invList }));
+            window.dispatchEvent(new CustomEvent('kongre_trigger_cloud_sync'));
+          } catch {}
+
+          setActiveRole(role);
+          setActiveRoles([role]);
+          setIdentifiedBrother(brotherName);
+          setSecureLocalPin('kongre_session_pin_v2', cleanInvite);
+          if (cleanCpin) {
+            setSecureLocalPin('kongre_registered_cong_pin', cleanCpin);
+            setSecureLocalPin('kongre_last_cong_pin', cleanCpin);
+          }
+          localStorage.setItem('kongre_is_registered_congregation', 'true');
+          localStorage.setItem('kongre_has_entered_app', 'true');
+          if (cleanCong) {
+            localStorage.setItem('kongre_congregation_number', cleanCong);
+            localStorage.setItem('kongre_congregation_id', cleanCong);
+          }
+          localStorage.setItem('kongre_identified_brother', brotherName);
+
+          const emailToAssign = user?.email || `invitado_${(cleanCong || 'teocratico').toLowerCase()}@kongre.org`;
+          assignRoleToEmail(emailToAssign, role, brotherName, cleanInvite);
+
+          setShowWelcomeLanding(false);
+          setIsJoinModalOpen(false);
+
+          const roleInfo = THEOCRATIC_ROLES[role];
+          const targetTab = roleInfo?.allowedTabs?.[0] || 'inicio';
+          setActiveTab(targetTab);
+        }
+      })();
+      return;
+    }
+
+    // B) Enlace Directo por Publicador con PIN Personal Único
     if (urlCong && urlPub && urlPin) {
       const cleanCong = formatCanonicalCongregationId(urlCong);
       const cleanCpin = urlCpin ? urlCpin.trim() : '';
@@ -554,6 +653,9 @@ const AppContent: React.FC = () => {
           localStorage.setItem('kongre_congregation_number', cleanCong);
           localStorage.setItem('kongre_congregation_id', cleanCong);
           localStorage.setItem('kongre_identified_brother', brotherName);
+
+          const emailToAssign = user?.email || matchingPub.email || `publicador_${cleanPub}@kongre.org`;
+          assignRoleToEmail(emailToAssign, role, brotherName, cleanPin);
 
           setShowWelcomeLanding(false);
           setActiveTab('mi_vista');

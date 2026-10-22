@@ -546,6 +546,13 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               finalRolesList = resolved.allRoles;
               finalBrotherName = matched.name && !isGenericIdentityName(matched.name) ? matched.name.trim() : 'Hermano';
               publisherIdToSet = matched.id;
+            } else if (Array.isArray(cloudRes.data.invitations)) {
+              const invRes = await redeemInvitationCode(codeToRedeem, user?.email || `hermano_${Date.now()}@kongre.org`, 'Hermano', cloudRes.data.invitations);
+              if (invRes.success && invRes.role) {
+                finalRole = invRes.role;
+                finalRolesList = [invRes.role];
+                finalBrotherName = invRes.targetName && !isGenericIdentityName(invRes.targetName) ? invRes.targetName : 'Hermano';
+              }
             }
           }
         }
@@ -672,7 +679,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               }
             }
             if (!finalRole && Array.isArray(cloudRes.data.invitations)) {
-              const invRes = await redeemInvitationCode(codeToRedeem, user?.email || `hermano_${Date.now()}@kongre.org`, 'Hermano');
+              const invRes = await redeemInvitationCode(codeToRedeem, user?.email || `hermano_${Date.now()}@kongre.org`, 'Hermano', cloudRes.data.invitations);
               if (invRes.success && invRes.role) {
                 finalRole = invRes.role;
                 finalRolesList = [invRes.role];
@@ -713,6 +720,12 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       if (targetCongregationId) {
         localStorage.setItem('kongre_congregation_number', targetCongregationId);
         localStorage.setItem('kongre_congregation_id', targetCongregationId);
+      }
+
+      const emailForRole = user?.email || `hermano_${Date.now()}@kongre.org`;
+      assignRoleToEmail(emailForRole, finalRole, finalBrotherName || 'Hermano', codeToRedeem);
+      if (user?.email && user.email.toLowerCase().trim() !== emailForRole.toLowerCase().trim()) {
+        assignRoleToEmail(user.email, finalRole, finalBrotherName || 'Hermano', codeToRedeem);
       }
 
       // Limpiar parámetros ?invite=... de la URL para evitar re-ejecución al recargar

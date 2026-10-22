@@ -1392,22 +1392,71 @@ export function hashInvitationCode(code: string | null | undefined): string {
 
 /**
  * Verifica si un código ingresado coincide con una invitación (por código directo o por su hash `codeHash`).
+ * Es resiliente ante variaciones como:
+ * - Códigos completos: KONG-SEC-8X4M9P
+ * - Códigos sin prefijo: SEC-8X4M9P
+ * - Variaciones de espacios o guiones
+ * - Tokens cifrados de enlaces QR (kgr_tk1_...)
+ * - Códigos portátiles compuestos (CONG::CPIN::INVITE)
  */
 export function verifyInvitationCodeMatch(
   inputCode: string | null | undefined,
   invitation: { code?: string; codeHash?: string } | null | undefined
 ): boolean {
   if (!inputCode || !invitation) return false;
-  const cleanInput = String(inputCode).trim().toUpperCase();
-  if (!cleanInput) return false;
+  let raw = String(inputCode).trim();
+  if (!raw) return false;
 
-  if (invitation.codeHash) {
-    const computed = hashInvitationCode(cleanInput);
-    if (computed === invitation.codeHash) return true;
+  // 1. Si es un token cifrado de enlace directo o QR (kgr_tk1_...), extraer el parámetro 'invite'
+  if (raw.startsWith('kgr_tk1_')) {
+    const decoded = decodeSecureShareToken(raw);
+    if (decoded?.invite) {
+      raw = decoded.invite.trim();
+    }
   }
 
-  if (invitation.code && String(invitation.code).trim().toUpperCase() === cleanInput) {
-    return true;
+  // 2. Si es un código compuesto con '::' (ej: KGR-XXXX-XXXX::PINCONG::KONG-SEC-...), extraer el segmento final
+  if (raw.includes('::')) {
+    const parts = raw.split('::').map((s) => s.trim()).filter(Boolean);
+    if (parts.length >= 3) {
+      raw = parts.slice(2).join('::');
+    }
+  }
+
+  const cleanInput = raw.toUpperCase().replace(/\s+/g, '-');
+  if (!cleanInput) return false;
+
+  // Generar variaciones candidatas (ej: con KONG-, sin KONG-, o con caracteres alfanuméricos puros)
+  const candidates = new Set<string>([cleanInput]);
+  if (!cleanInput.startsWith('KONG-')) {
+    candidates.add(`KONG-${cleanInput}`);
+  } else {
+    candidates.add(cleanInput.slice(5)); // Remover KONG-
+  }
+
+  // Candidatos sin guiones ni espacios
+  const stripped = cleanInput.replace(/[^A-Z0-9]/g, '');
+  if (stripped) {
+    candidates.add(stripped);
+    if (!stripped.startsWith('KONG')) {
+      candidates.add(`KONG${stripped}`);
+    }
+  }
+
+  // Comparar candidatos contra codeHash y contra code en memoria
+  for (const cand of candidates) {
+    if (invitation.codeHash) {
+      const computed = hashInvitationCode(cand);
+      if (computed === invitation.codeHash) return true;
+    }
+
+    if (invitation.code) {
+      const normStored = String(invitation.code).trim().toUpperCase();
+      if (normStored === cand) return true;
+      if (normStored.replace(/[^A-Z0-9]/g, '') === cand.replace(/[^A-Z0-9]/g, '')) return true;
+      if (!normStored.startsWith('KONG-') && `KONG-${normStored}` === cand) return true;
+      if (normStored.startsWith('KONG-') && normStored.slice(5) === cand) return true;
+    }
   }
 
   return false;

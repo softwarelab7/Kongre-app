@@ -42,6 +42,7 @@ import {
   getPinLockoutRemainingSeconds,
   recordFailedPinAttempt,
   resetFailedPinAttempts,
+  verifyInvitationCodeMatch,
 } from '../utils/theocraticSecurity';
 import { UserProfile, PreferredContactMethod, ContactTimePreference } from '../types';
 
@@ -860,8 +861,76 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.warn('Aviso buscando PIN en Supabase:', searchErr);
         }
       }
-    } catch (searchErr) {
-      console.warn('Aviso en búsqueda de PIN:', searchErr);
+    } catch (pubsErr) {
+      console.warn('Aviso buscando publicador por PIN:', pubsErr);
+    }
+
+    // 3c. Comprobar si el PIN ingresado coincide con un código de invitación oficial generado por los ancianos
+    try {
+      let invList: any[] = [];
+      const storedInv = localStorage.getItem('kongre_theocratic_invitations_v1');
+      if (storedInv) {
+        const rawJson = storedInv.startsWith('kgr_v1:') ? decryptPinAtRest(storedInv) : storedInv;
+        const parsed = JSON.parse(rawJson || '[]');
+        if (Array.isArray(parsed)) invList = parsed;
+      }
+
+      let matchInv = invList.find((inv) => verifyInvitationCodeMatch(cleanPin, inv));
+
+      if (!matchInv) {
+        const congId = (localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_congregation_id') || '').trim();
+        const congPin = getSecureLocalPin('kongre_registered_cong_pin') || getSecureLocalPin('kongre_last_cong_pin') || '';
+        if (congId && congPin) {
+          const cloudRes = await supabaseSyncService.fetchAndDecryptCongregation(congId, congPin);
+          if (cloudRes.success && cloudRes.data?.invitations && Array.isArray(cloudRes.data.invitations)) {
+            matchInv = cloudRes.data.invitations.find((inv: any) => verifyInvitationCodeMatch(cleanPin, inv));
+          }
+        }
+      }
+
+      if (matchInv && matchInv.status !== 'revoked' && matchInv.status !== 'used') {
+        const role = matchInv.role as TheocraticRole;
+        const brotherName = matchInv.targetName && !isGenericIdentityName(matchInv.targetName) ? matchInv.targetName.trim() : 'Hermano';
+
+        // Marcar invitación como utilizada para evitar re-uso y sincronizar
+        matchInv.status = 'used';
+        matchInv.usedAt = new Date().toISOString();
+        const emailToAssign = user?.email || `invitado_${Date.now()}@kongre.org`;
+        matchInv.usedByEmail = emailToAssign;
+        try {
+          localStorage.setItem('kongre_theocratic_invitations_v1', encryptPinAtRest(JSON.stringify(invList)));
+          window.dispatchEvent(new CustomEvent('kongre_invitations_updated', { detail: invList }));
+          window.dispatchEvent(new CustomEvent('kongre_trigger_cloud_sync'));
+        } catch {}
+
+        resetFailedPinAttempts();
+        setActiveRole(role);
+        setActiveRoles([role]);
+        setCurrentBrotherName(brotherName);
+        localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+        localStorage.setItem('kongre_identified_brother', brotherName);
+        setSecureLocalPin('kongre_session_pin_v2', cleanPin);
+
+        assignRoleToEmail(emailToAssign, role, brotherName, cleanPin);
+
+        await insertAuditLog({
+          accion: 'login',
+          hermano_nid: matchInv.id || 'invitation',
+          hermano_nombre: brotherName,
+          modulo: 'auth',
+          detalles: `Inicio de sesión con código de invitación teocrático (${THEOCRATIC_ROLES[role]?.name || role})`,
+        });
+
+        return {
+          success: true,
+          role,
+          roles: [role],
+          name: brotherName,
+          message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol asignado: ${THEOCRATIC_ROLES[role]?.name || role}.`,
+        };
+      }
+    } catch (invErr) {
+      console.warn('Aviso buscando invitación:', invErr);
     }
 
     // 4. Backward-compatibility: Check if PIN matches previously registered Coordinator App Lock PIN
@@ -967,7 +1036,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const broName = savedCoord || mappedUser.displayName || 'Coordinador';
           setCurrentBrotherName(broName);
         } else {
-          setActiveRole('publico');
+          const savedRole = localStorage.getItem(LOCAL_STORAGE_ACTIVE_ROLE_KEY) as TheocraticRole;
+          const sessionPin = getSecureLocalPin('kongre_session_pin_v2');
+          const savedRolesRaw = localStorage.getItem(LOCAL_STORAGE_ACTIVE_ROLES_KEY);
+          const savedRoles = savedRolesRaw ? JSON.parse(savedRolesRaw) : [savedRole || 'publico'];
+          if (savedRole && savedRole !== 'publico' && verifyRoleSessionSignature(savedRole, savedRoles)) {
+            setActiveRole(savedRole);
+            assignRoleToEmail(email, savedRole, mappedUser.displayName || undefined, sessionPin || undefined);
+          } else {
+            setActiveRole('publico');
+          }
         }
       } else {
         setUser(null);

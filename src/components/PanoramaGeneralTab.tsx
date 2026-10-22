@@ -313,9 +313,8 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
         hours: quickHours,
         bibleStudies: quickStudies,
         notes: quickRv > 0 ? `Revisitas: ${quickRv}` : undefined,
-        reportedAt: new Date().toISOString(),
-        isPioneer: activePublisher?.privilege_pioneer === 'regular',
-        isAuxiliaryPioneer: activePublisher?.privilege_pioneer === 'auxiliary',
+        isPioneer: activePublisher?.pioneerStatus === 'regular' || activePublisher?.privilege === 'precursor_regular',
+        isAuxiliaryPioneer: activePublisher?.pioneerStatus === 'auxiliar_continuo' || activePublisher?.privilege === 'precursor_auxiliar',
       });
     }
 
@@ -524,7 +523,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
             title: 'Presidente Reunión Pública',
             subtitle: `Fin de semana · ${weekLabel}`,
             type: 'part',
-            targetTab: 'reunion_publica',
+            targetTab: 'programacion',
           });
         }
         if (w.weekend?.publicTalkSpeaker === activePublisherId) {
@@ -533,7 +532,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
             title: w.weekend.publicTalkTheme || 'Discurso Público',
             subtitle: `Orador · ${weekLabel}`,
             type: 'part',
-            targetTab: 'reunion_publica',
+            targetTab: 'programacion',
           });
         }
         if (w.weekend?.atalayaConductorId === activePublisherId) {
@@ -542,7 +541,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
             title: 'Conductor de La Atalaya',
             subtitle: `Fin de semana · ${weekLabel}`,
             type: 'part',
-            targetTab: 'reunion_publica',
+            targetTab: 'programacion',
           });
         }
         if (w.weekend?.atalayaLectorId === activePublisherId) {
@@ -551,7 +550,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
             title: 'Lector de La Atalaya',
             subtitle: `Fin de semana · ${weekLabel}`,
             type: 'part',
-            targetTab: 'reunion_publica',
+            targetTab: 'programacion',
           });
         }
 

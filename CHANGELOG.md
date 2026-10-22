@@ -25,7 +25,17 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.10.8] - 21 de Octubre, 2026 (Compilación Activa)
+### [v2.10.9] - 21 de Octubre, 2026 (Compilación Activa)
+**Título:** Corrección Crítica de Conexión a Supabase en Despliegue en la Nube (https://kongre.ai.studio)
+- **Corrección de URL y Credenciales en el Bundle de Producción:**
+  - Se configuraron las credenciales oficiales de Supabase (`https://rceyevhwhtjshsthrrtp.supabase.co`) como valores predeterminados directos en [`src/lib/supabase.ts`](file:///home/hectorgutierrezjimenez/Documentos/Kongre/src/lib/supabase.ts).
+  - En entornos de compilación remota o pipelines CI/CD (donde los archivos `.env` no se suben al repositorio por razones de seguridad), Vite utilizaba previamente el fallback `https://placeholder-project.supabase.co`. Al no existir ese dominio, cualquier intento de inicio de sesión o sincronización en la nube en `https://kongre.ai.studio` fallaba inmediatamente con `TypeError: Failed to fetch`.
+- **Manejo de Errores de Red y Bloqueadores:**
+  - Se implementó un detector amigable en [`supabaseSyncService.ts`](file:///home/hectorgutierrezjimenez/Documentos/Kongre/src/services/supabaseSyncService.ts) y [`CongregationWelcomeLanding.tsx`](file:///home/hectorgutierrezjimenez/Documentos/Kongre/src/components/CongregationWelcomeLanding.tsx) que orienta al usuario si un bloqueador de anuncios (como Brave Shields o uBlock Origin) o la falta de internet impiden la conexión.
+- **Respaldo Local Offline Tolerante:**
+  - Se amplió la verificación en [`CongregationContext.tsx`](file:///home/hectorgutierrezjimenez/Documentos/Kongre/src/context/CongregationContext.tsx) para permitir el acceso con los datos locales guardados en el navegador cuando no sea posible alcanzar la nube.
+
+### [v2.10.8] - 21 de Octubre, 2026
 **Título:** Optimización Global de Interfaz: Eliminación de Banner Redundante y Arranque Directo con Contenido (Opción 1) en Toda la App
 - **Implementación Global de la Opción 1 (27 Secciones y Vistas Refactorizadas):**
   - Se completó la auditoría y refactorización integral de todos los módulos de la aplicación, eliminando tarjetas de encabezado redundantes (`SectionHeader` y contenedores con gradientes pesados) que duplicaban el nombre del departamento o sección.

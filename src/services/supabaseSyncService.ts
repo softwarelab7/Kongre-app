@@ -576,7 +576,13 @@ export const supabaseSyncService = {
         .maybeSingle();
 
       if (error) {
-        return { success: false, error: `Error conectando con Supabase: ${error.message}` };
+        const isFetchError = error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError');
+        return {
+          success: false,
+          error: isFetchError
+            ? 'No se pudo conectar con el servidor en la nube (Failed to fetch). Comprueba tu conexión a internet o desactiva bloqueadores de anuncios (como Brave Shields o uBlock Origin) en este sitio.'
+            : `Error conectando con Supabase: ${error.message}`,
+        };
       }
 
       if (!data) {

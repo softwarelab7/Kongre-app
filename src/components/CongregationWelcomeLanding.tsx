@@ -732,9 +732,12 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       );
 
       if (!cloudRes?.success || !cloudData) {
+        const msg = cloudRes?.message || '';
+        const isFetchError = msg.includes('Failed to fetch') || msg.includes('NetworkError');
         setCodeError(
-          cloudRes?.message ||
-            `No se encontró ninguna congregación registrada con el ID "${cleanId}" o el PIN de Congregación es incorrecto.`
+          isFetchError
+            ? 'No se pudo conectar con el servidor en la nube (Failed to fetch). Desactiva bloqueadores de anuncios (como Brave Shields o uBlock Origin) en localhost:3050 o revisa tu conexión a internet.'
+            : (msg || `No se encontró ninguna congregación registrada con el ID "${cleanId}" o el PIN de Congregación es incorrecto.`)
         );
         setIsSubmittingCode(false);
         return;

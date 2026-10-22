@@ -2163,7 +2163,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       );
       const targetCanonicalId = formatCanonicalCongregationId(rawClean);
 
-      if (fresh.settings?.isRegistered && localCongId && localCongId === targetCanonicalId) {
+      if ((fresh.settings?.isRegistered || fresh.settings?.congregationName) && localCongId && localCongId === targetCanonicalId) {
         return {
           success: true,
           data: fresh,

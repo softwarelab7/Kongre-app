@@ -6,6 +6,7 @@ export interface AutoLockRingProps {
   stroke: number;
   fraction: number; // 0 to 1 (1 = lleno, 0 = vacío)
   state?: 'ok' | 'warn' | 'crit';
+  colorClass?: string;
   isRefill?: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -16,6 +17,7 @@ export const AutoLockRing: React.FC<AutoLockRingProps> = ({
   stroke,
   fraction,
   state = 'ok',
+  colorClass,
   isRefill = false,
   className = '',
   children,
@@ -27,6 +29,7 @@ export const AutoLockRing: React.FC<AutoLockRingProps> = ({
 
   // Selector de color dinámico según estado teocrático
   const getColorClass = () => {
+    if (colorClass) return colorClass;
     switch (state) {
       case 'crit':
         return 'text-[#E11D48] dark:text-[#FB7185]';

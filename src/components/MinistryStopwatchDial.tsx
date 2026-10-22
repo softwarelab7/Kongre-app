@@ -6,17 +6,11 @@ import {
   Square,
   RotateCcw,
   Plus,
-  Home,
-  Users,
-  BookOpen,
-  Phone,
-  Store,
-  PlusCircle,
-  MinusCircle,
+  Minus,
   Clock,
   Sparkles,
-  Compass,
 } from 'lucide-react';
+import { AutoLockRing } from './AutoLockRing';
 import { MinistryTimeLog } from './MinisterioPublicadorTab';
 
 interface MinistryStopwatchDialProps {
@@ -31,9 +25,11 @@ interface MinistryStopwatchDialProps {
   onUpdateReturnVisits: (val: number | ((prev: number) => number)) => void;
   sessionPlacements: number;
   onUpdatePlacements: (val: number | ((prev: number) => number)) => void;
-  onUpdateModality: (modality: MinistryTimeLog['modality']) => void;
-  onOpenManualLog: () => void;
-  modalityLabels: Record<MinistryTimeLog['modality'], string>;
+  onUpdateModality?: (mod: MinistryTimeLog['modality']) => void;
+  onChangeModality?: (mod: MinistryTimeLog['modality']) => void;
+  onOpenManualLog?: () => void;
+  onOpenManualModal?: () => void;
+  modalityLabels?: Record<string, string>;
 }
 
 export const MinistryStopwatchDial: React.FC<MinistryStopwatchDialProps> = ({
@@ -49,490 +45,288 @@ export const MinistryStopwatchDial: React.FC<MinistryStopwatchDialProps> = ({
   sessionPlacements,
   onUpdatePlacements,
   onUpdateModality,
+  onChangeModality,
   onOpenManualLog,
+  onOpenManualModal,
   modalityLabels,
 }) => {
-  // Format total seconds into Hours, Minutes, and Seconds
-  const { hrs, mins, secs, totalMinutes } = useMemo(() => {
-    const hrs = Math.floor(displaySeconds / 3600);
-    const mins = Math.floor((displaySeconds % 3600) / 60);
-    const secs = displaySeconds % 60;
-    const totalMinutes = Math.floor(displaySeconds / 60);
-    return {
-      hrs: String(hrs).padStart(2, '0'),
-      mins: String(mins).padStart(2, '0'),
-      secs: String(secs).padStart(2, '0'),
-      totalMinutes,
-    };
+  const handleModalityChange = (mod: MinistryTimeLog['modality']) => {
+    if (onUpdateModality) onUpdateModality(mod);
+    else if (onChangeModality) onChangeModality(mod);
+  };
+
+  const handleOpenManual = onOpenManualLog || onOpenManualModal;
+  // Formatear segundos en HH:MM:SS
+  const formatTime = (totalSecs: number) => {
+    const s = Math.max(0, Math.floor(totalSecs));
+    const hrs = Math.floor(s / 3600);
+    const mins = Math.floor((s % 3600) / 60);
+    const secs = s % 60;
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Fracción circular de 0 a 1 según la hora en curso (o 0 si en reposo)
+  const fraction = useMemo(() => {
+    if (displaySeconds <= 0) return 0;
+    const rem = displaySeconds % 3600;
+    return rem === 0 ? 1 : rem / 3600;
   }, [displaySeconds]);
 
-  // SVG Dial Calculations
-  // Outer diameter 220px, strokeWidth 8px, radius 100px
-  const size = 220;
-  const strokeWidth = 8;
-  const center = size / 2;
-  const radius = center - strokeWidth - 4; // 106 - 8 - 4 = 94
-  const circumference = 2 * Math.PI * radius;
-
-  // Progress calculations:
-  // Sweep corresponds to seconds within the current minute (0..59)
-  // or subtle progression when idle/paused
-  const secondsInMinute = displaySeconds % 60;
-  const progressRatio = isRunning
-    ? (secondsInMinute === 0 && displaySeconds > 0 ? 1 : secondsInMinute / 60)
-    : displaySeconds > 0
-    ? (secondsInMinute / 60)
-    : 0.04;
-
-  const strokeDashoffset = circumference - progressRatio * circumference;
-
-  // Orbiting bead coordinates
-  // Start from top (-90 deg / -PI/2)
-  const angle = progressRatio * 2 * Math.PI - Math.PI / 2;
-  const beadX = center + radius * Math.cos(angle);
-  const beadY = center + radius * Math.sin(angle);
-
-  // Dynamic Theme Colors based on State (Active, Paused, Idle)
-  const dialTheme = useMemo(() => {
-    if (isRunning) {
-      return {
-        badgeBg: 'bg-emerald-500/20 border-emerald-400/40 text-emerald-300',
-        badgeText: '● EN VIVO',
-        ringGradient: 'url(#stopwatchGradRunning)',
-        glowFilter: 'url(#stopwatchGlowRunning)',
-        ambientGlow: 'from-emerald-500/15 via-teal-500/10 to-transparent',
-        beadFill: '#34D399',
-        beadStroke: '#10B981',
-        digitsColor: 'text-white',
-        secColor: 'text-emerald-300',
-        activePulse: true,
-      };
-    }
-    if (displaySeconds > 0) {
-      return {
-        badgeBg: 'bg-amber-500/20 border-amber-400/40 text-amber-300',
-        badgeText: '❚❚ EN PAUSA',
-        ringGradient: 'url(#stopwatchGradPaused)',
-        glowFilter: 'url(#stopwatchGlowPaused)',
-        ambientGlow: 'from-amber-500/15 via-orange-500/10 to-transparent',
-        beadFill: '#FBBF24',
-        beadStroke: '#F59E0B',
-        digitsColor: 'text-slate-100',
-        secColor: 'text-amber-300',
-        activePulse: false,
-      };
-    }
-    return {
-      badgeBg: 'bg-indigo-500/20 border-indigo-400/30 text-indigo-300',
-      badgeText: 'LISTO PARA PREDICAR',
-      ringGradient: 'url(#stopwatchGradIdle)',
-      glowFilter: 'none',
-      ambientGlow: 'from-indigo-500/10 via-purple-500/5 to-transparent',
-      beadFill: '#818CF8',
-      beadStroke: '#6366F1',
-      digitsColor: 'text-slate-200',
-      secColor: 'text-indigo-300/80',
-      activePulse: false,
-    };
+  // Color dinámico del anillo SVG inspirado en el reloj de bloqueo
+  const ringColor = useMemo(() => {
+    if (isRunning) return 'text-emerald-500 dark:text-emerald-400';
+    if (displaySeconds > 0) return 'text-amber-500 dark:text-amber-400';
+    return 'text-slate-300 dark:text-slate-700';
   }, [isRunning, displaySeconds]);
 
-  // Modality Icons
-  const ModalityIcon = useMemo(() => {
-    switch (modality) {
-      case 'casa_en_casa':
-        return Home;
-      case 'carritos':
-        return Store;
-      case 'revisitas':
-        return Users;
-      case 'estudio':
-        return BookOpen;
-      case 'informal':
-        return Phone;
-      default:
-        return Compass;
-    }
-  }, [modality]);
-
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950/90 text-white rounded-3xl p-5 sm:p-7 shadow-2xl border border-indigo-500/20 flex flex-col justify-between gap-5 transition-all">
-      {/* Ambient Radial Glow behind the Dial */}
-      <div
-        className={`absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-gradient-to-tr ${dialTheme.ambientGlow} blur-3xl pointer-events-none transition-all duration-700`}
-      />
-
-      {/* Header Row */}
-      <div className="flex items-center justify-between gap-3 flex-wrap relative z-10">
-        <div className="flex items-center gap-2.5">
-          <div className="relative flex items-center justify-center">
-            <span
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                isRunning
-                  ? 'bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.9)]'
-                  : displaySeconds > 0
-                  ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.7)]'
-                  : 'bg-slate-500'
-              }`}
-            />
-            {isRunning && (
-              <span className="absolute w-5 h-5 rounded-full bg-emerald-400/40 animate-ping pointer-events-none" />
-            )}
-          </div>
-          <span className="text-xs font-black uppercase tracking-wider text-indigo-200 flex items-center gap-1.5">
-            <span>
-              {isRunning
-                ? 'Ministerio en Vivo'
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xs space-y-5 transition-all">
+      {/* Cabecera superior con título y botón de registro manual */}
+      <div className="flex items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800/80 pb-4">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div
+            className={`w-2.5 h-2.5 rounded-full ${
+              isRunning
+                ? 'bg-emerald-500 animate-pulse'
                 : displaySeconds > 0
-                ? 'Sesión en Pausa'
-                : 'Cronómetro de Ministerio'}
+                ? 'bg-amber-500'
+                : 'bg-slate-400 dark:bg-slate-600'
+            }`}
+          />
+          <h3 className="text-xs sm:text-sm font-bold tracking-wider uppercase text-slate-600 dark:text-slate-300 truncate">
+            Cronómetro para llevar el tiempo
+          </h3>
+          {isRunning && (
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50">
+              En Vivo
             </span>
-            {totalMinutes > 0 && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/10 text-indigo-300 border border-white/10">
-                {totalMinutes} min
-              </span>
-            )}
-          </span>
+          )}
+          {!isRunning && displaySeconds > 0 && (
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50">
+              En Pausa
+            </span>
+          )}
         </div>
 
-        <button
-          type="button"
-          onClick={onOpenManualLog}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-xs font-bold text-indigo-100 transition cursor-pointer border border-white/10 shadow-xs"
-        >
-          <Plus className="w-3.5 h-3.5 text-indigo-300" />
-          <span>Añadir Manualmente</span>
-        </button>
-      </div>
-
-      {/* Central Dial Area (Inspired by AutoLock Clock & Swiss Chronometer) */}
-      <div className="flex flex-col items-center justify-center relative py-2 sm:py-3 z-10">
-        <div className="relative flex items-center justify-center select-none">
-          {/* SVG Progress Ring */}
-          <svg
-            width={size}
-            height={size}
-            className="overflow-visible"
-            viewBox={`0 0 ${size} ${size}`}
+        {handleOpenManual && (
+          <button
+            type="button"
+            onClick={handleOpenManual}
+            className="shrink-0 text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200/80 dark:border-slate-700/80 rounded-full px-3.5 py-1.5 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
           >
-            <defs>
-              {/* Gradient Running (Emerald to Cyan) */}
-              <linearGradient id="stopwatchGradRunning" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#10B981" />
-                <stop offset="60%" stopColor="#06B6D4" />
-                <stop offset="100%" stopColor="#34D399" />
-              </linearGradient>
+            <Plus className="w-3.5 h-3.5" />
+            <span>Añadir Horas Manualmente</span>
+          </button>
+        )}
+      </div>
 
-              {/* Gradient Paused (Amber to Orange) */}
-              <linearGradient id="stopwatchGradPaused" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#F59E0B" />
-                <stop offset="100%" stopColor="#EF4444" />
-              </linearGradient>
-
-              {/* Gradient Idle (Indigo to Violet) */}
-              <linearGradient id="stopwatchGradIdle" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#6366F1" />
-                <stop offset="100%" stopColor="#8B5CF6" />
-              </linearGradient>
-
-              {/* Glow Filter Running */}
-              <filter id="stopwatchGlowRunning" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-
-              {/* Glow Filter Paused */}
-              <filter id="stopwatchGlowPaused" x="-20%" y="-20%" width="140%" height="140%">
-                <feGaussianBlur stdDeviation="3" result="blur" />
-                <feComposite in="SourceGraphic" in2="blur" operator="over" />
-              </filter>
-            </defs>
-
-            {/* Subtle Circular Degree Ticks (Precision Watch Markings) */}
-            {Array.from({ length: 60 }).map((_, i) => {
-              const tickAngle = (i * 6 * Math.PI) / 180 - Math.PI / 2;
-              const isMajor = i % 5 === 0;
-              const tickInner = isMajor ? radius - 14 : radius - 10;
-              const tickOuter = radius - 6;
-              const x1 = center + tickInner * Math.cos(tickAngle);
-              const y1 = center + tickInner * Math.sin(tickAngle);
-              const x2 = center + tickOuter * Math.cos(tickAngle);
-              const y2 = center + tickOuter * Math.sin(tickAngle);
-              return (
-                <line
-                  key={i}
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke={isMajor ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.07)'}
-                  strokeWidth={isMajor ? 1.5 : 1}
-                  strokeLinecap="round"
-                />
-              );
-            })}
-
-            {/* Background Track Circle */}
-            <circle
-              cx={center}
-              cy={center}
-              r={radius}
-              fill="none"
-              stroke="rgba(255, 255, 255, 0.08)"
-              strokeWidth={strokeWidth}
-            />
-
-            {/* Active Sweeping Progress Ring */}
-            <circle
-              cx={center}
-              cy={center}
-              r={radius}
-              fill="none"
-              stroke={dialTheme.ringGradient}
-              strokeWidth={strokeWidth}
-              strokeDasharray={circumference}
-              strokeDashoffset={strokeDashoffset}
-              strokeLinecap="round"
-              filter={dialTheme.glowFilter}
-              style={{
-                transform: 'rotate(-90deg)',
-                transformOrigin: '50% 50%',
-                transition: isRunning ? 'stroke-dashoffset 0.95s linear' : 'stroke-dashoffset 0.4s ease',
-              }}
-            />
-
-            {/* Orbiting Glowing Bead at the tip of the arc */}
-            {displaySeconds > 0 && (
-              <g
-                style={{
-                  transition: isRunning ? 'all 0.95s linear' : 'all 0.4s ease',
-                }}
-              >
-                {/* Bead outer glow */}
-                <circle
-                  cx={beadX}
-                  cy={beadY}
-                  r={8}
-                  fill={dialTheme.beadFill}
-                  opacity={0.35}
-                />
-                {/* Bead core */}
-                <circle
-                  cx={beadX}
-                  cy={beadY}
-                  r={4.5}
-                  fill="#FFFFFF"
-                  stroke={dialTheme.beadStroke}
-                  strokeWidth={2}
-                />
-              </g>
-            )}
-          </svg>
-
-          {/* Dial Center Content */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-            {/* Live State Badge */}
-            <div
-              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all ${dialTheme.badgeBg}`}
-            >
-              <span>{dialTheme.badgeText}</span>
-            </div>
-
-            {/* Big Chronometer Digits */}
-            <div className="mt-2.5 flex items-baseline justify-center font-mono font-black tracking-tight text-4xl sm:text-5xl text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
-              <span className="tabular-nums">{hrs}</span>
-              <span className="text-indigo-400 mx-0.5 text-3xl sm:text-4xl animate-pulse">:</span>
-              <span className="tabular-nums">{mins}</span>
-              <span className="text-indigo-400 mx-0.5 text-2xl sm:text-3xl">:</span>
-              <span className={`text-2xl sm:text-3xl font-extrabold tabular-nums ${dialTheme.secColor}`}>
-                {secs}
-              </span>
-            </div>
-
-            {/* Segment Labels */}
-            <div className="flex items-center justify-center gap-6 text-[9px] font-black uppercase tracking-wider text-slate-400 mt-0.5">
-              <span>HRS</span>
-              <span className="ml-1">MIN</span>
-              <span className="ml-1">SEG</span>
-            </div>
-
-            {/* Active Modality Capsule inside dial */}
-            <div className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 border border-white/15 text-[10px] font-extrabold text-indigo-200">
-              <ModalityIcon className="w-3 h-3 text-indigo-300" />
-              <span className="max-w-[130px] truncate">{modalityLabels[modality]}</span>
-            </div>
+      {/* Núcleo central con el anillo SVG (inspirado en AutoLockRing / bigRing) */}
+      <div className="flex flex-col items-center justify-center text-center py-2">
+        <AutoLockRing
+          size={190}
+          stroke={9}
+          fraction={fraction}
+          colorClass={ringColor}
+          className="shrink-0"
+        >
+          <div className="text-3xl sm:text-4xl font-extrabold tracking-tight tabular-nums font-mono text-slate-900 dark:text-white leading-none">
+            {formatTime(displaySeconds)}
           </div>
-        </div>
+          <div className="text-[11px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase mt-2">
+            {isRunning
+              ? 'EN PREDICACIÓN'
+              : displaySeconds > 0
+              ? 'EN PAUSA'
+              : 'LISTO PARA INICIAR'}
+          </div>
+        </AutoLockRing>
 
-        {/* Subtitle notice */}
-        <p className="text-[11px] text-indigo-200/80 mt-2 text-center flex items-center gap-1.5 font-medium">
-          <Clock className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-          <span>El tiempo corre en segundo plano aunque cierres o bloquees tu pantalla</span>
+        {/* Subtexto explicativo sutil */}
+        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs sm:max-w-sm mt-3 leading-relaxed">
+          El tiempo sigue corriendo aunque cierres la pestaña o apagues la pantalla del teléfono
         </p>
+
+        {/* Píldoras de ajuste rápido de tiempo (-5m, +15m, +30m, +1h) */}
+        <div className="flex items-center justify-center gap-2 mt-3.5 flex-wrap">
+          <button
+            type="button"
+            onClick={() => onAdjustMinutes(-5)}
+            disabled={displaySeconds <= 0}
+            className="border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-700/60 text-slate-600 dark:text-slate-300 rounded-xl px-3 py-1 text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-2xs"
+          >
+            -5m
+          </button>
+          <button
+            type="button"
+            onClick={() => onAdjustMinutes(15)}
+            className="border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 dark:hover:text-emerald-400 rounded-xl px-3 py-1 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+          >
+            +15m
+          </button>
+          <button
+            type="button"
+            onClick={() => onAdjustMinutes(30)}
+            className="border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 dark:hover:text-emerald-400 rounded-xl px-3 py-1 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+          >
+            +30m
+          </button>
+          <button
+            type="button"
+            onClick={() => onAdjustMinutes(60)}
+            className="border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/60 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 dark:hover:text-indigo-400 rounded-xl px-3 py-1 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+          >
+            +1h
+          </button>
+        </div>
       </div>
 
-      {/* Quick Time Adjustment Buttons (Micro-Pill Bar) */}
-      <div className="flex items-center justify-center gap-2 flex-wrap relative z-10">
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mr-1">
-          Ajustar:
-        </span>
-        <button
-          type="button"
-          onClick={() => onAdjustMinutes(-5)}
-          className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-rose-500/20 active:scale-95 text-xs font-mono font-bold text-slate-300 hover:text-rose-200 border border-white/10 transition-all cursor-pointer shadow-2xs"
-          title="Restar 5 minutos"
-        >
-          -5m
-        </button>
-        <button
-          type="button"
-          onClick={() => onAdjustMinutes(15)}
-          className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-emerald-500/20 active:scale-95 text-xs font-mono font-bold text-emerald-300 border border-white/10 transition-all cursor-pointer shadow-2xs"
-          title="Sumar 15 minutos"
-        >
-          +15m
-        </button>
-        <button
-          type="button"
-          onClick={() => onAdjustMinutes(30)}
-          className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-emerald-500/20 active:scale-95 text-xs font-mono font-bold text-emerald-300 border border-white/10 transition-all cursor-pointer shadow-2xs"
-          title="Sumar 30 minutos"
-        >
-          +30m
-        </button>
-        <button
-          type="button"
-          onClick={() => onAdjustMinutes(60)}
-          className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-emerald-500/20 active:scale-95 text-xs font-mono font-bold text-emerald-300 border border-white/10 transition-all cursor-pointer shadow-2xs"
-          title="Sumar 1 hora"
-        >
-          +1h
-        </button>
-      </div>
-
-      {/* Modality & Session Counters Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white/5 p-3.5 rounded-2xl border border-white/10 relative z-10 backdrop-blur-xs">
-        {/* Modality Selector */}
+      {/* Controles de salida: Modalidad, Revisitas y Publicaciones */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/60">
+        {/* Selector de Modalidad */}
         <div>
-          <label className="text-[10px] font-black uppercase tracking-wider text-indigo-300 block mb-1 flex items-center gap-1">
-            <Compass className="w-3 h-3" />
-            <span>Modalidad</span>
+          <label className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase block mb-1">
+            Modalidad
           </label>
           <select
             value={modality}
-            onChange={(e) => onUpdateModality(e.target.value as MinistryTimeLog['modality'])}
-            className="w-full rounded-xl bg-slate-900/90 border border-white/15 px-2.5 py-2 text-xs font-bold text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 cursor-pointer"
+            onChange={(e) => handleModalityChange(e.target.value as MinistryTimeLog['modality'])}
+            className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-2xs"
           >
-            {Object.entries(modalityLabels).map(([k, label]) => (
-              <option key={k} value={k} className="bg-slate-900 text-white">
-                {label}
-              </option>
-            ))}
+            {modalityLabels ? (
+              Object.entries(modalityLabels).map(([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))
+            ) : (
+              <>
+                <option value="casa">De casa en casa</option>
+                <option value="publica">Carritos / Público</option>
+                <option value="informal">Informal / Ocasional</option>
+                <option value="telefonica">Cartas / Telefónica</option>
+                <option value="cursos">Cursos Bíblicos</option>
+              </>
+            )}
           </select>
         </div>
 
-        {/* Revisitas Counter */}
+        {/* Stepper de Revisitas en esta salida */}
         <div>
-          <label className="text-[10px] font-black uppercase tracking-wider text-indigo-300 block mb-1 flex items-center gap-1">
-            <Users className="w-3 h-3" />
-            <span>Revisitas en Salida</span>
+          <label className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase block mb-1">
+            Revisitas en esta salida
           </label>
-          <div className="flex items-center justify-between bg-slate-900/80 rounded-xl px-2.5 py-1.5 border border-white/15">
+          <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2 py-1 shadow-2xs">
             <button
               type="button"
               onClick={() => onUpdateReturnVisits((prev) => Math.max(0, prev - 1))}
-              className="p-1 text-slate-400 hover:text-white active:scale-90 transition cursor-pointer"
-              title="Restar revisita"
+              disabled={sessionReturnVisits <= 0}
+              className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              aria-label="Disminuir revisitas"
             >
-              <MinusCircle className="w-4 h-4" />
+              <Minus className="w-3.5 h-3.5" />
             </button>
-            <span className="font-mono font-black text-sm text-white px-2">
+            <span className="text-xs font-bold text-slate-900 dark:text-white tabular-nums px-2">
               {sessionReturnVisits}
             </span>
             <button
               type="button"
               onClick={() => onUpdateReturnVisits((prev) => prev + 1)}
-              className="p-1 text-emerald-400 hover:text-emerald-300 active:scale-90 transition cursor-pointer"
-              title="Sumar revisita"
+              className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer transition-colors"
+              aria-label="Aumentar revisitas"
             >
-              <PlusCircle className="w-4 h-4" />
+              <Plus className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
 
-        {/* Publicaciones / Videos Counter */}
+        {/* Stepper de Publicaciones / Videos */}
         <div>
-          <label className="text-[10px] font-black uppercase tracking-wider text-indigo-300 block mb-1 flex items-center gap-1">
-            <BookOpen className="w-3 h-3" />
-            <span>Publicaciones / Videos</span>
+          <label className="text-[10px] font-bold tracking-wider text-slate-500 dark:text-slate-400 uppercase block mb-1">
+            Publicaciones / Videos
           </label>
-          <div className="flex items-center justify-between bg-slate-900/80 rounded-xl px-2.5 py-1.5 border border-white/15">
+          <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2 py-1 shadow-2xs">
             <button
               type="button"
               onClick={() => onUpdatePlacements((prev) => Math.max(0, prev - 1))}
-              className="p-1 text-slate-400 hover:text-white active:scale-90 transition cursor-pointer"
-              title="Restar publicación"
+              disabled={sessionPlacements <= 0}
+              className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              aria-label="Disminuir publicaciones"
             >
-              <MinusCircle className="w-4 h-4" />
+              <Minus className="w-3.5 h-3.5" />
             </button>
-            <span className="font-mono font-black text-sm text-white px-2">
+            <span className="text-xs font-bold text-slate-900 dark:text-white tabular-nums px-2">
               {sessionPlacements}
             </span>
             <button
               type="button"
               onClick={() => onUpdatePlacements((prev) => prev + 1)}
-              className="p-1 text-emerald-400 hover:text-emerald-300 active:scale-90 transition cursor-pointer"
-              title="Sumar publicación"
+              className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer transition-colors"
+              aria-label="Aumentar publicaciones"
             >
-              <PlusCircle className="w-4 h-4" />
+              <Plus className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* Primary Action Buttons */}
-      <div className="flex items-center gap-2.5 flex-wrap relative z-10">
-        <button
-          type="button"
-          onClick={onStartPause}
-          className={`flex-1 py-3.5 px-5 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl transition-all cursor-pointer active:scale-95 border ${
-            isRunning
-              ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:brightness-105 text-slate-950 border-amber-300/60 shadow-amber-500/25'
-              : 'bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:brightness-105 text-slate-950 border-emerald-300/60 shadow-emerald-500/25'
-          }`}
-        >
-          {isRunning ? (
-            <>
-              <Pause className="w-5 h-5 fill-current" />
-              <span>Pausar Tiempo</span>
-            </>
-          ) : (
-            <>
-              <Play className="w-5 h-5 fill-current" />
-              <span>{displaySeconds > 0 ? 'Reanudar Predicación' : 'Iniciar Predicación'}</span>
-            </>
-          )}
-        </button>
-
-        {displaySeconds > 0 && (
-          <>
+      {/* Botones de acción principales según el estado */}
+      <div>
+        {!isRunning && displaySeconds === 0 ? (
+          <button
+            type="button"
+            onClick={onStartPause}
+            className="w-full py-3.5 px-6 rounded-2xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <Play className="w-4 h-4 fill-current" />
+            <span>Iniciar Predicación</span>
+          </button>
+        ) : isRunning ? (
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onStartPause}
+              className="flex-1 py-3 px-5 rounded-2xl font-bold text-sm bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Pause className="w-4 h-4 fill-current" />
+              <span>Pausar</span>
+            </button>
             <button
               type="button"
               onClick={onFinish}
-              className="flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:brightness-110 text-white font-black text-sm flex items-center justify-center gap-2 shadow-xl border border-indigo-400/40 transition-all cursor-pointer active:scale-95 shadow-indigo-500/20"
+              className="flex-1 py-3 px-5 rounded-2xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <Square className="w-4 h-4 fill-current" />
-              <span>Guardar Sesión</span>
+              <span>Finalizar Salida</span>
             </button>
-
+          </div>
+        ) : (
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={onStartPause}
+              className="flex-1 py-3 px-4 rounded-2xl font-bold text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Play className="w-4 h-4 fill-current" />
+              <span>Reanudar</span>
+            </button>
+            <button
+              type="button"
+              onClick={onFinish}
+              className="flex-1 py-3 px-4 rounded-2xl font-bold text-xs sm:text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Square className="w-4 h-4 fill-current" />
+              <span>Terminar y Guardar</span>
+            </button>
             <button
               type="button"
               onClick={onReset}
-              className="p-3.5 rounded-2xl bg-white/10 hover:bg-rose-500/30 text-slate-300 hover:text-rose-200 border border-white/10 transition-all cursor-pointer active:scale-90"
-              title="Reiniciar a cero"
+              className="py-3 px-3.5 rounded-2xl font-bold text-xs border border-slate-200 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-all flex items-center justify-center gap-1 cursor-pointer"
+              title="Reiniciar cronómetro"
             >
-              <RotateCcw className="w-5 h-5" />
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Reiniciar</span>
             </button>
-          </>
+          </div>
         )}
       </div>
     </div>

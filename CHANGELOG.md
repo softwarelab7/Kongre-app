@@ -25,7 +25,23 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.10.9] - 21 de Octubre, 2026 (Compilación Activa)
+### [v2.11.0] - 22 de Octubre, 2026 (Compilación Activa)
+**Título:** Nuevo Panel "Mi Congregación", Estadísticas de Secretaría y Auditoría de Accesibilidad ARIA
+- **Nuevo Panel "Mi Congregación" (`PanoramaGeneralTab.tsx`):**
+  - Nuevo centro de resumen personal y congregacional accesible desde la categoría principal *Mi Ministerio*.
+  - **Tarjeta de Informe:** Muestra horas, revisitas y cursos bíblicos del mes en curso sincronizados con *Mi Ministerio*, botón rápido `+` para actualizar el informe S-4 mediante modal directo y estado real de entrega del mes anterior.
+  - **Tarjeta de Próximos:** Escanea automáticamente las próximas semanas en busca de asignaciones reales del publicador (Vida y Ministerio, Reunión Pública, asignaciones estudiantiles S-89, deberes de audio/video/acomodadores, aseo por grupo y turnos de carritos).
+  - **Tablero de Anuncios y Eventos:** Resumen directo de anuncios publicados, cartas/documentos oficiales, asambleas de circuito/regionales, visita del Superintendente de Circuito, Conmemoración y eventos del calendario.
+  - **Directorio Rápido de Secciones:** Cuadrícula inferior de acceso directo con métricas reales hacia *Vida y Ministerio*, *Reunión Pública*, *Aseo y Deberes*, *Salidas al Campo*, *Territorios*, *Carritos*, *Grupos de Servicio* y *Mis Asignaciones*.
+- **Integridad de Datos Reales vs. Modo Demostración Interactivo (`isDemoMode`):**
+  - En modo real (`!isDemoMode`), se eliminaron todos los datos de relleno o fechas predeterminadas inexistentes, mostrando estados vacíos limpios con botones de acción directa cuando aún no hay registros.
+  - En Modo Demo (`isDemoMode`), se despliegan datos demostrativos completos e interactivos en todas las tarjetas que llevan directamente a cada sección de la aplicación al hacer clic.
+- **Reorganización de "Estadísticas de Secretaría" (`ResumenInicioTab.tsx`):**
+  - La vista analítica de secretaría se reubicó dentro del grupo *Secretaría y Registros* bajo el nombre único **Estadísticas de Secretaría**, eliminando duplicidades de nombres en el menú lateral (`Navbar.tsx`) y en el buscador global (`GlobalSearchModal.tsx`).
+- **Auditoría de Accesibilidad para Lectores de Pantalla (ARIA):**
+  - Incorporación de etiquetas descriptivas `aria-label`, estados `aria-expanded`, indicador de página activa `aria-current="page"`, y atributos semánticos `role="dialog"` y `aria-modal="true"` en los botones de navegación de `Navbar.tsx` y en los modales de acción de toda la plataforma.
+
+### [v2.10.9] - 21 de Octubre, 2026
 **Título:** Rediseño del Cronómetro de Predicación: Esfera Circular de Precisión Inspirada en el Reloj de Bloqueo y Chip en Navbar
 - **Esfera Circular de Alta Precisión (`MinistryStopwatchDial.tsx`):**
   - Implementación de un cuadrante circular SVG de 220px inspirado en la mecánica del reloj de bloqueo por inactividad (`AutoLockRing`).

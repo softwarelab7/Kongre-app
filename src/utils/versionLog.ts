@@ -25,19 +25,45 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.10.9';
-export const CURRENT_BUILD_CODE = '2026.10.21.3601';
-export const BUILD_DATE = '21 de Octubre, 2026';
+export const CURRENT_APP_VERSION = '2.11.0';
+export const CURRENT_BUILD_CODE = '2026.10.22.3701';
+export const BUILD_DATE = '22 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '2.11.0',
+    buildCode: '2026.10.22.3701',
+    date: '22 de Octubre, 2026',
+    title: 'Nuevo Panel "Mi Congregación", Estadísticas de Secretaría y Auditoría de Accesibilidad ARIA',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Nuevo Panel "Mi Congregación" (PanoramaGeneralTab): Vista centralizada con tarjetas de Informe mensual (con registro rápido S-4), Próximos privilegios (partes de Vida y Ministerio, Reunión Pública, S-89, deberes, aseo por grupo y turnos de carritos), Tablero de anuncios, Eventos teocráticos y Directorio rápido de secciones.',
+      },
+      {
+        category: 'improvement',
+        text: 'Integridad Estricta de Datos vs Modo Demo Interactivo: En modo real se muestran únicamente registros, anuncios y eventos existentes de la congregación (sin datos inventados ni fechas predeterminadas), mientras que en Modo Demo se despliegan ejemplos interactivos que navegan directamente a cada módulo.',
+      },
+      {
+        category: 'improvement',
+        text: 'Reubicación de "Estadísticas de Secretaría": La vista analítica de congregación se trasladó dentro de la categoría Secretaría y Registros con denominación única, eliminando cualquier duplicidad de nombres en la barra de navegación y buscador global.',
+      },
+      {
+        category: 'improvement',
+        text: 'Auditoría Integral de Accesibilidad (ARIA): Incorporación de atributos aria-label, aria-expanded, aria-current="page", role="dialog" y aria-modal="true" en la barra lateral (Navbar), barra móvil inferior y modales de acción para lectores de pantalla.',
+      },
+    ],
+  },
   {
     version: '2.10.9',
     buildCode: '2026.10.21.3601',
     date: '21 de Octubre, 2026',
     title: 'Nuevo Cronómetro de Predicación Circular de Precisión y Chip Navbar',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

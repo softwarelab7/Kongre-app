@@ -151,6 +151,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     monthlyReports,
     updateMonthlyReport,
     preachingGroups,
+    isDemoMode,
   } = useCongregation();
 
   const { currentPublisherId, currentBrotherName } = useAuth();
@@ -323,15 +324,8 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   // =========================================================================
   // 2. HISTORIAL DE SESIONES DE PREDICACIÓN Y META DE HORAS
   // =========================================================================
-  const [timeLogs, setTimeLogs] = useState<MinistryTimeLog[]>(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY_LOGS);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) return parsed;
-      }
-    } catch {}
-    return [
+  const DEMO_TIME_LOGS: MinistryTimeLog[] = useMemo(
+    () => [
       {
         id: 'log-demo-1',
         date: todayIso,
@@ -354,8 +348,35 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         notes: 'Tarde de revisitas y curso bíblico.',
         createdAt: new Date().toISOString(),
       },
-    ];
+    ],
+    [todayIso, currentMonthKey]
+  );
+
+  const [timeLogs, setTimeLogs] = useState<MinistryTimeLog[]>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_LOGS);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          if (!isDemoMode) {
+            return parsed.filter((l: any) => l?.id !== 'log-demo-1' && l?.id !== 'log-demo-2');
+          }
+          return parsed.length > 0 ? parsed : DEMO_TIME_LOGS;
+        }
+      }
+    } catch {}
+    return isDemoMode ? DEMO_TIME_LOGS : [];
   });
+
+  useEffect(() => {
+    setTimeLogs((prev) => {
+      if (!isDemoMode) {
+        const cleaned = prev.filter((l) => l.id !== 'log-demo-1' && l.id !== 'log-demo-2');
+        return cleaned.length !== prev.length ? cleaned : prev;
+      }
+      return prev.length === 0 ? DEMO_TIME_LOGS : prev;
+    });
+  }, [isDemoMode, DEMO_TIME_LOGS]);
 
   useEffect(() => {
     try {
@@ -449,15 +470,8 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   // =========================================================================
   // 3. AGENDA DE REVISITAS (PERSONAS INTERESADAS)
   // =========================================================================
-  const [returnVisits, setReturnVisits] = useState<ReturnVisitRecord[]>(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY_RV);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) return parsed;
-      }
-    } catch {}
-    return [
+  const DEMO_RETURN_VISITS: ReturnVisitRecord[] = useMemo(
+    () => [
       {
         id: 'rv-1',
         name: 'Sra. Elena Morales',
@@ -500,8 +514,43 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         ],
         createdAt: new Date().toISOString(),
       },
-    ];
+    ],
+    [todayIso]
+  );
+
+  const [returnVisits, setReturnVisits] = useState<ReturnVisitRecord[]>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_RV);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          if (!isDemoMode) {
+            return parsed.filter(
+              (r: any) =>
+                !(r?.id === 'rv-1' && r?.name === 'Sra. Elena Morales') &&
+                !(r?.id === 'rv-2' && r?.name === 'Sr. Roberto Gómez')
+            );
+          }
+          return parsed.length > 0 ? parsed : DEMO_RETURN_VISITS;
+        }
+      }
+    } catch {}
+    return isDemoMode ? DEMO_RETURN_VISITS : [];
   });
+
+  useEffect(() => {
+    setReturnVisits((prev) => {
+      if (!isDemoMode) {
+        const cleaned = prev.filter(
+          (r) =>
+            !(r.id === 'rv-1' && r.name === 'Sra. Elena Morales') &&
+            !(r.id === 'rv-2' && r.name === 'Sr. Roberto Gómez')
+        );
+        return cleaned.length !== prev.length ? cleaned : prev;
+      }
+      return prev.length === 0 ? DEMO_RETURN_VISITS : prev;
+    });
+  }, [isDemoMode, DEMO_RETURN_VISITS]);
 
   useEffect(() => {
     try {
@@ -633,15 +682,8 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   // =========================================================================
   // 4. ESTUDIOS BÍBLICOS (CURSOS BÍBLICOS)
   // =========================================================================
-  const [bibleStudies, setBibleStudies] = useState<BibleStudyRecord[]>(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY_STUDIES);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) return parsed;
-      }
-    } catch {}
-    return [
+  const DEMO_BIBLE_STUDIES: BibleStudyRecord[] = useMemo(
+    () => [
       {
         id: 'st-1',
         studentName: 'Familia Hernández (Jorge y Lucía)',
@@ -658,8 +700,39 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         active: true,
         createdAt: new Date().toISOString(),
       },
-    ];
+    ],
+    [todayIso]
+  );
+
+  const [bibleStudies, setBibleStudies] = useState<BibleStudyRecord[]>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_STUDIES);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          if (!isDemoMode) {
+            return parsed.filter(
+              (s: any) => !(s?.id === 'st-1' && String(s?.studentName || '').includes('Familia Hernández'))
+            );
+          }
+          return parsed.length > 0 ? parsed : DEMO_BIBLE_STUDIES;
+        }
+      }
+    } catch {}
+    return isDemoMode ? DEMO_BIBLE_STUDIES : [];
   });
+
+  useEffect(() => {
+    setBibleStudies((prev) => {
+      if (!isDemoMode) {
+        const cleaned = prev.filter(
+          (s) => !(s.id === 'st-1' && String(s.studentName || '').includes('Familia Hernández'))
+        );
+        return cleaned.length !== prev.length ? cleaned : prev;
+      }
+      return prev.length === 0 ? DEMO_BIBLE_STUDIES : prev;
+    });
+  }, [isDemoMode, DEMO_BIBLE_STUDIES]);
 
   useEffect(() => {
     try {

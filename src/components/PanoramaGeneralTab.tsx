@@ -155,7 +155,14 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
   const loadLocalMinistryData = () => {
     try {
       const rawLogs = localStorage.getItem(STORAGE_KEY_LOGS);
-      const logs: MinistryTimeLog[] = rawLogs ? JSON.parse(rawLogs) : [];
+      const parsedLogs: MinistryTimeLog[] = rawLogs ? JSON.parse(rawLogs) : [];
+      const logs = !isDemoMode
+        ? parsedLogs.filter((l) => l?.id !== 'log-demo-1' && l?.id !== 'log-demo-2')
+        : parsedLogs;
+      if (!isDemoMode && logs.length !== parsedLogs.length) {
+        localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(logs));
+      }
+
       const monthLogs = logs.filter((l) => l.month === currentMonthKey);
       const totalMinutes = monthLogs.reduce((acc, l) => acc + (Number(l.minutes) || 0), 0);
       const logReturnVisits = monthLogs.reduce(
@@ -164,10 +171,28 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
       );
 
       const rawRv = localStorage.getItem(STORAGE_KEY_RV);
-      const rvList: ReturnVisitRecord[] = rawRv ? JSON.parse(rawRv) : [];
+      const parsedRv: ReturnVisitRecord[] = rawRv ? JSON.parse(rawRv) : [];
+      const rvList = !isDemoMode
+        ? parsedRv.filter(
+            (r) =>
+              !(r?.id === 'rv-1' && r?.name === 'Sra. Elena Morales') &&
+              !(r?.id === 'rv-2' && r?.name === 'Sr. Roberto Gómez')
+          )
+        : parsedRv;
+      if (!isDemoMode && rvList.length !== parsedRv.length) {
+        localStorage.setItem(STORAGE_KEY_RV, JSON.stringify(rvList));
+      }
 
       const rawStudies = localStorage.getItem(STORAGE_KEY_STUDIES);
-      const studiesList: BibleStudyRecord[] = rawStudies ? JSON.parse(rawStudies) : [];
+      const parsedStudies: BibleStudyRecord[] = rawStudies ? JSON.parse(rawStudies) : [];
+      const studiesList = !isDemoMode
+        ? parsedStudies.filter(
+            (s) => !(s?.id === 'st-1' && String(s?.studentName || '').includes('Familia Hernández'))
+          )
+        : parsedStudies;
+      if (!isDemoMode && studiesList.length !== parsedStudies.length) {
+        localStorage.setItem(STORAGE_KEY_STUDIES, JSON.stringify(studiesList));
+      }
       const activeStudiesCount = studiesList.filter((s) => s.active).length;
 
       const existingCurrentReport = activePublisherId
@@ -818,15 +843,39 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
     const carritosCount = cartShifts.length;
     const groupsCount = preachingGroups.length;
 
+    const scheduledWeeksCount = weeks.filter(
+      (w) =>
+        Boolean(w.midweek?.presidentId) ||
+        Boolean(w.midweek?.tesoros?.discurso?.publisherId) ||
+        Boolean(w.midweek?.tesoros?.perlas?.publisherId) ||
+        Boolean(w.midweek?.tesoros?.lecturaBiblia?.publisherId) ||
+        Boolean(w.weekend?.presidentId) ||
+        Boolean(w.weekend?.publicTalkSpeaker)
+    ).length;
+
+    const hasRealWeekendTalk =
+      Boolean(currentWeek?.weekend?.publicTalkSpeaker?.trim()) &&
+      Boolean(currentWeek?.weekend?.publicTalkTheme?.trim()) &&
+      currentWeek?.weekend?.publicTalkTheme !== 'Discurso Público';
+
+    const assignedDutiesCount = currentWeek
+      ? Object.values(currentWeek.midweek?.duties || {}).filter(
+          (arr) => Array.isArray(arr) && arr.length > 0
+        ).length +
+        Object.values(currentWeek.weekend?.duties || {}).filter(
+          (arr) => Array.isArray(arr) && arr.length > 0
+        ).length
+      : 0;
+
     return [
       {
         id: 'sec-vym',
         title: 'Vida y Ministerio',
         meta:
-          weeks.length > 0
-            ? `${weeks.length} ${weeks.length === 1 ? 'semana' : 'semanas'}`
+          scheduledWeeksCount > 0
+            ? `${scheduledWeeksCount} ${scheduledWeeksCount === 1 ? 'semana programada' : 'semanas programadas'}`
             : isDemoMode
-            ? 'Programa semanal'
+            ? `${weeks.length} semanas`
             : 'Ir al programa',
         icon: Calendar,
         targetTab: 'programacion' as ActiveTab,
@@ -835,12 +884,11 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
       {
         id: 'sec-publica',
         title: 'Reunión Pública',
-        meta:
-          currentWeek?.weekend?.publicTalkTheme
-            ? currentWeek.weekend.publicTalkTheme
-            : isDemoMode
-            ? 'Discursos y Atalaya'
-            : 'Discursos y lectores',
+        meta: hasRealWeekendTalk
+          ? currentWeek!.weekend.publicTalkTheme
+          : isDemoMode
+          ? currentWeek?.weekend?.publicTalkTheme || 'Discursos y Atalaya'
+          : 'Discursos y lectores',
         icon: Presentation,
         targetTab: 'reunion_publica' as ActiveTab,
         accent: 'text-blue-600 dark:text-blue-400 bg-blue-500/10 dark:bg-blue-500/20',
@@ -849,7 +897,9 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
         id: 'sec-deberes',
         title: 'Aseo y Deberes',
         meta:
-          customDuties.length > 0
+          assignedDutiesCount > 0
+            ? `${assignedDutiesCount} ${assignedDutiesCount === 1 ? 'turno asignado' : 'turnos asignados'}`
+            : isDemoMode && customDuties.length > 0
             ? `${customDuties.length} departamentos`
             : 'Audio, acomodadores y aseo',
         icon: Sparkles,
@@ -925,7 +975,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
     fieldServiceMeetings.length,
     cartShifts.length,
     preachingGroups.length,
-    weeks.length,
+    weeks,
     currentWeek,
     customDuties.length,
     publishers.length,

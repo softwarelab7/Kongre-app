@@ -82,7 +82,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   onOpenJoinWithCode,
   embedded = false,
 }) => {
-  const { settings, updateSettings, publishers, addPublisher } = useCongregation();
+  const { settings, updateSettings, addPublisher, resetAllCongregationData } = useCongregation();
   const { user, assignRoleToEmail, setActiveRole, assignPersonalPinToRole, setIdentifiedPublisher } = useAuth();
   const { setCongregationPin, setPersonalPin, setMasterPassphrase } = useSecurity();
 
@@ -369,6 +369,10 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       const congPinHashed = await hashPasscode(cleanCongPin);
       const finalId = formatCanonicalCongregationId(congregationNumber.trim()) || congregationNumber.trim().toUpperCase();
 
+      // 0. Limpiar completamente cualquier dato de demostración o sesión previa antes de registrar la nueva congregación
+      resetAllCongregationData();
+      localStorage.removeItem('kongre_demo_mode');
+
       // 1. Guardar credenciales y PINs inmediatamente en almacenamiento local cifrado
       setSecureLocalPin('kongre_session_pin_v2', cleanPersonalPin);
       setSecureLocalPin('kongre_coordinator_pin', cleanPersonalPin);
@@ -440,14 +444,9 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       );
       setActiveRole('coordinador');
 
-      // 4. Agregar al Coordinador al registro de publicadores si no existe
-      let updatedPubs = [...publishers];
-      const alreadyHasCoord = publishers.some(
-        (p) =>
-          areNamesEquivalent(p.name, coordinatorName.trim()) ||
-          (p.email && coordinatorEmail.trim() && p.email.trim().toLowerCase() === coordinatorEmail.trim().toLowerCase())
-      );
-      if (!alreadyHasCoord && coordinatorName.trim()) {
+      // 4. Agregar únicamente al Coordinador al registro limpio de publicadores
+      let updatedPubs: any[] = [];
+      if (coordinatorName.trim()) {
         const coordId = `pub_coord_${Date.now()}`;
         const coordPub = {
           id: coordId,
@@ -488,7 +487,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         };
         addPublisher(coordPub);
         setIdentifiedPublisher(coordId, coordinatorName.trim());
-        updatedPubs = [...publishers, coordPub];
+        updatedPubs = [coordPub];
       }
 
       // 5. Cifrado de grado militar (AES-256-GCM) y subida inmediata a Supabase

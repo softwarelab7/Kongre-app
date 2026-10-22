@@ -897,6 +897,7 @@ export function generateDemoWeeks(): WeekSchedule[] {
 
     const week: WeekSchedule = {
       ...baseWeek,
+      cleaningGroupNumbers: [(i % 4) + 1],
       midweek: {
         ...baseWeek.midweek,
         presidentId: midweekPresidents[i % midweekPresidents.length],

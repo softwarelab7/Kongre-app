@@ -432,7 +432,7 @@ export function createEmptyWeek(mondayDate: Date, index: number = 0): WeekSchedu
     id: weekId,
     weekStartDate: mondayISO,
     weekEndDate: sundayISO,
-    cleaningGroupNumbers: [(index % 4) + 1],
+    cleaningGroupNumbers: [],
     midweek: {
       date: formatDateISO(midweekDate),
       presidentId: '',
@@ -527,7 +527,7 @@ export function createEmptyWeek(mondayDate: Date, index: number = 0): WeekSchedu
       date: formatDateISO(weekendDate),
       presidentId: '',
       publicTalkSpeaker: '',
-      publicTalkTheme: 'Discurso Público',
+      publicTalkTheme: '',
       atalayaConductorId: '',
       atalayaLectorId: '',
       initialPrayerId: '',

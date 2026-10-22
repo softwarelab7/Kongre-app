@@ -802,8 +802,171 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // Modo de Demostración (declarado con el resto de estados para evitar TDZ en hooks superiores)
   const [isDemoMode, setIsDemoMode] = useState<boolean>(() => {
-    return typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true';
+    if (typeof window === 'undefined') return false;
+    const rawDemo = localStorage.getItem('kongre_demo_mode') === 'true';
+    const isRealCong = Boolean(
+      settings.isRegistered &&
+      settings.congregationName &&
+      !settings.congregationName.includes('(Demostración)') &&
+      settings.congregationId !== '1001-DEMO' &&
+      settings.congregationId !== 'DEMO-001' &&
+      settings.congregationNumber !== '1001-DEMO' &&
+      settings.congregationNumber !== 'DEMO-001'
+    );
+    if (rawDemo && isRealCong) {
+      localStorage.removeItem('kongre_demo_mode');
+      return false;
+    }
+    return rawDemo;
   });
+
+  // Purgar automáticamente cualquier dato residual del modo demostración cuando estamos en una congregación real
+  useEffect(() => {
+    if (isDemoMode) return;
+    const DEMO_PUB_IDS = new Set([
+      'pub-coord', 'pub-sec', 'pub-serv', 'pub-vym',
+      'pub-sm-lit', 'pub-sm-terr', 'pub-sm-audio', 'pub-sm-plat',
+      'pub-pion-1', 'pub-pion-2',
+      'pub-pub-1', 'pub-pub-2', 'pub-pub-3', 'pub-pub-4', 'pub-pub-5',
+    ]);
+
+    setPublishers((prev) => {
+      const cleaned = prev.filter(
+        (p) => !DEMO_PUB_IDS.has(p.id) && !String(p.email || '').endsWith('@kongre-demo.org')
+      );
+      return cleaned.length !== prev.length ? cleaned : prev;
+    });
+
+    setPreachingGroups((prev) => {
+      const cleaned = prev.filter((g) => !DEMO_PUB_IDS.has(g.overseerId || ''));
+      return cleaned.length !== prev.length ? cleaned : prev;
+    });
+
+    setNotices((prev) => {
+      const cleaned = prev.filter((n) => !['not-1', 'not-2', 'not-3'].includes(n.id));
+      return cleaned.length !== prev.length ? cleaned : prev;
+    });
+
+    setTerritories((prev) => {
+      const demoNames = new Set([
+        'Colonia Del Valle Norte',
+        'Comercial Insurgentes',
+        'Residencial San José',
+        'Sector La Cañada',
+      ]);
+      const cleaned = prev.filter(
+        (t) => !(['terr-1', 'terr-2', 'terr-3', 'terr-4'].includes(t.id) && demoNames.has(t.name))
+      );
+      return cleaned.length !== prev.length ? cleaned : prev;
+    });
+
+    setLiteratureItems((prev) => {
+      const cleaned = prev.filter(
+        (item) => !(['lit-1', 'lit-2', 'lit-3', 'lit-4'].includes(item.id) && item.lastCountDate === '2026-10-01')
+      );
+      return cleaned.length !== prev.length ? cleaned : prev;
+    });
+
+    setCartLocations((prev) => {
+      const cleaned = prev.filter(
+        (loc) => !(loc.id === 'cart-loc-1' && loc.name === 'Plaza Central - Salida Metro')
+      );
+      return cleaned.length !== prev.length ? cleaned : prev;
+    });
+
+    setCartShifts((prev) => {
+      const cleaned = prev.filter(
+        (s) => !((s.id === 'shift-1' || s.id === 'shift-2') && s.locationId === 'cart-loc-1')
+      );
+      return cleaned.length !== prev.length ? cleaned : prev;
+    });
+
+    setWeeks((prev) => {
+      let modified = false;
+      const cleanedWeeks = prev.map((w) => {
+        const hasDemoMidweek =
+          DEMO_PUB_IDS.has(w.midweek?.presidentId || '') ||
+          DEMO_PUB_IDS.has(w.midweek?.initialPrayerId || '') ||
+          DEMO_PUB_IDS.has(w.midweek?.tesoros?.discurso?.publisherId || '') ||
+          DEMO_PUB_IDS.has(w.midweek?.tesoros?.perlas?.publisherId || '') ||
+          DEMO_PUB_IDS.has(w.midweek?.tesoros?.lecturaBiblia?.publisherId || '');
+        const hasDemoWeekend =
+          DEMO_PUB_IDS.has(w.weekend?.presidentId || '') ||
+          DEMO_PUB_IDS.has(w.weekend?.atalayaConductorId || '') ||
+          w.weekend?.publicTalkSpeaker === 'Hno. Roberto Peña (Orador Visitante - Cong. Norte)';
+        const hasOrphanCleaning =
+          Array.isArray(w.cleaningGroupNumbers) &&
+          w.cleaningGroupNumbers.length > 0 &&
+          latestPreachingGroupsRef.current.filter((g) => !DEMO_PUB_IDS.has(g.overseerId || '')).length === 0;
+        const hasPlaceholderTheme =
+          !w.weekend?.publicTalkSpeaker && w.weekend?.publicTalkTheme === 'Discurso Público';
+
+        if (!hasDemoMidweek && !hasDemoWeekend && !hasOrphanCleaning && !hasPlaceholderTheme) {
+          return w;
+        }
+        modified = true;
+        const cloned: WeekSchedule = JSON.parse(JSON.stringify(w));
+        if (hasOrphanCleaning || hasDemoMidweek) {
+          cloned.cleaningGroupNumbers = [];
+        }
+        if (hasPlaceholderTheme) {
+          cloned.weekend.publicTalkTheme = '';
+        }
+        if (hasDemoMidweek || hasDemoWeekend) {
+          cloned.midweek.presidentId = '';
+          cloned.midweek.initialPrayerId = '';
+          cloned.midweek.finalPrayerId = '';
+          if (cloned.midweek.tesoros?.discurso) cloned.midweek.tesoros.discurso.publisherId = '';
+          if (cloned.midweek.tesoros?.perlas) cloned.midweek.tesoros.perlas.publisherId = '';
+          if (cloned.midweek.tesoros?.lecturaBiblia) cloned.midweek.tesoros.lecturaBiblia.publisherId = '';
+          if (cloned.midweek.tesoros?.lecturaBibliaAux) cloned.midweek.tesoros.lecturaBibliaAux.publisherId = '';
+          (cloned.midweek.maestros?.items || []).forEach((it) => {
+            it.publisherId = '';
+            it.assistantId = '';
+          });
+          (cloned.midweek.vidaCristiana?.items || []).forEach((it) => {
+            it.publisherId = '';
+          });
+          if (cloned.midweek.vidaCristiana?.estudioBiblico) {
+            cloned.midweek.vidaCristiana.estudioBiblico.conductorId = '';
+            cloned.midweek.vidaCristiana.estudioBiblico.lectorId = '';
+          }
+          cloned.midweek.duties = {
+            deber_audio: [],
+            deber_video: [],
+            deber_microfonos: [],
+            deber_plataforma: [],
+            deber_acomodador: [],
+            deber_seguridad: [],
+            deber_zoom: [],
+          };
+          cloned.weekend.presidentId = '';
+          cloned.weekend.publicTalkSpeaker = '';
+          cloned.weekend.publicTalkTheme = '';
+          cloned.weekend.publicTalkOutlineNumber = undefined;
+          cloned.weekend.isVisitingSpeaker = false;
+          cloned.weekend.visitingSpeakerCongregation = undefined;
+          cloned.weekend.visitingSpeakerPhone = undefined;
+          cloned.weekend.hospitalityPublisherId = undefined;
+          cloned.weekend.atalayaConductorId = '';
+          cloned.weekend.atalayaLectorId = '';
+          cloned.weekend.initialPrayerId = '';
+          cloned.weekend.finalPrayerId = '';
+          cloned.weekend.duties = {
+            deber_audio: [],
+            deber_video: [],
+            deber_microfonos: [],
+            deber_plataforma: [],
+            deber_acomodador: [],
+            deber_seguridad: [],
+            deber_zoom: [],
+          };
+        }
+        return cloned;
+      });
+      return modified ? cleanedWeeks : prev;
+    });
+  }, [isDemoMode]);
 
   const refreshQueueStats = async () => {
     try {
@@ -2344,23 +2507,37 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   // PUBLISHER ACTIONS
   const addPublisher = (pubData: Omit<Publisher, 'id'>) => {
-    // 1. Prevenir duplicados: verificar si ya existe un publicador equivalente por nombre, email o PIN
-    const existingIndex = publishers.findIndex(
-      (p) =>
-        isSamePublisher(p, pubData) ||
-        (pubData.personalPin && verifyPersonalPinMatch(pubData.personalPin, p)) ||
-        (pubData.name && areNamesEquivalent(p.name || (p as any).full_name, pubData.name))
-    );
+    setPublishers((prev) => {
+      const existingIndex = prev.findIndex(
+        (p) =>
+          isSamePublisher(p, pubData) ||
+          (pubData.personalPin && verifyPersonalPinMatch(pubData.personalPin, p)) ||
+          (pubData.name && areNamesEquivalent(p.name || (p as any).full_name, pubData.name))
+      );
 
-    if (existingIndex !== -1) {
-      const existing = publishers[existingIndex];
-      const merged = mergePublisherData(existing, pubData);
-      if (merged.personalPin) {
-        merged.personalPinHash = hashPersonalPin(merged.personalPin);
+      let updated: Publisher[];
+      if (existingIndex !== -1) {
+        const existing = prev[existingIndex];
+        const merged = mergePublisherData(existing, pubData);
+        if (merged.personalPin) {
+          merged.personalPinHash = hashPersonalPin(merged.personalPin);
+        }
+        updated = [...prev];
+        updated[existingIndex] = merged;
+      } else {
+        const immutableCode = ensureImmutablePublisherCode(pubData);
+        const resolvedId = (pubData as any).id || immutableCode;
+        const newPub: Publisher = {
+          ...pubData,
+          ...(pubData.personalPin ? { personalPinHash: hashPersonalPin(pubData.personalPin) } : {}),
+          id: resolvedId,
+          nid: (pubData as any).nid || resolvedId,
+          publisherCode: immutableCode,
+          createdAt: (pubData as any).createdAt || new Date().toISOString(),
+        };
+        updated = [...prev, newPub];
       }
-      const updated = [...publishers];
-      updated[existingIndex] = merged;
-      setPublishers(updated);
+
       try {
         localStorage.setItem(
           `${LOCAL_STORAGE_KEY}_publishers`,
@@ -2368,28 +2545,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         );
       } catch {}
       saveToFirestore(updated);
-      return;
-    }
-
-    const immutableCode = ensureImmutablePublisherCode(pubData);
-    const resolvedId = (pubData as any).id || immutableCode;
-    const newPub: Publisher = {
-      ...pubData,
-      ...(pubData.personalPin ? { personalPinHash: hashPersonalPin(pubData.personalPin) } : {}),
-      id: resolvedId,
-      nid: (pubData as any).nid || resolvedId,
-      publisherCode: immutableCode,
-      createdAt: (pubData as any).createdAt || new Date().toISOString(),
-    };
-    const updated = [...publishers, newPub];
-    setPublishers(updated);
-    try {
-      localStorage.setItem(
-        `${LOCAL_STORAGE_KEY}_publishers`,
-        JSON.stringify(sanitizePublishersForLocalStorage(updated))
-      );
-    } catch {}
-    saveToFirestore(updated);
+      return updated;
+    });
   };
 
   const updatePublisher = (pub: Publisher) => {
@@ -5217,6 +5374,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const resetAllCongregationData = () => {
+    setIsDemoMode(false);
     setPublishers([]);
     setPreachingGroups([]);
     setOutgoingSpeakers([]);
@@ -5231,6 +5389,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setQuarterlyAudits([]);
     setMemorialPlans([]);
     setTheocraticAssemblies([]);
+    setCongregationEvents([]);
     setLiteratureItems([]);
     setSpecialOrders([]);
     setGroupDistributions([]);
@@ -5240,6 +5399,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setMaintenanceSheets([]);
     setAuxPioneerRequests([]);
     setBranchReportsS1([]);
+    setAccountLinkRequests([]);
+    setClmProgramas({});
     setSettings(INITIAL_SETTINGS);
     latestSettingsRef.current = INITIAL_SETTINGS;
     const cleanWeeks = generateInitialWeeks();

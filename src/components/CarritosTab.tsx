@@ -20,7 +20,6 @@ import {
   Phone,
   MessageCircle,
 } from 'lucide-react';
-import { SectionHeader } from './SectionHeader';
 
 export const CarritosTab: React.FC = () => {
   const {
@@ -217,50 +216,47 @@ export const CarritosTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* SectionHeader Kongre 1 Style */}
-      <SectionHeader
-        icon={Compass}
-        title="Predicación con"
-        highlightWord="Carritos"
-        subtitle="Puntos autorizados, turnos semanales y asignación de parejas teocráticas"
-        colorTheme="amber"
-        actions={
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={handleCopyScheduleWhatsApp}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-slate-700 dark:text-white/80 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
-            >
-              {copiedSchedule ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">¡Horario Copiado!</span>
-                </>
-              ) : (
-                <>
-                  <Share2 className="w-4 h-4 text-slate-500" />
-                  <span>Copiar para WhatsApp</span>
-                </>
-              )}
-            </button>
+      {/* Barra de Acciones de Carritos (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+          {cartLocations.length} puntos autorizados • {cartShifts.length} turnos semanales
+        </div>
 
-            <button
-              onClick={handleOpenNewLoc}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-slate-700 dark:text-white/80 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold shadow-xs transition-all cursor-pointer"
-            >
-              <MapPin className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <span>Puntos de Carrito</span>
-            </button>
+        <div className="flex flex-wrap items-center gap-2 justify-end">
+          <button
+            onClick={handleCopyScheduleWhatsApp}
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-white/80 border border-slate-200/80 dark:border-white/[0.08] text-xs sm:text-sm font-semibold shadow-2xs transition-all cursor-pointer"
+          >
+            {copiedSchedule ? (
+              <>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">¡Horario Copiado!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-4 h-4 text-slate-500" />
+                <span>Copiar para WhatsApp</span>
+              </>
+            )}
+          </button>
 
-            <button
-              onClick={handleOpenNewShift}
-              className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-semibold shadow-md dark:shadow-amber-500/20 transition-all active:scale-95 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Nuevo Turno</span>
-            </button>
-          </div>
-        }
-      />
+          <button
+            onClick={handleOpenNewLoc}
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-white/80 border border-slate-200/80 dark:border-white/[0.08] text-xs sm:text-sm font-semibold shadow-2xs transition-all cursor-pointer"
+          >
+            <MapPin className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            <span>Puntos de Carrito</span>
+          </button>
+
+          <button
+            onClick={handleOpenNewShift}
+            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-semibold shadow-md dark:shadow-amber-500/20 transition-all active:scale-95 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nuevo Turno</span>
+          </button>
+        </div>
+      </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

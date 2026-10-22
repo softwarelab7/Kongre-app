@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { MaintenanceSheet, MaintenanceCategory, MaintenanceStatus } from '../types';
 import { SAMPLE_MAINTENANCE_SHEETS_TEMPLATE } from '../utils/sampleData';
-import { SectionHeader } from './SectionHeader';
 import { MaintenanceSheetCard } from './maintenance/MaintenanceSheetCard';
 import { MaintenanceSheetModal } from './maintenance/MaintenanceSheetModal';
 import {
@@ -173,39 +172,41 @@ export const MantenimientoTab: React.FC = () => {
 
       {/* Main Container */}
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
-        {/* Section Header */}
-        <SectionHeader
-          icon={Wrench}
-          title="Fichas de Mantenimiento"
-          highlight="del Salón"
-          subtitle="PLAN PREVENTIVO, LISTAS DE VERIFICACIÓN Y TAREAS OPERATIVAS"
-          badgeText="MANTENIMIENTO TEOCRÁTICO"
-          actions={
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Print Annual Register */}
-              <button
-                onClick={() => window.print()}
-                title="Imprimir el registro de fichas para el libro de mantenimiento del Salón"
-                className="p-2 sm:px-3 sm:py-2 rounded-xl border border-zinc-200 dark:border-white/[0.1] bg-white dark:bg-white/[0.05] text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors flex items-center gap-2 text-xs font-semibold"
-              >
-                <Printer size={16} />
-                <span className="hidden sm:inline">Imprimir Registro</span>
-              </button>
+        {/* Barra de Acciones de Mantenimiento (Opción 1: arranque directo sin banner redundante) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+              Mantenimiento Teocrático
+            </span>
+            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 hidden sm:inline">
+              Plan preventivo, listas de verificación y tareas operativas
+            </span>
+          </div>
 
-              {/* New Sheet Button */}
-              <button
-                onClick={() => {
-                  setEditingSheet(null);
-                  setIsModalOpen(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-indigo-500/25 transition-all"
-              >
-                <Plus size={16} />
-                <span>Nueva Ficha</span>
-              </button>
-            </div>
-          }
-        />
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Print Annual Register */}
+            <button
+              onClick={() => window.print()}
+              title="Imprimir el registro de fichas para el libro de mantenimiento del Salón"
+              className="p-2 sm:px-3 sm:py-2 rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-slate-900/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-2 text-xs font-semibold shadow-2xs cursor-pointer active:scale-95"
+            >
+              <Printer size={16} />
+              <span className="hidden sm:inline">Imprimir Registro</span>
+            </button>
+
+            {/* New Sheet Button */}
+            <button
+              onClick={() => {
+                setEditingSheet(null);
+                setIsModalOpen(true);
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-indigo-500/25 transition-all cursor-pointer active:scale-95"
+            >
+              <Plus size={16} />
+              <span>Nueva Ficha</span>
+            </button>
+          </div>
+        </div>
 
         {/* 5 KPI Metric Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">

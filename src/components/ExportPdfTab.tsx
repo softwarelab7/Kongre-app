@@ -288,73 +288,67 @@ export const ExportPdfTab: React.FC = () => {
         {`@media print { @page { size: ${pageSize} ${pageOrientation}; margin: 10mm; } }`}
       </style>
 
-      {/* Top action header */}
-      <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
-        <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-            Exportación y Plantillas Oficiales • 100% Local
-          </span>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-0.5">
-            Exportar Programa, Hojas S-89 y Formatos Oficiales (Local)
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Previsualiza el programa o carga tus archivos oficiales (S-21, S-89, S-140, S-88, S-13) para rellenarlos 100% en local sin servidores privados.
-          </p>
-        </div>
-
+      {/* Barra de Navegación de Exportación y Plantillas (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
         {/* Tab switch between Monthly Program, S-89 Slips, Local Official Forms, and WhatsApp Center */}
-        <div className="grid grid-cols-2 sm:flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl text-xs font-semibold w-full sm:w-auto">
+        <div className="flex items-center gap-1 bg-slate-100/90 dark:bg-slate-900/60 border border-slate-200/80 dark:border-white/[0.08] p-1 rounded-2xl text-xs font-semibold overflow-x-auto no-scrollbar shadow-2xs w-full sm:w-auto">
           <button
             type="button"
             onClick={() => setActiveTab('programa')}
-            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer whitespace-nowrap ${
               activeTab === 'programa'
-                ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-400 shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <FileText className="w-4 h-4 shrink-0" />
-            <span className="truncate">Programa</span>
+            <span>Programa</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('s89')}
-            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer whitespace-nowrap ${
               activeTab === 's89'
-                ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-400 shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <FileCheck className="w-4 h-4 shrink-0" />
-            <span className="truncate">Hojas S-89</span>
+            <span>Hojas S-89</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('formatos_oficiales')}
-            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer whitespace-nowrap ${
               activeTab === 'formatos_oficiales'
                 ? 'bg-emerald-600 text-white shadow-xs font-bold'
                 : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
             }`}
           >
             <ShieldCheck className="w-4 h-4 shrink-0" />
-            <span className="truncate">Formatos Oficiales (Local)</span>
+            <span>Formatos Oficiales (Local)</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('whatsapp')}
-            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
+            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer whitespace-nowrap ${
               activeTab === 'whatsapp'
-                ? 'bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-400 shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span className="truncate">WhatsApp</span>
+            <MessageCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>WhatsApp</span>
           </button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden md:inline">
+            100% Local • Sin servidores externos
+          </span>
         </div>
       </div>
 

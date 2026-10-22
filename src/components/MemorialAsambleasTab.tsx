@@ -452,114 +452,95 @@ export const MemorialAsambleasTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-linear-to-r from-red-950 via-slate-900 to-indigo-950 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-300 text-xs font-semibold tracking-wide border border-red-500/30">
-              <Flame className="w-3.5 h-3.5 text-red-400" />
-              <span>14 de Nisán & Asambleas Teocráticas</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Conmemoración del Memorial & Asambleas
-            </h1>
-            <p className="text-slate-300 text-sm sm:text-base max-w-3xl">
-              Organización del evento anual más sagrado, asignación de oradores y oraciones, servidores
-              de los emblemas, acomodadores, campaña mundial de invitaciones y asambleas de circuito y
-              regionales.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => {
-                if (currentPlan) {
-                  const msg = buildMemorialProgramWhatsApp(currentPlan, publishers);
-                  handleOpenWhatsApp(msg);
-                }
-              }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm rounded-xl transition-all shadow-md shadow-emerald-900/30 active:scale-95"
-            >
-              <Share2 className="w-4 h-4" />
-              <span>Programa WhatsApp</span>
-            </button>
-
-            <button
-              onClick={() => window.print()}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-medium text-sm rounded-xl border border-white/20 transition-all backdrop-blur-xs active:scale-95"
-            >
-              <Printer className="w-4 h-4" />
-              <span>Imprimir Cuadro</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Sub-tab Navigation Buttons */}
-        <div className="flex flex-wrap gap-2 mt-8 pt-4 border-t border-white/10">
+      {/* Barra de Acciones y Navegación de Memorial & Asambleas (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Sub-tab Navigation Pills */}
+        <div className="flex rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/90 dark:bg-slate-900/60 p-1 shadow-2xs overflow-x-auto no-scrollbar gap-1">
           <button
             onClick={() => setActiveSubTab('memorial')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
               activeSubTab === 'memorial'
-                ? 'bg-white text-slate-900 shadow-md'
-                : 'bg-white/10 text-slate-200 hover:bg-white/15'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Wine className="w-4 h-4 text-red-600" />
-            <span>Memorial (14 de Nisán)</span>
+            <Wine className="w-3.5 h-3.5 text-red-500" />
+            <span>Memorial (14 Nisán)</span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('asambleas')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
               activeSubTab === 'asambleas'
-                ? 'bg-white text-slate-900 shadow-md'
-                : 'bg-white/10 text-slate-200 hover:bg-white/15'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Building className="w-4 h-4 text-indigo-600" />
-            <span>Asambleas de Circuito & Regionales</span>
-            <span className="px-1.5 py-0.5 rounded-full text-xs bg-indigo-100 text-indigo-800 font-bold">
+            <Building className="w-3.5 h-3.5" />
+            <span>Asambleas</span>
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 font-bold">
               {theocraticAssemblies.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('checklist')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
               activeSubTab === 'checklist'
-                ? 'bg-white text-slate-900 shadow-md'
-                : 'bg-white/10 text-slate-200 hover:bg-white/15'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>Checklist Teocrático</span>
-            <span
-              className={`px-1.5 py-0.5 rounded-full text-xs font-bold ${
-                checklistReadyCount === checklist.length
-                  ? 'bg-emerald-100 text-emerald-800'
-                  : 'bg-amber-100 text-amber-800'
-              }`}
-            >
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+            <span>Checklist</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+              checklistReadyCount === checklist.length
+                ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200'
+                : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200'
+            }`}>
               {checklistReadyCount}/{checklist.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('informe_sucursal')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
               activeSubTab === 'informe_sucursal'
-                ? 'bg-white text-slate-900 shadow-md'
-                : 'bg-white/10 text-slate-200 hover:bg-white/15'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <FileText className="w-4 h-4 text-amber-600" />
-            <span>Informe a la Sucursal</span>
+            <FileText className="w-3.5 h-3.5" />
+            <span>Informe Sucursal</span>
             {currentPlan?.report.reportedToBranch && (
-              <span className="px-1.5 py-0.5 rounded-full text-xs bg-emerald-100 text-emerald-800 font-bold">
-                Enviado
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 font-bold">
+                ✓
               </span>
             )}
+          </button>
+        </div>
+
+        {/* Action quick buttons */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => {
+              if (currentPlan) {
+                const msg = buildMemorialProgramWhatsApp(currentPlan, publishers);
+                handleOpenWhatsApp(msg);
+              }
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl transition-all shadow-md shadow-emerald-900/30 active:scale-95 cursor-pointer"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            <span>Programa WhatsApp</span>
+          </button>
+
+          <button
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 font-semibold text-xs rounded-xl border border-slate-200/80 dark:border-white/[0.08] transition-all shadow-2xs active:scale-95 cursor-pointer"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Imprimir Cuadro</span>
           </button>
         </div>
       </div>

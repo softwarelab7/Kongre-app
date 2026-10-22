@@ -161,23 +161,15 @@ export const S89SlipsTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header and Controls */}
-      <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
-              Formulario S-89 Oficial
-            </span>
-            <span className="text-xs text-slate-500 font-medium">
-              Seguimiento de Lecciones del Folleto Maestros
-            </span>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-            Hojas de Asignación para Estudiantes (S-89)
-          </h2>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Generación oficial para imprimir en 4x1 o enviar por WhatsApp con enlace de confirmación y registro de lecciones.
-          </p>
+      {/* Barra de Acciones de Hojas S-89 (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+            Formulario S-89
+          </span>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
+            Asignaciones estudiantiles y seguimiento de lecciones
+          </span>
         </div>
 
         {/* Action Buttons */}

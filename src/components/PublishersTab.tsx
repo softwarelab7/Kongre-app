@@ -27,7 +27,6 @@ import {
   Plane,
   Sparkles,
 } from 'lucide-react';
-import { SectionHeader } from './SectionHeader';
 import { Select } from './Select';
 import { PublisherEditor, ASSIGNMENT_GROUPS, Tab } from './PublisherEditor';
 import { useCongregation } from '../context/CongregationContext';
@@ -801,68 +800,60 @@ export const PublishersTab: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
-      <SectionHeader
-        icon={Users}
-        title="Catálogo de"
-        highlightWord="Publicadores"
-        subtitle={`${stats.active} publicadores activos en ${settings.congregationName || 'la congregación'}`}
-        colorTheme="indigo"
-        actions={
-          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto justify-between sm:justify-end">
-            {/* Input oculto para subir archivo CSV */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileImport}
-              accept=".csv"
-              className="hidden"
-            />
+      {/* Barra de Acciones de Publicadores (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Input oculto para subir archivo CSV */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileImport}
+          accept=".csv"
+          className="hidden"
+        />
 
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={!canEditPublishers}
-                title="Importar publicadores desde archivo CSV"
-                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 bg-black/[0.04] hover:bg-black/[0.08] dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-200 rounded-xl text-xs font-semibold transition-all border border-black/[0.06] dark:border-white/[0.06] cursor-pointer disabled:opacity-50 active:scale-95"
-              >
-                <Upload size={14} /> <span className="hidden sm:inline">Importar CSV</span>
-              </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={!canEditPublishers}
+            title="Importar publicadores desde archivo CSV"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-zinc-700 dark:text-zinc-200 rounded-xl text-xs font-semibold transition-all border border-slate-200/80 dark:border-white/[0.08] cursor-pointer disabled:opacity-50 active:scale-95 shadow-2xs"
+          >
+            <Upload size={14} /> <span>Importar CSV</span>
+          </button>
 
-              <button
-                onClick={handleExportCsv}
-                title="Exportar catálogo completo a formato Excel CSV"
-                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 bg-black/[0.04] hover:bg-black/[0.08] dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-200 rounded-xl text-xs font-semibold transition-all border border-black/[0.06] dark:border-white/[0.06] cursor-pointer active:scale-95"
-              >
-                <Download size={14} /> <span className="hidden sm:inline">Exportar Excel</span>
-              </button>
+          <button
+            onClick={handleExportCsv}
+            title="Exportar catálogo completo a formato Excel CSV"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-zinc-700 dark:text-zinc-200 rounded-xl text-xs font-semibold transition-all border border-slate-200/80 dark:border-white/[0.08] cursor-pointer active:scale-95 shadow-2xs"
+          >
+            <Download size={14} /> <span>Exportar Excel</span>
+          </button>
 
-              {duplicateCount > 0 && canEditPublishers && (
-                <button
-                  onClick={() => {
-                    const { mergedCount } = cleanDuplicatePublishers();
-                    showToast(`¡Se fusionaron ${mergedCount} publicador(es) duplicado(s) exitosamente!`, 'success');
-                  }}
-                  title="Fusionar publicadores duplicados detectados"
-                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 rounded-xl text-xs font-semibold transition-all border border-amber-500/30 cursor-pointer animate-pulse active:scale-95"
-                >
-                  <Sparkles size={14} /> <span>Fusionar ({duplicateCount})</span>
-                </button>
-              )}
-            </div>
-
+          {duplicateCount > 0 && canEditPublishers && (
             <button
-              disabled={!canEditPublishers}
               onClick={() => {
-                setEditingPublisher(null);
-                setViewMode('editor');
+                const { mergedCount } = cleanDuplicatePublishers();
+                showToast(`¡Se fusionaron ${mergedCount} publicador(es) duplicado(s) exitosamente!`, 'success');
               }}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 sm:px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-md shadow-indigo-600/20 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer active:scale-95"
+              title="Fusionar publicadores duplicados detectados"
+              className="flex items-center gap-1.5 px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 rounded-xl text-xs font-semibold transition-all border border-amber-500/30 cursor-pointer animate-pulse active:scale-95 shadow-2xs"
             >
-              <UserPlus size={15} /> <span>Nuevo Publicador</span>
+              <Sparkles size={14} /> <span>Fusionar ({duplicateCount})</span>
             </button>
-          </div>
-        }
-      />
+          )}
+        </div>
+
+        <button
+          disabled={!canEditPublishers}
+          onClick={() => {
+            setEditingPublisher(null);
+            setViewMode('editor');
+          }}
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-md shadow-indigo-600/20 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer active:scale-95"
+        >
+          <UserPlus size={15} /> <span>Nuevo Publicador</span>
+        </button>
+      </div>
 
       {/* Banner de alerta de duplicados detectados */}
       {duplicateCount > 0 && canEditPublishers && (

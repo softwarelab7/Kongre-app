@@ -291,76 +291,37 @@ export const LiteraturaTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-linear-to-r from-blue-950 via-slate-900 to-indigo-950 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold tracking-wide border border-blue-500/30">
-              <Package className="w-3.5 h-3.5 text-blue-400" />
-              <span>Formulario Oficial S-14 • Departamento de Literatura</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Literatura & Publicaciones (S-14)
-            </h1>
-            <p className="text-slate-300 text-sm sm:text-base max-w-3xl">
-              Fichero oficial de existencias de publicaciones, control de reservas mínimas, tramitación
-              de pedidos especiales a Betel, distribución a grupos y recuento físico para la visita del
-              Superintendente de Circuito.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => {
-                const msg = buildLowStockReportWhatsApp(literatureItems);
-                handleOpenWhatsApp(msg);
-              }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-medium text-sm rounded-xl transition-all shadow-md active:scale-95"
-            >
-              <Share2 className="w-4 h-4" />
-              <span>Reporte Stock Bajo WhatsApp</span>
-            </button>
-
-            <button
-              onClick={() => window.print()}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-medium text-sm rounded-xl border border-white/20 transition-all backdrop-blur-xs active:scale-95"
-            >
-              <Printer className="w-4 h-4" />
-              <span>Imprimir Ficha S-14</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Sub-tab Navigation */}
-        <div className="flex flex-wrap gap-2 mt-8 pt-4 border-t border-white/10">
+      {/* Barra de Acciones y Navegación de Literatura (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Sub-tab Navigation Pills */}
+        <div className="flex rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/90 dark:bg-slate-900/60 p-1 shadow-2xs overflow-x-auto no-scrollbar gap-1">
           <button
             onClick={() => setActiveSubTab('inventario')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
               activeSubTab === 'inventario'
-                ? 'bg-white text-slate-900 shadow-md'
-                : 'bg-white/10 text-slate-200 hover:bg-white/15'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <BookOpen className="w-4 h-4 text-blue-600" />
-            <span>Fichero S-14 (Catálogo)</span>
-            <span className="px-1.5 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800 font-bold">
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Catálogo S-14</span>
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 font-bold">
               {stats.totalItems}
             </span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('pedidos')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
               activeSubTab === 'pedidos'
-                ? 'bg-white text-slate-900 shadow-md'
-                : 'bg-white/10 text-slate-200 hover:bg-white/15'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Truck className="w-4 h-4 text-indigo-600" />
-            <span>Pedidos Especiales</span>
+            <Truck className="w-3.5 h-3.5" />
+            <span>Pedidos</span>
             {stats.pendingOrdersCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full text-xs bg-amber-100 text-amber-900 font-bold">
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 font-bold">
                 {stats.pendingOrdersCount}
               </span>
             )}
@@ -368,26 +329,49 @@ export const LiteraturaTab: React.FC = () => {
 
           <button
             onClick={() => setActiveSubTab('grupos')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
               activeSubTab === 'grupos'
-                ? 'bg-white text-slate-900 shadow-md'
-                : 'bg-white/10 text-slate-200 hover:bg-white/15'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Users className="w-4 h-4 text-purple-600" />
-            <span>Distribución a Grupos</span>
+            <Users className="w-3.5 h-3.5" />
+            <span>Grupos</span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('recuento_s14')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
               activeSubTab === 'recuento_s14'
-                ? 'bg-white text-slate-900 shadow-md'
-                : 'bg-white/10 text-slate-200 hover:bg-white/15'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>Recuento Físico Oficial</span>
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>Recuento Físico</span>
+          </button>
+        </div>
+
+        {/* Action quick buttons */}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => {
+              const msg = buildLowStockReportWhatsApp(literatureItems);
+              handleOpenWhatsApp(msg);
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-xl border border-amber-200 dark:border-amber-800 transition-all shadow-2xs active:scale-95 cursor-pointer"
+            title="Enviar reporte de stock bajo por WhatsApp"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            <span>Reporte Stock Bajo</span>
+          </button>
+
+          <button
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 font-semibold text-xs rounded-xl border border-slate-200/80 dark:border-white/[0.08] transition-all shadow-2xs active:scale-95 cursor-pointer"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>Imprimir Ficha S-14</span>
           </button>
         </div>
       </div>

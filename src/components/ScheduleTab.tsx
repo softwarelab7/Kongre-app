@@ -20,7 +20,6 @@ import { ClmMonthlyBillboardModal } from './ClmMonthlyBillboardModal';
 import { StudentS38HistoryModal } from './StudentS38HistoryModal';
 import { ConflictsModal } from './ConflictsModal';
 import ClmScheduleView from './ClmScheduleView';
-import { SectionHeader } from './SectionHeader';
 import { SplashCheckbox } from './SplashCheckbox';
 import { createAssignmentWhatsAppMessage, openWhatsAppLink } from '../utils/whatsapp';
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganizedSync } from '../utils/organizedSync';
@@ -478,13 +477,16 @@ export const ScheduleTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* SectionHeader Kongre 1 Style con BARRA DE HERRAMIENTAS Y ACCIONES UNIFICADA */}
-      <SectionHeader
-        icon={Calendar}
-        title="Programa de"
-        highlightWord="Reuniones"
-        subtitle={`${formatTheocraticWeekRange(currentWeek.weekStartDate, currentWeek.weekEndDate)} • Semana ${currentIndex + 1} de ${sortedWeeks.length}`}
-        actions={
+      {/* Barra de Herramientas de Programa de Reuniones (Opción 1: arranque directo sin banner redundante) */}
+      <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/[0.08] p-3 sm:p-4 shadow-2xs space-y-3">
+        {/* Fila 1: Navegación de Semana y Selector de Modalidad */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              Semana {currentIndex + 1} de {sortedWeeks.length}
+            </span>
+          </div>
+
           <div className="flex items-center gap-2 flex-wrap">
             {/* Cápsula de navegación de semana interactiva con selector rápido */}
             <div className="relative">
@@ -731,8 +733,8 @@ export const ScheduleTab: React.FC = () => {
               <Plus className="w-4 h-4" />
             </button>
           </div>
-        }
-      >
+        </div>
+
         {/* ── BARRA DE HERRAMIENTAS ULTRA MINIMALISTA ── */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-slate-200/60 dark:border-white/[0.06] w-full text-xs">
           {/* Lado izquierdo: Acciones clave con diseño limpio */}
@@ -938,7 +940,7 @@ export const ScheduleTab: React.FC = () => {
             </div>
           </div>
         </div>
-      </SectionHeader>
+      </div>
 
       {/* SPECIAL EVENT BANNER IF ACTIVE */}
       {currentWeek.specialEvent?.isSpecial && (

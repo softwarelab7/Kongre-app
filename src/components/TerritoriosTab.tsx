@@ -36,7 +36,6 @@ import {
   QrCode,
 } from 'lucide-react';
 import { DigitalTerritoryModal } from './DigitalTerritoryModal';
-import { SectionHeader } from './SectionHeader';
 import { TerritoryMapView } from './territories/TerritoryMapView';
 import { TerritoryPolygonEditorModal } from './territories/TerritoryPolygonEditorModal';
 import { TerritoryCardMap } from './territories/TerritoryCardMap';
@@ -510,78 +509,72 @@ ${mapLink}${noVisitsText}
         </div>
       )}
 
-      {/* SectionHeader Kongre 1 Style */}
-      <SectionHeader
-        icon={Map}
-        title="Gestión de"
-        highlightWord="Territorios"
-        subtitle={`${stats.total} territorios • ${stats.disponibles} disponibles • ${stats.vencidos} vencidos`}
-        actions={
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* View Mode Toggle Pill */}
-            <div className="flex rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/80 dark:bg-slate-800/60 p-1">
-              <button
-                onClick={() => setViewMode('cards')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                  viewMode === 'cards'
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                Tarjetas
-              </button>
-              <button
-                onClick={() => setViewMode('table')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                  viewMode === 'table'
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                Tabla
-              </button>
-              <button
-                onClick={() => setViewMode('map')}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                  viewMode === 'map'
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <Map className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-300" />
-                <span>Mapa Interactivo</span>
-              </button>
-              <button
-                onClick={() => setViewMode('s13')}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-                  viewMode === 's13'
-                    ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                Fichero S-13
-              </button>
-            </div>
+      {/* Barra de Navegación de Vistas y Acciones de Territorio (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* View Mode Toggle Pill */}
+        <div className="flex rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/90 dark:bg-slate-900/60 p-1 shadow-2xs overflow-x-auto no-scrollbar">
+          <button
+            onClick={() => setViewMode('cards')}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+              viewMode === 'cards'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            Tarjetas
+          </button>
+          <button
+            onClick={() => setViewMode('table')}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+              viewMode === 'table'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            Tabla
+          </button>
+          <button
+            onClick={() => setViewMode('map')}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+              viewMode === 'map'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Map className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-300" />
+            <span>Mapa Interactivo</span>
+          </button>
+          <button
+            onClick={() => setViewMode('s13')}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+              viewMode === 's13'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            Fichero S-13
+          </button>
+        </div>
 
-            <button
-              onClick={() => window.print()}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] border border-slate-200/60 dark:border-white/[0.06] rounded-xl transition cursor-pointer"
-              title="Imprimir listado"
-            >
-              <Printer className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-              <span className="hidden sm:inline">Imprimir</span>
-            </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-white/[0.08] rounded-xl transition cursor-pointer shadow-2xs"
+            title="Imprimir listado"
+          >
+            <Printer className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+            <span className="hidden sm:inline">Imprimir</span>
+          </button>
 
-            <button
-              onClick={openCreateModal}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Nuevo Territorio</span>
-            </button>
-          </div>
-        }
-      />
+          <button
+            onClick={openCreateModal}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nuevo Territorio</span>
+          </button>
+        </div>
+      </div>
 
       {/* KPI Stats Ribbon */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">

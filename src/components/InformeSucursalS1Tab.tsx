@@ -32,7 +32,6 @@ import {
   Sparkles,
   Info,
 } from 'lucide-react';
-import { SectionHeader } from './SectionHeader';
 
 export const InformeSucursalS1Tab: React.FC = () => {
   const {
@@ -163,52 +162,54 @@ export const InformeSucursalS1Tab: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-16">
-      {/* SECTION HEADER */}
-      <div className="print:hidden">
-        <SectionHeader
-          icon={FileBarChart}
-          highlightWord="Informe Oficial"
-          title="S-1 Sucursal"
-          subtitle="CONSOLIDACIÓN MENSUAL DE ASISTENCIA Y PREDICACIÓN PARA JW HUB"
-        >
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={handleCopySummary}
-              className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white transition-colors"
-              title="Copiar resumen para WhatsApp o Ancianos"
-            >
-              {copiedSuccess ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span className="text-emerald-400">¡Copiado!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4 text-slate-300" />
-                  <span>Copiar Resumen</span>
-                </>
-              )}
-            </button>
+      {/* Barra de Acciones S-1 (Opción 1: arranque directo sin banner redundante) */}
+      <div className="print:hidden flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/20">
+            Formulario S-1
+          </span>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
+            Consolidación mensual de asistencia y predicación para JW HUB
+          </span>
+        </div>
 
-            <button
-              onClick={() => window.print()}
-              className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-white transition-colors"
-              title="Imprimir Formulario S-1 Oficial"
-            >
-              <Printer className="w-4 h-4 text-slate-300" />
-              <span>Imprimir S-1</span>
-            </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleCopySummary}
+            className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 shadow-2xs transition-all cursor-pointer active:scale-95"
+            title="Copiar resumen para WhatsApp o Ancianos"
+          >
+            {copiedSuccess ? (
+              <>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">¡Copiado!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                <span>Copiar Resumen</span>
+              </>
+            )}
+          </button>
 
-            <button
-              onClick={openJwHubPortal}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg bg-sky-600 hover:bg-sky-500 text-white shadow-md shadow-sky-600/20 transition-colors"
-              title="Abrir portal oficial hub.jw.org en nueva pestaña"
-            >
-              <ExternalLink className="w-4 h-4" />
-              <span>Abrir JW HUB</span>
-            </button>
-          </div>
-        </SectionHeader>
+          <button
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-white/[0.08] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 shadow-2xs transition-all cursor-pointer active:scale-95"
+            title="Imprimir Formulario S-1 Oficial"
+          >
+            <Printer className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+            <span>Imprimir S-1</span>
+          </button>
+
+          <button
+            onClick={openJwHubPortal}
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl bg-sky-600 hover:bg-sky-500 text-white shadow-md shadow-sky-600/20 transition-all cursor-pointer active:scale-95"
+            title="Abrir portal oficial hub.jw.org en nueva pestaña"
+          >
+            <ExternalLink className="w-4 h-4" />
+            <span>Abrir JW HUB</span>
+          </button>
+        </div>
       </div>
 
       {/* MONTH SELECTOR & ACTION RIBBON */}

@@ -260,34 +260,27 @@ export const TarjetasS21Tab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Header */}
-      <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 no-print">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">
-              Formulario Oficial S-21
-            </span>
-            <span className="text-xs text-slate-500 font-medium">Secretaría de Congregación</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <FileText className="w-6 h-6 text-indigo-600" />
-            <span>Tarjetas de Registro de Publicador (S-21)</span>
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Fichero oficial de 12 meses por año de servicio teocrático (Septiembre a Agosto), cálculo de promedios, seguimiento de horas e impresión física.
-          </p>
+      {/* Barra de Acciones de Tarjetas S-21 (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+            Formulario S-21
+          </span>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
+            Fichero oficial de 12 meses por año de servicio teocrático
+          </span>
         </div>
 
         {/* Global Action Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Service Year Selector */}
-          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-white/[0.08] rounded-xl px-3 py-1.5 shadow-2xs">
             <Calendar className="w-4 h-4 text-slate-500" />
-            <span className="text-xs font-bold text-slate-700">Año de Servicio:</span>
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Año:</span>
             <select
               value={selectedServiceYear}
               onChange={(e) => setSelectedServiceYear(e.target.value)}
-              className="bg-transparent text-xs font-bold text-indigo-700 focus:outline-none cursor-pointer"
+              className="bg-transparent text-xs font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer"
             >
               {availableYears.map((yr) => (
                 <option key={yr} value={yr}>
@@ -299,15 +292,15 @@ export const TarjetasS21Tab: React.FC = () => {
 
           <button
             onClick={() => setActiveView('formato_local')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer active:scale-95"
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>Rellenar S-21 Oficial (Local)</span>
+            <span>Rellenar S-21 (Local)</span>
           </button>
 
           <button
             onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer active:scale-95"
           >
             <Printer className="w-4 h-4" />
             <span>Imprimir Tarjetas S-21</span>

@@ -54,6 +54,7 @@ import { RolesManagerTab } from './components/RolesManagerTab';
 import { AccessRestrictedView } from './components/AccessRestrictedView';
 import { SecurityProvider } from './context/SecurityContext';
 import { SessionLockModal } from './components/SessionLockModal';
+import { AutoLockToastWarning } from './components/AutoLockToastWarning';
 import { JoinCongregationModal } from './components/JoinCongregationModal';
 import { InvitationManagerModal } from './components/InvitationManagerModal';
 import { CongregationWelcomeLanding } from './components/CongregationWelcomeLanding';
@@ -1139,6 +1140,9 @@ const AppContent: React.FC = () => {
 
       {/* Theocratic Session Lock Modal */}
       {!isDemoMode && <SessionLockModal />}
+
+      {/* Auto-Lock Inactivity Countdown Toast Warning (Últimos 60 segundos) */}
+      {!isDemoMode && <AutoLockToastWarning />}
 
       {/* Join Congregation with Code Modal */}
       <JoinCongregationModal

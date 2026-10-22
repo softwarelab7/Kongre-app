@@ -1,5 +1,4 @@
-// src/context/SecurityContext.tsx
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   hashPasscode,
   verifyPasscode,
@@ -43,6 +42,14 @@ interface SecurityContextType {
   revokeInvitation: (id: string) => void;
   redeemInvitationCode: (code: string, userEmail?: string, userName?: string) => Promise<{ success: boolean; role?: TheocraticRole; message: string; targetName?: string }>;
   revokeSession: (sessionId: string) => void;
+  // Reloj de Bloqueo Automático por Inactividad
+  remainingSeconds: number;
+  totalSeconds: number;
+  autoLockFraction: number;
+  autoLockState: 'ok' | 'warn' | 'crit';
+  isAutoLockActive: boolean;
+  isRefilling: boolean;
+  resetInactivityTimer: () => void;
 }
 
 const PIN_STORAGE_KEY = 'kongre_security_pin_hash';
@@ -294,6 +301,12 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const setAutoLockMinutes = useCallback((mins: number) => {
     setAutoLockMinutesState(mins);
     localStorage.setItem(AUTOLOCK_STORAGE_KEY, mins.toString());
+    if (mins > 0) {
+      deadlineRef.current = Date.now() + mins * 60 * 1000;
+      setRemainingSeconds(mins * 60);
+    } else {
+      setRemainingSeconds(0);
+    }
   }, []);
 
   const setPrivacyModeEnabled = useCallback((val: boolean) => {
@@ -526,42 +539,87 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   }, []);
 
-  // Inactivity detection for Auto-lock
+  // Inactivity countdown & automatic session locking
+  const [remainingSeconds, setRemainingSeconds] = useState<number>(() => {
+    const saved = localStorage.getItem(AUTOLOCK_STORAGE_KEY);
+    const mins = saved ? parseInt(saved, 10) : 5;
+    return mins > 0 ? mins * 60 : 0;
+  });
+  const [isRefilling, setIsRefilling] = useState<boolean>(false);
+
+  const deadlineRef = useRef<number>(Date.now() + (autoLockMinutes > 0 ? autoLockMinutes * 60 * 1000 : 0));
+  const lastResetRef = useRef<number>(Date.now());
+
+  const isAutoLockActive = !isDemoSession() && (!!pinHash || !!congregationPinHash) && autoLockMinutes > 0 && !isLocked;
+  const totalSeconds = autoLockMinutes > 0 ? autoLockMinutes * 60 : 0;
+  const autoLockFraction = totalSeconds > 0 ? Math.min(1, Math.max(0, remainingSeconds / totalSeconds)) : 0;
+
+  const autoLockState: 'ok' | 'warn' | 'crit' = useMemo(() => {
+    if (!isAutoLockActive) return 'ok';
+    if (remainingSeconds <= 30) return 'crit';
+    if (remainingSeconds <= 60) return 'warn';
+    return 'ok';
+  }, [isAutoLockActive, remainingSeconds]);
+
+  const resetInactivityTimer = useCallback(() => {
+    if (isDemoSession() || isLocked || autoLockMinutes <= 0) return;
+    const now = Date.now();
+    deadlineRef.current = now + autoLockMinutes * 60 * 1000;
+    lastResetRef.current = now;
+    setRemainingSeconds(autoLockMinutes * 60);
+    setIsRefilling(true);
+    setTimeout(() => setIsRefilling(false), 600);
+  }, [isLocked, autoLockMinutes]);
+
   useEffect(() => {
-    if (isDemoSession()) {
-      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-      if (isLocked) setIsLocked(false);
+    if (!isAutoLockActive) {
+      setRemainingSeconds(0);
       return;
     }
 
-    if (!pinHash || autoLockMinutes <= 0) {
-      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-      return;
-    }
+    deadlineRef.current = Date.now() + autoLockMinutes * 60 * 1000;
+    setRemainingSeconds(autoLockMinutes * 60);
 
-    const resetTimer = () => {
-      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-      if (isLocked) return;
-
-      inactivityTimerRef.current = setTimeout(() => {
+    const updateCountdown = () => {
+      const now = Date.now();
+      const diffMs = deadlineRef.current - now;
+      const secs = Math.max(0, Math.ceil(diffMs / 1000));
+      setRemainingSeconds(secs);
+      if (secs <= 0) {
         lockSession();
-      }, autoLockMinutes * 60 * 1000);
+      }
     };
 
-    resetTimer();
+    const interval = setInterval(updateCountdown, 250);
 
-    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'touchstart', 'scroll'];
-    activityEvents.forEach((event) => {
-      window.addEventListener(event, resetTimer, { passive: true });
-    });
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        updateCountdown();
+      }
+    };
+
+    window.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleVisibility);
+
+    const handleActivity = () => {
+      const now = Date.now();
+      if (now - lastResetRef.current > 500) {
+        lastResetRef.current = now;
+        deadlineRef.current = now + autoLockMinutes * 60 * 1000;
+        setRemainingSeconds(autoLockMinutes * 60);
+      }
+    };
+
+    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'touchstart', 'scroll', 'click'];
+    activityEvents.forEach((ev) => window.addEventListener(ev, handleActivity, { passive: true }));
 
     return () => {
-      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-      activityEvents.forEach((event) => {
-        window.removeEventListener(event, resetTimer);
-      });
+      clearInterval(interval);
+      window.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleVisibility);
+      activityEvents.forEach((ev) => window.removeEventListener(ev, handleActivity));
     };
-  }, [pinHash, autoLockMinutes, isLocked, lockSession]);
+  }, [isAutoLockActive, autoLockMinutes, lockSession]);
 
   return (
     <SecurityContext.Provider
@@ -592,6 +650,13 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         revokeInvitation,
         redeemInvitationCode,
         revokeSession,
+        remainingSeconds,
+        totalSeconds,
+        autoLockFraction,
+        autoLockState,
+        isAutoLockActive,
+        isRefilling,
+        resetInactivityTimer,
       }}
     >
       {children}

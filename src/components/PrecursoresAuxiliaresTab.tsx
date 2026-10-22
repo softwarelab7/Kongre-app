@@ -2,7 +2,6 @@
 import React, { useState, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { AuxPioneerRequest, Publisher } from '../types';
-import { SectionHeader } from './SectionHeader';
 import { AuxPioneerModal } from './pioneers/AuxPioneerModal';
 import {
   Target,
@@ -212,39 +211,41 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
 
       {/* Main Container */}
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
-        {/* Section Header */}
-        <SectionHeader
-          icon={Target}
-          title="Precursores"
-          highlight="Auxiliares"
-          subtitle="GESTIÓN Y APROBACIÓN DE SOLICITUDES DEL COMITÉ DE SERVICIO"
-          badgeText="FORMULARIO S-205"
-          actions={
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Print Register */}
-              <button
-                onClick={() => window.print()}
-                title="Imprimir el registro de solicitudes aprobadas para el comité"
-                className="p-2 sm:px-3 sm:py-2 rounded-xl border border-zinc-200 dark:border-white/[0.1] bg-white dark:bg-white/[0.05] text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors flex items-center gap-2 text-xs font-semibold"
-              >
-                <Printer size={16} />
-                <span className="hidden sm:inline">Imprimir Registro</span>
-              </button>
+        {/* Barra de Acciones de Precursores Auxiliares (Opción 1: arranque directo sin banner redundante) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+              Formulario S-205
+            </span>
+            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 hidden sm:inline">
+              Gestión y aprobación de solicitudes del comité de servicio
+            </span>
+          </div>
 
-              {/* New Request Button */}
-              <button
-                onClick={() => {
-                  setEditingRequest(null);
-                  setIsModalOpen(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-indigo-500/25 transition-all"
-              >
-                <Plus size={16} />
-                <span>Nueva Solicitud (S-205)</span>
-              </button>
-            </div>
-          }
-        />
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Print Register */}
+            <button
+              onClick={() => window.print()}
+              title="Imprimir el registro de solicitudes aprobadas para el comité"
+              className="p-2 sm:px-3 sm:py-2 rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-slate-900/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-2 text-xs font-semibold shadow-2xs cursor-pointer active:scale-95"
+            >
+              <Printer size={16} />
+              <span className="hidden sm:inline">Imprimir Registro</span>
+            </button>
+
+            {/* New Request Button */}
+            <button
+              onClick={() => {
+                setEditingRequest(null);
+                setIsModalOpen(true);
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-indigo-500/25 transition-all cursor-pointer active:scale-95"
+            >
+              <Plus size={16} />
+              <span>Nueva Solicitud (S-205)</span>
+            </button>
+          </div>
+        </div>
 
         {/* 5 KPI Metric Ribbon */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">

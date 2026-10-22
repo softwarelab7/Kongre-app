@@ -57,28 +57,27 @@ export const ConflictCenterTab: React.FC<ConflictCenterTabProps> = ({ onNavigate
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full">
+      {/* Barra de Acciones del Centro de Conflictos (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
             Detección en Tiempo Real
           </span>
-          <h2 className="text-xl font-bold text-slate-900 mt-1">Centro de Conflictos y Cruces</h2>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Supervisión integral de asignaciones duplicadas, cruces con ausencias, roles deshabilitados y descansos teocráticos.
-          </p>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
+            Supervisión integral de asignaciones duplicadas, ausencias y descansos
+          </span>
         </div>
 
         {/* Counters */}
-        <div className="flex items-center gap-3">
-          <div className="px-4 py-2.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800">
-            <span className="text-[10px] uppercase font-bold text-rose-600 block">Cruces Críticos</span>
-            <span className="text-lg font-black">{criticalErrors.length}</span>
+        <div className="flex items-center gap-2">
+          <div className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-300 flex items-center gap-2 shadow-2xs">
+            <span className="text-[10px] uppercase font-bold text-rose-600 dark:text-rose-400">Cruces Críticos:</span>
+            <span className="text-sm font-black">{criticalErrors.length}</span>
           </div>
 
-          <div className="px-4 py-2.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800">
-            <span className="text-[10px] uppercase font-bold text-amber-600 block">Advertencias</span>
-            <span className="text-lg font-black">{warnings.length}</span>
+          <div className="px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-amber-800 dark:text-amber-300 flex items-center gap-2 shadow-2xs">
+            <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400">Advertencias:</span>
+            <span className="text-sm font-black">{warnings.length}</span>
           </div>
         </div>
       </div>

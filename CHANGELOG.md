@@ -25,7 +25,62 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.10.5] - 21 de Octubre, 2026 (Compilación Activa)
+### [v2.10.8] - 21 de Octubre, 2026 (Compilación Activa)
+**Título:** Optimización Global de Interfaz: Eliminación de Banner Redundante y Arranque Directo con Contenido (Opción 1) en Toda la App
+- **Implementación Global de la Opción 1 (27 Secciones y Vistas Refactorizadas):**
+  - Se completó la auditoría y refactorización integral de todos los módulos de la aplicación, eliminando tarjetas de encabezado redundantes (`SectionHeader` y contenedores con gradientes pesados) que duplicaban el nombre del departamento o sección.
+  - La barra fija superior de navegación (`Navbar.tsx`) se establece de forma definitiva como la **única fuente de verdad** del contexto congregacional y departamental (`[Nombre de Congregación] / [Sección]`).
+- **Ahorro de Espacio Vertical (60-90px en Cada Pantalla):**
+  - Toda la aplicación adopta la filosofía de diseño moderna de herramientas profesionales (estilo Notion, Linear y Stripe).
+  - Cada vista arranca inmediatamente con su contenido útil, filtros, selectores de fecha, cuadrículas de métricas o barras horizontales de píldoras.
+- **Barras de Herramientas Directas y Píldoras de Navegación Estandarizadas:**
+  - **Ajustes:** Píldoras de pestañas integradas con botones de acción (*Guardar Ajustes* y *Mi Perfil*).
+  - **Publicadores:** Barra de acción directa (*Importar CSV*, *Exportar Excel*, *Fusionar*, *Nuevo Publicador*).
+  - **Territorios:** Selector de vista en píldoras (*Tarjetas*, *Tabla*, *Mapa*, *S-13*) y botones de acción rápida.
+  - **Asistencia:** Conmutador en píldoras (*Dashboard Visual*, *Registro Semanal*) y botón *Contador en Vivo*.
+  - **Carritos:** Barra de estado directa con botones (*Copiar para WhatsApp*, *Puntos de Carrito*, *Nuevo Turno*).
+  - **Hospitalidad:** Barra compacta con contador de familias, botón *Copiar WhatsApp* y *Nuevo Anfitrión*.
+  - **Precursores Auxiliares:** Píldora de formulario S-205, *Imprimir Registro* y *Nueva Solicitud*.
+  - **Panel Eléctrico:** Toolbar con conmutador *Modo Edición*, botón de acción rápida *Modo Reunión ON/OFF*, *Imprimir Rótulo* y *Nuevo Circuito*.
+  - **Mantenimiento:** Píldora informativa, botón *Imprimir Registro* y *Nueva Ficha de Mantenimiento*.
+  - **Informe Sucursal S-1:** Píldora S-1, botones directos de acción (*Copiar Resumen*, *Imprimir S-1*, *Abrir JW HUB*).
+  - **Editor de Publicador:** Barra de herramientas superior con navegación atrás, nombre del publicador, estado activo, *Renombrar* y *Guardar Ficha*.
+  - **Programa Semanal:** Barra compacta con navegación de semana, selector de vista y fila ergonómica de utilidades (autoasignación, WhatsApp, S-89, S-38, Modo Atril).
+  - **Cuentas (S-26 / S-30):** Selector de mes en barra directa, con acciones para *Registrar Ingreso*, *Registrar Gasto* e *Imprimir*.
+  - **Literatura:** Píldoras de subpestañas (*Catálogo S-14*, *Pedidos*, *Grupos*, *Recuento Físico*) y acciones inmediatas (*Stock Bajo WhatsApp*, *Imprimir S-14*).
+  - **Discursos Públicos:** Píldoras horizontales (*Programa Fin de Semana*, *Bosquejos 1-194*, *Salientes*, *Historial*) y botón *Nueva Salida*.
+  - **Memorial y Asambleas:** Píldoras de subpestañas (*Memorial*, *Asambleas*, *Checklist*, *Informe Sucursal*) y botones de acción.
+  - **Visita Superintendente:** Fila directa de circuito e información de visita con KPI cards inmediatos.
+  - **Tarjetas S-21, Informes S-4, Grupos de Servicio, Tablero de Anuncios, Hojas S-89, Centro de Conflictos, Dashboard de Equidad, Exportar PDF y Gestión de Roles:** Todas adaptadas con píldoras distintivas y barras de herramientas directas sin tarjetas duplicadas.
+- **Cero Regresiones y Verificación de Tipos TypeScript:**
+  - Verificación `tsc --noEmit` completada con 0 errores; todas las acciones, callbacks, filtros y modales permanecen 100% operativos.
+
+### [v2.10.7] - 21 de Octubre, 2026
+**Título:** Reloj Animado de Bloqueo por Inactividad, Anillos SVG de Progreso y Aviso Flotante
+- **Chip Contador en Barra Superior (Navbar):**
+  - Se integró un chip contador interactivo junto al botón de tema (`AutoLockTimerChip`) con un anillo SVG de progreso de 22px y cuenta regresiva dinámica en formato `mm:ss`.
+  - Estados dinámicos de alerta: estado normal (índigo `#4C3AED` / `#9085F4`), estado advertencia en el último minuto (`<= 60s`, color ámbar `#D97706` con pulso suave) y estado crítico en los últimos 30 segundos (`<= 30s`, color rojo `#E11D48` con pulso rápido).
+  - Al hacer clic en el chip o al detectar cualquier interacción del usuario (teclado, cursor, pantalla táctil, scroll), el anillo realiza una animación de recarga suave (*refill*) y reinicia la cuenta.
+- **Aviso Flotante (Toast) en los Últimos 60 Segundos:**
+  - Si el usuario deja la aplicación inactiva y restan menos de 60 segundos para el bloqueo, emerge suavemente en la parte inferior de la pantalla un toast flotante con candado, anillo SVG de 46px y segundero en vivo.
+  - Tocar o hacer clic en cualquier parte del aviso o presionar cualquier tecla restablece la cuenta y disuelve el toast de inmediato.
+- **Nueva Tarjeta Interactiva en Ajustes de Seguridad:**
+  - Se sustituyó el selector desplegable básico por un panel de control interactivo con anillo SVG de 60px que muestra los minutos configurados, switch de encendido/apagado, deslizador continuo de 5 a 15 minutos con marcas numeradas y botones de acceso directo preestablecidos (5 min recomendado, 10 min, 15 min).
+- **Cálculo de Inactividad por Fecha Límite (`deadline`):**
+  - Implementado en `SecurityContext` mediante marcas de tiempo reales y sincronización con eventos de visibilidad (`visibilitychange` y `focus`), asegurando que si el usuario suspende el móvil o cambia de pestaña por más tiempo del permitido, la sesión se bloquee de forma segura y automática al volver.
+
+### [v2.10.6] - 21 de Octubre, 2026
+**Título:** Optimización de Interfaz: Eliminación de Banner Redundante en Ajustes y Arranque Directo con Contenido (Opción 1)
+- **Eliminación del Banner Redundante:**
+  - Se eliminó la tarjeta envolvente interior `<SectionHeader>` que duplicaba *"Ajustes de la Congregación Central"* justo debajo de la barra fija superior de navegación.
+  - La barra superior fija queda ahora como la única fuente fidedigna y no redundante del contexto actual de la congregación y el departamento (`Congregación Central / Ajustes de la Congregación`).
+- **Arranque Directo con Contenido:**
+  - La sección inicia directamente con el selector de pestañas (Panel de Tarjetas / HUB, Notificaciones, General, Reglas, Invitaciones, Seguridad, Nube, Respaldos, Mantenimiento).
+  - Se optimizó el espacio vertical de la vista ganando entre 70 y 90 píxeles útiles en pantalla (diseño moderno y limpio estilo Linear, Notion y Stripe).
+- **Barra de Herramientas Unificada y Ergonómica:**
+  - Se ubicaron los botones de acción principales (**Guardar Ajustes** y **Mi Perfil**) e indicadores de estado (`Cambios pendientes` / `Sincronizado`) directamente en la misma fila de herramientas que las pestañas, alineados a la derecha.
+
+### [v2.10.5] - 21 de Octubre, 2026
 **Título:** Botón de Modo Oscuro Sin Contenedor, Animación Fluida y Luna Blanca Nítida
 - **Luna Blanca Brillante en Modo Oscuro:**
   - Se configuró el color de la luna y las estrellas en modo oscuro a blanco nítido (`text-white hover:text-slate-100`), garantizando alto contraste y máxima visibilidad sobre el fondo grafito/slate de la barra superior.

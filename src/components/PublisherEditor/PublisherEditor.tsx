@@ -40,7 +40,6 @@ import { usePermissions } from '../../context/AuthContext';
 
 // Sections
 import { BasicInfoSection } from './sections/BasicInfoSection';
-import { SectionHeader } from '../SectionHeader';
 import { ContactSection } from './sections/ContactSection';
 // import { IdentitySection } from './sections/IdentitySection'; // REMOVED: obsolete
 import { SpecialConditionsSection } from './sections/SpecialConditionsSection';
@@ -407,64 +406,75 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* 1. Header con el componente oficial de Kongre (SectionHeader) */}
-      <SectionHeader
-        icon={User}
-        title="Ficha de"
-        highlightWord={formData.full_name || formData.name || 'Nuevo Publicador'}
-        subtitle={`ID: ${formData.publisherCode || formData.nid || formData.id} • ${publisherRoleLabel} • ${groupName || 'Congregación'}${isDirty ? ' • ⚠️ Cambios sin guardar' : ' • ✓ Sincronizado'}`}
-        badgeText={publisherRoleLabel}
-        colorTheme="indigo"
-        actions={
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              type="button"
-              onClick={() => setIsEditingName((prev) => !prev)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-zinc-200 border border-slate-200/60 dark:border-white/[0.06] text-xs font-semibold transition-all cursor-pointer"
-              title="Cambiar nombre del publicador"
-            >
-              <Edit2 size={14} />
-              <span className="hidden sm:inline">Renombrar</span>
-            </button>
+      {/* Barra Superior del Editor de Publicador (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <button
+            type="button"
+            onClick={() => {
+              if (activeTab !== 'all') {
+                setActiveTab('all');
+              } else {
+                handleBack();
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 border border-slate-200/80 dark:border-white/[0.08] text-xs sm:text-sm font-semibold transition-all cursor-pointer active:scale-95 shadow-2xs shrink-0"
+            title={activeTab !== 'all' ? 'Volver al panel de tarjetas' : 'Volver a la lista de publicadores'}
+          >
+            <ArrowLeft size={16} />
+            <span>{activeTab !== 'all' ? 'Tarjetas' : 'Volver'}</span>
+          </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                if (activeTab !== 'all') {
-                  setActiveTab('all');
-                } else {
-                  handleBack();
-                }
-              }}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-zinc-200 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold transition-all cursor-pointer active:scale-95"
-              title={activeTab !== 'all' ? 'Volver al panel de tarjetas' : 'Volver a la lista de publicadores'}
-            >
-              <ArrowLeft size={16} />
-              <span>{activeTab !== 'all' ? 'Tarjetas' : 'Volver'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleSaveClick}
-              disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all shadow-md shadow-indigo-600/20 disabled:opacity-50 cursor-pointer"
-              title="Guardar cambios del publicador"
-            >
-              {loading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Guardando...</span>
-                </>
-              ) : (
-                <>
-                  <Save size={16} />
-                  <span>Guardar</span>
-                </>
-              )}
-            </button>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-bold text-slate-900 dark:text-white text-base sm:text-lg truncate">
+                {formData.full_name || formData.name || 'Nuevo Publicador'}
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                {publisherRoleLabel}
+              </span>
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${isDirty ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'}`}>
+                {isDirty ? '⚠️ Sin guardar' : '✓ Sincronizado'}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+              ID: {formData.publisherCode || formData.nid || formData.id} • {groupName || 'Congregación'}
+            </p>
           </div>
-        }
-      />
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsEditingName((prev) => !prev)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 border border-slate-200/80 dark:border-white/[0.08] text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+            title="Cambiar nombre del publicador"
+          >
+            <Edit2 size={14} />
+            <span>Renombrar</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSaveClick}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white text-xs sm:text-sm font-semibold transition-all shadow-md shadow-indigo-600/20 disabled:opacity-50 cursor-pointer"
+            title="Guardar cambios del publicador"
+          >
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>Guardando...</span>
+              </>
+            ) : (
+              <>
+                <Save size={16} />
+                <span>Guardar</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
 
       {/* Editor de nombre inline cuando el usuario presiona "Renombrar" */}
       {isEditingName && (

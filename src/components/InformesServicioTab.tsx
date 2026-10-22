@@ -242,27 +242,21 @@ export const InformesServicioTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header Bar */}
-      <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-              Registro S-4 / S-21
-            </span>
-            <span className="text-xs text-slate-500 font-medium">Servicio del Campo</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-            Informes de Predicación
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Registro mensual de actividad en el ministerio, horas de precursores y recordatorios automáticos por WhatsApp.
-          </p>
+      {/* Barra de Acciones de Informes de Predicación (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+            Registro S-4 / S-21
+          </span>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
+            Actividad mensual en el ministerio y horas de precursores
+          </span>
         </div>
 
         {/* Action button */}
         <button
           onClick={handleCopyCongregationSummary}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-colors"
+          className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer active:scale-95"
         >
           {copiedSummary ? (
             <>
@@ -272,7 +266,7 @@ export const InformesServicioTab: React.FC = () => {
           ) : (
             <>
               <Share2 className="w-4 h-4" />
-              <span>Copiar Resumen para Sucursal (S-4)</span>
+              <span>Copiar Resumen Sucursal (S-4)</span>
             </>
           )}
         </button>

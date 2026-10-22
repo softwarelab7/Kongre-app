@@ -60,11 +60,11 @@ import {
   BookOpen,
   RefreshCw,
 } from 'lucide-react';
-import { SectionHeader } from './SectionHeader';
 import { JoinCongregationModal } from './JoinCongregationModal';
 import { InvitationManagerModal } from './InvitationManagerModal';
 import { SplashCheckbox } from './SplashCheckbox';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
+import { AutoLockSettingsCard } from './AutoLockSettingsCard';
 import { Select } from './Select';
 import { IosTimePicker } from './IosTimePicker';
 import { PushSubscriptionModal } from './PushSubscriptionModal';
@@ -1021,101 +1021,113 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
 
   return (
     <div className="w-full space-y-6 animate-in fade-in duration-300 pb-12">
-      {/* 1. Cabecera Oficial y Moderna de Kongre con SectionHeader */}
-      <SectionHeader
-        icon={Building2}
-        title="Ajustes de la"
-        highlightWord={congName.trim() || settings.congregationName || 'Congregación'}
-        subtitle={`ID: ${settings.congregationNumber || settings.congregationId || 'Configurado'} • ${midDay} ${midTime} y ${fdsDay} ${fdsTime}${isFormDirty ? ' • ⚠️ Cambios sin guardar' : ' • ✓ Sincronizado'}`}
-        badgeText={user ? 'Google Sincronizado' : 'Modo Seguro'}
-        colorTheme="indigo"
-        actions={
-          <div className="flex items-center gap-2 flex-wrap justify-end">
-            {onNavigateToProfile && (
+      {/* 1. Barra de Herramientas y Pestañas Unificada (Opción 1: sin tarjeta redundante, estilo Linear / Stripe) */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        {/* Pestañas de categorías con diseño Pill Container */}
+        <div
+          ref={tabsRef}
+          className="p-1.5 bg-slate-100/90 dark:bg-slate-900/60 rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] backdrop-blur-md flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-2xs flex-1 min-w-0"
+        >
+          {tabKeys.map((tabKey) => {
+            const config = SETTINGS_TABS_CONFIG[tabKey];
+            const isActive = activeTab === tabKey;
+            const Icon = config.icon;
+
+            return (
               <button
+                key={tabKey}
                 type="button"
-                onClick={onNavigateToProfile}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-zinc-200 border border-slate-200/60 dark:border-white/[0.06] text-xs font-semibold transition-all cursor-pointer"
-                title="Configurar foto, teléfono y contacto personal"
+                data-active={isActive}
+                onClick={() => setActiveTab(tabKey)}
+                className={`flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold border border-slate-200/60 dark:border-transparent'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/[0.04]'
+                }`}
               >
-                <User size={14} />
-                <span className="hidden sm:inline">Mi Perfil</span>
+                <Icon
+                  size={14}
+                  className={isActive ? 'text-indigo-600 dark:text-white' : 'text-slate-500 dark:text-slate-400'}
+                />
+                <span>{config.label}</span>
+                {tabKey === 'all' && (
+                  <span
+                    className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
+                      isActive
+                        ? 'bg-indigo-50 text-indigo-600 dark:bg-white/20 dark:text-white'
+                        : 'bg-slate-200/80 text-slate-600 dark:bg-white/10 dark:text-slate-300'
+                    }`}
+                  >
+                    HUB
+                  </span>
+                )}
               </button>
-            )}
+            );
+          })}
+        </div>
 
-            <button
-              type="button"
-              onClick={() => handleSaveSettings()}
-              disabled={isSaving}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer ${
-                savedFeedback
-                  ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
-                  : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/20'
+        {/* Acciones principales de Ajustes en barra limpia y compacta */}
+        <div className="flex items-center gap-2 shrink-0 justify-end">
+          {/* Indicador de cambios sin guardar o sincronizado */}
+          <div
+            className={`hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border ${
+              isFormDirty
+                ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
+                : 'bg-slate-100/90 dark:bg-slate-900/60 text-slate-600 dark:text-slate-300 border-zinc-200/80 dark:border-white/[0.08]'
+            }`}
+            title={isFormDirty ? 'Hay cambios sin guardar' : 'Ajustes sincronizados'}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                isFormDirty ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'
               }`}
-              title="Guardar todos los cambios de configuración"
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Guardando...</span>
-                </>
-              ) : savedFeedback ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>¡Guardado!</span>
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  <span>Guardar Ajustes</span>
-                </>
-              )}
-            </button>
+            />
+            <span className="hidden md:inline">
+              {isFormDirty ? 'Cambios pendientes' : user ? 'Google Sincronizado' : 'Modo Seguro'}
+            </span>
           </div>
-        }
-      />
 
-      {/* 2. Barra de Pestañas con el Diseño Estándar de Kongre (Pill Bar Container) */}
-      <div
-        ref={tabsRef}
-        className="p-1.5 bg-slate-100/90 dark:bg-slate-900/60 rounded-2xl border border-zinc-200/80 dark:border-white/[0.08] backdrop-blur-md flex items-center gap-1.5 overflow-x-auto no-scrollbar shadow-2xs"
-      >
-        {tabKeys.map((tabKey) => {
-          const config = SETTINGS_TABS_CONFIG[tabKey];
-          const isActive = activeTab === tabKey;
-          const Icon = config.icon;
-
-          return (
+          {onNavigateToProfile && (
             <button
-              key={tabKey}
               type="button"
-              data-active={isActive}
-              onClick={() => setActiveTab(tabKey)}
-              className={`flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all cursor-pointer ${
-                isActive
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold border border-slate-200/60 dark:border-transparent'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/[0.04]'
-              }`}
+              onClick={onNavigateToProfile}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-900/60 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 border border-zinc-200/80 dark:border-white/[0.08] text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+              title="Configurar foto, teléfono y contacto personal"
             >
-              <Icon
-                size={14}
-                className={isActive ? 'text-indigo-600 dark:text-white' : 'text-slate-500 dark:text-slate-400'}
-              />
-              <span>{config.label}</span>
-              {tabKey === 'all' && (
-                <span
-                  className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider ${
-                    isActive
-                      ? 'bg-indigo-50 text-indigo-600 dark:bg-white/20 dark:text-white'
-                      : 'bg-slate-200/80 text-slate-600 dark:bg-white/10 dark:text-slate-300'
-                  }`}
-                >
-                  HUB
-                </span>
-              )}
+              <User size={14} className="text-slate-500 dark:text-slate-400" />
+              <span className="hidden sm:inline">Mi Perfil</span>
             </button>
-          );
-        })}
+          )}
+
+          <button
+            type="button"
+            onClick={() => handleSaveSettings()}
+            disabled={isSaving}
+            className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl text-white text-xs sm:text-sm font-semibold transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer ${
+              savedFeedback
+                ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
+                : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/20'
+            }`}
+            title="Guardar todos los cambios de configuración"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Guardando...</span>
+              </>
+            ) : savedFeedback ? (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                <span>¡Guardado!</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>Guardar Ajustes</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* 3. VISTA PRINCIPAL: PANEL DE TARJETAS (HUB) */}
@@ -2680,40 +2692,16 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                   </div>
                 </div>
 
-                {/* Card: Auto-Bloqueo por Inactividad */}
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col justify-between space-y-3">
-                  <div>
-                    <span className="text-xs font-bold text-slate-900 dark:text-white block mb-1.5 flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                      Bloqueo Automático por Inactividad
-                    </span>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {isDemoMode
-                        ? 'El auto-bloqueo está desactivado temporalmente mientras explores el modo de prueba.'
-                        : 'Bloquea la pantalla automáticamente si no se detecta actividad del mouse o teclado durante el tiempo seleccionado.'}
-                    </p>
-                  </div>
-
-                  <div>
-                    <select
-                      value={isDemoMode ? 0 : autoLockMinutes}
-                      onChange={(e) => setAutoLockMinutes(Number(e.target.value))}
-                      disabled={isDemoMode || !isPinEnabled}
-                      className="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-semibold disabled:opacity-50"
-                    >
-                      <option value={2}>Bloquear tras 2 minutos de inactividad</option>
-                      <option value={5}>Bloquear tras 5 minutos de inactividad (Recomendado)</option>
-                      <option value={10}>Bloquear tras 10 minutos de inactividad</option>
-                      <option value={15}>Bloquear tras 15 minutos de inactividad</option>
-                      <option value={0}>Desactivado (Solo bloqueo manual)</option>
-                    </select>
-                    {!isPinEnabled && (
-                      <span className="text-[10px] text-slate-400 mt-1 block">
-                        * Requiere configurar un PIN primero
-                      </span>
-                    )}
-                  </div>
-                </div>
+                {/* Card: Auto-Bloqueo por Inactividad con Reloj y Controles Interactivos */}
+                <AutoLockSettingsCard
+                  onOpenPinModal={() => {
+                    setPinCurrent('');
+                    setPinNew('');
+                    setPinConfirm('');
+                    setPinModalError(null);
+                    setShowPinSetupModal(true);
+                  }}
+                />
               </div>
 
               {/* Privacy Mode (PII Masking) */}

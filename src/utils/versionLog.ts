@@ -25,19 +25,91 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.10.5';
-export const CURRENT_BUILD_CODE = '2026.10.21.3410';
+export const CURRENT_APP_VERSION = '2.10.8';
+export const CURRENT_BUILD_CODE = '2026.10.21.3501';
 export const BUILD_DATE = '21 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.10.8',
+    buildCode: '2026.10.21.3501',
+    date: '21 de Octubre, 2026',
+    title: 'Optimización Global de Interfaz: Arranque Directo con Contenido (Opción 1) en Toda la App',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Eliminación Integral de Banners Redundantes: Se auditaron y refactorizaron las 27 vistas y módulos de la aplicación, retirando los títulos y tarjetas interiores duplicadas (SectionHeader y hero banners) para consolidar la barra superior fija (Navbar) como la única fuente fidedigna de navegación.',
+      },
+      {
+        category: 'improvement',
+        text: 'Ahorro de Espacio Vertical (60-90px por vista): Cada sección inicia de forma inmediata con su contenido interactivo, barras de píldoras horizontales de subpestañas o barras de herramientas de acción directa (diseño ergonómico estilo Notion, Linear y Stripe).',
+      },
+      {
+        category: 'feature',
+        text: 'Barras de Herramientas Directas y Píldoras de Navegación: Estandarización de toolbars de acción compactos con badges contextuales en Ajustes, Publicadores, Territorios, Asistencia, Carritos, Hospitalidad, Precursores Auxiliares, Panel Eléctrico, Mantenimiento, Informe S-1, Editor de Publicador, Programa, Cuentas, Literatura, Discursos Públicos, Memorial/Asambleas, Visita Superintendente, Tarjetas S-21, Informes S-4, Grupos, Tablero, S-89, Conflictos, Equidad, Exportar y Roles.',
+      },
+      {
+        category: 'security',
+        text: 'Consistencia Estructural y DOM Optimizado: Reducción del anidamiento innecesario del DOM y unificación de la ergonomía de navegación táctil y de escritorio en toda la plataforma.',
+      },
+    ],
+  },
+  {
+    version: '2.10.7',
+    buildCode: '2026.10.21.3412',
+    date: '21 de Octubre, 2026',
+    title: 'Reloj Animado de Bloqueo por Inactividad, Anillos SVG y Aviso Flotante',
+    isCurrent: false,
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Chip Contador en Barra Superior (Navbar): Muestra una cápsula animada con anillo de progreso SVG de 22px y cuenta regresiva mm:ss en tiempo real junto al botón de tema. Cambia a color ámbar con pulso suave en los últimos 60 segundos y a rojo con pulso acelerado en los últimos 30 segundos.',
+      },
+      {
+        category: 'feature',
+        text: 'Aviso Flotante (Toast) en los Últimos 60 Segundos: Notificación emergente inferior con anillo SVG de 46px, segundero en vivo e icono de candado. Tocar la pantalla, hacer clic o presionar cualquier tecla restablece el tiempo instantáneamente con animación refill fluida.',
+      },
+      {
+        category: 'improvement',
+        text: 'Nueva Tarjeta Interactiva en Ajustes de Seguridad: Anillo de 60px con indicador de minutos, switch on/off, control deslizante continuo de 5 a 15 minutos con marcas numéricas y acceso directo a presets (5 min recomendado, 10 min, 15 min).',
+      },
+      {
+        category: 'security',
+        text: 'Cálculo de Inactividad por Fecha Límite (Deadline): El tiempo se evalúa contra marcas de tiempo absolutas y eventos de visibilidad de pestaña (visibilitychange/focus), bloqueando de forma segura la sesión incluso al reabrir la app tras suspender el dispositivo.',
+      },
+    ],
+  },
+  {
+    version: '2.10.6',
+    buildCode: '2026.10.21.3411',
+    date: '21 de Octubre, 2026',
+    title: 'Optimización de Interfaz: Eliminación de Banner Redundante en Ajustes (Opción 1)',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Eliminación del Banner Redundante en Ajustes: Se retiró la tarjeta interior que duplicaba el título de la congregación y ajustes bajo la barra superior fija, ganando hasta 90px verticales de espacio útil.',
+      },
+      {
+        category: 'improvement',
+        text: 'Arranque Directo con Contenido y Pestañas: La sección de Ajustes inicia directamente con la barra de navegación de categorías (Panel de Tarjetas, Notificaciones, General, Reglas, Seguridad, etc.).',
+      },
+      {
+        category: 'feature',
+        text: 'Barra de Herramientas Unificada y Limpia: Botones de Guardar Ajustes, Mi Perfil e indicador dinámico de sincronización/cambios pendientes integrados directamente en la fila de navegación estilo Notion / Linear.',
+      },
+    ],
+  },
+  {
     version: '2.10.5',
     buildCode: '2026.10.21.3410',
     date: '21 de Octubre, 2026',
     title: 'Botón de Modo Oscuro Sin Contenedor, Animación Fluida y Luna Blanca Nítida',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

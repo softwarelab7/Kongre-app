@@ -253,26 +253,20 @@ export const GruposServicioTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header Bar */}
-      <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
-              Grupos de Servicio
-            </span>
-            <span className="text-xs text-slate-500 font-medium">Predicación del Reino</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-            Grupos de Servicio del Campo
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Organice los publicadores, asigne superintendentes y auxiliares, y coordine las salidas a predicar.
-          </p>
+      {/* Barra de Acciones de Grupos de Servicio (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20">
+            Grupos de Servicio
+          </span>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
+            Superintendentes, auxiliares e integrantes por grupo
+          </span>
         </div>
 
         <button
           onClick={handleOpenNewGroup}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-colors"
+          className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer active:scale-95"
         >
           <Plus className="w-4 h-4" />
           <span>Nuevo Grupo</span>

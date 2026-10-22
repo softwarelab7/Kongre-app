@@ -1,0 +1,90 @@
+/* src/kongre-autolock.css
+ * Estilos y animaciones del Reloj de Bloqueo por Inactividad de Kongre
+ */
+
+.kg-ring {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+}
+
+.kg-ring svg {
+  position: absolute;
+  inset: 0;
+}
+
+.kg-ring .kg-arc {
+  transition: stroke-dashoffset 0.9s linear, stroke 0.3s ease;
+}
+
+.kg-ring .kg-arc.refill {
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.3s ease;
+}
+
+/* Chip de tiempo en la barra superior */
+.kg-autolock-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 4px 10px 4px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.kg-autolock-chip b {
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.kg-autolock-chip[data-state="warn"] {
+  animation: kg-pulse-warn 2s infinite ease-in-out;
+}
+
+.kg-autolock-chip[data-state="crit"] {
+  animation: kg-pulse-crit 1s infinite ease-in-out;
+}
+
+@keyframes kg-pulse-warn {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(217, 119, 6, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.28);
+  }
+}
+
+@keyframes kg-pulse-crit {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(225, 29, 72, 0.38);
+  }
+}
+
+/* Deslizador de rango para minutos en Ajustes */
+.kg-range-slider {
+  width: 100%;
+  accent-color: #4c3aed;
+  cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+  .kg-range-slider {
+    accent-color: #818cf8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kg-autolock-chip,
+  .kg-ring .kg-arc {
+    animation: none !important;
+    transition: none !important;
+  }
+}

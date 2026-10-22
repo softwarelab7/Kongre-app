@@ -2,7 +2,6 @@
 import React, { useState, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { HospitalityHost, Publisher } from '../types';
-import { SectionHeader } from './SectionHeader';
 import { SplashCheckbox } from './SplashCheckbox';
 import {
   Coffee,
@@ -230,43 +229,42 @@ export const HospitalidadTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* SectionHeader Kongre 1 Style */}
-      <SectionHeader
-        icon={Coffee}
-        title="Directorio de"
-        highlightWord="Hospitalidad"
-        subtitle={`${hospitalityHosts.length} familias registradas • ${stats.totalCapacity} comensales en total`}
-        colorTheme="emerald"
-        actions={
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={handleCopyWhatsAppList}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-slate-700 dark:text-white/80 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-xs active:scale-95"
-              title="Copiar lista completa formateada para WhatsApp"
-            >
-              {copiedSuccess ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">¡Copiado!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                  <span>Copiar para WhatsApp</span>
-                </>
-              )}
-            </button>
+      {/* Barra de Acciones de Hospitalidad (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">
+            {hospitalityHosts.length} familias registradas • {stats.totalCapacity} comensales en total
+          </span>
+        </div>
 
-            <button
-              onClick={openNewModal}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Nuevo Anfitrión</span>
-            </button>
-          </div>
-        }
-      />
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={handleCopyWhatsAppList}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 border border-slate-200/80 dark:border-white/[0.08] text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-2xs active:scale-95"
+            title="Copiar lista completa formateada para WhatsApp"
+          >
+            {copiedSuccess ? (
+              <>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">¡Copiado!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                <span>Copiar para WhatsApp</span>
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={openNewModal}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nuevo Anfitrión</span>
+          </button>
+        </div>
+      </div>
 
       {/* KPI Stats Ribbon */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

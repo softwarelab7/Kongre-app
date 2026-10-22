@@ -107,27 +107,24 @@ export const EquidadDashboardTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">
-            Analítica y Equidad Teocrática
+      {/* Barra de Acciones de Equidad Teocrática (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+            Analítica y Equidad
           </span>
-          <h2 className="text-xl font-bold text-slate-900 mt-1">Control de Distribución y Descanso</h2>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Supervisa el equilibrio de responsabilidades para evitar sobrecargar a los mismos hermanos y dar oportunidad a todos.
-          </p>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
+            Equilibrio de responsabilidades para evitar sobrecargar y dar oportunidad a todos
+          </span>
         </div>
 
         {/* Global Confirmation Pill */}
-        <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200">
+        <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-white/[0.08] shadow-2xs">
           <div className="text-right">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block">Tasa de Confirmación</span>
-            <span className="text-lg font-black text-emerald-600">{statusCounts.confirmRate}%</span>
+            <span className="text-[10px] uppercase font-bold text-slate-400 block">Tasa Confirmación:</span>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
-            <CheckCircle2 className="w-5 h-5" />
-          </div>
+          <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">{statusCounts.confirmRate}%</span>
+          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
         </div>
       </div>
 

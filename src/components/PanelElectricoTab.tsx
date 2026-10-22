@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { Breaker } from '../types';
 import { SAMPLE_BREAKERS_TEMPLATE } from '../utils/sampleData';
-import { SectionHeader } from './SectionHeader';
 import { BreakerCard } from './electrical/BreakerCard';
 import { BreakerModal } from './electrical/BreakerModal';
 import {
@@ -239,74 +238,76 @@ export const PanelElectricoTab: React.FC = () => {
 
       {/* Main Container */}
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
-        {/* Section Header */}
-        <SectionHeader
-          icon={Zap}
-          title="Tablero / Panel"
-          highlight="Eléctrico"
-          subtitle="DIAGRAMA UNIFILAR Y CONTROL DE CIRCUITOS DEL SALÓN DEL REINO"
-          badgeText="SISTEMA ELÉCTRICO"
-          actions={
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Toggle Mode Button */}
-              <button
-                onClick={() => setIsReadOnly(!isReadOnly)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border ${
-                  isReadOnly
-                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
-                    : 'bg-white dark:bg-white/[0.05] text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-white/[0.1] hover:bg-zinc-100 dark:hover:bg-white/[0.08]'
-                }`}
-              >
-                {isReadOnly ? <ShieldAlert size={15} /> : <Edit3 size={15} />}
-                {isReadOnly ? 'Solo Lectura' : 'Modo Edición'}
-              </button>
+        {/* Barra de Herramientas de Panel Eléctrico (Opción 1: arranque directo sin banner redundante) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+              Sistema Eléctrico
+            </span>
+            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 hidden sm:inline">
+              Diagrama unifilar y control de circuitos del Salón del Reino
+            </span>
+          </div>
 
-              {/* Quick Meeting Mode Switch */}
-              <button
-                onClick={() => handleToggleMeetingMode(true)}
-                title="Energizar todos los circuitos configurados en Modo Reunión"
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all"
-              >
-                <Power size={14} />
-                <span className="hidden sm:inline">Modo Reunión</span> ON
-              </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Toggle Mode Button */}
+            <button
+              onClick={() => setIsReadOnly(!isReadOnly)}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer active:scale-95 ${
+                isReadOnly
+                  ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                  : 'bg-white dark:bg-slate-900/60 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-white/[0.08] hover:bg-zinc-100 dark:hover:bg-slate-800 shadow-2xs'
+              }`}
+            >
+              {isReadOnly ? <ShieldAlert size={15} /> : <Edit3 size={15} />}
+              {isReadOnly ? 'Solo Lectura' : 'Modo Edición'}
+            </button>
 
-              <button
-                onClick={() => handleToggleMeetingMode(false)}
-                title="Apagar circuitos de reunión para ahorro de energía"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-zinc-100 dark:bg-white/[0.05] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/[0.1] hover:bg-zinc-200 dark:hover:bg-white/[0.08] transition-all"
-              >
-                <PowerOff size={14} />
-                <span className="hidden sm:inline">Reunión</span> OFF
-              </button>
+            {/* Quick Meeting Mode Switch */}
+            <button
+              onClick={() => handleToggleMeetingMode(true)}
+              title="Energizar todos los circuitos configurados en Modo Reunión"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all cursor-pointer active:scale-95"
+            >
+              <Power size={14} />
+              <span className="hidden sm:inline">Modo Reunión</span> ON
+            </button>
 
-              {/* Print Cabinet Door Roster */}
-              <button
-                onClick={() => window.print()}
-                title="Imprimir rótulo reglamentario para la puerta interior del tablero"
-                className="p-2 sm:px-3 sm:py-2 rounded-xl border border-zinc-200 dark:border-white/[0.1] bg-white dark:bg-white/[0.05] text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/[0.08] transition-colors flex items-center gap-2 text-xs font-semibold"
-              >
-                <Printer size={16} />
-                <span className="hidden sm:inline">Imprimir Rótulo</span>
-              </button>
+            <button
+              onClick={() => handleToggleMeetingMode(false)}
+              title="Apagar circuitos de reunión para ahorro de energía"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-zinc-100 dark:bg-slate-900/60 text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/[0.08] hover:bg-zinc-200 dark:hover:bg-slate-800 transition-all cursor-pointer active:scale-95"
+            >
+              <PowerOff size={14} />
+              <span className="hidden sm:inline">Reunión</span> OFF
+            </button>
 
-              {/* New Breaker Button */}
-              {!isReadOnly && (
-                <button
-                  onClick={() => {
-                    setEditingBreaker(null);
-                    setTargetColumnForNew('left');
-                    setIsModalOpen(true);
-                  }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-indigo-500/25 transition-all"
-                >
-                  <Plus size={16} />
-                  <span>Nuevo Circuito</span>
-                </button>
-              )}
-            </div>
-          }
-        />
+            {/* Print Cabinet Door Roster */}
+            <button
+              onClick={() => window.print()}
+              title="Imprimir rótulo reglamentario para la puerta interior del tablero"
+              className="p-2 sm:px-3 sm:py-2 rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-slate-900/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-2 text-xs font-semibold shadow-2xs cursor-pointer active:scale-95"
+            >
+              <Printer size={16} />
+              <span className="hidden sm:inline">Imprimir Rótulo</span>
+            </button>
+
+            {/* New Breaker Button */}
+            {!isReadOnly && (
+              <button
+                onClick={() => {
+                  setEditingBreaker(null);
+                  setTargetColumnForNew('left');
+                  setIsModalOpen(true);
+                }}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-indigo-500/25 transition-all cursor-pointer active:scale-95"
+              >
+                <Plus size={16} />
+                <span>Nuevo Circuito</span>
+              </button>
+            )}
+          </div>
+        </div>
 
         {/* Banner cuando no hay circuitos configurados */}
         {breakers.length === 0 && (

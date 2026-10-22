@@ -32,7 +32,6 @@ import {
   Mic,
   Check,
 } from 'lucide-react';
-import { SectionHeader } from './SectionHeader';
 
 export const CleaningDutiesTab: React.FC = () => {
   const {
@@ -470,114 +469,107 @@ export const CleaningDutiesTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* SectionHeader Kongre 1 Style */}
-      <SectionHeader
-        icon={ShieldCheck}
-        title="Servicios de la"
-        highlightWord="Congregación"
-        subtitle="Deberes y turnos de entre semana y fin de semana (Audio y Video, Micrófonos, Acomodadores) y aseo"
-        colorTheme="indigo"
-        actions={
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={handleCopyWeeklyDutiesSummary}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs sm:text-sm font-semibold transition-all cursor-pointer"
-              title="Copiar lista de turnos de la semana para WhatsApp"
-            >
-              {copiedDutiesSuccess ? (
-                <>
-                  <Check className="w-4 h-4 text-emerald-600" />
-                  <span>¡Copiado!</span>
-                </>
-              ) : (
-                <>
-                  <MessageCircle className="w-4 h-4 text-emerald-600" />
-                  <span>Copiar Turnos WhatsApp</span>
-                </>
-              )}
-            </button>
+      {/* Barra Unificada de Pestañas y Acciones (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        {/* Subtab Navigation Pills */}
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 dark:bg-slate-900/60 rounded-2xl border border-slate-200/80 dark:border-white/10 w-fit overflow-x-auto max-w-full shadow-2xs">
+          <button
+            onClick={() => setActiveSection('turnos')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              activeSection === 'turnos'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span>Deberes y Turnos Semanales</span>
+          </button>
 
-            <button
-              onClick={handleAutoRotateCleaning}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/[0.1] text-slate-700 dark:text-white/80 border border-slate-200/60 dark:border-white/[0.06] text-xs sm:text-sm font-semibold transition-all cursor-pointer"
-              title="Rotar automáticamente los grupos de aseo semana a semana"
-            >
-              <Brush className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <span>Rotar Limpieza</span>
-            </button>
+          <button
+            onClick={() => setActiveSection('limpieza')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              activeSection === 'limpieza'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Brush className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span>Rotación de Limpieza ({weeks.length} sem.)</span>
+          </button>
 
-            <button
-              onClick={openNewDutyModal}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>+ Nuevo Privilegio</span>
-            </button>
-          </div>
-        }
-      />
+          <button
+            onClick={() => setActiveSection('catalogo')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              activeSection === 'catalogo'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Briefcase className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span>Configurar Deberes ({customDuties.length})</span>
+          </button>
 
-      {/* Subtab Navigation Pills */}
-      <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl border border-slate-200/80 dark:border-white/10 w-fit overflow-x-auto max-w-full">
-        <button
-          onClick={() => setActiveSection('turnos')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-            activeSection === 'turnos'
-              ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-          <span>Deberes y Turnos Semanales</span>
-        </button>
+          <button
+            onClick={() => setActiveSection('grupos')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              activeSection === 'grupos'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Users className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            <span>Grupos ({preachingGroups.length})</span>
+          </button>
 
-        <button
-          onClick={() => setActiveSection('limpieza')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-            activeSection === 'limpieza'
-              ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          <Brush className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-          <span>Rotación de Limpieza ({weeks.length} sem.)</span>
-        </button>
+          <button
+            onClick={() => setActiveSection('salidas')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              activeSection === 'salidas'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Compass className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <span>Salidas ({fieldServiceMeetings.length})</span>
+          </button>
+        </div>
 
-        <button
-          onClick={() => setActiveSection('catalogo')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-            activeSection === 'catalogo'
-              ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          <Briefcase className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-          <span>Configurar Deberes ({customDuties.length})</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2 shrink-0 justify-end">
+          <button
+            onClick={handleCopyWeeklyDutiesSummary}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-2xs"
+            title="Copiar lista de turnos de la semana para WhatsApp"
+          >
+            {copiedDutiesSuccess ? (
+              <>
+                <Check className="w-4 h-4 text-emerald-600" />
+                <span>¡Copiado!</span>
+              </>
+            ) : (
+              <>
+                <MessageCircle className="w-4 h-4 text-emerald-600" />
+                <span>Copiar Turnos WhatsApp</span>
+              </>
+            )}
+          </button>
 
-        <button
-          onClick={() => setActiveSection('grupos')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-            activeSection === 'grupos'
-              ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          <Users className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-          <span>Grupos de Predicación ({preachingGroups.length})</span>
-        </button>
+          <button
+            onClick={handleAutoRotateCleaning}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-white/80 border border-slate-200/80 dark:border-white/[0.08] text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-2xs"
+            title="Rotar automáticamente los grupos de aseo semana a semana"
+          >
+            <Brush className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span>Rotar Limpieza</span>
+          </button>
 
-        <button
-          onClick={() => setActiveSection('salidas')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-            activeSection === 'salidas'
-              ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          <Compass className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          <span>Salidas al Campo ({fieldServiceMeetings.length})</span>
-        </button>
+          <button
+            onClick={openNewDutyModal}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>+ Nuevo Privilegio</span>
+          </button>
+        </div>
       </div>
 
       {/* KPI Stats Ribbon */}

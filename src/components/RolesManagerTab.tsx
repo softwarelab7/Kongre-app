@@ -710,58 +710,41 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
   return (
     <div className="space-y-6 animate-fade-in max-w-7xl mx-auto pb-12">
-      {/* 1. HERO BANNER: GESTIÓN TEOCRÁTICA CON ZERO-KNOWLEDGE E2EE */}
-      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-5 sm:p-7 shadow-xl border border-indigo-900/40">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] uppercase font-black tracking-widest bg-indigo-500/30 text-indigo-200 px-3 py-1 rounded-full border border-indigo-400/30 flex items-center gap-1.5 shadow-inner">
-                <ShieldCheck className="w-3.5 h-3.5 text-indigo-300" />
-                <span>Gestión Teocrática • Cero Conocimiento</span>
-              </span>
-              <span className="text-xs text-indigo-300 font-semibold">
-                {settings.congregationName || 'Congregación Central'}
+      {/* Barra de Sesión y Acciones de Roles (Opción 1: arranque directo sin banner redundante) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+            Seguridad Teocrática
+          </span>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
+            Roles de departamento y claves personales (PINs)
+          </span>
+        </div>
+
+        {/* Active Brother Session Capsule */}
+        <div className="p-2 sm:px-3 sm:py-2 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-white/[0.08] flex items-center justify-between sm:justify-start gap-3 shrink-0 shadow-2xs">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black text-xs shadow-xs shrink-0">
+            {(currentBrotherName || 'H')[0]?.toUpperCase()}
+          </div>
+          <div className="min-w-0 pr-1 text-left">
+            <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate max-w-[150px]">
+              {currentBrotherName || 'Usuario'}
+            </h4>
+            <div className="flex items-center gap-1">
+              <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded-md ${effectiveRoleInfo.badgeColor}`}>
+                {effectiveRoleInfo.shortName}
               </span>
             </div>
-
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight">
-              Roles Teocráticos y PINs de Acceso
-            </h1>
-            <p className="text-xs sm:text-sm text-indigo-200/90 leading-relaxed font-normal">
-              Asigna responsabilidades teocráticas oficiales a cada anciano, siervo ministerial y publicador. Los PINs
-              personales desbloquean automáticamente los departamentos autorizados (Secretaría, Territorios, Cuentas, etc.).
-            </p>
           </div>
 
-          {/* Active Brother Session Capsule */}
-          <div className="p-3.5 sm:p-4 rounded-2xl bg-white/10 dark:bg-black/30 backdrop-blur-md border border-white/15 flex items-center justify-between sm:justify-start gap-3.5 shrink-0 shadow-lg">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-black text-lg shadow-md shrink-0">
-              {(currentBrotherName || 'H')[0]?.toUpperCase()}
-            </div>
-            <div className="min-w-0 pr-2">
-              <span className="text-[10px] text-indigo-200 font-medium uppercase tracking-wider block">
-                Sesión Activa
-              </span>
-              <h4 className="text-sm font-bold text-white truncate max-w-[170px]">
-                {currentBrotherName || 'Usuario'}
-              </h4>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${effectiveRoleInfo.badgeColor}`}>
-                  {effectiveRoleInfo.shortName}
-                </span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setActiveTabMode('mi_sesion')}
-              className="p-2 rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer"
-              title="Cambiar sesión o ingresar PIN"
-            >
-              <KeyRound className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setActiveTabMode('mi_sesion')}
+            className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-zinc-200 transition-colors cursor-pointer"
+            title="Cambiar sesión o ingresar PIN"
+          >
+            <KeyRound className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 

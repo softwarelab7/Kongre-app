@@ -25,41 +25,19 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.10.9';
-export const CURRENT_BUILD_CODE = '2026.10.21.3601';
+export const CURRENT_APP_VERSION = '2.10.8';
+export const CURRENT_BUILD_CODE = '2026.10.21.3501';
 export const BUILD_DATE = '21 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
-    version: '2.10.9',
-    buildCode: '2026.10.21.3601',
-    date: '21 de Octubre, 2026',
-    title: 'Corrección Crítica de Conexión a Supabase en Despliegue en la Nube (kongre.ai.studio)',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
-    environment: 'Producción Cloud (Kongre)',
-    changes: [
-      {
-        category: 'fix',
-        text: 'Corrección de URL y Credenciales de Supabase en Producción: Se configuraron las credenciales oficiales de Supabase directamente como valores predeterminados en `src/lib/supabase.ts`. Esto soluciona de raíz el error `TypeError: Failed to fetch` en https://kongre.ai.studio, causado porque las variables de entorno (.env) no se suben a Git por seguridad y el compilador caía en la URL placeholder inexistente.',
-      },
-      {
-        category: 'improvement',
-        text: 'Diagnóstico Claro de Red: Mensajes de error informativos en caso de bloqueadores de anuncios (Brave Shields, uBlock Origin) o falta de conexión a internet en la pantalla de bienvenida.',
-      },
-      {
-        category: 'improvement',
-        text: 'Respaldo Local Offline: Soporte para acceder con la copia local de la congregación en caso de fallo de red o modo sin conexión.',
-      },
-    ],
-  },
-  {
     version: '2.10.8',
     buildCode: '2026.10.21.3501',
     date: '21 de Octubre, 2026',
     title: 'Optimización Global de Interfaz: Arranque Directo con Contenido (Opción 1) en Toda la App',
-    isCurrent: false,
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

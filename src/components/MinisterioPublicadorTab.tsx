@@ -1037,32 +1037,32 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
       {/* =========================================================================
           2. BARRA DE NAVEGACIÓN DE FUNCIONES PARA PUBLICADORES
          ========================================================================= */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 p-1.5 rounded-2xl bg-slate-200/70 dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 p-1 rounded-xl bg-slate-200/70 dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800">
         <button
           type="button"
           onClick={() => setActiveSubTab('resumen')}
-          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeSubTab === 'resumen'
               ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <Home className="w-4 h-4 shrink-0" />
+          <Home className="w-3.5 h-3.5 shrink-0" />
           <span>Panel Principal</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveSubTab('cronometro')}
-          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeSubTab === 'cronometro'
               ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <Timer className={`w-4 h-4 shrink-0 ${timerState.isRunning ? 'text-emerald-500 animate-spin' : ''}`} />
+          <Timer className={`w-3.5 h-3.5 shrink-0 ${timerState.isRunning ? 'text-emerald-500 animate-spin' : ''}`} />
           <span>Cronómetro</span>
-          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-300">
+          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-300">
             {monthSummary.fullHours}h
           </span>
         </button>
@@ -1070,15 +1070,15 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         <button
           type="button"
           onClick={() => setActiveSubTab('revisitas')}
-          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeSubTab === 'revisitas'
               ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-xs'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <MapPin className="w-4 h-4 shrink-0" />
+          <MapPin className="w-3.5 h-3.5 shrink-0" />
           <span>Revisitas</span>
-          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-300">
+          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-300">
             {returnVisits.length}
           </span>
         </button>
@@ -1086,15 +1086,15 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         <button
           type="button"
           onClick={() => setActiveSubTab('estudios')}
-          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeSubTab === 'estudios'
               ? 'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-xs'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <BookOpen className="w-4 h-4 shrink-0" />
+          <BookOpen className="w-3.5 h-3.5 shrink-0" />
           <span>Estudios</span>
-          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-mono bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-300">
+          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-300">
             {bibleStudies.length}
           </span>
         </button>
@@ -1102,13 +1102,13 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         <button
           type="button"
           onClick={() => setActiveSubTab('informe')}
-          className={`col-span-2 sm:col-span-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+          className={`col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeSubTab === 'informe'
               ? 'bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-xs'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <FileText className="w-4 h-4 shrink-0" />
+          <FileText className="w-3.5 h-3.5 shrink-0" />
           <span>Informe S-4</span>
           {existingS4Report && (
             <span className="w-2 h-2 rounded-full bg-emerald-500" title="Informe guardado" />
@@ -1120,9 +1120,9 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
           3. CONTENIDO: PANEL PRINCIPAL (RESUMEN + CRONÓMETRO EN VIVO + ACCESOS)
          ========================================================================= */}
       {(activeSubTab === 'resumen' || activeSubTab === 'cronometro') && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4 items-stretch">
           {/* Izquierda: Cronómetro de Predicación en Vivo con Anillo Circular */}
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-7 flex flex-col">
             <MinistryStopwatchDial
               displaySeconds={displaySeconds}
               isRunning={timerState.isRunning}
@@ -1159,21 +1159,21 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
           </div>
 
           {/* Derecha: Resumen del Mes y Meta de Horas */}
-          <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between gap-4">
+          <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl p-3.5 sm:p-4.5 border border-slate-200/90 dark:border-slate-800 shadow-xs flex flex-col justify-between gap-2.5">
             <div>
-              <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-100 dark:border-slate-800/80">
                 <div>
-                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                  <span className="text-[9.5px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                     Resumen de {currentMonthLabel}
                   </span>
-                  <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
+                  <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
                     Mi Meta y Registro Mensual
                   </h3>
                 </div>
                 <select
                   value={hourGoal}
                   onChange={(e) => handleUpdateGoal(Number(e.target.value))}
-                  className="text-xs font-bold px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
+                  className="text-[11px] font-bold px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-2xs"
                   title="Configurar meta de horas del mes"
                 >
                   <option value={10}>Meta: 10 h (Personal)</option>
@@ -1185,48 +1185,48 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
               </div>
 
               {/* Barra de Progreso de Horas */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-2.5">
+              <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-1.5">
                 <div className="flex items-baseline justify-between">
                   <div>
-                    <span className="text-3xl font-black text-slate-900 dark:text-white">
+                    <span className="text-2xl font-black text-slate-900 dark:text-white">
                       {monthSummary.fullHours} h
                     </span>
-                    <span className="text-sm font-bold text-slate-500 dark:text-slate-400 ml-1.5">
+                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1">
                       {monthSummary.remainingMinutes} min
                     </span>
                   </div>
-                  <span className="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
+                  <span className="text-[11px] font-extrabold text-indigo-600 dark:text-indigo-400">
                     {monthSummary.progressPct}% de {hourGoal} h
                   </span>
                 </div>
 
-                <div className="w-full h-3 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                <div className="w-full h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-indigo-600 via-violet-500 to-emerald-500 transition-all duration-500"
                     style={{ width: `${monthSummary.progressPct}%` }}
                   />
                 </div>
 
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
                   <span>
                     {monthSummary.fullHours >= hourGoal
-                      ? '¡Felicidades! Has alcanzado tu meta del mes 🎉'
-                      : `Faltan ${Math.max(0, hourGoal - monthSummary.fullHours)} h para tu meta de ${hourGoal} h`}
+                      ? '¡Felicidades! Meta alcanzada 🎉'
+                      : `Faltan ${Math.max(0, hourGoal - monthSummary.fullHours)} h para meta`}
                   </span>
                   <span>{monthSummary.logsThisMonth.length} salidas</span>
                 </p>
               </div>
 
               {/* 3 Mini-Tarjetas: Revisitas, Estudios, Publicaciones */}
-              <div className="grid grid-cols-3 gap-2.5 mt-3.5">
+              <div className="grid grid-cols-3 gap-2 mt-2.5">
                 <div
                   onClick={() => setActiveSubTab('revisitas')}
-                  className="p-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/50 cursor-pointer hover:shadow-xs transition"
+                  className="p-2 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/50 cursor-pointer hover:shadow-xs transition"
                 >
-                  <span className="text-[10px] font-bold uppercase text-emerald-700 dark:text-emerald-300 block">
+                  <span className="text-[9px] font-bold uppercase text-emerald-700 dark:text-emerald-300 block">
                     Revisitas
                   </span>
-                  <span className="text-xl font-black text-emerald-900 dark:text-white mt-0.5 block">
+                  <span className="text-lg font-black text-emerald-900 dark:text-white mt-0.5 block">
                     {returnVisits.length}
                   </span>
                   <span className="text-[10px] text-emerald-600 dark:text-emerald-400">

@@ -1298,10 +1298,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithGoogle = async (): Promise<User | null> => {
     setError(null);
     try {
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('kongre_pending_oauth_view', 'email_login');
+      }
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/#portal?view=email_login` : undefined,
         },
       });
       if (error) throw error;

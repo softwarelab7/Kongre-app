@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSecurity } from '../context/SecurityContext';
 import { useCongregation } from '../context/CongregationContext';
@@ -311,11 +311,19 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
   const [activeTab, setRawActiveTab] = useState<'home' | 'email_login' | 'code_login' | 'invite_code_login' | 'register' | 'unauthorized'>(() => {
     if (typeof window !== 'undefined') {
+      const pendingView = sessionStorage.getItem('kongre_pending_oauth_view');
+      if (pendingView && ['home', 'email_login', 'code_login', 'invite_code_login', 'register', 'unauthorized'].includes(pendingView)) {
+        return pendingView as any;
+      }
       const hash = window.location.hash;
-      const params = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
-      const v = params.get('view') as any;
+      const hashParams = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+      const searchParams = new URLSearchParams(window.location.search);
+      const v = (hashParams.get('view') || searchParams.get('view')) as any;
       if (['home', 'email_login', 'code_login', 'invite_code_login', 'register', 'unauthorized'].includes(v)) {
         return v;
+      }
+      if (hash.includes('access_token') || window.location.search.includes('code=')) {
+        return 'email_login';
       }
     }
     return 'home';
@@ -331,12 +339,32 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     });
   }, []);
 
+  const hasHandledOAuthRedirectRef = useRef(false);
+  useEffect(() => {
+    if (hasHandledOAuthRedirectRef.current) return;
+    const isPendingOAuth = typeof window !== 'undefined' && sessionStorage.getItem('kongre_pending_oauth_view') === 'email_login';
+    const hasAuthTokens = typeof window !== 'undefined' && (
+      window.location.hash.includes('access_token') ||
+      window.location.search.includes('code=')
+    );
+    if ((isPendingOAuth || hasAuthTokens) && user?.email) {
+      hasHandledOAuthRedirectRef.current = true;
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('kongre_pending_oauth_view');
+      }
+      if (activeTab !== 'email_login') {
+        setActiveTab('email_login');
+      }
+    }
+  }, [user, activeTab, setActiveTab]);
+
   useEffect(() => {
     const onPop = (e: PopStateEvent) => {
       const hash = window.location.hash;
-      if (hash.startsWith('#portal') || hash.startsWith('#bienvenida')) {
-        const params = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
-        const v = (params.get('view') || e.state?.view || 'home') as any;
+      if (hash.startsWith('#portal') || hash.startsWith('#bienvenida') || hash.includes('access_token')) {
+        const hashParams = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
+        const searchParams = new URLSearchParams(window.location.search);
+        const v = (hashParams.get('view') || searchParams.get('view') || e.state?.view || 'home') as any;
         if (['home', 'email_login', 'code_login', 'invite_code_login', 'register', 'unauthorized'].includes(v)) {
           setRawActiveTab(v);
         } else {
@@ -367,6 +395,18 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     }
     return formatCanonicalCongregationId(defaultId);
   });
+
+  useEffect(() => {
+    if (user?.email && !congregationIdInput) {
+      findUserCongregationId(user.email, user.uid)
+        .then((foundId) => {
+          if (foundId) {
+            setCongregationIdInput(formatCanonicalCongregationId(foundId));
+          }
+        })
+        .catch((err) => console.warn('Aviso buscando ID de congregación:', err));
+    }
+  }, [user?.email, user?.uid, congregationIdInput]);
 
   // Garantizar que '1001-DEMO' o cualquier texto de prueba nunca persista en el formulario
   useEffect(() => {
@@ -1089,6 +1129,9 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   const handleGoogleLogin = async () => {
     setEmailError(null);
     setIsSubmittingEmail(true);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('kongre_pending_oauth_view', 'email_login');
+    }
     try {
       const loggedUser = await signInWithGoogle();
       if (!loggedUser) {
@@ -1107,7 +1150,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       try {
         const foundId = await findUserCongregationId(userEmail, loggedUser.uid);
         if (foundId) {
-          setCongregationIdInput(foundId);
+          setCongregationIdInput(formatCanonicalCongregationId(foundId));
         }
       } catch (err) {
         console.warn('Aviso buscando ID de congregación:', err);
@@ -1158,6 +1201,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       setIsSubmittingRequest(false);
     }
   };
+
+  const isFullWidthView = activeTab !== 'home';
 
   return (
     <div className="min-h-screen bg-page text-ink flex flex-col justify-between font-sans selection:bg-brand selection:text-white transition-colors duration-200">
@@ -1374,7 +1419,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         {/* ========================================================= */}
         <main
           className={`mx-auto grid w-full flex-1 gap-6 lg:gap-10 xl:gap-14 px-4 sm:px-6 md:px-8 ${
-            activeTab === 'register'
+            isFullWidthView
               ? 'max-w-4xl xl:max-w-5xl grid-cols-1 py-2 sm:py-3.5 my-auto items-center'
               : 'max-w-[1240px] 2xl:max-w-[1360px] lg:grid-cols-[1.12fr_.88fr] py-4 sm:py-6 lg:py-6 xl:py-8 items-center'
           }`}
@@ -1382,7 +1427,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           {/* ========================================================= */}
           {/* LEFT COLUMN: DESKTOP HERO & THEOCRATIC FEATURES (Only on Desktop) */}
           {/* ========================================================= */}
-          {activeTab !== 'register' && (
+          {!isFullWidthView && (
             <section className="hidden lg:block space-y-0">
               <div
                 className="inline-flex items-center gap-2 rounded-full border border-bline bg-brand-soft px-3 py-1 text-[11.5px] sm:text-xs font-semibold text-brand mb-2.5 sm:mb-3 select-none"
@@ -1439,25 +1484,25 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           {/* ========================================================= */}
           {/* RIGHT COLUMN: INTERACTIVE ACCESS CARD                    */}
           {/* ========================================================= */}
-          <div className={`${activeTab === 'register' ? 'w-full' : 'w-full'} mx-auto transition-all duration-300`}>
+          <div className="w-full mx-auto transition-all duration-300">
             <section
-              key={activeTab === 'register' ? 'register-box' : `portal-${activeTab}`}
+              key={isFullWidthView ? `portal-wide-${activeTab}` : `portal-${activeTab}`}
               aria-label="Portal de acceso"
               className={`card rounded-3xl border border-line bg-card relative ${
-                activeTab === 'register'
-                  ? 'p-3.5 sm:p-5 lg:p-6 kg-register-box-enter shadow-2xl overflow-visible'
+                isFullWidthView
+                  ? 'p-4 sm:p-6 lg:p-7 kg-register-box-enter shadow-2xl overflow-visible'
                   : 'p-4 sm:p-5 lg:p-6 kg-home-box-enter shadow-xl overflow-hidden'
               } transition-all`}
               style={{ boxShadow: 'var(--card-shadow)' }}
             >
-              {/* Vibrant glowing gradient line at top for register mode */}
-              {activeTab === 'register' && (
+              {/* Vibrant glowing gradient line at top for full-width view */}
+              {isFullWidthView && (
                 <div className="absolute top-0 left-0 right-0 h-1 kg-shimmer-bar z-10 rounded-t-3xl" />
               )}
 
               {/* UNIFIED CARD HEADER ACROSS ALL VIEWS */}
               <div className={`eye flex items-center justify-between text-[11px] font-bold tracking-[0.06em] text-brand ${
-                activeTab === 'register' ? 'kg-header-enter' : ''
+                isFullWidthView ? 'kg-header-enter' : ''
               }`}>
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   {activeTab !== 'home' && (
@@ -1500,9 +1545,9 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               </div>
 
               {/* Main Title & Subtitle */}
-              <div className={activeTab === 'register' ? 'kg-title-enter' : ''}>
+              <div className={isFullWidthView ? 'kg-title-enter' : ''}>
                 <h2 className={`font-extrabold tracking-tight text-ink ${
-                  activeTab === 'register'
+                  isFullWidthView
                     ? 'mb-0.5 mt-1 sm:mt-1.5 text-lg sm:text-xl lg:text-2xl'
                     : 'mb-0.5 mt-2 text-[20px] sm:text-[22px] lg:text-[24px]'
                 }`}>
@@ -1519,7 +1564,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     : 'Registrar mi Congregación'}
                 </h2>
                 <p className={`text-muted ${
-                  activeTab === 'register'
+                  isFullWidthView
                     ? 'mb-2 sm:mb-2.5 text-[11px] sm:text-xs'
                     : 'mb-3 sm:mb-3.5 text-xs sm:text-[13px]'
                 } leading-normal`}>
@@ -1744,77 +1789,79 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       </div>
 
                       {/* Formulario para ingresar ID y PIN de congregación */}
-                      <form onSubmit={handleConnectWithIdPin} className="space-y-3.5">
-                        {/* DATO 1: ID DE LA CONGREGACIÓN */}
-                        <div>
-                          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
-                            <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                            <span>1. ID de la Congregación: *</span>
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              required
-                              maxLength={13}
-                              value={congregationIdInput}
-                              onFocus={() => {
-                                if (!congregationIdInput) setCongregationIdInput('KGR-');
-                              }}
-                              onBlur={() => {
-                                if (congregationIdInput === 'KGR-' || congregationIdInput === 'KGR') {
-                                  setCongregationIdInput('');
-                                }
-                              }}
-                              onChange={(e) => setCongregationIdInput(formatCongregationIdInput(e.target.value, congregationIdInput))}
-                              placeholder="KGR-XXXX-XXXX (ej: KGR-NQ5A-JQAA)"
-                              className="w-full p-2.5 pr-9 font-mono font-bold tracking-widest text-center text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
-                            />
-                            {congregationIdInput && (
+                      <form onSubmit={handleConnectWithIdPin} className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {/* DATO 1: ID DE LA CONGREGACIÓN */}
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                              <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                              <span>1. ID de la Congregación: *</span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                required
+                                maxLength={13}
+                                value={congregationIdInput}
+                                onFocus={() => {
+                                  if (!congregationIdInput) setCongregationIdInput('KGR-');
+                                }}
+                                onBlur={() => {
+                                  if (congregationIdInput === 'KGR-' || congregationIdInput === 'KGR') {
+                                    setCongregationIdInput('');
+                                  }
+                                }}
+                                onChange={(e) => setCongregationIdInput(formatCongregationIdInput(e.target.value, congregationIdInput))}
+                                placeholder="KGR-XXXX-XXXX (ej: KGR-NQ5A-JQAA)"
+                                className="w-full p-2.5 pr-9 font-mono font-bold tracking-widest text-center text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                              />
+                              {congregationIdInput && (
+                                <button
+                                  type="button"
+                                  onClick={() => setCongregationIdInput('')}
+                                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors cursor-pointer"
+                                  title="Borrar ID"
+                                  tabIndex={-1}
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-slate-400 block mt-0.5">
+                              Formato estándar oficial con guiones automáticos (ej: KGR-NQ5A-JQAA).
+                            </span>
+                          </div>
+
+                          {/* DATO 2: PIN DE LA CONGREGACIÓN */}
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                              <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                              <span>2. PIN de la Congregación: *</span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type={showCongPin ? 'text' : 'password'}
+                                required
+                                maxLength={9}
+                                value={congregationPinInput}
+                                onChange={(e) => setCongregationPinInput(formatCongregationPinInput(e.target.value, congregationPinInput))}
+                                placeholder="XXXX-XXXX (ej: 8X4W-9M2K)"
+                                className="w-full p-2.5 pr-10 font-mono font-bold tracking-wider text-center text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                              />
                               <button
                                 type="button"
-                                onClick={() => setCongregationIdInput('')}
-                                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors cursor-pointer"
-                                title="Borrar ID"
+                                onClick={() => setShowCongPin(!showCongPin)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                                 tabIndex={-1}
+                                title={showCongPin ? 'Ocultar PIN' : 'Ver PIN'}
                               >
-                                <X className="w-3.5 h-3.5" />
+                                {showCongPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                               </button>
-                            )}
+                            </div>
+                            <span className="text-[10px] text-slate-400 block mt-0.5">
+                              Clave de 8 caracteres alfanuméricos con guión central automático (ej: 8X4W-9M2K).
+                            </span>
                           </div>
-                          <span className="text-[10px] text-slate-400 block mt-0.5">
-                            Formato estándar oficial con guiones automáticos (ej: KGR-NQ5A-JQAA).
-                          </span>
-                        </div>
-
-                        {/* DATO 2: PIN DE LA CONGREGACIÓN */}
-                        <div>
-                          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
-                            <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                            <span>2. PIN de la Congregación: *</span>
-                          </label>
-                          <div className="relative">
-                            <input
-                              type={showCongPin ? 'text' : 'password'}
-                              required
-                              maxLength={9}
-                              value={congregationPinInput}
-                              onChange={(e) => setCongregationPinInput(formatCongregationPinInput(e.target.value, congregationPinInput))}
-                              placeholder="XXXX-XXXX (ej: 8X4W-9M2K)"
-                              className="w-full p-2.5 pr-10 font-mono font-bold tracking-wider text-center text-sm rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowCongPin(!showCongPin)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                              tabIndex={-1}
-                              title={showCongPin ? 'Ocultar PIN' : 'Ver PIN'}
-                            >
-                              {showCongPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            </button>
-                          </div>
-                          <span className="text-[10px] text-slate-400 block mt-0.5">
-                            Clave de 8 caracteres alfanuméricos con guión central automático (ej: 8X4W-9M2K).
-                          </span>
                         </div>
 
                         {/* DATO 3: PIN PERSONAL */}
@@ -1890,77 +1937,79 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     </div>
                   )}
 
-                  <form onSubmit={handleConnectWithIdPin} className="space-y-3.5">
-                    {/* DATO 1: ID DE LA CONGREGACIÓN */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
-                        <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                        <span>1. ID de la Congregación: *</span>
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          required
-                          maxLength={13}
-                          value={congregationIdInput}
-                          onFocus={() => {
-                            if (!congregationIdInput) setCongregationIdInput('KGR-');
-                          }}
-                          onBlur={() => {
-                            if (congregationIdInput === 'KGR-' || congregationIdInput === 'KGR') {
-                              setCongregationIdInput('');
-                            }
-                          }}
-                          onChange={(e) => setCongregationIdInput(formatCongregationIdInput(e.target.value, congregationIdInput))}
-                          placeholder="KGR-XXXX-XXXX (ej: KGR-NQ5A-JQAA)"
-                          className="w-full p-2.5 pr-9 font-mono font-bold tracking-widest text-center text-sm sm:text-base rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
-                        />
-                        {congregationIdInput && (
+                  <form onSubmit={handleConnectWithIdPin} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* DATO 1: ID DE LA CONGREGACIÓN */}
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                          <Hash className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span>1. ID de la Congregación: *</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            required
+                            maxLength={13}
+                            value={congregationIdInput}
+                            onFocus={() => {
+                              if (!congregationIdInput) setCongregationIdInput('KGR-');
+                            }}
+                            onBlur={() => {
+                              if (congregationIdInput === 'KGR-' || congregationIdInput === 'KGR') {
+                                setCongregationIdInput('');
+                              }
+                            }}
+                            onChange={(e) => setCongregationIdInput(formatCongregationIdInput(e.target.value, congregationIdInput))}
+                            placeholder="KGR-XXXX-XXXX (ej: KGR-NQ5A-JQAA)"
+                            className="w-full p-2.5 pr-9 font-mono font-bold tracking-widest text-center text-sm sm:text-base rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                          />
+                          {congregationIdInput && (
+                            <button
+                              type="button"
+                              onClick={() => setCongregationIdInput('')}
+                              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors cursor-pointer"
+                              title="Borrar ID"
+                              tabIndex={-1}
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                        <span className="text-[10.5px] text-slate-400 mt-1 block">
+                          Identificador único oficial asignado a tu congregación (formato KGR-XXXX-XXXX).
+                        </span>
+                      </div>
+
+                      {/* DATO 2: PIN DE LA CONGREGACIÓN */}
+                      <div>
+                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
+                          <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span>2. PIN de la Congregación: *</span>
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showCongPin ? 'text' : 'password'}
+                            required
+                            maxLength={9}
+                            value={congregationPinInput}
+                            onChange={(e) => setCongregationPinInput(formatCongregationPinInput(e.target.value, congregationPinInput))}
+                            placeholder="XXXX-XXXX (ej: 8X4W-9M2K)"
+                            className="w-full p-2.5 pr-10 font-mono font-bold tracking-widest text-center text-sm sm:text-base rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
+                          />
                           <button
                             type="button"
-                            onClick={() => setCongregationIdInput('')}
-                            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors cursor-pointer"
-                            title="Borrar ID"
+                            onClick={() => setShowCongPin(!showCongPin)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                             tabIndex={-1}
+                            title={showCongPin ? 'Ocultar PIN' : 'Ver PIN'}
                           >
-                            <X className="w-3.5 h-3.5" />
+                            {showCongPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
-                        )}
+                        </div>
+                        <span className="text-[10.5px] text-slate-400 mt-1 block">
+                          Clave de seguridad general de 8 caracteres con guión (ej: 8X4W-9M2K).
+                        </span>
                       </div>
-                      <span className="text-[10.5px] text-slate-400 mt-1 block">
-                        Identificador único oficial asignado a tu congregación (formato KGR-XXXX-XXXX).
-                      </span>
-                    </div>
-
-                    {/* DATO 2: PIN DE LA CONGREGACIÓN */}
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1.5">
-                        <Lock className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                        <span>2. PIN de la Congregación: *</span>
-                      </label>
-                      <div className="relative">
-                        <input
-                          type={showCongPin ? 'text' : 'password'}
-                          required
-                          maxLength={9}
-                          value={congregationPinInput}
-                          onChange={(e) => setCongregationPinInput(formatCongregationPinInput(e.target.value, congregationPinInput))}
-                          placeholder="XXXX-XXXX (ej: 8X4W-9M2K)"
-                          className="w-full p-2.5 pr-10 font-mono font-bold tracking-widest text-center text-sm sm:text-base rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white uppercase focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-2xs"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowCongPin(!showCongPin)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                          tabIndex={-1}
-                          title={showCongPin ? 'Ocultar PIN' : 'Ver PIN'}
-                        >
-                          {showCongPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
-                      <span className="text-[10.5px] text-slate-400 mt-1 block">
-                        Clave de seguridad general de 8 caracteres con guión (ej: 8X4W-9M2K).
-                      </span>
                     </div>
 
                     {/* DATO 3: PIN PERSONAL SUMINISTRADO POR EL COORDINADOR (Opcional si es coordinador) */}

@@ -7,7 +7,9 @@ node_modules/
 dist/
 dist-ssr/
 build/
+dev-dist/
 *.local
+client_secret*.json
 
 # Cache and temporary
 .vite/

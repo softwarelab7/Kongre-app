@@ -25,19 +25,42 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.0';
-export const CURRENT_BUILD_CODE = '2026.10.23.5100';
+export const CURRENT_APP_VERSION = '2.12.1';
+export const CURRENT_BUILD_CODE = '2026.10.23.5200';
 export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.1',
+    buildCode: '2026.10.23.5200',
+    date: '23 de Octubre, 2026',
+    title: 'Transición Fluida de OAuth con Google y Diseño Full-Width en Portal de Acceso',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Navegación automática post-Google OAuth: Al autorizar con Google, el usuario regresa directamente al menú de vinculación de congregación sin tener que pulsar nuevamente el botón de acceso.',
+      },
+      {
+        category: 'improvement',
+        text: 'Diseño Full-Width para vistas de acción: El menú de inicio con Google y de conexión por ID/PIN ahora se expanden al ancho completo de pantalla (como el registro), con cuadrícula equilibrada de 2 columnas para ID y PIN.',
+      },
+      {
+        category: 'fix',
+        text: 'Pre-llenado de ID canónico: Recuperación y formato automático del ID de congregación para cuentas con historial en la nube al ingresar con Google.',
+      },
+    ],
+  },
+  {
     version: '2.12.0',
     buildCode: '2026.10.23.5100',
     date: '23 de Octubre, 2026',
     title: 'Sincronización Segura vía Supabase Edge Function y Blindaje Criptográfico de PINs y Roles',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
+    highlight: 'Versión estable',
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

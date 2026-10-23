@@ -1495,11 +1495,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               } transition-all`}
               style={{ boxShadow: 'var(--card-shadow)' }}
             >
-              {/* Vibrant glowing gradient line at top for full-width view */}
-              {isFullWidthView && (
-                <div className="absolute top-0 left-0 right-0 h-1 kg-shimmer-bar z-10 rounded-t-3xl" />
-              )}
-
               {/* UNIFIED CARD HEADER ACROSS ALL VIEWS */}
               <div className={`eye flex items-center justify-between text-[11px] font-bold tracking-[0.06em] text-brand ${
                 isFullWidthView ? 'kg-header-enter' : ''

@@ -29,8 +29,8 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 **Título:** Transición Fluida de OAuth con Google y Diseño Full-Width en Portal de Acceso
 - **Navegación Fluida tras Autenticación con Google:**
   - Se eliminó el problema de tener que hacer clic dos veces en "Iniciar sesión con Google". Ahora la aplicación recuerda la vista pendiente y cambia automáticamente al menú de vinculación congregacional (`email_login`) en cuanto Supabase valida la cuenta de Google.
-- **Diseño de Pantalla Completa (Full-Width) en las Vistas de Acción:**
-  - El menú de acceso con Google y el de conexión por ID/PIN ahora aprovechan todo el ancho de la pantalla (`max-w-4xl xl:max-w-5xl`), ocultando la columna promocional estática izquierda y mostrando la barra de resplandor (`kg-shimmer-bar`) y animaciones idénticas al registro de congregación.
+- **Diseño Limpio de Pantalla Completa (Full-Width) en las Vistas de Acción:**
+  - El menú de acceso con Google y el de conexión por ID/PIN ahora aprovechan todo el ancho de la pantalla (`max-w-4xl xl:max-w-5xl`), ocultando la columna promocional estática izquierda y con bordes limpios sin barras superiores moradas.
   - Los campos de ID de Congregación y PIN de Congregación se distribuyen ahora en una cuadrícula simétrica de 2 columnas en pantallas medianas y grandes para una experiencia limpia y equilibrada.
 - **Pre-llenado de ID Canónico:**
   - Para publicadores y coordinadores con cuenta ya enlazada en la nube, el sistema recupera y formatea automáticamente su ID oficial (ej: `KGR-XXXX-XXXX`).

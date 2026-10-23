@@ -66,6 +66,11 @@ const LIMITS = {
   ip: { limit: 40, window: 900, lock: 900 },
   cong: { limit: 300, window: 3600, lock: 300 },
   create: { limit: 10, window: 3600, lock: 3600 },
+  // Límite por (congregación, publicador) para PIN personal. Los PIN personales suelen ser de 4 dígitos
+  // (9.000 combinaciones): sin este tope un atacante con el PIN de congregación los recorre en ~1,5 días.
+  // Con 6 fallos/hora y 30 min de bloqueo, el máximo es ~12 intentos/hora por publicador (>30 días para
+  // agotar el espacio) sin importar cuántas IPs use. Contrapartida: se puede bloquear a un publicador.
+  pub: { limit: 6, window: 3600, lock: 1800 },
 };
 
 const enc = new TextEncoder();
@@ -326,16 +331,31 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
       return json(req, env, 400, { ok: false, error: 'publisher_id_required' });
     }
 
+    // Evita claves de contador arbitrariamente largas (el atacante controla publisher_id).
+    if (publisherId.length > 100) {
+      return json(req, env, 400, { ok: false, error: 'bad_publisher_id' });
+    }
+    const kPub = `pp:${id}:${publisherId}`;
+    const lockedPub = await db.lockedUntil([kPub]);
+    if (lockedPub && lockedPub > now()) {
+      return json(req, env, 429, { ok: false, error: 'rate_limited', retry_after: Math.ceil((lockedPub - now()) / 1000) });
+    }
+
     const expectedVerifier = await verifierOfPersonal(env.pepper, id, pinToken);
     const verifiers = Array.isArray(row.personal_verifiers) ? row.personal_verifiers : [];
 
     const matched = verifiers.find((v) => v.id === publisherId && safeEqual(expectedVerifier, v.verifier));
 
     if (!matched) {
+      const pubLock = await db.registerFailure(kPub, LIMITS.pub.limit, LIMITS.pub.window, LIMITS.pub.lock);
+      if (pubLock && pubLock > now()) {
+        return json(req, env, 429, { ok: false, error: 'rate_limited', retry_after: Math.ceil((pubLock - now()) / 1000) });
+      }
       return reject();
     }
 
     await db.clearFailures(kCongIp);
+    await db.clearFailures(kPub);
     return json(req, env, 200, {
       ok: true,
       publisher: {

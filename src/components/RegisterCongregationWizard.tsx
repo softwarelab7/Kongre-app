@@ -327,16 +327,16 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         setError('El PIN de la Congregación es obligatorio.');
         return false;
       }
-      if (congregationPin.trim().length < 4) {
-        setError('El PIN de la Congregación debe tener al menos 4 caracteres o dígitos.');
+      if (congregationPin.trim().length < 8) {
+        setError('El PIN de la Congregación debe tener al menos 8 caracteres.');
         return false;
       }
       if (!personalPin.trim()) {
-        setError('El PIN Maestro del Coordinador es obligatorio (mínimo 8 dígitos).');
+        setError('El PIN Maestro del Coordinador es obligatorio (mínimo 12 dígitos).');
         return false;
       }
-      if (personalPin.trim().length < 8) {
-        setError('El PIN Maestro del Coordinador debe tener al menos 8 dígitos para proteger la congregación contra ataques de fuerza bruta.');
+      if (personalPin.trim().length < 12) {
+        setError('El PIN Maestro del Coordinador debe tener al menos 12 dígitos para proteger la congregación contra ataques de fuerza bruta.');
         return false;
       }
       if (personalPin !== confirmPersonalPin) {
@@ -1095,7 +1095,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                   <div className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                        PIN Maestro (8 dígitos):
+                        PIN Maestro (12 dígitos):
                       </span>
                       <div className="flex items-center gap-1.5">
                         <button
@@ -1127,7 +1127,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                             setPersonalPinInput(val);
                             setConfirmPersonalPin(val);
                           }}
-                          placeholder="PIN Maestro (8 dígitos)"
+                          placeholder="PIN Maestro (12 dígitos)"
                           className="w-full px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                           required
                         />

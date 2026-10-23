@@ -176,23 +176,20 @@ export const PublisherPinsModal: React.FC<PublisherPinsModalProps> = ({
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const token = encodeSecureShareToken({
       cong: congId || undefined,
-      cpin: realCongPin || undefined,
       pub: pub.id || undefined,
-      pin: pin || undefined,
     });
     const directLink = congId
       ? token
         ? `${origin}/?tk=${encodeURIComponent(token)}`
-        : `${origin}/?cong=${encodeURIComponent(congId)}&pub=${encodeURIComponent(pub.id)}&pin=${encodeURIComponent(pin)}`
+        : `${origin}/?cong=${encodeURIComponent(congId)}&pub=${encodeURIComponent(pub.id)}`
       : '';
-    const compositeCode = token || (congId && realCongPin ? `${congId}::${realCongPin}::${pin}` : pin);
+    const compositeCode = token;
 
     const text =
       `Hola estimado hermano *${pub.name}*,\n\n` +
       `Te comparto tus credenciales oficiales para la aplicación de la congregación *${congName}*:\n\n` +
       `🏛️ *ID de la Congregación:* *${congId}*\n` +
-      `🔒 *PIN de la Congregación:* *${realCongPin || '(el PIN general de la congregación)'}*\n` +
-      `🔑 *Tu PIN Personal Único:* *${pin}*\n` +
+      `🔒 Tu PIN personal y el PIN de la congregación te los entrega un anciano por separado (en persona o por llamada). No se envían por mensaje.\n` +
       `📋 *Código Portátil Cifrado:* *${compositeCode}*\n` +
       (directLink ? `\n📲 *Enlace de Acceso Directo (un solo toque):*\n${directLink}\n` : '') +
       `\nAl tocar el enlace o ingresar tus credenciales, tu rol y responsabilidades teocráticas se activarán de inmediato.`;

@@ -100,7 +100,6 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
     const { congId, congPin } = getCongregationCredentials();
     const token = encodeSecureShareToken({
       cong: congId || undefined,
-      cpin: congPin || undefined,
       invite: code,
     });
     if (token) {
@@ -143,13 +142,9 @@ export const InvitationManagerModal: React.FC<InvitationManagerModalProps> = ({
     const { congId, congPin } = getCongregationCredentials();
     const token = encodeSecureShareToken({
       cong: congId || undefined,
-      cpin: congPin || undefined,
       invite: baseCode,
     });
     if (token) return token;
-    if (congId && congPin) {
-      return `${congId}::${congPin}::${baseCode}`;
-    }
     return baseCode;
   };
 

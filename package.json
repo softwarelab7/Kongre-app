@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "tsx --test test/core.test.ts test/e2e/e2e.test.ts test/rbac.test.ts",
+    "test": "tsx --test test/core.test.ts test/e2e/e2e.test.ts test/rbac.test.ts test/crypto-and-tokens.test.ts",
     "verify": "bun scripts/verify-production.ts"
   },
   "dependencies": {

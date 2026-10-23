@@ -530,17 +530,15 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const token = encodeSecureShareToken({
       cong: congNumber || undefined,
-      cpin: congPin || undefined,
       pub: id || undefined,
-      pin: pin || undefined,
     });
     const directLink =
       congNumber && id && pin
         ? token
           ? `${origin}/?tk=${encodeURIComponent(token)}`
-          : `${origin}/?cong=${encodeURIComponent(congNumber)}&pub=${encodeURIComponent(id)}&pin=${encodeURIComponent(pin)}`
+          : `${origin}/?cong=${encodeURIComponent(congNumber)}&pub=${encodeURIComponent(id)}`
         : '';
-    const compositeCode = token || (congNumber && congPin && pin ? `${congNumber}::${congPin}::${pin}` : pin);
+    const compositeCode = token;
 
     return `🏛️ *CREDENCIALES TEOCRÁTICAS KONGRE*\n` +
       `Congregación: *${congName}*\n` +
@@ -548,8 +546,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       `👤 Hermano: *${name}*\n` +
       `📋 Responsabilidad: *${roleTitle}*\n` +
       (congNumber ? `🏛️ ID Congregación: *${congNumber}*\n` : '') +
-      (congPin ? `🔒 PIN Congregación: *${congPin}*\n` : '') +
-      `🔑 Tu PIN Personal Único: *${pin}*\n` +
+      `🔒 Tu PIN personal y el PIN de la congregación te los entrega un anciano por separado (en persona o por llamada). No se envían por mensaje.\n` +
       `📋 Código Portátil Cifrado: *${compositeCode}*\n` +
       (directLink ? `━━━━━━━━━━━━━━━━━━━━\n📲 *Enlace de Acceso Directo (un solo toque):*\n${directLink}\n` : '') +
       `━━━━━━━━━━━━━━━━━━━━\n` +
@@ -574,13 +571,11 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const token = encodeSecureShareToken({
       cong: congNumber || undefined,
-      cpin: congPin || undefined,
       pub: id || undefined,
-      pin: pin || undefined,
     });
     const directLink = token
       ? `${origin}/?tk=${encodeURIComponent(token)}`
-      : `${origin}/?cong=${encodeURIComponent(congNumber)}&pub=${encodeURIComponent(id)}&pin=${encodeURIComponent(pin)}`;
+      : `${origin}/?cong=${encodeURIComponent(congNumber)}&pub=${encodeURIComponent(id)}`;
     navigator.clipboard.writeText(directLink);
     setCopiedId(`link_${id}`);
     setTimeout(() => setCopiedId(null), 2500);
@@ -1568,10 +1563,9 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                             : '';
                         const invToken = encodeSecureShareToken({
                           cong: congNumber || undefined,
-                          cpin: congPin || undefined,
                           invite: inv.code,
                         });
-                        const portableCode = invToken || (congNumber && congPin ? `${congNumber}::${congPin}::${inv.code}` : inv.code);
+                        const portableCode = invToken || inv.code;
                         const directInviteUrl = invToken
                           ? `${window.location.origin}/?tk=${encodeURIComponent(invToken)}#portal?view=invite_code_login`
                           : `${window.location.origin}/?invite=${encodeURIComponent(inv.code)}#portal?view=invite_code_login`;

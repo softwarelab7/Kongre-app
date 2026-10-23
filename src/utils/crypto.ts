@@ -8,7 +8,16 @@
  * saltHex:ivHex:authTagHex:ciphertextHex
  */
 
-const ITERATIONS = 100000;
+// Iteraciones PBKDF2. v1 (heredado) = 100.000; v2 = 600.000 (recomendación OWASP para PBKDF2-SHA256).
+// El formato v2 antepone "v2:" al texto cifrado. Siempre se pueden LEER ambos formatos.
+//
+// DESPLIEGUE EN DOS FASES (importante): los clientes antiguos NO entienden "v2:".
+//   Fase 1: publicar esta versión con WRITE_KDF_V2 = false (todos los dispositivos aprenden a leer v2).
+//   Fase 2: cuando todos los dispositivos se hayan actualizado, cambiar a true y publicar.
+export const WRITE_KDF_V2 = false;
+const ITERATIONS_V1 = 100000;
+const ITERATIONS_V2 = 600000;
+const V2_PREFIX = 'v2:';
 const KEY_LEN = 256;
 const ALGO = 'AES-GCM';
 
@@ -48,7 +57,7 @@ export function normalizePin(pin: string): string {
 /**
  * Deriva una clave AES-GCM de 256 bits a partir de un PIN y un salt usando PBKDF2-SHA-256
  */
-async function deriveKey(pin: string, salt: Uint8Array): Promise<CryptoKey> {
+async function deriveKey(pin: string, salt: Uint8Array, iterations: number = ITERATIONS_V1): Promise<CryptoKey> {
   const encoder = new TextEncoder();
   const cleanPin = normalizePin(pin);
 
@@ -64,7 +73,7 @@ async function deriveKey(pin: string, salt: Uint8Array): Promise<CryptoKey> {
     {
       name: 'PBKDF2',
       salt: salt as unknown as BufferSource,
-      iterations: ITERATIONS,
+      iterations,
       hash: 'SHA-256',
     },
     baseKey,
@@ -85,7 +94,8 @@ export async function encryptForSupabase(data: any, pin: string): Promise<string
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
 
-  const key = await deriveKey(pin, salt);
+  const iterations = WRITE_KDF_V2 ? ITERATIONS_V2 : ITERATIONS_V1;
+  const key = await deriveKey(pin, salt, iterations);
   const encryptedBuf = await crypto.subtle.encrypt(
     { name: ALGO, iv: iv as unknown as BufferSource },
     key,
@@ -98,7 +108,8 @@ export async function encryptForSupabase(data: any, pin: string): Promise<string
   const ciphertext = encryptedBytes.slice(0, encryptedBytes.length - authTagLength);
   const authTag = encryptedBytes.slice(encryptedBytes.length - authTagLength);
 
-  return `${bytesToHex(salt)}:${bytesToHex(iv)}:${bytesToHex(authTag)}:${bytesToHex(ciphertext)}`;
+  const body = `${bytesToHex(salt)}:${bytesToHex(iv)}:${bytesToHex(authTag)}:${bytesToHex(ciphertext)}`;
+  return WRITE_KDF_V2 ? `${V2_PREFIX}${body}` : body;
 }
 
 /**
@@ -111,6 +122,13 @@ export async function decryptFromSupabase(encryptedString: string, pin: string):
 
   const decoder = new TextDecoder();
   const cleanPin = normalizePin(pin);
+
+  // Versión del KDF según prefijo (sin prefijo = v1 heredado)
+  let iterations = ITERATIONS_V1;
+  if (encryptedString.startsWith(V2_PREFIX)) {
+    iterations = ITERATIONS_V2;
+    encryptedString = encryptedString.slice(V2_PREFIX.length);
+  }
 
   // Formato Hex delimitado por ':' (saltHex:ivHex:authTagHex:ciphertextHex)
   if (encryptedString.includes(':')) {
@@ -126,7 +144,7 @@ export async function decryptFromSupabase(encryptedString: string, pin: string):
       combinedCiphertext.set(ciphertext, 0);
       combinedCiphertext.set(authTag, ciphertext.length);
 
-      const key = await deriveKey(cleanPin, salt);
+      const key = await deriveKey(cleanPin, salt, iterations);
       const decryptedBuf = await crypto.subtle.decrypt(
         { name: ALGO, iv: iv as unknown as BufferSource },
         key,
@@ -143,7 +161,7 @@ export async function decryptFromSupabase(encryptedString: string, pin: string):
     const iv = combined.slice(16, 28);
     const data = combined.slice(28);
 
-    const key = await deriveKey(cleanPin, salt);
+    const key = await deriveKey(cleanPin, salt, iterations);
     const decryptedBuf = await crypto.subtle.decrypt(
       { name: ALGO, iv: iv as unknown as BufferSource },
       key,
@@ -164,7 +182,8 @@ export async function encryptData(data: any, password: string): Promise<string> 
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
 
-  const key = await deriveKey(password, salt);
+  const iterations = WRITE_KDF_V2 ? ITERATIONS_V2 : ITERATIONS_V1;
+  const key = await deriveKey(password, salt, iterations);
   const encryptedBuf = await crypto.subtle.encrypt(
     { name: ALGO, iv: iv as unknown as BufferSource },
     key,
@@ -176,7 +195,8 @@ export async function encryptData(data: any, password: string): Promise<string> 
   combined.set(iv, salt.length);
   combined.set(new Uint8Array(encryptedBuf), salt.length + iv.length);
 
-  return bytesToBase64(combined);
+  const b64 = bytesToBase64(combined);
+  return WRITE_KDF_V2 ? `${V2_PREFIX}${b64}` : b64;
 }
 
 /**
@@ -184,13 +204,18 @@ export async function encryptData(data: any, password: string): Promise<string> 
  */
 export async function decryptData(encryptedBase64: string, password: string): Promise<any> {
   const decoder = new TextDecoder();
+  let iterations = ITERATIONS_V1;
+  if (encryptedBase64.startsWith(V2_PREFIX)) {
+    iterations = ITERATIONS_V2;
+    encryptedBase64 = encryptedBase64.slice(V2_PREFIX.length);
+  }
   const combined = base64ToBytes(encryptedBase64);
 
   const salt = combined.slice(0, 16);
   const iv = combined.slice(16, 28);
   const data = combined.slice(28);
 
-  const key = await deriveKey(password, salt);
+  const key = await deriveKey(password, salt, iterations);
   const decryptedBuf = await crypto.subtle.decrypt(
     { name: ALGO, iv: iv as unknown as BufferSource },
     key,

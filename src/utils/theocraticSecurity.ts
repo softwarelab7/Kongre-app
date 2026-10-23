@@ -430,19 +430,24 @@ export function generateSecureRolePin(existingPins: string[] = []): string {
 }
 
 /**
- * Genera un PIN Maestro numérico seguro de 8 dígitos para el Coordinador (alta entropía).
+ * Genera un PIN Maestro numérico seguro de 12 dígitos para el Coordinador (alta entropía).
  */
 export function generateSecureMasterPin(): string {
-  const array = new Uint32Array(2);
-  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-    window.crypto.getRandomValues(array);
-  } else {
-    array[0] = Math.floor(Math.random() * 0xffffffff);
-    array[1] = Math.floor(Math.random() * 0xffffffff);
-  }
-  const p1 = (1000 + (array[0] % 9000)).toString();
-  const p2 = (1000 + (array[1] % 9000)).toString();
-  return `${p1}${p2}`;
+  // 12 dígitos (~40 bits) con muestreo por rechazo (sin sesgo de módulo). El PIN maestro es lo único que
+  // protege el cifrado del payload maestro frente a un ataque sin conexión, así que la longitud importa.
+  const LIMIT = 0x100000000 - (0x100000000 % 10);
+  const nextDigit = (): string => {
+    const buf = new Uint32Array(1);
+    do {
+      crypto.getRandomValues(buf);
+    } while (buf[0] >= LIMIT);
+    return String(buf[0] % 10);
+  };
+  let pin = '';
+  do {
+    pin = Array.from({ length: 12 }, nextDigit).join('');
+  } while (/^(\d)\1+$/.test(pin));
+  return pin;
 }
 
 export interface PinStrengthResult {
@@ -1217,13 +1222,17 @@ const SHARE_TOKEN_CIPHER_KEY = 'kongre_share_link_qr_cipher_v1_2026';
  */
 export function encodeSecureShareToken(payload: SecureShareTokenPayload): string {
   try {
+    // SEGURIDAD: este token NO es confidencial. SHARE_TOKEN_CIPHER_KEY está en el bundle público, así que
+    // cualquiera puede decodificar (y falsificar) un enlace/QR. Por eso NUNCA se incluyen en él credenciales
+    // de larga duración: ni el PIN de congregación (`cpin`) ni el PIN personal (`pin`). Esos se entregan por
+    // un canal aparte. Solo viajan datos no secretos (ID de congregación, publicador) y el código de
+    // invitación, que es de un solo uso y caduca. Todo token caduca (7 días por defecto).
+    const MAX_TTL_MS = 7 * 24 * 60 * 60 * 1000;
     const compact: Record<string, any> = {};
     if (payload.cong) compact.c = formatCanonicalCongregationId(payload.cong);
-    if (payload.cpin) compact.k = payload.cpin.trim();
     if (payload.pub) compact.u = payload.pub.trim();
-    if (payload.pin) compact.p = payload.pin.trim();
     if (payload.invite) compact.i = payload.invite.trim();
-    if (payload.exp) compact.e = payload.exp;
+    compact.e = Math.min(payload.exp || Date.now() + MAX_TTL_MS, Date.now() + MAX_TTL_MS);
 
     const json = JSON.stringify(compact);
     const plainBytes = new TextEncoder().encode(json);

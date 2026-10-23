@@ -221,7 +221,8 @@ test('verificación segura de PIN personal con límite de intentos', async () =>
   assert.equal(badCong.status, 401);
 
   // 6. PIN personal incorrecto para ese publicador: 401 y dispara límite de intentos tras fallos repetidos
-  for (let i = 0; i < 7; i++) {
+  //    (tope por publicador: 6 fallos -> el 6.º ya devuelve 429)
+  for (let i = 0; i < 5; i++) {
     const fail = await call({
       action: 'verify_personal_pin',
       id: CONG,
@@ -239,5 +240,45 @@ test('verificación segura de PIN personal con límite de intentos', async () =>
     publisher_id: 'pub_anciano',
   }, '9.9.9.9');
   assert.equal(blocked.status, 429);
+});
+
+test('PIN personal: el tope por publicador se aplica aunque el atacante cambie de IP', async () => {
+  const { call, clock } = setup();
+  const CONG = 'CONGPP';
+  const good = 'a1'.repeat(32);
+  const guess = (n: number) => n.toString(16).padStart(64, '0');
+  await call({
+    action: 'push', id: CONG, tokens: { master: T.masterA, public: T.publicA }, payload: 'A', payload_public: 'P',
+    personal_pins: [{ id: 'pubX', token: good, name: 'X', role: 'anciano', privilege: 'anciano' }],
+  });
+  const verify = (tok: string, ip: string) =>
+    call({ action: 'verify_personal_pin', id: CONG, tokens: { public: T.publicA }, pin_token: tok, publisher_id: 'pubX' }, ip);
+
+  // 6 intentos fallidos desde 6 IPs distintas: el tope por (congregación, publicador) debe saltar igual
+  let last: any;
+  for (let i = 0; i < 6; i++) last = await verify(guess(i + 1), `10.0.0.${i + 1}`);
+  assert.equal(last.status, 429, 'el 6.º fallo bloquea al publicador');
+
+  // Bloqueado: ni siquiera el PIN correcto desde otra IP pasa mientras dure el bloqueo
+  const during = await verify(good, '10.9.9.9');
+  assert.equal(during.status, 429);
+
+  // Otro publicador de la misma congregación NO se ve afectado por este bloqueo
+  const other = await call({ action: 'verify_personal_pin', id: CONG, tokens: { public: T.publicA }, pin_token: good, publisher_id: 'otro' }, '10.8.8.8');
+  assert.notEqual(other.status, 429);
+
+  // Pasado el bloqueo (30 min) el PIN correcto vuelve a funcionar
+  clock.t += 31 * 60 * 1000;
+  const after = await verify(good, '10.7.7.7');
+  assert.equal(after.status, 200);
+  assert.equal(after.body.publisher.id, 'pubX');
+});
+
+test('PIN personal: publisher_id demasiado largo se rechaza (no se crean contadores arbitrarios)', async () => {
+  const { call } = setup();
+  await create(call, 'CONGLONG');
+  const r = await call({ action: 'verify_personal_pin', id: 'CONGLONG', tokens: { public: T.publicA }, pin_token: hex('f'), publisher_id: 'x'.repeat(101) });
+  assert.equal(r.status, 400);
+  assert.equal(r.body.error, 'bad_publisher_id');
 });
 

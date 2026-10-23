@@ -50,6 +50,7 @@ import AnimatedLogo from '../AnimatedLogo';
 import ThemeToggle from './ThemeToggle';
 import { AppFooter } from './AppFooter';
 import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
+import { supabaseSyncService } from '../services/supabaseSyncService';
 
 const NEXT_THEME: Record<string, 'light' | 'dark'> = { light: 'dark', dark: 'light' };
 const THEME_NAMES: Record<string, string> = { light: 'Claro', dark: 'Oscuro' };
@@ -539,7 +540,23 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             setSecureLocalPin('kongre_last_cong_pin', targetCongPin);
 
             const pubs = (cloudRes.data.publishers || []) as any[];
-            const matched = pubs.find((p: any) => verifyPersonalPinMatch(codeToRedeem, p));
+            let matched = pubs.find((p: any) => verifyPersonalPinMatch(codeToRedeem, p));
+            const candPub = pubs.find((p: any) => p.email && user?.email && p.email.toLowerCase() === user.email.toLowerCase()) ||
+                            pubs.find((p: any) => p.name && user?.displayName && p.name.toLowerCase() === user.displayName.toLowerCase());
+            if (!matched && codeToRedeem.length >= 4 && targetCongPin && candPub?.id) {
+              try {
+                const verifyRes = await supabaseSyncService.verifyPersonalPin(targetCongregationId, targetCongPin, codeToRedeem, candPub.id);
+                if (verifyRes.success && verifyRes.publisher) {
+                  matched = {
+                    id: verifyRes.publisher.id,
+                    name: verifyRes.publisher.name,
+                    theocraticRole: verifyRes.publisher.role,
+                    privilege: verifyRes.publisher.privilege,
+                    theocraticRoles: verifyRes.publisher.theocraticRoles,
+                  };
+                }
+              } catch {}
+            }
             if (matched) {
               const resolved = resolvePublisherRolesList(matched);
               finalRole = resolved.primaryRole;
@@ -669,7 +686,23 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           if (cloudRes?.success && cloudRes.data) {
             await hydrateCongregation(cloudRes.data);
             if (cloudRes.data.publishers) {
-              const matched = cloudRes.data.publishers.find((p: any) => verifyPersonalPinMatch(codeToRedeem, p));
+              let matched = cloudRes.data.publishers.find((p: any) => verifyPersonalPinMatch(codeToRedeem, p));
+              const candPub = cloudRes.data.publishers.find((p: any) => p.email && user?.email && p.email.toLowerCase() === user.email.toLowerCase()) ||
+                              cloudRes.data.publishers.find((p: any) => p.name && user?.displayName && p.name.toLowerCase() === user.displayName.toLowerCase());
+              if (!matched && codeToRedeem.length >= 4 && (targetCongPin || codeToRedeem) && candPub?.id) {
+                try {
+                  const verifyRes = await supabaseSyncService.verifyPersonalPin(activeCongId, targetCongPin || codeToRedeem, codeToRedeem, candPub.id);
+                  if (verifyRes.success && verifyRes.publisher) {
+                    matched = {
+                      id: verifyRes.publisher.id,
+                      name: verifyRes.publisher.name,
+                      theocraticRole: verifyRes.publisher.role,
+                      privilege: verifyRes.publisher.privilege,
+                      theocraticRoles: verifyRes.publisher.theocraticRoles,
+                    };
+                  }
+                } catch {}
+              }
               if (matched) {
                 const resolved = resolvePublisherRolesList(matched);
                 finalRole = resolved.primaryRole;
@@ -852,9 +885,34 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           const congPubs = (cloudData?.publishers || publishers) as any[];
           matchingPub = congPubs.find((p) => verifyPersonalPinMatch(cleanPersonalPin, p));
 
+          const candPub = congPubs.find((p) => p.email && emailToUse && p.email.toLowerCase() === emailToUse.toLowerCase()) ||
+                          congPubs.find((p) => p.name && user?.displayName && p.name.toLowerCase() === user.displayName.toLowerCase());
+
+          if (!matchingPub && cleanPersonalPin.length >= 4 && cleanCongPin && candPub?.id) {
+            try {
+              const verifyRes = await supabaseSyncService.verifyPersonalPin(cleanId, cleanCongPin, cleanPersonalPin, candPub.id);
+              if (verifyRes.success && verifyRes.publisher) {
+                matchingPub = {
+                  id: verifyRes.publisher.id,
+                  name: verifyRes.publisher.name,
+                  theocraticRole: verifyRes.publisher.role,
+                  privilege: verifyRes.publisher.privilege,
+                  theocraticRoles: verifyRes.publisher.theocraticRoles,
+                };
+              }
+            } catch {}
+          }
+
           if (matchingPub) {
             const resolved = resolvePublisherRolesList(matchingPub);
-            identifiedRole = resolved.primaryRole;
+            let roleToAssign = resolved.primaryRole;
+            if (roleToAssign === 'coordinador') {
+              const isVerified = verifySecureLocalPin('kongre_coordinator_pin', cleanPersonalPin);
+              if (!isVerified) {
+                roleToAssign = matchingPub.privilege === 'anciano' ? 'anciano' : 'publico';
+              }
+            }
+            identifiedRole = roleToAssign;
             nameToUse = matchingPub.name && !isGenericIdentityName(matchingPub.name) ? matchingPub.name.trim() : 'Hermano';
             if (matchingPub.email) emailToUse = matchingPub.email;
             setIdentifiedPublisher(matchingPub.id, nameToUse);

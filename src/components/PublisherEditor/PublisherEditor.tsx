@@ -36,7 +36,9 @@ import { useModal } from '../../context/ModalContext';
 import { usePublisherForm } from './hooks/usePublisherForm';
 import { usePublisherActions } from './hooks/usePublisherActions';
 import { PremiumDatePicker } from '../PremiumDatePicker';
-import { usePermissions } from '../../context/AuthContext';
+import { usePermissions, useAuth } from '../../context/AuthContext';
+import { useCongregation } from '../../context/CongregationContext';
+import { canViewS21Of } from '../../utils/rbac';
 
 // Sections
 import { BasicInfoSection } from './sections/BasicInfoSection';
@@ -157,7 +159,17 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
   initialTab = 'all',
   user
 }) => {
-  const { canEditPublishers, canViewS21 } = usePermissions();
+  const { canEditPublishers, canViewS21: canViewS21Base } = usePermissions();
+  const { activeRole: s21ActiveRole, activeRoles: s21ActiveRoles, currentPublisherId: s21ActorId } = useAuth();
+  const { preachingGroups: s21Groups } = useCongregation();
+  // La tarjeta S-21 respeta el alcance del rol: los superintendentes de grupo solo ven la de su grupo.
+  const canViewS21 =
+    canViewS21Base &&
+    canViewS21Of(
+      s21ActiveRoles && s21ActiveRoles.length > 0 ? s21ActiveRoles : [s21ActiveRole],
+      publisher?.id,
+      { actorPublisherId: s21ActorId, groups: s21Groups || [] }
+    );
   const { showToast } = useToast();
   const { confirm, prompt } = useModal();
   const {

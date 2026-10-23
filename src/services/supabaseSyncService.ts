@@ -5,7 +5,16 @@
  * Soporta sincronización bidireccional continua, cola offline y resolución de conflictos.
  */
 
-import { supabase } from '../lib/supabase';
+import {
+  syncPull,
+  syncMeta,
+  syncPush,
+  syncDelete,
+  syncVerifyPersonalPin,
+  describeSyncError,
+  type PersonalPinEntry,
+  type VerifiedPublisher,
+} from './syncApi';
 import { encryptForSupabase, decryptFromSupabase, normalizePin } from '../utils/crypto';
 import {
   hashPersonalPin,
@@ -166,7 +175,7 @@ const LOCAL_STORAGE_OFFLINE_QUEUE_KEY = 'kongre_offline_supabase_queue_v1';
 /**
  * Función auxiliar para fusionar listas de publicadores resolviendo conflictos
  */
-function mergePublishers(local: Publisher[], remote: Publisher[]): Publisher[] {
+export function mergePublishers(local: Publisher[], remote: Publisher[]): Publisher[] {
   const map = new Map<string, Publisher>();
   // 1. Agregar registros remotos
   for (const p of remote) {
@@ -340,6 +349,12 @@ export const supabaseSyncService = {
     data: CongregationFullData;
     pinMaestro: string;
     pinCongregacion?: string;
+    /**
+     * Rotación de PIN: si el PIN maestro o el de congregación cambiaron, indica aquí los PINs ANTERIORES.
+     * Se usarán para autenticar la operación y los nuevos (pinMaestro / pinCongregacion) pasarán a ser
+     * las credenciales vigentes en el servidor.
+     */
+    rotateFrom?: { pinMaestro?: string; pinCongregacion?: string };
   }): Promise<{ success: boolean; error?: string }> {
     const cleanId = normalizeCongregationId(params.congregationId);
     const cleanMasterPin = normalizePin(params.pinMaestro);
@@ -387,7 +402,7 @@ export const supabaseSyncService = {
         settings: params.data.settings,
         publishers: (params.data.publishers || []).map((p) => ({
           ...p,
-          personalPinHash: p.personalPin ? hashPersonalPin(p.personalPin) : p.personalPinHash,
+          personalPinHash: p.personalPin ? hashPersonalPin(p.personalPin, p.id) : p.personalPinHash,
         })),
         weeks: params.data.weeks,
         territories: params.data.territories,
@@ -448,7 +463,9 @@ export const supabaseSyncService = {
         },
         invitations: sanitizeInvitationsForPublicPayload(normalizedAdminInvitations),
         publishers: (params.data.publishers || []).map((p) => {
-          const pinHash = p.personalPin ? hashPersonalPin(p.personalPin) : p.personalPinHash;
+          // Seguridad: NUNCA incluir personalPinHash en payload_public.
+          // Los PINs personales se verifican en la Edge Function con límite de intentos,
+          // impidiendo ataques de fuerza bruta offline sobre PINs de 4 dígitos.
           return {
             id: p.id,
             name: p.name,
@@ -458,7 +475,6 @@ export const supabaseSyncService = {
             privilege: p.privilege,
             theocraticRole: p.theocraticRole,
             theocraticRoles: (p as any).theocraticRoles,
-            ...(pinHash ? { personalPinHash: pinHash } : {}),
             email: p.email,
             roles: p.roles,
           };
@@ -483,88 +499,68 @@ export const supabaseSyncService = {
         monthlyReports: params.data.monthlyReports || [],
       };
 
-      // 3. Verificación criptográfica de propiedad antes de sobrescribir un registro existente en Supabase
-      let preservedMasterPayload: string | null = null;
-      try {
-        const { data: existingRow } = await supabase
-          .from('sync_queue')
-          .select('payload, payload_public')
-          .eq('id_congregacion', cleanId)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (existingRow && (existingRow.payload || existingRow.payload_public)) {
-          let canDecryptMaster = false;
-          let canDecryptPublic = false;
-
-          if (existingRow.payload) {
-            try {
-              const decM = await decryptFromSupabase(existingRow.payload, cleanMasterPin);
-              if (decM) canDecryptMaster = true;
-            } catch {}
-            if (!canDecryptMaster && cleanPublicPin && cleanPublicPin !== cleanMasterPin) {
-              try {
-                const decM2 = await decryptFromSupabase(existingRow.payload, cleanPublicPin);
-                if (decM2) canDecryptMaster = true;
-              } catch {}
-            }
-          }
-
-          if (existingRow.payload_public) {
-            try {
-              const decP = await decryptFromSupabase(existingRow.payload_public, cleanPublicPin);
-              if (decP) canDecryptPublic = true;
-            } catch {}
-            if (!canDecryptPublic && cleanMasterPin) {
-              try {
-                const decP2 = await decryptFromSupabase(existingRow.payload_public, cleanMasterPin);
-                if (decP2) canDecryptPublic = true;
-              } catch {}
-            }
-          }
-
-          if (!canDecryptMaster && !canDecryptPublic) {
-            return {
-              success: false,
-              error: 'Acceso denegado: Las credenciales criptográficas no coinciden con el registro existente de esta congregación en la nube.',
-            };
-          }
-
-          // Si el usuario tiene acceso público válido pero no posee la clave maestra del Coordinador, preservar el payload maestro intacto
-          if (!canDecryptMaster && existingRow.payload) {
-            preservedMasterPayload = existingRow.payload;
-          }
+      // 3. Extraer PINs personales para verificación segura en la Edge Function
+      const personalPinsList: PersonalPinEntry[] = [];
+      for (const p of params.data.publishers || []) {
+        const pin = p.personalPin ? String(p.personalPin).trim() : '';
+        if (pin.length >= 4) {
+          personalPinsList.push({
+            id: p.id,
+            pin,
+            name: p.name || '',
+            role: p.theocraticRole || (p.privilege === 'anciano' ? 'anciano' : 'publico'),
+            privilege: p.privilege,
+            theocraticRoles: Array.isArray((p as any).theocraticRoles) ? (p as any).theocraticRoles : undefined,
+          });
         }
-      } catch {
-        // Si la verificación previa de red falla, continuar con el intento de upsert
       }
 
-      // 4. Cifrar ambos payloads antes de enviarlos a la nube (Cero Conocimiento)
-      const encryptedAdmin = preservedMasterPayload || (await encryptForSupabase(adminPayload, cleanMasterPin));
+      // 4. Cifrar ambos payloads en el dispositivo (Cero Conocimiento).
+      const encryptedAdmin = await encryptForSupabase(adminPayload, cleanMasterPin);
       const encryptedPublic = await encryptForSupabase(publicPayload, cleanPublicPin);
 
-      // 5. Upsert en sync_queue en Supabase
-      const { error } = await supabase.from('sync_queue').upsert(
-        {
-          id_congregacion: cleanId,
-          payload: encryptedAdmin,
-          payload_public: encryptedPublic,
-          type: 'full_sync',
-          created_at: nowISO,
-          consumed_at: null,
-        },
-        { onConflict: 'id_congregacion' }
-      );
+      // 5. Enviar a la Edge Function `kongre-sync`. El servidor valida el acceso (token derivado del PIN),
+      //    decide qué puede escribir cada nivel (el PIN de congregación nunca puede tocar el payload maestro)
+      //    y aplica el límite de intentos. Ya no hay verificación de propiedad en el cliente.
+      //    Si este dispositivo tiene una lista de publicadores vacía/incompleta no se sobrescribe el payload
+      //    maestro existente (evita el borrado catastrófico de datos de ancianos).
+      const preserveMaster = Boolean(params.data.publishers && params.data.publishers.length <= 1);
+      const rotating = Boolean(params.rotateFrom && (params.rotateFrom.pinMaestro || params.rotateFrom.pinCongregacion));
+      const pushRes = await syncPush({
+        id: cleanId,
+        masterPin: params.rotateFrom?.pinMaestro ? normalizePin(params.rotateFrom.pinMaestro) : cleanMasterPin,
+        publicPin: params.rotateFrom?.pinCongregacion ? normalizePin(params.rotateFrom.pinCongregacion) : cleanPublicPin,
+        payload: encryptedAdmin,
+        payloadPublic: encryptedPublic,
+        preserveMaster,
+        personalPins: personalPinsList.length > 0 ? personalPinsList : undefined,
+        rotateTo: rotating
+          ? {
+              masterPin: params.rotateFrom?.pinMaestro ? cleanMasterPin : undefined,
+              publicPin: params.rotateFrom?.pinCongregacion ? cleanPublicPin : undefined,
+            }
+          : undefined,
+      });
 
-      if (error) {
-        console.warn('Supabase sync upsert error:', error);
+      if (!pushRes.ok) {
+        const message = describeSyncError(pushRes);
+        // Errores de acceso o de límite de intentos no se reintentan desde la cola offline.
+        if (pushRes.status === 401 || pushRes.status === 403 || pushRes.status === 429) {
+          return {
+            success: false,
+            error: pushRes.status === 401
+              ? 'Acceso denegado: Las credenciales no coinciden con el registro de esta congregación en la nube.'
+              : message,
+          };
+        }
+        console.warn('Sync push error:', pushRes.status, pushRes.error);
         this.enqueueOfflineChange(cleanId, params.data);
-        return { success: false, error: error.message };
+        return { success: false, error: message };
       }
 
       if (typeof window !== 'undefined') {
-        localStorage.setItem(LOCAL_STORAGE_LAST_SYNC_KEY, nowISO);
+        // La marca de tiempo la fija el servidor: evita desfases de reloj entre dispositivos.
+        localStorage.setItem(LOCAL_STORAGE_LAST_SYNC_KEY, pushRes.created_at);
         localStorage.removeItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY);
       }
 
@@ -579,42 +575,35 @@ export const supabaseSyncService = {
   /**
    * Consulta si hay actualizaciones remotas en Supabase para este ID
    */
-  async checkRemoteUpdates(rawId: string): Promise<{
+  async checkRemoteUpdates(rawId: string, rawPin?: string): Promise<{
     hasUpdate: boolean;
     remoteCreatedAt?: string;
     error?: string;
   }> {
     const cleanId = normalizeCongregationId(rawId);
     if (!cleanId || isDemoModeActive(cleanId)) return { hasUpdate: false };
+    if (!rawPin) return { hasUpdate: false, error: 'PIN requerido para consultar actualizaciones' };
 
     try {
-      const { data, error } = await supabase
-        .from('sync_queue')
-        .select('id, created_at, type')
-        .eq('id_congregacion', cleanId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (error) {
-        return { hasUpdate: false, error: error.message };
+      const res = await syncMeta(cleanId, normalizePin(rawPin));
+      if (!res.ok) {
+        return { hasUpdate: false, error: describeSyncError(res) };
       }
-
-      if (!data || !data.created_at) {
+      if (!res.created_at) {
         return { hasUpdate: false };
       }
 
       const lastLocalSync = this.getLastSyncTimestamp();
       if (!lastLocalSync) {
-        return { hasUpdate: true, remoteCreatedAt: data.created_at };
+        return { hasUpdate: true, remoteCreatedAt: res.created_at };
       }
 
-      const remoteTime = new Date(data.created_at).getTime();
+      const remoteTime = new Date(res.created_at).getTime();
       const localTime = new Date(lastLocalSync).getTime();
 
       return {
         hasUpdate: remoteTime > localTime + 1000,
-        remoteCreatedAt: data.created_at,
+        remoteCreatedAt: res.created_at,
       };
     } catch (err: any) {
       return { hasUpdate: false, error: err?.message };
@@ -640,27 +629,17 @@ export const supabaseSyncService = {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('sync_queue')
-        .select('*')
-        .eq('id_congregacion', cleanId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (error) {
-        const isFetchError = error.message?.includes('Failed to fetch') || error.message?.includes('NetworkError');
-        return {
-          success: false,
-          error: isFetchError
-            ? 'No se pudo conectar con el servidor en la nube (Failed to fetch). Comprueba tu conexión a internet o desactiva bloqueadores de anuncios (como Brave Shields o uBlock Origin) en este sitio.'
-            : `Error conectando con Supabase: ${error.message}`,
-        };
+      // El servidor valida el PIN (token derivado) y limita los intentos. Con el PIN de congregación
+      // solo devuelve payload_public; el payload maestro únicamente se entrega al PIN maestro.
+      const res = await syncPull(cleanId, cleanPin);
+      if (!res.ok) {
+        return { success: false, error: describeSyncError(res) };
       }
-
-      if (!data) {
-        return { success: false, error: 'No se encontraron datos registrados para este ID de Congregación.' };
-      }
+      const data = {
+        payload: res.payload,
+        payload_public: res.payload_public,
+        created_at: res.created_at,
+      };
 
       // Intento 1: ¿Es el PIN Maestro? Intentar descifrar payload admin
       if (data.payload) {
@@ -752,7 +731,7 @@ export const supabaseSyncService = {
 
     try {
       // 1. Verificar si hay cambios en la nube
-      const check = await this.checkRemoteUpdates(cleanId);
+      const check = await this.checkRemoteUpdates(cleanId, params.pinMaestro || params.pinCongregacion);
 
       if (check.hasUpdate && !params.forceUpload) {
         // 2. Descargar y descifrar la versión remota
@@ -1007,40 +986,69 @@ export const supabaseSyncService = {
   },
 
   /**
-   * Suscribe en tiempo real a cambios en la congregación
+   * Elimina la congregación de la nube. Solo el PIN maestro puede hacerlo (lo valida el servidor).
+   */
+  async deleteCongregation(rawId: string, masterPin: string): Promise<{ success: boolean; error?: string }> {
+    const cleanId = normalizeCongregationId(rawId);
+    if (!cleanId || !masterPin) return { success: false, error: 'ID y PIN maestro requeridos' };
+    if (isDemoModeActive(cleanId)) return { success: true };
+    try {
+      const res = await syncDelete(cleanId, normalizePin(masterPin));
+      return res.ok ? { success: true } : { success: false, error: describeSyncError(res) };
+    } catch (err: any) {
+      return { success: false, error: err?.message };
+    }
+  },
+
+  /**
+   * Avisa cuando hay cambios remotos mediante sondeo de la Edge Function (reemplaza al canal Realtime:
+   * la tabla ya no es accesible por el navegador). Devuelve la función para cancelar el sondeo.
    */
   subscribeToCongregation(
     rawId: string,
-    onRemoteUpdate: (payloadRow: any) => void
+    rawPin: string,
+    onRemoteUpdate: (info: { created_at: string }) => void,
+    intervalMs: number = 30000
   ) {
     const cleanId = normalizeCongregationId(rawId);
-    if (!cleanId) return null;
+    if (!cleanId || !rawPin) return null;
 
+    const timer = setInterval(async () => {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+      const check = await this.checkRemoteUpdates(cleanId, rawPin);
+      if (check.hasUpdate && check.remoteCreatedAt) {
+        onRemoteUpdate({ created_at: check.remoteCreatedAt });
+      }
+    }, Math.max(10000, intervalMs));
+
+    return () => clearInterval(timer);
+  },
+
+  /**
+   * Verifica un PIN personal en la Edge Function con límite de intentos y cero conocimiento.
+   */
+  async verifyPersonalPin(
+    rawCongId: string,
+    rawPublicPin: string,
+    rawPersonalPin: string,
+    publisherId: string
+  ): Promise<{ success: boolean; publisher?: VerifiedPublisher; error?: string }> {
+    const cleanId = normalizeCongregationId(rawCongId);
+    const cleanPubId = (publisherId || '').trim();
+    if (!cleanId || !rawPublicPin || !rawPersonalPin || !cleanPubId) {
+      return { success: false, error: 'Datos incompletos para verificación (ID, PIN y publicador requeridos)' };
+    }
+    if (isDemoModeActive(cleanId)) {
+      return { success: false, error: 'No disponible en modo demo' };
+    }
     try {
-      const channel = supabase
-        .channel(`sync_queue_${cleanId}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'sync_queue',
-            filter: `id_congregacion=eq.${cleanId}`,
-          },
-          (payload) => {
-            if (payload.new) {
-              onRemoteUpdate(payload.new);
-            }
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    } catch (e) {
-      console.warn('Realtime channel no disponible, operando con sondeo REST:', e);
-      return null;
+      const res = await syncVerifyPersonalPin(cleanId, rawPublicPin, rawPersonalPin, cleanPubId);
+      if (!res.ok) {
+        return { success: false, error: describeSyncError(res) };
+      }
+      return { success: true, publisher: res.publisher };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Error al conectar con el servidor de sincronización' };
     }
   },
 };

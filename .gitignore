@@ -40,3 +40,5 @@ bun.log
 # Temporary server and scratch files
 server.js
 *.backup
+supabase/.temp/
+.temp/

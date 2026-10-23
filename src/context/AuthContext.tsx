@@ -684,12 +684,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (foundPublisher) {
       resetFailedPinAttempts();
-      const rolesList = resolveAllRoles(foundPublisher.role, foundPublisher.privilege, foundPublisher.roles);
+      // Protección contra escalada de privilegios:
+      // El rol de Coordinador solo puede activarse si el PIN ingresado coincide con el PIN maestro del Coordinador
+      let primaryRole = foundPublisher.role;
+      if (primaryRole === 'coordinador') {
+        const isVerifiedCoord = verifySecureLocalPin('kongre_coordinator_pin', cleanPin);
+        if (!isVerifiedCoord) {
+          primaryRole = foundPublisher.privilege === 'anciano' ? 'anciano' : 'publico';
+        }
+      }
+      const rolesList = resolveAllRoles(primaryRole, foundPublisher.privilege, foundPublisher.roles);
       setActiveRoles(rolesList);
       const brotherName =
         foundPublisher.name && !isGenericIdentityName(foundPublisher.name)
           ? foundPublisher.name.trim()
-          : resolveNonGenericName(foundPublisher.name, foundPublisher.role) || 'Hermano';
+          : resolveNonGenericName(foundPublisher.name, primaryRole) || 'Hermano';
       if (!isGenericIdentityName(brotherName)) {
         setCurrentBrotherName(brotherName);
         localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
@@ -705,16 +714,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         hermano_nid: foundPublisher.publisherId || 'personal',
         hermano_nombre: brotherName,
         modulo: 'auth',
-        detalles: `Inicio de sesión con PIN único (${THEOCRATIC_ROLES[foundPublisher.role]?.name || foundPublisher.role})`,
+        detalles: `Inicio de sesión con PIN único (${THEOCRATIC_ROLES[primaryRole]?.name || primaryRole})`,
       });
 
       return {
         success: true,
-        role: foundPublisher.role,
+        role: primaryRole,
         roles: rolesList,
         name: brotherName,
         publisherId: foundPublisher.publisherId,
-        message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[foundPublisher.role]?.name}.`,
+        message: `¡Identificación exitosa! Bienvenido, ${brotherName}. Rol activo: ${THEOCRATIC_ROLES[primaryRole]?.name}.`,
       };
     }
 
@@ -760,7 +769,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const matchPub = parsedPubs.find((p: any) => verifyPersonalPinMatch(cleanPin, p));
           if (matchPub) {
             resetFailedPinAttempts();
-            const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : 'publico')) as TheocraticRole;
+            let role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : 'publico')) as TheocraticRole;
+            if (role === 'coordinador') {
+              const isVerified = verifySecureLocalPin('kongre_coordinator_pin', cleanPin);
+              if (!isVerified) {
+                role = matchPub.privilege === 'anciano' ? 'anciano' : 'publico';
+              }
+            }
             const rolesList = resolveAllRoles(role, matchPub.privilege, matchPub.theocraticRoles);
             const brotherName =
               matchPub.name && !isGenericIdentityName(matchPub.name)
@@ -815,10 +830,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (cloudRes.success && cloudRes.data) {
             const cloudPubs = cloudRes.data.publishers;
             if (Array.isArray(cloudPubs)) {
-              const matchPub = cloudPubs.find((p: any) => verifyPersonalPinMatch(cleanPin, p));
+              let matchPub = cloudPubs.find((p: any) => verifyPersonalPinMatch(cleanPin, p));
+              const candidatePub = cloudPubs.find((p: any) => p.email && user?.email && p.email.toLowerCase() === user.email.toLowerCase()) ||
+                                   cloudPubs.find((p: any) => p.name && currentBrotherName && p.name.toLowerCase() === currentBrotherName.toLowerCase());
+              const targetPubId = candidatePub?.id || currentPublisherId || '';
+              if (!matchPub && cleanPin.length >= 4 && congPinSaved && targetPubId) {
+                try {
+                  const vRes = await supabaseSyncService.verifyPersonalPin(congId, congPinSaved, cleanPin, targetPubId);
+                  if (vRes.success && vRes.publisher) {
+                    matchPub = {
+                      id: vRes.publisher.id,
+                      name: vRes.publisher.name,
+                      theocraticRole: vRes.publisher.role,
+                      privilege: vRes.publisher.privilege,
+                      theocraticRoles: vRes.publisher.theocraticRoles,
+                    };
+                  }
+                } catch {}
+              }
               if (matchPub) {
                 resetFailedPinAttempts();
-                const role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : 'publico')) as TheocraticRole;
+                let role: TheocraticRole = (matchPub.theocraticRole || (matchPub.privilege === 'anciano' ? 'anciano' : 'publico')) as TheocraticRole;
+                if (role === 'coordinador') {
+                  const isVerified = verifySecureLocalPin('kongre_coordinator_pin', cleanPin);
+                  if (!isVerified) {
+                    role = matchPub.privilege === 'anciano' ? 'anciano' : 'publico';
+                  }
+                }
                 const rolesList = resolveAllRoles(role, matchPub.privilege, matchPub.theocraticRoles);
                 const brotherName =
                   matchPub.name && !isGenericIdentityName(matchPub.name)
@@ -1028,7 +1066,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ).toLowerCase().trim();
 
         if (found) {
-          setActiveRole(found.role);
+          // Protección contra escalada: el rol de Coordinador solo se concede por correo si coincide con el
+          // correo del coordinador registrado en este dispositivo (igual que el login por PIN exige su PIN).
+          // Cualquier otro caso entra como 'publico' y el hermano debe identificarse con su PIN.
+          let grantedRole = found.role;
+          if (grantedRole === 'coordinador' && !(registeredCoordEmail && email === registeredCoordEmail)) {
+            grantedRole = 'publico';
+          }
+          setActiveRole(grantedRole);
           if (found.name) setCurrentBrotherName(found.name);
         } else if (registeredCoordEmail && email === registeredCoordEmail) {
           setActiveRole('coordinador');

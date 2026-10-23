@@ -425,11 +425,24 @@ export function generateSecurePublisherPin(existingPins: string[] = []): string 
   return pin;
 }
 
-/**
- * Genera un PIN numérico seguro de 4 dígitos no trivial para identificación de rol teocrático (alias)
- */
 export function generateSecureRolePin(existingPins: string[] = []): string {
   return generateSecurePublisherPin(existingPins);
+}
+
+/**
+ * Genera un PIN Maestro numérico seguro de 8 dígitos para el Coordinador (alta entropía).
+ */
+export function generateSecureMasterPin(): string {
+  const array = new Uint32Array(2);
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+    window.crypto.getRandomValues(array);
+  } else {
+    array[0] = Math.floor(Math.random() * 0xffffffff);
+    array[1] = Math.floor(Math.random() * 0xffffffff);
+  }
+  const p1 = (1000 + (array[0] % 9000)).toString();
+  const p2 = (1000 + (array[1] % 9000)).toString();
+  return `${p1}${p2}`;
 }
 
 export interface PinStrengthResult {
@@ -823,19 +836,21 @@ export function normalizePersonalPinInput(pin?: string | null): string {
 
 /**
  * Genera el hash criptográfico irreversible SHA-256 con sal de un PIN personal.
- * Este es el valor que se incluye en `publicPayload` de Supabase y en `localStorage`
- * para que nunca se expongan los PINs en texto plano.
+ * Soporta sal contextual (ej: id_congregacion:publisherId) para evitar ataques de tablas precomputadas.
  */
-export function hashPersonalPin(pin?: string | null): string {
+export function hashPersonalPin(pin?: string | null, saltContext?: string): string {
   const clean = normalizePersonalPinInput(pin);
   if (!clean || clean.length < 4) return '';
   // Si ya es un hash SHA-256 de 64 caracteres hexadecimales, devolverlo tal cual
   if (/^[a-f0-9]{64}$/i.test(clean)) return clean.toLowerCase();
-  return sha256HexSync(`${clean}:${PERSONAL_PIN_SALT}`);
+  const salt = saltContext ? `${PERSONAL_PIN_SALT}:${saltContext}` : PERSONAL_PIN_SALT;
+  return sha256HexSync(`${clean}:${salt}`);
 }
 
 /**
- * Cifra simétricamente un PIN para almacenamiento local en reposo (evitando texto plano en DevTools -> localStorage)
+ * Ofusca simétricamente un PIN para almacenamiento local en reposo (evita que inspeccionar
+ * `localStorage` en DevTools muestre texto plano de forma inmediata).
+ * Nota: es una medida de defensa en profundidad local / ofuscación, no una barrera criptográfica absoluta.
  */
 export function encryptPinAtRest(pin?: string | null): string {
   if (!pin) return '';
@@ -883,6 +898,8 @@ export function decryptPinAtRest(encoded?: string | null): string {
 export function verifyPersonalPinMatch(
   candidatePin: string | null | undefined,
   record: {
+    id?: string;
+    publisherId?: string;
     personalPin?: string;
     pin?: string;
     personalPinHash?: string;
@@ -901,6 +918,10 @@ export function verifyPersonalPinMatch(
   const storedHash = (record.personalPinHash || record.pinHash || '').trim().toLowerCase();
   if (storedHash && storedHash.length === 64) {
     if (storedHash === candidateHash || storedHash === legacyHash) {
+      return true;
+    }
+    const pubId = record.id || record.publisherId;
+    if (pubId && storedHash === hashPersonalPin(cleanCandidate, pubId)) {
       return true;
     }
   }
@@ -1116,9 +1137,10 @@ export function signRoleSession(role: string, roles?: string[]): void {
 }
 
 /**
- * Verifica la firma criptográfica de la sesión de rol activa en localStorage.
- * Si alguien modifica `kongre_active_role_v1` manualmente en el navegador sin poseer el PIN correspondiente,
- * la firma será inválida y se rechazará la escalada de privilegios.
+ * Verifica la firma de la sesión de rol activa en localStorage.
+ * Nota de seguridad: Esta verificación es una protección de estado en UI para evitar
+ * modificaciones accidentales o no autorizadas en localStorage, pero no constituye una
+ * barrera criptográfica frente a alguien con acceso a DevTools en el navegador.
  */
 export function verifyRoleSessionSignature(role: string, roles?: string[]): boolean {
   if (typeof window === 'undefined') return true;
@@ -1143,14 +1165,10 @@ export function verifyRoleSessionSignature(role: string, roles?: string[]): bool
       return true;
     }
 
-    // Migración transparente para sesiones legítimas preexistentes que aún no tenían firma
+    // Solo se re-firma si el PIN de sesión coincide estrictamente con el PIN verificado del Coordinador
     const sessionPin = getSecureLocalPin('kongre_session_pin_v2');
     const coordPin = getSecureLocalPin('kongre_coordinator_pin');
     if (coordPin && sessionPin && normalizePersonalPinInput(coordPin) === normalizePersonalPinInput(sessionPin)) {
-      signRoleSession(normRole, normRolesList);
-      return true;
-    }
-    if (sessionPin && sessionPin.length >= 4) {
       signRoleSession(normRole, normRolesList);
       return true;
     }

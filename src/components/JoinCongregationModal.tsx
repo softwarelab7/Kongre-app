@@ -4,7 +4,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
-import { verifyPasscode, isCongregationIdString, isGenericIdentityName, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput, verifyPersonalPinMatch, setSecureLocalPin, getPinLockoutRemainingSeconds, recordFailedPinAttempt, resetFailedPinAttempts, decodeSecureShareToken } from '../utils/theocraticSecurity';
+import { verifyPasscode, isCongregationIdString, isGenericIdentityName, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput, verifyPersonalPinMatch, verifySecureLocalPin, setSecureLocalPin, getPinLockoutRemainingSeconds, recordFailedPinAttempt, resetFailedPinAttempts, decodeSecureShareToken } from '../utils/theocraticSecurity';
 import { areNamesEquivalent } from '../utils/publisherDeduplication';
 import { supabaseSyncService } from '../services/supabaseSyncService';
 import {
@@ -224,17 +224,46 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         if (parts.length >= 3) codeToRedeem = parts.slice(2).join('::');
       }
 
-      // A) Buscar estrictamente en la lista de publicadores de la congregación por PIN personal o su hash SHA-256
+      // A) Buscar en la lista local o verificar de forma segura contra la Edge Function (sin hashes públicos)
       const congPubs = (cloudData?.publishers || publishers) as any[];
-      const matchingPub = congPubs.find((p) => verifyPersonalPinMatch(codeToRedeem, p));
+      let matchingPub = congPubs.find((p) => verifyPersonalPinMatch(codeToRedeem, p));
+
+      const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+      const decodedTk = decodeSecureShareToken(urlParams?.get('tk'));
+      const candidatePub =
+        (decodedTk?.pub ? congPubs.find((p) => p.id === decodedTk.pub) : null) ||
+        congPubs.find((p) => p.email && emailToUse && p.email.toLowerCase() === emailToUse.toLowerCase()) ||
+        congPubs.find((p) => p.name && user?.displayName && p.name.toLowerCase() === user.displayName.toLowerCase());
+      const targetPubId = candidatePub?.id || '';
+
+      if (!matchingPub && codeToRedeem.length >= 4 && cleanCongPin && targetPubId) {
+        try {
+          const verifyRes = await supabaseSyncService.verifyPersonalPin(cleanId, cleanCongPin, codeToRedeem, targetPubId);
+          if (verifyRes.success && verifyRes.publisher) {
+            matchingPub = {
+              id: verifyRes.publisher.id,
+              name: verifyRes.publisher.name,
+              theocraticRole: verifyRes.publisher.role,
+              privilege: verifyRes.publisher.privilege,
+              theocraticRoles: verifyRes.publisher.theocraticRoles,
+            };
+          }
+        } catch {}
+      }
       let isInvitationApproved = false;
 
       if (matchingPub) {
-        const finalRole: TheocraticRole =
+        let finalRole: TheocraticRole =
           matchingPub.theocraticRole ||
           (matchingPub.privilege === 'anciano'
             ? 'anciano'
             : 'publico');
+        if (finalRole === 'coordinador') {
+          const isVerifiedCoord = verifySecureLocalPin('kongre_coordinator_pin', codeToRedeem);
+          if (!isVerifiedCoord) {
+            finalRole = matchingPub.privilege === 'anciano' ? 'anciano' : 'publico';
+          }
+        }
         identifiedRole = finalRole;
         const rolesSet = new Set<TheocraticRole>([finalRole]);
         if (matchingPub.privilege === 'anciano') rolesSet.add('anciano');

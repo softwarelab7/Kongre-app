@@ -1,0 +1,5 @@
+# Añade esto a supabase/config.toml de tu proyecto.
+# verify_jwt = false porque la app usa la clave "publishable" (no es un JWT) y la función
+# hace su propia autenticación con los tokens derivados del PIN.
+[functions.kongre-sync]
+verify_jwt = false

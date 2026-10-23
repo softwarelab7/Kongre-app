@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react';
-import { supabase } from '../lib/supabase';
-import { supabaseSyncService, mergeMonthlyReports } from '../services/supabaseSyncService';
+import { supabaseSyncService, mergeMonthlyReports, mergePublishers } from '../services/supabaseSyncService';
 import { QueueStats, getOfflineQueueStats } from '../services/indexedDbQueue';
 import { useAuth } from './AuthContext';
 import {
@@ -1267,14 +1266,36 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     let idMapFromPubs: Record<string, string> = {};
 
     if (data.publishers && Array.isArray(data.publishers)) {
+      // PROTECCIÓN CRÍTICA DE DIRECTORIO:
+      // Si el snapshot entrante tiene 1 o menos publicadores pero localmente o en caché de resguardo
+      // poseemos una lista completa de publicadores (> 1), NUNCA permitir vaciar el directorio.
+      let incomingPubs = data.publishers;
+      let existingPubsSource = publishers;
+      if (existingPubsSource.length <= 1) {
+        try {
+          const safetyBackup = localStorage.getItem('kongre_publishers_safety_backup_v1');
+          if (safetyBackup) {
+            const parsedBackup = JSON.parse(safetyBackup);
+            if (Array.isArray(parsedBackup) && parsedBackup.length > 1) {
+              existingPubsSource = restorePublishersFromLocalStorage(parsedBackup);
+            }
+          }
+        } catch {}
+      }
+
+      if (incomingPubs.length <= 1 && existingPubsSource.length > 1) {
+        // Fusionar no destructivamente respetando la lista completa
+        incomingPubs = mergePublishers(existingPubsSource, incomingPubs);
+      }
+
       // Depuración automática de duplicados al hidratar datos desde la nube o caché
-      const { cleanList, mergedCount, idMap } = deduplicatePublishersList(data.publishers);
+      const { cleanList, mergedCount, idMap } = deduplicatePublishersList(incomingPubs);
       idMapFromPubs = idMap;
-      const rawPubsToUse = mergedCount > 0 ? cleanList : data.publishers;
+      const rawPubsToUse = mergedCount > 0 ? cleanList : incomingPubs;
 
       // Preservar personalPin local si el payload hidratado es público (solo trae personalPinHash)
       const localPubsById = new Map<string, Publisher>();
-      publishers.forEach((lp) => {
+      existingPubsSource.forEach((lp) => {
         if (lp && lp.id) localPubsById.set(lp.id, lp);
       });
 
@@ -1285,6 +1306,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           p.personalPinHash ||
           (effectivePin ? hashPersonalPin(String(effectivePin)) : localExisting?.personalPinHash || '');
         return {
+          ...localExisting,
           ...p,
           ...(effectivePin ? { personalPin: effectivePin } : {}),
           ...(effectiveHash ? { personalPinHash: effectiveHash } : {}),
@@ -1297,6 +1319,16 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         `${LOCAL_STORAGE_KEY}_publishers`,
         JSON.stringify(sanitizePublishersForLocalStorage(restoredPubs))
       );
+
+      // Copia de seguridad automática de seguridad en localStorage
+      if (restoredPubs.length > 1) {
+        try {
+          localStorage.setItem(
+            'kongre_publishers_safety_backup_v1',
+            JSON.stringify(sanitizePublishersForLocalStorage(restoredPubs))
+          );
+        } catch {}
+      }
 
       // Sincronizar PINs personales únicos (con hash criptográfico SHA-256 en localStorage)
       try {
@@ -1686,7 +1718,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   // Supabase Sync: Carga inicial, escucha en tiempo real por BroadcastChannel y Supabase Realtime
   useEffect(() => {
     let isCancelled = false;
-    let realtimeChannel: any = null;
+    let stopPolling: (() => void) | null = null;
 
     const setupSync = async () => {
       // En modo demo no se conecta a Supabase ni se abren canales en tiempo real
@@ -1710,22 +1742,16 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         return;
       }
 
-      const pinMaestro =
+      const savedCoordPin =
+        (typeof window !== 'undefined' ? getSecureLocalPin('kongre_coordinator_pin') : '') || '';
+      const savedCongPin =
         (typeof window !== 'undefined'
-          ? getSecureLocalPin('kongre_session_pin_v2') ||
-            getSecureLocalPin('kongre_coordinator_pin') ||
-            getSecureLocalPin('kongre_registered_cong_pin') ||
-            getSecureLocalPin('kongre_last_cong_pin')
+          ? getSecureLocalPin('kongre_registered_cong_pin') || getSecureLocalPin('kongre_last_cong_pin')
           : '') || '';
+      const sessionPin =
+        (typeof window !== 'undefined' ? getSecureLocalPin('kongre_session_pin_v2') : '') || '';
 
-      const pinCongregacion =
-        (typeof window !== 'undefined'
-          ? getSecureLocalPin('kongre_registered_cong_pin') ||
-            getSecureLocalPin('kongre_last_cong_pin') ||
-            pinMaestro
-          : '') || pinMaestro;
-
-      const activePin = pinMaestro || pinCongregacion;
+      const activePin = savedCoordPin || savedCongPin || sessionPin;
 
       if (activePin) {
         setSyncStatus('saving');
@@ -1744,26 +1770,20 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setSyncStatus('synced');
       }
 
-      // Suscripción reactiva en tiempo real a cambios en Supabase sync_queue
+      // Detección de cambios remotos mediante sondeo de la Edge Function `kongre-sync`
+      // (la tabla sync_queue ya no es accesible por el navegador, así que no hay canal Realtime).
       try {
-        const cleanCongId = supabaseSyncService.normalizeCongregationId(syncCongId);
-        realtimeChannel = supabase
-          .channel(`kongre_sync_${cleanCongId}`)
-          .on(
-            'postgres_changes',
-            {
-              event: '*',
-              schema: 'public',
-              table: 'sync_queue',
-              filter: `id_congregacion=eq.${cleanCongId}`,
-            },
+        if (activePin) {
+          stopPolling = supabaseSyncService.subscribeToCongregation(
+            syncCongId,
+            activePin,
             async () => {
               if (isCancelled) return;
               const currentPin =
-                getSecureLocalPin('kongre_session_pin_v2') ||
                 getSecureLocalPin('kongre_coordinator_pin') ||
                 getSecureLocalPin('kongre_registered_cong_pin') ||
                 getSecureLocalPin('kongre_last_cong_pin') ||
+                getSecureLocalPin('kongre_session_pin_v2') ||
                 '';
               if (currentPin) {
                 const refreshed = await supabaseSyncService.fetchAndDecryptCongregation(syncCongId, currentPin);
@@ -1772,10 +1792,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 }
               }
             }
-          )
-          .subscribe();
+          );
+        }
       } catch (e) {
-        console.warn('Realtime subscription notice:', e);
+        console.warn('Remote change polling notice:', e);
       }
     };
 
@@ -1796,8 +1816,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     return () => {
       isCancelled = true;
-      if (realtimeChannel) {
-        try { supabase.removeChannel(realtimeChannel); } catch {}
+      if (stopPolling) {
+        try { stopPolling(); } catch {}
       }
       if (broadcastChannel) {
         try { broadcastChannel.close(); } catch {}
@@ -1958,12 +1978,18 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         // Sincronización teocrática en Supabase (Cifrado AES-256-GCM / Cero Conocimiento)
         try {
-          const pinMaestro =
-            getSecureLocalPin('kongre_session_pin_v2') ||
-            getSecureLocalPin('kongre_coordinator_pin') ||
-            getSecureLocalPin('kongre_registered_cong_pin') ||
-            getSecureLocalPin('kongre_last_cong_pin') ||
-            '';
+          const isUserCoordinator =
+            (typeof window !== 'undefined' && localStorage.getItem('theocratic_app_data_v1_active_role') === 'coordinador') ||
+            Boolean(getSecureLocalPin('kongre_coordinator_pin'));
+
+          const savedCoordPin = getSecureLocalPin('kongre_coordinator_pin');
+          const sessionPin = getSecureLocalPin('kongre_session_pin_v2');
+
+          // El PIN maestro para cifrar/sobrescribir el payload completo de ancianos
+          // SOLO debe ser el PIN del Coordinador, NUNCA el PIN personal de un publicador
+          const pinMaestro = (isUserCoordinator && savedCoordPin && sessionPin === savedCoordPin)
+            ? savedCoordPin
+            : savedCoordPin || '';
 
           const pinCongregacion =
             getSecureLocalPin('kongre_registered_cong_pin') ||
@@ -2399,10 +2425,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return () => window.removeEventListener('online', handleReconnected);
   }, [publishers, weeks, territories]);
 
-  // Garantizar que el Coordinador siempre exista en la lista de publicadores de la congregación sin duplicarlo
+  // Garantizar que el Coordinador exista en la lista de publicadores de la congregación sin duplicarlo ni sobreescribir su PIN
   useEffect(() => {
     const coordName = settings.coordinatorName?.trim();
     if (!coordName || isGenericIdentityName(coordName) || !settings.isRegistered) return;
+    // Si la lista de publicadores aún no ha cargado (longitud 0), esperar a que cargue antes de intentar enriquecer
+    if (publishers.length === 0) return;
 
     // Verificar si ya existe en publishers con coincidencia fonética/tildes o correo
     const existingIndex = publishers.findIndex((p) => {
@@ -2414,23 +2442,30 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       );
     });
 
+    const isCurrentSessionCoordinator =
+      (typeof window !== 'undefined' && localStorage.getItem('theocratic_app_data_v1_active_role') === 'coordinador') ||
+      Boolean(getSecureLocalPin('kongre_coordinator_pin'));
+
+    // NUNCA usar kongre_session_pin_v2 para el coordinador si quien tiene sesión es un publicador
+    const coordPin = isCurrentSessionCoordinator ? (getSecureLocalPin('kongre_coordinator_pin') || '') : '';
+
     if (existingIndex !== -1) {
-      // Ya existe. Si no tenía rol de coordinador o faltaban datos de contacto, enriquecer el existente sin duplicar
+      // Ya existe. Si faltaban datos de contacto o rol, enriquecer sin alterar PIN a menos que sea el propio coordinador
       const existing = publishers[existingIndex];
       const needsCoordRole = existing.theocraticRole !== 'coordinador' || existing.privilege !== 'anciano';
       const needsPhone = !existing.phone && !!settings.coordinatorPhone;
       const needsEmail = !existing.email && !!settings.coordinatorEmail;
-      const coordPin = getSecureLocalPin('kongre_coordinator_pin') || getSecureLocalPin('kongre_session_pin_v2') || '';
-      const needsPin = !existing.personalPin && !!coordPin;
+      // Solo el Coordinador autenticado puede asignar o actualizar su propio PIN; un publicador NUNCA debe sobreescribirlo
+      const needsPin = isCurrentSessionCoordinator && !existing.personalPin && !!coordPin;
 
       if (needsCoordRole || needsPhone || needsEmail || needsPin) {
-        const finalPin = existing.personalPin || coordPin || undefined;
+        const finalPin = existing.personalPin || (needsPin ? coordPin : undefined);
         const updatedCoord: Publisher = {
           ...existing,
           theocraticRole: 'coordinador',
           privilege: 'anciano',
-          personalPin: finalPin,
-          ...(finalPin ? { personalPinHash: hashPersonalPin(finalPin) } : {}),
+          ...(finalPin ? { personalPin: finalPin } : {}),
+          ...(finalPin ? { personalPinHash: hashPersonalPin(finalPin) } : existing.personalPinHash ? { personalPinHash: existing.personalPinHash } : {}),
           phone: existing.phone || settings.coordinatorPhone || '',
           email: existing.email || settings.coordinatorEmail || '',
           notes: existing.notes || 'Coordinador del Cuerpo de Ancianos',
@@ -2444,12 +2479,12 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             JSON.stringify(sanitizePublishersForLocalStorage(updatedList))
           );
         } catch {}
-        saveToFirestore(updatedList);
+        // IMPORTANTE: NO llamar a saveToFirestore aquí para evitar sobrescrituras destructivas o bucles en la nube
       }
       return;
     }
 
-    const coordPin = getSecureLocalPin('kongre_coordinator_pin') || getSecureLocalPin('kongre_session_pin_v2') || '';
+    // Si no existía y ya hay publicadores cargados, añadirlo localmente
     const coordPub: Publisher = {
       id: `pub-coord-${Date.now()}`,
       name: coordName,
@@ -2498,7 +2533,6 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       } catch {}
       return next;
     });
-    saveToFirestore([...publishers, coordPub]);
   }, [settings.coordinatorName, settings.isRegistered, publishers.length]);
 
   // Conflict detection for current week
@@ -5390,9 +5424,6 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const loadDemoData = () => {
-    try {
-      supabase.removeAllChannels();
-    } catch {}
     const demo = getDemoCongregationData();
     hydrateAllFromData(demo);
     setIsDemoMode(true);
@@ -5573,7 +5604,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           try {
             const verifyCloud = await supabaseSyncService.fetchAndDecryptCongregation(cleanId, activeMasterPin);
             if (verifyCloud.success) {
-              await supabase.from('sync_queue').delete().eq('id_congregacion', cleanId);
+              await supabaseSyncService.deleteCongregation(cleanId, activeMasterPin);
             }
           } catch {}
         }

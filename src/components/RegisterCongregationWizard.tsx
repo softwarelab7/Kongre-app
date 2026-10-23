@@ -10,7 +10,7 @@ import {
   generateMilitaryGradeCongregationId,
   formatCanonicalCongregationId,
   generateSecureCongregationPin,
-  generateSecureRolePin,
+  generateSecureMasterPin,
   isCongregationIdString,
   setSecureLocalPin,
   signRoleSession,
@@ -139,7 +139,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   const [showCongregationPin, setShowCongregationPin] = useState(true);
   const [copiedCongPin, setCopiedCongPin] = useState(false);
 
-  const [personalPin, setPersonalPinInput] = useState(() => generateSecureRolePin());
+  const [personalPin, setPersonalPinInput] = useState(() => generateSecureMasterPin());
   const [confirmPersonalPin, setConfirmPersonalPin] = useState(() => personalPin);
   const [showPersonalPin, setShowPersonalPin] = useState(true);
   const [copiedPersPin, setCopiedPersPin] = useState(false);
@@ -172,7 +172,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   };
 
   const handleRegeneratePersonalPin = () => {
-    const newPin = generateSecureRolePin();
+    const newPin = generateSecureMasterPin();
     setPersonalPinInput(newPin);
     setConfirmPersonalPin(newPin);
     setShowPersonalPin(true);
@@ -332,15 +332,15 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         return false;
       }
       if (!personalPin.trim()) {
-        setError('Tu PIN Personal es obligatorio (4 a 6 dígitos numéricos).');
+        setError('El PIN Maestro del Coordinador es obligatorio (mínimo 8 dígitos).');
         return false;
       }
-      if (personalPin.trim().length < 4) {
-        setError('Tu PIN Personal debe tener al menos 4 dígitos numéricos.');
+      if (personalPin.trim().length < 8) {
+        setError('El PIN Maestro del Coordinador debe tener al menos 8 dígitos para proteger la congregación contra ataques de fuerza bruta.');
         return false;
       }
       if (personalPin !== confirmPersonalPin) {
-        setError('La confirmación de tu PIN Personal no coincide.');
+        setError('La confirmación de tu PIN Maestro no coincide.');
         return false;
       }
     }
@@ -1095,7 +1095,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                   <div className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                        PIN de 4 dígitos:
+                        PIN Maestro (8 dígitos):
                       </span>
                       <div className="flex items-center gap-1.5">
                         <button
@@ -1120,14 +1120,14 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                       <div>
                         <input
                           type={showPersonalPin ? 'text' : 'password'}
-                          maxLength={6}
+                          maxLength={12}
                           value={personalPin}
                           onChange={(e) => {
                             const val = e.target.value.replace(/\D/g, '');
                             setPersonalPinInput(val);
                             setConfirmPersonalPin(val);
                           }}
-                          placeholder="PIN"
+                          placeholder="PIN Maestro (8 dígitos)"
                           className="w-full px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-mono font-bold tracking-widest text-center text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                           required
                         />
@@ -1135,7 +1135,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                       <div>
                         <input
                           type={showPersonalPin ? 'text' : 'password'}
-                          maxLength={6}
+                          maxLength={12}
                           value={confirmPersonalPin}
                           onChange={(e) => setConfirmPersonalPin(e.target.value.replace(/\D/g, ''))}
                           placeholder="Confirmar"

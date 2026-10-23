@@ -25,19 +25,53 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.11.8';
-export const CURRENT_BUILD_CODE = '2026.10.22.4501';
-export const BUILD_DATE = '22 de Octubre, 2026';
+export const CURRENT_APP_VERSION = '2.12.0';
+export const CURRENT_BUILD_CODE = '2026.10.23.5100';
+export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '2.12.0',
+    buildCode: '2026.10.23.5100',
+    date: '23 de Octubre, 2026',
+    title: 'Sincronización Segura vía Supabase Edge Function y Blindaje Criptográfico de PINs y Roles',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Sincronización Segura Cero Conocimiento: Se reemplazó el acceso directo a tablas por la Edge Function kongre-sync con validación de credenciales en servidor y tokens derivados por PBKDF2.',
+      },
+      {
+        category: 'security',
+        text: 'Eliminación de Hashes de PIN del Payload Público: Se removieron los hashes de PIN personal de payload_public, impidiendo ataques de fuerza bruta offline contra PINs de 4 dígitos.',
+      },
+      {
+        category: 'security',
+        text: 'Verificación en Servidor con Rate Limiting: Verificación de PIN personal en Edge Function con publisher_id obligatorio y bloqueo por fuerza bruta (8 intentos fallidos por congregación e IP).',
+      },
+      {
+        category: 'security',
+        text: 'Protección de Integridad del Payload Público: La acción push ahora requiere nivel maestro exclusivamente (403 para solicitudes públicas), impidiendo manipulación de roles o configuraciones.',
+      },
+      {
+        category: 'security',
+        text: 'PIN Maestro de 8+ Dígitos: El asistente de registro ahora exige un PIN Maestro mínimo de 8 dígitos para el Coordinador (100 millones de combinaciones).',
+      },
+      {
+        category: 'security',
+        text: 'Saneamiento de Sesión Local: Se eliminó el bypass permisivo de re-firma de rol en verifyRoleSessionSignature.',
+      },
+    ],
+  },
   {
     version: '2.11.8',
     buildCode: '2026.10.22.4501',
     date: '22 de Octubre, 2026',
     title: 'Eliminación del Menú Lateral en Dispositivos Móviles y Navegación Exclusiva Inferior',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

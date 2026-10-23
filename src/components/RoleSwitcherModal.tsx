@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useSecurity } from '../context/SecurityContext';
-import { TheocraticRole, THEOCRATIC_ROLES } from '../utils/rbac';
+import { TheocraticRole, THEOCRATIC_ROLES, checkCredentialChange, checkEmailRoleLink, getAssignableRoles, canRevealPinOf } from '../utils/rbac';
 import { generateSecurePublisherPin, formatCanonicalCongregationId, getSecureLocalPin, encodeSecureShareToken } from '../utils/theocraticSecurity';
 import { insertAuditLog } from '../services/auditLogService';
 import { ActiveTab } from './Navbar';
@@ -53,6 +53,8 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
 }) => {
   const {
     activeRole,
+    activeRoles,
+    currentPublisherId,
     setActiveRole,
     effectiveRoleInfo,
     userRolesList,
@@ -312,10 +314,47 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
   };
 
   // Quick 1-click role change
+  // ── Política de administración de accesos (reglas en utils/rbac.ts) ───────────────────
+  const actorRoles: TheocraticRole[] = activeRoles && activeRoles.length > 0 ? activeRoles : [activeRole];
+  const policyGuard = (
+    target: { publisherId?: string; role?: string; privilege?: string },
+    newRole?: TheocraticRole
+  ): boolean => {
+    const decision = checkCredentialChange({
+      actorRoles,
+      actorPublisherId: currentPublisherId,
+      target: { publisherId: target.publisherId, currentRole: target.role, privilege: target.privilege },
+      newRole,
+    });
+    if (!decision.allowed) {
+      setFeedback(`🚫 ${decision.reason}`);
+      setTimeout(() => setFeedback(null), 4000);
+    }
+    return decision.allowed;
+  };
+  const canRevealPin = (item: { publisherId: string; role: TheocraticRole; privilege?: string }) =>
+    canRevealPinOf(
+      actorRoles,
+      { publisherId: item.publisherId, currentRole: item.role, privilege: item.privilege },
+      currentPublisherId
+    );
+  const roleOptionsGeneric = allTheocraticRoles.filter((r) => checkEmailRoleLink(actorRoles, r).allowed);
+  const roleOptionsFor = (item: { publisherId: string; role: TheocraticRole; privilege?: string }) =>
+    getAssignableRoles(
+      actorRoles,
+      { publisherId: item.publisherId, currentRole: item.role, privilege: item.privilege },
+      currentPublisherId
+    );
+  const denyReveal = () => {
+    setFeedback('🚫 No tienes permiso para ver ni compartir el PIN de este hermano.');
+    setTimeout(() => setFeedback(null), 4000);
+  };
+
   const handleChangePublisherRole = (publisherId: string, newRoleValue: TheocraticRole) => {
     if (!isAllowedAccess) return;
     const item = combinedPublishersList.find((p) => p.publisherId === publisherId);
     if (!item) return;
+    if (!policyGuard({ publisherId, role: item.role, privilege: item.privilege }, newRoleValue)) return;
 
     const pinToUse = item.pin || generateUniquePublisherPin();
 
@@ -341,7 +380,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       accion: 'CAMBIO_ROL_PUBLICADOR',
       modulo: 'seguridad',
       hermano_nid: publisherId,
-      hermano_nombre: currentBrotherName || 'Coordinador',
+      hermano_nombre: currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar',
       detalles: `Rol de ${item.name} actualizado a ${THEOCRATIC_ROLES[newRoleValue]?.shortName || newRoleValue}`,
     }).catch(() => {});
 
@@ -354,6 +393,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     if (!isAllowedAccess) return;
     const item = combinedPublishersList.find((p) => p.publisherId === publisherId);
     if (!item) return;
+    if (!policyGuard({ publisherId, role: item.role, privilege: item.privilege })) return;
 
     const newGeneratedPin = generateUniquePublisherPin();
     assignPersonalPinToPublisher(
@@ -378,7 +418,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       accion: 'GENERAR_PIN_PUBLICADOR',
       modulo: 'seguridad',
       hermano_nid: publisherId,
-      hermano_nombre: currentBrotherName || 'Coordinador',
+      hermano_nombre: currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar',
       detalles: `Nuevo PIN personal generado para ${item.name}`,
     }).catch(() => {});
 
@@ -391,6 +431,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     if (!isAllowedAccess) return;
     const item = combinedPublishersList.find((p) => p.publisherId === publisherId);
     if (!item) return;
+    if (!policyGuard({ publisherId, role: item.role, privilege: item.privilege })) return;
 
     removePublisherPin(publisherId);
 
@@ -406,7 +447,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       accion: 'REVOCAR_PIN_PUBLICADOR',
       modulo: 'seguridad',
       hermano_nid: publisherId,
-      hermano_nombre: currentBrotherName || 'Coordinador',
+      hermano_nombre: currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar',
       detalles: `PIN revocado y sesiones cerradas para ${item.name}`,
     }).catch(() => {});
 
@@ -417,7 +458,15 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
   // Auto-generate PINs for all publishers who don't have one
   const handleAutoAssignAllMissingPins = () => {
     if (!isAllowedAccess) return;
-    const missing = combinedPublishersList.filter((p) => !p.pin);
+    const missing = combinedPublishersList.filter(
+      (p) =>
+        !p.pin &&
+        checkCredentialChange({
+          actorRoles,
+          actorPublisherId: currentPublisherId,
+          target: { publisherId: p.publisherId, currentRole: p.role, privilege: p.privilege },
+        }).allowed
+    );
     if (missing.length === 0) {
       setFeedback('Todos los publicadores ya tienen su PIN personal asignado.');
       setTimeout(() => setFeedback(null), 3000);
@@ -455,7 +504,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       accion: 'AUTO_ASIGNAR_PINS_MASIVO',
       modulo: 'seguridad',
       hermano_nid: 'directorio',
-      hermano_nombre: currentBrotherName || 'Coordinador',
+      hermano_nombre: currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar',
       detalles: `Generación masiva de ${count} PINs personales únicos`,
     }).catch(() => {});
 
@@ -509,6 +558,8 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
 
   // Copy 1-click Pocket Direct Link to clipboard
   const handleCopyDirectLink = (name: string, _role: TheocraticRole, pin: string, id: string) => {
+    const revealTarget = combinedPublishersList.find((p) => p.publisherId === id);
+    if (revealTarget && !canRevealPin(revealTarget)) return denyReveal();
     const congNumber = formatCanonicalCongregationId(
       settings.congregationNumber ||
         settings.congregationId ||
@@ -539,6 +590,8 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
 
   // Copy or send by WhatsApp
   const handleShareWhatsApp = (name: string, role: TheocraticRole, pin: string, id: string) => {
+    const revealTarget = combinedPublishersList.find((p) => p.publisherId === id);
+    if (revealTarget && !canRevealPin(revealTarget)) return denyReveal();
     const msg = getTheocraticShareMessage(name, role, pin, id);
     navigator.clipboard.writeText(msg);
     setCopiedId(id);
@@ -604,6 +657,12 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
   const handleAddEmail = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAllowedAccess) return;
+    const emailDecision = checkEmailRoleLink(actorRoles, selectedRoleForEmail);
+    if (!emailDecision.allowed) {
+      setFeedback(`🚫 ${emailDecision.reason}`);
+      setTimeout(() => setFeedback(null), 4000);
+      return;
+    }
     if (!newEmail.trim() || !newEmail.includes('@')) {
       setFeedback('Introduce un correo electrónico válido.');
       setTimeout(() => setFeedback(null), 3000);
@@ -619,6 +678,13 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
   // Create temporary code
   const handleCreateInvitation = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAllowedAccess) return;
+    const inviteDecision = checkEmailRoleLink(actorRoles, invRole);
+    if (!inviteDecision.allowed) {
+      setFeedback(`🚫 ${inviteDecision.reason}`);
+      setTimeout(() => setFeedback(null), 4000);
+      return;
+    }
     const created = await createInvitation(invRole, invBrotherName);
     setInvBrotherName('');
     setFeedback(`¡Código generado exitosamente: ${created.code}!`);
@@ -636,6 +702,15 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       setEditError('El PIN debe tener al menos 4 dígitos numéricos.');
       return;
     }
+
+    const existingForEdit = combinedPublishersList.find((p) => p.publisherId === editingPublisher.id);
+    if (
+      !policyGuard(
+        { publisherId: editingPublisher.id, role: existingForEdit?.role, privilege: editingPublisher.privilege ?? existingForEdit?.privilege },
+        editingPublisher.role
+      )
+    )
+      return;
 
     const res = assignPersonalPinToPublisher(
       editingPublisher.id,
@@ -686,6 +761,9 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     } else {
       pubId = `pub_custom_${Date.now()}`;
     }
+
+    const existingRoleForNew = combinedPublishersList.find((p) => p.publisherId === pubId)?.role;
+    if (!policyGuard({ publisherId: pubId, role: existingRoleForNew, privilege }, newRole)) return;
 
     const pinToUse = newPin.trim() || generateUniquePublisherPin();
     const res = assignPersonalPinToPublisher(
@@ -1029,7 +1107,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                 ) : (
                   filteredPublishers.map((item) => {
                     const roleInfo = THEOCRATIC_ROLES[item.role] || THEOCRATIC_ROLES.publico;
-                    const isVisible = visiblePins[item.publisherId] || false;
+                    const isVisible = (visiblePins[item.publisherId] || false) && canRevealPin(item);
                     const hasPin = item.hasPin;
 
                     return (
@@ -1070,7 +1148,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                               onChange={(e) => handleChangePublisherRole(item.publisherId, e.target.value as TheocraticRole)}
                               className="w-full pl-3 pr-8 py-1.5 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
                             >
-                              {allTheocraticRoles.map((rKey) => (
+                              {roleOptionsFor(item).map((rKey) => (
                                 <option key={rKey} value={rKey}>
                                   {THEOCRATIC_ROLES[rKey].name} ({THEOCRATIC_ROLES[rKey].shortName})
                                 </option>
@@ -1088,7 +1166,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                                 {item.pin ? (isVisible ? item.pin : '••••') : '🔒 Hash'}
                               </span>
 
-                              {item.pin && (
+                              {item.pin && canRevealPin(item) && (
                                 <button
                                   type="button"
                                   onClick={() => togglePinVisibility(item.publisherId)}
@@ -1367,7 +1445,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                       onChange={(e) => setSelectedRoleForEmail(e.target.value as TheocraticRole)}
                       className="flex-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold"
                     >
-                      {allTheocraticRoles.map((rKey) => (
+                      {roleOptionsGeneric.map((rKey) => (
                         <option key={rKey} value={rKey}>
                           {THEOCRATIC_ROLES[rKey].shortName}
                         </option>
@@ -1449,7 +1527,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                       onChange={(e) => setInvRole(e.target.value as TheocraticRole)}
                       className="flex-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-semibold"
                     >
-                      {allTheocraticRoles.map((rKey) => (
+                      {roleOptionsGeneric.map((rKey) => (
                         <option key={rKey} value={rKey}>
                           {THEOCRATIC_ROLES[rKey].name}
                         </option>
@@ -1630,7 +1708,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                   }
                   className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
                 >
-                  {allTheocraticRoles.map((rKey) => (
+                  {roleOptionsGeneric.map((rKey) => (
                     <option key={rKey} value={rKey}>
                       {THEOCRATIC_ROLES[rKey].name} ({THEOCRATIC_ROLES[rKey].shortName})
                     </option>
@@ -1775,7 +1853,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                   onChange={(e) => setNewRole(e.target.value as TheocraticRole)}
                   className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
                 >
-                  {allTheocraticRoles.map((rKey) => (
+                  {roleOptionsGeneric.map((rKey) => (
                     <option key={rKey} value={rKey}>
                       {THEOCRATIC_ROLES[rKey].name} ({THEOCRATIC_ROLES[rKey].shortName})
                     </option>

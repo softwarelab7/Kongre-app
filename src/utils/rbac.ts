@@ -1,5 +1,5 @@
 // src/utils/rbac.ts
-import { ActiveTab } from '../components/Navbar';
+import type { ActiveTab } from '../components/Navbar';
 
 export type TheocraticRole =
   | 'coordinador'
@@ -866,3 +866,173 @@ export function isTabAllowedForRole(roleOrRoles: string | string[], tab: ActiveT
     return roleInfo.allowedTabs.includes(tab);
   });
 }
+
+// ============================================================================
+//  POLÍTICA DE ADMINISTRACIÓN DE ACCESOS Y ALCANCE DE DATOS
+//  Funciones puras (sin React) para poder probarlas y reutilizarlas en la interfaz.
+//
+//  IMPORTANTE: en esta versión la app aplica estas reglas en el navegador. Son una barrera
+//  de interfaz y de coherencia, no un control de servidor: el servidor solo distingue
+//  "PIN maestro" y "PIN de congregación" (ver supabase/functions/kongre-sync).
+// ============================================================================
+
+/**
+ * Política: ¿pueden los ancianos (no coordinador) cambiar roles/PIN de OTROS ancianos?
+ * Por defecto NO: un anciano que fija el PIN de otro anciano podría iniciar sesión como él.
+ * Cámbialo a true si en tu congregación todos los ancianos administran accesos entre sí.
+ */
+export const ELDERS_CAN_MANAGE_ELDERS = true;
+
+/** Roles que ven la tarjeta S-21 de TODOS los publicadores. */
+const S21_BROAD_ROLES: TheocraticRole[] = ['coordinador', 'anciano', 'secretario', 'superintendente_servicio'];
+
+export interface PolicyDecision {
+  allowed: boolean;
+  reason?: string;
+}
+
+export interface CredentialTarget {
+  publisherId?: string;
+  currentRole?: TheocraticRole | string | null;
+  privilege?: string | null;
+}
+
+export interface CredentialChangeRequest {
+  actorRoles: (TheocraticRole | string)[];
+  actorPublisherId?: string | null;
+  target: CredentialTarget;
+  /** Rol que se quiere asignar. Omitir si solo se cambia/revoca/revela el PIN. */
+  newRole?: TheocraticRole | string;
+}
+
+function normalizeRoles(roles: (TheocraticRole | string)[] | undefined | null): TheocraticRole[] {
+  return (roles || []).map((r) => normalizeTheocraticRole(r));
+}
+
+export function isCoordinatorRoles(roles: (TheocraticRole | string)[] | undefined | null): boolean {
+  return normalizeRoles(roles).includes('coordinador');
+}
+
+/**
+ * ¿Puede este conjunto de roles abrir el directorio de accesos? Refleja la regla que ya aplicaba la
+ * interfaz: coordinador, quien tenga canManageAccess y los ancianos.
+ */
+export function canAdministerAccess(actorRoles: (TheocraticRole | string)[]): boolean {
+  const roles = normalizeRoles(actorRoles);
+  return (
+    roles.includes('coordinador') ||
+    roles.includes('anciano') ||
+    getPermissionsForRoles(roles).canManageAccess
+  );
+}
+
+/**
+ * Decide si el actor puede asignar un rol y/o cambiar, revocar o ver el PIN de un hermano.
+ * Reglas (el coordinador queda exento de todas):
+ *  1. Nadie salvo el coordinador otorga el rol de Coordinador ni toca las credenciales del Coordinador.
+ *  2. El rol de Anciano solo se asigna a hermanos con privilegio de anciano.
+ *  3. Nadie cambia su propio rol (evita auto-ascenso); sí puede regenerar su propio PIN.
+ *  4. Los ancianos no administran las credenciales de otros ancianos (ver ELDERS_CAN_MANAGE_ELDERS).
+ */
+export function checkCredentialChange(req: CredentialChangeRequest): PolicyDecision {
+  const actor = normalizeRoles(req.actorRoles);
+  if (!canAdministerAccess(actor)) {
+    return { allowed: false, reason: 'Tu rol no puede administrar accesos.' };
+  }
+  if (actor.includes('coordinador')) return { allowed: true };
+
+  const targetRole = normalizeTheocraticRole(req.target.currentRole as string | undefined);
+  const newRole = req.newRole !== undefined ? normalizeTheocraticRole(req.newRole as string) : undefined;
+  const isSelf = Boolean(req.actorPublisherId && req.target.publisherId && req.actorPublisherId === req.target.publisherId);
+
+  if (targetRole === 'coordinador') {
+    return { allowed: false, reason: 'Solo el Coordinador puede modificar las credenciales del Coordinador.' };
+  }
+  if (newRole === 'coordinador') {
+    return { allowed: false, reason: 'Solo el Coordinador puede otorgar el rol de Coordinador.' };
+  }
+  if (newRole === 'anciano' && req.target.privilege !== 'anciano') {
+    return { allowed: false, reason: 'El rol de Anciano solo puede asignarse a hermanos con privilegio de anciano.' };
+  }
+  if (isSelf && newRole !== undefined && newRole !== targetRole) {
+    return { allowed: false, reason: 'No puedes cambiar tu propio rol.' };
+  }
+  const targetIsElder = req.target.privilege === 'anciano' || targetRole === 'anciano';
+  if (targetIsElder && !isSelf && !ELDERS_CAN_MANAGE_ELDERS) {
+    return { allowed: false, reason: 'Solo el Coordinador puede modificar las credenciales de otros ancianos.' };
+  }
+  return { allowed: true };
+}
+
+/** Roles que el actor puede ofrecer en un selector para este hermano (siempre incluye el rol actual). */
+export function getAssignableRoles(
+  actorRoles: (TheocraticRole | string)[],
+  target: CredentialTarget,
+  actorPublisherId?: string | null
+): TheocraticRole[] {
+  const current = normalizeTheocraticRole(target.currentRole as string | undefined);
+  return (Object.keys(THEOCRATIC_ROLES) as TheocraticRole[]).filter(
+    (role) =>
+      role === current ||
+      checkCredentialChange({ actorRoles, actorPublisherId, target, newRole: role }).allowed
+  );
+}
+
+/** ¿Puede el actor ver/copiar/compartir el PIN de este hermano? */
+export function canRevealPinOf(
+  actorRoles: (TheocraticRole | string)[],
+  target: CredentialTarget,
+  actorPublisherId?: string | null
+): boolean {
+  if (isCoordinatorRoles(actorRoles)) return true;
+  if (actorPublisherId && target.publisherId === actorPublisherId) return true;
+  return checkCredentialChange({ actorRoles, actorPublisherId, target }).allowed;
+}
+
+export interface GroupScope {
+  overseerId?: string;
+  assistantId?: string;
+  memberIds: string[];
+}
+
+/**
+ * ¿Puede el actor ver la tarjeta S-21 (registro de servicio) de este publicador?
+ * Coordinador, ancianos, secretario y superintendente de servicio: todos los publicadores.
+ * Superintendente de grupo (y cualquier otro rol con canViewS21): solo su propia tarjeta y las de
+ * los miembros de los grupos donde es superintendente o auxiliar.
+ */
+export function canViewS21Of(
+  actorRoles: (TheocraticRole | string)[],
+  publisherId: string | undefined | null,
+  ctx: { actorPublisherId?: string | null; groups?: GroupScope[] }
+): boolean {
+  const roles = normalizeRoles(actorRoles);
+  if (!getPermissionsForRoles(roles).canViewS21) return false;
+  if (roles.some((r) => S21_BROAD_ROLES.includes(r))) return true;
+
+  const me = ctx.actorPublisherId;
+  if (!me || !publisherId) return false;
+  if (publisherId === me) return true;
+  return (ctx.groups || []).some(
+    (g) =>
+      (g.overseerId === me || g.assistantId === me) &&
+      (g.memberIds.includes(publisherId) || g.overseerId === publisherId || g.assistantId === publisherId)
+  );
+}
+
+/**
+ * ¿Puede este actor vincular una cuenta de Google con este rol? Solo el coordinador puede vincular
+ * una cuenta como Coordinador; el resto sigue las mismas reglas que la asignación de roles.
+ */
+export function checkEmailRoleLink(
+  actorRoles: (TheocraticRole | string)[],
+  role: TheocraticRole | string
+): PolicyDecision {
+  if (!canAdministerAccess(actorRoles)) return { allowed: false, reason: 'Tu rol no puede administrar accesos.' };
+  if (isCoordinatorRoles(actorRoles)) return { allowed: true };
+  const r = normalizeTheocraticRole(role as string);
+  if (r === 'coordinador') return { allowed: false, reason: 'Solo el Coordinador puede vincular una cuenta como Coordinador.' };
+  if (r === 'anciano') return { allowed: false, reason: 'Solo el Coordinador puede vincular una cuenta con el rol de Anciano.' };
+  return { allowed: true };
+}
+

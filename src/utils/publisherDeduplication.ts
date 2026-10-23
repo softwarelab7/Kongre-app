@@ -40,19 +40,21 @@ export function areNamesEquivalent(nameA?: string | null, nameB?: string | null)
   const wordsB = normB.split(' ').filter((w) => w.length > 1);
 
   if (wordsA.length >= 2 && wordsB.length >= 2) {
-    // Si comparten el primer nombre y el primer apellido
-    if (wordsA[0] === wordsB[0] && wordsA[1] === wordsB[1]) {
+    // Si ambas tienen exactamente las mismas palabras sin importar el orden (ej. "Gutiérrez, Héctor" vs "Héctor Gutiérrez")
+    const setA = new Set(wordsA);
+    const setB = new Set(wordsB);
+    if (wordsA.length === wordsB.length && wordsA.every((w) => setB.has(w))) {
       return true;
     }
 
-    // Coincidencia de todas las palabras de la lista menor
-    const setA = new Set(wordsA);
-    const setB = new Set(wordsB);
-    const matchesInB = wordsA.filter((w) => setB.has(w)).length;
-    const matchesInA = wordsB.filter((w) => setA.has(w)).length;
-
-    if (matchesInB >= 2 && (matchesInB === wordsA.length || matchesInA === wordsB.length)) {
-      return true;
+    // Coincidencia completa de la lista menor si tiene al menos 2 palabras y no hay colisión de segundo apellido diferente
+    if (wordsA.length !== wordsB.length) {
+      const shorter = wordsA.length < wordsB.length ? wordsA : wordsB;
+      const longerSet = new Set(wordsA.length < wordsB.length ? wordsB : wordsA);
+      if (shorter.length >= 2 && shorter.every((w) => longerSet.has(w))) {
+        // Solo si la diferencia es un segundo apellido o nombre intermedio y comparten el primer apellido y nombre
+        return true;
+      }
     }
   }
 
@@ -61,6 +63,8 @@ export function areNamesEquivalent(nameA?: string | null, nameB?: string | null)
 
 /**
  * Verifica si dos objetos de publicador son en realidad la misma persona.
+ * NOTA: El PIN personal NUNCA debe usarse como criterio de fusión de identidad,
+ * ya que un PIN duplicado o temporal no significa que dos hermanos sean la misma persona.
  */
 export function isSamePublisher(p1: Partial<Publisher>, p2: Partial<Publisher>): boolean {
   if (!p1 || !p2) return false;
@@ -78,14 +82,7 @@ export function isSamePublisher(p1: Partial<Publisher>, p2: Partial<Publisher>):
     return true;
   }
 
-  // 4. Mismo PIN Personal (si ambos tienen PIN válido de al menos 4 dígitos)
-  const pin1 = String(p1.personalPin || '').trim();
-  const pin2 = String(p2.personalPin || '').trim();
-  if (pin1.length >= 4 && pin2.length >= 4 && pin1 === pin2) {
-    return true;
-  }
-
-  // 5. Nombres equivalentes (con o sin tildes)
+  // 4. Nombres equivalentes (con o sin tildes)
   const name1 = p1.name || (p1 as any).full_name;
   const name2 = p2.name || (p2 as any).full_name;
   if (name1 && name2 && areNamesEquivalent(name1, name2)) {

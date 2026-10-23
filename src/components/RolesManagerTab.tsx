@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 import { useSecurity } from '../context/SecurityContext';
-import { TheocraticRole, THEOCRATIC_ROLES } from '../utils/rbac';
+import { TheocraticRole, THEOCRATIC_ROLES, checkCredentialChange, checkEmailRoleLink, getAssignableRoles, canRevealPinOf } from '../utils/rbac';
 import {
   generateSecurePublisherPin,
   formatCanonicalCongregationId,
@@ -58,6 +58,8 @@ interface RolesManagerTabProps {
 export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, onBack }) => {
   const {
     activeRole,
+    activeRoles,
+    currentPublisherId,
     setActiveRole,
     effectiveRoleInfo,
     currentBrotherName,
@@ -321,10 +323,47 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
   };
 
   // Quick 1-click role change
+  // ── Política de administración de accesos (reglas en utils/rbac.ts) ───────────────────
+  const actorRoles: TheocraticRole[] = activeRoles && activeRoles.length > 0 ? activeRoles : [activeRole];
+  const policyGuard = (
+    target: { publisherId?: string; role?: string; privilege?: string },
+    newRole?: TheocraticRole
+  ): boolean => {
+    const decision = checkCredentialChange({
+      actorRoles,
+      actorPublisherId: currentPublisherId,
+      target: { publisherId: target.publisherId, currentRole: target.role, privilege: target.privilege },
+      newRole,
+    });
+    if (!decision.allowed) {
+      setFeedback(`🚫 ${decision.reason}`);
+      setTimeout(() => setFeedback(null), 4000);
+    }
+    return decision.allowed;
+  };
+  const canRevealPin = (item: { publisherId: string; role: TheocraticRole; privilege?: string }) =>
+    canRevealPinOf(
+      actorRoles,
+      { publisherId: item.publisherId, currentRole: item.role, privilege: item.privilege },
+      currentPublisherId
+    );
+  const roleOptionsGeneric = allTheocraticRoles.filter((r) => checkEmailRoleLink(actorRoles, r).allowed);
+  const roleOptionsFor = (item: { publisherId: string; role: TheocraticRole; privilege?: string }) =>
+    getAssignableRoles(
+      actorRoles,
+      { publisherId: item.publisherId, currentRole: item.role, privilege: item.privilege },
+      currentPublisherId
+    );
+  const denyReveal = () => {
+    setFeedback('🚫 No tienes permiso para ver ni compartir el PIN de este hermano.');
+    setTimeout(() => setFeedback(null), 4000);
+  };
+
   const handleChangePublisherRole = (publisherId: string, newRoleValue: TheocraticRole) => {
     if (!isAllowedAccess) return;
     const item = combinedPublishersList.find((p) => p.publisherId === publisherId);
     if (!item) return;
+    if (!policyGuard({ publisherId, role: item.role, privilege: item.privilege }, newRoleValue)) return;
 
     const pinToUse = item.pin || generateUniquePublisherPin();
 
@@ -350,7 +389,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       accion: 'CAMBIO_ROL_PUBLICADOR',
       modulo: 'seguridad',
       hermano_nid: publisherId,
-      hermano_nombre: currentBrotherName || 'Coordinador',
+      hermano_nombre: currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar',
       detalles: `Rol de ${item.name} actualizado a ${THEOCRATIC_ROLES[newRoleValue]?.shortName || newRoleValue}`,
     }).catch(() => {});
 
@@ -363,6 +402,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
     if (!isAllowedAccess) return;
     const item = combinedPublishersList.find((p) => p.publisherId === publisherId);
     if (!item) return;
+    if (!policyGuard({ publisherId, role: item.role, privilege: item.privilege })) return;
 
     const newGeneratedPin = generateUniquePublisherPin();
     assignPersonalPinToPublisher(
@@ -387,7 +427,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       accion: 'GENERAR_PIN_PUBLICADOR',
       modulo: 'seguridad',
       hermano_nid: publisherId,
-      hermano_nombre: currentBrotherName || 'Coordinador',
+      hermano_nombre: currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar',
       detalles: `Nuevo PIN personal generado para ${item.name}`,
     }).catch(() => {});
 
@@ -400,6 +440,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
     if (!isAllowedAccess) return;
     const item = combinedPublishersList.find((p) => p.publisherId === publisherId);
     if (!item) return;
+    if (!policyGuard({ publisherId, role: item.role, privilege: item.privilege })) return;
 
     removePublisherPin(publisherId);
 
@@ -415,7 +456,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       accion: 'REVOCAR_PIN_PUBLICADOR',
       modulo: 'seguridad',
       hermano_nid: publisherId,
-      hermano_nombre: currentBrotherName || 'Coordinador',
+      hermano_nombre: currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar',
       detalles: `PIN revocado y sesiones cerradas para ${item.name}`,
     }).catch(() => {});
 
@@ -426,7 +467,15 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
   // Auto-generate PINs for all publishers who don't have one
   const handleAutoAssignAllMissingPins = () => {
     if (!isAllowedAccess) return;
-    const missing = combinedPublishersList.filter((p) => !p.pin);
+    const missing = combinedPublishersList.filter(
+      (p) =>
+        !p.pin &&
+        checkCredentialChange({
+          actorRoles,
+          actorPublisherId: currentPublisherId,
+          target: { publisherId: p.publisherId, currentRole: p.role, privilege: p.privilege },
+        }).allowed
+    );
     if (missing.length === 0) {
       setFeedback('Todos los publicadores ya tienen su PIN personal asignado.');
       setTimeout(() => setFeedback(null), 3000);
@@ -464,7 +513,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       accion: 'AUTO_ASIGNAR_PINS_MASIVO',
       modulo: 'seguridad',
       hermano_nid: 'directorio',
-      hermano_nombre: currentBrotherName || 'Coordinador',
+      hermano_nombre: currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar',
       detalles: `Generación masiva de ${count} PINs personales únicos`,
     }).catch(() => {});
 
@@ -520,6 +569,8 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
   // Copy 1-click Pocket Direct Link to clipboard
   const handleCopyDirectLink = (name: string, _role: TheocraticRole, pin: string, id: string) => {
+    const revealTarget = combinedPublishersList.find((p) => p.publisherId === id);
+    if (revealTarget && !canRevealPin(revealTarget)) return denyReveal();
     const congNumber = formatCanonicalCongregationId(
       settings.congregationNumber ||
         settings.congregationId ||
@@ -550,6 +601,8 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
 
   // Share via WhatsApp
   const handleShareWhatsApp = (name: string, role: TheocraticRole, pin: string, id: string) => {
+    const revealTarget = combinedPublishersList.find((p) => p.publisherId === id);
+    if (revealTarget && !canRevealPin(revealTarget)) return denyReveal();
     const msg = getTheocraticShareMessage(name, role, pin, id);
     navigator.clipboard.writeText(msg);
     setCopiedId(id);
@@ -594,6 +647,9 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       return;
     }
 
+    const existingRoleForNew = combinedPublishersList.find((p) => p.publisherId === publisherId)?.role;
+    if (!policyGuard({ publisherId, role: existingRoleForNew, privilege: brotherPrivilege }, newRole)) return;
+
     assignPersonalPinToPublisher(publisherId, cleanPin, newRole, brotherName, undefined, brotherPrivilege);
 
     if (newSelectedPublisherId) {
@@ -611,7 +667,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       accion: 'ASIGNAR_ROL_MANUAL',
       modulo: 'seguridad',
       hermano_nid: publisherId,
-      hermano_nombre: currentBrotherName || 'Coordinador',
+      hermano_nombre: currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar',
       detalles: `Asignación de ${THEOCRATIC_ROLES[newRole]?.name} a ${brotherName} con PIN ${cleanPin}`,
     }).catch(() => {});
 
@@ -635,6 +691,15 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       return;
     }
 
+    const existingForEdit = combinedPublishersList.find((p) => p.publisherId === editingPublisher.id);
+    if (
+      !policyGuard(
+        { publisherId: editingPublisher.id, role: existingForEdit?.role, privilege: editingPublisher.privilege ?? existingForEdit?.privilege },
+        editingPublisher.role
+      )
+    )
+      return;
+
     assignPersonalPinToPublisher(
       editingPublisher.id,
       cleanPin,
@@ -657,7 +722,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
       accion: 'EDITAR_CREDENCIALES_HERMANO',
       modulo: 'seguridad',
       hermano_nid: editingPublisher.id,
-      hermano_nombre: currentBrotherName || 'Coordinador',
+      hermano_nombre: currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar',
       detalles: `Actualizadas credenciales de ${editingPublisher.name}: Rol ${THEOCRATIC_ROLES[editingPublisher.role]?.shortName}`,
     }).catch(() => {});
 
@@ -696,6 +761,12 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
   const handleCreateInvitation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!invBrotherName.trim()) return;
+    const inviteDecision = checkEmailRoleLink(actorRoles, invRole);
+    if (!inviteDecision.allowed) {
+      setFeedback(`🚫 ${inviteDecision.reason}`);
+      setTimeout(() => setFeedback(null), 4000);
+      return;
+    }
 
     try {
       const inv = await createInvitation(invRole, invBrotherName.trim(), 7);
@@ -1119,7 +1190,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
             ) : (
               filteredPublishers.map((item) => {
                 const roleInfo = THEOCRATIC_ROLES[item.role] || THEOCRATIC_ROLES.publico;
-                const isVisible = visiblePins[item.publisherId] || false;
+                const isVisible = (visiblePins[item.publisherId] || false) && canRevealPin(item);
                 const hasPin = item.hasPin;
 
                 return (
@@ -1161,7 +1232,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                           onChange={(e) => handleChangePublisherRole(item.publisherId, e.target.value as TheocraticRole)}
                           className="w-full pl-3 pr-8 py-2 text-xs sm:text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/90 text-slate-900 dark:text-white cursor-pointer focus:ring-2 focus:ring-indigo-500/20 shadow-2xs"
                         >
-                          {allTheocraticRoles.map((rKey) => (
+                          {roleOptionsFor(item).map((rKey) => (
                             <option key={rKey} value={rKey}>
                               {THEOCRATIC_ROLES[rKey].name} ({THEOCRATIC_ROLES[rKey].shortName})
                             </option>
@@ -1182,7 +1253,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                           </div>
 
                           <div className="flex items-center gap-1">
-                            {item.pin && (
+                            {item.pin && canRevealPin(item) && (
                               <button
                                 type="button"
                                 onClick={() => togglePinVisibility(item.publisherId)}
@@ -1460,14 +1531,22 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                       <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           type="button"
-                          onClick={() => approveAccountLinkRequest(req.id, currentBrotherName || 'Coordinador')}
+                          onClick={() => {
+                            const linkDecision = checkEmailRoleLink(actorRoles, req.role);
+                            if (!linkDecision.allowed) {
+                              setFeedback(`🚫 ${linkDecision.reason} (la solicitud pide el rol "${req.role}")`);
+                              setTimeout(() => setFeedback(null), 5000);
+                              return;
+                            }
+                            approveAccountLinkRequest(req.id, currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar');
+                          }}
                           className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer shadow-xs"
                         >
                           Aprobar
                         </button>
                         <button
                           type="button"
-                          onClick={() => rejectAccountLinkRequest(req.id, currentBrotherName || 'Coordinador')}
+                          onClick={() => rejectAccountLinkRequest(req.id, currentBrotherName || THEOCRATIC_ROLES[activeRole]?.shortName || 'Sin identificar')}
                           className="px-2.5 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer"
                         >
                           Rechazar
@@ -1521,7 +1600,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                     onChange={(e) => setInvRole(e.target.value as TheocraticRole)}
                     className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
                   >
-                    {allTheocraticRoles.map((rKey) => (
+                    {roleOptionsGeneric.map((rKey) => (
                       <option key={rKey} value={rKey}>
                         {THEOCRATIC_ROLES[rKey].name} ({THEOCRATIC_ROLES[rKey].shortName})
                       </option>
@@ -1766,7 +1845,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                   onChange={(e) => setNewRole(e.target.value as TheocraticRole)}
                   className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
                 >
-                  {allTheocraticRoles.map((rKey) => (
+                  {roleOptionsGeneric.map((rKey) => (
                     <option key={rKey} value={rKey}>
                       {THEOCRATIC_ROLES[rKey].name} ({THEOCRATIC_ROLES[rKey].shortName})
                     </option>
@@ -1862,7 +1941,7 @@ export const RolesManagerTab: React.FC<RolesManagerTabProps> = ({ setActiveTab, 
                   }
                   className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold"
                 >
-                  {allTheocraticRoles.map((rKey) => (
+                  {roleOptionsGeneric.map((rKey) => (
                     <option key={rKey} value={rKey}>
                       {THEOCRATIC_ROLES[rKey].name} ({THEOCRATIC_ROLES[rKey].shortName})
                     </option>

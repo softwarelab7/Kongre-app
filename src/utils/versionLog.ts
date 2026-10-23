@@ -25,19 +25,179 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.11.1';
-export const CURRENT_BUILD_CODE = '2026.10.22.3801';
+export const CURRENT_APP_VERSION = '2.11.8';
+export const CURRENT_BUILD_CODE = '2026.10.22.4501';
 export const BUILD_DATE = '22 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.11.8',
+    buildCode: '2026.10.22.4501',
+    date: '22 de Octubre, 2026',
+    title: 'Eliminación del Menú Lateral en Dispositivos Móviles y Navegación Exclusiva Inferior',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Eliminación del Botón y Cajón Lateral en Móvil (Navbar.tsx): Se retiró por completo el botón de menú hamburguesa en la cabecera móvil (< md), el sensor táctil del borde izquierdo y los gestos de deslizamiento lateral (swipe-to-open).',
+      },
+      {
+        category: 'improvement',
+        text: 'Cabecera Móvil Unificada con Icono de Congregación: En dispositivos móviles ahora se muestra directamente el distintivo limpio de la congregación (Building2) junto al título y migas de pan.',
+      },
+      {
+        category: 'improvement',
+        text: 'Hoja Inferior Nativa (Bottom Sheet) desde Barra Inferior: Al abrir el catálogo completo de departamentos desde la barra de navegación inferior en móvil, ahora se despliega como una hoja inferior (slide-in-from-bottom) sin menús ni tiradores laterales.',
+      },
+    ],
+  },
+  {
+    version: '2.11.7',
+    buildCode: '2026.10.22.4401',
+    date: '22 de Octubre, 2026',
+    title: 'Control de Barra Lateral Oculto Detrás del Icono de Congregación con Revelación al Pasar el Cursor',
+    isCurrent: false,
+    highlight: 'Versión estable anterior',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Revelación Dinámica al Pasar el Cursor (Hover) (Navbar.tsx): El control para ocultar la barra lateral ahora reside elegantemente detrás del icono de congregación (Building2). Por defecto se presenta como el avatar o distintivo visual de la congregación, y al pasar el cursor (hover) se transforma con una microanimación fluida en el botón PanelLeftClose ([|<]) para colapsar la barra lateral con un clic.',
+      },
+      {
+        category: 'improvement',
+        text: 'Cabecera Limpia y Armoniosa: Sin botones desnudos o estáticos que interfieran con el nombre de la congregación cuando no se interactúa con ellos, manteniendo además el botón en el pie de la barra lateral y el atajo de teclado Ctrl+B / ⌘B.',
+      },
+    ],
+  },
+  {
+    version: '2.11.6',
+    buildCode: '2026.10.22.4301',
+    date: '22 de Octubre, 2026',
+    title: 'Corrección Definitiva de Ubicación del Control de Barra Lateral en Cabecera',
+    isCurrent: false,
+    highlight: 'Versión estable anterior',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'fix',
+        text: 'Eliminación del Icono Colisionante en Migas de Pan (Navbar.tsx): Se removió por completo el botón residual PanelLeftClose que aparecía flotando delante del nombre de la congregación en la cabecera cuando la barra lateral estaba abierta.',
+      },
+      {
+        category: 'improvement',
+        text: 'Ubicación Canónica en Barra de Herramientas Superior: El control de alternancia de la barra lateral ahora se ubica en el área derecha de utilidades de la cabecera (junto al selector de tema oscuro/claro) y en el pie de la barra lateral vertical, manteniendo la cabecera izquierda 100% limpia para el título y la navegación.',
+      },
+      {
+        category: 'improvement',
+        text: 'Persistencia de Accesibilidad con Atajo Ctrl+B / ⌘B: Se mantiene la capacidad de alternar la barra lateral al instante mediante teclado o botones no invasivos.',
+      },
+    ],
+  },
+  {
+    version: '2.11.5',
+    buildCode: '2026.10.22.4201',
+    date: '22 de Octubre, 2026',
+    title: 'Optimización Ergonómica del Control para Ocultar Barra Lateral y Atajo Global Ctrl+B',
+    isCurrent: false,
+    highlight: 'Versión estable anterior',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Ubicación Natural en Barra Lateral (Navbar.tsx): Se integró el botón para ocultar la barra lateral (PanelLeftClose) directamente en el pie de la barra vertical junto a Mi Perfil y Ajustes, donde reside la interacción del menú.',
+      },
+      {
+        category: 'improvement',
+        text: 'Cabecera Despejada y Diferenciación Móvil/Desktop (Navbar.tsx): En pantallas móviles el botón de cabecera ahora muestra el icono y etiqueta de "Menú" (hamburguesa). En escritorio, cuando la barra lateral está oculta, se muestra un botón destacado (PanelLeftOpen) para restaurarla junto al isotipo de Kongre.',
+      },
+      {
+        category: 'feature',
+        text: 'Atajo de Teclado Global Ctrl+B / ⌘B (App.tsx): Ahora es posible alternar (ocultar o mostrar) la barra lateral al instante desde cualquier sección del sistema presionando Ctrl+B o ⌘B.',
+      },
+    ],
+  },
+  {
+    version: '2.11.4',
+    buildCode: '2026.10.22.4101',
+    date: '22 de Octubre, 2026',
+    title: 'Eliminación de Barra de Cabecera Redundante en Mi Ministerio y Limpieza de Repeticiones en Navegación',
+    isCurrent: false,
+    highlight: 'Versión estable anterior',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Eliminación de Barra de Cabecera Redundante (MinisterioPublicadorTab.tsx): Se retiró la tarjeta/banner superior que duplicaba el título de la vista y contenía accesos repetidos hacia "Mis Asignaciones" y "Mi Congregación", completando el estándar global de arranque directo (Opción 1) y ahorrando hasta 90px de espacio vertical.',
+      },
+      {
+        category: 'fix',
+        text: 'Depuración de Secciones Duplicadas (Navbar.tsx): Se eliminó la repetición de "Portal del Publicador (mi_vista)" dentro de la categoría Supervisión & Control, consolidándola exclusivamente dentro del menú de Publicador.',
+      },
+      {
+        category: 'improvement',
+        text: 'Sincronización Bidireccional de Subpestañas (MinisterioPublicadorTab.tsx): Los botones de Panel Principal, Cronómetro, Revisitas y Estudios ahora actualizan directamente la pestaña activa de navegación global (setActiveTab), manteniendo la barra superior y migajas de pan perfectamente alineadas.',
+      },
+    ],
+  },
+  {
+    version: '2.11.3',
+    buildCode: '2026.10.22.4001',
+    date: '22 de Octubre, 2026',
+    title: 'Autoguardado Instantáneo de Tiempo de Ministerio (+15m) y Sincronización Multidispositivo en Tiempo Real',
+    isCurrent: false,
+    highlight: 'Versión estable anterior',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Autoguardado Instantáneo del Ministerio y Meta Mensual (MinisterioPublicadorTab.tsx): Cualquier ajuste de tiempo (+15m, +30m, +1h, -5m), cronómetro activo, cambio de meta mensual, revisitas o estudios bíblicos se guarda y sincroniza automáticamente en la nube sin necesidad de presionar manualmente "Guardar en mi Informe S-4".',
+      },
+      {
+        category: 'fix',
+        text: 'Sincronización de Fracciones de Hora (15 min) entre PC y Móvil (types/index.ts, supabaseSyncService.ts, CongregationContext.tsx): Inclusión de monthlyReports en payload_public con resolución inteligente por marca de tiempo (mergeMonthlyReports) y soporte para minutes, totalMinutes, hourGoal y timeLogs, evitando que las fracciones menores a 1 hora se redondeen a 0h en el dispositivo móvil.',
+      },
+      {
+        category: 'improvement',
+        text: 'Controles Rápidos en "Mi Meta y Registro Mensual" y Panorama General (MinisterioPublicadorTab.tsx, PanoramaGeneralTab.tsx): Botones directos (-5m, +15m, +30m, +1h) en la tarjeta de meta mensual y visualización exacta de horas y minutos (ej. 15m o 1h 15m) tanto en Mi Ministerio como en la tarjeta de Informe de Panorama General.',
+      },
+    ],
+  },
+  {
+    version: '2.11.2',
+    buildCode: '2026.10.22.3901',
+    date: '22 de Octubre, 2026',
+    title: 'Estrategia Avanzada de Caché en Service Worker y Persistencia Offline de Formularios S-89 con IndexedDB',
+    isCurrent: false,
+    highlight: 'Versión estable anterior',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Almacenamiento Persistente de Formularios S-89 en IndexedDB (s89IndexedDbService.ts): Nuevo motor Offline-First que solicita almacenamiento persistente (StorageManager.persist) y guarda todas las boletas S-89 por semana con cifrado AES-GCM en reposo, estados de entrega/confirmación y archivos PDF rellenados.',
+      },
+      {
+        category: 'improvement',
+        text: 'Estrategia de Caché Optimizada en Service Worker (vite.config.ts): Incorporación de reglas Workbox runtimeCaching específicas para formularios S-89 (StaleWhileRevalidate), plantillas PDF oficiales (CacheFirst) y datos de programación en Supabase (NetworkFirst con timeout de 4s), además de precaching extendido para archivos PDF y JSON.',
+      },
+      {
+        category: 'feature',
+        text: 'Sincronización Bidireccional con Service Worker (push-sw.js): Almacén s89_offline_forms integrado dentro del propio Service Worker con intercepción de rutas virtuales /__offline__/s89/* y soporte Background Sync (kongre-sync-s89-forms) para servir asignaciones estudiantiles incluso sin conexión.',
+      },
+      {
+        category: 'improvement',
+        text: 'Control de Entrega S-89 Offline (S89SlipsTab.tsx): Indicador de respaldo IndexedDB en la barra de acciones y botón interactivo en cada boleta S-89 para alternar entre "Pendiente" y "Entregada" con persistencia inmediata sin conexión.',
+      },
+    ],
+  },
+  {
     version: '2.11.1',
     buildCode: '2026.10.22.3801',
     date: '22 de Octubre, 2026',
     title: 'Blindaje de Invitaciones por QR y PIN, Asignación Inmediata de Rol Teocrático y Aislamiento de Modo Demo',
-    isCurrent: true,
-    highlight: 'Última versión compilada y activa',
+    isCurrent: false,
     environment: 'Producción Cloud (Kongre)',
     changes: [
       {

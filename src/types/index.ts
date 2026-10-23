@@ -588,12 +588,32 @@ export interface MonthlyServiceReport {
   month: string; // 'YYYY-MM'
   participated: boolean;
   hours?: number;
+  minutes?: number; // Minutos adicionales (0-59) para conservar fracciones como 15 min
+  totalMinutes?: number; // Total exacto de minutos acumulados en el mes (ej. 15, 75, 120)
+  returnVisits?: number;
+  placements?: number;
+  hourGoal?: number; // Meta mensual de horas configurada por el publicador
   bibleStudies: number;
   notes?: string;
   reportedAt?: string;
+  updatedAt?: string; // Timestamp ISO de la última sincronización automática o manual
   isPioneer?: boolean;
   isAuxiliaryPioneer?: boolean;
   creditHours?: number;
+  activeTimerSeconds?: number; // Segundos acumulados en el cronómetro pendientes de cerrar
+  timeLogs?: Array<{
+    id: string;
+    date: string;
+    month: string;
+    minutes: number;
+    modality: 'casa_en_casa' | 'carritos' | 'revisitas' | 'estudio' | 'informal';
+    returnVisitsCount: number;
+    placementsCount: number;
+    notes: string;
+    createdAt: string;
+  }>;
+  returnVisitRecords?: any[];
+  bibleStudyRecords?: any[];
 }
 
 // ==========================================

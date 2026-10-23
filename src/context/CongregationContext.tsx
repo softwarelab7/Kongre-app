@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabase';
-import { supabaseSyncService } from '../services/supabaseSyncService';
+import { supabaseSyncService, mergeMonthlyReports } from '../services/supabaseSyncService';
 import { QueueStats, getOfflineQueueStats } from '../services/indexedDbQueue';
 import { useAuth } from './AuthContext';
 import {
@@ -1567,8 +1567,20 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       localStorage.setItem(`${LOCAL_STORAGE_KEY}_notices`, JSON.stringify(data.notices));
     }
     if (data.monthlyReports && Array.isArray(data.monthlyReports)) {
-      setMonthlyReports(data.monthlyReports);
-      localStorage.setItem(`${LOCAL_STORAGE_KEY}_monthly_reports`, JSON.stringify(data.monthlyReports));
+      let currentLocalReports: MonthlyServiceReport[] = monthlyReports;
+      try {
+        const rawLocal = localStorage.getItem(`${LOCAL_STORAGE_KEY}_monthly_reports`);
+        if (rawLocal) {
+          const parsedLocal = JSON.parse(rawLocal);
+          if (Array.isArray(parsedLocal)) currentLocalReports = parsedLocal;
+        }
+      } catch {}
+      const mergedReports = mergeMonthlyReports(currentLocalReports, data.monthlyReports);
+      setMonthlyReports(mergedReports);
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_monthly_reports`, JSON.stringify(mergedReports));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('kongre_monthly_reports_hydrated', { detail: mergedReports }));
+      }
     }
     if (data.territories && Array.isArray(data.territories)) {
       setTerritories(data.territories);
@@ -4182,50 +4194,105 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const updateMonthlyReport = (report: MonthlyServiceReport) => {
+    const nowIso = new Date().toISOString();
+    const stampedReport: MonthlyServiceReport = {
+      ...report,
+      id: report.id || `rep-${report.publisherId}-${report.month}`,
+      updatedAt: report.updatedAt || nowIso,
+      reportedAt: report.reportedAt || nowIso,
+    };
+
     const existingIndex = monthlyReports.findIndex(
-      r => r.publisherId === report.publisherId && r.month === report.month
+      r => r.publisherId === stampedReport.publisherId && r.month === stampedReport.month
     );
     let updated: MonthlyServiceReport[];
     if (existingIndex >= 0) {
       updated = [...monthlyReports];
-      updated[existingIndex] = report;
+      updated[existingIndex] = { ...updated[existingIndex], ...stampedReport };
     } else {
-      updated = [...monthlyReports, { ...report, id: report.id || `rep-${Date.now()}` }];
+      updated = [...monthlyReports, stampedReport];
     }
     setMonthlyReports(updated);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_monthly_reports`, JSON.stringify(updated));
+    } catch {}
 
     const congId = resolveCongregationDocId();
     if (congId && typeof navigator !== 'undefined' && !navigator.onLine) {
       supabaseSyncService.enqueueOfflineChange(
         congId,
         {
-          settings: latestSettingsRef.current,
-          publishers,
-          weeks,
-          territories,
-          notices,
-          transactions,
-          audits: quarterlyAudits,
-          literatureItems,
-          literatureOrders: specialOrders,
-          literatureDistributions: groupDistributions,
-          literatureInventory: inventoryRecords,
+          ...getFreshLocalCongregationData(),
+          monthlyReports: updated,
         },
         {
           actionType: 'UPDATE_SERVICE_REPORT',
-          description: `Informe de servicio S-4 mes ${report.month}: ${publishers.find(p => p.id === report.publisherId)?.name || report.publisherId} (${report.hours || 0} hrs)`,
-          payload: report,
+          description: `Informe de servicio S-4 mes ${stampedReport.month}: ${publishers.find(p => p.id === stampedReport.publisherId)?.name || stampedReport.publisherId} (${stampedReport.hours || 0}h ${stampedReport.minutes || 0}m)`,
+          payload: stampedReport,
         }
       ).catch(() => {});
       refreshQueueStats();
     }
 
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, updated);
+    saveToFirestore(
+      publishers,
+      weeks,
+      preachingGroups,
+      customDuties,
+      settings,
+      outgoingSpeakers,
+      fieldServiceMeetings,
+      cartLocations,
+      cartShifts,
+      notices,
+      updated,
+      territories,
+      circuitVisit,
+      transactions,
+      quarterlyAudits,
+      memorialPlans,
+      theocraticAssemblies,
+      literatureItems,
+      specialOrders,
+      groupDistributions,
+      inventoryRecords,
+      accountLinkRequests,
+      clmProgramas,
+      { immediate: true }
+    );
   };
 
   const batchUpdateMonthlyReports = (newReports: MonthlyServiceReport[]) => {
     setMonthlyReports(newReports);
-    saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, fieldServiceMeetings, cartLocations, cartShifts, notices, newReports);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_monthly_reports`, JSON.stringify(newReports));
+    } catch {}
+    saveToFirestore(
+      publishers,
+      weeks,
+      preachingGroups,
+      customDuties,
+      settings,
+      outgoingSpeakers,
+      fieldServiceMeetings,
+      cartLocations,
+      cartShifts,
+      notices,
+      newReports,
+      territories,
+      circuitVisit,
+      transactions,
+      quarterlyAudits,
+      memorialPlans,
+      theocraticAssemblies,
+      literatureItems,
+      specialOrders,
+      groupDistributions,
+      inventoryRecords,
+      accountLinkRequests,
+      clmProgramas,
+      { immediate: true }
+    );
   };
 
   // Territory Management actions (S-13)

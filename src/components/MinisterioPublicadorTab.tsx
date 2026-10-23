@@ -1,5 +1,5 @@
 // src/components/MinisterioPublicadorTab.tsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { ActiveTab } from './Navbar';
@@ -154,9 +154,20 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     isDemoMode,
   } = useCongregation();
 
-  const { currentPublisherId, currentBrotherName } = useAuth();
+  const { currentPublisherId, currentBrotherName, activeRole } = useAuth();
 
   const [activeSubTab, setActiveSubTab] = useState<MinistrySubTab>(initialSubTab);
+
+  // Referencia para saber si el usuario realizó cambios locales en esta sesión
+  const hasUserEditedRef = useRef<boolean>(false);
+  const lastAutoSavedSignatureRef = useRef<string>('');
+
+  const markLocalMinistryEdit = () => {
+    hasUserEditedRef.current = true;
+    try {
+      localStorage.setItem('kongre_ministry_local_updated_at', String(Date.now()));
+    } catch {}
+  };
 
   useEffect(() => {
     if (initialSubTab) {
@@ -164,7 +175,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     }
   }, [initialSubTab]);
 
-  // Identify current publisher profile
+  // Identify current publisher profile consistently across desktop and mobile
   const activePublisherId = useMemo(() => {
     if (currentPublisherId && publishersMap.has(currentPublisherId)) {
       return currentPublisherId;
@@ -172,13 +183,27 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     const saved = localStorage.getItem('kongre_current_publisher_id_v2');
     if (saved && publishersMap.has(saved)) return saved;
     if (currentBrotherName) {
+      const cleanName = currentBrotherName.toLowerCase().trim();
       const match = publishers.find(
-        (p) => p.name.toLowerCase().trim() === currentBrotherName.toLowerCase().trim()
+        (p) => p.name.toLowerCase().trim() === cleanName
       );
       if (match) return match.id;
     }
+    if (
+      activeRole === 'coordinador' ||
+      (currentBrotherName && currentBrotherName.toLowerCase().includes('coordinador'))
+    ) {
+      const coordName = (settings.coordinatorName || '').toLowerCase().trim();
+      const coordMatch = publishers.find(
+        (p) =>
+          p.theocraticRole === 'coordinador' ||
+          (p.id && p.id.startsWith('pub-coord')) ||
+          (coordName && p.name.toLowerCase().trim() === coordName)
+      );
+      if (coordMatch) return coordMatch.id;
+    }
     return publishers[0]?.id || 'pub-local';
-  }, [currentPublisherId, currentBrotherName, publishers, publishersMap]);
+  }, [currentPublisherId, currentBrotherName, activeRole, settings.coordinatorName, publishers, publishersMap]);
 
   const activePublisher = publishersMap.get(activePublisherId);
 
@@ -284,6 +309,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   };
 
   const handleAdjustTimerMinutes = (deltaMinutes: number) => {
+    markLocalMinistryEdit();
     setTimerState((prev) => {
       const currentElapsed =
         prev.isRunning && prev.startedAt
@@ -299,6 +325,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   };
 
   const handleResetTimer = () => {
+    markLocalMinistryEdit();
     setTimerState({
       isRunning: false,
       startedAt: null,
@@ -395,10 +422,44 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   });
 
   const handleUpdateGoal = (newGoal: number) => {
+    markLocalMinistryEdit();
     setHourGoal(newGoal);
     try {
       localStorage.setItem(STORAGE_KEY_GOAL, String(newGoal));
     } catch {}
+  };
+
+  // Ajuste rápido directo desde la tarjeta "Mi Meta y Registro Mensual" (+15m, +30m, +1h, -5m)
+  const handleQuickAdjustMonthlyMinutes = (deltaMinutes: number) => {
+    markLocalMinistryEdit();
+    setTimeLogs((prev) => {
+      const quickLogId = `log-quick-${currentMonthKey}`;
+      const existingQuick = prev.find((l) => l.id === quickLogId || (l.month === currentMonthKey && l.date === todayIso));
+      if (existingQuick) {
+        const nextMins = Math.max(0, existingQuick.minutes + deltaMinutes);
+        if (nextMins === 0) {
+          return prev.filter((l) => l.id !== existingQuick.id);
+        }
+        return prev.map((l) =>
+          l.id === existingQuick.id
+            ? { ...l, minutes: nextMins, createdAt: new Date().toISOString() }
+            : l
+        );
+      }
+      if (deltaMinutes <= 0) return prev;
+      const newQuickLog: MinistryTimeLog = {
+        id: quickLogId,
+        date: todayIso,
+        month: currentMonthKey,
+        minutes: deltaMinutes,
+        modality: timerState.modality || 'casa_en_casa',
+        returnVisitsCount: 0,
+        placementsCount: 0,
+        notes: 'Registro rápido mensual',
+        createdAt: new Date().toISOString(),
+      };
+      return [newQuickLog, ...prev];
+    });
   };
 
   // Save finished live timer session
@@ -409,6 +470,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   };
 
   const handleFinishAndSaveSession = () => {
+    markLocalMinistryEdit();
     const minutes = Math.max(1, Math.round(displaySeconds / 60));
     const newLog: MinistryTimeLog = {
       id: `log-${Date.now()}`,
@@ -424,15 +486,15 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     setTimeLogs((prev) => [newLog, ...prev]);
     handleResetTimer();
     triggerToast(
-      `¡Sesión guardada! Se sumaron ${Math.floor(minutes / 60)}h ${minutes % 60}min a tu registro del mes.`
+      `¡Sesión guardada y sincronizada automáticamente! Se sumaron ${Math.floor(minutes / 60)}h ${minutes % 60}min a tu registro del mes.`
     );
   };
 
   // Manual Time Log Modal
   const [isManualLogOpen, setIsManualLogOpen] = useState(false);
   const [manualDate, setManualDate] = useState(todayIso);
-  const [manualHours, setManualHours] = useState(2);
-  const [manualMinutes, setManualMinutes] = useState(0);
+  const [manualHours, setManualHours] = useState(0);
+  const [manualMinutes, setManualMinutes] = useState(15);
   const [manualModality, setManualModality] = useState<MinistryTimeLog['modality']>('casa_en_casa');
   const [manualRV, setManualRV] = useState(0);
   const [manualPlacements, setManualPlacements] = useState(0);
@@ -443,6 +505,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     const totalMins = manualHours * 60 + manualMinutes;
     if (totalMins <= 0) return;
 
+    markLocalMinistryEdit();
     const newLog: MinistryTimeLog = {
       id: `log-${Date.now()}`,
       date: manualDate,
@@ -460,10 +523,11 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     setManualNotes('');
     setManualRV(0);
     setManualPlacements(0);
-    triggerToast('Registro de tiempo añadido correctamente.');
+    triggerToast('Registro de tiempo añadido y sincronizado automáticamente.');
   };
 
   const handleDeleteTimeLog = (id: string) => {
+    markLocalMinistryEdit();
     setTimeLogs((prev) => prev.filter((l) => l.id !== id));
   };
 
@@ -624,6 +688,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     e.preventDefault();
     if (!rvForm.name.trim()) return;
 
+    markLocalMinistryEdit();
     if (editingRv) {
       setReturnVisits((prev) =>
         prev.map((item) =>
@@ -656,6 +721,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   };
 
   const handleLogQuickVisitToday = (rvId: string) => {
+    markLocalMinistryEdit();
     setReturnVisits((prev) =>
       prev.map((rv) => {
         if (rv.id !== rvId) return rv;
@@ -676,6 +742,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   };
 
   const handleDeleteRv = (rvId: string) => {
+    markLocalMinistryEdit();
     setReturnVisits((prev) => prev.filter((r) => r.id !== rvId));
   };
 
@@ -804,6 +871,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     e.preventDefault();
     if (!studyForm.studentName.trim()) return;
 
+    markLocalMinistryEdit();
     if (editingStudy) {
       setBibleStudies((prev) =>
         prev.map((s) =>
@@ -832,6 +900,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
   // Convert Return Visit into a Bible Study in 1 click
   const handleConvertRvToStudy = (rv: ReturnVisitRecord) => {
+    markLocalMinistryEdit();
     const newStudy: BibleStudyRecord = {
       id: `st-${Date.now()}`,
       studentName: rv.name,
@@ -854,6 +923,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   };
 
   const handleUpdateStudyLesson = (studyId: string, delta: number) => {
+    markLocalMinistryEdit();
     setBibleStudies((prev) =>
       prev.map((s) => {
         if (s.id !== studyId) return s;
@@ -864,6 +934,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   };
 
   const handleMarkStudySessionToday = (studyId: string) => {
+    markLocalMinistryEdit();
     setBibleStudies((prev) =>
       prev.map((s) => {
         if (s.id !== studyId) return s;
@@ -880,30 +951,195 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   };
 
   const handleDeleteStudy = (studyId: string) => {
+    markLocalMinistryEdit();
     setBibleStudies((prev) => prev.filter((s) => s.id !== studyId));
   };
 
   // =========================================================================
-  // 5. CÁLCULO MENSUAL Y SINCRONIZACIÓN CON INFORME S-4
+  // 5. CÁLCULO MENSUAL Y SINCRONIZACIÓN AUTOMÁTICA CON INFORME S-4 Y NUBE
   // =========================================================================
+  // Existing S-4 report in CongregationContext (con resolución inteligente entre escritorio y móvil)
+  const existingS4Report = useMemo(() => {
+    const exact = monthlyReports.find(
+      (r) => r.publisherId === activePublisherId && r.month === currentMonthKey
+    );
+    if (exact) return exact;
+
+    const fallbackLocal = monthlyReports.find(
+      (r) => r.publisherId === 'pub-local' && r.month === currentMonthKey
+    );
+    if (fallbackLocal) return fallbackLocal;
+
+    if (
+      activeRole === 'coordinador' ||
+      activePublisherId.startsWith('pub-coord') ||
+      activePublisherId === publishers[0]?.id
+    ) {
+      const monthCandidates = monthlyReports.filter((r) => r.month === currentMonthKey);
+      const coordCandidate = monthCandidates.find(
+        (r) =>
+          r.publisherId.startsWith('pub-coord') ||
+          r.publisherId === publishers[0]?.id ||
+          (r.timeLogs && r.timeLogs.length > 0) ||
+          (r.totalMinutes && r.totalMinutes > 0)
+      );
+      if (coordCandidate) return coordCandidate;
+    }
+
+    return null;
+  }, [monthlyReports, activePublisherId, currentMonthKey, activeRole, publishers]);
+
+  // Hidratación reactiva desde la nube (Supabase / MonthlyServiceReport) para sesión móvil y escritorio
+  useEffect(() => {
+    if (!existingS4Report) return;
+
+    const cloudUpdatedAt = new Date(
+      existingS4Report.updatedAt || existingS4Report.reportedAt || 0
+    ).getTime();
+    let localUpdatedAt = 0;
+    try {
+      localUpdatedAt = Number(localStorage.getItem('kongre_ministry_local_updated_at') || 0);
+    } catch {}
+
+    const localLogsThisMonth = timeLogs.filter((l) => l.month === currentMonthKey);
+    const localTotalMinutes =
+      localLogsThisMonth.reduce((acc, l) => acc + (Number(l.minutes) || 0), 0) +
+      Math.floor((Number(timerState.accumulatedSeconds) || 0) / 60);
+
+    const cloudTotalMinutes =
+      typeof existingS4Report.totalMinutes === 'number'
+        ? existingS4Report.totalMinutes
+        : (Number(existingS4Report.hours) || 0) * 60 + (Number(existingS4Report.minutes) || 0);
+
+    const shouldHydrateFromCloud =
+      (!hasUserEditedRef.current && localTotalMinutes === 0 && (cloudTotalMinutes > 0 || existingS4Report.hourGoal !== undefined)) ||
+      (cloudUpdatedAt > localUpdatedAt + 500 && !hasUserEditedRef.current);
+
+    if (!shouldHydrateFromCloud) return;
+
+    if (typeof existingS4Report.hourGoal === 'number' && existingS4Report.hourGoal > 0) {
+      setHourGoal(existingS4Report.hourGoal);
+      try {
+        localStorage.setItem(STORAGE_KEY_GOAL, String(existingS4Report.hourGoal));
+      } catch {}
+    }
+
+    if (Array.isArray(existingS4Report.timeLogs) && existingS4Report.timeLogs.length > 0) {
+      setTimeLogs((prev) => {
+        const otherMonths = prev.filter((l) => l.month !== currentMonthKey);
+        const next = [...existingS4Report.timeLogs!, ...otherMonths];
+        try {
+          localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(next));
+        } catch {}
+        return next;
+      });
+    } else if (
+      cloudTotalMinutes > 0 &&
+      localTotalMinutes === 0 &&
+      !existingS4Report.activeTimerSeconds
+    ) {
+      // Si el informe en la nube tenía minutos/horas (ej. 15 min) sin array de logs detallados, sintetizar el registro mensual
+      const synthesizedLog: MinistryTimeLog = {
+        id: `log-cloud-${currentMonthKey}`,
+        date: todayIso,
+        month: currentMonthKey,
+        minutes: cloudTotalMinutes,
+        modality: 'casa_en_casa',
+        returnVisitsCount: existingS4Report.returnVisits || 0,
+        placementsCount: existingS4Report.placements || 0,
+        notes: 'Sincronizado desde mi informe en la nube',
+        createdAt: existingS4Report.updatedAt || existingS4Report.reportedAt || new Date().toISOString(),
+      };
+      setTimeLogs((prev) => {
+        const otherMonths = prev.filter((l) => l.month !== currentMonthKey);
+        const next = [synthesizedLog, ...otherMonths];
+        try {
+          localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(next));
+        } catch {}
+        return next;
+      });
+    }
+
+    if (
+      typeof existingS4Report.activeTimerSeconds === 'number' &&
+      !timerState.isRunning &&
+      existingS4Report.activeTimerSeconds !== timerState.accumulatedSeconds
+    ) {
+      setTimerState((prev) => ({
+        ...prev,
+        accumulatedSeconds: existingS4Report.activeTimerSeconds || 0,
+      }));
+    }
+
+    if (
+      Array.isArray(existingS4Report.returnVisitRecords) &&
+      existingS4Report.returnVisitRecords.length > 0
+    ) {
+      setReturnVisits(existingS4Report.returnVisitRecords);
+    }
+
+    if (
+      Array.isArray(existingS4Report.bibleStudyRecords) &&
+      existingS4Report.bibleStudyRecords.length > 0
+    ) {
+      setBibleStudies(existingS4Report.bibleStudyRecords);
+    }
+
+    if (cloudUpdatedAt > 0) {
+      try {
+        localStorage.setItem('kongre_ministry_local_updated_at', String(cloudUpdatedAt));
+      } catch {}
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('kongre_ministry_data_changed'));
+    }
+  }, [existingS4Report, currentMonthKey, todayIso]);
+
   const monthSummary = useMemo(() => {
     const logsThisMonth = timeLogs.filter((l) => l.month === currentMonthKey);
-    const totalMinutes = logsThisMonth.reduce((acc, l) => acc + l.minutes, 0);
+    const loggedMinutes = logsThisMonth.reduce((acc, l) => acc + (Number(l.minutes) || 0), 0);
+    const activeTimerMinutes = Math.floor(displaySeconds / 60);
+    const rawTotalMinutes = loggedMinutes + activeTimerMinutes;
+
+    const cloudFallbackMinutes = existingS4Report
+      ? typeof existingS4Report.totalMinutes === 'number'
+        ? existingS4Report.totalMinutes
+        : (Number(existingS4Report.hours) || 0) * 60 + (Number(existingS4Report.minutes) || 0)
+      : 0;
+
+    const totalMinutes =
+      rawTotalMinutes > 0 || hasUserEditedRef.current ? rawTotalMinutes : cloudFallbackMinutes;
     const fullHours = Math.floor(totalMinutes / 60);
     const remainingMinutes = totalMinutes % 60;
-    const totalReturnVisitsLogged = logsThisMonth.reduce((acc, l) => acc + l.returnVisitsCount, 0);
-    const totalPlacementsLogged = logsThisMonth.reduce((acc, l) => acc + l.placementsCount, 0);
+    const totalReturnVisitsLogged =
+      logsThisMonth.reduce((acc, l) => acc + (Number(l.returnVisitsCount) || 0), 0) +
+      (timerState.sessionReturnVisits || 0);
+    const totalPlacementsLogged =
+      logsThisMonth.reduce((acc, l) => acc + (Number(l.placementsCount) || 0), 0) +
+      (timerState.sessionPlacements || 0);
 
     // Active bible studies conducted at least once in currentMonthKey
     const activeStudiesThisMonth = bibleStudies.filter((s) =>
       s.sessionsThisMonth.some((d) => d.startsWith(currentMonthKey))
     ).length;
 
-    const totalStudiesCount = Math.max(activeStudiesThisMonth, bibleStudies.length);
-    const progressPct = hourGoal > 0 ? Math.min(100, Math.round((totalMinutes / (hourGoal * 60)) * 100)) : 100;
+    const totalStudiesCount = Math.max(
+      activeStudiesThisMonth,
+      bibleStudies.length,
+      existingS4Report?.bibleStudies || 0
+    );
+    const progressPct =
+      hourGoal > 0 ? Math.min(100, Math.round((totalMinutes / (hourGoal * 60)) * 100)) : 100;
+
+    const remainingGoalTotalMinutes = Math.max(0, hourGoal * 60 - totalMinutes);
+    const remainingGoalHours = Math.floor(remainingGoalTotalMinutes / 60);
+    const remainingGoalMinutes = remainingGoalTotalMinutes % 60;
 
     return {
       logsThisMonth,
+      loggedMinutes,
+      activeTimerMinutes,
       totalMinutes,
       fullHours,
       remainingMinutes,
@@ -911,22 +1147,24 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
       totalPlacementsLogged,
       totalStudiesCount,
       progressPct,
+      remainingGoalHours,
+      remainingGoalMinutes,
     };
-  }, [timeLogs, currentMonthKey, bibleStudies, hourGoal]);
-
-  // Existing S-4 report in CongregationContext
-  const existingS4Report = useMemo(() => {
-    return (
-      monthlyReports.find(
-        (r) => r.publisherId === activePublisherId && r.month === currentMonthKey
-      ) || null
-    );
-  }, [monthlyReports, activePublisherId, currentMonthKey]);
+  }, [
+    timeLogs,
+    currentMonthKey,
+    bibleStudies,
+    hourGoal,
+    displaySeconds,
+    timerState.sessionReturnVisits,
+    timerState.sessionPlacements,
+    existingS4Report,
+  ]);
 
   const [s4Notes, setS4Notes] = useState(() => existingS4Report?.notes || '');
   const [s4Participated, setS4Participated] = useState(true);
 
-  const handleSyncAndSubmitS4 = () => {
+  const buildCurrentMonthlyReport = (): MonthlyServiceReport => {
     const isPioneer =
       activePublisher?.privilege === 'precursor_regular' ||
       activePublisher?.pioneerStatus === 'regular' ||
@@ -935,35 +1173,142 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
       activePublisher?.privilege === 'precursor_auxiliar' ||
       activePublisher?.pioneerStatus === 'auxiliar_continuo';
 
-    const report: MonthlyServiceReport = {
+    const nowIso = new Date().toISOString();
+
+    return {
       id: existingS4Report?.id || `rep-${activePublisherId}-${currentMonthKey}`,
       publisherId: activePublisherId,
       month: currentMonthKey,
       participated: s4Participated || monthSummary.totalMinutes > 0,
       hours: monthSummary.fullHours,
+      minutes: monthSummary.remainingMinutes,
+      totalMinutes: monthSummary.totalMinutes,
+      hourGoal,
+      returnVisits: Math.max(returnVisits.length, monthSummary.totalReturnVisitsLogged),
+      placements: monthSummary.totalPlacementsLogged,
       bibleStudies: monthSummary.totalStudiesCount,
+      activeTimerSeconds: timerState.accumulatedSeconds,
+      timeLogs: monthSummary.logsThisMonth,
+      returnVisitRecords: returnVisits,
+      bibleStudyRecords: bibleStudies,
       notes:
         s4Notes.trim() ||
         (monthSummary.remainingMinutes > 0
-          ? `Quedan ${monthSummary.remainingMinutes} min acumulados para el próximo mes.`
+          ? `Tiempo registrado: ${monthSummary.fullHours}h ${monthSummary.remainingMinutes}min (Meta: ${hourGoal}h).`
           : undefined),
-      reportedAt: new Date().toISOString(),
+      reportedAt: nowIso,
+      updatedAt: nowIso,
       isPioneer: Boolean(isPioneer),
       isAuxiliaryPioneer: Boolean(isAux),
     };
+  };
 
+  // Guardado y sincronización AUTOMÁTICA en mi informe y en la nube ante cualquier cambio de tiempo, meta, revisitas o estudios
+  useEffect(() => {
+    if (!hasUserEditedRef.current) return;
+
+    const signature = JSON.stringify({
+      publisherId: activePublisherId,
+      month: currentMonthKey,
+      totalMinutes: monthSummary.totalMinutes,
+      hourGoal,
+      logsLen: monthSummary.logsThisMonth.length,
+      accSecs: timerState.accumulatedSeconds,
+      rvLen: returnVisits.length,
+      studiesLen: bibleStudies.length,
+      studiesCount: monthSummary.totalStudiesCount,
+      s4Notes: s4Notes.trim(),
+      s4Participated,
+    });
+
+    if (signature === lastAutoSavedSignatureRef.current) return;
+    lastAutoSavedSignatureRef.current = signature;
+
+    const report = buildCurrentMonthlyReport();
     updateMonthlyReport(report);
-    triggerToast('¡Informe S-4 sincronizado y enviado a la Secretaría de la congregación!');
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('kongre_ministry_data_changed'));
+    }
+  }, [
+    activePublisherId,
+    currentMonthKey,
+    monthSummary.totalMinutes,
+    monthSummary.logsThisMonth,
+    monthSummary.totalStudiesCount,
+    hourGoal,
+    timerState.accumulatedSeconds,
+    returnVisits,
+    bibleStudies,
+    s4Notes,
+    s4Participated,
+  ]);
+
+  const handleSyncAndSubmitS4 = () => {
+    markLocalMinistryEdit();
+    // Si hay tiempo en pausa en el cronómetro, consolidarlo también en el registro mensual
+    if (!timerState.isRunning && displaySeconds >= 60) {
+      const minutes = Math.max(1, Math.round(displaySeconds / 60));
+      const newLog: MinistryTimeLog = {
+        id: `log-${Date.now()}`,
+        date: todayIso,
+        month: currentMonthKey,
+        minutes,
+        modality: timerState.modality,
+        returnVisitsCount: timerState.sessionReturnVisits,
+        placementsCount: timerState.sessionPlacements,
+        notes: timerState.sessionNotes.trim() || `${MODALITY_LABELS[timerState.modality]}`,
+        createdAt: new Date().toISOString(),
+      };
+      const updatedLogs = [newLog, ...timeLogs];
+      setTimeLogs(updatedLogs);
+      setTimerState({
+        isRunning: false,
+        startedAt: null,
+        accumulatedSeconds: 0,
+        modality: 'casa_en_casa',
+        sessionReturnVisits: 0,
+        sessionPlacements: 0,
+        sessionNotes: '',
+      });
+    }
+
+    const report = buildCurrentMonthlyReport();
+    lastAutoSavedSignatureRef.current = JSON.stringify({
+      publisherId: activePublisherId,
+      month: currentMonthKey,
+      totalMinutes: report.totalMinutes,
+      hourGoal,
+      logsLen: report.timeLogs?.length || 0,
+      accSecs: 0,
+      rvLen: returnVisits.length,
+      studiesLen: bibleStudies.length,
+      studiesCount: report.bibleStudies,
+      s4Notes: s4Notes.trim(),
+      s4Participated,
+    });
+    updateMonthlyReport(report);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('kongre_ministry_data_changed'));
+      window.dispatchEvent(new CustomEvent('kongre_trigger_cloud_sync'));
+    }
+    triggerToast(
+      `¡Informe S-4 sincronizado en la nube (${monthSummary.fullHours}h ${monthSummary.remainingMinutes}min)! Ya está disponible en tu sesión móvil.`
+    );
   };
 
   const handleShareS4WhatsApp = () => {
     const pubName = activePublisher?.name || currentBrotherName || 'Publicador';
+    const timeLabel =
+      monthSummary.remainingMinutes > 0
+        ? `${monthSummary.fullHours} h ${monthSummary.remainingMinutes} min`
+        : `${monthSummary.fullHours} h`;
     const text =
       `*Informe de Servicio del Campo (S-4)* 📋\n` +
       `👤 *Hermano(a):* ${pubName}\n` +
       `📅 *Mes:* ${currentMonthLabel}\n` +
       `✅ *Participé en el ministerio:* Sí\n` +
-      `⏱️ *Horas:* ${monthSummary.fullHours}\n` +
+      `⏱️ *Tiempo:* ${timeLabel}\n` +
       `📖 *Cursos bíblicos:* ${monthSummary.totalStudiesCount}\n` +
       `🏠 *Revisitas registradas:* ${returnVisits.length}\n` +
       (s4Notes.trim() ? `📝 *Notas:* ${s4Notes.trim()}\n` : '') +
@@ -1034,62 +1379,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   const { hrs, mins, secs } = formatTimerHMS(displaySeconds);
 
   return (
-    <div className="space-y-4 sm:space-y-6 animate-fade-in select-none">
-      {/* =========================================================================
-          1. CABECERA PRINCIPAL: MI MINISTERIO (MENÚ PRINCIPAL DE PUBLICADORES)
-         ========================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-md shadow-indigo-500/20 shrink-0">
-            <Compass className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60">
-                Menú Principal • Publicador
-              </span>
-              <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                <Clock className="w-3 h-3" /> {currentMonthLabel}
-              </span>
-            </div>
-            <h2 className="text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate mt-0.5">
-              Mi Ministerio y Actividad Personal
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-              {activePublisher?.name || currentBrotherName || 'Publicador'} • Cronómetro de predicación, revisitas, estudios bíblicos e informe S-4
-            </p>
-          </div>
-        </div>
-
-        {/* Botones rápidos a Mis Asignaciones y a Panorama General */}
-        <div className="flex items-center gap-2 flex-wrap shrink-0">
-          <button
-            type="button"
-            onClick={() => setActiveTab('mi_vista')}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200/70 dark:border-purple-800/60 text-xs font-bold transition-all cursor-pointer active:scale-95"
-          >
-            <UserCheck className="w-3.5 h-3.5" />
-            <span>Mis Asignaciones</span>
-            {myUpcomingAssignments.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-purple-600 text-white">
-                {myUpcomingAssignments.length}
-              </span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('panorama_general')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer active:scale-95"
-            title="Abrir Mi Congregación (Informe, próximos privilegios, anuncios y eventos)"
-          >
-            <LayoutGrid className="w-3.5 h-3.5 text-indigo-500" />
-            <span>Mi Congregación</span>
-            <ArrowUpRight className="w-3.5 h-3.5 opacity-70" />
-          </button>
-        </div>
-      </div>
-
+    <div className="space-y-4 sm:space-y-5 animate-fade-in select-none">
       {/* Toast Notification */}
       {toastMsg && (
         <div className="p-3.5 rounded-2xl bg-emerald-600 text-white text-xs sm:text-sm font-bold flex items-center justify-between gap-3 shadow-lg shadow-emerald-600/20 animate-in fade-in slide-in-from-top-2">
@@ -1107,13 +1397,14 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         </div>
       )}
 
-      {/* =========================================================================
-          2. BARRA DE NAVEGACIÓN DE FUNCIONES PARA PUBLICADORES
-         ========================================================================= */}
+      {/* Barra de Funciones y Subpestañas de Mi Ministerio (Opción 1: arranque directo sin banner redundante) */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 p-1 rounded-xl bg-slate-200/70 dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800">
         <button
           type="button"
-          onClick={() => setActiveSubTab('resumen')}
+          onClick={() => {
+            setActiveSubTab('resumen');
+            setActiveTab('inicio');
+          }}
           className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeSubTab === 'resumen'
               ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
@@ -1126,7 +1417,10 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
         <button
           type="button"
-          onClick={() => setActiveSubTab('cronometro')}
+          onClick={() => {
+            setActiveSubTab('cronometro');
+            setActiveTab('cronometro_ministerio');
+          }}
           className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeSubTab === 'cronometro'
               ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
@@ -1136,13 +1430,22 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
           <Timer className={`w-3.5 h-3.5 shrink-0 ${timerState.isRunning ? 'text-emerald-500 animate-spin' : ''}`} />
           <span>Cronómetro</span>
           <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-300">
-            {monthSummary.fullHours}h
+            {monthSummary.fullHours > 0
+              ? monthSummary.remainingMinutes > 0
+                ? `${monthSummary.fullHours}h ${monthSummary.remainingMinutes}m`
+                : `${monthSummary.fullHours}h`
+              : monthSummary.remainingMinutes > 0
+                ? `${monthSummary.remainingMinutes}m`
+                : '0h'}
           </span>
         </button>
 
         <button
           type="button"
-          onClick={() => setActiveSubTab('revisitas')}
+          onClick={() => {
+            setActiveSubTab('revisitas');
+            setActiveTab('revisitas');
+          }}
           className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeSubTab === 'revisitas'
               ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-xs'
@@ -1158,7 +1461,10 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
         <button
           type="button"
-          onClick={() => setActiveSubTab('estudios')}
+          onClick={() => {
+            setActiveSubTab('estudios');
+            setActiveTab('estudios_biblicos');
+          }}
           className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeSubTab === 'estudios'
               ? 'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-xs'
@@ -1236,9 +1542,15 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
             <div>
               <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-slate-100 dark:border-slate-800/80">
                 <div>
-                  <span className="text-[9.5px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                    Resumen de {currentMonthLabel}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9.5px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                      Resumen de {currentMonthLabel}
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[9px] font-bold border border-emerald-200/60 dark:border-emerald-800/60">
+                      <CheckCircle2 className="w-2.5 h-2.5" />
+                      Autoguardado
+                    </span>
+                  </div>
                   <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
                     Mi Meta y Registro Mensual
                   </h3>
@@ -1258,7 +1570,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
               </div>
 
               {/* Barra de Progreso de Horas */}
-              <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-1.5">
+              <div className="p-3 rounded-xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-2">
                 <div className="flex items-baseline justify-between">
                   <div>
                     <span className="text-2xl font-black text-slate-900 dark:text-white">
@@ -1280,11 +1592,54 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                   />
                 </div>
 
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                {/* Controles rápidos de ajuste de tiempo mensual (+15m, +30m, +1h, -5m) con autoguardado en la nube */}
+                <div className="flex items-center justify-between gap-1.5 pt-1">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                    Sumar al mes:
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleQuickAdjustMonthlyMinutes(-5)}
+                      className="px-2 py-1 rounded-lg bg-white dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-slate-600 dark:text-slate-300 hover:text-rose-600 border border-slate-200 dark:border-slate-700 text-[10px] font-extrabold transition cursor-pointer"
+                      title="Restar 5 minutos al registro mensual"
+                    >
+                      -5m
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleQuickAdjustMonthlyMinutes(15)}
+                      className="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800 text-[10px] font-extrabold transition cursor-pointer"
+                      title="Sumar 15 minutos al registro mensual"
+                    >
+                      +15m
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleQuickAdjustMonthlyMinutes(30)}
+                      className="px-2 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800 text-[10px] font-extrabold transition cursor-pointer"
+                      title="Sumar 30 minutos al registro mensual"
+                    >
+                      +30m
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleQuickAdjustMonthlyMinutes(60)}
+                      className="px-2 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-extrabold transition cursor-pointer shadow-2xs"
+                      title="Sumar 1 hora al registro mensual"
+                    >
+                      +1h
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between pt-0.5">
                   <span>
-                    {monthSummary.fullHours >= hourGoal
+                    {monthSummary.totalMinutes >= hourGoal * 60
                       ? '¡Felicidades! Meta alcanzada 🎉'
-                      : `Faltan ${Math.max(0, hourGoal - monthSummary.fullHours)} h para meta`}
+                      : monthSummary.remainingGoalMinutes > 0
+                        ? `Faltan ${monthSummary.remainingGoalHours}h ${monthSummary.remainingGoalMinutes}m para meta`
+                        : `Faltan ${monthSummary.remainingGoalHours} h para meta`}
                   </span>
                   <span>{monthSummary.logsThisMonth.length} salidas</span>
                 </p>

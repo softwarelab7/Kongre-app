@@ -1,11 +1,12 @@
 // public/push-sw.js
 // Service Worker de Notificaciones Web Push y Recordatorios en Segundo Plano - Kongre
 
-const SW_VERSION = '2.9.2';
+const SW_VERSION = '2.11.2';
 const DB_NAME = 'kongre_push_sw_db_v1';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_REMINDERS = 'scheduled_reminders';
 const STORE_CONFIG = 'sw_config';
+const STORE_S89_FORMS = 's89_offline_forms';
 
 // ---------------------------------------------------------------------------
 // 1. UTILIDADES INDEXEDDB EN EL SERVICE WORKER
@@ -22,6 +23,10 @@ function openPushDb() {
       }
       if (!db.objectStoreNames.contains(STORE_CONFIG)) {
         db.createObjectStore(STORE_CONFIG, { keyPath: 'key' });
+      }
+      if (!db.objectStoreNames.contains(STORE_S89_FORMS)) {
+        const s89Store = db.createObjectStore(STORE_S89_FORMS, { keyPath: 'weekId' });
+        s89Store.createIndex('updatedAt', 'updatedAt', { unique: false });
       }
     };
     req.onsuccess = () => resolve(req.result);
@@ -148,6 +153,49 @@ async function clearAllRemindersInDb() {
     tx.onerror = () => {
       db.close();
       resolve(false);
+    };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// 1B. PERSISTENCIA INDEXEDDB PARA FORMULARIOS S-89 EN SERVICE WORKER
+// ---------------------------------------------------------------------------
+async function saveS89FormsToSwDb(payload) {
+  if (!payload || !payload.weekId) return false;
+  const db = await openPushDb();
+  return new Promise((resolve) => {
+    const tx = db.transaction(STORE_S89_FORMS, 'readwrite');
+    const store = tx.objectStore(STORE_S89_FORMS);
+    store.put({
+      weekId: payload.weekId,
+      weekStartDate: payload.weekStartDate || payload.weekId,
+      slips: Array.isArray(payload.slips) ? payload.slips : [],
+      updatedAt: payload.updatedAt || new Date().toISOString(),
+    });
+    tx.oncomplete = () => {
+      db.close();
+      resolve(true);
+    };
+    tx.onerror = () => {
+      db.close();
+      resolve(false);
+    };
+  });
+}
+
+async function getS89FormsFromSwDb(weekId) {
+  const db = await openPushDb();
+  return new Promise((resolve) => {
+    const tx = db.transaction(STORE_S89_FORMS, 'readonly');
+    const store = tx.objectStore(STORE_S89_FORMS);
+    const req = weekId ? store.get(weekId) : store.getAll();
+    req.onsuccess = () => {
+      db.close();
+      resolve(req.result || null);
+    };
+    req.onerror = () => {
+      db.close();
+      resolve(null);
     };
   });
 }
@@ -401,6 +449,50 @@ self.addEventListener('sync', (event) => {
         await checkAndFireDueReminders();
       })()
     );
+  } else if (event.tag === 'kongre-sync-s89-forms') {
+    event.waitUntil(
+      (async () => {
+        const allS89 = await getS89FormsFromSwDb(null);
+        const windowClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        for (const client of windowClients) {
+          client.postMessage({
+            type: 'S89_OFFLINE_SYNC_COMPLETED',
+            cachedWeeks: Array.isArray(allS89) ? allS89.length : 0,
+          });
+        }
+      })()
+    );
+  }
+});
+
+// Intercepción de rutas virtuales /__offline__/s89/* para servir formularios S-89 desde IndexedDB sin conexión
+self.addEventListener('fetch', (event) => {
+  try {
+    const url = new URL(event.request.url);
+    if (url.pathname.startsWith('/__offline__/s89/')) {
+      event.respondWith(
+        (async () => {
+          const weekId = url.searchParams.get('weekId');
+          const result = await getS89FormsFromSwDb(weekId);
+          return new Response(
+            JSON.stringify(
+              weekId
+                ? result || { weekId, slips: [] }
+                : { weeks: Array.isArray(result) ? result : [] }
+            ),
+            {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store',
+              },
+            }
+          );
+        })()
+      );
+    }
+  } catch (e) {
+    // Continuar con estrategia Workbox por defecto
   }
 });
 
@@ -551,6 +643,24 @@ self.addEventListener('message', (event) => {
         await clearAllRemindersInDb();
         if (event.ports && event.ports[0]) {
           event.ports[0].postMessage({ ok: true });
+        }
+      })()
+    );
+  } else if (data.type === 'SYNC_S89_OFFLINE_DATA') {
+    event.waitUntil(
+      (async () => {
+        await saveS89FormsToSwDb(data.payload);
+        if (event.ports && event.ports[0]) {
+          event.ports[0].postMessage({ ok: true, swVersion: SW_VERSION });
+        }
+      })()
+    );
+  } else if (data.type === 'GET_S89_OFFLINE_DATA') {
+    event.waitUntil(
+      (async () => {
+        const result = await getS89FormsFromSwDb(data.weekId || null);
+        if (event.ports && event.ports[0]) {
+          event.ports[0].postMessage({ ok: true, data: result });
         }
       })()
     );

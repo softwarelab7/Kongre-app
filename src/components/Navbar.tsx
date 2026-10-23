@@ -61,6 +61,8 @@ import {
   Building2,
   LayoutGrid,
   PanelLeft,
+  PanelLeftClose,
+  PanelLeftOpen,
   Smartphone,
   Table,
   CreditCard,
@@ -278,73 +280,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  // Gestos táctiles (Swipe) para abrir y cerrar el menú lateral en dispositivos móviles
-  useEffect(() => {
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let isTrackingSwipe = false;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (window.innerWidth >= 768) return;
-      if (e.touches.length !== 1) return;
-
-      const touch = e.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-
-      if (!isMobileMenuOpen) {
-        // Solo iniciar gesto de apertura si el toque se origina en el borde izquierdo (<= 45px)
-        if (touchStartX <= 45) {
-          isTrackingSwipe = true;
-        } else {
-          isTrackingSwipe = false;
-        }
-      } else {
-        // Menú abierto: rastrear swipe hacia la izquierda en el panel o backdrop
-        isTrackingSwipe = true;
-      }
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!isTrackingSwipe || e.touches.length !== 1) return;
-
-      const touch = e.touches[0];
-      const deltaX = touch.clientX - touchStartX;
-      const deltaY = touch.clientY - touchStartY;
-
-      if (!isMobileMenuOpen) {
-        // Deslizar desde el borde izquierdo hacia la derecha para abrir (> 45px)
-        if (deltaX > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
-          setIsMobileMenuOpen(true);
-          isTrackingSwipe = false;
-        }
-      } else {
-        // Deslizar hacia la izquierda para cerrar (<-45px)
-        if (deltaX < -45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
-          setIsMobileMenuOpen(false);
-          setDrawerSearch('');
-          isTrackingSwipe = false;
-        }
-      }
-    };
-
-    const handleTouchEnd = () => {
-      isTrackingSwipe = false;
-    };
-
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: true });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
-    window.addEventListener('touchcancel', handleTouchEnd, { passive: true });
-
-    return () => {
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchend', handleTouchEnd);
-      window.removeEventListener('touchcancel', handleTouchEnd);
-    };
-  }, [isMobileMenuOpen]);
 
   const overdueTerritoriesCount = territories.filter(
     (t) =>
@@ -694,7 +629,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       title: 'Supervisión & Control',
       shortTitle: 'Supervisión',
       icon: NAV_ICONS.supervision,
-      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'mi_vista', 'perfil', 'ajustes', 'roles'],
+      tabIds: ['conflictos', 'equidad', 'exportar_pdf', 'perfil', 'ajustes', 'roles'],
       items: [
         {
           id: 'conflictos',
@@ -715,12 +650,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           label: 'Formatos Oficiales (Local) y PDF',
           description: 'Carga y rellenado 100% local de S-21, S-89, S-140, S-88 y exportación',
           icon: NAV_ICONS.exportar_pdf,
-        },
-        {
-          id: 'mi_vista',
-          label: 'Portal del Publicador',
-          description: 'Asignaciones, informe mensual S-4 y ausencias con PIN personal',
-          icon: NAV_ICONS.mi_vista,
         },
         {
           id: 'perfil',
@@ -1128,8 +1057,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </div>
 
-          {/* Bottom Quick Settings & Profile */}
-          <div className="mt-auto pt-2 flex flex-col items-center gap-2 border-t border-slate-100 dark:border-slate-800 w-full shrink-0">
+          {/* Bottom Quick Settings, Profile & Sidebar Collapse Button */}
+          <div className="mt-auto pt-2 flex flex-col items-center gap-1.5 border-t border-slate-100 dark:border-slate-800 w-full shrink-0">
             <button
               type="button"
               onClick={() => handleSelectTab('perfil')}
@@ -1161,6 +1090,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
+            {/* Botón integrado directamente en la barra lateral para ocultarla */}
+            {onToggleSidebar && (
+              <button
+                type="button"
+                onClick={onToggleSidebar}
+                aria-label="Ocultar barra lateral"
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-all cursor-pointer group"
+                title="Ocultar barra lateral (Ctrl+B / ⌘B)"
+              >
+                <PanelLeftClose className="w-4 h-4 stroke-[1.8] group-hover:-translate-x-0.5 transition-transform" />
+              </button>
+            )}
+
             {onOpenVersionModal && (
               <button
                 type="button"
@@ -1181,36 +1123,56 @@ export const Navbar: React.FC<NavbarProps> = ({
          ========================================================================= */}
       <header className={`sticky top-0 z-30 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-all duration-200`}>
         <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 lg:px-8 2xl:px-12 gap-2">
-          {/* Left: Panel Toggle & Congregation Name */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-            {/* Sidebar toggle button (collapses/expands on desktop, opens drawer on mobile) */}
-            <button
-              type="button"
-              onClick={() => {
-                if (window.innerWidth < 768) {
-                  setIsMobileMenuOpen((prev) => !prev);
-                } else if (onToggleSidebar) {
-                  onToggleSidebar();
-                }
-              }}
-              aria-label={isSidebarVisible ? 'Ocultar barra lateral de navegación' : 'Mostrar barra lateral de navegación'}
-              aria-expanded={isSidebarVisible}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-200 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer shrink-0 active:scale-95"
-              title={isSidebarVisible ? 'Ocultar barra lateral' : 'Mostrar barra lateral'}
+          {/* Left: Sidebar Toggle & Congregation Breadcrumb (sin menú lateral en móvil) */}
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+            {/* Móvil (< md): Distintivo limpio de la congregación sin menú lateral */}
+            <div
+              className="md:hidden w-8 h-8 rounded-xl flex items-center justify-center bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100/90 dark:border-indigo-800/60 shrink-0 shadow-2xs"
+              aria-hidden="true"
             >
-              <PanelLeft className="w-4 h-4" />
-            </button>
+              <Building2 className="w-4 h-4 stroke-[2]" />
+            </div>
 
-            {/* If desktop sidebar is collapsed: show brand logo button */}
+            {/* Desktop cuando la barra lateral está oculta (!isSidebarVisible): Botón destacado para mostrarla + Logo */}
             {!isSidebarVisible && (
+              <div className="hidden md:flex items-center gap-2 shrink-0">
+                {onToggleSidebar && (
+                  <button
+                    type="button"
+                    onClick={onToggleSidebar}
+                    aria-label="Mostrar barra lateral"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100/90 dark:bg-slate-800/90 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 border border-slate-200/80 dark:border-slate-700/80 transition-all cursor-pointer shadow-2xs group"
+                    title="Mostrar barra lateral (Ctrl+B / ⌘B)"
+                  >
+                    <PanelLeftOpen className="w-4 h-4 stroke-[2] group-hover:translate-x-0.5 transition-transform" />
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleSelectTab('inicio')}
+                  aria-label="Ir al inicio - Mi Ministerio"
+                  className="shrink-0 cursor-pointer transition-transform hover:scale-105 active:scale-95"
+                  title="Kongre - Mi Ministerio"
+                >
+                  <Logo variant="isotipo" className="w-7 h-7 object-contain" />
+                </button>
+              </div>
+            )}
+
+            {/* Desktop cuando la barra lateral está visible: Oculto detrás del icono de congre y al pasar el cursor sale el botón */}
+            {isSidebarVisible && onToggleSidebar && (
               <button
                 type="button"
-                onClick={() => handleSelectTab('inicio')}
-                aria-label="Ir al inicio - Mi Ministerio"
-                className="shrink-0 cursor-pointer transition-transform hover:scale-105 active:scale-95 hidden md:block"
-                title="Kongre - Mi Ministerio"
+                onClick={onToggleSidebar}
+                aria-label="Ocultar barra lateral (Ctrl+B)"
+                className="hidden md:flex relative group w-8 h-8 rounded-xl items-center justify-center bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100/90 dark:hover:bg-indigo-900/60 border border-indigo-100/90 dark:border-indigo-800/60 transition-all cursor-pointer shrink-0 shadow-2xs"
+                title="Ocultar barra lateral (Ctrl+B / ⌘B)"
               >
-                <Logo variant="isotipo" className="w-7 h-7 object-contain" />
+                {/* Icono por defecto de Congregación */}
+                <Building2 className="w-4 h-4 stroke-[2] transition-all duration-200 group-hover:scale-0 group-hover:opacity-0" />
+                
+                {/* Botón para ocultar barra lateral revelado al pasar el cursor */}
+                <PanelLeftClose className="w-4 h-4 stroke-[2] absolute transition-all duration-200 scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100 text-indigo-600 dark:text-indigo-400" />
               </button>
             )}
 
@@ -1506,24 +1468,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </header>
 
-      {/* Sensor táctil del borde izquierdo en móvil para facilitar el gesto de apertura (swipe-to-open) */}
-      {!isMobileMenuOpen && (
-        <div
-          aria-hidden="true"
-          className="md:hidden fixed left-0 top-14 bottom-16 w-5 z-20 pointer-events-auto touch-pan-y"
-          title="Desliza desde el borde izquierdo para abrir el menú"
-        />
-      )}
-
       {/* =========================================================================
-          3. FULL SLIDE-OVER DRAWER (STRICTLY MOBILE ONLY: md:hidden)
+          3. PANEL INFERIOR DE MÓDULOS EN MÓVIL (BOTTOM SHEET - SIN MENÚ LATERAL)
          ========================================================================= */}
       {isMobileMenuOpen && (
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Menú de navegación móvil"
-          className="md:hidden fixed inset-0 z-50 flex animate-in fade-in duration-150"
+          aria-label="Selector de departamentos y módulos"
+          className="md:hidden fixed inset-0 z-50 flex flex-col justify-end animate-in fade-in duration-150"
         >
           {/* Backdrop */}
           <div
@@ -1534,27 +1487,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             }}
           />
 
-          {/* Drawer content with slide-in animation */}
-          <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 h-full shadow-2xl flex flex-col z-10 border-r border-slate-200 dark:border-slate-800 pb-[env(safe-area-inset-bottom,0px)] animate-in slide-in-from-left duration-200 ease-out">
-            {/* Tirador visual para deslizar o tocar hacia la izquierda para cerrar */}
+          {/* Bottom sheet content with slide-up animation */}
+          <div className="relative w-full max-h-[86dvh] bg-white dark:bg-slate-900 rounded-t-3xl shadow-2xl flex flex-col z-10 border-t border-slate-200 dark:border-slate-800 pb-[env(safe-area-inset-bottom,0px)] animate-in slide-in-from-bottom duration-200 ease-out overflow-hidden">
+            {/* Indicador superior de hoja inferior (Bottom Sheet Handle) */}
             <div
-              role="button"
-              tabIndex={0}
-              aria-label="Cerrar menú lateral"
-              className="absolute -right-3.5 top-1/2 -translate-y-1/2 w-7 h-14 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-700/90 rounded-r-2xl flex items-center justify-center shadow-lg cursor-pointer text-slate-400 active:scale-95 transition-transform"
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 setDrawerSearch('');
               }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  setIsMobileMenuOpen(false);
-                  setDrawerSearch('');
-                }
-              }}
-              title="Desliza a la izquierda o toca aquí para cerrar el menú"
+              className="w-full pt-2.5 pb-1 flex justify-center items-center cursor-pointer shrink-0 bg-slate-50/70 dark:bg-slate-800/40"
             >
-              <ChevronLeft className="w-4 h-4 text-slate-600 dark:text-slate-300 animate-pulse" />
+              <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
             </div>
 
             {/* 1. Compact Single-Row Header: User Profile + Theme + Close */}

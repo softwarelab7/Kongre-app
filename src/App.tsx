@@ -844,12 +844,16 @@ const AppContent: React.FC = () => {
     );
   }, [digitalTerritoryNumber, territories]);
 
-  // Listen to Cmd+K / Ctrl+K shortcut globally
+  // Listen to Cmd+K / Ctrl+K and Cmd+B / Ctrl+B shortcuts globally
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setIsSearchModalOpen((prev) => !prev);
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        handleToggleSidebar();
       }
     };
     window.addEventListener('keydown', handleKeyDown);

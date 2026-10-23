@@ -21,6 +21,10 @@ import {
   inspectPdfBytes,
   downloadPdfBytesLocally,
 } from '../services/localOfficialFormsService';
+import {
+  getS89WeekSlipsFromIndexedDb,
+  saveGeneratedS89PdfToIndexedDb,
+} from '../services/s89IndexedDbService';
 import { getAvailableServiceYears, getCurrentServiceYear } from '../utils/s21Helper';
 import {
   ShieldCheck,
@@ -302,13 +306,23 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
             showToast('Selecciona una semana válida para rellenar las hojas S-89.', 'error');
             return;
           }
-          const slips = getS89SlipsForWeek(targetWeek);
+          let slips = getS89SlipsForWeek(targetWeek);
+          if (slips.length === 0) {
+            slips = await getS89WeekSlipsFromIndexedDb(targetWeek.id);
+          }
           if (slips.length === 0) {
             showToast('No hay asignaciones estudiantiles en la semana seleccionada.', 'error');
             return;
           }
           filledBytes = await fillOfficialS89Pdf(stored.bytes, slips);
           outFileName = `S-89_Semana_${targetWeek.weekStartDate}.pdf`;
+          await saveGeneratedS89PdfToIndexedDb(
+            targetWeek.id,
+            'official_pdf',
+            filledBytes,
+            outFileName,
+            slips.length
+          );
         } else if (currentFormMeta.code === 'S-140') {
           const targetWeek = weeks.find((w) => w.id === selectedWeekId) || currentWeek || weeks[0];
           if (!targetWeek) {

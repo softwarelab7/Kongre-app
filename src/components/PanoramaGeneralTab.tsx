@@ -102,7 +102,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
 
   const { currentPublisherId, currentBrotherName, effectiveRoleInfo } = useAuth();
 
-  // Identify current publisher
+  // Identify current publisher (matching MinisterioPublicadorTab cross-device resolution)
   const activePublisher = useMemo(() => {
     if (currentPublisherId && publishersMap.has(currentPublisherId)) {
       return publishersMap.get(currentPublisherId) || null;
@@ -115,13 +115,25 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
       );
       if (match) return match;
     }
+    if (settings.coordinatorName || settings.coordinatorEmail || settings.coordinatorPhone) {
+      const coordName = (settings.coordinatorName || '').toLowerCase().trim();
+      const coordEmail = (settings.coordinatorEmail || '').toLowerCase().trim();
+      const coordPhone = (settings.coordinatorPhone || '').replace(/\D/g, '');
+      const coordMatch = publishers.find((p) => {
+        if (coordName && p.name.toLowerCase().trim() === coordName) return true;
+        if (coordEmail && p.email && p.email.toLowerCase().trim() === coordEmail) return true;
+        if (coordPhone && coordPhone.length >= 7 && p.phone && p.phone.replace(/\D/g, '').endsWith(coordPhone.slice(-7))) return true;
+        return false;
+      });
+      if (coordMatch) return coordMatch;
+    }
     if (isDemoMode && publishers.length > 0) {
       return publishers[0];
     }
     return null;
-  }, [currentPublisherId, currentBrotherName, publishers, publishersMap, isDemoMode]);
+  }, [currentPublisherId, currentBrotherName, publishers, publishersMap, settings.coordinatorName, settings.coordinatorEmail, settings.coordinatorPhone, isDemoMode]);
 
-  const activePublisherId = activePublisher?.id || currentPublisherId || '';
+  const activePublisherId = activePublisher?.id || currentPublisherId || 'pub-local';
 
   // Current and Previous Month calculations
   const now = useMemo(() => new Date(), []);
@@ -139,14 +151,18 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
   const prevMonthKey = `${prevYear}-${String(prevMonthIndex + 1).padStart(2, '0')}`;
   const prevMonthName = SPANISH_MONTHS[prevMonthIndex];
 
-  // Read local ministry data (synced with MinisterioPublicadorTab)
+  // Read local ministry data (synced with MinisterioPublicadorTab and Cloud S-4 Report)
   const [localStats, setLocalStats] = useState<{
     hours: number;
+    minutes: number;
+    totalMinutes: number;
     returnVisits: number;
     bibleStudies: number;
     hasRealRecord: boolean;
   }>({
     hours: 0,
+    minutes: 0,
+    totalMinutes: 0,
     returnVisits: 0,
     bibleStudies: 0,
     hasRealRecord: false,
@@ -164,11 +180,25 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
       }
 
       const monthLogs = logs.filter((l) => l.month === currentMonthKey);
-      const totalMinutes = monthLogs.reduce((acc, l) => acc + (Number(l.minutes) || 0), 0);
+      const loggedMinutes = monthLogs.reduce((acc, l) => acc + (Number(l.minutes) || 0), 0);
       const logReturnVisits = monthLogs.reduce(
         (acc, l) => acc + (Number(l.returnVisitsCount) || 0),
         0
       );
+
+      // Include active stopwatch timer minutes if any
+      let activeTimerMinutes = 0;
+      try {
+        const rawTimer = localStorage.getItem('kongre_ministry_active_timer_v1');
+        if (rawTimer) {
+          const parsedTimer = JSON.parse(rawTimer);
+          let sec = Number(parsedTimer?.accumulatedSeconds || 0);
+          if (parsedTimer?.isRunning && parsedTimer?.startedAtMs) {
+            sec += Math.max(0, Math.floor((Date.now() - Number(parsedTimer.startedAtMs)) / 1000));
+          }
+          activeTimerMinutes = Math.floor(sec / 60);
+        }
+      } catch {}
 
       const rawRv = localStorage.getItem(STORAGE_KEY_RV);
       const parsedRv: ReturnVisitRecord[] = rawRv ? JSON.parse(rawRv) : [];
@@ -195,23 +225,41 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
       }
       const activeStudiesCount = studiesList.filter((s) => s.active).length;
 
-      const existingCurrentReport = activePublisherId
-        ? monthlyReports.find(
-            (r) => r.publisherId === activePublisherId && r.month === currentMonthKey
-          )
+      const reportsForMonth = monthlyReports.filter((r) => r.month === currentMonthKey);
+      let existingCurrentReport = activePublisherId
+        ? reportsForMonth.find((r) => r.publisherId === activePublisherId)
         : undefined;
+      if (!existingCurrentReport) {
+        existingCurrentReport = reportsForMonth.find((r) => r.publisherId === 'pub-local');
+      }
+      if (!existingCurrentReport && reportsForMonth.length === 1) {
+        existingCurrentReport = reportsForMonth[0];
+      }
 
-      const computedHours =
-        totalMinutes > 0
-          ? Math.floor(totalMinutes / 60)
-          : existingCurrentReport?.hours ?? 0;
-      const computedRv = logReturnVisits > 0 ? logReturnVisits : rvList.length;
+      const localCombinedMinutes = loggedMinutes + activeTimerMinutes;
+      const cloudMinutes =
+        typeof existingCurrentReport?.totalMinutes === 'number'
+          ? existingCurrentReport.totalMinutes
+          : (existingCurrentReport?.hours || 0) * 60 + (existingCurrentReport?.minutes || 0);
+
+      const effectiveTotalMinutes =
+        localCombinedMinutes > 0 ? localCombinedMinutes : cloudMinutes;
+      const computedHours = Math.floor(effectiveTotalMinutes / 60);
+      const computedMinutes = effectiveTotalMinutes % 60;
+
+      const computedRv =
+        logReturnVisits > 0
+          ? logReturnVisits
+          : rvList.length > 0
+            ? rvList.length
+            : existingCurrentReport?.returnVisits ?? 0;
       const computedStudies =
         activeStudiesCount > 0
           ? activeStudiesCount
           : existingCurrentReport?.bibleStudies ?? 0;
 
       const hasReal =
+        effectiveTotalMinutes > 0 ||
         monthLogs.length > 0 ||
         rvList.length > 0 ||
         activeStudiesCount > 0 ||
@@ -220,6 +268,8 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
       if (!hasReal && isDemoMode) {
         setLocalStats({
           hours: 12,
+          minutes: 0,
+          totalMinutes: 720,
           returnVisits: 4,
           bibleStudies: 2,
           hasRealRecord: true,
@@ -227,6 +277,8 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
       } else {
         setLocalStats({
           hours: computedHours,
+          minutes: computedMinutes,
+          totalMinutes: effectiveTotalMinutes,
           returnVisits: computedRv,
           bibleStudies: computedStudies,
           hasRealRecord: hasReal,
@@ -235,6 +287,8 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
     } catch {
       setLocalStats({
         hours: isDemoMode ? 12 : 0,
+        minutes: 0,
+        totalMinutes: isDemoMode ? 720 : 0,
         returnVisits: isDemoMode ? 4 : 0,
         bibleStudies: isDemoMode ? 2 : 0,
         hasRealRecord: isDemoMode,
@@ -244,6 +298,13 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
 
   useEffect(() => {
     loadLocalMinistryData();
+    const handleMinistryChanged = () => loadLocalMinistryData();
+    window.addEventListener('kongre_ministry_data_changed', handleMinistryChanged);
+    window.addEventListener('kongre_monthly_reports_hydrated', handleMinistryChanged);
+    return () => {
+      window.removeEventListener('kongre_ministry_data_changed', handleMinistryChanged);
+      window.removeEventListener('kongre_monthly_reports_hydrated', handleMinistryChanged);
+    };
   }, [currentMonthKey, activePublisherId, monthlyReports, isDemoMode]);
 
   // Previous month sent state: strictly based on real report or explicit localStorage flag (unless in Demo Mode)
@@ -251,9 +312,9 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
     if (!activePublisherId) return undefined;
     return monthlyReports.find(
       (r) =>
-        r.publisherId === activePublisherId &&
+        (r.publisherId === activePublisherId || r.publisherId === 'pub-local') &&
         r.month === prevMonthKey &&
-        (r.participated || Boolean(r.reportedAt) || (r.hours ?? 0) > 0)
+        (r.participated || Boolean(r.reportedAt) || (r.hours ?? 0) > 0 || (r.totalMinutes ?? 0) > 0)
     );
   }, [monthlyReports, activePublisherId, prevMonthKey]);
 
@@ -297,8 +358,11 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
 
   const handleSaveQuickReport = (e: React.FormEvent) => {
     e.preventDefault();
+    const totalMins = quickHours * 60 + localStats.minutes;
     setLocalStats({
       hours: quickHours,
+      minutes: localStats.minutes,
+      totalMinutes: totalMins,
       returnVisits: quickRv,
       bibleStudies: quickStudies,
       hasRealRecord: true,
@@ -311,10 +375,14 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
         month: currentMonthKey,
         participated: true,
         hours: quickHours,
+        minutes: localStats.minutes,
+        totalMinutes: totalMins,
+        returnVisits: quickRv,
         bibleStudies: quickStudies,
         notes: quickRv > 0 ? `Revisitas: ${quickRv}` : undefined,
         isPioneer: activePublisher?.pioneerStatus === 'regular' || activePublisher?.privilege === 'precursor_regular',
         isAuxiliaryPioneer: activePublisher?.pioneerStatus === 'auxiliar_continuo' || activePublisher?.privilege === 'precursor_auxiliar',
+        updatedAt: new Date().toISOString(),
       });
     }
 
@@ -1084,10 +1152,16 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
                   className="p-2 rounded-xl bg-white/80 dark:bg-slate-800/60 border border-violet-100 dark:border-slate-800 hover:border-purple-300 dark:hover:border-purple-700 transition-colors cursor-pointer"
                 >
                   <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
-                    Horas
+                    Tiempo
                   </span>
                   <span className="text-base sm:text-lg font-extrabold font-mono tabular-nums text-slate-900 dark:text-white mt-0.5 block">
-                    {localStats.hours}
+                    {localStats.hours > 0
+                      ? localStats.minutes > 0
+                        ? `${localStats.hours}h ${localStats.minutes}m`
+                        : `${localStats.hours}h`
+                      : localStats.minutes > 0
+                        ? `${localStats.minutes}m`
+                        : '0h'}
                   </span>
                 </button>
                 <button

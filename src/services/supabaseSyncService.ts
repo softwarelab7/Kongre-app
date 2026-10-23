@@ -147,6 +147,7 @@ export interface PublicFilteredData {
   congregationEvents?: CongregationEvent[];
   memorialPlans?: MemorialPlan[];
   theocraticAssemblies?: TheocraticAssembly[];
+  monthlyReports?: MonthlyServiceReport[];
 }
 
 import {
@@ -204,6 +205,77 @@ function mergeById<T extends { id: string }>(local: T[] = [], remote: T[] = []):
       map.set(item.id, existing ? { ...existing, ...item } : item);
     }
   }
+  return Array.from(map.values());
+}
+
+/**
+ * Función especializada para fusionar informes mensuales S-4 y actividad de ministerio
+ * entre escritorio y móvil respetando la marca de tiempo más reciente (updatedAt / reportedAt)
+ * y preservando minutos exactos (ej. +15 min), metas y registros diarios.
+ */
+export function mergeMonthlyReports(
+  local: MonthlyServiceReport[] = [],
+  remote: MonthlyServiceReport[] = []
+): MonthlyServiceReport[] {
+  const map = new Map<string, MonthlyServiceReport>();
+  const getKey = (r: MonthlyServiceReport) =>
+    r.publisherId && r.month ? `${r.publisherId}::${r.month}` : r.id;
+
+  const getTimestamp = (r: MonthlyServiceReport): number => {
+    const ts = r.updatedAt || r.reportedAt;
+    if (!ts) return 0;
+    const parsed = new Date(ts).getTime();
+    return Number.isNaN(parsed) ? 0 : parsed;
+  };
+
+  const getEffectiveTotalMinutes = (r: MonthlyServiceReport): number => {
+    if (typeof r.totalMinutes === 'number') return r.totalMinutes;
+    return (Number(r.hours) || 0) * 60 + (Number(r.minutes) || 0);
+  };
+
+  for (const item of remote) {
+    if (item && (item.id || (item.publisherId && item.month))) {
+      map.set(getKey(item), { ...item });
+    }
+  }
+
+  for (const item of local) {
+    if (!item || (!item.id && !(item.publisherId && item.month))) continue;
+    const key = getKey(item);
+    const existingRemote = map.get(key);
+    if (!existingRemote) {
+      map.set(key, { ...item });
+      continue;
+    }
+
+    const localTs = getTimestamp(item);
+    const remoteTs = getTimestamp(existingRemote);
+    const localMins = getEffectiveTotalMinutes(item);
+    const remoteMins = getEffectiveTotalMinutes(existingRemote);
+
+    // Si el registro remoto es más reciente (o tiene más minutos cuando no hay timestamp local más nuevo),
+    // priorizar el registro remoto para que la sesión móvil reciba los cambios hechos en escritorio (y viceversa).
+    const remoteWins =
+      remoteTs > localTs || (remoteTs === localTs && remoteMins >= localMins);
+
+    const winner = remoteWins ? existingRemote : item;
+    const loser = remoteWins ? item : existingRemote;
+
+    // Unificar logs de tiempo por id si el ganador no los vació explícitamente en una edición posterior
+    const mergedLogs =
+      winner.timeLogs !== undefined
+        ? winner.timeLogs
+        : loser.timeLogs;
+
+    map.set(key, {
+      ...loser,
+      ...winner,
+      ...(mergedLogs ? { timeLogs: mergedLogs } : {}),
+      returnVisitRecords: winner.returnVisitRecords ?? loser.returnVisitRecords,
+      bibleStudyRecords: winner.bibleStudyRecords ?? loser.bibleStudyRecords,
+    });
+  }
+
   return Array.from(map.values());
 }
 
@@ -408,6 +480,7 @@ export const supabaseSyncService = {
         congregationEvents: params.data.congregationEvents || [],
         memorialPlans: params.data.memorialPlans || [],
         theocraticAssemblies: params.data.theocraticAssemblies || [],
+        monthlyReports: params.data.monthlyReports || [],
       };
 
       // 3. Verificación criptográfica de propiedad antes de sobrescribir un registro existente en Supabase
@@ -594,6 +667,19 @@ export const supabaseSyncService = {
         try {
           const decryptedAdmin = await decryptFromSupabase(data.payload, cleanPin);
           if (decryptedAdmin) {
+            // Si también existe payload_public (ej. actualizado por un publicador con PIN de congregación),
+            // fusionar monthlyReports más recientes para no perder informes enviados desde sesiones de publicador
+            if (data.payload_public) {
+              try {
+                const decryptedPub = await decryptFromSupabase(data.payload_public, cleanPin);
+                if (decryptedPub && Array.isArray(decryptedPub.monthlyReports)) {
+                  decryptedAdmin.monthlyReports = mergeMonthlyReports(
+                    decryptedAdmin.monthlyReports || [],
+                    decryptedPub.monthlyReports
+                  );
+                }
+              } catch {}
+            }
             if (typeof window !== 'undefined' && data.created_at) {
               localStorage.setItem(LOCAL_STORAGE_LAST_SYNC_KEY, data.created_at);
             }
@@ -700,7 +786,7 @@ export const supabaseSyncService = {
             fieldServiceMeetings: mergeById(params.currentData.fieldServiceMeetings || [], rData.fieldServiceMeetings || []),
             cartLocations: mergeById(params.currentData.cartLocations || [], rData.cartLocations || []),
             cartShifts: mergeById(params.currentData.cartShifts || [], rData.cartShifts || []),
-            monthlyReports: mergeById(params.currentData.monthlyReports || [], rData.monthlyReports || []),
+            monthlyReports: mergeMonthlyReports(params.currentData.monthlyReports || [], rData.monthlyReports || []),
             circuitVisit: rData.circuitVisit !== undefined ? rData.circuitVisit : params.currentData.circuitVisit,
             memorialPlans: mergeById(params.currentData.memorialPlans || [], rData.memorialPlans || []),
             theocraticAssemblies: mergeById(params.currentData.theocraticAssemblies || [], rData.theocraticAssemblies || []),

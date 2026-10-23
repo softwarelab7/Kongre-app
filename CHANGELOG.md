@@ -25,7 +25,84 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.11.1] - 22 de Octubre, 2026 (Compilación Activa)
+### [v2.11.8] - 22 de Octubre, 2026 (Compilación Activa)
+**Título:** Eliminación del Menú Lateral en Dispositivos Móviles y Navegación Exclusiva Inferior
+- **Eliminación del Menú Lateral en Móvil (`Navbar.tsx`):**
+  - Se retiró el botón de menú hamburguesa de la esquina superior izquierda en dispositivos móviles (`< md`).
+  - Se eliminaron el sensor táctil del borde izquierdo y los gestos de deslizamiento lateral (`swipe-to-open` / `swipe-to-close`) junto con el tirador lateral.
+- **Cabecera Móvil Limpia y Hoja Inferior (Bottom Sheet):**
+  - La cabecera móvil muestra ahora el distintivo limpio de la congregación (`Building2`) junto al nombre de la congregación.
+  - El acceso al directorio de módulos desde la barra inferior en móvil ahora se abre como una hoja inferior (`Bottom Sheet` con animación vertical) en lugar de un menú lateral.
+
+### [v2.11.7] - 22 de Octubre, 2026
+**Título:** Control de Barra Lateral Oculto Detrás del Icono de Congregación con Revelación al Pasar el Cursor
+- **Revelación Dinámica al Pasar el Cursor (Hover) (`Navbar.tsx`):**
+  - El control para ocultar la barra lateral ahora reside de forma elegante detrás del icono de congregación (`Building2`).
+  - Por defecto, el usuario visualiza el icono de la congregación con estética limpia junto al nombre de la congregación.
+  - Al posar el cursor sobre el icono (`hover`), el icono de la congregación realiza una transición suave hacia el botón de ocultar barra lateral (`[|<]` / `PanelLeftClose`), permitiendo colapsarla con un clic rápido sin saturar la cabecera cuando no se usa.
+- **Armonía Visual en la Cabecera:**
+  - Se eliminan elementos duplicados o invasivos, manteniendo la cabecera despejada, el botón en el pie de la barra lateral y el atajo global de teclado `Ctrl+B` / `Cmd+B`.
+
+### [v2.11.6] - 22 de Octubre, 2026
+**Título:** Corrección Definitiva de Ubicación del Control de Barra Lateral en Cabecera
+- **Eliminación del Icono Colisionante en Migas de Pan (`Navbar.tsx`):**
+  - Se eliminó el botón duplicado/residual `[|<]` (`PanelLeftClose`) que se ubicaba justo al frente del nombre de la congregación (`Cong...`) en la cabecera.
+  - La cabecera superior izquierda ahora muestra limpiamente el nombre de la congregación y las migas de pan sin elementos desalineados.
+- **Ubicación Canónica en Barra de Herramientas y Pie Lateral:**
+  - El botón para ocultar/mostrar la barra lateral ahora está ubicado armoniosamente en el área de utilidades superior derecha (al lado del cambio de tema claro/oscuro) y en el pie de la barra lateral vertical izquierda.
+  - Se preserva el atajo global de teclado `Ctrl+B` / `Cmd+B` y el botón destacado al colapsar la barra.
+
+### [v2.11.5] - 22 de Octubre, 2026
+**Título:** Optimización Ergonómica del Control para Ocultar Barra Lateral y Atajo Global Ctrl+B
+- **Ubicación Natural en la Barra Lateral (`Navbar.tsx`):**
+  - Se incorporó el botón dedicado de ocultar barra lateral (`PanelLeftClose`) directamente en el pie de la barra vertical izquierda, junto a los botones de Perfil y Ajustes.
+- **Cabecera Optimizada y Diferenciada por Dispositivo (`Navbar.tsx`):**
+  - En móviles (`< md`), el botón superior ahora actúa y se titula correctamente como **Menú** de navegación (icono hamburguesa).
+  - En pantallas de escritorio (`>= md`), cuando la barra lateral está oculta, se muestra un botón destacado (`PanelLeftOpen`) junto al logotipo para restaurarla con un clic. Cuando está visible, se mantiene un control sutil y despejado.
+- **Atajo Global de Teclado `Ctrl+B` / `⌘B` (`App.tsx`):**
+  - Se añadió la combinación estándar de teclado para alternar la visibilidad de la barra lateral desde cualquier pantalla sin necesidad del ratón.
+
+### [v2.11.4] - 22 de Octubre, 2026
+**Título:** Eliminación de Barra de Cabecera Redundante en Mi Ministerio y Limpieza de Repeticiones en Navegación
+- **Eliminación de Barra de Cabecera Redundante (`MinisterioPublicadorTab.tsx`):**
+  - Se eliminó la tarjeta/banner superior que duplicaba el título de la vista y contenía accesos redundantes hacia "Mis Asignaciones" y "Mi Congregación".
+  - La sección ahora inicia de forma directa y limpia con la barra de subpestañas compactas, ganando hasta 90px de espacio vertical útil y completando el estándar global de arranque directo (Opción 1).
+- **Limpieza de Repeticiones en Navegación (`Navbar.tsx`):**
+  - Se retiró la entrada duplicada de "Portal del Publicador" (`mi_vista`) del departamento de Supervisión & Control, manteniéndola de forma única y coherente bajo el Menú Principal del Publicador.
+- **Sincronización Bidireccional de Subpestañas (`MinisterioPublicadorTab.tsx`):**
+  - Al alternar entre Panel Principal, Cronómetro, Revisitas y Estudios Bíblicos, la barra superior fija (Navbar) y el indicador de migajas de pan se sincronizan en tiempo real.
+
+### [v2.11.3] - 22 de Octubre, 2026
+**Título:** Autoguardado Instantáneo de Tiempo de Ministerio (+15m) y Sincronización Multidispositivo en Tiempo Real
+- **Autoguardado Automático en Mi Ministerio (`MinisterioPublicadorTab.tsx`):**
+  - Todo ajuste de tiempo (`+15m`, `+30m`, `+1h`, `-5m`), sesión de cronómetro, cambio en la meta de horas (`hourGoal`), revisitas o cursos bíblicos se guarda y sincroniza automáticamente en segundo plano con el informe mensual (`MonthlyServiceReport`) sin requerir clic manual en *"Guardar en mi Informe S-4"*.
+  - Controles rápidos (`-5m`, `+15m`, `+30m`, `+1h`) integrados directamente dentro de la tarjeta **Mi Meta y Registro Mensual** con indicador visual de `Autoguardado`.
+- **Sincronización Multidispositivo de Fracciones de Hora (`supabaseSyncService.ts`, `CongregationContext.tsx`, `types/index.ts`):**
+  - Ampliación de `MonthlyServiceReport` con `minutes`, `totalMinutes`, `hourGoal`, `activeTimerSeconds`, `timeLogs`, `returnVisitRecords`, `bibleStudyRecords` y `updatedAt` para que los incrementos menores a 1 hora (como `15 min`) no se trunquen a `0h`.
+  - Inclusión de `monthlyReports` en `payload_public` y fusión inteligente mediante `mergeMonthlyReports` basada en `updatedAt` / `totalMinutes`, garantizando que las sesiones móviles reciban al instante el tiempo y la meta registrados en escritorio y viceversa.
+- **Reflejo en Tiempo Real en Panorama General (`PanoramaGeneralTab.tsx`):**
+  - La tarjeta **Informe** ahora muestra horas y minutos exactos (`15m`, `1h 15m`), incluye el tiempo activo del cronómetro y se actualiza en tiempo real al recibir datos de la nube.
+
+### [v2.11.2] - 22 de Octubre, 2026
+**Título:** Estrategia Avanzada de Caché en Service Worker y Persistencia Offline de Formularios S-89 con IndexedDB
+- **Estrategia de Caché Optimizada en Service Worker (`vite.config.ts`):**
+  - Ampliación de `globPatterns` en Workbox para incluir recursos `.pdf`, `.json` y `.webmanifest`, con límite de precaché de 6 MB, `cleanupOutdatedCaches`, `clientsClaim`, `skipWaiting` y `navigateFallback`.
+  - Nuevas políticas de `runtimeCaching`:
+    - `s89-forms-indexeddb-cache` (`StaleWhileRevalidate`) para rutas y recursos asociados a formularios S-89.
+    - `official-pdf-templates-cache` (`CacheFirst`, vigencia de 1 año) para plantillas PDF oficiales locales.
+    - `supabase-s89-congregation-cache` (`NetworkFirst` con timeout de 4 segundos) para asegurar disponibilidad inmediata en caso de desconexión.
+  - Nuevo acceso directo PWA (*Shortcut*) hacia **Hojas S-89** (`/#/s89`).
+- **Motor de Almacenamiento Persistente en IndexedDB para S-89 (`src/services/s89IndexedDbService.ts`):**
+  - Solicitud automática de almacenamiento persistente del navegador (`navigator.storage.persist()`) para impedir el borrado automático bajo presión de almacenamiento.
+  - Tres almacenes dedicados en `kongre_s89_offline_db_v1`:
+    1. `s89_slips_by_week`: Almacena todas las asignaciones S-89 por semana con cifrado AES-GCM en reposo (`encryptPinAtRest`).
+    2. `s89_slip_overrides`: Guarda de forma persistente el estado de entrega/confirmación (`Entregada` / `Pendiente`) y notas de cada estudiante sin conexión.
+    3. `s89_filled_pdfs`: Conserva los binarios PDF S-89 ya autocompletados para reimpresión o descarga instantánea offline.
+- **Integración en el Service Worker (`public/push-sw.js`) e Interfaz (`S89SlipsTab.tsx`, `LocalOfficialFormsCenter.tsx`):**
+  - El Service Worker incorpora el almacén `s89_offline_forms` (DB v2), sincronización mediante Background Sync (`kongre-sync-s89-forms`) y respuesta directa a peticiones offline `/__offline__/s89/*`.
+  - `S89SlipsTab` muestra el indicador en vivo de boletas respaldadas en IndexedDB y permite marcar cada asignación S-89 como *Entregada* o *Pendiente* con persistencia offline.
+
+### [v2.11.1] - 22 de Octubre, 2026
 **Título:** Blindaje de Invitaciones por QR y PIN, Asignación Inmediata de Rol Teocrático y Aislamiento de Modo Demo
 - **Verificación y Canje Multidispositivo por QR y PIN (`theocraticSecurity.ts`, `SecurityContext.tsx`):**
   - Reconocimiento integral en `verifyInvitationCodeMatch` para códigos completos (`KONG-SEC-...`), códigos cortos (`SEC-...`), tokens seguros (`kgr_tk1_...`) y códigos compuestos portátiles (`CONG::CPIN::INVITE`).

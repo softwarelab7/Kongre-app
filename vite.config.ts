@@ -93,13 +93,74 @@ export default defineConfig(() => {
                 { src: '/shortcuts/tablero_anuncios-192.png', sizes: '192x192', type: 'image/png' },
               ],
             },
+            {
+              name: 'Hojas S-89',
+              short_name: 'S-89',
+              description: 'Asignaciones estudiantiles S-89 (Offline)',
+              url: '/#/s89',
+              icons: [
+                { src: '/shortcuts/programacion-96.png', sizes: '96x96', type: 'image/png' },
+                { src: '/shortcuts/programacion-192.png', sizes: '192x192', type: 'image/png' },
+              ],
+            },
           ],
         },
         workbox: {
           importScripts: ['/push-sw.js'],
-          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+          cleanupOutdatedCaches: true,
+          clientsClaim: true,
+          skipWaiting: true,
+          navigateFallback: '/index.html',
+          navigateFallbackDenylist: [/^\/api\//, /^\/__offline__\//],
+          maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6MB para plantillas PDF S-89 y bundles
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,pdf,json,webmanifest}'],
           runtimeCaching: [
+            // Estrategia dedicada para Formularios y Datos S-89 respaldados por IndexedDB
+            {
+              urlPattern: /\/__offline__\/s89\/.*|.*(s89|s-89|s_89).*\.(json|pdf)$/i,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 's89-forms-indexeddb-cache',
+                expiration: {
+                  maxEntries: 250,
+                  maxAgeSeconds: 60 * 60 * 24 * 180, // 180 días
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            // Caché persistente para Plantillas PDF Oficiales (S-89, S-21, S-140, S-88, S-13)
+            {
+              urlPattern: /.*\.pdf$/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'official-pdf-templates-cache',
+                expiration: {
+                  maxEntries: 60,
+                  maxAgeSeconds: 60 * 60 * 24 * 365, // 1 año
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            // Sincronización Resiliente de Datos de Congregación y Semanas S-89 (Supabase REST)
+            {
+              urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/i,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'supabase-s89-congregation-cache',
+                networkTimeoutSeconds: 4,
+                expiration: {
+                  maxEntries: 120,
+                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 días de respaldo offline
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
               handler: 'CacheFirst',
@@ -174,7 +235,7 @@ export default defineConfig(() => {
           ],
         },
         devOptions: {
-          enabled: false,
+          enabled: true,
           type: 'module',
         },
       }),

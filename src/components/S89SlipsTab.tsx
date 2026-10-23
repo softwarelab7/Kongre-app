@@ -1,11 +1,21 @@
 // src/components/S89SlipsTab.tsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { S89Slip, Publisher } from '../types';
 import { OFFICIAL_STUDENT_LESSONS } from '../utils/theocraticData';
 import { generateConfirmationUrl } from '../utils/whatsapp';
 import { BatchWhatsAppModal } from './BatchWhatsAppModal';
 import { SplashCheckbox } from './SplashCheckbox';
+import {
+  ensureS89PersistentStorage,
+  saveS89WeekSlipsToIndexedDb,
+  getS89WeekSlipsFromIndexedDb,
+  saveS89SlipOverrideToIndexedDb,
+  getS89SlipOverridesForWeek,
+  getS89OfflineStorageStats,
+  S89OfflineStorageStats,
+  S89SlipOverrideRecord,
+} from '../services/s89IndexedDbService';
 import {
   FileText,
   Printer,
@@ -29,6 +39,8 @@ import {
   X,
   Check,
   ShieldCheck,
+  HardDrive,
+  RefreshCw,
 } from 'lucide-react';
 import { LocalOfficialFormsCenter } from './LocalOfficialFormsCenter';
 
@@ -56,6 +68,12 @@ export const S89SlipsTab: React.FC = () => {
   const [historyStudent, setHistoryStudent] = useState<Publisher | null>(null);
   const [feedbackNote, setFeedbackNote] = useState<{ id: string; text: string } | null>(null);
 
+  // IndexedDB persistent offline storage state for S-89 forms
+  const [idbFallbackSlips, setIdbFallbackSlips] = useState<S89Slip[]>([]);
+  const [idbOverrides, setIdbOverrides] = useState<Record<string, S89SlipOverrideRecord>>({});
+  const [offlineStats, setOfflineStats] = useState<S89OfflineStorageStats | null>(null);
+  const [isSyncingOffline, setIsSyncingOffline] = useState(false);
+
   // Sorted weeks
   const sortedWeeks = useMemo(() => {
     return [...weeks].sort((a, b) => a.weekStartDate.localeCompare(b.weekStartDate));
@@ -70,10 +88,79 @@ export const S89SlipsTab: React.FC = () => {
   }, [sortedWeeks, activeWeek]);
 
   // Extract S-89 slips for the active week
-  const rawSlips = useMemo(() => {
+  const computedSlips = useMemo(() => {
     if (!activeWeek) return [];
     return getS89SlipsForWeek(activeWeek);
   }, [activeWeek, getS89SlipsForWeek]);
+
+  // Request persistent storage & sync all weeks' S-89 slips into IndexedDB + Service Worker
+  const syncAllWeeksToIndexedDb = useCallback(async () => {
+    setIsSyncingOffline(true);
+    try {
+      await ensureS89PersistentStorage();
+      for (const w of sortedWeeks) {
+        const wSlips = getS89SlipsForWeek(w);
+        if (wSlips.length > 0) {
+          await saveS89WeekSlipsToIndexedDb(w.id, wSlips, {
+            congregationId: settings.congregationNumber || settings.congregationId,
+            weekStartDate: w.weekStartDate,
+            weekEndDate: w.weekEndDate,
+          });
+        }
+      }
+      const stats = await getS89OfflineStorageStats();
+      setOfflineStats(stats);
+    } catch {} finally {
+      setIsSyncingOffline(false);
+    }
+  }, [sortedWeeks, getS89SlipsForWeek, settings.congregationNumber, settings.congregationId]);
+
+  useEffect(() => {
+    syncAllWeeksToIndexedDb();
+  }, [syncAllWeeksToIndexedDb]);
+
+  // Load IndexedDB cached slips & overrides for activeWeek
+  useEffect(() => {
+    if (!activeWeek?.id) return;
+    let mounted = true;
+    (async () => {
+      try {
+        const [cachedSlips, overrides, stats] = await Promise.all([
+          getS89WeekSlipsFromIndexedDb(activeWeek.id),
+          getS89SlipOverridesForWeek(activeWeek.id),
+          getS89OfflineStorageStats(),
+        ]);
+        if (!mounted) return;
+        setIdbFallbackSlips(cachedSlips);
+        setIdbOverrides(overrides);
+        setOfflineStats(stats);
+      } catch {}
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [activeWeek?.id, computedSlips]);
+
+  // Merge live slips (or IndexedDB offline fallback) with IndexedDB delivery status overrides
+  const rawSlips = useMemo(() => {
+    const base = computedSlips.length > 0 ? computedSlips : idbFallbackSlips;
+    return base.map((slip) => {
+      const ov = idbOverrides[slip.id];
+      if (!ov) return slip;
+      return {
+        ...slip,
+        deliveredStatus: ov.deliveredStatus || slip.deliveredStatus,
+      };
+    });
+  }, [computedSlips, idbFallbackSlips, idbOverrides]);
+
+  const handleToggleSlipDelivered = async (slip: S89Slip) => {
+    if (!activeWeek) return;
+    const nextStatus = slip.deliveredStatus === 'confirmada' ? 'pendiente' : 'confirmada';
+    await saveS89SlipOverrideToIndexedDb(slip.id, activeWeek.id, slip.studentId, nextStatus);
+    const updatedOverrides = await getS89SlipOverridesForWeek(activeWeek.id);
+    setIdbOverrides(updatedOverrides);
+  };
 
   // Filtered slips
   const filteredSlips = useMemo(() => {
@@ -163,13 +250,25 @@ export const S89SlipsTab: React.FC = () => {
     <div className="space-y-6">
       {/* Barra de Acciones de Hojas S-89 (Opción 1: arranque directo sin banner redundante) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
             Formulario S-89
           </span>
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
-            Asignaciones estudiantiles y seguimiento de lecciones
-          </span>
+          <button
+            type="button"
+            onClick={syncAllWeeksToIndexedDb}
+            disabled={isSyncingOffline}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors cursor-pointer"
+            title="Sincronizar y respaldar todas las asignaciones S-89 en IndexedDB y Service Worker para uso sin conexión"
+          >
+            <HardDrive className="w-3 h-3" />
+            <span>
+              {isSyncingOffline
+                ? 'Sincronizando IndexedDB...'
+                : `IndexedDB Offline (${offlineStats?.totalCachedSlips || rawSlips.length} S-89)`}
+            </span>
+            <RefreshCw className={`w-2.5 h-2.5 ${isSyncingOffline ? 'animate-spin' : ''}`} />
+          </button>
         </div>
 
         {/* Action Buttons */}
@@ -431,7 +530,20 @@ export const S89SlipsTab: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleSlipDelivered(slip)}
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase transition-colors cursor-pointer flex items-center gap-1 ${
+                          isConfirmed
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                        }`}
+                        title="Cambiar estado de entrega/confirmación (persistido en IndexedDB Offline)"
+                      >
+                        {isConfirmed ? <CheckCircle2 className="w-2.5 h-2.5" /> : <Clock className="w-2.5 h-2.5" />}
+                        <span>{isConfirmed ? 'Entregada' : 'Pendiente'}</span>
+                      </button>
                       <span
                         className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
                           slip.room === 'auxiliar'

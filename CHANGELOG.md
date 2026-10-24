@@ -25,7 +25,17 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.12.4] - 23 de Octubre, 2026 (Compilación Activa)
+### [v2.12.5] - 23 de Octubre, 2026 (Compilación Activa)
+**Título:** CSP Activo en Producción, Higiene de PWA Caching y Orígenes Restringidos en Errores 500
+- **Content-Security-Policy Activa (Modo Enforce):**
+  - Transición definitiva de `Content-Security-Policy-Report-Only` a `Content-Security-Policy` bloqueador en `vercel.json`.
+  - Protección estricta contra XSS, secuestro de clics (clickjacking con `frame-ancestors 'none'`) y ejecución de recursos externos no autorizados.
+- **Higiene del Service Worker y Optimización de Almacenamiento:**
+  - Se eliminó la regla de runtime caching de `*.supabase.co/rest/v1/*` en `vite.config.ts`, la cual resultaba obsoleta tras el bloqueo y migración a Edge Functions.
+- **Restricción de Orígenes en Fallos del Servidor:**
+  - Se ajustó el manejador global de excepciones en `supabase/functions/kongre-sync/index.ts` para aplicar `corsHeaders(req, env)` en errores 500, asegurando que nunca se exponga un comodín `*` en fallos no controlados.
+
+### [v2.12.4] - 23 de Octubre, 2026
 **Título:** Fortalecimiento de Invitaciones: 50 Bits de Entropía Criptográfica y Hash v2 Normalizado
 - **Entropía Reforzada a 10 Caracteres Base32 (Crockford):**
   - Los nuevos códigos de invitación adoptan la estructura `KONG-[ROL]-XXXXX-XXXXX` con 50 bits de entropía real ($32^{10} \approx 1.12 \times 10^{15}$ combinaciones).

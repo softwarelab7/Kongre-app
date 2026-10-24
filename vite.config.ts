@@ -148,22 +148,6 @@ export default defineConfig(({ mode }) => {
                 },
               },
             },
-            // Sincronización Resiliente de Datos de Congregación y Semanas S-89 (Supabase REST)
-            {
-              urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/i,
-              handler: 'NetworkFirst',
-              options: {
-                cacheName: 'supabase-s89-congregation-cache',
-                networkTimeoutSeconds: 4,
-                expiration: {
-                  maxEntries: 120,
-                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 días de respaldo offline
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
-              },
-            },
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
               handler: 'CacheFirst',

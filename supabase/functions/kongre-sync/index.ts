@@ -9,7 +9,7 @@
  * Inyectados por Supabase: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  */
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { handleRequest, type SyncDb, type SyncRow } from './core.ts';
+import { handleRequest, type SyncDb, type SyncRow, corsHeaders } from './core.ts';
 
 const url = Deno.env.get('SUPABASE_URL')!;
 const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
   if (pepper.length < 32) {
     return new Response(JSON.stringify({ ok: false, error: 'server_misconfigured' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req, env), 'Content-Type': 'application/json' },
     });
   }
   try {
@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
     console.error('kongre-sync error:', e instanceof Error ? e.message : e);
     return new Response(JSON.stringify({ ok: false, error: 'internal' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      headers: { ...corsHeaders(req, env), 'Content-Type': 'application/json' },
     });
   }
 });

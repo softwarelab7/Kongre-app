@@ -25,18 +25,41 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.4';
-export const CURRENT_BUILD_CODE = '2026.10.23.5500';
+export const CURRENT_APP_VERSION = '2.12.5';
+export const CURRENT_BUILD_CODE = '2026.10.23.5600';
 export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.5',
+    buildCode: '2026.10.23.5600',
+    date: '23 de Octubre, 2026',
+    title: 'CSP Activo en Producción, Higiene de PWA Caching y Orígenes Restringidos en Errores 500',
+    isCurrent: true,
+    highlight: 'Content-Security-Policy activo bloqueador y limpieza total de runtime caching',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'CSP Activo en Producción (enforce): Activación de Content-Security-Policy como cabecera HTTP activa de bloqueo en vercel.json, impidiendo clickjacking, inserción de scripts externos no autorizados y ataques XSS.',
+      },
+      {
+        category: 'improvement',
+        text: 'Higiene de Service Worker: Eliminación de la regla obsoleta de runtime caching para *.supabase.co/rest/v1/* en vite.config.ts, optimizando el almacenamiento offline tras la migración a Edge Functions.',
+      },
+      {
+        category: 'security',
+        text: 'CORS seguro en excepciones 500: La Edge Function kongre-sync ahora aplica la lista estricta de ALLOWED_ORIGINS incluso en respuestas de error 500, eliminando el comodín (*).',
+      },
+    ],
+  },
+  {
     version: '2.12.4',
     buildCode: '2026.10.23.5500',
     date: '23 de Octubre, 2026',
     title: 'Fortalecimiento de Invitaciones: 50 Bits de Entropía Criptográfica y Hash v2 Normalizado',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Códigos de invitación de alta entropía inmunes a fuerza bruta offline',
     environment: 'Producción Cloud (Kongre)',
     changes: [

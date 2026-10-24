@@ -129,7 +129,7 @@ function clientIp(req: Request): string {
   return xff || 'unknown';
 }
 
-function corsHeaders(req: Request, env: SyncEnv): Record<string, string> {
+export function corsHeaders(req: Request, env: SyncEnv): Record<string, string> {
   const origin = req.headers.get('origin') || '';
   const allowAny = env.allowedOrigins.length === 0;
   const allowed = allowAny ? '*' : env.allowedOrigins.includes(origin) ? origin : env.allowedOrigins[0];

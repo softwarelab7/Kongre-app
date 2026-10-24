@@ -6,6 +6,17 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.9] — 23 de Octubre, 2026
+**Corrección en Cambio de Cuenta con Google**
+
+- 🔄 **Cambio y Selección de Cuentas de Google Fluido:**
+  - Al pulsar "Cambiar cuenta" y conectar de nuevo con Google, el selector de cuentas se abre siempre de forma limpia para que puedas elegir tu cuenta preferida.
+  - Se corrigió un detalle que hacía que, al volver de Google tras cambiar de cuenta, la pantalla quedara esperando o volviera a mostrar el botón "Continuar con Google". Ahora la sesión se valida al instante y muestra directamente tu tarjeta de cuenta verificada.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.8] — 23 de Octubre, 2026
 **Navegación Fluida en el Portal y Corrección en Menú de Google**
 

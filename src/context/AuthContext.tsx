@@ -1306,7 +1306,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/#portal?view=email_login` : undefined,
+          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/` : undefined,
+          queryParams: {
+            prompt: 'select_account',
+          },
         },
       });
       if (error) throw error;

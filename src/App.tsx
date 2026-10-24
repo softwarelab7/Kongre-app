@@ -440,6 +440,16 @@ const AppContent: React.FC = () => {
     const initialModal = hashInfo?.modal || null;
 
     if (isLanding) {
+      const hasAuthTokens = typeof window !== 'undefined' && (
+        window.location.search.includes('code=') ||
+        window.location.hash.includes('access_token') ||
+        window.location.search.includes('error=') ||
+        window.location.hash.includes('error=')
+      );
+      if (hasAuthTokens) {
+        // No sobreescribir el historial ni los parámetros de URL mientras Supabase procesa el intercambio de código OAuth
+        return;
+      }
       const currentHash = window.location.hash || '';
       const landingHash = (currentHash.startsWith('#portal') || currentHash.startsWith('#bienvenida'))
         ? currentHash

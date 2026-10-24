@@ -25,18 +25,41 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.8';
-export const CURRENT_BUILD_CODE = '2026.10.23.5900';
+export const CURRENT_APP_VERSION = '2.12.9';
+export const CURRENT_BUILD_CODE = '2026.10.23.6000';
 export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.9',
+    buildCode: '2026.10.23.6000',
+    date: '23 de Octubre, 2026',
+    title: 'Corrección de Re-autenticación y Selector de Cuentas con Google',
+    isCurrent: true,
+    highlight: 'URL de retorno OAuth canónica sin fragmentos hash, activación de prompt=select_account y preservación de parámetros de autorización en montaje',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'fix',
+        text: 'URL canónica de retorno OAuth: Corrección en AuthContext eliminando fragmentos hash en redirectTo, permitiendo a Supabase Auth detectar e intercambiar correctamente el código de autorización (?code=) sin parámetros truncados.',
+      },
+      {
+        category: 'fix',
+        text: 'Selector explícito de cuentas Google (prompt=select_account): Al pulsar "Cambiar cuenta" y re-ingresar con Google, la interfaz solicita siempre al usuario qué cuenta desea conectar.',
+      },
+      {
+        category: 'fix',
+        text: 'Protección contra sobreescritura de parámetros OAuth: En App.tsx, se inhabilita el reemplazo de URL mientras existan parámetros de retorno de autorización (?code= o access_token), garantizando la creación ininterrumpida de sesión.',
+      },
+    ],
+  },
+  {
     version: '2.12.8',
     buildCode: '2026.10.23.5900',
     date: '23 de Octubre, 2026',
     title: 'Sincronización Precisa de Historial y Vistas en Portal de Bienvenida',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Corrección de persistencia de sub-vista de Google al recargar #portal y preservación de parámetros de vista en el hash de navegación',
     environment: 'Producción Cloud (Kongre)',
     changes: [

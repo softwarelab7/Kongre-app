@@ -270,23 +270,26 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
                   <span>3. Uso de Datos de Cuentas de Google (Google API User Data Policy)</span>
                 </h4>
                 <p>
-                  Kongre permite la autenticación opcional con <strong>Google Sign-In</strong> para verificar la identidad de publicadores y ancianos. En estricto cumplimiento con la <em>Google API Services User Data Policy</em>:
+                  Kongre permite la autenticación opcional con <strong>Google Sign-In</strong> (OAuth 2.0) para verificar la identidad de publicadores y ancianos. En estricto cumplimiento con la <em>Google API Services User Data Policy</em>:
                 </p>
                 <ul className="list-disc list-inside space-y-1.5 pl-1 text-slate-600 dark:text-slate-300">
                   <li>
-                    <strong>Datos solicitados:</strong> Solo la información básica de perfil (nombre, dirección de correo electrónico y foto de perfil). No solicitamos acceso a Google Drive, Gmail, contactos ni ningún otro servicio privado.
+                    <strong>Datos solicitados:</strong> Solo la información básica de perfil: nombre visible (<code>name</code>), correo electrónico (<code>email</code>) y foto de perfil (<code>picture</code>). No solicitamos acceso a Google Drive, Gmail, contactos ni ningún otro servicio privado.
                   </li>
                   <li>
                     <strong>Uso exclusivo:</strong> La información se utiliza únicamente para identificar al usuario y enlazarlo con su congregación aprobada.
                   </li>
                   <li>
-                    <strong>No comercialización:</strong> Jamás vendemos, transferimos ni utilizamos los datos de Google para publicidad o mercadeo.
+                    <strong>No comercialización ni venta:</strong> Jamás vendemos, alquilamos ni transferimos los datos de Google a terceros, anunciantes o corredores de datos.
                   </li>
                   <li>
-                    <strong>Cumplimiento de Uso Limitado (Limited Use):</strong> El uso y transferencia de información recibida de las APIs de Google se apegan rigurosamente a la <em>Política de Datos de Usuario de los Servicios de las APIs de Google</em>, incluidos los requisitos de Uso Limitado.
+                    <strong>Sin entrenamiento de Inteligencia Artificial:</strong> Los datos de usuario de Google nunca se usan para entrenar ni mejorar modelos de inteligencia artificial o aprendizaje automático.
                   </li>
                   <li>
-                    <strong>Desvinculación inmediata:</strong> Puedes desconectar tu cuenta de Google en cualquier momento pulsando «Cambiar cuenta» dentro del portal de acceso.
+                    <strong>Cumplimiento de Uso Limitado (Limited Use):</strong> El uso y transferencia de información recibida de las APIs de Google se apegan rigurosamente a la <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 underline font-semibold">Política de Datos de Usuario de los Servicios de las APIs de Google</a>, incluidos los requisitos de Uso Limitado.
+                  </li>
+                  <li>
+                    <strong>Desvinculación y revocación:</strong> Puedes desconectar tu cuenta en cualquier momento con el botón «Cambiar cuenta» o revocando el acceso directamente en <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 underline font-semibold">Configuración de Seguridad de Google</a>.
                   </li>
                 </ul>
               </div>
@@ -320,10 +323,11 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
               <div className="space-y-2">
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
                   <Mail className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>6. Canal de Contacto y Soporte</span>
+                  <span>6. Canal de Contacto y Versión Oficial</span>
                 </h4>
                 <p>
-                  Para cualquier consulta sobre privacidad o solicitud de supresión de datos, puedes contactarnos en <strong>soporte@kongre-app.com</strong> o visitar nuestro sitio oficial en <strong>https://kongre-app.com</strong>.
+                  Para consultas de privacidad o solicitudes de supresión de datos: <strong>soporte@kongre-app.com</strong>.
+                  También puedes consultar la versión estática oficial y su versión en inglés en <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 dark:text-indigo-400 underline font-semibold">https://kongre-app.com/privacy</a>.
                 </p>
               </div>
             </>

@@ -190,65 +190,123 @@
     </header>
 
     <main class="card">
-      <h1>Política de Privacidad y Seguridad</h1>
-      <div class="meta">Última actualización: 23 de Octubre de 2026 • Versión 2.12.9</div>
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem;">
+        <h1>Política de Privacidad y Seguridad</h1>
+        <div style="font-size: 0.8rem; background: var(--border); padding: 0.25rem 0.65rem; border-radius: 8px; font-weight: 600;">
+          Aplicación: <strong>Kongre (Gestor Teocrático)</strong>
+        </div>
+      </div>
+      <div class="meta">Última actualización: 23 de Octubre de 2026 • Versión 2.12.10 • URL Oficial: https://kongre-app.com</div>
 
       <div class="banner">
         <strong>🔒 Compromiso de Cero Conocimiento (Zero-Knowledge Architecture)</strong>
-        La privacidad, discreción y confidencialidad de los hermanos y congregaciones es nuestra prioridad absoluta. Toda la información de tu congregación se cifra de extremo a extremo antes de salir de tu dispositivo.
+        La privacidad, discreción y confidencialidad de los hermanos y congregaciones es nuestra prioridad absoluta. Toda la información de tu congregación se cifra de extremo a extremo antes de salir de tu dispositivo. Los servidores en la nube no poseen las claves criptográficas para descifrar ni visualizar tus registros teocráticos.
       </div>
 
-      <h2>1. Cifrado de Grado Militar (AES-256-GCM)</h2>
-      <p>
-        Toda la información congregacional se cifra en tu dispositivo local mediante el estándar de cifrado autenticado <strong>AES-256-GCM</strong> utilizando funciones de derivación criptográfica de claves <strong>PBKDF2-SHA256</strong> con hasta 600.000 iteraciones (estándar recomendado por OWASP).
-      </p>
-      <p>
-        Los servidores en la nube únicamente almacenan paquetes criptográficos opacos e ilegibles. Los administradores del sistema, proveedores de alojamiento o terceros no poseen las claves necesarias para descifrar ni visualizar los datos de tu congregación.
-      </p>
+      <!-- SECCIÓN EN ESPAÑOL -->
+      <section id="politica-es">
+        <h2>1. Identidad del Responsable y Naturaleza de la Aplicación</h2>
+        <p>
+          <strong>Kongre</strong> (accesible en <a href="https://kongre-app.com" style="color: var(--brand);">https://kongre-app.com</a>) es una aplicación web progresiva (PWA) de apoyo auxiliar sin fines de lucro, diseñada exclusivamente para la organización teocrática interna de congregaciones cristianas (gestión de asignaciones de reuniones, hojas S-89, tarjetas S-21, territorios y asistencia).
+        </p>
+        <p>
+          Para cualquier consulta de privacidad, el canal de contacto directo y verificable es: <strong>soporte@kongre-app.com</strong>.
+        </p>
 
-      <h2>2. Principio de Minimización de Datos (Ley 1581)</h2>
-      <p>
-        En cumplimiento con las normas internacionales de protección de datos personales, Kongre solicita y procesa únicamente los datos estrictamente necesarios para la organización interna:
-      </p>
-      <ul>
-        <li><strong>Datos de Congregación:</strong> Nombre de la congregación, circuito, horarios de reuniones y dirección del Salón del Reino.</li>
-        <li><strong>Directorio de Publicadores:</strong> Nombre del hermano o hermana, grupo de servicio y asignaciones o tareas teocráticas aprobadas por los ancianos.</li>
-        <li><strong>Contacto Voluntario:</strong> Número telefónico o correo electrónico únicamente para enviar avisos de asignaciones (S-89) o vincular el acceso personal.</li>
-      </ul>
+        <h2>2. Cifrado de Grado Militar (AES-256-GCM y PBKDF2)</h2>
+        <p>
+          Toda la información congregacional se cifra en tu dispositivo local mediante el estándar de cifrado autenticado <strong>AES-256-GCM</strong> utilizando funciones de derivación criptográfica de claves <strong>PBKDF2-SHA256</strong> con hasta 600.000 iteraciones (estándar recomendado por OWASP).
+        </p>
+        <p>
+          Los servidores en la nube únicamente almacenan paquetes criptográficos opacos e ilegibles. Los administradores del sistema, proveedores de alojamiento o terceros no poseen las claves necesarias para descifrar ni visualizar los datos de tu congregación.
+        </p>
 
-      <h2>3. Uso de Datos de Cuentas de Google (Google API User Data Policy)</h2>
-      <p>
-        Kongre ofrece de forma opcional la autenticación mediante <strong>Google Sign-In</strong> para facilitar a los publicadores y ancianos el acceso a sus asignaciones individuales y perfiles. En cumplimiento con la <em>Google API Services User Data Policy</em>:
-      </p>
-      <ul>
-        <li><strong>Datos a los que se accede:</strong> Únicamente la información de perfil básica proporcionada por Google: dirección de correo electrónico (<code>email</code>), nombre visible (<code>name</code>) y fotografía de perfil (<code>picture</code>). Kongre <strong>no solicita ni tiene acceso</strong> a Google Drive, Gmail, Google Calendar, lista de contactos ni a ningún otro servicio privado de Google.</li>
-        <li><strong>Finalidad exclusiva:</strong> La información obtenida de Google se utiliza única y exclusivamente para verificar la identidad del usuario y asociarla a su ficha de publicador en su congregación.</li>
-        <li><strong>No venta ni comercialización:</strong> Los datos de Google <strong>nunca</strong> se venden, alquilan, ceden a terceros ni se utilizan para publicidad dirigida, mercadotecnia ni entrenamiento de modelos de inteligencia artificial.</li>
-        <li><strong>Cumplimiento de Uso Limitado (Limited Use):</strong> El uso y la transferencia que realice Kongre a cualquier otra aplicación de la información recibida de las APIs de Google se apegan estrictamente a la <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" style="color: var(--brand);">Google API Services User Data Policy</a>, incluidos los requisitos de Uso Limitado.</li>
-        <li><strong>Desvinculación y eliminación:</strong> El usuario puede desconectar su cuenta de Google en cualquier momento haciendo clic en «Cambiar cuenta» dentro del portal o solicitando la baja a los ancianos de su congregación.</li>
-      </ul>
+        <h2>3. Uso de Datos de Google (Google API Services User Data Policy)</h2>
+        <p>
+          Kongre ofrece la opción de autenticación mediante <strong>Google Sign-In</strong> (OAuth 2.0) únicamente para verificar la identidad del usuario y permitir a publicadores y ancianos acceder a sus asignaciones individuales de forma segura.
+        </p>
+        <ul>
+          <li><strong>Datos de Google a los que se accede:</strong> Únicamente los datos del perfil básico autorizados por el usuario: nombre completo (<code>name</code>), dirección de correo electrónico (<code>email</code>), fotografía de perfil (<code>picture</code>) y el identificador único de cuenta de Google (<code>sub</code>).</li>
+          <li><strong>Datos a los que NO se accede:</strong> Kongre <strong>NO solicita, no lee ni tiene acceso</strong> a Google Drive, Gmail, Google Calendar, lista de contactos, ubicación en tiempo real ni a ningún otro servicio privado de Google.</li>
+          <li><strong>Finalidad exclusiva:</strong> Los datos de perfil se emplean exclusivamente para autenticar la sesión del usuario y enlazar su acceso con su registro de publicador autorizado por los ancianos de su congregación.</li>
+          <li><strong>No venta ni comercialización:</strong> Los datos de usuario de Google <strong>nunca</strong> se venden, alquilan, transfieren ni se comparten con corredores de datos, terceros anunciantes, plataformas de mercadeo ni redes de publicidad.</li>
+          <li><strong>Sin entrenamiento de Inteligencia Artificial:</strong> Los datos de usuario de Google recibidos a través de las APIs <strong>nunca</strong> se utilizan para entrenar, ajustar ni mejorar modelos de inteligencia artificial (IA) o aprendizaje automático (Machine Learning).</li>
+          <li><strong>Declaración de Uso Limitado (Limited Use Disclosure):</strong> El uso y la transferencia que realice Kongre a cualquier otra aplicación de la información recibida de las APIs de Google se apegan rigurosamente a la <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" style="color: var(--brand); font-weight: 600;">Política de Datos de Usuario de los Servicios de las APIs de Google</a>, incluidos los requisitos de Uso Limitado (<em>Limited Use</em>).</li>
+        </ul>
 
-      <h2>4. Sin Publicidad Comercial ni Rastreo</h2>
-      <p>
-        Kongre es una herramienta auxiliar sin fines de lucro diseñada para apoyar el servicio cristiano. No contiene publicidad comercial, banners de anunciantes ni scripts de rastreo de comportamiento con fines comerciales. No utilizamos cookies de seguimiento entre sitios.
-      </p>
+        <h2>4. Retención, Eliminación de Datos y Revocación de Permisos de Google</h2>
+        <p>
+          Kongre aplica un principio estricto de retención mínima de datos:
+        </p>
+        <ul>
+          <li><strong>Duración del almacenamiento:</strong> Los datos de perfil se conservan únicamente mientras el usuario mantenga su cuenta vinculada activamente a su congregación.</li>
+          <li><strong>Desvinculación en la aplicación:</strong> El usuario puede desvincular su cuenta de Google en cualquier momento pulsando «Cambiar cuenta» dentro del portal de acceso o solicitándolo a los ancianos administradores de su congregación.</li>
+          <li><strong>Eliminación completa de datos:</strong> Si un usuario solicita la eliminación de sus datos o el cuerpo de ancianos elimina su registro de publicador, toda la información asociada se purga de manera inmediata, definitiva e irreversible del almacenamiento local y remoto.</li>
+          <li><strong>Revocación directa desde Google:</strong> Los usuarios pueden revocar el acceso de Kongre a su cuenta de Google en cualquier momento visitando la configuración de seguridad de Google: <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer" style="color: var(--brand); font-weight: 600;">https://myaccount.google.com/permissions</a>.</li>
+        </ul>
 
-      <h2>5. Almacenamiento Local, Control y Eliminación Definitiva</h2>
-      <p>
-        Para garantizar el funcionamiento sin conexión a internet dentro del Salón del Reino o en el territorio, los datos locales se conservan en el almacenamiento seguro del navegador (<code>IndexedDB</code> / <code>localStorage</code>) con cifrado en reposo y protección contra inactividad.
-      </p>
-      <p>
-        El cuerpo de ancianos autorizado puede modificar, descargar una copia de seguridad o <strong>eliminar de manera definitiva e irreversible</strong> todos los datos de su congregación desde el panel de Ajustes en cualquier momento.
-      </p>
+        <h2>5. Sin Publicidad Comercial ni Rastreo</h2>
+        <p>
+          Kongre es una herramienta libre de publicidad comercial. No contiene banners de anunciantes, no emplea píxeles de rastreo ni utiliza cookies de seguimiento entre sitios para fines publicitarios.
+        </p>
 
-      <h2>6. Contacto y Consultas</h2>
-      <p>
-        Para cualquier duda, solicitud de acceso o eliminación de datos de usuario, puedes comunicarte a través del canal de soporte oficial:
-      </p>
-      <p>
-        📧 Correo de soporte: <strong>soporte@kongre-app.com</strong><br>
-        🌐 Sitio web oficial: <strong>https://kongre-app.com</strong>
-      </p>
+        <h2>6. Almacenamiento Local y Protección sin Conexión</h2>
+        <p>
+          Para garantizar el funcionamiento sin conexión a internet en el Salón del Reino o en el territorio, los datos locales se conservan en el almacenamiento del navegador (<code>IndexedDB</code> / <code>localStorage</code>) con cifrado en reposo y bloqueo automático por PIN tras inactividad.
+        </p>
+      </section>
+
+      <hr style="border: 0; border-top: 1px dashed var(--border); margin: 2.5rem 0;" />
+
+      <!-- SECCIÓN EN INGLÉS PARA EVALUADORES DE GOOGLE (GOOGLE OAUTH REVIEW TEAM) -->
+      <section id="privacy-en" style="background: rgba(79, 70, 229, 0.03); padding: 1.5rem; border-radius: 14px; border: 1px solid var(--border);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+          <h2 style="margin: 0; font-size: 1.15rem; color: var(--brand);">English Version / Google OAuth Compliance Disclosure</h2>
+          <span style="font-size: 0.75rem; font-weight: 700; color: var(--brand); text-transform: uppercase;">Official Policy</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+          This section is provided in English to facilitate verification by the Google Trust & Safety and OAuth App Verification teams.
+        </p>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: var(--text);">1. Application Identity</h3>
+        <p>
+          <strong>Kongre</strong> ("the Application", accessible at <a href="https://kongre-app.com" style="color: var(--brand);">https://kongre-app.com</a>) is a non-commercial Progressive Web Application (PWA) designed to assist Christian congregations with internal administrative scheduling (meeting assignments, talk schedules, field service territory organization, and attendance records). Contact email: <strong>soporte@kongre-app.com</strong>.
+        </p>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: var(--text);">2. Google API User Data Policy & Limited Use Disclosure</h3>
+        <p>
+          Kongre's use and transfer to any other app of information received from Google APIs will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" style="color: var(--brand); font-weight: 600;">Google API Services User Data Policy</a>, including the <strong>Limited Use</strong> requirements.
+        </p>
+        <ul>
+          <li><strong>Data Accessed:</strong> Kongre only requests access to basic user profile information via Google Sign-In (OAuth 2.0): user full name (<code>name</code>), email address (<code>email</code>), profile picture (<code>picture</code>), and unique Google ID (<code>sub</code>).</li>
+          <li><strong>No Restricted Scopes:</strong> Kongre does NOT access, read, or request sensitive or restricted scopes such as Google Drive, Gmail, Google Calendar, or user contacts.</li>
+          <li><strong>Purpose of Collection:</strong> Google user data is strictly used for authenticating authorized users and linking them to their corresponding local congregation record.</li>
+          <li><strong>No Sale of Data:</strong> Kongre NEVER sells, rents, leases, or trades Google user data to any third party, broker, or advertiser.</li>
+          <li><strong>No Advertising or Tracking:</strong> Google user data is NEVER used for targeted advertising, retargeting, promotional marketing, or user profiling.</li>
+          <li><strong>No AI Model Training:</strong> Google user data is NEVER used to train, retrain, or fine-tune artificial intelligence (AI) or machine learning models.</li>
+        </ul>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: var(--text);">3. Data Retention, Deletion, and Revocation of Access</h3>
+        <ul>
+          <li><strong>Retention Period:</strong> Google user profile data is retained only while the user remains an active member of their congregation's roster.</li>
+          <li><strong>Account Disconnection & Deletion:</strong> Users may disconnect their Google account at any time using the "Cambiar cuenta" button within the application portal. Upon deletion of a user profile by congregation administrators, all associated data is permanently and irreversibly purged.</li>
+          <li><strong>Revoking Access via Google:</strong> Users can revoke Kongre's access to their Google account at any time via Google Account Security settings at: <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener noreferrer" style="color: var(--brand); font-weight: 600;">https://myaccount.google.com/permissions</a>.</li>
+        </ul>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: var(--text);">4. Security Architecture (Zero-Knowledge)</h3>
+        <p>
+          Kongre implements a zero-knowledge architecture. Congregation data is encrypted locally on client devices using authenticated <strong>AES-256-GCM</strong> encryption with <strong>PBKDF2-SHA256</strong> key derivation (up to 600,000 rounds). The central database only stores opaque ciphertexts, ensuring that administrators, hosting providers, and third parties cannot decrypt or read congregation records.
+        </p>
+
+        <h3 style="font-size: 1rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: var(--text);">5. Contact Information</h3>
+        <p>
+          For privacy inquiries, data deletion requests, or support, please reach out to:
+          <br>
+          Email: <strong>soporte@kongre-app.com</strong>
+          <br>
+          Official Website: <strong>https://kongre-app.com</strong>
+        </p>
+      </section>
 
       <div class="nav-links">
         <a href="/" class="nav-link">← Volver al Portal de Kongre</a>

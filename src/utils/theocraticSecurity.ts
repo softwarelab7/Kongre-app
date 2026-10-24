@@ -957,9 +957,127 @@ export function verifyPersonalPinMatch(
 }
 
 /**
+ * Obtiene o genera una sal aleatoria única por dispositivo en localStorage.
+ * Garantiza que el cifrado local en reposo varíe entre navegadores y no dependa únicamente de claves fijas.
+ */
+function getDeviceEntropySalt(): string {
+  if (typeof window === 'undefined') return 'server_side_device_entropy_salt_2026';
+  try {
+    let salt = localStorage.getItem('kongre_device_entropy_salt_v1');
+    if (!salt || salt.length < 32) {
+      const bytes = new Uint8Array(16);
+      if (window.crypto && window.crypto.getRandomValues) {
+        window.crypto.getRandomValues(bytes);
+      } else {
+        for (let i = 0; i < 16; i++) bytes[i] = Math.floor(Math.random() * 256);
+      }
+      salt = bufferToHex(bytes.buffer);
+      localStorage.setItem('kongre_device_entropy_salt_v1', salt);
+    }
+    return salt;
+  } catch {
+    return 'fallback_device_entropy_salt_2026';
+  }
+}
+
+/**
+ * Deriva una clave única para cifrar datos sensibles en reposo (salud, contactos de emergencia, teléfonos)
+ * combinando la sesión activa del usuario (PIN personal o congregación) con la entropía del dispositivo.
+ * Resuelve los hallazgos 4 y 6 de la auditoría de seguridad (cumplimiento Ley 1581 de 2012 de Colombia).
+ */
+export function getSensitiveDataAtRestKey(): string {
+  const sessionPin =
+    (typeof window !== 'undefined'
+      ? getSecureLocalPin('kongre_session_pin_v2') ||
+        getSecureLocalPin('kongre_coordinator_pin') ||
+        getSecureLocalPin('kongre_registered_cong_pin') ||
+        getSecureLocalPin('kongre_last_cong_pin')
+      : '') || '';
+  const congId =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_canonical_cong_id') || ''
+      : '';
+  const deviceSalt = getDeviceEntropySalt();
+  return sha256HexSync(`kgr_health_contacts_rest_v1:${sessionPin}:${congId}:${deviceSalt}`);
+}
+
+/**
+ * Cifra en reposo un campo sensible (salud, teléfono, contacto de emergencia, notas médicas)
+ * mediante un flujo simétrico ligado a la clave de sesión del dispositivo (`kgr_sec2:...`).
+ */
+export function encryptSensitiveFieldAtRest(val: any): any {
+  if (val === null || val === undefined || val === '') return val;
+  if (typeof val === 'string' && val.startsWith('kgr_sec2:')) return val;
+
+  try {
+    const rawStr = typeof val === 'object' ? `json:${JSON.stringify(val)}` : String(val);
+    const key = getSensitiveDataAtRestKey();
+    const plainBytes = new TextEncoder().encode(rawStr);
+    const nonce = new Uint8Array(4);
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+      window.crypto.getRandomValues(nonce);
+    } else {
+      for (let i = 0; i < 4; i++) nonce[i] = Math.floor(Math.random() * 256);
+    }
+    const nonceHex = bufferToHex(nonce.buffer);
+    const stream = sha256HexSync(`${key}:${nonceHex}:stream`);
+    const out = new Uint8Array(plainBytes.length);
+    for (let i = 0; i < plainBytes.length; i++) {
+      const kByte = parseInt(stream.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
+      out[i] = plainBytes[i] ^ kByte;
+    }
+    return `kgr_sec2:${nonceHex}${bufferToHex(out.buffer)}`;
+  } catch {
+    return val;
+  }
+}
+
+/**
+ * Descifra en memoria un valor sensible leído desde localStorage.
+ * Si el dato es legado o texto plano (sin prefijo kgr_sec2:), se devuelve tal cual (compatibilidad garantizada).
+ */
+export function decryptSensitiveFieldAtRest(val: any): any {
+  if (typeof val !== 'string' || !val.startsWith('kgr_sec2:')) return val;
+  try {
+    const payloadHex = val.slice('kgr_sec2:'.length);
+    if (payloadHex.length < 8) return val;
+    const nonceHex = payloadHex.slice(0, 8);
+    const cipherHex = payloadHex.slice(8);
+    const cipherBytes = hexToBuffer(cipherHex);
+    const key = getSensitiveDataAtRestKey();
+    const stream = sha256HexSync(`${key}:${nonceHex}:stream`);
+    const out = new Uint8Array(cipherBytes.length);
+    for (let i = 0; i < cipherBytes.length; i++) {
+      const kByte = parseInt(stream.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
+      out[i] = cipherBytes[i] ^ kByte;
+    }
+    const decoded = new TextDecoder().decode(out);
+    if (decoded.startsWith('json:')) {
+      return JSON.parse(decoded.slice(5));
+    }
+    return decoded;
+  } catch {
+    return val;
+  }
+}
+
+const SENSITIVE_HEALTH_AND_CONTACT_KEYS = [
+  'phone',
+  'home_phone',
+  'address',
+  'emergencyContactName',
+  'emergencyContactPhone',
+  'emergency_contacts',
+  'spiritual_notes',
+  'notes',
+  'birthDate',
+  'birth_date',
+] as const;
+
+/**
  * Sanitiza la lista de publicadores antes de guardarla en localStorage:
- * Reemplaza `personalPin` en texto plano por `personalPinHash` y `encryptedPin`
- * para que ningún PIN quede expuesto en texto plano al inspeccionar localStorage.
+ * 1. Reemplaza `personalPin` en texto plano por `personalPinHash` y `encryptedPin`.
+ * 2. Cifra los datos sensibles de salud, contactos de emergencia y teléfonos (Ley 1581 de 2012 / Hallazgos 4 y 6).
  */
 export function sanitizePublishersForLocalStorage<T extends Record<string, any>>(publishers: T[]): T[] {
   if (!Array.isArray(publishers)) return [];
@@ -974,12 +1092,20 @@ export function sanitizePublishersForLocalStorage<T extends Record<string, any>>
     delete clone.personalPin;
     if (pinHash) clone.personalPinHash = pinHash;
     if (encryptedPin) clone.encryptedPin = encryptedPin;
+
+    // Cifrado de datos sensibles en reposo (Salud y Contactos - Ley 1581 / Hallazgos 4 y 6)
+    for (const k of SENSITIVE_HEALTH_AND_CONTACT_KEYS) {
+      if (clone[k] !== undefined && clone[k] !== null && clone[k] !== '') {
+        clone[k] = encryptSensitiveFieldAtRest(clone[k]);
+      }
+    }
     return clone as T;
   });
 }
 
 /**
- * Restaura en memoria la lista de publicadores leída desde localStorage
+ * Restaura en memoria la lista de publicadores leída desde localStorage:
+ * Descifra transparentemente los datos de salud y contactos de emergencia.
  */
 export function restorePublishersFromLocalStorage<T extends Record<string, any>>(publishers: T[]): T[] {
   if (!Array.isArray(publishers)) return [];
@@ -996,11 +1122,20 @@ export function restorePublishersFromLocalStorage<T extends Record<string, any>>
       p.personalPinHash ||
       (restoredPin ? hashPersonalPin(restoredPin) : '');
 
-    return {
+    const restored: Record<string, any> = {
       ...p,
       ...(restoredPin ? { personalPin: restoredPin } : {}),
       ...(pinHash ? { personalPinHash: pinHash } : {}),
     };
+
+    // Descifrado transparente en memoria de datos de salud y contactos
+    for (const k of SENSITIVE_HEALTH_AND_CONTACT_KEYS) {
+      if (restored[k] !== undefined && restored[k] !== null) {
+        restored[k] = decryptSensitiveFieldAtRest(restored[k]);
+      }
+    }
+
+    return restored as T;
   });
 }
 

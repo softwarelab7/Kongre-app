@@ -425,7 +425,7 @@ export const GruposServicioTab: React.FC = () => {
                         <a
                           href={`https://wa.me/${overseer.phone.replace(/[^0-9]/g, '')}`}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50"
                           title="Escribir al superintendente de grupo"
                         >
@@ -447,7 +447,7 @@ export const GruposServicioTab: React.FC = () => {
                         <a
                           href={`https://wa.me/${assistant.phone.replace(/[^0-9]/g, '')}`}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50"
                           title="Escribir al auxiliar de grupo"
                         >
@@ -545,7 +545,7 @@ export const GruposServicioTab: React.FC = () => {
                                 <a
                                   href={`https://wa.me/${member.phone.replace(/[^0-9]/g, '')}`}
                                   target="_blank"
-                                  rel="noreferrer"
+                                  rel="noopener noreferrer"
                                   className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                                   title="WhatsApp"
                                 >

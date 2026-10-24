@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { encryptForSupabase, decryptFromSupabase, encryptData, decryptData } from '../src/utils/crypto.ts';
-import { encodeSecureShareToken, decodeSecureShareToken, generateSecureMasterPin } from '../src/utils/theocraticSecurity.ts';
+import { encodeSecureShareToken, decodeSecureShareToken, generateSecureMasterPin, sanitizePublishersForLocalStorage, restorePublishersFromLocalStorage } from '../src/utils/theocraticSecurity.ts';
 
 test('cifrado: ida y vuelta con el formato actual', async () => {
   const data = { hola: 'mundo', n: [1, 2, 3] };
@@ -49,4 +49,46 @@ test('PIN maestro generado: 12 dígitos, sin patrones triviales', () => {
     seen.add(p);
   }
   assert.equal(seen.size, 200);
+});
+
+test('datos sensibles en reposo (Ley 1581): se cifran en localStorage y se restauran en memoria transparentemente', () => {
+  const originalPubs = [
+    {
+      id: 'pub1',
+      name: 'Carlos Gomez',
+      personalPin: '4821',
+      phone: '3182634036',
+      address: 'Calle 100 # 15-20',
+      emergencyContactName: 'Maria Gomez',
+      emergencyContactPhone: '3109876543',
+      birthDate: '1990-05-15',
+      notes: 'Alergia a la penicilina y mariscos. DPA vigente.',
+    },
+  ];
+
+  // 1. Sanitizar para localStorage: no debe haber texto plano de PIN ni de datos sensibles
+  const sanitized = sanitizePublishersForLocalStorage(originalPubs);
+  assert.equal(sanitized[0].personalPin, undefined, 'El PIN no debe existir en texto plano');
+  assert.ok(sanitized[0].personalPinHash, 'Debe tener hash del PIN');
+  assert.ok(sanitized[0].phone.startsWith('kgr_sec2:'), 'El teléfono debe estar cifrado en reposo');
+  assert.ok(sanitized[0].address.startsWith('kgr_sec2:'), 'La dirección debe estar cifrada en reposo');
+  assert.ok(sanitized[0].emergencyContactName.startsWith('kgr_sec2:'), 'El contacto de emergencia debe estar cifrado');
+  assert.ok(sanitized[0].notes.startsWith('kgr_sec2:'), 'Las notas médicas deben estar cifradas');
+  assert.ok(sanitized[0].birthDate.startsWith('kgr_sec2:'), 'La fecha de nacimiento debe estar cifrada');
+
+  // 2. Restaurar en memoria: debe devolver los valores exactos originales
+  const restored = restorePublishersFromLocalStorage(sanitized);
+  assert.equal(restored[0].name, 'Carlos Gomez');
+  assert.equal(restored[0].phone, '3182634036');
+  assert.equal(restored[0].address, 'Calle 100 # 15-20');
+  assert.equal(restored[0].emergencyContactName, 'Maria Gomez');
+  assert.equal(restored[0].emergencyContactPhone, '3109876543');
+  assert.equal(restored[0].birthDate, '1990-05-15');
+  assert.equal(restored[0].notes, 'Alergia a la penicilina y mariscos. DPA vigente.');
+
+  // 3. Compatibilidad hacia atrás: registros legados sin cifrar se leen intactos
+  const legacyPub = [{ id: 'leg1', name: 'Pedro', phone: '3001234567', notes: 'Hipertensión' }];
+  const restoredLegacy = restorePublishersFromLocalStorage(legacyPub);
+  assert.equal(restoredLegacy[0].phone, '3001234567');
+  assert.equal(restoredLegacy[0].notes, 'Hipertensión');
 });

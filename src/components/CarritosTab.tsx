@@ -436,7 +436,7 @@ export const CarritosTab: React.FC = () => {
                         <a
                           href={`https://wa.me/${pub1.phone.replace(/[^0-9]/g, '')}`}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           className="p-1 text-slate-400 hover:text-emerald-600"
                         >
                           <MessageCircle className="w-3.5 h-3.5" />
@@ -464,7 +464,7 @@ export const CarritosTab: React.FC = () => {
                         <a
                           href={`https://wa.me/${pub2.phone.replace(/[^0-9]/g, '')}`}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                           className="p-1 text-slate-400 hover:text-emerald-600"
                         >
                           <MessageCircle className="w-3.5 h-3.5" />

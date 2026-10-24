@@ -44,3 +44,4 @@ server.js
 *.backup
 supabase/.temp/
 .temp/
+.aistudio/

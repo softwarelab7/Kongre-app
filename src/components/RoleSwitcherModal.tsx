@@ -7,6 +7,8 @@ import { TheocraticRole, THEOCRATIC_ROLES, checkCredentialChange, checkEmailRole
 import { generateSecurePublisherPin, formatCanonicalCongregationId, getSecureLocalPin, encodeSecureShareToken } from '../utils/theocraticSecurity';
 import { insertAuditLog } from '../services/auditLogService';
 import { ActiveTab } from './Navbar';
+import { TwoFactorSetupModal } from './TwoFactorSetupModal';
+import { TwoFactorPromptModal } from './TwoFactorPromptModal';
 import {
   ShieldCheck,
   Shield,
@@ -66,6 +68,9 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
     assignPersonalPinToPublisher,
     removePublisherPin,
     generateUniquePublisherPin,
+    enableTwoFactorForPublisher,
+    disableTwoFactorForPublisher,
+    verifyTwoFactorForPublisher,
     isCoordinator,
     permissions,
   } = useAuth();
@@ -88,6 +93,15 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
   // - 'mi_sesion': Mi perfil actual, cambiar con PIN y simulación de roles
   // - 'nube_qr': Vinculación Google y Códigos QR
   const [activeTabMode, setActiveTabMode] = useState<'directorio' | 'mi_sesion' | 'nube_qr'>('directorio');
+
+  // 2FA Security Modals State
+  const [show2FAPromptModal, setShow2FAPromptModal] = useState(false);
+  const [show2FASetupModal, setShow2FASetupModal] = useState(false);
+  const [pending2FAPublisher, setPending2FAPublisher] = useState<{
+    id: string;
+    name: string;
+    role?: TheocraticRole;
+  } | null>(null);
 
   // Search & category filter in the directory
   const [searchTerm, setSearchTerm] = useState('');
@@ -168,6 +182,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
         privilege?: string;
         email?: string;
         gender?: string;
+        twoFactorEnabled: boolean;
       }
     >();
 
@@ -182,6 +197,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
       const assignedRole = pub.theocraticRole || pinRec?.role || (pub.privilege === 'anciano' ? 'anciano' : 'publico');
       const assignedPin = pub.personalPin || pinRec?.pin || '';
       const assignedPinHash = pub.personalPinHash || pinRec?.pinHash || '';
+      const is2FA = Boolean(pub.twoFactorEnabled || pinRec?.twoFactorEnabled);
 
       map.set(pub.id, {
         id: pub.id,
@@ -193,6 +209,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
         privilege: pub.privilege,
         email: pub.email || pinRec?.email,
         gender: pub.gender,
+        twoFactorEnabled: is2FA,
       });
     });
 
@@ -210,6 +227,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
         );
         const cPin = pinRec?.pin || '';
         const cHash = pinRec?.pinHash || '';
+        const is2FA = Boolean(pinRec?.twoFactorEnabled);
         map.set('coord_principal', {
           id: 'coord_principal',
           publisherId: 'coord_principal',
@@ -220,6 +238,7 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
           privilege: 'anciano',
           email: settings.coordinatorEmail,
           gender: 'hermano',
+          twoFactorEnabled: is2FA,
         });
       }
     }
@@ -624,8 +643,34 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
         setEnteredPin('');
         onClose();
       }, 1200);
+    } else if (result.requires2FA && result.publisherId) {
+      setPending2FAPublisher({
+        id: result.publisherId,
+        name: result.name || '',
+        role: result.role,
+      });
+      setShow2FAPromptModal(true);
     } else {
       setPinError(result.message || 'PIN no encontrado o inválido.');
+    }
+  };
+
+  // Reset 2FA for a publisher (elder action if brother lost authenticator app)
+  const handleReset2FAForPublisher = async (publisherId: string, name: string) => {
+    if (
+      !confirm(
+        `¿Restablecer la verificación en dos pasos (2FA) para ${name}?\n\nEl publicador podrá volver a ingresar únicamente con su PIN personal sin que se le solicite código de Microsoft Authenticator.`
+      )
+    ) {
+      return;
+    }
+    const res = await disableTwoFactorForPublisher(publisherId);
+    if (res.success) {
+      setFeedback(`🛡️ 2FA restablecido para ${name}.`);
+      setTimeout(() => setFeedback(null), 3500);
+    } else {
+      setFeedback(`Error: ${res.message}`);
+      setTimeout(() => setFeedback(null), 3500);
     }
   };
 
@@ -1123,6 +1168,12 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                               <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 capitalize">
                                 {item.privilege?.replace('_', ' ') || 'Publicador'}
                               </span>
+                              {item.twoFactorEnabled && (
+                                <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300">
+                                  <ShieldCheck className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" />
+                                  <span>2FA</span>
+                                </span>
+                              )}
                               {item.email && (
                                 <span className="text-[10px] text-slate-400 truncate hidden sm:inline">
                                   • {item.email}
@@ -1192,6 +1243,18 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
+
+                              {item.twoFactorEnabled && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleReset2FAForPublisher(item.publisherId, item.name)}
+                                  aria-label={`Restablecer 2FA de ${item.name}`}
+                                  className="p-1 text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 cursor-pointer transition-colors"
+                                  title="Restablecer 2FA (si el hermano extravió su app de autenticación)"
+                                >
+                                  <Shield className="w-3.5 h-3.5 text-amber-500" />
+                                </button>
+                              )}
                             </div>
                           ) : (
                             <button
@@ -1293,6 +1356,76 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
                   </span>
                 </div>
               </div>
+
+              {/* 2FA Status Card for current active publisher */}
+              {currentPublisherId && (
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                        publisherPinsList.find((p) => p.publisherId === currentPublisherId)?.twoFactorEnabled
+                          ? 'bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400'
+                          : 'bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400'
+                      }`}
+                    >
+                      {publisherPinsList.find((p) => p.publisherId === currentPublisherId)?.twoFactorEnabled ? (
+                        <ShieldCheck className="w-5 h-5" />
+                      ) : (
+                        <Shield className="w-5 h-5" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-xs font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>Verificación en dos pasos (2FA)</span>
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            publisherPinsList.find((p) => p.publisherId === currentPublisherId)?.twoFactorEnabled
+                              ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300'
+                              : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                          }`}
+                        >
+                          {publisherPinsList.find((p) => p.publisherId === currentPublisherId)?.twoFactorEnabled
+                            ? 'Protegido con Authenticator'
+                            : 'Opcional'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                        {publisherPinsList.find((p) => p.publisherId === currentPublisherId)?.twoFactorEnabled
+                          ? 'Tu cuenta exige un código de Microsoft Authenticator en nuevos dispositivos.'
+                          : 'Añade una capa de seguridad con Microsoft Authenticator al ingresar en otros dispositivos.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {publisherPinsList.find((p) => p.publisherId === currentPublisherId)?.twoFactorEnabled ? (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (
+                          confirm(
+                            '¿Deseas desactivar la verificación en dos pasos (2FA)? Tu cuenta volverá a ingresar únicamente con tu PIN personal.'
+                          )
+                        ) {
+                          await disableTwoFactorForPublisher(currentPublisherId);
+                          setFeedback('2FA desactivado.');
+                          setTimeout(() => setFeedback(null), 3000);
+                        }
+                      }}
+                      className="px-3 py-1.5 text-xs font-bold rounded-xl bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 cursor-pointer transition-colors shrink-0"
+                    >
+                      Desactivar 2FA
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShow2FASetupModal(true)}
+                      className="px-3 py-1.5 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs cursor-pointer transition-colors shrink-0"
+                    >
+                      Activar 2FA
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Enter Personal PIN Form */}
               <div className="p-6 rounded-3xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
@@ -1901,6 +2034,49 @@ export const RoleSwitcherModal: React.FC<RoleSwitcherModalProps> = ({
           </div>
         </div>
       )}
+
+      {/* 2FA SETUP WIZARD MODAL */}
+      <TwoFactorSetupModal
+        isOpen={show2FASetupModal}
+        onClose={() => setShow2FASetupModal(false)}
+        publisherId={currentPublisherId || ''}
+        publisherName={currentBrotherName || 'Mi Perfil'}
+        onSuccess={async (secret, backupCodes) => {
+          if (!currentPublisherId) return false;
+          const res = await enableTwoFactorForPublisher(currentPublisherId, secret, backupCodes);
+          return res.success;
+        }}
+      />
+
+      {/* 2FA PROMPT CHALLENGE MODAL */}
+      <TwoFactorPromptModal
+        isOpen={show2FAPromptModal}
+        onClose={() => {
+          setShow2FAPromptModal(false);
+          setPending2FAPublisher(null);
+        }}
+        publisherName={pending2FAPublisher?.name || 'Publicador'}
+        onVerifyCode={async (code, trustDevice) => {
+          if (!pending2FAPublisher?.id) return { success: false, message: 'Identidad no encontrada' };
+          return await verifyTwoFactorForPublisher(pending2FAPublisher.id, code, trustDevice);
+        }}
+        onSuccess={() => {
+          setShow2FAPromptModal(false);
+          if (pending2FAPublisher?.role) {
+            const roleInfo = THEOCRATIC_ROLES[pending2FAPublisher.role];
+            if (roleInfo && !roleInfo.allowedTabs.includes(activeTab)) {
+              setActiveTab(roleInfo.allowedTabs[0] || 'programacion');
+            }
+          }
+          setPending2FAPublisher(null);
+          setEnteredPin('');
+          setPinSuccess('¡Identidad verificada exitosamente con 2FA!');
+          setTimeout(() => {
+            setPinSuccess(null);
+            onClose();
+          }, 1200);
+        }}
+      />
     </div>
   );
 };

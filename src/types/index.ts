@@ -93,6 +93,8 @@ export interface Publisher {
   personalPin?: string;
   personalPinHash?: string;
   encryptedPin?: string;
+  twoFactorEnabled?: boolean;
+  twoFactorEnabledAt?: string;
   notes?: string;
   active: boolean;
   groupNumber?: number; // Grupo de predicación

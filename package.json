@@ -1,7 +1,7 @@
 {
   "name": "react-example",
   "private": true,
-  "version": "2.12.10",
+  "version": "2.12.11",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3050",
@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "tsx --test test/core.test.ts test/e2e/e2e.test.ts test/rbac.test.ts test/crypto-and-tokens.test.ts",
+    "test": "tsx --test test/core.test.ts test/e2e/e2e.test.ts test/rbac.test.ts test/crypto-and-tokens.test.ts test/totp.test.ts",
     "verify": "bun scripts/verify-production.ts"
   },
   "dependencies": {

@@ -25,18 +25,49 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.10';
-export const CURRENT_BUILD_CODE = '2026.10.23.6100';
+export const CURRENT_APP_VERSION = '2.12.11';
+export const CURRENT_BUILD_CODE = '2026.10.23.6200';
 export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.11',
+    buildCode: '2026.10.23.6200',
+    date: '23 de Octubre, 2026',
+    title: 'Autenticación de Dos Pasos (2FA) con Microsoft Authenticator y Códigos de Respaldo',
+    isCurrent: true,
+    highlight: 'Verificación en dos factores opcional (TOTP RFC 6238) compatible con Microsoft Authenticator y Google Authenticator, 100% offline, códigos de recuperación y dispositivos de confianza',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Motor criptográfico TOTP nativo (RFC 6238): Implementación en cliente con Web Crypto API (HMAC-SHA1, 30s de intervalo, 6 dígitos y tolerancia de desfase de ±30s) sin librerías externas.',
+      },
+      {
+        category: 'feature',
+        text: 'Compatibilidad con Microsoft Authenticator: Generador de códigos QR otpauth:// y wizard paso a paso con opción de ingreso de clave secreta manual.',
+      },
+      {
+        category: 'security',
+        text: 'Códigos de respaldo de emergencia: 8 códigos únicos de un solo uso con almacenamiento seguro mediante hashes criptográficos SHA-256 en reposo.',
+      },
+      {
+        category: 'feature',
+        text: 'Dispositivos de confianza ("Recordar por 30 días"): Opción para recordar el navegador de uso personal y solicitar el código de 6 dígitos únicamente en dispositivos nuevos o tras 30 días de inactividad.',
+      },
+      {
+        category: 'feature',
+        text: 'Gestión teocrática y portal de publicadores: Pestaña "Seguridad 2FA" en Mi Portal, activación/desactivación voluntaria, e insignia de 2FA activo y botón de restablecimiento en Directorio para ancianos.',
+      },
+    ],
+  },
+  {
     version: '2.12.10',
     buildCode: '2026.10.23.6100',
     date: '23 de Octubre, 2026',
     title: 'Páginas Legales Oficiales y Rutas Directas de Privacidad y Términos para Verificación de Google',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Rutas directas #privacy, #terms, /privacy, /terms y páginas estáticas dedicadas en cumplimiento estricto con la Google API Services User Data Policy',
     environment: 'Producción Cloud (Kongre)',
     changes: [

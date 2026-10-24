@@ -49,6 +49,7 @@ import {
   Info,
   BellRing,
   X,
+  ShieldCheck,
 } from 'lucide-react';
 import {
   isNotificationSupported,
@@ -62,9 +63,11 @@ import {
   PushSubscriptionRecord,
 } from '../services/notificationService';
 import { PushSubscriptionModal } from './PushSubscriptionModal';
+import { TwoFactorSetupModal } from './TwoFactorSetupModal';
+import { TwoFactorPromptModal } from './TwoFactorPromptModal';
 import { setSecureLocalPin, getPinLockoutRemainingSeconds } from '../utils/theocraticSecurity';
 
-export type PublisherPortalTab = 'asignaciones' | 'informe' | 'ausencias' | 'grupo' | 'avisos';
+export type PublisherPortalTab = 'asignaciones' | 'informe' | 'ausencias' | 'grupo' | 'avisos' | 'seguridad_2fa';
 export type NWPublisherTab = PublisherPortalTab;
 
 export const PersonalViewTab: React.FC = () => {
@@ -96,6 +99,9 @@ export const PersonalViewTab: React.FC = () => {
     effectiveRoleInfo,
     identifyRoleByPersonalPin,
     publisherPinsList,
+    enableTwoFactorForPublisher,
+    disableTwoFactorForPublisher,
+    verifyTwoFactorForPublisher,
   } = useAuth();
 
   // Módulo activo dentro del Portal del Publicador
@@ -111,6 +117,19 @@ export const PersonalViewTab: React.FC = () => {
     if (saved && publishersMap.has(saved)) return saved;
     return publishers[0]?.id || '';
   });
+
+  // 2FA state
+  const [show2FASetupModal, setShow2FASetupModal] = useState(false);
+  const [show2FAPromptModal, setShow2FAPromptModal] = useState(false);
+  const [pending2FAPublisher, setPending2FAPublisher] = useState<{ id: string; name: string } | null>(null);
+  const [is2FADisabling, setIs2FADisabling] = useState(false);
+
+  const currentPinRecord = useMemo(() => {
+    if (!selectedPublisherId) return null;
+    return publisherPinsList.find((p) => p.publisherId === selectedPublisherId);
+  }, [publisherPinsList, selectedPublisherId]);
+
+  const isCurrentPublisher2FAEnabled = Boolean(currentPinRecord?.twoFactorEnabled);
 
   // PIN login state when not authenticated
   const [enteredPin, setEnteredPin] = useState('');
@@ -363,6 +382,11 @@ export const PersonalViewTab: React.FC = () => {
         }
         setEnteredPin('');
         setLockoutSeconds(0);
+      } else if (res.requires2FA && res.publisherId) {
+        setPending2FAPublisher({ id: res.publisherId, name: res.name || '' });
+        setShow2FAPromptModal(true);
+        setIsVerifyingPin(false);
+        return;
       } else {
         const remaining = getPinLockoutRemainingSeconds();
         if (remaining > 0) {
@@ -505,6 +529,23 @@ export const PersonalViewTab: React.FC = () => {
       ...selectedPublisher,
       ausencias: updated,
     });
+  };
+
+  // Desactivar 2FA para el publicador activo
+  const handleDisable2FA = async () => {
+    if (!selectedPublisherId) return;
+    if (!window.confirm('¿Deseas desactivar la verificación en dos pasos (2FA) para tu cuenta?')) return;
+    setIs2FADisabling(true);
+    try {
+      const res = await disableTwoFactorForPublisher(selectedPublisherId);
+      if (res.success) {
+        alert('Verificación en dos pasos desactivada exitosamente.');
+      } else {
+        alert(res.message || 'No se pudo desactivar 2FA.');
+      }
+    } finally {
+      setIs2FADisabling(false);
+    }
   };
 
   // My Preaching Group
@@ -1327,6 +1368,26 @@ export const PersonalViewTab: React.FC = () => {
             </span>
           )}
         </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveModule('seguridad_2fa')}
+          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+            activeModule === 'seguridad_2fa'
+              ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <ShieldCheck size={16} />
+          <span>Seguridad 2FA</span>
+          {isCurrentPublisher2FAEnabled ? (
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="2FA Activado" />
+          ) : (
+            <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold">
+              Opcional
+            </span>
+          )}
+        </button>
       </div>
 
       {/* 2.3 CONTENIDO DEL MÓDULO SELECCIONADO */}
@@ -1989,6 +2050,114 @@ export const PersonalViewTab: React.FC = () => {
         </div>
       )}
 
+      {/* MÓDULO 6: SEGURIDAD Y VERIFICACIÓN EN DOS PASOS (2FA) */}
+      {activeModule === 'seguridad_2fa' && (
+        <div className="space-y-5">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-7 shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-start sm:items-center gap-3.5">
+                <div
+                  className={`p-3 rounded-2xl ${
+                    isCurrentPublisher2FAEnabled
+                      ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+                      : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400'
+                  }`}
+                >
+                  <ShieldCheck className="w-7 h-7" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                      Verificación en Dos Pasos (2FA)
+                    </h3>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                        isCurrentPublisher2FAEnabled
+                          ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                      }`}
+                    >
+                      {isCurrentPublisher2FAEnabled ? '✓ Activada' : 'Desactivada'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Compatible con <strong>Microsoft Authenticator</strong>, Google Authenticator y apps estándar (RFC 6238).
+                  </p>
+                </div>
+              </div>
+
+              {!isCurrentPublisher2FAEnabled ? (
+                <button
+                  type="button"
+                  onClick={() => setShow2FASetupModal(true)}
+                  className="py-2.5 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-600/25 flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0"
+                >
+                  <Smartphone className="w-4 h-4" />
+                  <span>Configurar Microsoft Authenticator</span>
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setShow2FASetupModal(true)}
+                    className="py-2 px-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+                  >
+                    Reconfigurar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDisable2FA}
+                    disabled={is2FADisabling}
+                    className="py-2 px-3.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-semibold hover:bg-rose-100 transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {is2FADisabling ? 'Desactivando...' : 'Desactivar 2FA'}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Tarjetas de características y funcionamiento */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-1.5">
+                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <Smartphone className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  <span>Sin conexión requerida</span>
+                </div>
+                <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+                  Los códigos temporales de 6 dígitos se calculan con el reloj de tu teléfono. Funcionan incluso dentro del Salón del Reino sin señal móvil o en modo avión.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-1.5">
+                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>Solo en nuevos dispositivos</span>
+                </div>
+                <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+                  Puedes marcar «Recordar este dispositivo por 30 días» en tu teléfono habitual para no tener que escribir el código en cada reunión.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-1.5">
+                <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <KeyRound className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  <span>Códigos de respaldo</span>
+                </div>
+                <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+                  Al configurar 2FA recibes 8 códigos de respaldo de emergencia. Si alguna vez pierdes o cambias de teléfono, puedes utilizarlos para acceder sin quedarte fuera.
+                </p>
+              </div>
+            </div>
+
+            {isCurrentPublisher2FAEnabled && currentPinRecord?.twoFactorEnabledAt && (
+              <div className="p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40 text-emerald-800 dark:text-emerald-300 text-xs flex items-center justify-between">
+                <span>🛡️ Tu cuenta está protegida activamente desde: <strong>{new Date(currentPinRecord.twoFactorEnabledAt).toLocaleDateString()}</strong></span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* MODAL: NOTIFICAR AUSENCIA */}
       {showAddAbsenceModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-in fade-in">
@@ -2163,6 +2332,44 @@ export const PersonalViewTab: React.FC = () => {
         onSubscriptionChange={(sub) => {
           setPushSubscription(sub);
           setNotifPermission(getNotificationPermission());
+        }}
+      />
+
+      {/* MODAL: CONFIGURAR 2FA CON MICROSOFT AUTHENTICATOR */}
+      <TwoFactorSetupModal
+        isOpen={show2FASetupModal}
+        onClose={() => setShow2FASetupModal(false)}
+        publisherId={selectedPublisher?.id || currentPublisherId || ''}
+        publisherName={selectedPublisher?.name || currentBrotherName || 'Publicador'}
+        onSuccess={async (secret, backupCodes) => {
+          const targetId = selectedPublisher?.id || currentPublisherId || '';
+          if (!targetId) return false;
+          const res = await enableTwoFactorForPublisher(targetId, secret, backupCodes);
+          return res.success;
+        }}
+      />
+
+      {/* MODAL: SOLICITAR CÓDIGO 2FA AL INICIAR SESIÓN */}
+      <TwoFactorPromptModal
+        isOpen={show2FAPromptModal}
+        onClose={() => {
+          setShow2FAPromptModal(false);
+          setPending2FAPublisher(null);
+        }}
+        publisherName={pending2FAPublisher?.name || 'Publicador'}
+        onVerifyCode={async (code, trustDevice) => {
+          if (!pending2FAPublisher?.id) return { success: false, message: 'Identidad no encontrada' };
+          return await verifyTwoFactorForPublisher(pending2FAPublisher.id, code, trustDevice);
+        }}
+        onSuccess={() => {
+          setShow2FAPromptModal(false);
+          if (pending2FAPublisher?.id) {
+            setSelectedPublisherId(pending2FAPublisher.id);
+            setIdentifiedPublisher(pending2FAPublisher.id, pending2FAPublisher.name);
+          }
+          setPending2FAPublisher(null);
+          setEnteredPin('');
+          setLockoutSeconds(0);
         }}
       />
     </div>

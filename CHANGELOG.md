@@ -6,6 +6,28 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.11] — 23 de Octubre, 2026
+**Autenticación de Dos Pasos (2FA) con Microsoft Authenticator y Códigos de Respaldo**
+
+- 📱 **Verificación en Dos Factores con Microsoft Authenticator (Opcional):**
+  - Cada publicador puede activar de forma totalmente voluntaria la verificación en dos pasos en su portal ("Mi Vista" > pestaña "Seguridad 2FA").
+  - Compatible de forma nativa con **Microsoft Authenticator**, Google Authenticator y cualquier aplicación TOTP estándar.
+  - Escaneo sencillo con código QR o mediante clave secreta alfanumérica copiable.
+- 💾 **Códigos de Respaldo de Emergencia (8 Códigos de Un Solo Uso):**
+  - Al activar 2FA, se generan 8 códigos de recuperación imprimibles o descargables en texto para recuperar el acceso si pierdes o cambias de teléfono.
+  - Cada código se almacena en el sistema únicamente como hash seguro SHA-256 (arquitectura de conocimiento cero).
+- 🕒 **Dispositivos de Confianza ("Recordar este dispositivo por 30 días"):**
+  - No necesitas introducir el código de 6 dígitos cada vez que uses tu propio teléfono. Al marcar la casilla de confianza, el sistema solo te pedirá el código 2FA cuando ingreses en un dispositivo nuevo o si han pasado más de 30 días sin actividad.
+- 🏛️ **Herramientas para Ancianos y Administración Teocrática:**
+  - En el Directorio Teocrático, los ancianos pueden ver qué publicadores tienen 2FA activo con una insignia verde identificativa (`2FA`).
+  - Si un hermano extravía su teléfono o aplicación autenticadora, un anciano puede restablecer su 2FA con un solo clic para que pueda volver a ingresar con su PIN habitual.
+- ⚡ **100% Autónomo y Fuera de Línea:**
+  - La verificación de códigos se calcula íntegramente en el dispositivo del usuario con la API nativa del navegador (Web Crypto API), funcionando perfectamente sin conexión a internet.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.10] — 23 de Octubre, 2026
 **Páginas Oficiales de Privacidad y Términos de Uso para Verificación de Google**
 

@@ -46,6 +46,15 @@ import {
   verifyInvitationCodeMatch,
   isSafeDemoMode,
 } from '../utils/theocraticSecurity';
+import {
+  verifyTotpCode,
+  verifyAndConsumeBackupCode,
+  isDeviceTrusted,
+  markDeviceAsTrusted,
+  revokeDeviceTrust,
+  encryptTotpSecret,
+  decryptTotpSecret,
+} from '../utils/totp';
 import { UserProfile, PreferredContactMethod, ContactTimePreference } from '../types';
 
 export interface UserRoleRecord {
@@ -75,6 +84,10 @@ export interface PublisherPinRecord {
   encryptedPin?: string;
   email?: string;
   privilege?: string;
+  twoFactorEnabled?: boolean;
+  twoFactorSecret?: string;
+  twoFactorBackupCodes?: string[];
+  twoFactorEnabledAt?: string;
 }
 
 interface AuthContextType {
@@ -97,7 +110,18 @@ interface AuthContextType {
   publisherPinsList: PublisherPinRecord[];
   currentPublisherId: string | null;
   setIdentifiedPublisher: (publisherId: string | null, name?: string) => void;
-  identifyRoleByPersonalPin: (pin: string) => Promise<{ success: boolean; role?: TheocraticRole; roles?: TheocraticRole[]; name?: string; publisherId?: string; message: string }>;
+  identifyRoleByPersonalPin: (
+    pin: string,
+    options?: { skip2FA?: boolean; totpCode?: string; backupCode?: string; trustDevice?: boolean }
+  ) => Promise<{
+    success: boolean;
+    role?: TheocraticRole;
+    roles?: TheocraticRole[];
+    name?: string;
+    publisherId?: string;
+    message: string;
+    requires2FA?: boolean;
+  }>;
   assignPersonalPinToPublisher: (
     publisherId: string,
     pin: string,
@@ -115,6 +139,17 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   updateUserProfile: (data: Partial<UserProfile>) => Promise<{ success: boolean; error?: string }>;
   logAction: (accion: string, modulo: string, detalles?: string) => Promise<void>;
+  enableTwoFactorForPublisher: (
+    publisherId: string,
+    secret: string,
+    hashedBackupCodes: string[]
+  ) => Promise<{ success: boolean; message: string }>;
+  disableTwoFactorForPublisher: (publisherId: string) => Promise<{ success: boolean; message: string }>;
+  verifyTwoFactorForPublisher: (
+    publisherId: string,
+    codeOrBackup: string,
+    trustThisDevice?: boolean
+  ) => Promise<{ success: boolean; message: string; usedBackupCode?: boolean }>;
 }
 
 const LOCAL_STORAGE_ROLES_KEY = 'kongre_user_roles_v1';
@@ -181,6 +216,9 @@ const AuthContext = createContext<AuthContextType>({
   userProfile: null,
   updateUserProfile: async () => ({ success: true }),
   logAction: async () => {},
+  enableTwoFactorForPublisher: async () => ({ success: false, message: '' }),
+  disableTwoFactorForPublisher: async () => ({ success: false, message: '' }),
+  verifyTwoFactorForPublisher: async () => ({ success: false, message: '' }),
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -604,8 +642,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
    * (El PIN personal es ÚNICO por publicador y se verifica criptográficamente contra su hash SHA-256)
    */
   const identifyRoleByPersonalPin = async (
-    pin: string
-  ): Promise<{ success: boolean; role?: TheocraticRole; roles?: TheocraticRole[]; name?: string; publisherId?: string; message: string }> => {
+    pin: string,
+    options?: { skip2FA?: boolean; totpCode?: string; backupCode?: string; trustDevice?: boolean }
+  ): Promise<{ success: boolean; role?: TheocraticRole; roles?: TheocraticRole[]; name?: string; publisherId?: string; message: string; requires2FA?: boolean }> => {
     const lockoutRemaining = getPinLockoutRemainingSeconds();
     if (lockoutRemaining > 0) {
       return {
@@ -685,6 +724,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const foundPublisher = publisherPinsList.find((entry) => verifyPersonalPinMatch(cleanPin, entry));
 
     if (foundPublisher) {
+      // ── Comprobación de Verificación en Dos Pasos (2FA) con Microsoft Authenticator ──
+      if (foundPublisher.twoFactorEnabled && !options?.skip2FA) {
+        const isTrusted = isDeviceTrusted(foundPublisher.publisherId);
+        if (!isTrusted) {
+          // Si el usuario proporcionó código TOTP o de respaldo en options:
+          if (options?.totpCode || options?.backupCode) {
+            const secret = decryptTotpSecret(foundPublisher.twoFactorSecret || '');
+            let verified = false;
+
+            if (options.totpCode && secret) {
+              verified = await verifyTotpCode(secret, options.totpCode, 1);
+            }
+
+            if (!verified && options.backupCode && Array.isArray(foundPublisher.twoFactorBackupCodes)) {
+              const res = await verifyAndConsumeBackupCode(options.backupCode, foundPublisher.twoFactorBackupCodes);
+              if (res.isValid) {
+                verified = true;
+                setPublisherPinsList((prev) =>
+                  prev.map((p) =>
+                    p.publisherId === foundPublisher.publisherId
+                      ? { ...p, twoFactorBackupCodes: res.remainingHashedCodes }
+                      : p
+                  )
+                );
+              }
+            }
+
+            if (!verified) {
+              return {
+                success: false,
+                requires2FA: true,
+                publisherId: foundPublisher.publisherId,
+                name: foundPublisher.name,
+                message: 'Código de verificación de Microsoft Authenticator incorrecto o expirado.',
+              };
+            }
+
+            if (options.trustDevice) {
+              markDeviceAsTrusted(foundPublisher.publisherId, 30);
+            }
+          } else {
+            // Requiere 2FA: devolver indicador para que la interfaz abra TwoFactorPromptModal
+            return {
+              success: false,
+              requires2FA: true,
+              publisherId: foundPublisher.publisherId,
+              name: foundPublisher.name,
+              message: 'Se requiere verificación en dos pasos con Microsoft Authenticator.',
+            };
+          }
+        }
+      }
+
       resetFailedPinAttempts();
       // Protección contra escalada de privilegios:
       // El rol de Coordinador solo puede activarse si el PIN ingresado coincide con el PIN maestro del Coordinador
@@ -1016,6 +1108,170 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       message: lockout.isLockedOut
         ? `PIN Personal no reconocido. Demasiados intentos: espera ${lockout.remainingSeconds}s.`
         : 'PIN Personal no reconocido. Introduce el PIN con el que registraste tu congregación o el asignado por los ancianos.',
+    };
+  };
+
+  /**
+   * Activa la verificación en dos pasos (2FA) con Microsoft Authenticator para un publicador
+   */
+  const enableTwoFactorForPublisher = async (
+    publisherId: string,
+    secret: string,
+    hashedBackupCodes: string[]
+  ): Promise<{ success: boolean; message: string }> => {
+    try {
+      const encryptedSecret = encryptTotpSecret(secret);
+      setPublisherPinsList((prev) =>
+        prev.map((p) =>
+          p.publisherId === publisherId
+            ? {
+                ...p,
+                twoFactorEnabled: true,
+                twoFactorSecret: encryptedSecret,
+                twoFactorBackupCodes: hashedBackupCodes,
+                twoFactorEnabledAt: new Date().toISOString(),
+              }
+            : p
+        )
+      );
+
+      // El dispositivo donde se configuró queda marcado como de confianza inmediatamente
+      markDeviceAsTrusted(publisherId, 30);
+
+      await insertAuditLog({
+        accion: 'update',
+        hermano_nid: publisherId,
+        hermano_nombre: currentBrotherName || publisherId,
+        modulo: 'auth',
+        detalles: 'Activación de verificación en dos pasos (2FA) con Microsoft Authenticator',
+      });
+
+      return { success: true, message: 'Verificación en dos pasos activada exitosamente.' };
+    } catch (e: any) {
+      return { success: false, message: e.message || 'Error al activar 2FA.' };
+    }
+  };
+
+  /**
+   * Desactiva la verificación en dos pasos (2FA) para un publicador
+   */
+  const disableTwoFactorForPublisher = async (
+    publisherId: string
+  ): Promise<{ success: boolean; message: string }> => {
+    try {
+      setPublisherPinsList((prev) =>
+        prev.map((p) =>
+          p.publisherId === publisherId
+            ? {
+                ...p,
+                twoFactorEnabled: false,
+                twoFactorSecret: undefined,
+                twoFactorBackupCodes: undefined,
+                twoFactorEnabledAt: undefined,
+              }
+            : p
+        )
+      );
+
+      revokeDeviceTrust(publisherId);
+
+      await insertAuditLog({
+        accion: 'update',
+        hermano_nid: publisherId,
+        hermano_nombre: currentBrotherName || publisherId,
+        modulo: 'auth',
+        detalles: 'Desactivación de verificación en dos pasos (2FA)',
+      });
+
+      return { success: true, message: 'Verificación en dos pasos desactivada.' };
+    } catch (e: any) {
+      return { success: false, message: e.message || 'Error al desactivar 2FA.' };
+    }
+  };
+
+  /**
+   * Valida un código TOTP de 6 dígitos o un código de respaldo cuando 2FA es solicitado
+   */
+  const verifyTwoFactorForPublisher = async (
+    publisherId: string,
+    codeOrBackup: string,
+    trustThisDevice = true
+  ): Promise<{ success: boolean; message: string; usedBackupCode?: boolean }> => {
+    const pubRecord = publisherPinsList.find((p) => p.publisherId === publisherId);
+    if (!pubRecord) {
+      return { success: false, message: 'Publicador no encontrado en el directorio.' };
+    }
+    if (!pubRecord.twoFactorEnabled) {
+      return { success: false, message: 'La verificación en dos pasos no está configurada para este publicador.' };
+    }
+
+    const cleanInput = codeOrBackup.trim();
+    let verified = false;
+    let usedBackup = false;
+
+    // 1. Probar como código TOTP de 6 dígitos
+    const numericCode = cleanInput.replace(/\D/g, '');
+    if (numericCode.length === 6 && pubRecord.twoFactorSecret) {
+      const secret = decryptTotpSecret(pubRecord.twoFactorSecret);
+      verified = await verifyTotpCode(secret, numericCode, 1);
+    }
+
+    // 2. Probar como código de respaldo
+    if (!verified && Array.isArray(pubRecord.twoFactorBackupCodes) && pubRecord.twoFactorBackupCodes.length > 0) {
+      const backupRes = await verifyAndConsumeBackupCode(cleanInput, pubRecord.twoFactorBackupCodes);
+      if (backupRes.isValid) {
+        verified = true;
+        usedBackup = true;
+        setPublisherPinsList((prev) =>
+          prev.map((p) =>
+            p.publisherId === publisherId
+              ? { ...p, twoFactorBackupCodes: backupRes.remainingHashedCodes }
+              : p
+          )
+        );
+      }
+    }
+
+    if (!verified) {
+      return {
+        success: false,
+        message: 'Código incorrecto o expirado. Revisa la hora en tu Microsoft Authenticator o prueba con un código de respaldo.',
+      };
+    }
+
+    // Si se solicitó recordar dispositivo
+    if (trustThisDevice) {
+      markDeviceAsTrusted(publisherId, 30);
+    }
+
+    // Activar roles y sesión
+    let primaryRole = pubRecord.role;
+    const rolesList = [primaryRole];
+    if (pubRecord.privilege === 'anciano' && !rolesList.includes('anciano')) rolesList.push('anciano');
+    if (Array.isArray(pubRecord.roles)) {
+      pubRecord.roles.forEach((r) => {
+        if (r && !rolesList.includes(r)) rolesList.push(r);
+      });
+    }
+    setActiveRoles(rolesList);
+    const brotherName = pubRecord.name || 'Hermano';
+    setCurrentBrotherName(brotherName);
+    localStorage.setItem(LOCAL_STORAGE_BROTHER_NAME_KEY, brotherName);
+    localStorage.setItem('kongre_identified_brother', brotherName);
+    setIdentifiedPublisher(publisherId, brotherName);
+
+    await insertAuditLog({
+      accion: 'login',
+      hermano_nid: publisherId,
+      hermano_nombre: brotherName,
+      modulo: 'auth',
+      detalles: `Inicio de sesión validado con 2FA (${usedBackup ? 'Código de respaldo' : 'Microsoft Authenticator'})`,
+    });
+
+    return {
+      success: true,
+      message: `¡Identificación exitosa con 2FA! Bienvenido, ${brotherName}.`,
+      usedBackupCode: usedBackup,
     };
   };
 
@@ -1465,6 +1721,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         userProfile,
         updateUserProfile,
         logAction,
+        enableTwoFactorForPublisher,
+        disableTwoFactorForPublisher,
+        verifyTwoFactorForPublisher,
       }}
     >
       {children}

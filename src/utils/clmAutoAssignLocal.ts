@@ -1,5 +1,10 @@
 // src/utils/clmAutoAssignLocal.ts
 import type { Publisher, ClmPrograma, ClmParte, ClmHistorialItem } from '../types';
+import {
+  arePublishersFamily,
+  getAssignedFamilyMembersInMeeting,
+  isValidDemonstrationPair,
+} from './familyGrouping';
 
 /**
  * Validación de Elegibilidad Teocrática conforme a las pautas oficiales
@@ -104,8 +109,7 @@ export interface AutoAsignarResult {
 
 /**
  * Algoritmo 100% offline que distribuye las asignaciones evaluando historial
- * de semanas, estado activo, roles e incompatibilidades.
- * Soporta invocación por parámetros estructurados o pasando el objeto ClmPrograma directamente.
+ * de semanas, estado activo, roles, pauta S-38 y Agrupación Familiar (KHS).
  */
 export function autoAsignarLocal(params: AutoAsignarParams): AutoAsignarResult;
 export function autoAsignarLocal(
@@ -121,7 +125,7 @@ export function autoAsignarLocal(
   arg4?: string[]
 ): AutoAsignarResult | ClmPrograma {
   if (arg1 && 'plantillas' in arg1) {
-    const { plantillas, publishers, historial = [], semanaFecha, ocupadosEstaSemana = [] } = arg1;
+    const { plantillas, publishers, historial = [], ocupadosEstaSemana = [] } = arg1;
     const asignadosEstaSemana = new Set<string>(ocupadosEstaSemana);
     const asignaciones: Array<{
       parte_id: string;
@@ -136,7 +140,7 @@ export function autoAsignarLocal(
         const isActive = p.status ? p.status === 'active' : p.active !== false;
         if (!isActive) return false;
         const pId = p.id || p.nid;
-        if (pId && asignadosEstaSemana.has(pId)) return false; // Evitar saturación
+        if (pId && asignadosEstaSemana.has(pId)) return false;
 
         const isMale = (p.gender as string) === 'male' || p.gender === 'hermano';
         if (plantilla.requiere_hermano && !isMale) return false;
@@ -153,12 +157,23 @@ export function autoAsignarLocal(
         return true;
       });
 
-      // 2. Ordenar por menor carga reciente (quien hace más semanas que no participa)
+      // 2. Ordenar por Agrupación Familiar KHS + menor carga reciente
       candidatos.sort((a, b) => {
         const idA = a.id || a.nid;
         const idB = b.id || b.nid;
         const histA = (historial || []).filter((h) => h.publisher_nid === idA).length;
         const histB = (historial || []).filter((h) => h.publisher_nid === idB).length;
+
+        const famA =
+          a.groupWithFamilyInMeetings !== false &&
+          getAssignedFamilyMembersInMeeting(a, asignadosEstaSemana, publishers).length > 0;
+        const famB =
+          b.groupWithFamilyInMeetings !== false &&
+          getAssignedFamilyMembersInMeeting(b, asignadosEstaSemana, publishers).length > 0;
+
+        if (famA !== famB && Math.abs(histA - histB) <= 2) {
+          return famA ? -1 : 1;
+        }
         return histA - histB;
       });
 
@@ -207,12 +222,23 @@ export function autoAsignarLocal(
         });
 
         if (eligible.length > 0) {
-          // Ordenar por menor historial reciente
+          // Ordenar aplicando bonificación de Agrupación Familiar (KHS Same-Night Grouping) y menor historial
           eligible.sort((a, b) => {
             const idA = a.nid || a.id;
             const idB = b.nid || b.id;
             const histA = historial.filter((h) => h.publisher_nid === idA).length;
             const histB = historial.filter((h) => h.publisher_nid === idB).length;
+
+            const famA =
+              a.groupWithFamilyInMeetings !== false &&
+              getAssignedFamilyMembersInMeeting(a, asignadosEstaSemana, publishers).length > 0;
+            const famB =
+              b.groupWithFamilyInMeetings !== false &&
+              getAssignedFamilyMembersInMeeting(b, asignadosEstaSemana, publishers).length > 0;
+
+            if (famA !== famB && Math.abs(histA - histB) <= 2) {
+              return famA ? -1 : 1;
+            }
             return histA - histB;
           });
 
@@ -226,18 +252,26 @@ export function autoAsignarLocal(
         }
       }
 
-      // 2. Asignar ayudantes para demostraciones de estudiantes
+      // 2. Asignar ayudantes para demostraciones de estudiantes (cumpliendo pauta S-38: mismo género o familiar directo)
       const needsAssistant =
         parte.seccion === 'maestros' &&
         parte.tipo !== 'discurso_estudiante' &&
         parte.tipo !== 'lectura_biblica';
 
       if (needsAssistant && !parte.asignado_auxiliar_nid) {
+        const titularPub = publishers.find(
+          (p) => (p.nid || p.id) === parte.asignado_nid
+        );
+
         const eligibleAssistants = publishers.filter((p) => {
           const pId = p.nid || p.id;
           if (pId === parte.asignado_nid) return false; // No puede ser ayudante de sí mismo
           if (pId && asignadosEstaSemana.has(pId)) return false;
-          return isPublisherEligibleForPart(p, parte, 'assistant');
+          if (!isPublisherEligibleForPart(p, parte, 'assistant')) return false;
+          if (titularPub && !isValidDemonstrationPair(titularPub, p, true)) {
+            return false;
+          }
+          return true;
         });
 
         if (eligibleAssistants.length > 0) {
@@ -246,6 +280,14 @@ export function autoAsignarLocal(
             const idB = b.nid || b.id;
             const histA = historial.filter((h) => h.publisher_nid === idA).length;
             const histB = historial.filter((h) => h.publisher_nid === idB).length;
+
+            // Si es familiar directo del titular, darle prioridad cuando la carga sea equilibrada
+            const isFamWithTitularA = titularPub ? arePublishersFamily(titularPub, a) : false;
+            const isFamWithTitularB = titularPub ? arePublishersFamily(titularPub, b) : false;
+            if (isFamWithTitularA !== isFamWithTitularB && Math.abs(histA - histB) <= 3) {
+              return isFamWithTitularA ? -1 : 1;
+            }
+
             return histA - histB;
           });
 

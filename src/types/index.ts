@@ -172,6 +172,9 @@ export interface Publisher {
   marital_status?: 'soltero' | 'casado' | 'viudo' | 'divorciado' | string;
   spouse_name?: string;
   spouse_nid?: string;
+  familyId?: string; // Identificador de núcleo familiar (ej. 'FAM-PEREZ')
+  familyMemberIds?: string[]; // IDs de otros publicadores que pertenecen al mismo núcleo familiar
+  groupWithFamilyInMeetings?: boolean; // Preferencia KHS: Agrupar con miembros de su familia en la misma reunión/turno
   neighborhood?: string;
   city?: string;
   postal_code?: string;
@@ -459,14 +462,25 @@ export interface OutgoingSpeakerAssignment {
   notes?: string;
 }
 
+export type FieldServiceModality =
+  | 'casa_en_casa'
+  | 'carritos'
+  | 'estudios_revisitas'
+  | 'telefonica_cartas'
+  | 'negocios';
+
 export interface FieldServiceMeeting {
   id: string;
-  dayOfWeek: string;
+  date?: string; // YYYY-MM-DD (fecha específica si pertenece al cuadrante semanal/mensual)
+  dayOfWeek: string; // 'Lunes' | 'Martes' | 'Miércoles' | 'Jueves' | 'Viernes' | 'Sábado' | 'Domingo'
+  session?: 'manana' | 'tarde' | 'noche';
   time: string;
   location: string;
   conductorId?: string;
-  groupNumber?: number;
+  groupNumber?: number; // undefined o 0 = Congregación General
   territoryNumber?: string;
+  territoryId?: string;
+  modality?: FieldServiceModality;
   notes?: string;
 }
 
@@ -478,6 +492,7 @@ export interface ConflictRuleSettings {
   maxConsecutiveWeeksWithPart: number; // e.g. 2
   enforceSisterDemonstrationRules: boolean; // sisters only with sisters or family
   warnOutlineRepeatedWithinMonths: number; // e.g. 12 months
+  prioritizeFamilySameMeeting?: boolean; // KHS Same-Night Family Grouping
 }
 
 export interface ConflictAlert {

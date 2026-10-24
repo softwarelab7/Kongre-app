@@ -1,6 +1,12 @@
 // src/utils/autoAssigner.ts
 import { WeekSchedule, Publisher, CustomDuty, ConflictRuleSettings, Gender } from '../types';
 import { isPublisherAssignedInWeek } from './conflictDetector';
+import {
+  arePublishersFamily,
+  getAssignedFamilyMembersInMeeting,
+  getPubDisplayName,
+  isValidDemonstrationPair,
+} from './familyGrouping';
 
 export interface CandidateScore {
   publisher: Publisher;
@@ -9,6 +15,9 @@ export interface CandidateScore {
   totalHistoricalAssignments: number; // lower is better
   isRecommended: boolean;
   hasConflictWarning?: string;
+  familyMembersInMeeting?: string[]; // KHS Same-Night Family Grouping
+  isFamilyGrouped?: boolean;
+  isCompanionFamilyMatch?: boolean; // Si es familiar directo del titular en una demostración
 }
 
 // Compute all historical assignments for every publisher across all weeks
@@ -78,10 +87,14 @@ export function getEligibleCandidates(
   targetGender: Gender | 'any',
   currentAssignedIdsInMeeting: Set<string>,
   publishers: Publisher[],
-  allWeeks: WeekSchedule[]
+  allWeeks: WeekSchedule[],
+  companionPublisherId?: string
 ): CandidateScore[] {
   const stats = computePublisherAssignmentStats(allWeeks, publishers);
   const meetingTime = new Date(meetingDate).getTime();
+  const companionPub = companionPublisherId
+    ? publishers.find(p => p.id === companionPublisherId || p.nid === companionPublisherId)
+    : undefined;
 
   const candidates: CandidateScore[] = [];
 
@@ -89,8 +102,16 @@ export function getEligibleCandidates(
     // 1. Must be active
     if (!pub.active) continue;
 
-    // 2. Gender check
-    if (targetGender !== 'any' && pub.gender !== targetGender) continue;
+    // 2. Gender or S-38 Family Demonstration check
+    if (companionPub) {
+      // Si se elige ayudante (o titular) frente a un compañero ya definido, validar pauta S-38:
+      // mismo género siempre permitido; distinto género solo si son familiares directos
+      if (!isValidDemonstrationPair(companionPub, pub, true)) {
+        continue;
+      }
+    } else if (targetGender !== 'any' && pub.gender !== targetGender) {
+      continue;
+    }
 
     // 3. Absence check
     const isAbsent = pub.absences.some(
@@ -114,6 +135,22 @@ export function getEligibleCandidates(
       daysSinceLast = Math.max(0, Math.floor((meetingTime - lastTime) / (1000 * 60 * 60 * 24)));
     }
 
+    // 6. KHS Same-Night Family Grouping check
+    const assignedFamily = getAssignedFamilyMembersInMeeting(
+      pub,
+      currentAssignedIdsInMeeting,
+      publishers
+    );
+    const familyNames = assignedFamily.map(f => getPubDisplayName(f));
+    const isFamilyGrouped =
+      pub.groupWithFamilyInMeetings !== false &&
+      familyNames.length > 0 &&
+      daysSinceLast >= 14; // Evita asignar dos semanas seguidas solo por agrupación familiar
+
+    const isCompanionFamilyMatch = companionPub
+      ? arePublishersFamily(companionPub, pub)
+      : false;
+
     candidates.push({
       publisher: pub,
       lastAssignedDate: pubStat?.lastDate,
@@ -121,15 +158,33 @@ export function getEligibleCandidates(
       totalHistoricalAssignments: pubStat?.total || 0,
       isRecommended: false,
       hasConflictWarning: alreadyInMeeting ? 'Ya tiene otra asignación en esta misma reunión' : undefined,
+      familyMembersInMeeting: familyNames.length > 0 ? familyNames : undefined,
+      isFamilyGrouped,
+      isCompanionFamilyMatch,
     });
   }
 
-  // Sort: First those WITHOUT conflict warning, then by longest time since last assignment (descending), then fewest total assignments
+  // Sort:
+  // 1. Without conflict warning first
+  // 2. If selecting demonstration companion, prioritize family match or same-night family grouping (when rested >= 14 days)
+  // 3. Longest time since last assignment (with +21 days virtual boost for KHS Same-Night Family Grouping)
+  // 4. Fewest total assignments
   candidates.sort((a, b) => {
     if (a.hasConflictWarning && !b.hasConflictWarning) return 1;
     if (!a.hasConflictWarning && b.hasConflictWarning) return -1;
-    if (b.daysSinceLastAssignment !== a.daysSinceLastAssignment) {
-      return b.daysSinceLastAssignment - a.daysSinceLastAssignment;
+
+    if (companionPub && a.isCompanionFamilyMatch !== b.isCompanionFamilyMatch) {
+      if (a.isCompanionFamilyMatch && a.daysSinceLastAssignment >= 14) return -1;
+      if (b.isCompanionFamilyMatch && b.daysSinceLastAssignment >= 14) return 1;
+    }
+
+    const effectiveDaysA =
+      a.daysSinceLastAssignment + (a.isFamilyGrouped ? 21 : 0);
+    const effectiveDaysB =
+      b.daysSinceLastAssignment + (b.isFamilyGrouped ? 21 : 0);
+
+    if (effectiveDaysB !== effectiveDaysA) {
+      return effectiveDaysB - effectiveDaysA;
     }
     return a.totalHistoricalAssignments - b.totalHistoricalAssignments;
   });
@@ -163,8 +218,20 @@ export function autoAssignWeek(
     const midweekDate = updated.midweek.date;
     const assignedThisMeeting = new Set<string>();
 
-    const pick = (role: string, gender: Gender | 'any' = 'any'): string | undefined => {
-      const list = getEligibleCandidates(role, midweekDate, gender, assignedThisMeeting, publishers, allWeeks);
+    const pick = (
+      role: string,
+      gender: Gender | 'any' = 'any',
+      companionPublisherId?: string
+    ): string | undefined => {
+      const list = getEligibleCandidates(
+        role,
+        midweekDate,
+        gender,
+        assignedThisMeeting,
+        publishers,
+        allWeeks,
+        companionPublisherId
+      );
       const chosen = list.find(c => !c.hasConflictWarning);
       if (chosen) {
         assignedThisMeeting.add(chosen.publisher.id);
@@ -220,15 +287,18 @@ export function autoAssignWeek(
         const titularId = pick('vym_maestros_titular', 'any');
         if (titularId) {
           item.publisherId = titularId;
-          const pub = publishers.find(p => p.id === titularId);
-          // Pick assistant matching gender rule
-          const assistantGender = pub?.gender === 'hermana' ? 'hermana' : 'any';
-          const assistantId = pick('vym_maestros_ayudante', assistantGender);
+          // Pick assistant respecting S-38 gender/family rule and KHS Family Grouping
+          const assistantId = pick('vym_maestros_ayudante', 'any', titularId);
           if (assistantId) item.assistantId = assistantId;
         }
       } else {
         assignedThisMeeting.add(item.publisherId);
-        if (item.assistantId) assignedThisMeeting.add(item.assistantId);
+        if (item.assistantId) {
+          assignedThisMeeting.add(item.assistantId);
+        } else {
+          const assistantId = pick('vym_maestros_ayudante', 'any', item.publisherId);
+          if (assistantId) item.assistantId = assistantId;
+        }
       }
     });
 

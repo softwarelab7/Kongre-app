@@ -198,7 +198,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
 
             {/* Right Group (Desktop & Sync Queue): Offline Sync Badge & Version Pill */}
             <div className="hidden md:flex items-center gap-2.5 shrink-0">
-              {onOpenQueueModal && !isDemoMode && (
+              {variant === 'landing' && onOpenQueueModal && !isDemoMode && (
                 <OfflineSyncBadge
                   isOnline={isOnline}
                   onOpenQueueModal={onOpenQueueModal}

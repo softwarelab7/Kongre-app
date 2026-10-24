@@ -1119,22 +1119,22 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 lg:px-8 2xl:px-12 gap-2">
           {/* Left: Sidebar Toggle & Congregation Breadcrumb (sin menú lateral en móvil) */}
           <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
-            {/* Móvil (< md): Botón directo para navegar a la página completa de Menú */}
+            {/* Móvil (< md): Botón Volver cuando está en Menú, o Logo directo al Inicio */}
             <button
               type="button"
-              onClick={() => handleSelectTab(activeTab === 'menu' ? 'inicio' : 'menu')}
-              aria-label={activeTab === 'menu' ? 'Volver a Mi Ministerio' : 'Abrir Menú de la congregación'}
-              title={activeTab === 'menu' ? 'Volver a Mi Ministerio' : 'Abrir Menú de departamentos'}
-              className={`md:hidden w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 shadow-2xs active:scale-95 transition cursor-pointer ${
+              onClick={() => handleSelectTab('inicio')}
+              aria-label={activeTab === 'menu' ? 'Volver a Mi Ministerio' : 'Ir a Mi Ministerio'}
+              title={activeTab === 'menu' ? 'Volver a Mi Ministerio' : 'Kongre - Mi Ministerio'}
+              className={`md:hidden w-9 h-9 rounded-xl flex items-center justify-center shrink-0 active:scale-95 transition cursor-pointer ${
                 activeTab === 'menu'
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-indigo-50/90 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border-indigo-100/90 dark:border-indigo-800/60'
+                  ? 'bg-indigo-600 text-white border border-indigo-600 shadow-2xs'
+                  : 'bg-transparent'
               }`}
             >
               {activeTab === 'menu' ? (
                 <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
               ) : (
-                <Building2 className="w-4 h-4 stroke-[2]" />
+                <Logo variant="isotipo" className="w-8 h-8 object-contain" />
               )}
             </button>
 
@@ -1162,23 +1162,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <Logo variant="isotipo" className="w-7 h-7 object-contain" />
                 </button>
               </div>
-            )}
-
-            {/* Desktop cuando la barra lateral está visible: Oculto detrás del icono de congre y al pasar el cursor sale el botón */}
-            {isSidebarVisible && onToggleSidebar && (
-              <button
-                type="button"
-                onClick={onToggleSidebar}
-                aria-label="Ocultar barra lateral (Ctrl+B)"
-                className="hidden md:flex relative group w-8 h-8 rounded-xl items-center justify-center bg-indigo-50/80 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100/90 dark:hover:bg-indigo-900/60 border border-indigo-100/90 dark:border-indigo-800/60 transition-all cursor-pointer shrink-0 shadow-2xs"
-                title="Ocultar barra lateral (Ctrl+B / ⌘B)"
-              >
-                {/* Icono por defecto de Congregación */}
-                <Building2 className="w-4 h-4 stroke-[2] transition-all duration-200 group-hover:scale-0 group-hover:opacity-0" />
-                
-                {/* Botón para ocultar barra lateral revelado al pasar el cursor */}
-                <PanelLeftClose className="w-4 h-4 stroke-[2] absolute transition-all duration-200 scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100 text-indigo-600 dark:text-indigo-400" />
-              </button>
             )}
 
             {/* Congregation title & breadcrumb navigation */}
@@ -1308,8 +1291,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Divider */}
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 hidden sm:block" />
 
-            {/* Cronómetro de Ministerio en Vivo (Chip con anillo SVG) */}
-            <MinistryTimerNavbarChip onNavigateToMinistry={() => setActiveTab('inicio')} />
+            {/* Cronómetro de Ministerio en Vivo (Chip con anillo SVG - en móvil se oculta si ya estamos viendo el cronómetro en Inicio) */}
+            <div
+              className={
+                activeTab === 'inicio' || activeTab === 'cronometro_ministerio'
+                  ? 'hidden sm:flex items-center'
+                  : 'flex items-center'
+              }
+            >
+              <MinistryTimerNavbarChip onNavigateToMinistry={() => setActiveTab('inicio')} />
+            </div>
 
             {/* Reloj de Bloqueo por Inactividad (Chip con anillo SVG - oculto en móvil para despejar cabecera) */}
             <div className="hidden sm:flex items-center">

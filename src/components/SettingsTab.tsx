@@ -1370,74 +1370,17 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
               <div className="flex items-center gap-2 flex-wrap">
                 <button
                   type="button"
-                  onClick={handleTestNotifFromSettings}
-                  className="px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.06] dark:hover:bg-white/[0.12] text-zinc-700 dark:text-zinc-200 font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-                >
-                  <Send size={13} className="text-violet-600 dark:text-violet-400" />
-                  <span>Probar Recordatorio</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsPushModalOpen(true)}
+                  onClick={() => setActiveTab('notificaciones')}
                   className="px-3 py-1.5 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/50 dark:hover:bg-violet-900/50 text-violet-700 dark:text-violet-300 border border-violet-200/70 dark:border-violet-800/50 font-bold flex items-center gap-1.5 transition-all cursor-pointer"
                 >
-                  <Smartphone size={13} />
-                  <span>Suscripción Push (App Cerrada)</span>
+                  <Sliders size={13} />
+                  <span>Ver Opciones Avanzadas de Notificación</span>
                 </button>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* Tarjeta 0: Preferencias de Notificación */}
-            <div
-              onClick={() => setActiveTab('notificaciones')}
-              className="bg-white dark:bg-[#0f1623] hover:bg-violet-50/[0.3] dark:hover:bg-violet-500/[0.04] rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-zinc-200 dark:border-white/[0.06] hover:border-violet-400/50 dark:hover:border-violet-500/40 shadow-xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="p-3 bg-violet-50 dark:bg-violet-500/10 rounded-2xl text-violet-600 dark:text-violet-400 group-hover:scale-110 transition-transform">
-                    <BellRing size={22} />
-                  </div>
-                  <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-800/40">
-                    {notifPrefs.notifyDaysBefore === 1
-                      ? '1 día antes'
-                      : `${notifPrefs.notifyDaysBefore} días antes`}
-                  </span>
-                </div>
-                <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
-                  Preferencias de Notificación
-                </h4>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2">
-                  Configura cuántos días antes deseas recibir el recordatorio automático de tus asignaciones (1, 3 o 7 días antes) y alertas Push.
-                </p>
-
-                <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
-                  <div className="flex justify-between">
-                    <span className="text-zinc-400">Anticipación:</span>
-                    <span className="font-semibold text-violet-600 dark:text-violet-400">
-                      {notifPrefs.notifyDaysBefore === 1
-                        ? '1 día antes'
-                        : `${notifPrefs.notifyDaysBefore} días antes`}{' '}
-                      ({notifPrefs.preferredHour})
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-zinc-400"> Categorías:</span>
-                    <span className="font-semibold">
-                      Partes{notifPrefs.notifyDuties ? ', Deberes' : ''}
-                      {notifPrefs.notifyCarts ? ', Carritos' : ''}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-white/[0.04] flex items-center justify-between text-xs font-bold text-violet-600 dark:text-violet-400 group-hover:translate-x-1 transition-transform">
-                <span>Configurar preferencias de notificación</span>
-                <ChevronRight size={16} />
-              </div>
-            </div>
-
             {/* Tarjeta 1: Información y Horarios */}
             <div
               onClick={() => setActiveTab('general')}
@@ -1825,22 +1768,15 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
-                  {notifPermission !== 'granted' ? (
-                    <button
-                      type="button"
-                      onClick={handleEnablePushFromSettings}
-                      disabled={isSubscribingPush}
-                      className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer disabled:opacity-50"
-                    >
-                      <BellRing className="w-4 h-4" />
-                      <span>
-                        {isSubscribingPush ? 'Activando...' : 'Permitir Notificaciones del Navegador'}
-                      </span>
-                    </button>
-                  ) : (
+                  {notifPermission === 'granted' ? (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                       <span>Permiso del Navegador Activo</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                      <BellRing className="w-4 h-4 text-amber-600" />
+                      <span>Usa la guía inferior para suscribirte</span>
                     </span>
                   )}
                 </div>
@@ -2157,27 +2093,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
               </div>
 
               {/* Pie de acciones */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <button
-                    type="button"
-                    onClick={handleTestNotifFromSettings}
-                    className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-                  >
-                    <Send className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
-                    <span>Enviar Recordatorio de Prueba</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsPushModalOpen(true)}
-                    className="px-4 py-2.5 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/60 dark:hover:bg-violet-900/60 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-                  >
-                    <Smartphone className="w-3.5 h-3.5" />
-                    <span>Configurar Push en Segundo Plano (App Cerrada)</span>
-                  </button>
-                </div>
-
+              <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
                   onClick={() =>

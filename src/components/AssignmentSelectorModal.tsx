@@ -231,6 +231,12 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
                           </span>
                         )}
 
+                        {c.familyMembersInMeeting && c.familyMembersInMeeting.length > 0 && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-950/70 dark:text-indigo-300">
+                            Familiar hoy: {c.familyMembersInMeeting[0]}
+                          </span>
+                        )}
+
                         {c.hasConflictWarning && (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800">
                             <AlertTriangle className="w-3 h-3 text-amber-600" />

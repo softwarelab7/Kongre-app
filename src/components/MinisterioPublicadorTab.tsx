@@ -1397,39 +1397,23 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         </div>
       )}
 
-      {/* Barra de Funciones y Subpestañas de Mi Ministerio (Opción 1: arranque directo sin banner redundante) */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 p-1 rounded-xl bg-slate-200/70 dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800">
+      {/* Barra de Funciones y Subpestañas de Mi Ministerio (Cuadrícula simétrica 2x2 en móvil, 4 columnas en escritorio) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 rounded-xl bg-slate-200/70 dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800">
         <button
           type="button"
           onClick={() => {
             setActiveSubTab('resumen');
             setActiveTab('inicio');
           }}
-          className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            activeSubTab === 'resumen'
-              ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-          }`}
-        >
-          <Home className="w-3.5 h-3.5 shrink-0" />
-          <span>Panel Principal</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setActiveSubTab('cronometro');
-            setActiveTab('cronometro_ministerio');
-          }}
-          className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            activeSubTab === 'cronometro'
+          className={`flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            activeSubTab === 'resumen' || activeSubTab === 'cronometro'
               ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
           <Timer className={`w-3.5 h-3.5 shrink-0 ${timerState.isRunning ? 'text-emerald-500 animate-spin' : ''}`} />
-          <span>Cronómetro</span>
-          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-300">
+          <span className="truncate">Cronómetro y Mes</span>
+          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-300 shrink-0">
             {monthSummary.fullHours > 0
               ? monthSummary.remainingMinutes > 0
                 ? `${monthSummary.fullHours}h ${monthSummary.remainingMinutes}m`
@@ -1446,15 +1430,15 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
             setActiveSubTab('revisitas');
             setActiveTab('revisitas');
           }}
-          className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeSubTab === 'revisitas'
               ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-xs'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
           <MapPin className="w-3.5 h-3.5 shrink-0" />
-          <span>Revisitas</span>
-          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-300">
+          <span className="truncate">Revisitas</span>
+          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-300 shrink-0">
             {returnVisits.length}
           </span>
         </button>
@@ -1465,15 +1449,15 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
             setActiveSubTab('estudios');
             setActiveTab('estudios_biblicos');
           }}
-          className={`flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeSubTab === 'estudios'
               ? 'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-xs'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
           <BookOpen className="w-3.5 h-3.5 shrink-0" />
-          <span>Estudios</span>
-          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-300">
+          <span className="truncate">Estudios</span>
+          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-300 shrink-0">
             {bibleStudies.length}
           </span>
         </button>
@@ -1481,16 +1465,16 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         <button
           type="button"
           onClick={() => setActiveSubTab('informe')}
-          className={`col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 py-2 sm:py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeSubTab === 'informe'
               ? 'bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-xs'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
           <FileText className="w-3.5 h-3.5 shrink-0" />
-          <span>Informe S-4</span>
+          <span className="truncate">Informe S-4</span>
           {existingS4Report && (
-            <span className="w-2 h-2 rounded-full bg-emerald-500" title="Informe guardado" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Informe guardado" />
           )}
         </button>
       </div>
@@ -1645,49 +1629,49 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                 </p>
               </div>
 
-              {/* 3 Mini-Tarjetas: Revisitas, Estudios, Publicaciones */}
+              {/* 3 Mini-Tarjetas: Revisitas, Estudios, Publicaciones (tamaño y espaciado uniforme) */}
               <div className="grid grid-cols-3 gap-2 mt-2.5">
                 <div
                   onClick={() => setActiveSubTab('revisitas')}
-                  className="p-2 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/50 cursor-pointer hover:shadow-xs transition"
+                  className="p-2.5 sm:p-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/50 cursor-pointer hover:shadow-xs transition"
                 >
-                  <span className="text-[9px] font-bold uppercase text-emerald-700 dark:text-emerald-300 block">
+                  <span className="text-[10px] font-bold uppercase text-emerald-700 dark:text-emerald-300 block truncate">
                     Revisitas
                   </span>
-                  <span className="text-lg font-black text-emerald-900 dark:text-white mt-0.5 block">
+                  <span className="text-lg sm:text-xl font-black text-emerald-900 dark:text-white mt-0.5 block">
                     {returnVisits.length}
                   </span>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400">
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block truncate">
                     En agenda
                   </span>
                 </div>
 
                 <div
                   onClick={() => setActiveSubTab('estudios')}
-                  className="p-3 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/50 cursor-pointer hover:shadow-xs transition"
+                  className="p-2.5 sm:p-3 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/50 cursor-pointer hover:shadow-xs transition"
                 >
-                  <span className="text-[10px] font-bold uppercase text-amber-700 dark:text-amber-300 block">
+                  <span className="text-[10px] font-bold uppercase text-amber-700 dark:text-amber-300 block truncate">
                     Estudios
                   </span>
-                  <span className="text-xl font-black text-amber-900 dark:text-white mt-0.5 block">
+                  <span className="text-lg sm:text-xl font-black text-amber-900 dark:text-white mt-0.5 block">
                     {bibleStudies.length}
                   </span>
-                  <span className="text-[10px] text-amber-600 dark:text-amber-400">
+                  <span className="text-[10px] text-amber-600 dark:text-amber-400 block truncate">
                     Cursos activos
                   </span>
                 </div>
 
                 <div
                   onClick={() => setActiveSubTab('informe')}
-                  className="p-3 rounded-2xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200/60 dark:border-purple-800/50 cursor-pointer hover:shadow-xs transition"
+                  className="p-2.5 sm:p-3 rounded-2xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200/60 dark:border-purple-800/50 cursor-pointer hover:shadow-xs transition"
                 >
-                  <span className="text-[10px] font-bold uppercase text-purple-700 dark:text-purple-300 block">
+                  <span className="text-[10px] font-bold uppercase text-purple-700 dark:text-purple-300 block truncate">
                     Publicaciones
                   </span>
-                  <span className="text-xl font-black text-purple-900 dark:text-white mt-0.5 block">
+                  <span className="text-lg sm:text-xl font-black text-purple-900 dark:text-white mt-0.5 block">
                     {monthSummary.totalPlacementsLogged}
                   </span>
-                  <span className="text-[10px] text-purple-600 dark:text-purple-400">
+                  <span className="text-[10px] text-purple-600 dark:text-purple-400 block truncate">
                     Este mes
                   </span>
                 </div>
@@ -1718,8 +1702,8 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         </div>
       )}
 
-      {/* Historial de Sesiones de Tiempo (cuando está en la pestaña Cronómetro) */}
-      {activeSubTab === 'cronometro' && (
+      {/* Historial de Sesiones de Tiempo */}
+      {(activeSubTab === 'resumen' || activeSubTab === 'cronometro') && (
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <div className="flex items-center gap-2.5">
@@ -1809,7 +1793,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
       {/* =========================================================================
           4. VISTA RÁPIDA DE REVISITAS Y ESTUDIOS EN EL PANEL PRINCIPAL
          ========================================================================= */}
-      {activeSubTab === 'resumen' && (
+      {(activeSubTab === 'resumen' || activeSubTab === 'cronometro') && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
           {/* Revisitas Recientes / Para Hoy */}
           <div className="lg:col-span-6 bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3.5">
@@ -1957,7 +1941,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
               </div>
             </div>
 
-            {/* Accesos Rápidos del Publicador */}
+            {/* Accesos Rápidos del Publicador (Sin duplicar botones fijos de la barra inferior móvil) */}
             <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs">
               <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-3">
                 Herramientas de la Congregación para Publicadores
@@ -1965,11 +1949,11 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                 <button
                   type="button"
-                  onClick={() => setActiveTab('programacion')}
+                  onClick={() => setActiveTab('mi_vista')}
                   className="flex items-center gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 border border-slate-200/60 dark:border-slate-700/60 text-xs font-bold text-slate-700 dark:text-slate-200 cursor-pointer"
                 >
-                  <Calendar className="w-4 h-4 text-indigo-500 shrink-0" />
-                  <span className="truncate">Programa Semanal</span>
+                  <UserCheck className="w-4 h-4 text-indigo-500 shrink-0" />
+                  <span className="truncate">Mis Asignaciones</span>
                 </button>
                 <button
                   type="button"
@@ -2005,11 +1989,11 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveTab('panorama_general')}
+                  onClick={() => setActiveTab('grupos_servicio')}
                   className="flex items-center gap-2 p-3 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/50 hover:bg-indigo-100 border border-indigo-200/70 dark:border-indigo-800/60 text-xs font-bold text-indigo-700 dark:text-indigo-300 cursor-pointer"
                 >
-                  <LayoutGrid className="w-4 h-4 text-indigo-600 shrink-0" />
-                  <span className="truncate">Panorama General</span>
+                  <Users className="w-4 h-4 text-indigo-600 shrink-0" />
+                  <span className="truncate">Grupos Servicio</span>
                 </button>
               </div>
             </div>

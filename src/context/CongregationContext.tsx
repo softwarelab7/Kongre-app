@@ -249,6 +249,7 @@ interface CongregationContextType {
   addFieldServiceMeeting: (item: Omit<FieldServiceMeeting, 'id'>) => void;
   updateFieldServiceMeeting: (item: FieldServiceMeeting) => void;
   deleteFieldServiceMeeting: (id: string) => void;
+  replaceFieldServiceMeetings: (items: FieldServiceMeeting[]) => void;
 
   // Cart Witnessing
   addCartLocation: (loc: Omit<CartLocation, 'id'>) => void;
@@ -3979,6 +3980,22 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     saveToFirestore(publishers, weeks, preachingGroups, customDuties, settings, outgoingSpeakers, updated);
   };
 
+  const replaceFieldServiceMeetings = (items: FieldServiceMeeting[]) => {
+    setFieldServiceMeetings(items);
+    try {
+      localStorage.setItem(`${LOCAL_STORAGE_KEY}_field_service`, JSON.stringify(items));
+    } catch {}
+    saveToFirestore(
+      publishers,
+      weeks,
+      preachingGroups,
+      customDuties,
+      settings,
+      outgoingSpeakers,
+      items
+    );
+  };
+
   const updatePreachingGroups = async (groups: PreachingGroup[]): Promise<void> => {
     latestPreachingGroupsRef.current = groups;
     setPreachingGroups(groups);
@@ -5998,6 +6015,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         addFieldServiceMeeting,
         updateFieldServiceMeeting,
         deleteFieldServiceMeeting,
+        replaceFieldServiceMeetings,
         addCartLocation,
         updateCartLocation,
         deleteCartLocation,

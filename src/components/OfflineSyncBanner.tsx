@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
-import { WifiOff, Wifi, ShieldCheck, Database, RefreshCw, ChevronRight } from 'lucide-react';
+import { WifiOff, Wifi, ShieldCheck, RefreshCw, ChevronRight, X } from 'lucide-react';
 import { getOfflineQueueStats, QueueStats } from '../services/indexedDbQueue';
 
 interface OfflineSyncBannerProps {
@@ -9,6 +9,7 @@ interface OfflineSyncBannerProps {
 
 export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ onOpenQueueModal }) => {
   const { isOnline, wasOffline } = useOnlineStatus();
+  const [dismissed, setDismissed] = useState(false);
   const [stats, setStats] = useState<QueueStats>({
     pendingCount: 0,
     syncingCount: 0,
@@ -35,6 +36,25 @@ export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ onOpenQueu
     };
   }, []);
 
+  // Reset dismissal if connection drops again
+  useEffect(() => {
+    if (!isOnline) {
+      setDismissed(false);
+    }
+  }, [isOnline]);
+
+  // Auto-hide banner 4 seconds after reconnecting once queue is empty
+  useEffect(() => {
+    if (isOnline && stats.pendingCount === 0 && stats.syncingCount === 0) {
+      const timer = window.setTimeout(() => setDismissed(true), 4000);
+      return () => window.clearTimeout(timer);
+    }
+  }, [isOnline, stats.pendingCount, stats.syncingCount]);
+
+  if (dismissed) {
+    return null;
+  }
+
   if (isOnline && !wasOffline && stats.pendingCount === 0 && stats.syncingCount === 0) {
     return null;
   }
@@ -58,18 +78,31 @@ export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ onOpenQueu
                 <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
                 {stats.pendingCount > 0 && (
                   <span className="px-1.5 py-0.2 rounded text-[10px] bg-amber-500/30 text-amber-300 font-extrabold">
-                    {stats.pendingCount} en IndexedDB
+                    {stats.pendingCount} en cola
                   </span>
                 )}
               </p>
               <p className="text-[11px] text-slate-300 truncate">
-                Tus cambios se guardan en IndexedDB y se sincronizarán con Supabase al reconectar.
+                Tus cambios se guardan localmente y se sincronizarán al reconectar.
               </p>
             </div>
           </div>
-          {onOpenQueueModal && (
-            <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
-          )}
+          <div className="flex items-center gap-1 shrink-0">
+            {onOpenQueueModal && (
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+            )}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setDismissed(true);
+              }}
+              aria-label="Cerrar aviso offline"
+              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -94,19 +127,32 @@ export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ onOpenQueu
           </div>
           <div className="min-w-0">
             <p className="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
-              <span>{stats.syncingCount > 0 ? 'Sincronizando con Supabase...' : 'Conexión restablecida'}</span>
+              <span>{stats.syncingCount > 0 ? 'Sincronizando cola offline...' : 'Conexión restablecida'}</span>
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             </p>
             <p className="text-[11px] text-emerald-100 truncate">
               {stats.pendingCount > 0
-                ? `Procesando ${stats.pendingCount} cambio(s) guardados en IndexedDB hacia Supabase...`
-                : 'Cola de IndexedDB al día con Supabase (Cero Conocimiento AES-256).'}
+                ? `Procesando ${stats.pendingCount} cambio(s) pendiente(s)...`
+                : 'Cola de sincronización al día.'}
             </p>
           </div>
         </div>
-        {onOpenQueueModal && (
-          <ChevronRight className="w-4 h-4 text-emerald-300 shrink-0" />
-        )}
+        <div className="flex items-center gap-1 shrink-0">
+          {onOpenQueueModal && (
+            <ChevronRight className="w-4 h-4 text-emerald-300" />
+          )}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setDismissed(true);
+            }}
+            aria-label="Cerrar aviso de sincronización"
+            className="p-1 rounded-lg text-emerald-300 hover:text-white hover:bg-white/10 transition cursor-pointer"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
     </div>
   );

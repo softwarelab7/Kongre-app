@@ -14,20 +14,8 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [themeMode, setThemeModeState] = useState<ThemeMode>(() => {
-    try {
-      const saved = (localStorage.getItem('kongre-theme') || localStorage.getItem('kongre_theme')) as string;
-      if (saved === 'dark' || saved === 'light') {
-        return saved;
-      }
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark';
-      }
-    } catch (e) {
-      // ignore
-    }
-    return 'light';
-  });
+  // Siempre predeterminado en modo Claro ('light') al iniciar la aplicación
+  const [themeMode, setThemeModeState] = useState<ThemeMode>('light');
 
   const applyThemeToDOM = (mode: ThemeMode) => {
     applyTheme(mode as BrandTheme);
@@ -37,6 +25,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem('kongre_theme', themeMode);
       localStorage.setItem('kongre-theme', themeMode);
+      localStorage.setItem('theme', themeMode);
     } catch (e) {
       // ignore
     }
@@ -48,6 +37,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       localStorage.setItem('kongre_theme', cleanMode);
       localStorage.setItem('kongre-theme', cleanMode);
+      localStorage.setItem('theme', cleanMode);
     } catch (e) {}
     applyThemeToDOM(cleanMode);
     setThemeModeState(cleanMode);

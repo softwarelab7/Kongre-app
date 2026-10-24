@@ -1959,21 +1959,21 @@ export default function ClmScheduleView({
           {/* Selector de salas y configuración auxiliar compacta */}
           <div className="flex items-center justify-between sm:justify-start lg:justify-end gap-2 flex-wrap pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-200/60 dark:border-white/[0.05]">
             <div className="flex items-center gap-1.5 flex-wrap">
-              {/* Píldora de sala Auditorio / Sala Auxiliar */}
-              <div className="inline-flex items-center gap-0.5 bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-semibold shadow-2xs">
-                <button
-                  type="button"
-                  onClick={() => setActiveRoom('principal')}
-                  className={`min-h-[30px] px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                    activeRoom === 'principal'
-                      ? 'bg-indigo-600 text-white font-bold shadow-xs'
-                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  <span>Auditorio</span>
-                </button>
+              {/* Píldora de sala Auditorio / Sala Auxiliar (solo visible cuando Sala Auxiliar está activa) */}
+              {showAuxRoom && (
+                <div className="inline-flex items-center gap-0.5 bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-semibold shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setActiveRoom('principal')}
+                    className={`min-h-[30px] px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                      activeRoom === 'principal'
+                        ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                        : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <span>Auditorio</span>
+                  </button>
 
-                {showAuxRoom && (
                   <button
                     type="button"
                     onClick={() => setActiveRoom('auxiliar')}
@@ -1985,8 +1985,8 @@ export default function ClmScheduleView({
                   >
                     <span>Sala Auxiliar</span>
                   </button>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Checkbox estilizado para activar o desactivar Sala Auxiliar */}
               <div
@@ -2019,14 +2019,14 @@ export default function ClmScheduleView({
               )}
             </div>
 
-            {/* Acceso directo a Modo Atril / Cronómetro */}
+            {/* Acceso directo a Modo Atril / Cronómetro (oculto en móvil donde ya está en el menú de la barra superior del programa) */}
             <button
               type="button"
               onClick={() => {
                 setTimerInitialPartId(undefined);
                 setIsTimerModalOpen(true);
               }}
-              className="min-h-[34px] flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 transition-all cursor-pointer shadow-2xs shrink-0"
+              className="hidden sm:flex min-h-[34px] items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 transition-all cursor-pointer shadow-2xs shrink-0"
               title="Iniciar Modo Atril y Cronómetro de Presidencia para esta sala"
             >
               <Clock size={12} className="shrink-0 text-amber-400 dark:text-white" />

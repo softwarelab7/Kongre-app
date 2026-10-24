@@ -17,14 +17,15 @@ export function applyTheme(t: Theme) {
   try {
     localStorage.setItem(KEY, cleanTheme);
     localStorage.setItem('kongre_theme', cleanTheme);
+    localStorage.setItem('theme', cleanTheme);
   } catch {}
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', BAR[cleanTheme] || '#4C3AED');
 }
 
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>(
-    () => ((document.documentElement.dataset.theme as Theme) === 'dark' ? 'dark' : 'light')
-  );
-  useEffect(() => { applyTheme(theme); }, [theme]);
+  const [theme, setTheme] = useState<Theme>('light');
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
   return { theme, setTheme };
 }

@@ -168,32 +168,14 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
       items: [
         {
           id: 'inicio',
-          label: 'Resumen de Ministerio',
-          description: 'Informe mensual y metas',
+          label: 'Mi Ministerio y Cronómetro',
+          description: 'Tiempo, revisitas, estudios e informe S-4',
           icon: NAV_ICONS.inicio,
-        },
-        {
-          id: 'cronometro_ministerio',
-          label: 'Cronómetro',
-          description: 'Temporizador de predicación',
-          icon: NAV_ICONS.cronometro_ministerio,
-        },
-        {
-          id: 'revisitas',
-          label: 'Agenda de Revisitas',
-          description: 'Seguimiento de interesados',
-          icon: NAV_ICONS.revisitas,
-        },
-        {
-          id: 'estudios_biblicos',
-          label: 'Estudios Bíblicos',
-          description: 'Progreso de estudiantes',
-          icon: NAV_ICONS.estudios_biblicos,
         },
         {
           id: 'mi_vista',
           label: 'Mis Asignaciones',
-          description: 'Partes y privilegios personales',
+          description: 'Partes, ausencias y avisos personales',
           icon: NAV_ICONS.mi_vista,
         },
       ],
@@ -538,17 +520,7 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
         </div>
 
         {/* Compact right utility buttons */}
-        <div className="flex items-center gap-1 shrink-0">
-          <button
-            type="button"
-            onClick={() => handleNavigate('perfil')}
-            aria-label="Mi Perfil"
-            title="Mi Perfil"
-            className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center cursor-pointer active:scale-95"
-          >
-            <User className="w-4 h-4" />
-          </button>
-
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             type="button"
             onClick={toggleTheme}
@@ -828,24 +800,6 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
           })}
         </div>
       )}
-
-      {/* =========================================================================
-          5. SUBTLE VERSION FOOTER
-         ========================================================================= */}
-      <div className="pt-2 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 px-1">
-        <span>Kongre • Organización Teocrática</span>
-        {onOpenVersionModal ? (
-          <button
-            type="button"
-            onClick={onOpenVersionModal}
-            className="font-mono font-bold hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer"
-          >
-            v{CURRENT_APP_VERSION}
-          </button>
-        ) : (
-          <span className="font-mono">v{CURRENT_APP_VERSION}</span>
-        )}
-      </div>
     </div>
   );
 };

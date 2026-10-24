@@ -3,8 +3,16 @@ import React, { useMemo, useState } from 'react';
 import { Publisher } from '../../../types';
 import { PremiumDatePicker } from '../../PremiumDatePicker';
 import { ensureImmutablePublisherCode } from '../../../utils/publisherDeduplication';
+import { useCongregation } from '../../../context/CongregationContext';
+import {
+  getPubDisplayName,
+  getPubId,
+  getPublisherFamilyMembers,
+  suggestPotentialFamilyMembers,
+} from '../../../utils/familyGrouping';
 import {
   User,
+  Users,
   Heart,
   Home,
   Calendar,
@@ -16,6 +24,8 @@ import {
   Copy,
   Check,
   ShieldCheck,
+  UserPlus,
+  X,
 } from 'lucide-react';
 
 interface BasicInfoSectionProps {
@@ -24,7 +34,65 @@ interface BasicInfoSectionProps {
 }
 
 export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleChange }) => {
+  const { publishers } = useCongregation();
   const [copiedId, setCopiedId] = useState(false);
+  const [familySearch, setFamilySearch] = useState('');
+
+  const selfId = getPubId(formData);
+
+  // Miembros del núcleo familiar actualmente vinculados
+  const linkedFamilyMembers = useMemo(() => {
+    return getPublisherFamilyMembers(formData, publishers || []);
+  }, [formData, publishers]);
+
+  // Sugerencias automáticas por apellido o dirección compartida
+  const familySuggestions = useMemo(() => {
+    return suggestPotentialFamilyMembers(formData, publishers || []);
+  }, [formData, publishers]);
+
+  // Candidatos buscables para agregar al núcleo familiar
+  const searchableRelatives = useMemo(() => {
+    const q = familySearch.trim().toLowerCase();
+    if (!q) return [];
+    const linkedIds = new Set(linkedFamilyMembers.map((m) => getPubId(m)));
+    return (publishers || [])
+      .filter((p) => {
+        const pid = getPubId(p);
+        if (!pid || pid === selfId || linkedIds.has(pid)) return false;
+        return getPubDisplayName(p).toLowerCase().includes(q);
+      })
+      .slice(0, 6);
+  }, [familySearch, publishers, linkedFamilyMembers, selfId]);
+
+  const handleAddFamilyMember = (targetPub: Publisher) => {
+    const targetId = getPubId(targetPub);
+    if (!targetId) return;
+    const currentList = Array.isArray(formData.familyMemberIds)
+      ? [...formData.familyMemberIds]
+      : [];
+    if (!currentList.includes(targetId)) {
+      handleChange('familyMemberIds', [...currentList, targetId]);
+    }
+    setFamilySearch('');
+  };
+
+  const handleRemoveFamilyMember = (targetPub: Publisher) => {
+    const targetId = getPubId(targetPub);
+    const currentList = Array.isArray(formData.familyMemberIds)
+      ? formData.familyMemberIds.filter(
+          (id) => id !== targetId && id !== targetPub.id && id !== targetPub.nid
+        )
+      : [];
+    handleChange('familyMemberIds', currentList);
+    if (
+      formData.spouse_nid &&
+      (formData.spouse_nid === targetId ||
+        formData.spouse_nid === targetPub.id ||
+        formData.spouse_nid === targetPub.nid)
+    ) {
+      handleChange('spouse_nid', '');
+    }
+  };
 
   const uniquePublisherId = useMemo(() => {
     return ensureImmutablePublisherCode(formData);
@@ -81,6 +149,11 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
               {formData.is_head_of_household && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800/40">
                   <Home size={10} /> Cabeza de familia
+                </span>
+              )}
+              {linkedFamilyMembers.length > 0 && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40">
+                  <Users size={10} /> {linkedFamilyMembers.length} familiar(es) en congregación
                 </span>
               )}
             </div>
@@ -265,20 +338,51 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
         <div className="p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in duration-200">
           <div>
             <label className="text-[11px] font-medium text-indigo-900 dark:text-indigo-300 mb-1.5 block">
-              Nombre del Cónyuge
+              Cónyuge en la Congregación (o Nombre)
             </label>
-            <div className="relative">
-              <Heart
-                size={14}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-400"
-              />
-              <input
-                type="text"
-                value={formData.spouse_name || ''}
-                onChange={(e) => handleChange('spouse_name', e.target.value)}
-                className="kf-input kf-input-icon w-full bg-white dark:bg-zinc-900"
-                placeholder="Nombre completo del esposo(a)"
-              />
+            <div className="space-y-2">
+              <select
+                value={formData.spouse_nid || ''}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  handleChange('spouse_nid', selectedId);
+                  const found = (publishers || []).find(
+                    (p) => getPubId(p) === selectedId
+                  );
+                  if (found) {
+                    handleChange('spouse_name', getPubDisplayName(found));
+                    handleAddFamilyMember(found);
+                  }
+                }}
+                aria-label="Seleccionar cónyuge de la congregación"
+                className="kf-input w-full bg-white dark:bg-zinc-900 text-xs"
+              >
+                <option value="">— Seleccionar cónyuge del directorio (opcional) —</option>
+                {(publishers || [])
+                  .filter((p) => getPubId(p) !== selfId)
+                  .map((p) => {
+                    const pid = getPubId(p);
+                    return (
+                      <option key={pid} value={pid}>
+                        {getPubDisplayName(p)}
+                      </option>
+                    );
+                  })}
+              </select>
+
+              <div className="relative">
+                <Heart
+                  size={14}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-indigo-400"
+                />
+                <input
+                  type="text"
+                  value={formData.spouse_name || ''}
+                  onChange={(e) => handleChange('spouse_name', e.target.value)}
+                  className="kf-input kf-input-icon w-full bg-white dark:bg-zinc-900"
+                  placeholder="O escribe el nombre del esposo(a) si no está en lista"
+                />
+              </div>
             </div>
           </div>
 
@@ -309,6 +413,158 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
           </div>
         </div>
       )}
+
+      {/* NÚCLEO FAMILIAR Y AGRUPACIÓN INTELIGENTE (ESTILO KHS FAMILY SCHEDULING) */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 dark:bg-white/[0.02] border border-zinc-200/80 dark:border-white/[0.06] space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+              <Users size={18} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h4 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                  Núcleo Familiar y Agrupación en Reuniones (KHS)
+                </h4>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
+                  Same-Night Grouping
+                </span>
+              </div>
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                Vincula padres, hijos, cónyuge o hermanos carnales para priorizar asignarlos la misma noche y validar parejas familiares en demostraciones VMC (pauta S-38).
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              handleChange(
+                'groupWithFamilyInMeetings',
+                formData.groupWithFamilyInMeetings === false ? true : false
+              )
+            }
+            className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center gap-2 shrink-0 transition-all cursor-pointer ${
+              formData.groupWithFamilyInMeetings !== false
+                ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700'
+            }`}
+          >
+            <Sparkles size={14} />
+            <span>
+              {formData.groupWithFamilyInMeetings !== false
+                ? 'Agrupar misma noche: Activo'
+                : 'Agrupar misma noche: Inactivo'}
+            </span>
+          </button>
+        </div>
+
+        {/* Lista de familiares vinculados */}
+        <div className="space-y-2">
+          <label className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 block">
+            Familiares vinculados en la congregación ({linkedFamilyMembers.length})
+          </label>
+          {linkedFamilyMembers.length === 0 ? (
+            <p className="text-xs text-zinc-400 italic">
+              Aún no se han vinculado familiares directos en el directorio.
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {linkedFamilyMembers.map((fam) => {
+                const famId = getPubId(fam);
+                const isSpouse =
+                  (formData.spouse_nid && formData.spouse_nid === famId) ||
+                  (formData.spouse_name &&
+                    formData.spouse_name.toLowerCase() ===
+                      getPubDisplayName(fam).toLowerCase());
+                return (
+                  <span
+                    key={famId}
+                    className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 shadow-2xs"
+                  >
+                    {isSpouse ? (
+                      <Heart size={12} className="text-rose-500 shrink-0" />
+                    ) : (
+                      <Users size={12} className="text-indigo-500 shrink-0" />
+                    )}
+                    <span>{getPubDisplayName(fam)}</span>
+                    {isSpouse && (
+                      <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400">
+                        (Cónyuge)
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveFamilyMember(fam)}
+                      aria-label={`Desvincular a ${getPubDisplayName(fam)}`}
+                      className="p-0.5 rounded-md text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                    >
+                      <X size={13} />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Buscador para añadir cualquier familiar de la congregación */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+          <div className="relative">
+            <label className="text-[11px] font-medium text-zinc-600 dark:text-zinc-400 mb-1 block">
+              Añadir familiar de la congregación (Padre, Madre, Hijo, Hermano)
+            </label>
+            <input
+              type="text"
+              value={familySearch}
+              onChange={(e) => setFamilySearch(e.target.value)}
+              placeholder="Escribe el nombre para vincular..."
+              className="kf-input w-full bg-white dark:bg-zinc-900 text-xs"
+            />
+            {searchableRelatives.length > 0 && (
+              <div className="mt-1.5 p-1.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 shadow-lg space-y-1 max-h-44 overflow-y-auto">
+                {searchableRelatives.map((rel) => (
+                  <button
+                    key={getPubId(rel)}
+                    type="button"
+                    onClick={() => handleAddFamilyMember(rel)}
+                    className="w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 flex items-center justify-between cursor-pointer"
+                  >
+                    <span>{getPubDisplayName(rel)}</span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+                      <UserPlus size={12} /> Vincular
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Sugerencias inteligentes por apellido o dirección */}
+          {familySuggestions.length > 0 && (
+            <div>
+              <label className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 mb-1 block">
+                Sugerencias detectadas por apellido o domicilio
+              </label>
+              <div className="flex flex-wrap gap-1.5">
+                {familySuggestions.slice(0, 5).map(({ publisher: sug, reason }) => (
+                  <button
+                    key={getPubId(sug)}
+                    type="button"
+                    onClick={() => handleAddFamilyMember(sug)}
+                    title={reason}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-all cursor-pointer"
+                  >
+                    <UserPlus size={12} className="text-emerald-600 shrink-0" />
+                    <span>{getPubDisplayName(sug)}</span>
+                    <span className="text-[9px] opacity-75">({reason})</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Ocupación y Habilidades Útiles */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-zinc-100 dark:border-white/[0.04]">

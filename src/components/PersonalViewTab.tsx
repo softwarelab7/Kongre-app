@@ -4,6 +4,15 @@ import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { AssignmentStatus, MonthlyServiceReport, PublisherAbsence } from '../types';
 import { generateGoogleCalendarUrl, downloadSingleIcsEvent } from '../utils/calendarExport';
+import {
+  extractUnifiedAssignmentsForPublisher,
+  formatUnifiedMonthlyWhatsAppMessage,
+  downloadPublisherUnifiedIcs,
+  printPublisherUnifiedMonthlySheet,
+  formatSpanishMonthLabel,
+  UnifiedAssignmentCategory,
+} from '../utils/unifiedMonthlyAssignments';
+import { openWhatsAppLink } from '../utils/whatsapp';
 import { SplashCheckbox } from './SplashCheckbox';
 import {
   UserCheck,
@@ -50,6 +59,9 @@ import {
   BellRing,
   X,
   ShieldCheck,
+  Download,
+  Printer,
+  Layers,
 } from 'lucide-react';
 import {
   isNotificationSupported,
@@ -86,6 +98,9 @@ export const PersonalViewTab: React.FC = () => {
     theocraticAssemblies,
     specialOrders,
     preachingGroups,
+    customDuties,
+    outgoingSpeakers,
+    fieldServiceMeetings,
     monthlyReports,
     updateMonthlyReport,
     updatePublisher,
@@ -566,332 +581,134 @@ export const PersonalViewTab: React.FC = () => {
     ? publishersMap.get(myPreachingGroup.assistantId)
     : null;
 
-  // Extract all future assignments for this publisher
-  const myAssignments = useMemo(() => {
-    if (!selectedPublisherId) return [];
+  // Filtros de la Hoja Unificada Mensual (Estilo KHS)
+  const [unifiedMonthFilter, setUnifiedMonthFilter] = useState<string>('all_upcoming');
+  const [unifiedCategoryFilter, setUnifiedCategoryFilter] = useState<'todas' | UnifiedAssignmentCategory>('todas');
+  const [copiedSummaryToast, setCopiedSummaryToast] = useState(false);
 
-    const list: Array<{
-      id: string;
-      weekId: string;
-      date: string;
-      meetingType: 'midweek' | 'weekend';
-      meetingName: string;
-      assignmentTitle: string;
-      roleKey: string;
-      assignmentPath: string;
-      room?: 'principal' | 'auxiliar';
-      assistantName?: string;
-      timeMinutes?: number;
-      status: AssignmentStatus;
-    }> = [];
-
-    const pid = selectedPublisherId;
-
+  const availableAssignmentMonths = useMemo(() => {
+    const set = new Set<string>();
     weeks.forEach((w) => {
-      // Midweek
-      if (!w.specialEvent?.noMeetingMidweek) {
-        // President
-        if (w.midweek.presidentId === pid) {
-          list.push({
-            id: `mid-pres-${w.id}`,
-            weekId: w.id,
-            date: w.midweek.date,
-            meetingType: 'midweek',
-            meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: 'Presidente de la reunión',
-            roleKey: 'vym_presidente',
-            assignmentPath: 'presidentId',
-            status: 'confirmada',
-          });
-        }
-        // Auxiliary Counselor
-        if (w.midweek.auxiliaryCounselorId === pid) {
-          list.push({
-            id: `mid-auxc-${w.id}`,
-            weekId: w.id,
-            date: w.midweek.date,
-            meetingType: 'midweek',
-            meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: 'Consejero de la Sala Auxiliar',
-            roleKey: 'vym_consejero_aux',
-            assignmentPath: 'auxiliaryCounselorId',
-            room: 'auxiliar',
-            status: 'confirmada',
-          });
-        }
-        // Initial Prayer
-        if (w.midweek.initialPrayerId === pid) {
-          list.push({
-            id: `mid-inip-${w.id}`,
-            weekId: w.id,
-            date: w.midweek.date,
-            meetingType: 'midweek',
-            meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: 'Oración de apertura',
-            roleKey: 'vym_oracion_inicial',
-            assignmentPath: 'initialPrayerId',
-            status: 'confirmada',
-          });
-        }
-        // Final Prayer
-        if (w.midweek.finalPrayerId === pid) {
-          list.push({
-            id: `mid-finp-${w.id}`,
-            weekId: w.id,
-            date: w.midweek.date,
-            meetingType: 'midweek',
-            meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: 'Oración final',
-            roleKey: 'vym_oracion_final',
-            assignmentPath: 'finalPrayerId',
-            status: 'confirmada',
-          });
-        }
-        // Treasures Talk
-        if (w.midweek.tesoros.discurso.publisherId === pid) {
-          list.push({
-            id: `tes-disc-${w.id}`,
-            weekId: w.id,
-            date: w.midweek.date,
-            meetingType: 'midweek',
-            meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: `Discurso: ${w.midweek.tesoros.discurso.title}`,
-            roleKey: 'vym_tesoros_discurso',
-            assignmentPath: 'tesoros.discurso',
-            timeMinutes: 10,
-            status: w.midweek.tesoros.discurso.status,
-          });
-        }
-        // Treasures Gems
-        if (w.midweek.tesoros.perlas.publisherId === pid) {
-          list.push({
-            id: `tes-perl-${w.id}`,
-            weekId: w.id,
-            date: w.midweek.date,
-            meetingType: 'midweek',
-            meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: 'Busquemos perlas escondidas',
-            roleKey: 'vym_tesoros_perlas',
-            assignmentPath: 'tesoros.perlas',
-            timeMinutes: 10,
-            status: w.midweek.tesoros.perlas.status,
-          });
-        }
-        // Bible Reading Main
-        if (w.midweek.tesoros.lecturaBiblia.publisherId === pid) {
-          list.push({
-            id: `tes-lect-${w.id}`,
-            weekId: w.id,
-            date: w.midweek.date,
-            meetingType: 'midweek',
-            meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: 'Lectura de la Biblia (Sala Principal)',
-            roleKey: 'vym_tesoros_lectura',
-            assignmentPath: 'tesoros.lecturaBiblia',
-            room: 'principal',
-            timeMinutes: 4,
-            status: w.midweek.tesoros.lecturaBiblia.status,
-          });
-        }
-        // Bible Reading Aux
-        if (w.midweek.tesoros.lecturaBibliaAux?.publisherId === pid) {
-          list.push({
-            id: `tes-lectaux-${w.id}`,
-            weekId: w.id,
-            date: w.midweek.date,
-            meetingType: 'midweek',
-            meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: 'Lectura de la Biblia (Sala Auxiliar)',
-            roleKey: 'vym_tesoros_lectura',
-            assignmentPath: 'tesoros.lecturaBibliaAux',
-            room: 'auxiliar',
-            timeMinutes: 4,
-            status: w.midweek.tesoros.lecturaBibliaAux.status,
-          });
-        }
-
-        // Apply Yourself (Seamos mejores maestros)
-        w.midweek.maestros.items.forEach((item, idx) => {
-          if (item.publisherId === pid) {
-            const assistant = item.assistantId ? publishersMap.get(item.assistantId)?.name : undefined;
-            list.push({
-              id: `maes-tit-${item.id}`,
-              weekId: w.id,
-              date: w.midweek.date,
-              meetingType: 'midweek',
-              meetingName: 'Vida y Ministerio Cristianos',
-              assignmentTitle: `Titular en: ${item.title}`,
-              roleKey: 'vym_maestros_titular',
-              assignmentPath: `maestros.${idx}`,
-              room: item.room,
-              assistantName: assistant ? `Ayudante: ${assistant}` : undefined,
-              timeMinutes: item.timeMinutes,
-              status: item.status,
-            });
-          }
-          if (item.assistantId === pid) {
-            const titularName = item.publisherId ? publishersMap.get(item.publisherId)?.name : 'Titular';
-            list.push({
-              id: `maes-asst-${item.id}`,
-              weekId: w.id,
-              date: w.midweek.date,
-              meetingType: 'midweek',
-              meetingName: 'Vida y Ministerio Cristianos',
-              assignmentTitle: `Ayudante en: ${item.title}`,
-              roleKey: 'vym_maestros_ayudante',
-              assignmentPath: `maestros_helper.${idx}`,
-              room: item.room,
-              assistantName: `Titular: ${titularName}`,
-              timeMinutes: item.timeMinutes,
-              status: item.status,
-            });
-          }
-        });
-
-        // Living as Christians
-        w.midweek.vidaCristiana.items.forEach((item, idx) => {
-          if (item.publisherId === pid) {
-            list.push({
-              id: `vida-${item.id}`,
-              weekId: w.id,
-              date: w.midweek.date,
-              meetingType: 'midweek',
-              meetingName: 'Vida y Ministerio Cristianos',
-              assignmentTitle: `Nuestra Vida Cristiana: ${item.title}`,
-              roleKey: 'vym_vida_partes',
-              assignmentPath: `vida.${idx}`,
-              timeMinutes: item.timeMinutes,
-              status: item.status,
-            });
-          }
-        });
-
-        // Congregation Bible Study Conductor & Reader
-        if (w.midweek.vidaCristiana.estudioBiblico.conductorId === pid) {
-          list.push({
-            id: `cbs-cond-${w.id}`,
-            weekId: w.id,
-            date: w.midweek.date,
-            meetingType: 'midweek',
-            meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: 'Conductor del Estudio Bíblico de Congregación',
-            roleKey: 'vym_estudio_conductor',
-            assignmentPath: 'vidaCristiana.estudioBiblico.conductorId',
-            timeMinutes: 30,
-            status: 'confirmada',
-          });
-        }
-        if (w.midweek.vidaCristiana.estudioBiblico.lectorId === pid) {
-          list.push({
-            id: `cbs-lect-${w.id}`,
-            weekId: w.id,
-            date: w.midweek.date,
-            meetingType: 'midweek',
-            meetingName: 'Vida y Ministerio Cristianos',
-            assignmentTitle: 'Lector del Estudio Bíblico de Congregación',
-            roleKey: 'vym_estudio_lector',
-            assignmentPath: 'vidaCristiana.estudioBiblico.lectorId',
-            timeMinutes: 30,
-            status: 'confirmada',
-          });
-        }
-
-        // Midweek Duties
-        Object.entries(w.midweek.duties).forEach(([dKey, ids]) => {
-          if (ids.includes(pid)) {
-            list.push({
-              id: `duty-mid-${w.id}-${dKey}`,
-              weekId: w.id,
-              date: w.midweek.date,
-              meetingType: 'midweek',
-              meetingName: 'Vida y Ministerio Cristianos',
-              assignmentTitle: `Deber: ${dKey.replace('deber_', '').toUpperCase()}`,
-              roleKey: dKey,
-              assignmentPath: `midweek_duty_${dKey}`,
-              status: 'confirmada',
-            });
-          }
-        });
-      }
-
-      // Weekend
-      if (!w.specialEvent?.noMeetingWeekend) {
-        if (w.weekend.presidentId === pid) {
-          list.push({
-            id: `fds-pres-${w.id}`,
-            weekId: w.id,
-            date: w.weekend.date,
-            meetingType: 'weekend',
-            meetingName: 'Reunión del Fin de Semana',
-            assignmentTitle: 'Presidente de la reunión',
-            roleKey: 'fds_presidente',
-            assignmentPath: 'presidentId',
-            status: 'confirmada',
-          });
-        }
-        if (w.weekend.atalayaConductorId === pid) {
-          list.push({
-            id: `fds-cond-${w.id}`,
-            weekId: w.id,
-            date: w.weekend.date,
-            meetingType: 'weekend',
-            meetingName: 'Reunión del Fin de Semana',
-            assignmentTitle: 'Conductor del Estudio de La Atalaya',
-            roleKey: 'fds_atalaya_conductor',
-            assignmentPath: 'atalayaConductorId',
-            timeMinutes: 60,
-            status: 'confirmada',
-          });
-        }
-        if (w.weekend.atalayaLectorId === pid) {
-          list.push({
-            id: `fds-lect-${w.id}`,
-            weekId: w.id,
-            date: w.weekend.date,
-            meetingType: 'weekend',
-            meetingName: 'Reunión del Fin de Semana',
-            assignmentTitle: 'Lector de La Atalaya',
-            roleKey: 'fds_atalaya_lector',
-            assignmentPath: 'atalayaLectorId',
-            timeMinutes: 60,
-            status: 'confirmada',
-          });
-        }
-        if (w.weekend.finalPrayerId === pid) {
-          list.push({
-            id: `fds-finp-${w.id}`,
-            weekId: w.id,
-            date: w.weekend.date,
-            meetingType: 'weekend',
-            meetingName: 'Reunión del Fin de Semana',
-            assignmentTitle: 'Oración final (Fin de semana)',
-            roleKey: 'fds_oracion',
-            assignmentPath: 'finalPrayerId',
-            status: 'confirmada',
-          });
-        }
-
-        // Weekend Duties
-        Object.entries(w.weekend.duties).forEach(([dKey, ids]) => {
-          if (ids.includes(pid)) {
-            list.push({
-              id: `duty-fds-${w.id}-${dKey}`,
-              weekId: w.id,
-              date: w.weekend.date,
-              meetingType: 'weekend',
-              meetingName: 'Reunión del Fin de Semana',
-              assignmentTitle: `Deber: ${dKey.replace('deber_', '').toUpperCase()}`,
-              roleKey: dKey,
-              assignmentPath: `weekend_duty_${dKey}`,
-              status: 'confirmada',
-            });
-          }
-        });
-      }
+      if (w.weekStartDate) set.add(w.weekStartDate.slice(0, 7));
+      if (w.midweek?.date) set.add(w.midweek.date.slice(0, 7));
+      if (w.weekend?.date) set.add(w.weekend.date.slice(0, 7));
     });
+    return Array.from(set).sort();
+  }, [weeks]);
 
-    return list.sort((a, b) => a.date.localeCompare(b.date));
-  }, [selectedPublisherId, weeks, publishersMap]);
+  // Extraer todas las asignaciones unificadas (VMC, Fin de Semana, Audio/Micrófonos/Acomodadores, Limpieza, Carritos, Orador Saliente, Hospitalidad)
+  const myUnifiedAssignmentsAll = useMemo(() => {
+    if (!selectedPublisher) return [];
+    return extractUnifiedAssignmentsForPublisher(
+      selectedPublisher,
+      {
+        publishers,
+        publishersMap,
+        weeks,
+        settings,
+        preachingGroups,
+        customDuties,
+        cartShifts,
+        cartLocations,
+        outgoingSpeakers,
+        fieldServiceMeetings,
+        circuitVisit,
+      },
+      unifiedMonthFilter
+    );
+  }, [
+    selectedPublisher,
+    publishers,
+    publishersMap,
+    weeks,
+    settings,
+    preachingGroups,
+    customDuties,
+    cartShifts,
+    cartLocations,
+    outgoingSpeakers,
+    fieldServiceMeetings,
+    circuitVisit,
+    unifiedMonthFilter,
+  ]);
+
+  const myAssignments = useMemo(() => {
+    const filtered =
+      unifiedCategoryFilter === 'todas'
+        ? myUnifiedAssignmentsAll
+        : myUnifiedAssignmentsAll.filter((a) => a.category === unifiedCategoryFilter);
+
+    return filtered.map((u) => ({
+      id: u.id,
+      weekId: u.weekId || '',
+      date: u.date,
+      time: u.time,
+      meetingType: u.meetingType || 'midweek',
+      meetingName: u.meetingOrVenue,
+      assignmentTitle: u.title,
+      subtitle: u.subtitle,
+      category: u.category,
+      categoryLabel: u.categoryLabel,
+      roleKey: u.category,
+      assignmentPath: u.assignmentPath || '',
+      room: u.room,
+      assistantName: u.partnerName,
+      timeMinutes: u.durationMinutes,
+      status: u.status,
+      canConfirmInPortal: Boolean(u.canConfirmInPortal && u.weekId && u.assignmentPath),
+      familyAssignedSameDay: u.familyAssignedSameDay,
+      rawUnified: u,
+    }));
+  }, [myUnifiedAssignmentsAll, unifiedCategoryFilter]);
+
+  // Acciones de la Hoja Unificada Mensual (KHS)
+  const handleDownloadAllUnifiedIcs = () => {
+    if (!selectedPublisher || myUnifiedAssignmentsAll.length === 0) return;
+    downloadPublisherUnifiedIcs(
+      selectedPublisher,
+      unifiedMonthFilter,
+      myUnifiedAssignmentsAll,
+      settings
+    );
+    setNotifSuccessToast(
+      `Calendario (.ics) con ${myUnifiedAssignmentsAll.length} asignaciones descargado con alarmas automáticas.`
+    );
+    setTimeout(() => setNotifSuccessToast(null), 4000);
+  };
+
+  const handleSendUnifiedMonthlyWhatsApp = () => {
+    if (!selectedPublisher || myUnifiedAssignmentsAll.length === 0) return;
+    const msg = formatUnifiedMonthlyWhatsAppMessage(
+      selectedPublisher,
+      unifiedMonthFilter,
+      myUnifiedAssignmentsAll,
+      settings.congregationName
+    );
+    openWhatsAppLink(selectedPublisher.phone || '', msg);
+  };
+
+  const handleCopyUnifiedMonthlySummary = () => {
+    if (!selectedPublisher || myUnifiedAssignmentsAll.length === 0) return;
+    const msg = formatUnifiedMonthlyWhatsAppMessage(
+      selectedPublisher,
+      unifiedMonthFilter,
+      myUnifiedAssignmentsAll,
+      settings.congregationName
+    );
+    navigator.clipboard.writeText(msg);
+    setCopiedSummaryToast(true);
+    setTimeout(() => setCopiedSummaryToast(false), 2500);
+  };
+
+  const handlePrintUnifiedMonthlySheet = () => {
+    if (!selectedPublisher || myUnifiedAssignmentsAll.length === 0) return;
+    printPublisherUnifiedMonthlySheet(
+      selectedPublisher,
+      unifiedMonthFilter,
+      myUnifiedAssignmentsAll,
+      settings
+    );
+  };
 
   // Handle assignment status confirmation
   const handleUpdateStatus = (
@@ -900,7 +717,7 @@ export const PersonalViewTab: React.FC = () => {
     assignmentPath: string,
     newStatus: AssignmentStatus
   ) => {
-    if (!selectedPublisherId) return;
+    if (!selectedPublisherId || !weekId || !assignmentPath) return;
     replaceAssignment(weekId, meetingType, assignmentPath, selectedPublisherId, newStatus);
   };
 
@@ -908,11 +725,14 @@ export const PersonalViewTab: React.FC = () => {
   const copyAssignmentDetails = (item: any) => {
     const text =
       `Asignación teocrática:\n` +
-      `📅 Fecha: ${item.date}\n` +
-      `🏛 Reunión: ${item.meetingName}\n` +
-      `📌 Tarea: ${item.assignmentTitle}` +
+      `📅 Fecha: ${item.date} (${item.time || ''})\n` +
+      `🏛 Lugar / Reunión: ${item.meetingName}\n` +
+      `📌 Privilegio: ${item.assignmentTitle}` +
       (item.room ? `\nSala: ${item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}` : '') +
-      (item.assistantName ? `\n${item.assistantName}` : '');
+      (item.assistantName ? `\n${item.assistantName}` : '') +
+      (item.familyAssignedSameDay?.length
+        ? `\n👨‍👩‍👧‍👦 Familiar asignado hoy: ${item.familyAssignedSameDay.join(', ')}`
+        : '');
 
     navigator.clipboard.writeText(text);
     setCopiedId(item.id);
@@ -922,10 +742,11 @@ export const PersonalViewTab: React.FC = () => {
   // Google Calendar URL generator
   const getGoogleCalLink = (item: any) => {
     const time =
-      item.meetingType === 'midweek'
+      item.time ||
+      (item.meetingType === 'midweek'
         ? settings.midweekMeetingTime || '19:00'
-        : settings.weekendMeetingTime || '10:00';
-    const loc = settings.hallAddress || 'Salón del Reino de los Testigos de Jehová';
+        : settings.weekendMeetingTime || '10:00');
+    const loc = settings.hallAddress || item.meetingName || 'Salón del Reino de los Testigos de Jehová';
     const desc = `${item.assignmentTitle} - ${item.meetingName}. Asignado a ${selectedPublisher?.name || 'Publicador'}.`;
 
     return generateGoogleCalendarUrl(
@@ -941,10 +762,11 @@ export const PersonalViewTab: React.FC = () => {
   // Download .ics
   const handleDownloadIcs = (item: any) => {
     const time =
-      item.meetingType === 'midweek'
+      item.time ||
+      (item.meetingType === 'midweek'
         ? settings.midweekMeetingTime || '19:00'
-        : settings.weekendMeetingTime || '10:00';
-    const loc = settings.hallAddress || 'Salón del Reino de los Testigos de Jehová';
+        : settings.weekendMeetingTime || '10:00');
+    const loc = settings.hallAddress || item.meetingName || 'Salón del Reino de los Testigos de Jehová';
     const desc = `${item.assignmentTitle} - ${item.meetingName}.`;
 
     downloadSingleIcsEvent(
@@ -961,14 +783,17 @@ export const PersonalViewTab: React.FC = () => {
   const handleShareAssignmentWhatsApp = (item: any) => {
     const text =
       `*Mi Asignación Teocrática* 🏛\n` +
-      `📅 *Fecha:* ${item.date}\n` +
-      `📖 *Reunión:* ${item.meetingName}\n` +
+      `📅 *Fecha:* ${item.date} (${item.time || ''})\n` +
+      `📖 *Reunión / Área:* ${item.meetingName}\n` +
       `📌 *Parte:* ${item.assignmentTitle}` +
       (item.room ? `\n🏛 *Sala:* ${item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}` : '') +
       (item.assistantName ? `\n👥 ${item.assistantName}` : '') +
+      (item.familyAssignedSameDay?.length
+        ? `\n👨‍👩‍👧‍👦 *Familiar asignado hoy:* ${item.familyAssignedSameDay.join(', ')}`
+        : '') +
       `\n\n_Portal del Publicador Kongre_`;
 
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    openWhatsAppLink('', text);
   };
 
   // 1. PIN LOGIN SCREEN (If not authenticated as publisher and not supervisor)
@@ -1392,29 +1217,146 @@ export const PersonalViewTab: React.FC = () => {
 
       {/* 2.3 CONTENIDO DEL MÓDULO SELECCIONADO */}
 
-      {/* MÓDULO 1: MIS ASIGNACIONES */}
+      {/* MÓDULO 1: MIS ASIGNACIONES (HOJA UNIFICADA DEL MES KHS + CALENDARIO .ICS + WHATSAPP ÚNICO) */}
       {activeModule === 'asignaciones' && (
         <div className="space-y-4">
+          {/* BARRA MAESTRA KHS: HOJA UNIFICADA DE MIS ASIGNACIONES DEL MES */}
+          <div className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3.5">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
+                    <Layers size={11} /> Hoja Personal Unificada KHS
+                  </span>
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    VMC • Fin de Semana • Audio/Acomodadores • Limpieza • Carritos
+                  </span>
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                  Mis Asignaciones del Mes ({myUnifiedAssignmentsAll.length})
+                </h3>
+              </div>
+
+              {/* Botones de Exportación Unificada (.ics, WhatsApp único, Impresión) */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleDownloadAllUnifiedIcs}
+                  disabled={myUnifiedAssignmentsAll.length === 0}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                  title="Descargar todas tus asignaciones en un solo archivo .ics con recordatorios para Google/Apple/Outlook Calendar"
+                >
+                  <Download size={14} />
+                  <span>Exportar Calendario (.ics)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSendUnifiedMonthlyWhatsApp}
+                  disabled={myUnifiedAssignmentsAll.length === 0}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                  title="Enviar un único resumen consolidado por WhatsApp con todas las partes del mes"
+                >
+                  <MessageCircle size={14} />
+                  <span>Resumen Único WhatsApp</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCopyUnifiedMonthlySummary}
+                  disabled={myUnifiedAssignmentsAll.length === 0}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 disabled:opacity-40 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer"
+                  title="Copiar resumen mensual al portapapeles"
+                >
+                  {copiedSummaryToast ? (
+                    <Check size={14} className="text-emerald-600" />
+                  ) : (
+                    <Copy size={14} />
+                  )}
+                  <span>{copiedSummaryToast ? '¡Resumen Copiado!' : 'Copiar Mes'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handlePrintUnifiedMonthlySheet}
+                  disabled={myUnifiedAssignmentsAll.length === 0}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 disabled:opacity-40 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer"
+                  title="Imprimir o guardar en PDF tu Hoja Personal de Asignaciones del Mes"
+                >
+                  <Printer size={14} />
+                  <span className="hidden sm:inline">Imprimir Hoja</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Filtros por Mes y por Área Teocrática */}
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+                {(
+                  [
+                    { id: 'todas', label: 'Todas las áreas' },
+                    { id: 'vym', label: '📖 Vida y Min.' },
+                    { id: 'fin_de_semana', label: '🏛️ Fin de Semana' },
+                    { id: 'deberes', label: '🎧 Audio / Acomodador' },
+                    { id: 'limpieza', label: '🧹 Limpieza' },
+                    { id: 'carritos', label: '🛒 Carritos' },
+                    { id: 'servicio_campo', label: '🧭 Salidas al Campo' },
+                  ] as const
+                ).map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setUnifiedCategoryFilter(cat.id as any)}
+                    className={`px-2.5 py-1 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer ${
+                      unifiedCategoryFilter === cat.id
+                        ? 'bg-purple-600 text-white shadow-2xs'
+                        : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2 ml-auto">
+                <label className="text-[11px] font-bold text-slate-500">Periodo:</label>
+                <select
+                  value={unifiedMonthFilter}
+                  onChange={(e) => setUnifiedMonthFilter(e.target.value)}
+                  className="px-2.5 py-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-slate-800 dark:text-white focus:outline-hidden"
+                >
+                  <option value="all_upcoming">Todas las semanas cargadas</option>
+                  {availableAssignmentMonths.map((mKey) => (
+                    <option key={mKey} value={mKey}>
+                      {formatSpanishMonthLabel(mKey)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
           {myAssignments.length === 0 ? (
             <div className="p-8 sm:p-12 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-3">
               <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-7 h-7" />
               </div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                No tienes asignaciones pendientes en el programa
+                No tienes asignaciones en el filtro seleccionado
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                Todas las semanas registradas están al día y no figuran tareas asignadas para tu perfil.
+                Prueba seleccionando «Todas las áreas» o «Todas las semanas cargadas» para ver el programa completo.
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               <div className="flex items-center justify-between px-2">
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  {myAssignments.length} {myAssignments.length === 1 ? 'asignación programada' : 'asignaciones programadas'}
+                  Mostrando {myAssignments.length}{' '}
+                  {myAssignments.length === 1 ? 'asignación programada' : 'asignaciones programadas'}
                 </p>
                 <span className="text-[11px] text-slate-400">
-                  Haz clic en Google Calendar o WhatsApp para sincronizar o avisar
+                  Sincroniza con tu calendario o confirma asistencia en 1 clic
                 </span>
               </div>
 
@@ -1433,10 +1375,10 @@ export const PersonalViewTab: React.FC = () => {
                         <div className="flex items-center justify-between gap-2 flex-wrap">
                           <span className="flex items-center gap-1.5 text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/70 px-2.5 py-1 rounded-xl border border-purple-100 dark:border-purple-800/60">
                             <Calendar className="w-3.5 h-3.5" />
-                            {item.date}
+                            {item.date} {item.time ? `• ${item.time}` : ''}
                           </span>
-                          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
-                            {item.meetingName}
+                          <span className="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                            {item.categoryLabel || item.meetingName}
                           </span>
                           {item.room && (
                             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
@@ -1450,16 +1392,32 @@ export const PersonalViewTab: React.FC = () => {
                           <h4 className="text-base font-bold text-slate-900 dark:text-white leading-snug">
                             {item.assignmentTitle}
                           </h4>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                            {item.meetingName}
+                          </p>
+                          {item.subtitle && (
+                            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
+                              {item.subtitle}
+                            </p>
+                          )}
                           {item.assistantName && (
                             <p className="text-xs font-semibold text-purple-700 dark:text-purple-300 mt-1 flex items-center gap-1">
                               <Users size={12} />
                               <span>{item.assistantName}</span>
                             </p>
                           )}
+                          {item.familyAssignedSameDay && item.familyAssignedSameDay.length > 0 && (
+                            <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded-xl border border-emerald-200/60 dark:border-emerald-800/50 mt-1.5 inline-flex items-center gap-1.5">
+                              <Users size={12} />
+                              <span>
+                                👨‍👩‍👧‍👦 También participa hoy: {item.familyAssignedSameDay.join(', ')}
+                              </span>
+                            </p>
+                          )}
                           {item.timeMinutes && (
-                            <p className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+                            <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
                               <Clock size={12} />
-                              <span>Tiempo estimado: {item.timeMinutes} minutos</span>
+                              <span>Duración estimada: {item.timeMinutes} minutos</span>
                             </p>
                           )}
                         </div>
@@ -1495,46 +1453,52 @@ export const PersonalViewTab: React.FC = () => {
                       {/* Botones de acción rápida */}
                       <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 flex-wrap">
                         {/* Confirmar / Rechazar */}
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleUpdateStatus(
-                                item.weekId,
-                                item.meetingType,
-                                item.assignmentPath,
-                                'confirmada'
-                              )
-                            }
-                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                              isConfirmed
-                                ? 'bg-emerald-600 text-white shadow-xs'
-                                : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                            }`}
-                          >
-                            <Check size={12} />
-                            <span>Confirmar</span>
-                          </button>
+                        {item.canConfirmInPortal ? (
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleUpdateStatus(
+                                  item.weekId,
+                                  item.meetingType,
+                                  item.assignmentPath,
+                                  'confirmada'
+                                )
+                              }
+                              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                                isConfirmed
+                                  ? 'bg-emerald-600 text-white shadow-xs'
+                                  : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                              }`}
+                            >
+                              <Check size={12} />
+                              <span>Confirmar</span>
+                            </button>
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setDeclineModalState({
-                                isOpen: true,
-                                assignment: item,
-                                reason: '',
-                              })
-                            }
-                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                              isRejected
-                                ? 'bg-rose-600 text-white shadow-xs'
-                                : 'bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-600 hover:text-rose-600 dark:text-slate-400'
-                            }`}
-                          >
-                            <XCircle size={12} />
-                            <span>No podré</span>
-                          </button>
-                        </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setDeclineModalState({
+                                  isOpen: true,
+                                  assignment: item,
+                                  reason: '',
+                                })
+                              }
+                              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                                isRejected
+                                  ? 'bg-rose-600 text-white shadow-xs'
+                                  : 'bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-600 hover:text-rose-600 dark:text-slate-400'
+                              }`}
+                            >
+                              <XCircle size={12} />
+                              <span>No podré</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-[11px] text-slate-400 font-medium">
+                            Programación general
+                          </span>
+                        )}
 
                         {/* Exportar / Compartir */}
                         <div className="flex items-center gap-1">
@@ -1981,6 +1945,56 @@ export const PersonalViewTab: React.FC = () => {
                 <p className="text-[11px] text-slate-500">
                   Consulta al superintendente de servicio para tu asignación de grupo.
                 </p>
+              </div>
+            )}
+
+            {/* Salidas de Predicación del Grupo y Congregación (KHS) */}
+            {fieldServiceMeetings.length > 0 && (
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                    🧭 Programa de Salidas al Servicio del Campo
+                  </h4>
+                  <span className="text-[10px] font-semibold text-slate-400">
+                    Tu grupo y salidas generales
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {fieldServiceMeetings
+                    .filter(
+                      (m) =>
+                        !m.groupNumber ||
+                        (myPreachingGroup && m.groupNumber === myPreachingGroup.number)
+                    )
+                    .slice(0, 8)
+                    .map((fsm) => {
+                      const cond = fsm.conductorId
+                        ? publishersMap.get(fsm.conductorId)
+                        : undefined;
+                      return (
+                        <div
+                          key={fsm.id}
+                          className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 text-xs space-y-1"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-extrabold text-indigo-700 dark:text-indigo-300">
+                              {fsm.dayOfWeek} {fsm.date ? `(${fsm.date})` : ''} • {fsm.time}
+                            </span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-800 dark:text-indigo-300">
+                              {fsm.groupNumber ? `Grupo ${fsm.groupNumber}` : 'General'}
+                            </span>
+                          </div>
+                          <p className="text-slate-700 dark:text-slate-200 font-semibold">
+                            📍 {fsm.location}
+                          </p>
+                          <p className="text-[11px] text-slate-500">
+                            👤 Conductor: <strong>{cond?.name || 'Por asignar'}</strong>
+                            {fsm.territoryNumber ? ` • 🗺 #${fsm.territoryNumber}` : ''}
+                          </p>
+                        </div>
+                      );
+                    })}
+                </div>
               </div>
             )}
           </div>

@@ -3,6 +3,12 @@ import type { Publisher, ClmParte, ClmPrograma, WeekSchedule, OutgoingSpeakerAss
 import { isPublisherEligibleForPart } from '../utils/clmAutoAssignLocal';
 import { checkPublisherConflictsOnDate } from '../utils/assignmentConflictChecker';
 import {
+  arePublishersFamily,
+  getAssignedFamilyMembersInMeeting,
+  getPubDisplayName,
+  isValidDemonstrationPair,
+} from '../utils/familyGrouping';
+import {
   X,
   ArrowRightLeft,
   Search,
@@ -87,6 +93,23 @@ export const ClmReplacementModal: React.FC<ClmReplacementModalProps> = ({
   // Candidatos elegibles ordenados por conveniencia
   const eligibleCandidates = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
+    const assignedInMeetingSet = new Set<string>();
+    for (const pItem of programa.partes) {
+      if (pItem.asignado_nid) assignedInMeetingSet.add(pItem.asignado_nid);
+      if (pItem.asignado_auxiliar_nid) assignedInMeetingSet.add(pItem.asignado_auxiliar_nid);
+    }
+
+    const companionId =
+      part.seccion === 'maestros' &&
+      part.tipo !== 'discurso_estudiante' &&
+      part.tipo !== 'lectura_biblica'
+        ? targetType === 'assistant'
+          ? part.asignado_nid
+          : part.asignado_auxiliar_nid
+        : undefined;
+    const companionPub = companionId
+      ? publishers.find((p) => (p.nid || p.id) === companionId)
+      : undefined;
 
     return publishers
       .filter((p) => {
@@ -100,6 +123,11 @@ export const ClmReplacementModal: React.FC<ClmReplacementModalProps> = ({
 
         // Comprobar elegibilidad teocrática (género, privilegio, etc.)
         if (!isPublisherEligibleForPart(p, part, targetType)) return false;
+
+        // Validar pauta S-38 en demostraciones: mismo género o familiar directo
+        if (companionPub && !isValidDemonstrationPair(companionPub, p, true)) {
+          return false;
+        }
 
         // Filtro de búsqueda
         if (term) {
@@ -123,11 +151,23 @@ export const ClmReplacementModal: React.FC<ClmReplacementModalProps> = ({
           part.id
         );
 
+        const assignedFamily = getAssignedFamilyMembersInMeeting(
+          p,
+          assignedInMeetingSet,
+          publishers
+        );
+        const familyNames = assignedFamily.map((f) => getPubDisplayName(f));
+        const isCompanionFamily = companionPub
+          ? arePublishersFamily(companionPub, p)
+          : false;
+
         return {
           publisher: p,
           hasStrictConflict: conflictRes.hasStrictConflict,
           conflicts: conflictRes.conflicts,
           weeksAgo: publisherRotationMap.get(pId) || 0,
+          familyNames,
+          isCompanionFamily,
         };
       })
       .sort((a, b) => {
@@ -139,7 +179,19 @@ export const ClmReplacementModal: React.FC<ClmReplacementModalProps> = ({
         if (a.conflicts.length !== b.conflicts.length) {
           return a.conflicts.length - b.conflicts.length;
         }
-        // 3. Orden alfabético
+        // 3. Si es familiar del compañero de demostración, priorizar
+        if (a.isCompanionFamily !== b.isCompanionFamily) {
+          return a.isCompanionFamily ? -1 : 1;
+        }
+        // 4. Agrupación Familiar KHS (familiar ya asignado esta misma noche)
+        const hasFamA =
+          a.publisher.groupWithFamilyInMeetings !== false && a.familyNames.length > 0;
+        const hasFamB =
+          b.publisher.groupWithFamilyInMeetings !== false && b.familyNames.length > 0;
+        if (hasFamA !== hasFamB) {
+          return hasFamA ? -1 : 1;
+        }
+        // 5. Orden alfabético
         return (a.publisher.full_name || a.publisher.name).localeCompare(
           b.publisher.full_name || b.publisher.name
         );
@@ -379,7 +431,7 @@ export const ClmReplacementModal: React.FC<ClmReplacementModalProps> = ({
                   No se encontraron candidatos elegibles libres para esta parte con ese filtro.
                 </div>
               ) : (
-                eligibleCandidates.map(({ publisher: cand, hasStrictConflict, conflicts }) => (
+                eligibleCandidates.map(({ publisher: cand, hasStrictConflict, conflicts, familyNames, isCompanionFamily }) => (
                   <div
                     key={cand.id || cand.nid}
                     className={`p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
@@ -398,6 +450,16 @@ export const ClmReplacementModal: React.FC<ClmReplacementModalProps> = ({
                         {cand.privilege && (
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-zinc-300">
                             {cand.privilege}
+                          </span>
+                        )}
+                        {isCompanionFamily && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">
+                            Familiar del compañero(a)
+                          </span>
+                        )}
+                        {familyNames && familyNames.length > 0 && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-950/70 dark:text-indigo-300">
+                            Familiar hoy: {familyNames[0]}
                           </span>
                         )}
                         {cand.groupNumber && (

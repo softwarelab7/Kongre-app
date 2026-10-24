@@ -440,7 +440,11 @@ const AppContent: React.FC = () => {
     const initialModal = hashInfo?.modal || null;
 
     if (isLanding) {
-      window.history.replaceState({ tab: activeTab, modal: null, landing: true }, '', '#portal');
+      const currentHash = window.location.hash || '';
+      const landingHash = (currentHash.startsWith('#portal') || currentHash.startsWith('#bienvenida'))
+        ? currentHash
+        : '#portal';
+      window.history.replaceState({ tab: activeTab, modal: null, landing: true }, '', landingHash);
     } else {
       let initialHash = `#${activeTab}`;
       const params = new URLSearchParams();

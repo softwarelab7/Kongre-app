@@ -311,20 +311,33 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
   const [activeTab, setRawActiveTab] = useState<'home' | 'email_login' | 'code_login' | 'invite_code_login' | 'register' | 'unauthorized'>(() => {
     if (typeof window !== 'undefined') {
-      const pendingView = sessionStorage.getItem('kongre_pending_oauth_view');
-      if (pendingView && ['home', 'email_login', 'code_login', 'invite_code_login', 'register', 'unauthorized'].includes(pendingView)) {
-        return pendingView as any;
-      }
-      const hash = window.location.hash;
+      const hash = window.location.hash || '';
       const hashParams = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
-      const searchParams = new URLSearchParams(window.location.search);
-      const v = (hashParams.get('view') || searchParams.get('view')) as any;
-      if (['home', 'email_login', 'code_login', 'invite_code_login', 'register', 'unauthorized'].includes(v)) {
-        return v;
+      const searchParams = new URLSearchParams(window.location.search || '');
+      const explicitView = (hashParams.get('view') || searchParams.get('view')) as any;
+
+      // 1. Explicit view parameter in the URL takes top priority
+      if (explicitView && ['home', 'email_login', 'code_login', 'invite_code_login', 'register', 'unauthorized'].includes(explicitView)) {
+        return explicitView;
       }
-      if (hash.includes('access_token') || window.location.search.includes('code=')) {
+
+      // 2. OAuth tokens in hash or search (returning from OAuth provider callback)
+      const hasAuthTokens = hash.includes('access_token') ||
+        window.location.search.includes('code=') ||
+        hash.includes('error=') ||
+        window.location.search.includes('error=');
+
+      if (hasAuthTokens) {
+        const pendingView = sessionStorage.getItem('kongre_pending_oauth_view');
+        if (pendingView && ['home', 'email_login', 'code_login', 'invite_code_login', 'register', 'unauthorized'].includes(pendingView)) {
+          return pendingView as any;
+        }
         return 'email_login';
       }
+
+      // 3. User is at #portal or has no explicit sub-view; clean up any stale pending oauth view
+      sessionStorage.removeItem('kongre_pending_oauth_view');
+      return 'home';
     }
     return 'home';
   });
@@ -332,6 +345,13 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   const setActiveTab = useCallback((nextTabOrFn: any) => {
     setRawActiveTab((prev: any) => {
       const nextTab = typeof nextTabOrFn === 'function' ? nextTabOrFn(prev) : nextTabOrFn;
+      if (typeof window !== 'undefined') {
+        if (nextTab === 'email_login') {
+          sessionStorage.setItem('kongre_pending_oauth_view', 'email_login');
+        } else {
+          sessionStorage.removeItem('kongre_pending_oauth_view');
+        }
+      }
       if (nextTab === prev) return prev;
       const hash = nextTab === 'home' ? '#portal' : `#portal?view=${nextTab}`;
       window.history.pushState({ landing: true, view: nextTab }, '', hash);
@@ -360,15 +380,25 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
   useEffect(() => {
     const onPop = (e: PopStateEvent) => {
-      const hash = window.location.hash;
+      const hash = window.location.hash || '';
       if (hash.startsWith('#portal') || hash.startsWith('#bienvenida') || hash.includes('access_token')) {
         const hashParams = new URLSearchParams(hash.includes('?') ? hash.split('?')[1] : '');
-        const searchParams = new URLSearchParams(window.location.search);
+        const searchParams = new URLSearchParams(window.location.search || '');
         const v = (hashParams.get('view') || searchParams.get('view') || e.state?.view || 'home') as any;
         if (['home', 'email_login', 'code_login', 'invite_code_login', 'register', 'unauthorized'].includes(v)) {
           setRawActiveTab(v);
+          if (typeof window !== 'undefined') {
+            if (v === 'email_login') {
+              sessionStorage.setItem('kongre_pending_oauth_view', 'email_login');
+            } else {
+              sessionStorage.removeItem('kongre_pending_oauth_view');
+            }
+          }
         } else {
           setRawActiveTab('home');
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('kongre_pending_oauth_view');
+          }
         }
       }
     };

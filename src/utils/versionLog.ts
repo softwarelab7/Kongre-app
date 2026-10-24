@@ -25,18 +25,41 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.7';
-export const CURRENT_BUILD_CODE = '2026.10.23.5800';
+export const CURRENT_APP_VERSION = '2.12.8';
+export const CURRENT_BUILD_CODE = '2026.10.23.5900';
 export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.8',
+    buildCode: '2026.10.23.5900',
+    date: '23 de Octubre, 2026',
+    title: 'Sincronización Precisa de Historial y Vistas en Portal de Bienvenida',
+    isCurrent: true,
+    highlight: 'Corrección de persistencia de sub-vista de Google al recargar #portal y preservación de parámetros de vista en el hash de navegación',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'fix',
+        text: 'Prioridad de URL sobre sessionStorage: En CongregationWelcomeLanding, el parámetro explícito ?view= en el hash o search params tiene prioridad estricta sobre kongre_pending_oauth_view. Al refrescar o navegar en #portal sin sub-vista, se purgan vistas temporales obsoletas y se muestra siempre la vista de inicio.',
+      },
+      {
+        category: 'fix',
+        text: 'Preservación de sub-vistas en historial: En App.tsx, la sincronización inicial de historial no sobreescribe ciegamente sub-vistas legítimas (como #portal?view=email_login) con #portal, manteniendo la URL y la interfaz perfectamente alineadas.',
+      },
+      {
+        category: 'improvement',
+        text: 'Higiene de sesión OAuth: Limpieza inmediata de kongre_pending_oauth_view al volver al inicio del portal o al retroceder con el botón Atrás del navegador.',
+      },
+    ],
+  },
+  {
     version: '2.12.7',
     buildCode: '2026.10.23.5800',
     date: '23 de Octubre, 2026',
     title: 'Auditoría Profunda de Seguridad: Mitigación de DoS en Rate Limits, Purga de PIN en Texto Plano y Blindaje Anti-Bypass',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Prevención de fuga de PIN de sesión en vista personal, anti-agotamiento en tabla sync_rate_limits, sincronización segura kgr_v2 y blindaje de firmas de rol con entropía de dispositivo',
     environment: 'Producción Cloud (Kongre)',
     changes: [

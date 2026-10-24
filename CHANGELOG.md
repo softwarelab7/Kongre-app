@@ -6,6 +6,19 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.8] — 23 de Octubre, 2026
+**Navegación Fluida en el Portal y Corrección en Menú de Google**
+
+- 🧭 **Sincronización Precisa de Pantalla y Enlace:**
+  - Se corrigió un problema donde refrescar la página en `#portal` mostraba la pantalla de inicio con Google en lugar del portal principal.
+  - La barra de direcciones ahora refleja exactamente la opción en la que te encuentras (Google, Conectar con ID y PIN, o Invitación) y permite retroceder o refrescar sin perder tu ubicación.
+- 🧹 **Higiene de Sesión:**
+  - Al pulsar "Volver" o usar las flechas del navegador para regresar al portal de bienvenida, las pantallas temporales de inicio de sesión se limpian de inmediato.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.7] — 23 de Octubre, 2026
 **Blindaje de Privacidad en Vista Personal, Cierre por Inactividad y Protección del Sistema**
 

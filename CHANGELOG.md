@@ -50,9 +50,11 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
   - Implementación de `isSafeDemoMode()`, que valida que el modo de demostración solo pueda activarse en congregaciones no registradas o de prueba (`DEMO`).
   - Si el usuario se encuentra en una congregación real registrada, cualquier intento de inyección manual de `kongre_demo_mode=true` en DevTools es automáticamente purgado y deshabilitado, impidiendo la elusión de la pantalla de bloqueo (`SessionLockModal`) o la falsificación de perfiles en `AuthContext.tsx`.
   - Integración exhaustiva de `isSafeDemoMode()` en `SecurityContext.tsx` (`isDemoSession` e `isLocked`), `AuthContext.tsx` (`userProfile` y perfiles locales), `supabaseSyncService.ts` (`isDemoModeActive`), `OfflineSyncBadge.tsx` y `OfflineSyncQueueModal.tsx`.
-- **Firma de Rol v2 Ligada a Entropía del Dispositivo:**
-  - `signRoleSession` y `verifyRoleSessionSignature` actualizados a `role_sig_v2`, combinando el rol, roles secundarios, constante criptográfica y la sal de hardware/dispositivo (`getDeviceEntropySalt()`).
-  - Migración automática de firmas v1 a v2 al iniciar sesión.
+- **Firma de Rol v2 Ligada a Entropía del Dispositivo y Congregación:**
+  - `signRoleSession` y `verifyRoleSessionSignature` actualizados a `role_sig_v2`, combinando el rol primario, roles secundarios, identificador canónico de la congregación activa, constante criptográfica interna y la sal de hardware/dispositivo (`getDeviceEntropySalt()`).
+  - **Prevención de Escalada Cruzada:** Una firma válida generada en una congregación (ej. demostración o local) es rechazada automáticamente si se intenta reutilizar en otra congregación dentro del mismo navegador.
+  - **Migración Fluida:** Reconocimiento y auto-actualización inmediata de firmas legadas v1 y v2 sin requerir re-autenticación del usuario.
+  - **Re-firma Segura:** La auto-re-firma condicionada se restringe estrictamente a sesiones donde el PIN activo coincide con un PIN de Coordinador verificado de 4 a 8 dígitos.
 - **Protección contra Tablas Arcoíris en Registro de Auditoría:**
   - `sanitizeActorNid` ahora incorpora la sal de entropía del dispositivo al calcular el identificador anónimo de actores que ingresan con PIN, impidiendo ataques de inversión mediante tablas arcoíris precalculadas de 10.000 combinaciones.
 

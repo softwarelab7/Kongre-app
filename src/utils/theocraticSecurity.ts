@@ -1504,26 +1504,35 @@ export function verifySecureLocalPin(key: string, candidatePin?: string | null):
  * impidiendo la escalada de privilegios mediante edición manual de `kongre_active_role_v1` en DevTools.
  * Versión v2 ligada a entropía única del dispositivo y salt de hardware.
  */
-export function signRoleSession(role: string, roles?: string[]): void {
+export function signRoleSession(role: string, roles?: string[], congId?: string): void {
   if (typeof window === 'undefined') return;
   try {
     const normRole = (role || 'publico').trim().toLowerCase();
     const normRoles = Array.isArray(roles) && roles.length > 0
       ? roles.map((r) => String(r).trim().toLowerCase()).join(',')
       : normRole;
+    const cleanCong = String(
+      congId ||
+      (typeof localStorage !== 'undefined'
+        ? localStorage.getItem('kongre_canonical_cong_id') ||
+          localStorage.getItem('kongre_congregation_id') ||
+          localStorage.getItem('kongre_congregation_number')
+        : '') ||
+      ''
+    ).trim().toUpperCase();
     const deviceSalt = getDeviceEntropySalt();
-    // V2 ligado a entropía del dispositivo + constante interna
-    const sig = sha256HexSync(`role_sig_v2|${normRole}|${normRoles}|${deviceSalt}|${AT_REST_CIPHER_KEY}`);
+    // V2 ligado a rol, roles secundarios, congregación activa, entropía del dispositivo + constante interna
+    const sig = sha256HexSync(`role_sig_v2|${normRole}|${normRoles}|${cleanCong}|${deviceSalt}|${AT_REST_CIPHER_KEY}`);
     localStorage.setItem(ROLE_SESSION_SIG_KEY, sig);
   } catch {}
 }
 
 /**
  * Verifica la firma de la sesión de rol activa en localStorage.
- * Soporta role_sig_v2 (preferente) y retrocompatibilidad con migración automática desde role_sig_v1.
+ * Soporta role_sig_v2 (preferente con congregación ligada) y retrocompatibilidad con migración automática desde role_sig_v1 y v2 previo.
  * Protegido contra omisión fraudulenta mediante modo demo en congregaciones reales (isSafeDemoMode).
  */
-export function verifyRoleSessionSignature(role: string, roles?: string[]): boolean {
+export function verifyRoleSessionSignature(role: string, roles?: string[], congId?: string): boolean {
   if (typeof window === 'undefined') return true;
   try {
     const normRole = (role || 'publico').trim().toLowerCase();
@@ -1539,15 +1548,31 @@ export function verifyRoleSessionSignature(role: string, roles?: string[]): bool
     }
 
     const normRoles = normRolesList.join(',');
+    const cleanCong = String(
+      congId ||
+      (typeof localStorage !== 'undefined'
+        ? localStorage.getItem('kongre_canonical_cong_id') ||
+          localStorage.getItem('kongre_congregation_id') ||
+          localStorage.getItem('kongre_congregation_number')
+        : '') ||
+      ''
+    ).trim().toUpperCase();
     const deviceSalt = getDeviceEntropySalt();
-    const expectedSigV2 = sha256HexSync(`role_sig_v2|${normRole}|${normRoles}|${deviceSalt}|${AT_REST_CIPHER_KEY}`);
+
+    const expectedSigV2WithCong = sha256HexSync(`role_sig_v2|${normRole}|${normRoles}|${cleanCong}|${deviceSalt}|${AT_REST_CIPHER_KEY}`);
+    const expectedSigV2NoCong = sha256HexSync(`role_sig_v2|${normRole}|${normRoles}|${deviceSalt}|${AT_REST_CIPHER_KEY}`);
     const expectedSigV1 = sha256HexSync(`role_sig_v1|${normRole}|${normRoles}|${AT_REST_CIPHER_KEY}`);
     const storedSig = localStorage.getItem(ROLE_SESSION_SIG_KEY);
 
-    if (storedSig && (storedSig === expectedSigV2 || storedSig === expectedSigV1)) {
-      if (storedSig === expectedSigV1) {
-        // Migración transparente a v2
-        signRoleSession(normRole, normRolesList);
+    if (
+      storedSig &&
+      (storedSig === expectedSigV2WithCong ||
+        storedSig === expectedSigV2NoCong ||
+        storedSig === expectedSigV1)
+    ) {
+      if (storedSig !== expectedSigV2WithCong) {
+        // Migración transparente a v2 con congregación ligada
+        signRoleSession(normRole, normRolesList, cleanCong);
       }
       return true;
     }
@@ -1555,8 +1580,14 @@ export function verifyRoleSessionSignature(role: string, roles?: string[]): bool
     // Solo se re-firma si el PIN de sesión coincide estrictamente con el PIN verificado del Coordinador
     const sessionPin = getSecureLocalPin('kongre_session_pin_v2');
     const coordPin = getSecureLocalPin('kongre_coordinator_pin');
-    if (coordPin && sessionPin && normalizePersonalPinInput(coordPin) === normalizePersonalPinInput(sessionPin)) {
-      signRoleSession(normRole, normRolesList);
+    if (
+      coordPin &&
+      sessionPin &&
+      coordPin.length >= 4 &&
+      sessionPin.length >= 4 &&
+      normalizePersonalPinInput(coordPin) === normalizePersonalPinInput(sessionPin)
+    ) {
+      signRoleSession(normRole, normRolesList, cleanCong);
       return true;
     }
 

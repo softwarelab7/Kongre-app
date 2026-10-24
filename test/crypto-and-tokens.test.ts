@@ -231,12 +231,17 @@ test('firma de rol v2: ligada a entropía de dispositivo y retrocompatible con v
   // 1. Rol público siempre válido
   assert.equal(verifyRoleSessionSignature('publico', ['publico']), true);
 
-  // 2. Firma v2 para anciano
+  // 2. Firma v2 para anciano en congregación 10582
+  mockStorage.setItem('kongre_congregation_id', '10582');
   signRoleSession('anciano', ['anciano']);
   assert.equal(verifyRoleSessionSignature('anciano', ['anciano']), true);
 
   // 3. Intento de escalada en localStorage sin firma válida
   mockStorage.setItem('kongre_active_role_v1', 'coordinador');
   assert.equal(verifyRoleSessionSignature('coordinador', ['coordinador']), false, 'Firma no válida debe ser rechazada');
+
+  // 4. Intento de reutilización de firma en otra congregación (escalada cruzada)
+  mockStorage.setItem('kongre_congregation_id', '99999');
+  assert.equal(verifyRoleSessionSignature('anciano', ['anciano'], '99999'), false, 'Firma de una congregación no debe ser válida para otra');
 });
 

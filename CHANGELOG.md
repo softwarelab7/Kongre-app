@@ -55,8 +55,10 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
   - **Prevención de Escalada Cruzada:** Una firma válida generada en una congregación (ej. demostración o local) es rechazada automáticamente si se intenta reutilizar en otra congregación dentro del mismo navegador.
   - **Migración Fluida:** Reconocimiento y auto-actualización inmediata de firmas legadas v1 y v2 sin requerir re-autenticación del usuario.
   - **Re-firma Segura:** La auto-re-firma condicionada se restringe estrictamente a sesiones donde el PIN activo coincide con un PIN de Coordinador verificado de 4 a 8 dígitos.
-- **Protección contra Tablas Arcoíris en Registro de Auditoría:**
-  - `sanitizeActorNid` ahora incorpora la sal de entropía del dispositivo al calcular el identificador anónimo de actores que ingresan con PIN, impidiendo ataques de inversión mediante tablas arcoíris precalculadas de 10.000 combinaciones.
+- **Protección contra Tablas Arcoíris y Fuga en Registro de Auditoría:**
+  - `sanitizeActorNid` ahora incorpora la sal de entropía del dispositivo (`getDeviceEntropySalt()`) y el secreto encadenado de auditoría al calcular el identificador anónimo de actores que ingresan con PIN.
+  - Se extiende el reconocimiento automático para enmascarar tanto PINs numéricos (4 a 8 dígitos) como tokens cifrados en reposo (`kgr_v2:`, `kgr_v1:`, `:ctr`, `:mac`), impidiendo la inferencia de credenciales mediante tablas arcoíris precalculadas.
+  - **Depuración Automática de Detalles (`sanitizeAuditDetails`):** Filtro regex en tiempo real que enmascara automáticamente cadenas como `pin: 1234` o `clave = 5678` a `••••`, garantizando que ninguna acción registre PINs en texto plano dentro del historial de auditoría inmutable.
 
 ### [v2.12.6] - 23 de Octubre, 2026
 **Título:** Remediación Integral de Seguridad: Cifrado en Reposo CTR con Tag MAC, CSP Estricta sin Unsafe-Inline y Claves Ligadas a Entropía

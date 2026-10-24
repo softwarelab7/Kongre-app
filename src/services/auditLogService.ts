@@ -1,6 +1,6 @@
 // src/services/auditLogService.ts
 import { AuditLogEntry } from '../utils/rbac';
-import { sha256HexSync, getDeviceEntropySalt } from '../utils/theocraticSecurity';
+import { sha256HexSync, getDeviceEntropySalt, isEncryptedPinAtRest } from '../utils/theocraticSecurity';
 
 const LOCAL_STORAGE_AUDIT_LOG_KEY = 'kongre_audit_log_v1';
 const LOCAL_STORAGE_AUDIT_CHAIN_SIG_KEY = 'kongre_audit_log_chain_sig_v1';
@@ -9,18 +9,35 @@ const MAX_LOG_ENTRIES = 500;
 
 /**
  * Sanitiza el identificador del hermano para garantizar que jamás se almacene un PIN en texto plano
- * dentro del registro de auditoría. Salteado con entropía del dispositivo para impedir ataques de tablas arcoíris.
+ * ni un token cifrado dentro del registro de auditoría. Salteado con entropía del dispositivo para impedir ataques de tablas arcoíris.
  */
-function sanitizeActorNid(rawNid?: string): string {
+export function sanitizeActorNid(rawNid?: string): string {
   if (!rawNid) return 'anonimo';
   const clean = String(rawNid).trim();
-  if (!clean) return 'anonimo';
-  // Si parece un PIN numérico puro (4 a 8 dígitos) o un PIN estilo XXXX-XXXX, enmascararlo con hash salteado por dispositivo
-  if (/^\d{4,8}$/.test(clean) || /^[A-Z0-9]{4}-[A-Z0-9]{4}$/i.test(clean)) {
+  if (!clean || clean === '••••' || clean === '••••••••') return 'anonimo';
+  // Si parece un PIN numérico puro (4 a 8 dígitos), un token cifrado o un PIN estilo XXXX-XXXX,
+  // enmascararlo con hash salteado por dispositivo para evitar filtración y tablas arcoíris.
+  if (
+    /^\d{4,8}$/.test(clean) ||
+    /^[A-Z0-9]{4}-[A-Z0-9]{4}$/i.test(clean) ||
+    isEncryptedPinAtRest(clean) ||
+    clean.includes(':ctr') ||
+    clean.includes(':mac')
+  ) {
     const salt = getDeviceEntropySalt();
     return `id_${sha256HexSync(`${clean}:${salt}:${AUDIT_CHAIN_SECRET}`).slice(0, 10)}`;
   }
   return clean;
+}
+
+/**
+ * Enmascara cualquier PIN que pudiera haberse incluido inadvertidamente en el texto de detalles
+ */
+export function sanitizeAuditDetails(details?: string): string | undefined {
+  if (!details) return undefined;
+  return details
+    .replace(/\b(pin\s*[:=]\s*)(\d{4,8})\b/gi, '$1••••')
+    .replace(/\b(clave\s*[:=]\s*)(\d{4,8})\b/gi, '$1••••');
 }
 
 /**
@@ -92,7 +109,7 @@ export async function insertAuditLog(
       hermano_nombre: entry.hermano_nombre || undefined,
       modulo: entry.modulo,
       fecha: entry.fecha || new Date().toISOString(),
-      detalles: entry.detalles || undefined,
+      detalles: sanitizeAuditDetails(entry.detalles),
       prevHash,
     };
     newEntry.integrityHash = computeEntryIntegrityHash(newEntry, prevHash);

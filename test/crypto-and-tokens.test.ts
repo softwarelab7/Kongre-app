@@ -19,6 +19,7 @@ import {
   signRoleSession,
   verifyRoleSessionSignature,
 } from '../src/utils/theocraticSecurity.ts';
+import { sanitizeActorNid, sanitizeAuditDetails } from '../src/services/auditLogService.ts';
 
 test('cifrado: ida y vuelta con el formato actual', async () => {
   const data = { hola: 'mundo', n: [1, 2, 3] };
@@ -243,5 +244,29 @@ test('firma de rol v2: ligada a entropía de dispositivo y retrocompatible con v
   // 4. Intento de reutilización de firma en otra congregación (escalada cruzada)
   mockStorage.setItem('kongre_congregation_id', '99999');
   assert.equal(verifyRoleSessionSignature('anciano', ['anciano'], '99999'), false, 'Firma de una congregación no debe ser válida para otra');
+});
+
+test('auditoría: sanitización de actor NID y detalles contra tablas arcoíris y fuga de PIN', () => {
+  // 1. PIN numérico se saltea y se oculta
+  const maskedNumeric = sanitizeActorNid('1234');
+  assert.ok(maskedNumeric.startsWith('id_'), 'PIN numérico debe enmascararse con prefijo id_');
+  assert.notEqual(maskedNumeric, '1234');
+
+  // 2. PIN cifrado kgr_v2 se enmascara con prefijo id_
+  const maskedV2 = sanitizeActorNid('kgr_v2:nonce:mac:data');
+  assert.ok(maskedV2.startsWith('id_'));
+
+  // 3. Cadena anónima
+  assert.equal(sanitizeActorNid(''), 'anonimo');
+  assert.equal(sanitizeActorNid(undefined), 'anonimo');
+
+  // 4. Nombre o ID no sensible se preserva
+  assert.equal(sanitizeActorNid('carlos_mendoza'), 'carlos_mendoza');
+
+  // 5. Detalles con PIN se sanitizan
+  const cleanDetails = sanitizeAuditDetails('Acceso concedido con pin: 4821 para usuario');
+  assert.equal(cleanDetails, 'Acceso concedido con pin: •••• para usuario');
+  const cleanClave = sanitizeAuditDetails('Cambio de clave = 9876 exitoso');
+  assert.equal(cleanClave, 'Cambio de clave = •••• exitoso');
 });
 

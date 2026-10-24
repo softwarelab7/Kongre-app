@@ -23,6 +23,7 @@ import {
   isEncryptedPinAtRest,
   sanitizeInvitationsForPublicPayload,
   hashInvitationCode,
+  isSafeDemoMode,
 } from '../utils/theocraticSecurity';
 import {
   Publisher,
@@ -78,7 +79,7 @@ export function isDemoModeActive(congregationId?: string): boolean {
   }
   if (typeof window !== 'undefined') {
     if (
-      localStorage.getItem('kongre_demo_mode') === 'true' ||
+      isSafeDemoMode() ||
       localStorage.getItem('kongre_is_guest') === 'true'
     ) {
       return true;

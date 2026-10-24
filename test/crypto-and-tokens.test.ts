@@ -208,6 +208,13 @@ test('isSafeDemoMode: impide omisión de seguridad en congregaciones reales', ()
   mockStorage.setItem('kongre_congregation_number', '10582');
   assert.equal(isSafeDemoMode(), false, 'Debe invalidar demo mode en congregación real registrada');
   assert.equal(mockStorage.getItem('kongre_demo_mode'), null, 'Debe purgar la clave kongre_demo_mode');
+
+  // 4. Intento con ID KGR formal en congregación real
+  mockStorage.setItem('kongre_demo_mode', 'true');
+  mockStorage.setItem('kongre_is_registered_congregation', 'true');
+  mockStorage.setItem('kongre_congregation_id', 'KGR-8P2M-7X4W');
+  assert.equal(isSafeDemoMode(), false, 'Debe invalidar demo mode en ID canónico registrado');
+  assert.equal(mockStorage.getItem('kongre_demo_mode'), null);
 });
 
 test('firma de rol v2: ligada a entropía de dispositivo y retrocompatible con v1', () => {

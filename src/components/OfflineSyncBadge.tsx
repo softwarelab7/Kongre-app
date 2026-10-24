@@ -8,6 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import { Wifi, WifiOff, RefreshCw, Database, CloudCheck, CloudUpload } from 'lucide-react';
 import { getOfflineQueueStats, QueueStats } from '../services/indexedDbQueue';
+import { isSafeDemoMode } from '../utils/theocraticSecurity';
 
 interface OfflineSyncBadgeProps {
   isOnline: boolean;
@@ -52,7 +53,7 @@ export const OfflineSyncBadge: React.FC<OfflineSyncBadgeProps> = ({
   // En modo demo no hay conexión ni sincronización con Supabase
   const isDemo =
     typeof window !== 'undefined' &&
-    (localStorage.getItem('kongre_demo_mode') === 'true' ||
+    (isSafeDemoMode() ||
       localStorage.getItem('kongre_is_guest') === 'true');
 
   if (isDemo) {

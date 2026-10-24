@@ -44,6 +44,7 @@ import {
   recordFailedPinAttempt,
   resetFailedPinAttempts,
   verifyInvitationCodeMatch,
+  isSafeDemoMode,
 } from '../utils/theocraticSecurity';
 import { UserProfile, PreferredContactMethod, ContactTimePreference } from '../types';
 
@@ -191,7 +192,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
     try {
       const isDemo =
-        typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true';
+        typeof window !== 'undefined' && isSafeDemoMode();
 
       if (isDemo) {
         const demoCached = localStorage.getItem('kongre_demo_user_profile');
@@ -1127,7 +1128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Cargar el documento de perfil del usuario desde almacenamiento local y caché
   useEffect(() => {
     const isDemo =
-      typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true';
+      typeof window !== 'undefined' && isSafeDemoMode();
 
     if (isDemo) {
       const demoCached = localStorage.getItem('kongre_demo_user_profile');
@@ -1254,7 +1255,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
 
       const isDemo =
-        typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true';
+        typeof window !== 'undefined' && isSafeDemoMode();
 
       if (isDemo) {
         localStorage.setItem('kongre_demo_user_profile', JSON.stringify(merged));

@@ -11,6 +11,7 @@ import {
   getPinLockoutRemainingSeconds,
   recordFailedPinAttempt,
   resetFailedPinAttempts,
+  isSafeDemoMode,
 } from '../utils/theocraticSecurity';
 import { TheocraticRole } from '../utils/rbac';
 import { CongregationInvitation, ActiveDeviceSession } from '../types';
@@ -177,23 +178,27 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } catch {}
   }, [activeSessions]);
 
-  // Helper to check if demo mode is active
+  // Helper to check if demo mode is active and safe
   const isDemoSession = (): boolean => {
     if (typeof window === 'undefined') return false;
-    return (
-      localStorage.getItem('kongre_demo_mode') === 'true' ||
-      localStorage.getItem('kongre_congregation_number')?.includes('DEMO') === true ||
-      localStorage.getItem('kongre_congregation_id')?.includes('DEMO') === true
-    );
+    const cleanCong = String(
+      localStorage.getItem('kongre_congregation_id') ||
+      localStorage.getItem('kongre_congregation_number') ||
+      ''
+    ).trim().toUpperCase();
+    if (cleanCong.includes('DEMO') || cleanCong === '1001') return true;
+    return isSafeDemoMode();
   };
 
   // Start unlocked unless a PIN is configured and was previously locked in this session (and not demo mode)
   const [isLocked, setIsLocked] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
-      const isDemo =
-        localStorage.getItem('kongre_demo_mode') === 'true' ||
-        localStorage.getItem('kongre_congregation_number')?.includes('DEMO') ||
-        localStorage.getItem('kongre_congregation_id')?.includes('DEMO');
+      const cleanCong = String(
+        localStorage.getItem('kongre_congregation_id') ||
+        localStorage.getItem('kongre_congregation_number') ||
+        ''
+      ).trim().toUpperCase();
+      const isDemo = cleanCong.includes('DEMO') || cleanCong === '1001' || isSafeDemoMode();
       if (isDemo) {
         sessionStorage.removeItem('kongre_session_locked');
         return false;

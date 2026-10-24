@@ -34,7 +34,7 @@ import {
   getOfflineQueueStats,
 } from '../services/indexedDbQueue';
 import { supabaseSyncService } from '../services/supabaseSyncService';
-import { getSecureLocalPin } from '../utils/theocraticSecurity';
+import { getSecureLocalPin, isSafeDemoMode } from '../utils/theocraticSecurity';
 
 interface OfflineSyncQueueModalProps {
   isOpen: boolean;
@@ -93,7 +93,7 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
   const handleManualSync = async () => {
     if (
       typeof window !== 'undefined' &&
-      (localStorage.getItem('kongre_demo_mode') === 'true' ||
+      (isSafeDemoMode() ||
         localStorage.getItem('kongre_is_guest') === 'true')
     ) {
       setSyncFeedback({

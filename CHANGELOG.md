@@ -25,7 +25,16 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.12.3] - 23 de Octubre, 2026 (Compilación Activa)
+### [v2.12.4] - 23 de Octubre, 2026 (Compilación Activa)
+**Título:** Fortalecimiento de Invitaciones: 50 Bits de Entropía Criptográfica y Hash v2 Normalizado
+- **Entropía Reforzada a 10 Caracteres Base32 (Crockford):**
+  - Los nuevos códigos de invitación adoptan la estructura `KONG-[ROL]-XXXXX-XXXXX` con 50 bits de entropía real ($32^{10} \approx 1.12 \times 10^{15}$ combinaciones).
+  - Esto erradica la viabilidad de cualquier ataque de recuperación por fuerza bruta offline con clusters de GPU sobre `payload_public`.
+- **Hash Canónico v2 (`inv_h2_`) y Compatibilidad hacia Atrás:**
+  - Nueva función `hashInvitationCode` normalizada que permite al usuario ingresar códigos con o sin prefijo `KONG-`, con o sin guiones intermedios, o en minúsculas.
+  - Compatibilidad completa preservada con hashes v1 heredados (`inv_h1_`), garantizando que las invitaciones ya emitidas sigan funcionando de forma transparente.
+
+### [v2.12.3] - 23 de Octubre, 2026
 **Título:** Minimización de Datos en Nube (Ley 1581) e Higiene de Dependencias (0 Vulnerabilidades)
 - **Minimización de Datos en `payload_public` (Ley 1581 / Privacidad):**
   - Se eliminaron los informes mensuales de predicación (`monthlyReports`) del payload público cifrado con PIN de congregación. Los informes de horas y estudios bíblicos ahora residen estrictamente en el payload maestro accesible solo por el cuerpo de ancianos.

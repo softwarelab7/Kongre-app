@@ -1,7 +1,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { encryptForSupabase, decryptFromSupabase, encryptData, decryptData } from '../src/utils/crypto.ts';
-import { encodeSecureShareToken, decodeSecureShareToken, generateSecureMasterPin, sanitizePublishersForLocalStorage, restorePublishersFromLocalStorage } from '../src/utils/theocraticSecurity.ts';
+import {
+  encodeSecureShareToken,
+  decodeSecureShareToken,
+  generateSecureMasterPin,
+  sanitizePublishersForLocalStorage,
+  restorePublishersFromLocalStorage,
+  generateSecureInvitationCode,
+  hashInvitationCode,
+  hashInvitationCodeV1,
+  verifyInvitationCodeMatch,
+} from '../src/utils/theocraticSecurity.ts';
 
 test('cifrado: ida y vuelta con el formato actual', async () => {
   const data = { hola: 'mundo', n: [1, 2, 3] };
@@ -91,4 +101,30 @@ test('datos sensibles en reposo (Ley 1581): se cifran en localStorage y se resta
   const restoredLegacy = restorePublishersFromLocalStorage(legacyPub);
   assert.equal(restoredLegacy[0].phone, '3001234567');
   assert.equal(restoredLegacy[0].notes, 'Hipertensión');
+});
+
+test('códigos de invitación: 10 caracteres base32 (50 bits de entropía), hash v2 y compatibilidad hacia atrás', () => {
+  // 1. Generación de alta entropía (2 bloques de 5 caracteres base32 = 10 caracteres = >10^15 combinaciones)
+  const code = generateSecureInvitationCode('ANC');
+  assert.match(code, /^KONG-ANC-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{5}-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{5}$/);
+
+  // 2. Hash v2
+  const hashV2 = hashInvitationCode(code);
+  assert.ok(hashV2.startsWith('inv_h2_'), 'Debe usar prefijo inv_h2_');
+
+  // 3. Verificación flexible contra hash v2 (sin código en memoria, simulando payload_public)
+  const invV2 = { codeHash: hashV2 };
+  assert.ok(verifyInvitationCodeMatch(code, invV2), 'Código idéntico coincide');
+  assert.ok(verifyInvitationCodeMatch(code.toLowerCase(), invV2), 'Minúsculas coincide');
+  assert.ok(verifyInvitationCodeMatch(code.replace(/-/g, ''), invV2), 'Sin guiones coincide');
+  assert.ok(verifyInvitationCodeMatch(code.replace('KONG-', ''), invV2), 'Sin prefijo KONG- coincide');
+  assert.ok(!verifyInvitationCodeMatch('KONG-ANC-WRONG-CODE1', invV2), 'Código incorrecto es rechazado');
+
+  // 4. Compatibilidad hacia atrás con hash v1 heredado (inv_h1_...)
+  const legacyCode = 'KONG-SEC-8X4M9P';
+  const legacyHash = hashInvitationCodeV1(legacyCode);
+  const invV1 = { codeHash: legacyHash };
+  assert.ok(verifyInvitationCodeMatch(legacyCode, invV1), 'Código v1 coincide contra hash v1');
+  assert.ok(verifyInvitationCodeMatch('SEC-8X4M9P', invV1), 'Código v1 sin KONG- coincide');
+  assert.ok(verifyInvitationCodeMatch(legacyCode.toLowerCase(), invV1), 'Código v1 en minúsculas coincide');
 });

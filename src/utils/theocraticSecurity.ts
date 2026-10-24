@@ -1322,22 +1322,24 @@ export function verifyRoleSessionSignature(role: string, roles?: string[]): bool
 /**
  * Genera un código de invitación teocrática con entropía criptográfica real (CSPRNG)
  * usando alfabeto Crockford Base32 (sin 0, O, 1, I) de 6 caracteres (más de mil millones de combinaciones).
- * Ejemplo: KONG-SEC-8X4M9P
+ * Ejemplo: KONG-SEC-8X4M9-P2W7K
  */
 export function generateSecureInvitationCode(rolePrefix: string = 'KONG'): string {
   const CHARSET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-  const randomBytes = new Uint8Array(6);
+  const randomBytes = new Uint8Array(10);
   if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
     window.crypto.getRandomValues(randomBytes);
   } else {
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 10; i++) {
       randomBytes[i] = Math.floor(Math.random() * 256);
     }
   }
   const token = Array.from(randomBytes)
     .map((b) => CHARSET[b % CHARSET.length])
     .join('');
-  return `KONG-${rolePrefix.toUpperCase()}-${token}`;
+  const p1 = token.slice(0, 5);
+  const p2 = token.slice(5, 10);
+  return `KONG-${rolePrefix.toUpperCase()}-${p1}-${p2}`;
 }
 
 export interface SecureShareTokenPayload {
@@ -1542,10 +1544,23 @@ const INVITATION_CODE_HASH_SALT = 'kongre_invitation_code_salt_2026_v1';
 const ASSIGNMENT_CONFIRM_HMAC_SALT = 'kongre_assignment_confirm_sig_2026_v1';
 
 /**
- * Calcula un hash SHA-256 con sal para un código de invitación teocrático.
+ * Calcula un hash SHA-256 seguro para un código de invitación teocrático.
  * Permite verificar códigos de invitación en `payload_public` sin exponer el código en texto plano.
+ * Formato v2 (inv_h2_...): Normaliza a caracteres alfanuméricos canónicos para soportar
+ * cualquier variación de formato (con o sin guiones, con o sin KONG-).
  */
 export function hashInvitationCode(code: string | null | undefined): string {
+  if (!code) return '';
+  const clean = String(code).trim().toUpperCase();
+  if (!clean) return '';
+  const stripped = clean.replace(/[^A-Z0-9]/g, '');
+  return `inv_h2_${sha256HexSync(`${INVITATION_CODE_HASH_SALT}:v2:${stripped}`)}`;
+}
+
+/**
+ * Hash v1 heredado (para verificar invitaciones previas emitidas con formato v1)
+ */
+export function hashInvitationCodeV1(code: string | null | undefined): string {
   if (!code) return '';
   const clean = String(code).trim().toUpperCase();
   if (!clean) return '';
@@ -1555,11 +1570,12 @@ export function hashInvitationCode(code: string | null | undefined): string {
 /**
  * Verifica si un código ingresado coincide con una invitación (por código directo o por su hash `codeHash`).
  * Es resiliente ante variaciones como:
- * - Códigos completos: KONG-SEC-8X4M9P
- * - Códigos sin prefijo: SEC-8X4M9P
+ * - Códigos completos: KONG-SEC-8X4M9-P2W7K
+ * - Códigos sin prefijo: SEC-8X4M9-P2W7K
  * - Variaciones de espacios o guiones
  * - Tokens cifrados de enlaces QR (kgr_tk1_...)
  * - Códigos portátiles compuestos (CONG::CPIN::INVITE)
+ * - Compatibilidad total con invitaciones previas v1 (inv_h1_) y nuevas v2 (inv_h2_)
  */
 export function verifyInvitationCodeMatch(
   inputCode: string | null | undefined,
@@ -1608,8 +1624,16 @@ export function verifyInvitationCodeMatch(
   // Comparar candidatos contra codeHash y contra code en memoria
   for (const cand of candidates) {
     if (invitation.codeHash) {
-      const computed = hashInvitationCode(cand);
-      if (computed === invitation.codeHash) return true;
+      if (invitation.codeHash.startsWith('inv_h2_')) {
+        const computed = hashInvitationCode(cand);
+        if (computed === invitation.codeHash) return true;
+      } else {
+        // Hash v1 heredado
+        const computedV1 = hashInvitationCodeV1(cand);
+        if (computedV1 === invitation.codeHash) return true;
+        const computedDirect = `inv_h1_${sha256HexSync(`${INVITATION_CODE_HASH_SALT}:${cand}`)}`;
+        if (computedDirect === invitation.codeHash) return true;
+      }
     }
 
     if (invitation.code) {

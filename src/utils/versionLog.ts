@@ -25,18 +25,37 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.3';
-export const CURRENT_BUILD_CODE = '2026.10.23.5400';
+export const CURRENT_APP_VERSION = '2.12.4';
+export const CURRENT_BUILD_CODE = '2026.10.23.5500';
 export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.4',
+    buildCode: '2026.10.23.5500',
+    date: '23 de Octubre, 2026',
+    title: 'Fortalecimiento de Invitaciones: 50 Bits de Entropía Criptográfica y Hash v2 Normalizado',
+    isCurrent: true,
+    highlight: 'Códigos de invitación de alta entropía inmunes a fuerza bruta offline',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Entropía de 10 caracteres base32 (50 bits): Los códigos de invitación generados adoptan el formato KONG-[ROL]-XXXXX-XXXXX (>1.1 billones de combinaciones), eliminando la viabilidad de ataques de fuerza bruta offline con GPU.',
+      },
+      {
+        category: 'security',
+        text: 'Hash v2 canónico (inv_h2_): Normalización alfanumérica de invitaciones con sal criptográfica y compatibilidad total hacia atrás con hashes v1 existentes.',
+      },
+    ],
+  },
+  {
     version: '2.12.3',
     buildCode: '2026.10.23.5400',
     date: '23 de Octubre, 2026',
     title: 'Minimización de Datos en Nube (Ley 1581) e Higiene de Dependencias (0 Vulnerabilidades)',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Payload público minimizado y dependencias auditadas al 100%',
     environment: 'Producción Cloud (Kongre)',
     changes: [

@@ -52,6 +52,10 @@
       "destination": "/terms.html"
     },
     {
+      "source": "/googleb748874bc7f6a37e.html",
+      "destination": "/googleb748874bc7f6a37e.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

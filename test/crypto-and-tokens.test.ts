@@ -13,6 +13,10 @@ import {
   verifyInvitationCodeMatch,
   encryptPinAtRest,
   decryptPinAtRest,
+  isEncryptedPinAtRest,
+  isSafeDemoMode,
+  signRoleSession,
+  verifyRoleSessionSignature,
 } from '../src/utils/theocraticSecurity.ts';
 
 test('cifrado: ida y vuelta con el formato actual', async () => {
@@ -148,3 +152,64 @@ test('códigos de invitación: 10 caracteres base32 (50 bits de entropía), hash
   assert.ok(verifyInvitationCodeMatch('SEC-8X4M9P', invV1), 'Código v1 sin KONG- coincide');
   assert.ok(verifyInvitationCodeMatch(legacyCode.toLowerCase(), invV1), 'Código v1 en minúsculas coincide');
 });
+
+test('isEncryptedPinAtRest: detecta formatos kgr_v2: y kgr_v1:', () => {
+  assert.equal(isEncryptedPinAtRest('kgr_v2:nonce:mac:data'), true);
+  assert.equal(isEncryptedPinAtRest('kgr_v1:5b575d5e'), true);
+  assert.equal(isEncryptedPinAtRest('1234'), false);
+  assert.equal(isEncryptedPinAtRest(''), false);
+  assert.equal(isEncryptedPinAtRest(null), false);
+  assert.equal(isEncryptedPinAtRest(undefined), false);
+});
+
+test('isSafeDemoMode: impide omisión de seguridad en congregaciones reales', () => {
+  const store: Record<string, string> = {};
+  const mockStorage = {
+    getItem: (k: string) => store[k] ?? null,
+    setItem: (k: string, v: string) => { store[k] = v; },
+    removeItem: (k: string) => { delete store[k]; },
+    clear: () => { Object.keys(store).forEach((k) => delete store[k]); },
+  };
+  (globalThis as any).window = {};
+  (globalThis as any).localStorage = mockStorage;
+
+  // 1. Sin demo_mode
+  assert.equal(isSafeDemoMode(), false);
+
+  // 2. Demo mode legítimo (congregación DEMO o sin registrar)
+  mockStorage.setItem('kongre_demo_mode', 'true');
+  mockStorage.setItem('kongre_congregation_id', 'DEMO-001');
+  assert.equal(isSafeDemoMode(), true);
+
+  // 3. Intento de bypass en congregación REAL registrada (ej: 10582)
+  mockStorage.setItem('kongre_demo_mode', 'true');
+  mockStorage.setItem('kongre_is_registered_congregation', 'true');
+  mockStorage.setItem('kongre_congregation_id', '10582');
+  mockStorage.setItem('kongre_congregation_number', '10582');
+  assert.equal(isSafeDemoMode(), false, 'Debe invalidar demo mode en congregación real registrada');
+  assert.equal(mockStorage.getItem('kongre_demo_mode'), null, 'Debe purgar la clave kongre_demo_mode');
+});
+
+test('firma de rol v2: ligada a entropía de dispositivo y retrocompatible con v1', () => {
+  const store: Record<string, string> = {};
+  const mockStorage = {
+    getItem: (k: string) => store[k] ?? null,
+    setItem: (k: string, v: string) => { store[k] = v; },
+    removeItem: (k: string) => { delete store[k]; },
+    clear: () => { Object.keys(store).forEach((k) => delete store[k]); },
+  };
+  (globalThis as any).window = {};
+  (globalThis as any).localStorage = mockStorage;
+
+  // 1. Rol público siempre válido
+  assert.equal(verifyRoleSessionSignature('publico', ['publico']), true);
+
+  // 2. Firma v2 para anciano
+  signRoleSession('anciano', ['anciano']);
+  assert.equal(verifyRoleSessionSignature('anciano', ['anciano']), true);
+
+  // 3. Intento de escalada en localStorage sin firma válida
+  mockStorage.setItem('kongre_active_role_v1', 'coordinador');
+  assert.equal(verifyRoleSessionSignature('coordinador', ['coordinador']), false, 'Firma no válida debe ser rechazada');
+});
+

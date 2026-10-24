@@ -37,6 +37,7 @@ import {
   getPushSubscriptionRecord,
 } from '../services/notificationService';
 import { PushSubscriptionModal } from './PushSubscriptionModal';
+import { isSafeDemoMode } from '../utils/theocraticSecurity';
 
 // Preset avatar styles with clean SVG iconography and theocratic themes
 const AVATAR_PRESETS = [
@@ -176,7 +177,7 @@ export const UserProfileSettingsView: React.FC = () => {
       isDemoMode ||
       settings?.congregationId?.includes('DEMO') ||
       settings?.congregationNumber?.includes('DEMO') ||
-      (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true');
+      isSafeDemoMode(settings?.congregationNumber || settings?.congregationId, settings?.isRegistered);
 
     if (activeIsDemo) {
       setDisplayName(userProfile?.displayName || settings?.coordinatorName || 'Carlos Mendoza');
@@ -348,7 +349,7 @@ export const UserProfileSettingsView: React.FC = () => {
 
     const activeIsDemo =
       isDemoMode ||
-      (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true');
+      isSafeDemoMode(settings?.congregationNumber || settings?.congregationId, settings?.isRegistered);
 
     if (cleanPhoto) {
       try {
@@ -486,7 +487,7 @@ export const UserProfileSettingsView: React.FC = () => {
             </span>
           </div>
 
-          {(isDemoMode || (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')) && (
+          {(isDemoMode || isSafeDemoMode(settings?.congregationNumber || settings?.congregationId, settings?.isRegistered)) && (
             <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 text-xs">
               <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
               <span>
@@ -557,7 +558,7 @@ export const UserProfileSettingsView: React.FC = () => {
                   <span>Subir Foto</span>
                 </button>
 
-                {!(isDemoMode || (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')) && (() => {
+                {!(isDemoMode || isSafeDemoMode(settings?.congregationNumber || settings?.congregationId, settings?.isRegistered)) && (() => {
                   const googlePhoto =
                     user?.photoURL ||
                     (typeof window !== 'undefined'

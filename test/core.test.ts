@@ -282,3 +282,26 @@ test('PIN personal: publisher_id demasiado largo se rechaza (no se crean contado
   assert.equal(r.body.error, 'bad_publisher_id');
 });
 
+test('PIN personal: publisher_id inexistente se rechaza sin crear registros de publicador falso en rate_limits', async () => {
+  const { call } = setup();
+  await call({
+    action: 'push',
+    id: 'CONGFAKE',
+    tokens: { master: T.masterA, public: T.publicA },
+    payload: 'ADMIN',
+    payload_public: 'PUB',
+    personal_pins: [{ id: 'pubReal', token: hex('1'), name: 'Real', role: 'publico', privilege: 'publicador' }],
+  });
+  const r = await call({
+    action: 'verify_personal_pin',
+    id: 'CONGFAKE',
+    tokens: { public: T.publicA },
+    pin_token: hex('1'),
+    publisher_id: 'pubInventado',
+  });
+  assert.equal(r.status, 401);
+  assert.equal(r.body.error, 'invalid_credentials');
+});
+
+
+

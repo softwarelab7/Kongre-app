@@ -5,6 +5,7 @@ import {
   generateSecureInvitationCode,
   encryptPinAtRest,
   decryptPinAtRest,
+  isEncryptedPinAtRest,
   hashInvitationCode,
   verifyInvitationCodeMatch,
   getPinLockoutRemainingSeconds,
@@ -93,14 +94,14 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       const saved = localStorage.getItem(INVITATIONS_STORAGE_KEY);
       if (saved) {
-        const rawJson = saved.startsWith('kgr_v1:') ? decryptPinAtRest(saved) : saved;
+        const rawJson = isEncryptedPinAtRest(saved) ? decryptPinAtRest(saved) : saved;
         const parsed = JSON.parse(rawJson || '[]');
         if (Array.isArray(parsed)) {
           const normalized = parsed.map((inv: CongregationInvitation) => ({
             ...inv,
             codeHash: inv.codeHash || (inv.code && !inv.code.includes('••••') ? hashInvitationCode(inv.code) : undefined),
           }));
-          if (!saved.startsWith('kgr_v1:')) {
+          if (!isEncryptedPinAtRest(saved)) {
             localStorage.setItem(INVITATIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(normalized)));
           }
           return normalized;
@@ -116,10 +117,10 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       const saved = localStorage.getItem(SESSIONS_STORAGE_KEY);
       if (saved) {
-        const rawJson = saved.startsWith('kgr_v1:') ? decryptPinAtRest(saved) : saved;
+        const rawJson = isEncryptedPinAtRest(saved) ? decryptPinAtRest(saved) : saved;
         const parsed = JSON.parse(rawJson || '[]');
         if (Array.isArray(parsed)) {
-          if (!saved.startsWith('kgr_v1:')) {
+          if (!isEncryptedPinAtRest(saved)) {
             localStorage.setItem(SESSIONS_STORAGE_KEY, encryptPinAtRest(JSON.stringify(parsed)));
           }
           return parsed;
@@ -423,7 +424,7 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         const stored = localStorage.getItem(INVITATIONS_STORAGE_KEY);
         if (stored) {
-          const rawJson = stored.startsWith('kgr_v1:') ? decryptPinAtRest(stored) : stored;
+          const rawJson = isEncryptedPinAtRest(stored) ? decryptPinAtRest(stored) : stored;
           const parsed = JSON.parse(rawJson || '[]');
           if (Array.isArray(parsed) && parsed.length > 0) {
             currentList = parsed;

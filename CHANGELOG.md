@@ -25,7 +25,27 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.12.6] - 23 de Octubre, 2026 (Compilación Activa)
+### [v2.12.7] - 23 de Octubre, 2026 (Compilación Activa)
+**Título:** Auditoría Profunda de Seguridad: Mitigación de DoS en Rate Limits, Purga de PIN en Texto Plano y Blindaje Anti-Bypass
+- **Almacenamiento Seguro de PIN en Vista Personal (Mitigación Fuga Texto Plano):**
+  - Se eliminó el almacenamiento en texto plano en `localStorage.setItem('kongre_session_pin_v2')` en `PersonalViewTab.tsx`.
+  - Ahora se utiliza `setSecureLocalPin`, conservando el PIN en memoria volátil de sesión (`sessionStorage`) y cifrándolo en reposo con `kgr_v2:...` derivado de la sal de entropía del dispositivo.
+  - Purga completa y limpia de PINs y hashes al cerrar sesión en `PersonalViewTab.tsx`, `Navbar.tsx` y `AuthContext.tsx`.
+- **Mitigación de DoS y Agotamiento de Tabla en Edge Function `kongre-sync`:**
+  - En la acción `verify_personal_pin`, se verifica la existencia previa de `publisher_id` en `row.personal_verifiers` antes de instanciar contadores en la tabla `sync_rate_limits`.
+  - Si el publicador no existe en la congregación, la solicitud es rechazada de forma estandarizada (`401 invalid_credentials`) sin crear buckets de contadores arbitrarios en Postgres, previniendo ataques de agotamiento de almacenamiento y DoS.
+- **Sincronización Transparente de Prefijos con `isEncryptedPinAtRest`:**
+  - Se implementó el helper canónico `isEncryptedPinAtRest` para reconocer tanto `kgr_v2:` como `kgr_v1:`, resolviendo inconsistencias en `AuthContext.tsx`, `App.tsx`, `SecurityContext.tsx`, `supabaseSyncService.ts` y `CongregationContext.tsx`.
+- **Blindaje Anti-Bypass en Pantalla de Bloqueo y Firmas (Función `isSafeDemoMode`):**
+  - Implementación de `isSafeDemoMode()`, que valida que el modo de demostración solo pueda activarse en congregaciones no registradas o de prueba (`DEMO`).
+  - Si el usuario se encuentra en una congregación real registrada, cualquier intento de inyección manual de `kongre_demo_mode=true` en DevTools es automáticamente purgado y deshabilitado, impidiendo la elusión de la pantalla de bloqueo (`SessionLockModal`) o la falsificación de firmas de rol.
+- **Firma de Rol v2 Ligada a Entropía del Dispositivo:**
+  - `signRoleSession` y `verifyRoleSessionSignature` actualizados a `role_sig_v2`, combinando el rol, roles secundarios, constante criptográfica y la sal de hardware/dispositivo (`getDeviceEntropySalt()`).
+  - Migración automática de firmas v1 a v2 al iniciar sesión.
+- **Protección contra Tablas Arcoíris en Registro de Auditoría:**
+  - `sanitizeActorNid` ahora incorpora la sal de entropía del dispositivo al calcular el identificador anónimo de actores que ingresan con PIN, impidiendo ataques de inversión mediante tablas arcoíris precalculadas de 10.000 combinaciones.
+
+### [v2.12.6] - 23 de Octubre, 2026
 **Título:** Remediación Integral de Seguridad: Cifrado en Reposo CTR con Tag MAC, CSP Estricta sin Unsafe-Inline y Claves Ligadas a Entropía
 - **Cifrado en Reposo no Repetitivo (`kgr_sec3:`, Hallazgo H-02):**
   - Se sustituyó el flujo de cifrado repetitivo cada 30 bytes por un generador de flujo en modo contador (CTR) por bloques de 32 bytes derivados por SHA-256 con nonce CSPRNG de 128 bits.

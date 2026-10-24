@@ -37,6 +37,7 @@ import {
   verifySecureLocalPin,
   encryptPinAtRest,
   decryptPinAtRest,
+  isEncryptedPinAtRest,
   signRoleSession,
   verifyRoleSessionSignature,
   getPinLockoutRemainingSeconds,
@@ -355,7 +356,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(LOCAL_STORAGE_PUBLISHER_ID_KEY, publisherId);
     } else {
       localStorage.removeItem(LOCAL_STORAGE_PUBLISHER_ID_KEY);
-      localStorage.removeItem('kongre_session_pin_v2');
+      setSecureLocalPin('kongre_session_pin_v2', null);
       localStorage.removeItem('kongre_identified_brother');
     }
     if (name && !isGenericIdentityName(name)) {
@@ -373,7 +374,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (Array.isArray(parsed)) {
           return parsed.map((r: UserRoleRecord) => {
             const restoredPin =
-              r.personalPin && !r.personalPin.startsWith('kgr_v1:')
+              r.personalPin && !isEncryptedPinAtRest(r.personalPin)
                 ? r.personalPin
                 : r.encryptedPin
                 ? decryptPinAtRest(r.encryptedPin)
@@ -908,7 +909,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       let invList: any[] = [];
       const storedInv = localStorage.getItem('kongre_theocratic_invitations_v1');
       if (storedInv) {
-        const rawJson = storedInv.startsWith('kgr_v1:') ? decryptPinAtRest(storedInv) : storedInv;
+        const rawJson = isEncryptedPinAtRest(storedInv) ? decryptPinAtRest(storedInv) : storedInv;
         const parsed = JSON.parse(rawJson || '[]');
         if (Array.isArray(parsed)) invList = parsed;
       }

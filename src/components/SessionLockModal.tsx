@@ -7,6 +7,7 @@ import {
   getPinLockoutRemainingSeconds,
   recordFailedPinAttempt,
   resetFailedPinAttempts,
+  isSafeDemoMode,
 } from '../utils/theocraticSecurity';
 
 export const SessionLockModal: React.FC = () => {
@@ -24,7 +25,7 @@ export const SessionLockModal: React.FC = () => {
     isDemoMode ||
     settings?.congregationNumber?.includes('DEMO') ||
     settings?.congregationId?.includes('DEMO') ||
-    (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true');
+    isSafeDemoMode(settings?.congregationNumber || settings?.congregationId, settings?.isRegistered);
 
   // Check lockout on mount and on lock
   useEffect(() => {

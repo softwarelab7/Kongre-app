@@ -1,6 +1,6 @@
 // src/services/auditLogService.ts
 import { AuditLogEntry } from '../utils/rbac';
-import { sha256HexSync } from '../utils/theocraticSecurity';
+import { sha256HexSync, getDeviceEntropySalt } from '../utils/theocraticSecurity';
 
 const LOCAL_STORAGE_AUDIT_LOG_KEY = 'kongre_audit_log_v1';
 const LOCAL_STORAGE_AUDIT_CHAIN_SIG_KEY = 'kongre_audit_log_chain_sig_v1';
@@ -9,15 +9,16 @@ const MAX_LOG_ENTRIES = 500;
 
 /**
  * Sanitiza el identificador del hermano para garantizar que jamás se almacene un PIN en texto plano
- * dentro del registro de auditoría.
+ * dentro del registro de auditoría. Salteado con entropía del dispositivo para impedir ataques de tablas arcoíris.
  */
 function sanitizeActorNid(rawNid?: string): string {
   if (!rawNid) return 'anonimo';
   const clean = String(rawNid).trim();
   if (!clean) return 'anonimo';
-  // Si parece un PIN numérico puro (4 a 8 dígitos) o un PIN estilo XXXX-XXXX, enmascararlo con hash corto
+  // Si parece un PIN numérico puro (4 a 8 dígitos) o un PIN estilo XXXX-XXXX, enmascararlo con hash salteado por dispositivo
   if (/^\d{4,8}$/.test(clean) || /^[A-Z0-9]{4}-[A-Z0-9]{4}$/i.test(clean)) {
-    return `id_${sha256HexSync(`${clean}:${AUDIT_CHAIN_SECRET}`).slice(0, 10)}`;
+    const salt = getDeviceEntropySalt();
+    return `id_${sha256HexSync(`${clean}:${salt}:${AUDIT_CHAIN_SECRET}`).slice(0, 10)}`;
   }
   return clean;
 }

@@ -62,6 +62,7 @@ import {
   PushSubscriptionRecord,
 } from '../services/notificationService';
 import { PushSubscriptionModal } from './PushSubscriptionModal';
+import { setSecureLocalPin } from '../utils/theocraticSecurity';
 
 export type PublisherPortalTab = 'asignaciones' | 'informe' | 'ausencias' | 'grupo' | 'avisos';
 export type NWPublisherTab = PublisherPortalTab;
@@ -323,7 +324,7 @@ export const PersonalViewTab: React.FC = () => {
     try {
       const res = await identifyRoleByPersonalPin(enteredPin);
       if (res.success) {
-        localStorage.setItem('kongre_session_pin_v2', enteredPin.trim());
+        setSecureLocalPin('kongre_session_pin_v2', enteredPin.trim());
         if (res.publisherId && publishersMap.has(res.publisherId)) {
           setSelectedPublisherId(res.publisherId);
           setIdentifiedPublisher(res.publisherId, res.name);
@@ -354,7 +355,7 @@ export const PersonalViewTab: React.FC = () => {
   // Exit / switch publisher
   const handleExitPortal = () => {
     setIdentifiedPublisher(null);
-    localStorage.removeItem('kongre_session_pin_v2');
+    setSecureLocalPin('kongre_session_pin_v2', null);
     setEnteredPin('');
     setShowSupervisorSelect(false);
   };

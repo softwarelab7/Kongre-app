@@ -20,6 +20,7 @@ import {
   hashPersonalPin,
   encryptPinAtRest,
   decryptPinAtRest,
+  isEncryptedPinAtRest,
   sanitizeInvitationsForPublicPayload,
   hashInvitationCode,
 } from '../utils/theocraticSecurity';
@@ -382,7 +383,7 @@ export const supabaseSyncService = {
         try {
           const rawInv = localStorage.getItem('kongre_theocratic_invitations_v1');
           if (rawInv) {
-            const decInv = rawInv.startsWith('kgr_v1:') ? decryptPinAtRest(rawInv) : rawInv;
+            const decInv = isEncryptedPinAtRest(rawInv) ? decryptPinAtRest(rawInv) : rawInv;
             storedInvitations = JSON.parse(decInv || '[]');
           }
         } catch {}

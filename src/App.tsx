@@ -9,7 +9,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CongregationProvider, useCongregation } from './context/CongregationContext';
 import { Navbar, ActiveTab } from './components/Navbar';
 import { isTabAllowedForRole, TheocraticRole, THEOCRATIC_ROLES } from './utils/rbac';
-import { formatCanonicalCongregationId, isGenericIdentityName, getSecureLocalPin, setSecureLocalPin, verifySecureLocalPin, verifyPersonalPinMatch, decodeSecureShareToken, verifyAssignmentConfirmSignature, verifyInvitationCodeMatch, decryptPinAtRest, encryptPinAtRest } from './utils/theocraticSecurity';
+import { formatCanonicalCongregationId, isGenericIdentityName, getSecureLocalPin, setSecureLocalPin, verifySecureLocalPin, verifyPersonalPinMatch, decodeSecureShareToken, verifyAssignmentConfirmSignature, verifyInvitationCodeMatch, decryptPinAtRest, encryptPinAtRest, isEncryptedPinAtRest, isSafeDemoMode } from './utils/theocraticSecurity';
 import { CongregationCalendar } from './components/CongregationCalendar';
 import { ScheduleTab } from './components/ScheduleTab';
 import ClmScheduleView from './components/ClmScheduleView';
@@ -266,8 +266,7 @@ const AppContent: React.FC = () => {
 
   const [isDemoNoticeOpen, setIsDemoNoticeOpen] = useState(() => {
     return (
-      typeof window !== 'undefined' &&
-      localStorage.getItem('kongre_demo_mode') === 'true' &&
+      isSafeDemoMode() &&
       sessionStorage.getItem('kongre_demo_notice_shown') !== 'true'
     );
   });
@@ -280,7 +279,7 @@ const AppContent: React.FC = () => {
 
   // Limpieza de fotos y perfiles residuales previos para que no contaminen el modo prueba
   useEffect(() => {
-    if (isDemoMode || (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')) {
+    if (isDemoMode || isSafeDemoMode()) {
       try {
         if (localStorage.getItem('kongre_user_photo')) localStorage.removeItem('kongre_user_photo');
         if (localStorage.getItem('kongre_google_photo')) localStorage.removeItem('kongre_google_photo');
@@ -539,7 +538,7 @@ const AppContent: React.FC = () => {
         try {
           const stored = localStorage.getItem('kongre_theocratic_invitations_v1');
           if (stored) {
-            const rawJson = stored.startsWith('kgr_v1:') ? decryptPinAtRest(stored) : stored;
+            const rawJson = isEncryptedPinAtRest(stored) ? decryptPinAtRest(stored) : stored;
             const parsed = JSON.parse(rawJson || '[]');
             if (Array.isArray(parsed)) invList = parsed;
           }
@@ -668,7 +667,7 @@ const AppContent: React.FC = () => {
   // Verificación de existencia real de la congregación en la nube (Supabase):
   // Si la congregación activa fue eliminada de la nube o no existe, restablecer el acceso a la pantalla de bienvenida
   useEffect(() => {
-    if (isDemoMode || localStorage.getItem('kongre_demo_mode') === 'true') {
+    if (isDemoMode || isSafeDemoMode()) {
       return;
     }
     const activeCongId = settings.congregationNumber || settings.congregationId || localStorage.getItem('kongre_congregation_number');
@@ -876,9 +875,7 @@ const AppContent: React.FC = () => {
 
   // Suggest setting up app lock PIN on this device after user enters the session / logs in
   useEffect(() => {
-    const isDemo =
-      isDemoMode ||
-      (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true');
+    const isDemo = isDemoMode || isSafeDemoMode();
     if (isDemo) return;
 
     const isGuest = localStorage.getItem('kongre_is_guest') === 'true' || localStorage.getItem('kongre_identified_brother') === 'Invitado';
@@ -895,9 +892,7 @@ const AppContent: React.FC = () => {
   }, [showWelcomeLanding, isDemoMode]);
 
   useEffect(() => {
-    const isDemo =
-      isDemoMode ||
-      (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true');
+    const isDemo = isDemoMode || isSafeDemoMode();
     if (isDemo) return;
 
     if (user && !prevUserRef.current && !showWelcomeLanding) {
@@ -915,7 +910,7 @@ const AppContent: React.FC = () => {
   // OR enter as guest (read-only mode like Organized app) before accessing the platform
   const isGuestSession = Boolean(
     isDemoMode ||
-    localStorage.getItem('kongre_demo_mode') === 'true' ||
+    isSafeDemoMode() ||
     localStorage.getItem('kongre_is_guest') === 'true' ||
     localStorage.getItem('kongre_identified_brother') === 'Invitado'
   );

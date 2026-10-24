@@ -100,6 +100,7 @@ import {
   setSecureLocalPin,
   encryptPinAtRest,
   decryptPinAtRest,
+  isEncryptedPinAtRest,
   sanitizeImportedBackupObject,
   computeBackupIntegritySeal,
   verifyBackupIntegritySeal,
@@ -5765,7 +5766,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const { email, brotherName, role, personalPin } = approvedReq;
     const cleanEmail = email.toLowerCase().trim();
-    const restoredPin = personalPin?.startsWith('kgr_v1:')
+    const restoredPin = isEncryptedPinAtRest(personalPin)
       ? decryptPinAtRest(personalPin)
       : personalPin;
 

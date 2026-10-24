@@ -25,18 +25,53 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.6';
-export const CURRENT_BUILD_CODE = '2026.10.23.5700';
+export const CURRENT_APP_VERSION = '2.12.7';
+export const CURRENT_BUILD_CODE = '2026.10.23.5800';
 export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.7',
+    buildCode: '2026.10.23.5800',
+    date: '23 de Octubre, 2026',
+    title: 'Auditoría Profunda de Seguridad: Mitigación de DoS en Rate Limits, Purga de PIN en Texto Plano y Blindaje Anti-Bypass',
+    isCurrent: true,
+    highlight: 'Prevención de fuga de PIN de sesión en vista personal, anti-agotamiento en tabla sync_rate_limits, sincronización segura kgr_v2 y blindaje de firmas de rol con entropía de dispositivo',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Almacenamiento seguro de PIN en Vista Personal: Eliminación de almacenamiento en texto plano en localStorage dentro de PersonalViewTab mediante setSecureLocalPin (cifrado kgr_v2 y memoria volátil) y purga en cascada en Navbar y AuthContext.',
+      },
+      {
+        category: 'security',
+        text: 'Prevención de DoS y agotamiento en sync_rate_limits: La Edge Function valida la existencia previa del publicador en row.personal_verifiers antes de registrar contadores de tasa, impidiendo la saturación maliciosa de la base de datos con identificadores arbitrarios.',
+      },
+      {
+        category: 'fix',
+        text: 'Sincronización robusta kgr_v2 con isEncryptedPinAtRest: Unificación del reconocimiento de formatos de cifrado en reposo (kgr_v2 y kgr_v1) en AuthContext, App, SecurityContext, supabaseSyncService y CongregationContext, resolviendo desincronizaciones de estado.',
+      },
+      {
+        category: 'security',
+        text: 'Blindaje contra bypass de pantalla de bloqueo y firmas de rol (isSafeDemoMode): La bandera kongre_demo_mode es invalidada y purgada automáticamente si la sesión corresponde a una congregación real registrada, impidiendo eludir la pantalla de bloqueo o falsificar firmas.',
+      },
+      {
+        category: 'security',
+        text: 'Firma de rol v2 ligada a entropía de dispositivo: Actualización de la firma criptográfica de rol en localStorage para incluir el salt de entropía único de la máquina, impidiendo la falsificación de privilegios en consola.',
+      },
+      {
+        category: 'security',
+        text: 'Protección contra tablas arcoíris en registro de auditoría: Salteado con entropía del dispositivo en el enmascaramiento de PINs de hermanos en el log de auditoría (sanitizeActorNid), impidiendo la inversión de PINs de 4 dígitos.',
+      },
+    ],
+  },
+  {
     version: '2.12.6',
     buildCode: '2026.10.23.5700',
     date: '23 de Octubre, 2026',
     title: 'Remediación Integral de Seguridad: Cifrado en Reposo CTR con Tag MAC, CSP Estricta sin Unsafe-Inline y Claves Ligadas a Entropía',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Cifrado local de salud/PINs en modo CTR no repetitivo, sesión activa en memoria y eliminación de inline scripts en CSP',
     environment: 'Producción Cloud (Kongre)',
     changes: [

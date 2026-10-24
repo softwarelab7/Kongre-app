@@ -10,7 +10,7 @@ import Logo from '../Logo';
 import ThemeToggle from './ThemeToggle';
 import { AutoLockTimerChip } from './AutoLockTimerChip';
 import { MinistryTimerNavbarChip } from './MinistryTimerNavbarChip';
-import { getFriendlyCongregationName, isGenericIdentityName } from '../utils/theocraticSecurity';
+import { getFriendlyCongregationName, isGenericIdentityName, setSecureLocalPin } from '../utils/theocraticSecurity';
 import { isTabAllowedForRole } from '../utils/rbac';
 import { CURRENT_APP_VERSION } from '../utils/versionLog';
 import { OfflineSyncBadge } from './OfflineSyncBadge';
@@ -242,7 +242,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       localStorage.removeItem('kongre_user_profile_active');
       localStorage.removeItem('kongre_identified_brother');
       localStorage.removeItem('kongre_current_publisher_id_v2');
-      localStorage.removeItem('kongre_session_pin_v2');
+      setSecureLocalPin('kongre_session_pin_v2', null);
       localStorage.removeItem('kongre_active_role_v1');
       localStorage.removeItem('kongre_active_roles_v1');
       localStorage.removeItem('kongre_role_session_sig_v1');

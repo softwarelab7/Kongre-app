@@ -335,6 +335,15 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     if (publisherId.length > 100) {
       return json(req, env, 400, { ok: false, error: 'bad_publisher_id' });
     }
+    const verifiers = Array.isArray(row.personal_verifiers) ? row.personal_verifiers : [];
+    const targetPublisher = verifiers.find((v) => v.id === publisherId);
+
+    // Seguridad: si el publicador no existe en la congregación, rechazar inmediatamente
+    // sin crear buckets de contador arbitrarios en la tabla sync_rate_limits (evita DoS por saturación).
+    if (!targetPublisher) {
+      return reject();
+    }
+
     const kPub = `pp:${id}:${publisherId}`;
     const lockedPub = await db.lockedUntil([kPub]);
     if (lockedPub && lockedPub > now()) {
@@ -342,9 +351,7 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     }
 
     const expectedVerifier = await verifierOfPersonal(env.pepper, id, pinToken);
-    const verifiers = Array.isArray(row.personal_verifiers) ? row.personal_verifiers : [];
-
-    const matched = verifiers.find((v) => v.id === publisherId && safeEqual(expectedVerifier, v.verifier));
+    const matched = safeEqual(expectedVerifier, targetPublisher.verifier);
 
     if (!matched) {
       const pubLock = await db.registerFailure(kPub, LIMITS.pub.limit, LIMITS.pub.window, LIMITS.pub.lock);
@@ -359,11 +366,11 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     return json(req, env, 200, {
       ok: true,
       publisher: {
-        id: matched.id,
-        name: matched.name,
-        role: matched.role,
-        privilege: matched.privilege,
-        theocraticRoles: matched.theocraticRoles || [],
+        id: targetPublisher.id,
+        name: targetPublisher.name,
+        role: targetPublisher.role,
+        privilege: targetPublisher.privilege,
+        theocraticRoles: targetPublisher.theocraticRoles || [],
       },
     });
   }

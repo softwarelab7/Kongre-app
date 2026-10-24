@@ -621,6 +621,35 @@ export function resetFailedPinAttempts(): void {
 }
 
 /**
+ * Valida de forma estricta si el dispositivo se encuentra legítimamente en modo demostración.
+ * Si la congregación activa es una congregación real registrada, el modo demostración queda estrictamente deshabilitado,
+ * impidiendo la omisión de bloqueo de pantalla o firmas de seguridad mediante inyección manual en localStorage.
+ */
+export function isSafeDemoMode(congId?: string | null, isRegistered?: boolean): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const rawDemo = localStorage.getItem('kongre_demo_mode') === 'true';
+    if (!rawDemo) return false;
+    const cleanCong = String(
+      congId ||
+      localStorage.getItem('kongre_congregation_id') ||
+      localStorage.getItem('kongre_congregation_number') ||
+      ''
+    ).trim().toUpperCase();
+    const isRegisteredFlag = isRegistered ?? (localStorage.getItem('kongre_is_registered_congregation') === 'true');
+
+    // Si hay una congregación real registrada con ID que no sea DEMO, invalidar demo_mode
+    if (isRegisteredFlag && cleanCong && !cleanCong.includes('DEMO') && cleanCong !== '1001') {
+      localStorage.removeItem('kongre_demo_mode');
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Detecta si una cadena corresponde a un ID o código técnico generado en vez de un nombre oficial de congregación.
  * Por ejemplo: UUIDs ("7f6b7269-3ae2-4185-8cd1-0b3873d79f48"), "ID: 10582", "Congregación #10582", "10582", "KGR-8P2M-7X4W", "CONG_1234", etc.
  */
@@ -925,6 +954,15 @@ export function encryptPinAtRest(pin?: string | null): string {
   } catch {
     return '';
   }
+}
+
+/**
+ * Determina si una cadena almacenada está cifrada en reposo (formato kgr_v2 o kgr_v1)
+ */
+export function isEncryptedPinAtRest(val?: string | null): boolean {
+  if (!val) return false;
+  const str = String(val).trim();
+  return str.startsWith('kgr_v2:') || str.startsWith('kgr_v1:');
 }
 
 /**
@@ -1440,6 +1478,7 @@ export function verifySecureLocalPin(key: string, candidatePin?: string | null):
 /**
  * Genera y persiste una firma criptográfica de integridad para la sesión de rol activa (`kongre_role_session_sig_v1`),
  * impidiendo la escalada de privilegios mediante edición manual de `kongre_active_role_v1` en DevTools.
+ * Versión v2 ligada a entropía única del dispositivo y salt de hardware.
  */
 export function signRoleSession(role: string, roles?: string[]): void {
   if (typeof window === 'undefined') return;
@@ -1448,16 +1487,17 @@ export function signRoleSession(role: string, roles?: string[]): void {
     const normRoles = Array.isArray(roles) && roles.length > 0
       ? roles.map((r) => String(r).trim().toLowerCase()).join(',')
       : normRole;
-    const sig = sha256HexSync(`role_sig_v1|${normRole}|${normRoles}|${AT_REST_CIPHER_KEY}`);
+    const deviceSalt = getDeviceEntropySalt();
+    // V2 ligado a entropía del dispositivo + constante interna
+    const sig = sha256HexSync(`role_sig_v2|${normRole}|${normRoles}|${deviceSalt}|${AT_REST_CIPHER_KEY}`);
     localStorage.setItem(ROLE_SESSION_SIG_KEY, sig);
   } catch {}
 }
 
 /**
  * Verifica la firma de la sesión de rol activa en localStorage.
- * Nota de seguridad: Esta verificación es una protección de estado en UI para evitar
- * modificaciones accidentales o no autorizadas en localStorage, pero no constituye una
- * barrera criptográfica frente a alguien con acceso a DevTools en el navegador.
+ * Soporta role_sig_v2 (preferente) y retrocompatibilidad con migración automática desde role_sig_v1.
+ * Protegido contra omisión fraudulenta mediante modo demo en congregaciones reales (isSafeDemoMode).
  */
 export function verifyRoleSessionSignature(role: string, roles?: string[]): boolean {
   if (typeof window === 'undefined') return true;
@@ -1470,15 +1510,21 @@ export function verifyRoleSessionSignature(role: string, roles?: string[]): bool
     if (normRole === 'publico' && normRolesList.every((r) => r === 'publico')) {
       return true;
     }
-    if (localStorage.getItem('kongre_demo_mode') === 'true') {
+    if (isSafeDemoMode()) {
       return true;
     }
 
     const normRoles = normRolesList.join(',');
-    const expectedSig = sha256HexSync(`role_sig_v1|${normRole}|${normRoles}|${AT_REST_CIPHER_KEY}`);
+    const deviceSalt = getDeviceEntropySalt();
+    const expectedSigV2 = sha256HexSync(`role_sig_v2|${normRole}|${normRoles}|${deviceSalt}|${AT_REST_CIPHER_KEY}`);
+    const expectedSigV1 = sha256HexSync(`role_sig_v1|${normRole}|${normRoles}|${AT_REST_CIPHER_KEY}`);
     const storedSig = localStorage.getItem(ROLE_SESSION_SIG_KEY);
 
-    if (storedSig && storedSig === expectedSig) {
+    if (storedSig && (storedSig === expectedSigV2 || storedSig === expectedSigV1)) {
+      if (storedSig === expectedSigV1) {
+        // Migración transparente a v2
+        signRoleSession(normRole, normRolesList);
+      }
       return true;
     }
 

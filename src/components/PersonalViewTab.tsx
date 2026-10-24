@@ -62,7 +62,7 @@ import {
   PushSubscriptionRecord,
 } from '../services/notificationService';
 import { PushSubscriptionModal } from './PushSubscriptionModal';
-import { setSecureLocalPin } from '../utils/theocraticSecurity';
+import { setSecureLocalPin, getPinLockoutRemainingSeconds } from '../utils/theocraticSecurity';
 
 export type PublisherPortalTab = 'asignaciones' | 'informe' | 'ausencias' | 'grupo' | 'avisos';
 export type NWPublisherTab = PublisherPortalTab;
@@ -119,6 +119,25 @@ export const PersonalViewTab: React.FC = () => {
   const [showSupervisorSelect, setShowSupervisorSelect] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [reportSuccessMsg, setReportSuccessMsg] = useState<string | null>(null);
+  const [lockoutSeconds, setLockoutSeconds] = useState<number>(() => {
+    return typeof window !== 'undefined' ? getPinLockoutRemainingSeconds() : 0;
+  });
+  const [isShaking, setIsShaking] = useState(false);
+
+  // Temporizador de cuenta regresiva en vivo para el bloqueo por intentos fallidos
+  useEffect(() => {
+    if (lockoutSeconds <= 0) return;
+    const interval = setInterval(() => {
+      setLockoutSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lockoutSeconds]);
 
   // Absence modal / form
   const [showAddAbsenceModal, setShowAddAbsenceModal] = useState(false);
@@ -313,6 +332,7 @@ export const PersonalViewTab: React.FC = () => {
   // Handle PIN login directly
   const handlePinSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (lockoutSeconds > 0) return;
     if (!enteredPin || enteredPin.length < 4) {
       setPinError('Introduce tu PIN de 4 dígitos asignado.');
       return;
@@ -342,15 +362,51 @@ export const PersonalViewTab: React.FC = () => {
           }
         }
         setEnteredPin('');
+        setLockoutSeconds(0);
       } else {
+        const remaining = getPinLockoutRemainingSeconds();
+        if (remaining > 0) {
+          setLockoutSeconds(remaining);
+        }
         setPinError(res.message || 'PIN Personal no reconocido.');
+        setIsShaking(true);
+        setTimeout(() => setIsShaking(false), 500);
+        try {
+          if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+            navigator.vibrate([40, 60, 40]);
+          }
+        } catch {}
       }
     } catch (err: any) {
       setPinError(err.message || 'Error al validar el PIN.');
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
     } finally {
       setIsVerifyingPin(false);
     }
   };
+
+  // Auto-cierre por inactividad (5 min) en vista personal para proteger privacidad en equipos compartidos
+  useEffect(() => {
+    if (!isAuthenticatedPublisher || canSupervise) return;
+
+    let timeoutId: any;
+    const resetTimer = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        handleExitPortal();
+      }, 5 * 60 * 1000); // 5 minutos de inactividad
+    };
+
+    resetTimer();
+    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+    events.forEach((ev) => window.addEventListener(ev, resetTimer, { passive: true }));
+
+    return () => {
+      clearTimeout(timeoutId);
+      events.forEach((ev) => window.removeEventListener(ev, resetTimer));
+    };
+  }, [isAuthenticatedPublisher, canSupervise]);
 
   // Exit / switch publisher
   const handleExitPortal = () => {
@@ -898,11 +954,19 @@ export const PersonalViewTab: React.FC = () => {
 
           {/* Formulario de PIN */}
           <form onSubmit={handlePinSubmit} className="space-y-4">
+            {/* Aviso visual de bloqueo por intentos fallidos */}
+            {lockoutSeconds > 0 && (
+              <div className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-200 text-xs font-semibold animate-pulse">
+                <Clock size={16} className="shrink-0 text-amber-600 dark:text-amber-400" />
+                <span>Bloqueo de seguridad: espera {lockoutSeconds}s para reintentar</span>
+              </div>
+            )}
+
             <div className="space-y-2">
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                 PIN Personal del Publicador
               </label>
-              <div className="relative max-w-xs mx-auto">
+              <div className={`relative max-w-xs mx-auto ${isShaking ? 'animate-shake' : ''}`}>
                 <input
                   type="password"
                   inputMode="numeric"
@@ -910,19 +974,30 @@ export const PersonalViewTab: React.FC = () => {
                   maxLength={6}
                   placeholder="••••"
                   value={enteredPin}
+                  disabled={lockoutSeconds > 0 || isVerifyingPin}
+                  autoComplete="one-time-code"
+                  data-lpignore="true"
+                  data-1p-ignore="true"
+                  data-bwignore="true"
+                  spellCheck={false}
                   onChange={(e) => {
+                    if (lockoutSeconds > 0) return;
                     const clean = e.target.value.replace(/\D/g, '').slice(0, 6);
                     setEnteredPin(clean);
                     setPinError(null);
                   }}
-                  className="w-full text-center text-3xl font-mono tracking-widest py-3 px-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border-2 border-slate-200 dark:border-slate-700 focus:border-purple-600 dark:focus:border-purple-500 focus:outline-hidden text-slate-900 dark:text-white transition-all shadow-inner"
+                  className={`w-full text-center text-3xl font-mono tracking-widest py-3 px-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border-2 ${
+                    isShaking ? 'border-rose-500 ring-2 ring-rose-500/20' : 'border-slate-200 dark:border-slate-700 focus:border-purple-600 dark:focus:border-purple-500'
+                  } focus:outline-hidden text-slate-900 dark:text-white transition-all shadow-inner ${
+                    lockoutSeconds > 0 ? 'opacity-50 cursor-not-allowed bg-slate-100 dark:bg-slate-800' : ''
+                  }`}
                   autoFocus
                 />
               </div>
 
               {pinError && (
                 <div className="flex items-center justify-center gap-1.5 text-xs text-rose-600 dark:text-rose-400 font-semibold animate-in fade-in">
-                  <AlertCircle size={14} />
+                  <AlertCircle size={14} className="shrink-0" />
                   <span>{pinError}</span>
                 </div>
               )}
@@ -934,7 +1009,9 @@ export const PersonalViewTab: React.FC = () => {
                 <button
                   key={k}
                   type="button"
+                  disabled={lockoutSeconds > 0 || isVerifyingPin}
                   onClick={() => {
+                    if (lockoutSeconds > 0 || isVerifyingPin) return;
                     if (k === 'C') {
                       setEnteredPin('');
                       setPinError(null);
@@ -947,7 +1024,9 @@ export const PersonalViewTab: React.FC = () => {
                       }
                     }
                   }}
-                  className={`py-3 rounded-xl font-bold text-base transition-all cursor-pointer ${
+                  className={`py-3 rounded-xl font-bold text-base transition-all ${
+                    lockoutSeconds > 0 || isVerifyingPin ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
+                  } ${
                     k === '✓'
                       ? 'bg-purple-600 hover:bg-purple-500 text-white shadow-xs'
                       : k === 'C'
@@ -962,11 +1041,13 @@ export const PersonalViewTab: React.FC = () => {
 
             <button
               type="submit"
-              disabled={isVerifyingPin || enteredPin.length < 4}
+              disabled={isVerifyingPin || enteredPin.length < 4 || lockoutSeconds > 0}
               className="w-full max-w-xs mx-auto py-3 px-6 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm shadow-md shadow-purple-600/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               {isVerifyingPin ? (
                 <span>Validando credencial...</span>
+              ) : lockoutSeconds > 0 ? (
+                <span>Bloqueado temporalmente ({lockoutSeconds}s)</span>
               ) : (
                 <>
                   <span>Ingresar a Mi Portal</span>

@@ -27,10 +27,14 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ### [v2.12.7] - 23 de Octubre, 2026 (Compilación Activa)
 **Título:** Auditoría Profunda de Seguridad: Mitigación de DoS en Rate Limits, Purga de PIN en Texto Plano y Blindaje Anti-Bypass
-- **Almacenamiento Seguro de PIN en Vista Personal (Mitigación Fuga Texto Plano):**
+- **Almacenamiento Seguro de PIN en Vista Personal (Mitigación Fuga Texto Plano y Anti-Fuerza Bruta):**
   - Se eliminó el almacenamiento en texto plano en `localStorage.setItem('kongre_session_pin_v2')` en `PersonalViewTab.tsx`.
   - Ahora se utiliza `setSecureLocalPin`, conservando el PIN en memoria volátil de sesión (`sessionStorage`) y cifrándolo en reposo con `kgr_v2:...` derivado de la sal de entropía del dispositivo.
   - Purga completa y limpia de PINs y hashes al cerrar sesión en `PersonalViewTab.tsx`, `Navbar.tsx` y `AuthContext.tsx`.
+  - **Temporizador Visual de Bloqueo Anti-Fuerza Bruta:** Al alcanzar el tope de intentos fallidos, la Vista Personal muestra un aviso con cuenta regresiva en vivo (`⏳ Bloqueo de seguridad: espera Xs`) e inhabilita el teclado táctil y el botón de ingreso.
+  - **Auto-cierre por Inactividad (5 min):** Para proteger la privacidad en tabletas o dispositivos compartidos del Salón del Reino, el portal personal se cierra y purga credenciales tras 5 minutos sin interacción del usuario.
+  - **Blindaje contra Autocompletado del Navegador:** Atributos `autoComplete="one-time-code"`, `data-lpignore="true"` y `data-1p-ignore="true"` para prevenir autoguardado del PIN en navegadores compartidos.
+  - **Feedback Háptico y Animación de Sacudida:** Respuesta vibratoria (`navigator.vibrate`) y animación CSS `.animate-shake` ante fallos de autenticación.
 - **Mitigación de DoS y Agotamiento de Tabla en Edge Function `kongre-sync`:**
   - En la acción `verify_personal_pin`, se verifica la existencia previa de `publisher_id` en `row.personal_verifiers` antes de instanciar contadores en la tabla `sync_rate_limits`.
   - Si el publicador no existe en la congregación, la solicitud es rechazada de forma estandarizada (`401 invalid_credentials`) sin crear buckets de contadores arbitrarios en Postgres, previniendo ataques de agotamiento de almacenamiento y DoS.

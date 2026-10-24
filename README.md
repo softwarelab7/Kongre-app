@@ -1,7 +1,11 @@
 # Kongre - Gestor Teocrático Integral
 
 <p align="center">
-  <img src="public/logo/kongre_horizontal_positivo.svg" width="260" alt="Kongre Logo" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="public/logo/kongre_horizontal_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="public/logo/kongre_horizontal_positivo.svg">
+    <img src="public/logo/kongre_horizontal_positivo.svg" width="280" alt="Kongre - Gestor Teocrático Integral" />
+  </picture>
 </p>
 
 <p align="center">
@@ -9,7 +13,13 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-2.8.4-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión 2.8.4" />
+  <a href="https://www.kongre-app.com"><strong>🌐 https://www.kongre-app.com — Acceder a la Aplicación en Producción</strong></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-2.12.11-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión 2.12.11" />
+  <img src="https://img.shields.io/badge/Google%20OAuth-Brand%20Verified-4285F4?style=flat-square&logo=google&logoColor=white" alt="Google OAuth Brand Verified" />
+  <img src="https://img.shields.io/badge/2FA-Microsoft%20Authenticator-00A4EF?style=flat-square&logo=microsoft&logoColor=white" alt="2FA Microsoft Authenticator" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
   <img src="https://img.shields.io/badge/TypeScript-7.0-3178c6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Vite-8.3-646cff?style=flat-square&logo=vite&logoColor=white" alt="Vite 8" />
@@ -30,43 +40,32 @@
 - **Publicadores y Fichas S-21**: Control de informes, grupos de servicio, privilegios y deduplicación inteligente de registros.
 - **Asistencia S-88 y Dashboard Analítico**: Gráficos de tendencias mensuales y semanales con Recharts, desglose presencial/Zoom y métricas del año de servicio.
 - **Cuentas, Literatura y Mantenimiento del Salón**: Libro de transacciones, hojas de auditoría, inventario físico de publicaciones y cuadro de disyuntores eléctricos.
+- **Autenticación en Dos Pasos (2FA) TOTP**: Verificación opcional con **Microsoft Authenticator** (RFC 6238), códigos de respaldo y dispositivos de confianza por 30 días, 100% calculada en cliente de forma desconectada.
 - **Seguridad Cero Conocimiento (Zero-Knowledge)**: Cifrado en el dispositivo mediante **AES-256-GCM** y derivación **PBKDF2 (100,000 iteraciones)** antes de sincronizarse con la nube mediante **Supabase**.
 - **Modo Offline & Modo Demo**: Soporte PWA 100% desconectado y entorno de demostración precargado para explorar sin modificar datos reales.
 
 ---
 
-## ✨ Novedades Recientes (v2.8.4)
+## ✨ Novedades Recientes (v2.12.11)
 
-### 🎨 Estandarización de Marca Oficial Índigo (#4C3AED) y Parche v3
-- **Escala de Color Tailwind Centralizada**: Integración de `kongre-indigo.css` mapeando la paleta oficial de marca sobre las clases `indigo-*` de TailwindCSS.
-- **PWA Manifest Estandarizado**: Tema `#4C3AED`, fondo `#FFFFFF` e iconos limpios de 192px, 512px y 512px maskable en el Service Worker.
-- **Metadatos y Tarjetas Sociales**: URLs absolutas oficiales para imágenes Open Graph y Twitter Cards (`https://kongre.ai.studio/og-image-1200x630.png`).
-- **Depuración Integral de Activos**: Retiro de archivos gráficos antiguos y generación de favicons multiformato, splash screen y logotipos de alta fidelidad.
-- **Logotipo Unificado**: Variante plana (`flat`) por defecto en `KongreLogo` para consistencia absoluta con los recursos de marca.
+### 🛡️ Autenticación de Dos Pasos (2FA) con Microsoft Authenticator y Códigos de Respaldo
+- **Motor Criptográfico TOTP Cliente Nativo (RFC 6238)**: Algoritmo HMAC-SHA1 ejecutado directamente en el navegador con la Web Crypto API (`window.crypto.subtle`), con intervalos de 30 segundos, código de 6 dígitos y tolerancia de desfase horario ($\pm 30$s). Funciona totalmente fuera de línea sin servidores de terceros.
+- **Configuración Intuitiva con Microsoft Authenticator**: Asistente en 3 pasos con código QR oficial `otpauth://totp/...` y copiado de clave secreta manual.
+- **8 Códigos de Respaldo de Emergencia**: Códigos alfanuméricos de un solo uso protegidos en reposo mediante hash SHA-256 (arquitectura de conocimiento cero) descargables en archivo `.txt`.
+- **Dispositivos de Confianza ("Recordar por 30 días")**: Posibilidad de marcar el dispositivo de uso personal para no solicitar el código de 6 dígitos en cada inicio de sesión, exigiéndolo solo en navegadores nuevos o tras 30 días de inactividad.
+- **Gestión Teocrática**: Insignia verde `[2FA]` en el Directorio y botón de restablecimiento de emergencia exclusivo para ancianos en caso de extravío de teléfono.
+
+### 📜 Páginas Legales Oficiales y Rutas Directas (v2.12.10)
+- **Acceso Público a Documentos Legales**: Rutas directas `#privacy`, `#terms`, `/privacy` y `/terms` disponibles tanto en la PWA como mediante páginas HTML estáticas autónomas (`privacy.html`, `terms.html`).
+- **Verificación de Marca Google OAuth**: Declaración transparente de cumplimiento de la *Google API Services User Data Policy* y requisitos de *Limited Use*, garantizando que ningún dato de perfil es comercializado ni compartido con terceros.
+
+### 🔄 Selector y Cambio Fluido de Cuentas Google (v2.12.9)
+- Selector de cuentas limpio e interactivo al pulsar "Cambiar cuenta", evitando bloqueos de pantalla o reapariciones involuntarias del botón de inicio.
 
 ### 💻 Portal de Bienvenida Teocrático para PC y Móviles
-- **Experiencia de Escritorio (PC)**:
-  - Cabecera con selector de tema de 3 modos: **Claro**, **Oscuro** y **Cabina A/V** (modo de contraste especial para cabina de sonido).
-  - Acceso directo a **Modo Demo** con un solo clic.
-  - Columna izquierda con insignia de destellos interactivos, titular en gradiente y cuadrícula 2x2 de características (`.feat`) con divisores sutiles e iconografía teocrática Lucide React.
-  - Tarjeta interactiva de acceso (`.card` y `.opt`):
-    - 🏛️ **Registrar mi Congregación**: Asistente completo por pasos con badge oficial.
-    - 👤 **Iniciar sesión con Google**: Vinculación de perfil y asignaciones.
-    - 🔑 **Conectar con ID y PIN de Congregación**: Autenticación teocrática directa.
-    - 👁️ **Iniciar sesión con código de invitación**: Acceso de un solo uso en dispositivo local con código temporal.
-- **Experiencia Móvil (Smartphones)**:
-  - Encabezado con gradiente teocrático `#4C3AED`, logotipo vertical e indicador de estado offline.
-  - Bottom sheet táctil deslizante con esquinas redondeadas y opciones optimizadas para pulsación con una sola mano.
-
-### 🧪 Modo Demo Teocrático
-- Exploración de todas las funciones sin requerir registro ni alterar datos de una congregación real.
-- Carga instantánea de publicadores simulados, programas de reuniones semanales, territorios cartográficos y hojas de asignación.
-- Banner de advertencia flotante que permite reiniciar los datos de prueba o salir al portal de bienvenida en cualquier momento.
-
-### 📊 Dashboard Analítico de Asistencia (Recharts)
-- Visualización de doble capa (barras y áreas) de la asistencia mensual durante el Año de Servicio teocrático (Septiembre a Agosto).
-- Comparativa presencial vs. Zoom con gráficos apilados y cálculo de promedios anuales.
-- Vistas por desglose semanal continuo, distribución de canales y tabla exportable a formato CSV.
+- Selector de tema de 3 modos: **Claro**, **Oscuro** y **Cabina A/V** (modo de contraste especial para cabina de sonido).
+- Acceso directo a **Modo Demo** con un solo clic para capacitación y pruebas.
+- Opciones de acceso unificadas: Registro de congregación, PIN teocrático, Google Sign-In y Códigos de Invitación.
 
 ---
 
@@ -77,10 +76,10 @@
 - **Gráficos & Métricas**: [Recharts](https://recharts.org/)
 - **Cartografía**: [Leaflet 1.9](https://leafletjs.com/), [OpenStreetMap](https://www.openstreetmap.org/), CartoDB, Esri
 - **Base de Datos & Tiempo Real**: [Supabase](https://supabase.com/) (PostgreSQL, Realtime & Authentication)
-- **Criptografía**: Web Crypto API nativa (AES-256-GCM, PBKDF2 SHA-256, CSPRNG)
+- **Criptografía**: Web Crypto API nativa (AES-256-GCM, PBKDF2 SHA-256, HMAC-SHA1 TOTP RFC 6238, CSPRNG)
 - **Documentos PDF**: [jsPDF](https://github.com/parallax/jsPDF) & [html2canvas](https://html2canvas.hertzen.com/)
 - **Iconografía**: [Lucide React](https://lucide.dev/)
-- **Entorno de Ejecución**: [Bun](https://bun.sh/)
+- **Entorno de Ejecución**: [Bun](https://bun.sh/) o Node.js v20+
 
 ---
 
@@ -119,10 +118,13 @@ La aplicación estará disponible de inmediato en `http://localhost:3050`.
 
 ### 5. Verificación de calidad y compilación para producción
 ```bash
+# Ejecutar suite de pruebas unitarias y de integración
+bun run test
+
 # Comprobación estricta de tipos TypeScript
 bun x tsc --noEmit
 
-# Compilación optimizada para producción
+# Compilación optimizada para producción con CSP reforzado
 bun run build
 ```
 
@@ -134,7 +136,8 @@ Kongre ha sido concebido bajo los más rigurosos principios de confidencialidad 
 
 1. **Cifrado de Extremo a Extremo en el Dispositivo**: Los datos sensibles (asignaciones, notas de pastoreo, fichas de publicadores) se cifran antes de abandonar el navegador.
 2. **Control de Acceso por Roles (RBAC)**: Cada hermano solo puede visualizar y editar la información correspondiente a su nombramiento o asignación oficial.
-3. **Auditoría Inmutable**: Registro cronológico local de eventos críticos firmado criptográficamente para trazabilidad.
+3. **Autenticación en Dos Pasos (2FA)**: Protección robusta opcional para evitar suplantaciones o accesos no autorizados en dispositivos nuevos o prestados.
+4. **Auditoría Inmutable**: Registro cronológico local de eventos críticos firmado criptográficamente para trazabilidad.
 
 ---
 

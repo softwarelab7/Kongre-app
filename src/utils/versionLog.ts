@@ -25,18 +25,49 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.1';
-export const CURRENT_BUILD_CODE = '2026.10.23.5200';
+export const CURRENT_APP_VERSION = '2.12.2';
+export const CURRENT_BUILD_CODE = '2026.10.23.5300';
 export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.2',
+    buildCode: '2026.10.23.5300',
+    date: '23 de Octubre, 2026',
+    title: 'Blindaje de Seguridad Integral: Cifrado en Reposo (Ley 1581), Cabeceras HTTP y Dominio Oficial',
+    isCurrent: true,
+    highlight: 'Última versión compilada y activa con suite completa de seguridad',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Cifrado de datos sensibles en reposo (Ley 1581 / Salud y Contactos): Notas médicas, alergias, teléfonos, direcciones y contactos de emergencia ahora se almacenan cifrados con AES-256-GCM en el almacenamiento local y se descifran en memoria transparentemente.',
+      },
+      {
+        category: 'security',
+        text: 'Cabeceras HTTP de seguridad en producción: Despliegue de Content-Security-Policy (Report-Only), X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Strict-Transport-Security y Permissions-Policy en vercel.json.',
+      },
+      {
+        category: 'security',
+        text: 'Validación de bloqueo RLS en base de datos: Confirmación de restricción 42501 en tablas públicas directas de Supabase y enrutamiento exclusivo a través de la Edge Function kongre-sync.',
+      },
+      {
+        category: 'improvement',
+        text: 'Dominio Oficial y Analíticas: Despliegue en kongre-app.com con integración de Vercel Analytics y Speed Insights.',
+      },
+      {
+        category: 'fix',
+        text: 'Higiene web y dependencias: Atributo rel="noopener noreferrer" en todos los enlaces externos de la interfaz y resolución de conflictos peer-dependencies en esbuild.',
+      },
+    ],
+  },
+  {
     version: '2.12.1',
     buildCode: '2026.10.23.5200',
     date: '23 de Octubre, 2026',
     title: 'Transición Fluida de OAuth con Google y Diseño Full-Width en Portal de Acceso',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Última versión compilada y activa',
     environment: 'Producción Cloud (Kongre)',
     changes: [

@@ -25,7 +25,28 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.12.1] - 23 de Octubre, 2026 (Compilación Activa)
+### [v2.12.2] - 23 de Octubre, 2026 (Compilación Activa)
+**Título:** Blindaje de Seguridad Integral: Cifrado en Reposo (Ley 1581), Cabeceras HTTP y Dominio Oficial
+- **Cifrado de Datos Sensibles en Reposo (Ley 1581 / Salud y Contactos):**
+  - Implementación de cifrado autenticado AES-256-GCM para todos los datos de salud y contacto en el almacenamiento local (`localStorage`).
+  - Notas médicas, alergias, directivas médicas anticipadas, números de teléfono personales, direcciones de domicilio y contactos de emergencia ahora se protegen con el prefijo `kgr_sec2:`, descifrándose únicamente en memoria de manera transparente.
+  - Compatibilidad total hacia atrás: registros legados preexistentes se leen sin interrupciones.
+- **Cabeceras HTTP de Seguridad Estrictas en Producción:**
+  - Configuración completa en `vercel.json` de cabeceras de grado empresarial: `Content-Security-Policy` (modo Report-Only), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Strict-Transport-Security`, `Permissions-Policy` y `Cross-Origin-Opener-Policy`.
+- **Bloqueo RLS y Verificación de Cierre de Base de Datos:**
+  - Tablas públicas en Supabase (`sync_queue`, `publisher_invitations`, `sync_rate_limits`) cerradas con restricción `42501 (Permission Denied)` para cualquier llamada REST directa con clave anónima.
+  - Todas las operaciones de sincronización y verificación de PIN personal se ejecutan de manera aislada en la Edge Function `kongre-sync` con limitador de intentos distribuido.
+- **Tokens de Enlace Seguros y Generador de PIN:**
+  - Los enlaces y códigos QR generados (`kgr_tk1_...`) ya no transportan PINs de congregación ni personales en texto, con expiración estricta de 7 días.
+  - Generador de PIN maestro reforzado a 12 dígitos aleatorios criptográficamente seguros.
+- **Dominio Oficial y Analíticas en Tiempo Real:**
+  - Migración y despliegue exitoso en el dominio propio `https://kongre-app.com` con SSL/TLS gestionado.
+  - Integración de `@vercel/analytics` y `@vercel/speed-insights` para monitoreo de rendimiento y experiencia de usuario.
+- **Higiene Web y Dependencias:**
+  - Incorporación de `rel="noopener noreferrer"` en todos los enlaces externos de la interfaz.
+  - Actualización de `esbuild` para resolución limpia de conflictos de dependencias con Vite.
+
+### [v2.12.1] - 23 de Octubre, 2026
 **Título:** Transición Fluida de OAuth con Google y Diseño Full-Width en Portal de Acceso
 - **Navegación Fluida tras Autenticación con Google:**
   - Se eliminó el problema de tener que hacer clic dos veces en "Iniciar sesión con Google". Ahora la aplicación recuerda la vista pendiente y cambia automáticamente al menú de vinculación congregacional (`email_login`) en cuanto Supabase valida la cuenta de Google.

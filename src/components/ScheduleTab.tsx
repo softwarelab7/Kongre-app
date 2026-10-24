@@ -1,5 +1,4 @@
-// src/components/ScheduleTab.tsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -349,6 +348,26 @@ export const ScheduleTab: React.FC = () => {
     setTimeout(() => setToastNotification(null), 3000);
   };
 
+  const touchStartXRef = useRef<number | null>(null);
+
+  const handleWeekTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0]?.clientX ?? null;
+  };
+
+  const handleWeekTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null) return;
+    const endX = e.changedTouches[0]?.clientX ?? touchStartXRef.current;
+    const deltaX = endX - touchStartXRef.current;
+    touchStartXRef.current = null;
+    if (Math.abs(deltaX) >= 55) {
+      if (deltaX > 0) {
+        goToPreviousWeek();
+      } else {
+        goToNextWeek();
+      }
+    }
+  };
+
   const goToPreviousWeek = () => {
     if (currentIndex > 0) {
       setCurrentWeekId(sortedWeeks[currentIndex - 1].id);
@@ -476,27 +495,30 @@ export const ScheduleTab: React.FC = () => {
 
 
   return (
-    <div className="space-y-6">
-      {/* Barra de Herramientas de Programa de Reuniones (Opción 1: arranque directo sin banner redundante) */}
-      <div className="bg-white/80 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl border border-slate-200/80 dark:border-white/[0.08] p-3 sm:p-4 shadow-2xs space-y-3">
-        {/* Fila 1: Navegación de Semana y Selector de Modalidad */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Barra de Herramientas de Programa de Reuniones (Swipeable en Móvil, sin superposición) */}
+      <div
+        onTouchStart={handleWeekTouchStart}
+        onTouchEnd={handleWeekTouchEnd}
+        className="relative z-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] p-3 sm:p-4 shadow-xs space-y-2.5 sm:space-y-3"
+      >
+        {/* Fila 1: Navegación de Semana y Selector de Modalidad (Apilados limpiamente en móvil, en línea en desktop) */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 md:gap-3">
+          {/* Bloque 1A: Contador (desktop) + Cápsula de Semana + Botón Hoy */}
+          <div className="flex items-center justify-between md:justify-start gap-2 w-full md:w-auto min-w-0">
+            <span className="hidden lg:inline-block text-xs font-semibold text-slate-500 dark:text-slate-400 mr-1 shrink-0">
               Semana {currentIndex + 1} de {sortedWeeks.length}
             </span>
-          </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
             {/* Cápsula de navegación de semana interactiva con selector rápido */}
-            <div className="relative">
-              <div className="flex items-center bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] p-1 rounded-xl">
+            <div className="relative flex items-center gap-1.5 flex-1 md:flex-initial min-w-0">
+              <div className="flex items-center justify-between flex-1 md:flex-initial min-w-0 bg-slate-100 dark:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08] p-1 rounded-xl">
                 <button
                   type="button"
                   onClick={goToPreviousWeek}
                   disabled={currentIndex <= 0}
-                  className="p-1 rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
-                  title="Semana anterior"
+                  className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-1.5 sm:p-1 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-800 disabled:opacity-30 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer active:scale-95 shrink-0"
+                  title="Semana anterior (o desliza a la derecha)"
                   aria-label="Semana anterior"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -505,18 +527,18 @@ export const ScheduleTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsWeekPickerOpen((prev) => !prev)}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-800 dark:text-white hover:bg-white dark:hover:bg-slate-800/80 transition-all cursor-pointer select-none whitespace-nowrap shadow-2xs"
+                  className="min-h-[36px] sm:min-h-0 flex-1 md:flex-initial min-w-0 flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-800 dark:text-white hover:bg-white dark:hover:bg-slate-800/80 transition-all cursor-pointer select-none shadow-2xs"
                   title="Clic para abrir selector de semanas, meses y calendario"
                 >
                   <Calendar className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                  <span>
+                  <span className="truncate">
                     {formatTheocraticWeekRangeShort(currentWeek.weekStartDate, currentWeek.weekEndDate)}
                   </span>
                   {isCurrentWeekToday && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" title="Semana en curso (Hoy)" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block shrink-0" title="Semana en curso (Hoy)" />
                   )}
                   <ChevronDown
-                    className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
+                    className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0 ${
                       isWeekPickerOpen ? 'rotate-180 text-indigo-500' : ''
                     }`}
                   />
@@ -525,13 +547,25 @@ export const ScheduleTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={goToNextWeek}
-                  className="p-1 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer"
-                  title={currentIndex < sortedWeeks.length - 1 ? 'Semana siguiente' : 'Crear siguiente semana'}
+                  className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 p-1.5 sm:p-1 flex items-center justify-center rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 cursor-pointer active:scale-95 shrink-0"
+                  title={currentIndex < sortedWeeks.length - 1 ? 'Semana siguiente (o desliza a la izquierda)' : 'Crear siguiente semana'}
                   aria-label="Semana siguiente"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
+
+              {/* Botón rápido "Hoy" cuando el usuario navega a otra semana */}
+              {!isCurrentWeekToday && (
+                <button
+                  type="button"
+                  onClick={goToToday}
+                  className="min-h-[38px] sm:min-h-0 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/70 text-xs font-extrabold hover:bg-indigo-100 transition-all cursor-pointer shrink-0 active:scale-95"
+                  title="Volver a la semana actual (Hoy)"
+                >
+                  Hoy
+                </button>
+              )}
 
               {/* Popover desplegable de semanas y fechas */}
               {isWeekPickerOpen && (
@@ -541,7 +575,7 @@ export const ScheduleTab: React.FC = () => {
                     onClick={() => setIsWeekPickerOpen(false)}
                   />
 
-                  <div className="fixed sm:absolute top-24 sm:top-full left-3 right-3 sm:left-auto sm:right-0 sm:mt-2 z-50 sm:w-[380px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="fixed sm:absolute top-20 sm:top-full left-3 right-3 sm:left-0 sm:right-auto sm:mt-2 z-50 sm:w-[380px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/5">
                       <div className="flex items-center gap-2">
                         <CalendarDays className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -686,13 +720,15 @@ export const ScheduleTab: React.FC = () => {
                 </>
               )}
             </div>
+          </div>
 
-            {/* Selector de tipo de reunión compacto */}
-            <div className="flex items-center bg-slate-100 dark:bg-white/[0.05] p-1 rounded-xl border border-slate-200/80 dark:border-white/[0.08]">
+          {/* Bloque 1B: Selector de tipo de reunión (3 columnas simétricas en móvil, en línea en desktop) */}
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            <div className="grid grid-cols-3 md:flex items-center w-full md:w-auto bg-slate-100 dark:bg-white/[0.05] p-1 rounded-xl border border-slate-200/80 dark:border-white/[0.08] gap-1">
               <button
                 type="button"
                 onClick={() => setViewMode('all')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center truncate ${
                   viewMode === 'all'
                     ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-2xs font-bold'
                     : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
@@ -703,7 +739,7 @@ export const ScheduleTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('midweek')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center truncate ${
                   viewMode === 'midweek'
                     ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-2xs font-bold'
                     : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
@@ -714,7 +750,7 @@ export const ScheduleTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setViewMode('weekend')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                className={`min-h-[36px] md:min-h-0 px-2 sm:px-3 py-1.5 md:py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer text-center truncate ${
                   viewMode === 'weekend'
                     ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-2xs font-bold'
                     : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
@@ -724,10 +760,10 @@ export const ScheduleTab: React.FC = () => {
               </button>
             </div>
 
-            {/* Botón Nueva Semana sutil */}
+            {/* Botón Nueva Semana sutil (solo en desktop md+) */}
             <button
               onClick={addNextWeek}
-              className="p-2 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer"
+              className="hidden md:flex p-2 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer shrink-0"
               title="Añadir nueva semana"
             >
               <Plus className="w-4 h-4" />
@@ -735,14 +771,14 @@ export const ScheduleTab: React.FC = () => {
           </div>
         </div>
 
-        {/* ── BARRA DE HERRAMIENTAS ULTRA MINIMALISTA ── */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-slate-200/60 dark:border-white/[0.06] w-full text-xs">
+        {/* ── BARRA DE HERRAMIENTAS DE ACCIONES ── */}
+        <div className="flex items-center justify-between gap-1.5 sm:gap-2 pt-2.5 border-t border-slate-200/60 dark:border-white/[0.06] w-full text-xs flex-wrap">
           {/* Lado izquierdo: Acciones clave con diseño limpio */}
           <div className="flex items-center gap-1.5 flex-wrap">
             {!isReadOnly ? (
               <button
                 onClick={autoAssignCurrentWeek}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-2xs cursor-pointer"
+                className="min-h-[36px] sm:min-h-0 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-2xs cursor-pointer active:scale-95"
                 title="Autoasignar toda esta semana respetando rotación y sin cruces"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
@@ -756,7 +792,7 @@ export const ScheduleTab: React.FC = () => {
 
             <button
               onClick={() => setIsBatchWhatsAppOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 font-medium transition-all cursor-pointer"
+              className="min-h-[36px] sm:min-h-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 font-medium transition-all cursor-pointer active:scale-95"
               title="Enviar recordatorios de la semana por WhatsApp"
             >
               <MessageCircle className="w-3.5 h-3.5 shrink-0" />
@@ -765,12 +801,12 @@ export const ScheduleTab: React.FC = () => {
           </div>
 
           {/* Lado derecho: Documentos, Cruces y Menú Más */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {/* S-89 oficial */}
+          <div className="flex items-center gap-1.5 flex-wrap ml-auto sm:ml-0">
+            {/* S-89 oficial (en escritorio visible directo, en móvil dentro de Más Opciones) */}
             <button
               type="button"
               onClick={handlePrintS89}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 font-medium transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 font-medium transition-all cursor-pointer"
               title="Descargar hojas oficiales de asignación S-89 en PDF"
             >
               <FileText className="w-3.5 h-3.5 text-rose-500 shrink-0" />
@@ -781,7 +817,7 @@ export const ScheduleTab: React.FC = () => {
             <button
               type="button"
               onClick={handleOpenS38}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 font-medium transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-zinc-200 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 font-medium transition-all cursor-pointer"
               title="Registros S-38 y folleto de oratoria"
             >
               <Award className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
@@ -792,7 +828,7 @@ export const ScheduleTab: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsTimerModalOpen(true)}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-amber-800 dark:text-amber-300 bg-amber-50/70 hover:bg-amber-100/80 dark:bg-amber-950/40 dark:hover:bg-amber-900/50 border border-amber-200/80 dark:border-amber-800/60 font-semibold transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-amber-800 dark:text-amber-300 bg-amber-50/70 hover:bg-amber-100/80 dark:bg-amber-950/40 dark:hover:bg-amber-900/50 border border-amber-200/80 dark:border-amber-800/60 font-semibold transition-all cursor-pointer"
               title="Abrir Modo Atril y Cronómetro de Presidencia"
             >
               <Timer className="w-3.5 h-3.5 text-amber-500 shrink-0" />
@@ -803,7 +839,7 @@ export const ScheduleTab: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsConflictsModalOpen(true)}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-medium transition-all cursor-pointer border ${
+              className={`min-h-[36px] sm:min-h-0 flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-semibold transition-all cursor-pointer border active:scale-95 ${
                 weekConflictsCount > 0
                   ? 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
                   : 'text-slate-600 dark:text-zinc-300 border-slate-200/80 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5'
@@ -823,8 +859,9 @@ export const ScheduleTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsMoreMenuOpen((prev) => !prev)}
-                className="flex items-center gap-1 p-1.5 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer"
-                title="Más herramientas y opciones"
+                className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 flex items-center justify-center gap-1 p-1.5 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer active:scale-95"
+                title="Más herramientas, S-89, S-38 y opciones"
+                aria-label="Más herramientas y opciones"
               >
                 <MoreHorizontal className="w-4 h-4" />
               </button>
@@ -835,7 +872,34 @@ export const ScheduleTab: React.FC = () => {
                     className="fixed inset-0 z-40"
                     onClick={() => setIsMoreMenuOpen(false)}
                   />
-                  <div className="absolute right-0 top-full mt-1.5 w-60 max-h-[calc(100vh-140px)] overflow-y-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="absolute right-0 top-full mt-1.5 w-64 max-h-[calc(100vh-140px)] overflow-y-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-100">
+                    {/* Mobile quick access to S-89 and S-38 */}
+                    <div className="sm:hidden pb-1 mb-1 border-b border-slate-100 dark:border-white/5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsMoreMenuOpen(false);
+                          handlePrintS89();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                      >
+                        <FileText className="w-4 h-4 text-rose-500 shrink-0" />
+                        <span>Descargar Hojas S-89 (PDF)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsMoreMenuOpen(false);
+                          handleOpenS38();
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                      >
+                        <Award className="w-4 h-4 text-indigo-500 shrink-0" />
+                        <span>Registro de Estudiantes (S-38)</span>
+                      </button>
+                    </div>
+
                     <button
                       type="button"
                       onClick={() => {
@@ -1010,23 +1074,23 @@ export const ScheduleTab: React.FC = () => {
             }`}
           >
             {/* ── ENCABEZADO FDS SUPER MINIMALISTA (MODO EMBEBIDO / UNIFICADO) ── */}
-            <div className="px-3.5 sm:px-5 py-2.5 bg-slate-50/70 dark:bg-slate-800/30 border-b border-slate-200/70 dark:border-white/[0.05] flex items-center justify-between gap-2.5 sm:gap-3 flex-wrap text-xs">
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                <span className="font-bold text-slate-800 dark:text-zinc-200">
+            <div className="px-3.5 sm:px-5 py-3 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200/70 dark:border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
+                <span className="font-bold text-slate-900 dark:text-zinc-100 text-xs sm:text-sm">
                   Reunión del Fin de Semana
                 </span>
-                <span className="text-slate-300 dark:text-slate-600">•</span>
-                <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
+                <span className="hidden sm:inline text-slate-300 dark:text-slate-600">•</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide text-[11px] sm:text-xs">
                   {formatTheocraticMeetingDate(currentWeek.weekend.date, settings.weekendMeetingDay)} {settings.weekendMeetingTime ? `(${settings.weekendMeetingTime})` : ''}
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-white/[0.05]">
                 {!isReadOnly && (
                   <button
                     type="button"
                     onClick={() => handleQuickSyncOrganized('weekend')}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-medium text-xs transition shadow-2xs cursor-pointer active:scale-95"
+                    className="min-h-[34px] flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
                     title="Traer de Organized el bosquejo oficial y canciones del fin de semana"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -1040,7 +1104,7 @@ export const ScheduleTab: React.FC = () => {
                     setOrganizedModalTab('bosquejos');
                     setIsOrganizedModalOpen(true);
                   }}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-medium text-xs transition shadow-2xs cursor-pointer active:scale-95"
+                  className="min-h-[34px] flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 font-semibold text-xs transition shadow-2xs cursor-pointer active:scale-95"
                   title="Ver catálogo oficial de 194 bosquejos"
                 >
                   <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -2541,7 +2605,7 @@ export const ScheduleTab: React.FC = () => {
 
       {/* TOAST NOTIFICATION */}
       {toastNotification && (
-        <div className="fixed bottom-20 sm:bottom-6 right-6 z-50 px-4 py-3 bg-slate-900 text-white rounded-2xl shadow-2xl border border-indigo-500/40 text-xs font-bold flex items-center gap-2.5 animate-in fade-in slide-in-from-bottom duration-200">
+        <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-6 left-4 right-4 sm:left-auto sm:right-6 z-50 px-4 py-3 bg-slate-900 text-white rounded-2xl shadow-2xl border border-indigo-500/40 text-xs font-bold flex items-center gap-2.5 animate-in fade-in slide-in-from-bottom duration-200">
           <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
           <span>{toastNotification}</span>
         </div>

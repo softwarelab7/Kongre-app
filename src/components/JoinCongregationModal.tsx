@@ -20,6 +20,11 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
+import {
+  LegalConsentCheckbox,
+  hasAcceptedLegalTerms,
+  recordLegalTermsAcceptance,
+} from './TermsAndPrivacyModal';
 
 interface JoinCongregationModalProps {
   isOpen: boolean;
@@ -107,12 +112,25 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
     identifiedBrother: string;
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [acceptedLegalTerms, setAcceptedLegalTerms] = useState<boolean>(() =>
+    hasAcceptedLegalTerms()
+  );
+
+  React.useEffect(() => {
+    const syncConsent = () => setAcceptedLegalTerms(hasAcceptedLegalTerms());
+    window.addEventListener('kongre_legal_terms_accepted', syncConsent);
+    return () => window.removeEventListener('kongre_legal_terms_accepted', syncConsent);
+  }, []);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (!acceptedLegalTerms) {
+      setError('Debes aceptar los Términos de Uso y la Política de Privacidad para conectarte a la congregación.');
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -148,6 +166,8 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
         setIsSubmitting(false);
         return;
       }
+
+      recordLegalTermsAcceptance();
 
       // Si el ID ingresado no es de demostración, desactivar banderas previas de modo demo
       const isInputDemo = cleanId.toUpperCase().includes('DEMO') || cleanId === '1001';
@@ -676,6 +696,14 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
               </span>
             </div>
 
+            <LegalConsentCheckbox
+              checked={acceptedLegalTerms}
+              onChange={(val) => {
+                setAcceptedLegalTerms(val);
+                if (val) setError(null);
+              }}
+            />
+
             <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
@@ -686,8 +714,8 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold cursor-pointer shadow-md disabled:opacity-50 flex items-center gap-1.5"
+                disabled={isSubmitting || !acceptedLegalTerms}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
               >
                 <span>{isSubmitting ? 'Verificando datos...' : 'Conectar a la Congregación'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />

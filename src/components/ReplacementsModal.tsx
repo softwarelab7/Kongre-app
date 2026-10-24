@@ -130,11 +130,15 @@ export const ReplacementsModal: React.FC<ReplacementsModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label={`Gestión de reemplazo: ${assignmentTitle}`}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
     >
-      <div className="bg-white rounded-3xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-100">
+      <div className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-xl w-full max-h-[90dvh] sm:max-h-[85vh] flex flex-col shadow-2xl border border-slate-100 dark:border-slate-800 pb-[env(safe-area-inset-bottom,0px)] sm:pb-0 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
+        {/* Mobile Bottom Sheet Handle */}
+        <div onClick={onClose} className="sm:hidden w-full pt-2.5 pb-0.5 flex justify-center items-center cursor-pointer shrink-0">
+          <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+        </div>
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-700 flex items-center justify-center">
               <ArrowRightLeft className="w-5 h-5" />

@@ -40,11 +40,11 @@ export const SplashCheckbox = React.forwardRef<HTMLInputElement, SplashCheckboxP
 
     return (
       <div
-        className={`inline-flex items-start gap-2.5 select-none ${
+        className={`inline-flex ${description ? 'items-start' : 'items-center'} gap-2 select-none ${
           disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
         } ${wrapperClassName}`}
       >
-        <div className={`checkbox-wrapper-12 shrink-0 ${sizeScale}`}>
+        <div className={`checkbox-wrapper-12 shrink-0 flex items-center justify-center ${sizeScale}`}>
           <div className="cbx">
             <input
               ref={ref}
@@ -81,14 +81,14 @@ export const SplashCheckbox = React.forwardRef<HTMLInputElement, SplashCheckboxP
         </div>
 
         {(label || description) && (
-          <label htmlFor={inputId} className={`flex flex-col text-left ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+          <label htmlFor={inputId} className={`flex flex-col justify-center text-left ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
             {label && (
-              <span className="text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 leading-tight">
+              <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 leading-none">
                 {label}
               </span>
             )}
             {description && (
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-normal">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
                 {description}
               </span>
             )}

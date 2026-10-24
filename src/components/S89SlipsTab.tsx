@@ -440,14 +440,14 @@ export const S89SlipsTab: React.FC = () => {
                 <div className="space-y-2 text-xs">
                   <div>
                     <span className="font-bold text-slate-700">Nombre: </span>
-                    <span className="font-extrabold text-slate-900 border-b border-dotted border-slate-400 pb-0.5 px-1 inline-block min-w-[180px]">
+                    <span className="font-extrabold text-slate-900 border-b border-dotted border-slate-400 pb-0.5 px-1 inline-block min-w-[120px] sm:min-w-[180px] break-words">
                       {slip.studentName}
                     </span>
                   </div>
 
                   <div>
                     <span className="font-bold text-slate-700">Ayudante: </span>
-                    <span className="text-slate-800 border-b border-dotted border-slate-400 pb-0.5 px-1 inline-block min-w-[180px]">
+                    <span className="text-slate-800 border-b border-dotted border-slate-400 pb-0.5 px-1 inline-block min-w-[120px] sm:min-w-[180px] break-words">
                       {slip.assistantName || '—'}
                     </span>
                   </div>

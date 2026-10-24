@@ -57,8 +57,19 @@ export function createAssignmentWhatsAppMessage(
   try {
     const parts = meetingDate.split('-');
     if (parts.length === 3) {
-      const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-      dateFormatted = d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      const userLocale =
+        typeof navigator !== 'undefined'
+          ? navigator.languages && navigator.languages.length > 0
+            ? navigator.languages
+            : navigator.language
+          : undefined;
+      dateFormatted = new Intl.DateTimeFormat(userLocale, {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }).format(d);
     }
   } catch {
     // fallback

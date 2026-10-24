@@ -1,12 +1,19 @@
 // src/components/ExportPdfTab.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import {
   generateProgramPdf,
   generateProgramPdfBlobUrl,
   generateS89Pdf,
   generateS89PdfBlobUrl,
+  generateS21Pdf,
+  generateS21PdfBlobUrl,
 } from '../utils/pdfGenerator';
+import {
+  getAvailableServiceYears,
+  getCurrentServiceYear,
+  buildS21CardForPublisher,
+} from '../utils/s21Helper';
 import { createAssignmentWhatsAppMessage, openWhatsAppLink } from '../utils/whatsapp';
 import { exportScheduleToCsvExcel } from '../utils/excelExport';
 import { downloadMonthIcsSchedule } from '../utils/calendarExport';
@@ -32,11 +39,25 @@ import {
   X,
   Sparkles,
   ShieldCheck,
+  User,
+  Users,
+  Search,
+  Scissors,
+  Check,
 } from 'lucide-react';
 import { LocalOfficialFormsCenter } from './LocalOfficialFormsCenter';
 
 export const ExportPdfTab: React.FC = () => {
-  const { weeks, publishersMap, settings, updateSettings, currentWeek } = useCongregation();
+  const {
+    weeks,
+    publishers,
+    publishersMap,
+    monthlyReports,
+    settings,
+    updateSettings,
+    currentWeek,
+    currentWeekId,
+  } = useCongregation();
 
   const [activeTemplate, setActiveTemplate] = useState<
     'clasica' | 'moderna' | 'minimalista' | 'color' | 'oficial'
@@ -56,10 +77,14 @@ export const ExportPdfTab: React.FC = () => {
   const [showWeekend, setShowWeekend] = useState(settings.pdfSections.weekend);
   const [showDuties, setShowDuties] = useState(settings.pdfSections.duties);
   const [showCleaning, setShowCleaning] = useState(settings.pdfSections.cleaning);
-  const [activeTab, setActiveTab] = useState<'programa' | 's89' | 'whatsapp' | 'formatos_oficiales'>(() => {
+  const [activeTab, setActiveTab] = useState<
+    'programa' | 's89' | 's21' | 'whatsapp' | 'formatos_oficiales'
+  >(() => {
     if (typeof window !== 'undefined') {
       const h = window.location.hash.toLowerCase();
       if (h.includes('formatos')) return 'formatos_oficiales';
+      if (h.includes('s21')) return 's21';
+      if (h.includes('s89')) return 's89';
     }
     return 'programa';
   });
@@ -67,16 +92,75 @@ export const ExportPdfTab: React.FC = () => {
   const [copiedSummary, setCopiedSummary] = useState(false);
   const [pdfCongregationName, setPdfCongregationName] = useState(settings.congregationName || '');
 
-  // Preview state (Interactive Paper Sheet vs Embedded Generated PDF & Fullscreen Preview Modal)
+  // Preview state for Programa Mensual
   const [previewMode, setPreviewMode] = useState<'sheet' | 'pdf'>('sheet');
   const [previewZoom, setPreviewZoom] = useState<number>(100);
+
+  // Preview state for S-89 Slips
+  const [selectedS89WeekId, setSelectedS89WeekId] = useState<string>(
+    () => currentWeekId || currentWeek?.id || weeks[0]?.id || ''
+  );
+  const [s89PreviewMode, setS89PreviewMode] = useState<'sheet' | 'pdf'>('sheet');
+  const [s89Zoom, setS89Zoom] = useState<number>(100);
+  const [s89RoomFilter, setS89RoomFilter] = useState<'todos' | 'principal' | 'auxiliar'>('todos');
+
+  // Preview state for S-21 Cards
+  const availableServiceYears = useMemo(() => getAvailableServiceYears(), []);
+  const [selectedS21ServiceYear, setSelectedS21ServiceYear] = useState<string>(() =>
+    getCurrentServiceYear()
+  );
+  const activePublishers = useMemo(
+    () =>
+      (publishers || [])
+        .filter((p) => p.status !== 'deleted' && (p.active || p.is_active !== false))
+        .sort((a, b) => (a.name || '').localeCompare(b.name || '')),
+    [publishers]
+  );
+  const [selectedS21PublisherId, setSelectedS21PublisherId] = useState<string>(
+    () => activePublishers[0]?.id || ''
+  );
+  const [s21SearchQuery, setS21SearchQuery] = useState<string>('');
+  const [s21PreviewMode, setS21PreviewMode] = useState<'sheet' | 'pdf'>('sheet');
+  const [s21Zoom, setS21Zoom] = useState<number>(100);
+
+  // Common Preview Modal & Blob URL state
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState<boolean>(false);
-  const [previewModalDocType, setPreviewModalDocType] = useState<'programa' | 's89'>('programa');
+  const [previewModalDocType, setPreviewModalDocType] = useState<'programa' | 's89' | 's21'>('programa');
 
   useEffect(() => {
     setPdfCongregationName(settings.congregationName || '');
   }, [settings.congregationName]);
+
+  // Fallback default publisher when activePublishers loads
+  useEffect(() => {
+    if (!selectedS21PublisherId && activePublishers.length > 0) {
+      setSelectedS21PublisherId(activePublishers[0].id);
+    }
+  }, [activePublishers, selectedS21PublisherId]);
+
+  // Target S-89 Week Schedule
+  const s89Week = useMemo(() => {
+    return weeks.find((w) => w.id === selectedS89WeekId) || currentWeek || weeks[0];
+  }, [weeks, selectedS89WeekId, currentWeek]);
+
+  // Target S-21 Publisher Object & Computed Card Data
+  const selectedS21Publisher = useMemo(() => {
+    return (
+      publishersMap.get(selectedS21PublisherId) ||
+      activePublishers.find((p) => p.id === selectedS21PublisherId) ||
+      activePublishers[0]
+    );
+  }, [publishersMap, selectedS21PublisherId, activePublishers]);
+
+  const s21CardData = useMemo(() => {
+    if (!selectedS21Publisher) return null;
+    return buildS21CardForPublisher(
+      selectedS21Publisher,
+      selectedS21ServiceYear,
+      monthlyReports || []
+    );
+  }, [selectedS21Publisher, selectedS21ServiceYear, monthlyReports]);
 
   const getEffectivePdfSettings = useCallback(() => {
     return {
@@ -106,26 +190,40 @@ export const ExportPdfTab: React.FC = () => {
 
   // Regenerate real PDF Blob URL whenever preview mode or modal is active and options change
   useEffect(() => {
-    if (previewMode !== 'pdf' && !isPreviewModalOpen) return;
+    const isPdfActiveInTab =
+      (activeTab === 'programa' && previewMode === 'pdf') ||
+      (activeTab === 's89' && s89PreviewMode === 'pdf') ||
+      (activeTab === 's21' && s21PreviewMode === 'pdf');
+
+    if (!isPdfActiveInTab && !isPreviewModalOpen) return;
 
     let generatedUrl: string | null = null;
     try {
-      if (isPreviewModalOpen && previewModalDocType === 's89' && currentWeek) {
-        generatedUrl = generateS89PdfBlobUrl(
-          currentWeek,
-          publishersMap,
-          pdfCongregationName.trim() || settings.congregationName || 'Congregación',
-          pageSize,
-          pageOrientation
-        );
-      } else if (activeTab === 's89' && !isPreviewModalOpen && currentWeek) {
-        generatedUrl = generateS89PdfBlobUrl(
-          currentWeek,
-          publishersMap,
-          pdfCongregationName.trim() || settings.congregationName || 'Congregación',
-          pageSize,
-          pageOrientation
-        );
+      const activeDocType = isPreviewModalOpen ? previewModalDocType : activeTab;
+      const congregationTitle =
+        pdfCongregationName.trim() || settings.congregationName || 'Congregación';
+
+      if (activeDocType === 's89') {
+        if (s89Week) {
+          generatedUrl = generateS89PdfBlobUrl(
+            s89Week,
+            publishersMap,
+            congregationTitle,
+            pageSize,
+            pageOrientation
+          );
+        }
+      } else if (activeDocType === 's21') {
+        if (selectedS21Publisher) {
+          generatedUrl = generateS21PdfBlobUrl(
+            selectedS21Publisher,
+            selectedS21ServiceYear,
+            monthlyReports || [],
+            congregationTitle,
+            pageSize,
+            pageOrientation
+          );
+        }
       } else {
         generatedUrl = generateProgramPdfBlobUrl(
           weeks,
@@ -133,10 +231,13 @@ export const ExportPdfTab: React.FC = () => {
           getEffectivePdfSettings()
         );
       }
-      setPdfBlobUrl(prev => {
-        if (prev) URL.revokeObjectURL(prev);
-        return generatedUrl;
-      });
+
+      if (generatedUrl) {
+        setPdfBlobUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return generatedUrl;
+        });
+      }
     } catch (err) {
       console.error('Error generando vista previa PDF:', err);
     }
@@ -148,11 +249,16 @@ export const ExportPdfTab: React.FC = () => {
     };
   }, [
     previewMode,
+    s89PreviewMode,
+    s21PreviewMode,
     isPreviewModalOpen,
     previewModalDocType,
     activeTab,
     weeks,
-    currentWeek,
+    s89Week,
+    selectedS21Publisher,
+    selectedS21ServiceYear,
+    monthlyReports,
     publishersMap,
     pageSize,
     pageOrientation,
@@ -161,7 +267,7 @@ export const ExportPdfTab: React.FC = () => {
     getEffectivePdfSettings,
   ]);
 
-  const handleOpenPreviewBeforeDownload = (docType: 'programa' | 's89') => {
+  const handleOpenPreviewBeforeDownload = (docType: 'programa' | 's89' | 's21') => {
     setPreviewModalDocType(docType);
     setIsPreviewModalOpen(true);
   };
@@ -182,11 +288,24 @@ export const ExportPdfTab: React.FC = () => {
   };
 
   const handleDownloadS89 = () => {
-    if (!currentWeek) return;
+    const targetWeek = s89Week || currentWeek;
+    if (!targetWeek) return;
     generateS89Pdf(
-      currentWeek,
+      targetWeek,
       publishersMap,
       pdfCongregationName.trim() || settings.congregationName,
+      pageSize,
+      pageOrientation
+    );
+  };
+
+  const handleDownloadS21 = () => {
+    if (!selectedS21Publisher) return;
+    generateS21Pdf(
+      selectedS21Publisher,
+      selectedS21ServiceYear,
+      monthlyReports || [],
+      pdfCongregationName.trim() || settings.congregationName || 'Congregación',
       pageSize,
       pageOrientation
     );
@@ -197,7 +316,7 @@ export const ExportPdfTab: React.FC = () => {
   };
 
   const toggleNotified = (key: string) => {
-    setNotifiedKeys(prev => ({
+    setNotifiedKeys((prev) => ({
       ...prev,
       [key]: !prev[key],
     }));
@@ -316,6 +435,19 @@ export const ExportPdfTab: React.FC = () => {
           >
             <FileCheck className="w-4 h-4 shrink-0" />
             <span>Hojas S-89</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('s21')}
+            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer whitespace-nowrap ${
+              activeTab === 's21'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <User className="w-4 h-4 shrink-0" />
+            <span>Tarjetas S-21</span>
           </button>
 
           <button
@@ -947,158 +1079,986 @@ export const ExportPdfTab: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: HOJAS DE ASIGNACIÓN S-89 */}
+      {/* TAB 2: HOJAS DE ASIGNACIÓN S-89 CON VISTA PREVIA VISUAL E INTERACTIVA */}
       {activeTab === 's89' && (
-        <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Controls Column */}
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5 no-print self-start">
             <div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                Papeletas de Asignación S-89 (Seamos Mejores Maestros)
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Sliders className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <span>Papeletas de Asignación S-89</span>
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Formato oficial de 4 papeletas por hoja listas para previsualizar, imprimir y recortar.
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Visualiza, personaliza y genera el formato oficial de 4 papeletas por hoja antes de descargar o imprimir.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              {/* Orientation Switcher for S-89 */}
-              <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold">
+            {/* 1. Week Selector */}
+            <div className="space-y-1.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                1. Semana del Programa VMC
+              </label>
+              <select
+                value={selectedS89WeekId}
+                onChange={(e) => setSelectedS89WeekId(e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              >
+                {weeks.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    Semana del {w.weekStartDate} al {w.weekEndDate} {w.specialEvent?.isSpecial ? `[${w.specialEvent.title}]` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* 2. Room filter */}
+            <div className="space-y-1.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                2. Filtrar por Sala
+              </label>
+              <div className="grid grid-cols-3 gap-1.5">
+                {[
+                  { id: 'todos', label: 'Todas' },
+                  { id: 'principal', label: 'Principal' },
+                  { id: 'auxiliar', label: 'Auxiliar' },
+                ].map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => setS89RoomFilter(r.id as any)}
+                    className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
+                      s89RoomFilter === r.id
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 3. Page Size & Orientation */}
+            <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                3. Tamaño y Orientación
+              </label>
+
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => {
-                    setPageOrientation('portrait');
-                    updateSettings({ pdfOrientation: 'portrait' });
+                    setPageSize('letter');
+                    updateSettings({ pdfPageSize: 'letter' });
                   }}
-                  className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                    pageOrientation === 'portrait'
-                      ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs'
-                      : 'text-slate-600 dark:text-slate-400'
+                  className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    pageSize === 'letter'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                 >
-                  <RectangleVertical className="w-3.5 h-3.5" />
-                  <span>Vertical</span>
+                  Carta (Letter)
                 </button>
                 <button
                   type="button"
                   onClick={() => {
-                    setPageOrientation('landscape');
-                    updateSettings({ pdfOrientation: 'landscape' });
+                    setPageSize('a4');
+                    updateSettings({ pdfPageSize: 'a4' });
                   }}
-                  className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                    pageOrientation === 'landscape'
-                      ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs'
-                      : 'text-slate-600 dark:text-slate-400'
+                  className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    pageSize === 'a4'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                 >
-                  <RectangleHorizontal className="w-3.5 h-3.5" />
-                  <span>Horizontal</span>
+                  A4 (ISO)
                 </button>
               </div>
 
+              <div>
+                <span className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
+                  Orientación ({dimensionsLabel}):
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPageOrientation('portrait');
+                      updateSettings({ pdfOrientation: 'portrait' });
+                    }}
+                    className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2.5 cursor-pointer ${
+                      pageOrientation === 'portrait'
+                        ? 'border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-600 font-bold'
+                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-indigo-300'
+                    }`}
+                  >
+                    <RectangleVertical className="w-5 h-5 shrink-0 text-indigo-600 dark:text-indigo-400" />
+                    <div>
+                      <span className="block text-xs font-bold">Vertical</span>
+                      <span className="block text-[10px] text-slate-500">2x2 Clásico</span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPageOrientation('landscape');
+                      updateSettings({ pdfOrientation: 'landscape' });
+                    }}
+                    className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2.5 cursor-pointer ${
+                      pageOrientation === 'landscape'
+                        ? 'border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-600 font-bold'
+                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-indigo-300'
+                    }`}
+                  >
+                    <RectangleHorizontal className="w-5 h-5 shrink-0 text-indigo-600 dark:text-indigo-400" />
+                    <div>
+                      <span className="block text-xs font-bold">Horizontal</span>
+                      <span className="block text-[10px] text-slate-500">Paisaje</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                  Nombre en el Encabezado:
+                </label>
+                <input
+                  type="text"
+                  value={pdfCongregationName}
+                  onChange={(e) => setPdfCongregationName(e.target.value)}
+                  placeholder="Ej. Congregación Central"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                />
+              </div>
+            </div>
+
+            {/* 4. Action Buttons */}
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
               <button
                 type="button"
                 onClick={() => handleOpenPreviewBeforeDownload('s89')}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold shadow-xs transition-all shrink-0 cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Eye className="w-4 h-4" />
-                <span>Vista Previa PDF</span>
+                <span>Generar Vista Previa antes de Descargar</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleDownloadS89}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-md transition-all shrink-0 cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 text-xs sm:text-sm font-bold border border-indigo-200 dark:border-indigo-800 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Download className="w-4 h-4" />
                 <span>Descargar Papeletas S-89 (PDF)</span>
               </button>
+
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="w-full py-2.5 px-4 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Imprimir Hoja S-89 Directa</span>
+              </button>
             </div>
           </div>
 
-          {/* S-89 Slips 2x2 Preview */}
-          <div
-            className={`mx-auto transition-all grid grid-cols-1 md:grid-cols-2 gap-4 ${
-              pageOrientation === 'landscape' ? 'max-w-5xl' : 'max-w-3xl'
-            }`}
-          >
-            {currentWeek &&
-              currentWeek.midweek.maestros.items.map(item => {
-                const student = item.publisherId
-                  ? publishersMap.get(item.publisherId)?.name
-                  : 'Estudiante asignado';
-                const assistant = item.assistantId
-                  ? publishersMap.get(item.assistantId)?.name
-                  : '---';
+          {/* Interactive Live Preview Area for S-89 */}
+          <div className="lg:col-span-2 space-y-3">
+            {/* Preview Toolbar */}
+            <div className="bg-white dark:bg-slate-900 p-3 sm:px-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs no-print shadow-2xs">
+              <div className="flex items-center gap-2">
+                <FileCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <span className="font-bold text-slate-800 dark:text-slate-200">
+                  Vista Previa S-89 • Semana {s89Week?.weekStartDate || ''} ({pageSize.toUpperCase()} • {dimensionsLabel})
+                </span>
+              </div>
 
-                return (
-                  <div
-                    key={item.id}
-                    className="p-5 rounded-2xl border-2 border-slate-300 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-800/60 text-slate-800 dark:text-slate-200 space-y-3 font-sans shadow-xs"
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200/70 dark:border-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => setS89PreviewMode('sheet')}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                      s89PreviewMode === 'sheet'
+                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                    }`}
                   >
-                    <div className="text-center pb-2 border-b border-slate-200 dark:border-slate-700">
-                      <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-900 dark:text-white">
-                        Asignación para la Reunión
-                      </h4>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">
-                        Vida y Ministerio Cristianos (S-89)
-                      </p>
-                    </div>
+                    Hoja Interactiva
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setS89PreviewMode('pdf')}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                      s89PreviewMode === 'pdf'
+                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                    }`}
+                  >
+                    Documento PDF Real
+                  </button>
+                </div>
 
-                    <div className="text-xs space-y-1.5">
-                      <p className="flex justify-between">
-                        <span className="font-bold text-slate-600 dark:text-slate-400">
-                          Congregación:
-                        </span>
-                        <span className="font-semibold text-slate-900 dark:text-white">
-                          {settings.congregationName}
-                        </span>
-                      </p>
-                      <p className="flex justify-between">
-                        <span className="font-bold text-slate-600 dark:text-slate-400">Fecha:</span>
-                        <span className="font-semibold text-slate-900 dark:text-white">
-                          {currentWeek.midweek.date}
-                        </span>
-                      </p>
-                      <p className="flex justify-between">
-                        <span className="font-bold text-slate-600 dark:text-slate-400">
-                          Estudiante:
-                        </span>
-                        <span className="font-bold text-indigo-700 dark:text-indigo-400">
-                          {student}
-                        </span>
-                      </p>
-                      <p className="flex justify-between">
-                        <span className="font-bold text-slate-600 dark:text-slate-400">
-                          Ayudante:
-                        </span>
-                        <span className="font-semibold text-slate-900 dark:text-white">
-                          {assistant}
-                        </span>
-                      </p>
-                      <p className="flex justify-between">
-                        <span className="font-bold text-slate-600 dark:text-slate-400">
-                          Asignación:
-                        </span>
-                        <span className="font-semibold text-slate-900 dark:text-white">
-                          {item.title}
-                        </span>
-                      </p>
-                      <p className="flex justify-between">
-                        <span className="font-bold text-slate-600 dark:text-slate-400">Sala:</span>
-                        <span className="font-semibold text-slate-900 dark:text-white">
-                          {item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}
-                        </span>
-                      </p>
-                    </div>
-
-                    <div className="pt-2 border-t border-slate-200 dark:border-slate-700 text-center">
-                      <p className="text-[10px] text-slate-400 italic">
-                        Presente esta hoja a su consejero con su libro Guía.
-                      </p>
-                    </div>
+                {s89PreviewMode === 'sheet' && (
+                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-xl border border-slate-200/70 dark:border-slate-700">
+                    <button
+                      type="button"
+                      onClick={() => setS89Zoom((z) => Math.max(75, z - 10))}
+                      className="p-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 cursor-pointer"
+                      title="Reducir zoom"
+                    >
+                      <ZoomOut className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="text-[11px] font-mono font-bold text-slate-700 dark:text-slate-300 min-w-[38px] text-center">
+                      {s89Zoom}%
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setS89Zoom((z) => Math.min(120, z + 10))}
+                      className="p-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 cursor-pointer"
+                      title="Aumentar zoom"
+                    >
+                      <ZoomIn className="w-3.5 h-3.5" />
+                    </button>
+                    {s89Zoom !== 100 && (
+                      <button
+                        type="button"
+                        onClick={() => setS89Zoom(100)}
+                        className="p-1 text-slate-500 hover:text-slate-800 cursor-pointer"
+                        title="Restablecer zoom 100%"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
-                );
-              })}
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => handleOpenPreviewBeforeDownload('s89')}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[11px] font-bold hover:bg-indigo-100 transition-colors cursor-pointer"
+                  title="Abrir vista previa a pantalla completa antes de descargar"
+                >
+                  <Maximize2 className="w-3 h-3" />
+                  <span>Ampliar</span>
+                </button>
+              </div>
+            </div>
+
+            {/* S-89 Mode A: Embedded PDF Viewer */}
+            {s89PreviewMode === 'pdf' ? (
+              <div className="rounded-3xl bg-slate-800 border border-slate-300 dark:border-slate-700 shadow-lg overflow-hidden flex flex-col min-h-[680px] no-print">
+                <div className="px-4 py-2.5 bg-slate-900 text-slate-200 text-xs flex items-center justify-between border-b border-slate-700">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                    <span className="font-semibold">
+                      Archivo PDF S-89 generado ({pageSize.toUpperCase()} •{' '}
+                      {pageOrientation === 'landscape' ? 'Horizontal' : 'Vertical'})
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleDownloadS89}
+                    className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Descargar este PDF</span>
+                  </button>
+                </div>
+                {pdfBlobUrl ? (
+                  <iframe
+                    src={pdfBlobUrl}
+                    title="Vista previa del PDF de Papeletas S-89"
+                    className="w-full flex-1 min-h-[640px] bg-slate-700"
+                  />
+                ) : (
+                  <div className="flex-1 flex items-center justify-center text-slate-300 text-sm p-8">
+                    Generando documento PDF S-89...
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* S-89 Mode B: Proportional Paper Sheet (2x2 Slips with Cut Guidelines) */
+              <div className="bg-slate-200/70 dark:bg-slate-950/80 p-3 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 overflow-x-auto flex justify-center">
+                <div
+                  style={{
+                    transform: `scale(${s89Zoom / 100})`,
+                    transformOrigin: 'top center',
+                  }}
+                  className={`w-full transition-all duration-300 bg-white border border-slate-300 shadow-xl text-slate-900 rounded-xl p-5 sm:p-7 relative ${
+                    pageOrientation === 'landscape'
+                      ? 'max-w-[1040px] min-h-[560px]'
+                      : 'max-w-[760px] min-h-[780px]'
+                  }`}
+                >
+                  {/* Subtle cut guideline badge in corner */}
+                  <div className="flex items-center justify-between pb-3 mb-3 border-b border-dashed border-slate-200 text-[10px] text-slate-400">
+                    <span className="flex items-center gap-1 font-mono uppercase tracking-wider">
+                      <Scissors className="w-3 h-3 text-slate-400" />
+                      Hoja de Impresión 4x1 (S-89) • Líneas de corte sugeridas
+                    </span>
+                    <span>{pdfCongregationName.trim() || settings.congregationName}</span>
+                  </div>
+
+                  {(() => {
+                    const allSlips: Array<{
+                      id: string;
+                      title: string;
+                      publisherId?: string;
+                      assistantId?: string;
+                      room?: 'principal' | 'auxiliar';
+                    }> = [
+                      ...(s89Week?.midweek.maestros.items || []),
+                    ];
+                    if (s89Week?.midweek.tesoros.lecturaBiblia.publisherId) {
+                      allSlips.unshift({
+                        id: 'lectura-biblia-slip',
+                        title: 'Lectura de la Biblia',
+                        publisherId: s89Week.midweek.tesoros.lecturaBiblia.publisherId,
+                        room: 'principal',
+                      });
+                    }
+
+                    const filteredSlips = allSlips.filter((item) => {
+                      if (s89RoomFilter === 'principal') return item.room !== 'auxiliar';
+                      if (s89RoomFilter === 'auxiliar') return item.room === 'auxiliar';
+                      return true;
+                    });
+
+                    if (filteredSlips.length === 0) {
+                      return (
+                        <div className="py-20 text-center space-y-3">
+                          <FileCheck className="w-12 h-12 text-slate-300 mx-auto" />
+                          <p className="text-sm font-bold text-slate-700">
+                            No hay intervenciones de estudiantes para la semana seleccionada.
+                          </p>
+                          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                            Asigna publicadores en la sección &quot;Seamos Mejores Maestros&quot; o cambia de semana en el panel izquierdo.
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+                        {filteredSlips.map((item, idx) => {
+                          const student = item.publisherId
+                            ? publishersMap.get(item.publisherId)?.name || 'Estudiante asignado'
+                            : 'Estudiante por asignar';
+                          const assistant = item.assistantId
+                            ? publishersMap.get(item.assistantId)?.name
+                            : undefined;
+
+                          return (
+                            <div
+                              key={item.id || idx}
+                              className="rounded-xl border-2 border-indigo-500/70 bg-white p-4 text-slate-900 space-y-2.5 font-sans relative shadow-2xs hover:border-indigo-600 transition-colors"
+                            >
+                              {/* Slip Header */}
+                              <div className="bg-slate-100 rounded-lg p-2 text-center border-b border-slate-200">
+                                <h4 className="font-black text-xs uppercase tracking-tight text-slate-900 leading-tight">
+                                  ASIGNACIÓN PARA LA REUNIÓN
+                                </h4>
+                                <p className="text-[10px] text-slate-600 uppercase font-bold tracking-wider mt-0.5">
+                                  Vida y Ministerio Cristianos (S-89)
+                                </p>
+                              </div>
+
+                              {/* Slip Content Table */}
+                              <div className="text-xs space-y-1.5 pt-1">
+                                <div className="flex items-baseline justify-between border-b border-slate-100 pb-1">
+                                  <span className="font-bold text-slate-500 text-[11px]">Congregación:</span>
+                                  <span className="font-semibold text-slate-900 text-[11px] truncate max-w-[200px]">
+                                    {pdfCongregationName.trim() || settings.congregationName || 'Congregación local'}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-baseline justify-between border-b border-slate-100 pb-1">
+                                  <span className="font-bold text-slate-500 text-[11px]">Fecha:</span>
+                                  <span className="font-semibold text-slate-900 text-[11px]">
+                                    {s89Week?.midweek.date || '---'}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-baseline justify-between border-b border-slate-100 pb-1">
+                                  <span className="font-bold text-slate-500 text-[11px]">Estudiante:</span>
+                                  <span className="font-bold text-indigo-700 text-xs truncate max-w-[200px]">
+                                    {student}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-baseline justify-between border-b border-slate-100 pb-1">
+                                  <span className="font-bold text-slate-500 text-[11px]">Ayudante:</span>
+                                  <span className="font-semibold text-slate-800 text-[11px] truncate max-w-[200px]">
+                                    {assistant || '---'}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-baseline justify-between border-b border-slate-100 pb-1">
+                                  <span className="font-bold text-slate-500 text-[11px]">Asignación:</span>
+                                  <span className="font-semibold text-slate-900 text-[11px] text-right truncate max-w-[200px]">
+                                    {item.title}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-baseline justify-between">
+                                  <span className="font-bold text-slate-500 text-[11px]">Sala:</span>
+                                  <span
+                                    className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                                      item.room === 'auxiliar'
+                                        ? 'bg-amber-100 text-amber-900'
+                                        : 'bg-indigo-100 text-indigo-900'
+                                    }`}
+                                  >
+                                    {item.room === 'auxiliar' ? 'Sala Auxiliar' : 'Sala Principal'}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Slip Footer instruction */}
+                              <div className="pt-2 border-t border-slate-200 text-center">
+                                <p className="text-[9.5px] text-slate-500 italic">
+                                  Presente esta hoja a su consejero con su libro Guía.
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: TARJETAS DE PUBLICADOR S-21 CON VISTA PREVIA VISUAL E INTERACTIVA */}
+      {activeTab === 's21' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Controls Column */}
+          <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5 no-print self-start">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <span>Tarjeta de Publicador S-21</span>
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Visualiza el historial anual completo del publicador (12 meses de servicio teocrático) y expórtalo en formato oficial S-21.
+              </p>
+            </div>
+
+            {/* 1. Publisher Selector */}
+            <div className="space-y-1.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                1. Seleccionar Publicador
+              </label>
+
+              <div className="relative mb-2">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+                <input
+                  type="text"
+                  value={s21SearchQuery}
+                  onChange={(e) => setS21SearchQuery(e.target.value)}
+                  placeholder="Buscar por nombre..."
+                  className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                />
+              </div>
+
+              <select
+                value={selectedS21PublisherId}
+                onChange={(e) => setSelectedS21PublisherId(e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              >
+                {activePublishers
+                  .filter((p) =>
+                    s21SearchQuery
+                      ? (p.name || '').toLowerCase().includes(s21SearchQuery.toLowerCase())
+                      : true
+                  )
+                  .map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} {p.groupNumber ? `(Grupo #${p.groupNumber})` : ''}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            {/* 2. Service Year */}
+            <div className="space-y-1.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                2. Año de Servicio Teocrático
+              </label>
+              <select
+                value={selectedS21ServiceYear}
+                onChange={(e) => setSelectedS21ServiceYear(e.target.value)}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              >
+                {availableServiceYears.map((yr) => (
+                  <option key={yr} value={yr}>
+                    Año de Servicio {yr} (Sep - Ago)
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* 3. Publisher Summary Box */}
+            {selectedS21Publisher && (
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-900 dark:text-white">
+                    {selectedS21Publisher.name}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-900 dark:bg-indigo-950 dark:text-indigo-300">
+                    {selectedS21Publisher.pioneerStatus === 'regular'
+                      ? 'Precursor Regular'
+                      : selectedS21Publisher.pioneerStatus === 'especial'
+                      ? 'Precursor Especial'
+                      : selectedS21Publisher.spiritualStatus === 'anciano'
+                      ? 'Anciano'
+                      : selectedS21Publisher.spiritualStatus === 'siervo_ministerial'
+                      ? 'Siervo Min.'
+                      : 'Publicador'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  {selectedS21Publisher.groupNumber
+                    ? `Grupo de servicio #${selectedS21Publisher.groupNumber}`
+                    : 'Sin grupo asignado'}{' '}
+                  • {selectedS21Publisher.gender === 'female' ? 'Mujer' : 'Varón'} •{' '}
+                  {selectedS21Publisher.hope === 'ungido' ? 'Ungido' : 'Otras ovejas'}
+                </p>
+              </div>
+            )}
+
+            {/* 4. Page Size & Orientation */}
+            <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                3. Tamaño y Orientación
+              </label>
+
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPageSize('letter');
+                    updateSettings({ pdfPageSize: 'letter' });
+                  }}
+                  className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    pageSize === 'letter'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  Carta (Letter)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPageSize('a4');
+                    updateSettings({ pdfPageSize: 'a4' });
+                  }}
+                  className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    pageSize === 'a4'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  A4 (ISO)
+                </button>
+              </div>
+
+              <div>
+                <span className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
+                  Orientación ({dimensionsLabel}):
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPageOrientation('portrait');
+                      updateSettings({ pdfOrientation: 'portrait' });
+                    }}
+                    className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2.5 cursor-pointer ${
+                      pageOrientation === 'portrait'
+                        ? 'border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-600 font-bold'
+                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-indigo-300'
+                    }`}
+                  >
+                    <RectangleVertical className="w-5 h-5 shrink-0 text-indigo-600 dark:text-indigo-400" />
+                    <div>
+                      <span className="block text-xs font-bold">Vertical</span>
+                      <span className="block text-[10px] text-slate-500">Oficial</span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPageOrientation('landscape');
+                      updateSettings({ pdfOrientation: 'landscape' });
+                    }}
+                    className={`p-2.5 rounded-xl border text-left transition-all flex items-center gap-2.5 cursor-pointer ${
+                      pageOrientation === 'landscape'
+                        ? 'border-indigo-600 bg-indigo-50/80 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-600 font-bold'
+                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-indigo-300'
+                    }`}
+                  >
+                    <RectangleHorizontal className="w-5 h-5 shrink-0 text-indigo-600 dark:text-indigo-400" />
+                    <div>
+                      <span className="block text-xs font-bold">Horizontal</span>
+                      <span className="block text-[10px] text-slate-500">Panorámica</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                  Nombre de la Congregación:
+                </label>
+                <input
+                  type="text"
+                  value={pdfCongregationName}
+                  onChange={(e) => setPdfCongregationName(e.target.value)}
+                  placeholder="Ej. Congregación Central"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                />
+              </div>
+            </div>
+
+            {/* 5. Action Buttons */}
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
+              <button
+                type="button"
+                onClick={() => handleOpenPreviewBeforeDownload('s21')}
+                className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Eye className="w-4 h-4" />
+                <span>Generar Vista Previa antes de Descargar</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDownloadS21}
+                className="w-full py-2.5 px-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 text-xs sm:text-sm font-bold border border-indigo-200 dark:border-indigo-800 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Download className="w-4 h-4" />
+                <span>Descargar Tarjeta S-21 (PDF)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="w-full py-2.5 px-4 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Imprimir Tarjeta S-21</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Interactive Live Preview Area for S-21 */}
+          <div className="lg:col-span-2 space-y-3">
+            {/* Preview Toolbar */}
+            <div className="bg-white dark:bg-slate-900 p-3 sm:px-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs no-print shadow-2xs">
+              <div className="flex items-center gap-2">
+                <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <span className="font-bold text-slate-800 dark:text-slate-200">
+                  Vista Previa S-21 • {selectedS21Publisher?.name || 'Publicador'} ({selectedS21ServiceYear})
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200/70 dark:border-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => setS21PreviewMode('sheet')}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                      s21PreviewMode === 'sheet'
+                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                    }`}
+                  >
+                    Hoja Interactiva
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setS21PreviewMode('pdf')}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                      s21PreviewMode === 'pdf'
+                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-2xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                    }`}
+                  >
+                    Documento PDF Real
+                  </button>
+                </div>
+
+                {s21PreviewMode === 'sheet' && (
+                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-xl border border-slate-200/70 dark:border-slate-700">
+                    <button
+                      type="button"
+                      onClick={() => setS21Zoom((z) => Math.max(75, z - 10))}
+                      className="p-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 cursor-pointer"
+                      title="Reducir zoom"
+                    >
+                      <ZoomOut className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="text-[11px] font-mono font-bold text-slate-700 dark:text-slate-300 min-w-[38px] text-center">
+                      {s21Zoom}%
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setS21Zoom((z) => Math.min(120, z + 10))}
+                      className="p-1 text-slate-600 dark:text-slate-300 hover:text-indigo-600 cursor-pointer"
+                      title="Aumentar zoom"
+                    >
+                      <ZoomIn className="w-3.5 h-3.5" />
+                    </button>
+                    {s21Zoom !== 100 && (
+                      <button
+                        type="button"
+                        onClick={() => setS21Zoom(100)}
+                        className="p-1 text-slate-500 hover:text-slate-800 cursor-pointer"
+                        title="Restablecer zoom 100%"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => handleOpenPreviewBeforeDownload('s21')}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-[11px] font-bold hover:bg-indigo-100 transition-colors cursor-pointer"
+                  title="Abrir vista previa a pantalla completa antes de descargar"
+                >
+                  <Maximize2 className="w-3 h-3" />
+                  <span>Ampliar</span>
+                </button>
+              </div>
+            </div>
+
+            {/* S-21 Mode A: Embedded PDF Viewer */}
+            {s21PreviewMode === 'pdf' ? (
+              <div className="rounded-3xl bg-slate-800 border border-slate-300 dark:border-slate-700 shadow-lg overflow-hidden flex flex-col min-h-[680px] no-print">
+                <div className="px-4 py-2.5 bg-slate-900 text-slate-200 text-xs flex items-center justify-between border-b border-slate-700">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                    <span className="font-semibold">
+                      Archivo PDF S-21 generado ({pageSize.toUpperCase()} •{' '}
+                      {pageOrientation === 'landscape' ? 'Horizontal' : 'Vertical'})
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleDownloadS21}
+                    className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Descargar este PDF</span>
+                  </button>
+                </div>
+                {pdfBlobUrl ? (
+                  <iframe
+                    src={pdfBlobUrl}
+                    title="Vista previa del PDF de Tarjeta S-21"
+                    className="w-full flex-1 min-h-[640px] bg-slate-700"
+                  />
+                ) : (
+                  <div className="flex-1 flex items-center justify-center text-slate-300 text-sm p-8">
+                    Generando documento PDF S-21...
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* S-21 Mode B: Proportional Paper Sheet (Authentic S-21 Card) */
+              <div className="bg-slate-200/70 dark:bg-slate-950/80 p-3 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 overflow-x-auto flex justify-center">
+                <div
+                  style={{
+                    transform: `scale(${s21Zoom / 100})`,
+                    transformOrigin: 'top center',
+                  }}
+                  className={`w-full transition-all duration-300 bg-white border border-slate-300 shadow-xl text-slate-900 rounded-xl p-6 sm:p-8 space-y-5 ${
+                    pageOrientation === 'landscape'
+                      ? 'max-w-[1040px] min-h-[580px]'
+                      : 'max-w-[760px] min-h-[820px]'
+                  }`}
+                >
+                  {/* S-21 Header Banner */}
+                  <div className="bg-slate-900 text-white p-4 rounded-xl text-center space-y-1">
+                    <h2 className="text-sm sm:text-base font-black uppercase tracking-wider">
+                      REGISTRO DE PUBLICADOR DE LA CONGREGACIÓN (S-21)
+                    </h2>
+                    <p className="text-[11px] text-slate-300 uppercase tracking-widest font-semibold">
+                      {pdfCongregationName.trim() || settings.congregationName || 'CONGREGACIÓN LOCAL'} • AÑO DE SERVICIO {selectedS21ServiceYear}
+                    </p>
+                  </div>
+
+                  {/* S-21 Personal Info Grid */}
+                  {selectedS21Publisher && (
+                    <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-xs">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                        <div className="flex items-baseline justify-between border-b border-slate-200 pb-1">
+                          <span className="font-bold text-slate-600">Nombre completo:</span>
+                          <span className="font-extrabold text-slate-900 text-sm">
+                            {selectedS21Publisher.name}
+                          </span>
+                        </div>
+                        <div className="flex items-baseline justify-between border-b border-slate-200 pb-1">
+                          <span className="font-bold text-slate-600">Grupo de servicio:</span>
+                          <span className="font-bold text-indigo-700">
+                            {selectedS21Publisher.groupNumber
+                              ? `Grupo #${selectedS21Publisher.groupNumber}`
+                              : 'Sin grupo'}
+                          </span>
+                        </div>
+                        <div className="flex items-baseline justify-between border-b border-slate-200 pb-1">
+                          <span className="font-bold text-slate-600">Fecha de nacimiento:</span>
+                          <span className="font-medium text-slate-800">
+                            {selectedS21Publisher.birthDate || 'No registrada'}
+                          </span>
+                        </div>
+                        <div className="flex items-baseline justify-between border-b border-slate-200 pb-1">
+                          <span className="font-bold text-slate-600">Fecha de bautismo:</span>
+                          <span className="font-medium text-slate-800">
+                            {selectedS21Publisher.baptismDate || 'No registrado'}
+                          </span>
+                        </div>
+                        <div className="flex items-baseline justify-between">
+                          <span className="font-bold text-slate-600">Esperanza / Sexo:</span>
+                          <span className="font-medium text-slate-800">
+                            {selectedS21Publisher.hope === 'ungido' ? 'Ungido' : 'Otras ovejas'} •{' '}
+                            {selectedS21Publisher.gender === 'female' ? 'Mujer' : 'Varón'}
+                          </span>
+                        </div>
+                        <div className="flex items-baseline justify-between">
+                          <span className="font-bold text-slate-600">Condición / Privilegio:</span>
+                          <span className="font-bold text-indigo-600">
+                            {selectedS21Publisher.pioneerStatus === 'especial'
+                              ? 'Precursor Especial'
+                              : selectedS21Publisher.pioneerStatus === 'regular'
+                              ? 'Precursor Regular'
+                              : selectedS21Publisher.spiritualStatus === 'anciano'
+                              ? 'Anciano'
+                              : selectedS21Publisher.spiritualStatus === 'siervo_ministerial'
+                              ? 'Siervo Ministerial'
+                              : 'Publicador'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 12-Month Theocratic Table */}
+                  <div className="rounded-xl border border-slate-200 overflow-x-auto text-xs">
+                    <table className="w-full min-w-[500px] text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 text-[11px]">
+                          <th className="py-2.5 px-3">Mes</th>
+                          <th className="py-2.5 px-3 text-center">¿Participó?</th>
+                          <th className="py-2.5 px-3 text-center">Horas</th>
+                          <th className="py-2.5 px-3 text-center">Estudios</th>
+                          <th className="py-2.5 px-3 text-center">P. Auxiliar</th>
+                          <th className="py-2.5 px-3">Notas</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 text-[11px]">
+                        {s21CardData?.months.map((m, idx) => (
+                          <tr
+                            key={m.monthKey}
+                            className={idx % 2 === 1 ? 'bg-slate-50/50' : 'bg-white'}
+                          >
+                            <td className="py-2 px-3 font-bold text-slate-800">{m.monthName}</td>
+                            <td className="py-2 px-3 text-center">
+                              {m.hasReport ? (
+                                m.participated ? (
+                                  <span className="inline-flex items-center gap-0.5 text-emerald-700 font-bold">
+                                    <Check className="w-3.5 h-3.5" /> Sí
+                                  </span>
+                                ) : (
+                                  <span className="text-red-600 font-bold">✗ No</span>
+                                )
+                              ) : (
+                                <span className="text-slate-400 font-mono">---</span>
+                              )}
+                            </td>
+                            <td className="py-2 px-3 text-center font-mono">
+                              {m.hours !== undefined && m.hours > 0
+                                ? m.hours
+                                : m.participated
+                                ? '✓'
+                                : '---'}
+                            </td>
+                            <td className="py-2 px-3 text-center font-mono">
+                              {m.bibleStudies > 0 ? m.bibleStudies : m.hasReport ? '0' : '---'}
+                            </td>
+                            <td className="py-2 px-3 text-center">
+                              {m.isAuxiliaryPioneer ? (
+                                <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-900">
+                                  Sí
+                                </span>
+                              ) : (
+                                <span className="text-slate-400">-</span>
+                              )}
+                            </td>
+                            <td className="py-2 px-3 text-slate-600 truncate max-w-[180px]">
+                              {m.notes || '---'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr className="bg-indigo-50/80 font-bold border-t-2 border-indigo-200 text-indigo-950 text-xs">
+                          <td className="py-2.5 px-3 uppercase tracking-wider">Total Anual</td>
+                          <td className="py-2.5 px-3 text-center font-bold text-emerald-800">
+                            {s21CardData?.totalMonthsActive || 0} meses
+                          </td>
+                          <td className="py-2.5 px-3 text-center font-mono font-bold">
+                            {s21CardData?.totalHours ? `${s21CardData.totalHours} hrs` : '---'}
+                          </td>
+                          <td className="py-2.5 px-3 text-center font-mono font-bold">
+                            Prom: {s21CardData?.avgStudiesPerMonth || 0}
+                          </td>
+                          <td className="py-2.5 px-3 text-center font-bold">
+                            {s21CardData?.auxiliaryPioneerMonthsCount || 0} m.
+                          </td>
+                          <td className="py-2.5 px-3 text-slate-500 font-normal italic">
+                            Prom. {s21CardData?.avgHoursPerMonth || 0} hrs/mes
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+
+                  {/* S-21 Footer Note */}
+                  <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 text-[10.5px] text-slate-500 space-y-1">
+                    <p className="font-bold uppercase tracking-wider text-slate-700">
+                      Disposiciones del Secretario y Contacto
+                    </p>
+                    <p>
+                      {selectedS21Publisher?.phone ? `Tel: ${selectedS21Publisher.phone}` : 'Sin teléfono'}{' '}
+                      {selectedS21Publisher?.address ? `• Dir: ${selectedS21Publisher.address}` : ''}{' '}
+                      {selectedS21Publisher?.emergencyContactName
+                        ? `• Contacto de emergencia: ${selectedS21Publisher.emergencyContactName} (${
+                            selectedS21Publisher.emergencyContactPhone || 'sin tel'
+                          })`
+                        : ''}
+                    </p>
+                    <p className="text-[10px] text-slate-400 italic">
+                      Formato oficial S-21 para uso exclusivo de la congregación cristiana local. Información confidencial.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -1403,7 +2363,7 @@ export const ExportPdfTab: React.FC = () => {
           onClick={() => setIsPreviewModalOpen(false)}
         >
           <div
-            className="w-full max-w-6xl h-[90vh] rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden"
+            className="w-full max-w-6xl h-[90dvh] rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col overflow-hidden"
             onClick={e => e.stopPropagation()}
           >
             {/* Modal Header with Live Orientation & Page Size Controls */}
@@ -1418,7 +2378,9 @@ export const ExportPdfTab: React.FC = () => {
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                     {previewModalDocType === 's89'
-                      ? 'Papeletas de Asignación S-89'
+                      ? `Papeletas de Asignación S-89 (Semana ${s89Week?.weekStartDate || ''})`
+                      : previewModalDocType === 's21'
+                      ? `Tarjeta de Publicador S-21 (${selectedS21Publisher?.name || 'Publicador'} • ${selectedS21ServiceYear})`
                       : `Programa de Reuniones (${activeTemplate.toUpperCase()})`}{' '}
                     • {pageSize.toUpperCase()} ({dimensionsLabel})
                   </p>
@@ -1527,27 +2489,39 @@ export const ExportPdfTab: React.FC = () => {
                 • Formato <strong className="text-slate-800 dark:text-slate-200">{pageSize.toUpperCase()}</strong>
               </div>
 
-              <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
                 <button
                   type="button"
                   onClick={() => setIsPreviewModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold transition-colors cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold transition-colors cursor-pointer"
                 >
                   Seguir Editando
                 </button>
+
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Imprimir</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => {
                     if (previewModalDocType === 's89') {
                       handleDownloadS89();
+                    } else if (previewModalDocType === 's21') {
+                      handleDownloadS21();
                     } else {
                       handleDownloadPdf();
                     }
                     setIsPreviewModalOpen(false);
                   }}
-                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-md flex items-center gap-2 transition-all cursor-pointer"
+                  className="px-4 sm:px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer flex-1 sm:flex-initial"
                 >
-                  <Download className="w-4 h-4" />
+                  <Download className="w-4 h-4 shrink-0" />
                   <span>Confirmar y Descargar PDF</span>
                 </button>
               </div>

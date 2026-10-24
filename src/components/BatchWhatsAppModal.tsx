@@ -132,7 +132,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
   const rejectedCount = allAssignments.filter((a) => a.status === 'rechazada').length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity"
@@ -144,10 +144,14 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-label="Recordatorios y Confirmaciones de Asignación por WhatsApp"
-        className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] z-10 animate-in fade-in zoom-in-95 duration-150"
+        className="relative w-full max-w-4xl bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92dvh] pb-[env(safe-area-inset-bottom,0px)] sm:pb-0 z-10 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200"
       >
+        {/* Mobile Bottom Sheet Handle */}
+        <div onClick={onClose} className="sm:hidden w-full pt-2.5 pb-0.5 flex justify-center items-center cursor-pointer shrink-0 bg-emerald-50/70">
+          <div className="w-10 h-1 rounded-full bg-slate-300" />
+        </div>
         {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-200 bg-linear-to-r from-emerald-50 via-teal-50 to-white flex items-center justify-between">
+        <div className="px-4 sm:px-5 py-3.5 sm:py-4 border-b border-slate-200 bg-linear-to-r from-emerald-50 via-teal-50 to-white flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
               <MessageCircle className="w-5 h-5" />

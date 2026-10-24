@@ -51,6 +51,11 @@ import ThemeToggle from './ThemeToggle';
 import { AppFooter } from './AppFooter';
 import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
 import { supabaseSyncService } from '../services/supabaseSyncService';
+import {
+  LegalConsentCheckbox,
+  hasAcceptedLegalTerms,
+  recordLegalTermsAcceptance,
+} from './TermsAndPrivacyModal';
 
 const NEXT_THEME: Record<string, 'light' | 'dark'> = { light: 'dark', dark: 'light' };
 const THEME_NAMES: Record<string, string> = { light: 'Claro', dark: 'Oscuro' };
@@ -481,6 +486,15 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   const [inviteCodeError, setInviteCodeError] = useState<string | null>(null);
   const [inviteCodeSuccess, setInviteCodeSuccess] = useState<string | null>(null);
   const [isQrDetected, setIsQrDetected] = useState(false);
+  const [acceptedLegalTerms, setAcceptedLegalTerms] = useState<boolean>(() =>
+    hasAcceptedLegalTerms()
+  );
+
+  useEffect(() => {
+    const syncConsent = () => setAcceptedLegalTerms(hasAcceptedLegalTerms());
+    window.addEventListener('kongre_legal_terms_accepted', syncConsent);
+    return () => window.removeEventListener('kongre_legal_terms_accepted', syncConsent);
+  }, []);
 
   // Detectar automáticamente parámetro ?tk=... o ?invite=... de un Código QR o enlace compartido y limpiar la URL
   useEffect(() => {
@@ -548,12 +562,17 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     e.preventDefault();
     setInviteCodeError(null);
     setInviteCodeSuccess(null);
+    if (!acceptedLegalTerms) {
+      setInviteCodeError('Debes aceptar los Términos de Uso y la Política de Privacidad para activar la aplicación.');
+      return;
+    }
     let cleanCode = inviteCodeInput.trim();
     if (!cleanCode) {
       setInviteCodeError('Por favor introduce el código de invitación.');
       return;
     }
 
+    recordLegalTermsAcceptance();
     setIsActivatingCode(true);
 
     try {
@@ -877,6 +896,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     e.preventDefault();
     setCodeError(null);
     setCodeSuccess(null);
+    setEmailError(null);
+    if (!acceptedLegalTerms) {
+      const msg = 'Debes aceptar los Términos de Uso y la Política de Privacidad para ingresar a la aplicación.';
+      setCodeError(msg);
+      setEmailError(msg);
+      return;
+    }
+    recordLegalTermsAcceptance();
     setIsSubmittingCode(true);
 
     try {
@@ -1184,6 +1211,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
   const handleGoogleLogin = async () => {
     setEmailError(null);
+    if (!acceptedLegalTerms) {
+      setEmailError('Debes aceptar los Términos de Uso y la Política de Privacidad antes de iniciar sesión con Google.');
+      return;
+    }
+    recordLegalTermsAcceptance();
     setIsSubmittingEmail(true);
     if (typeof window !== 'undefined') {
       sessionStorage.setItem('kongre_pending_oauth_view', 'email_login');
@@ -1551,6 +1583,11 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               } transition-all`}
               style={{ boxShadow: 'var(--card-shadow)' }}
             >
+              {/* Vibrant glowing gradient line at top for full-width view */}
+              {isFullWidthView && (
+                <div className="absolute top-0 left-0 right-0 h-1 kg-shimmer-bar z-10 rounded-t-3xl" />
+              )}
+
               {/* UNIFIED CARD HEADER ACROSS ALL VIEWS */}
               <div className={`eye flex items-center justify-between text-[11px] font-bold tracking-[0.06em] text-brand ${
                 isFullWidthView ? 'kg-header-enter' : ''
@@ -1740,6 +1777,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
                   {!user ? (
                     <>
+                      <LegalConsentCheckbox
+                        checked={acceptedLegalTerms}
+                        onChange={(val) => {
+                          setAcceptedLegalTerms(val);
+                          if (val) setEmailError(null);
+                        }}
+                      />
+
                       {/* Google One-Click Button */}
                       {(() => {
                         const isAwaitingOAuth = isSubmittingEmail || (
@@ -1752,8 +1797,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                           <button
                             type="button"
                             onClick={handleGoogleLogin}
-                            disabled={isAwaitingOAuth}
-                            className="w-full py-3.5 px-4 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50 bg-white dark:bg-slate-900"
+                            disabled={isAwaitingOAuth || !acceptedLegalTerms}
+                            className="w-full py-3.5 px-4 rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-slate-900"
                           >
                             <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                               <path
@@ -1954,10 +1999,21 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                           </span>
                         </div>
 
+                        <LegalConsentCheckbox
+                          checked={acceptedLegalTerms}
+                          onChange={(val) => {
+                            setAcceptedLegalTerms(val);
+                            if (val) {
+                              setEmailError(null);
+                              setCodeError(null);
+                            }
+                          }}
+                        />
+
                         <button
                           type="submit"
-                          disabled={isSubmittingCode || !congregationIdInput.trim() || !congregationPinInput.trim()}
-                          className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                          disabled={isSubmittingCode || !congregationIdInput.trim() || !congregationPinInput.trim() || !acceptedLegalTerms}
+                          className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <ShieldCheck className="w-4 h-4" />
                           <span>{isSubmittingCode ? 'Verificando y vinculando...' : 'Vincular cuenta de Google y Entrar'}</span>
@@ -2110,10 +2166,18 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       </span>
                     </div>
 
+                    <LegalConsentCheckbox
+                      checked={acceptedLegalTerms}
+                      onChange={(val) => {
+                        setAcceptedLegalTerms(val);
+                        if (val) setCodeError(null);
+                      }}
+                    />
+
                     <button
                       type="submit"
-                      disabled={isSubmittingCode || !congregationIdInput.trim() || (!congregationPinInput.trim() && !personalPinInput.trim())}
-                      className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                      disabled={isSubmittingCode || !congregationIdInput.trim() || (!congregationPinInput.trim() && !personalPinInput.trim()) || !acceptedLegalTerms}
+                      className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShieldCheck className="w-4 h-4" />
                       <span>{isSubmittingCode ? 'Verificando datos...' : 'Conectar a la Congregación'}</span>
@@ -2185,10 +2249,18 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       </span>
                     </div>
 
+                    <LegalConsentCheckbox
+                      checked={acceptedLegalTerms}
+                      onChange={(val) => {
+                        setAcceptedLegalTerms(val);
+                        if (val) setInviteCodeError(null);
+                      }}
+                    />
+
                     {/* Big Action Button "ACTIVAR" matching Image 2 */}
                     <button
                       type="submit"
-                      disabled={!inviteCodeInput.trim() || isActivatingCode}
+                      disabled={!inviteCodeInput.trim() || isActivatingCode || !acceptedLegalTerms}
                       className="w-full py-3.5 px-6 rounded-xl bg-indigo-100 hover:bg-indigo-600 dark:bg-indigo-950/80 dark:hover:bg-indigo-600 text-indigo-700 hover:text-white dark:text-indigo-300 dark:hover:text-white disabled:opacity-40 disabled:hover:bg-indigo-100 dark:disabled:hover:bg-indigo-950/80 disabled:hover:text-indigo-700 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed shadow-xs"
                     >
                       {isActivatingCode ? (

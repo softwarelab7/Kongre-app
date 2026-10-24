@@ -678,11 +678,11 @@ export const TarjetasS21Tab: React.FC = () => {
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-wider uppercase font-serif">
                 REGISTRO DE PUBLICADOR DE LA CONGREGACIÓN
               </h2>
-              <div className="flex items-center justify-center gap-4 text-xs font-semibold text-slate-700 pt-1">
+              <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs font-semibold text-slate-700 pt-1">
                 <span>Congregación: <strong>{settings.congregationName}</strong></span>
-                <span>•</span>
+                <span className="hidden sm:inline">•</span>
                 <span>Año de Servicio: <strong>{selectedServiceYear}</strong></span>
-                <span>•</span>
+                <span className="hidden sm:inline">•</span>
                 <span className="font-mono bg-slate-100 px-2 py-0.5 rounded text-[11px] font-bold">S-21</span>
               </div>
             </div>
@@ -743,8 +743,8 @@ export const TarjetasS21Tab: React.FC = () => {
             </div>
 
             {/* Official 12-Month Service Table */}
-            <div className="border border-slate-800 rounded-xl overflow-hidden shadow-xs">
-              <table className="w-full text-xs text-left border-collapse">
+            <div className="border border-slate-800 rounded-xl overflow-x-auto shadow-xs">
+              <table className="w-full min-w-[540px] text-xs text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-800 text-white uppercase text-[10px] tracking-wider">
                     <th className="p-2.5 border-r border-slate-700 w-32 font-bold">Mes</th>
@@ -910,7 +910,7 @@ export const TarjetasS21Tab: React.FC = () => {
                   {metrics.irregularPublishers.map(({ publisher, missingMonths, lastMonth }) => (
                     <div
                       key={publisher.id}
-                      className="p-3 bg-amber-50/40 border border-amber-200 rounded-xl flex items-center justify-between gap-3 text-xs"
+                      className="p-3 bg-amber-50/40 border border-amber-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs"
                     >
                       <div>
                         <h4 className="font-bold text-slate-900">{publisher.name}</h4>
@@ -964,7 +964,7 @@ export const TarjetasS21Tab: React.FC = () => {
                   {metrics.inactivePublishers.map(({ publisher, missingMonths }) => (
                     <div
                       key={publisher.id}
-                      className="p-3 bg-rose-50/40 border border-rose-200 rounded-xl flex items-center justify-between gap-3 text-xs"
+                      className="p-3 bg-rose-50/40 border border-rose-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs"
                     >
                       <div>
                         <h4 className="font-bold text-slate-900">{publisher.name}</h4>

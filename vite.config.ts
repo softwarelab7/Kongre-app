@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
       securityHeadersPlugin(env),
       VitePWA({
         registerType: 'autoUpdate',
+        injectRegister: 'script',
         useCredentials: true,
         includeAssets: [
           'favicon.ico',
@@ -114,7 +115,15 @@ export default defineConfig(({ mode }) => {
           clientsClaim: true,
           skipWaiting: true,
           navigateFallback: '/index.html',
-          navigateFallbackDenylist: [/^\/api\//, /^\/__offline__\//],
+          navigateFallbackDenylist: [
+            /^\/api\//,
+            /^\/__offline__\//,
+            /^\/registerSW\.js$/,
+            /^\/sw\.js$/,
+            /^\/push-sw\.js$/,
+            /^\/workbox-.*\.js$/,
+            /\.js$/,
+          ],
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6MB para plantillas PDF S-89 y bundles
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,pdf,json,webmanifest}'],
           runtimeCaching: [
@@ -222,8 +231,7 @@ export default defineConfig(({ mode }) => {
           ],
         },
         devOptions: {
-          enabled: true,
-          type: 'module',
+          enabled: false,
         },
       }),
     ],

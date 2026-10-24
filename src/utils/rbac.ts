@@ -853,7 +853,8 @@ export function isTabAllowedForRole(roleOrRoles: string | string[], tab: ActiveT
     tab === 'mi_vista' ||
     tab === 'perfil' ||
     tab === 'calendario' ||
-    tab === 'roles'
+    tab === 'roles' ||
+    tab === 'menu'
   ) {
     return true;
   }

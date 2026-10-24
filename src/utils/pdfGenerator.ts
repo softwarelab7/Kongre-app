@@ -1,6 +1,7 @@
 // src/utils/pdfGenerator.ts
 import { jsPDF } from 'jspdf';
-import { WeekSchedule, Publisher, CongregationSettings } from '../types';
+import { WeekSchedule, Publisher, CongregationSettings, MonthlyServiceReport } from '../types';
+import { buildS21CardForPublisher } from './s21Helper';
 
 export function buildS89PdfDoc(
   week: WeekSchedule,
@@ -434,3 +435,295 @@ export function generateProgramPdfBlobUrl(
   const blob = doc.output('blob');
   return URL.createObjectURL(blob);
 }
+
+export function buildS21PdfDoc(
+  publisher: Publisher,
+  serviceYear: string,
+  monthlyReports: MonthlyServiceReport[],
+  congregationName: string = 'Congregación',
+  pageSize: 'letter' | 'a4' = 'letter',
+  orientation: 'portrait' | 'landscape' = 'portrait'
+): jsPDF {
+  const doc = new jsPDF({
+    orientation,
+    unit: 'mm',
+    format: pageSize === 'letter' ? 'letter' : 'a4',
+  });
+
+  const card = buildS21CardForPublisher(publisher, serviceYear, monthlyReports);
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const marginX = 12;
+  const contentW = pageWidth - marginX * 2;
+  let curY = 10;
+
+  // Header Box
+  doc.setFillColor(30, 41, 59);
+  doc.roundedRect(marginX, curY, contentW, 15, 2, 2, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10.5);
+  doc.setTextColor(255, 255, 255);
+  doc.text(
+    'REGISTRO DE PUBLICADOR DE LA CONGREGACIÓN (S-21)',
+    marginX + contentW / 2,
+    curY + 6.5,
+    { align: 'center' }
+  );
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'normal');
+  doc.text(
+    `${congregationName.toUpperCase()} • AÑO DE SERVICIO ${serviceYear} • FORMATO OFICIAL S-21`,
+    marginX + contentW / 2,
+    curY + 11.5,
+    { align: 'center' }
+  );
+  curY += 19;
+
+  // Personal Info Box
+  doc.setDrawColor(203, 213, 225);
+  doc.setFillColor(248, 250, 252);
+  doc.roundedRect(marginX, curY, contentW, 26, 2, 2, 'FD');
+
+  const col1 = marginX + 4;
+  const col2 = marginX + contentW * 0.52;
+
+  // Row 1: Name & Service Group
+  doc.setFontSize(8.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(51, 65, 85);
+  doc.text('Nombre:', col1, curY + 5.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(15, 23, 42);
+  doc.text((publisher.name || '---').substring(0, 36), col1 + 18, curY + 5.5);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(51, 65, 85);
+  doc.text('Grupo de servicio:', col2, curY + 5.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(15, 23, 42);
+  doc.text(
+    publisher.groupNumber ? `Grupo #${publisher.groupNumber}` : 'Sin grupo asignado',
+    col2 + 30,
+    curY + 5.5
+  );
+
+  // Row 2: Birth Date & Baptism Date
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(51, 65, 85);
+  doc.text('Fec. nacimiento:', col1, curY + 12);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(15, 23, 42);
+  doc.text(publisher.birthDate || 'No registrada', col1 + 26, curY + 12);
+
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(51, 65, 85);
+  doc.text('Fec. bautismo:', col2, curY + 12);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(15, 23, 42);
+  doc.text(publisher.baptismDate || 'No registrado', col2 + 25, curY + 12);
+
+  // Row 3: Hope / Gender & Privilege / Status
+  const esperanza = publisher.hope === 'ungido' ? 'Ungido' : 'Otras ovejas';
+  const genero = publisher.gender === 'female' ? 'Mujer' : 'Hombre';
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(51, 65, 85);
+  doc.text('Esperanza / Sexo:', col1, curY + 18.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(15, 23, 42);
+  doc.text(`${esperanza} • ${genero}`, col1 + 28, curY + 18.5);
+
+  const privilegio =
+    publisher.pioneerStatus === 'especial'
+      ? 'Precursor Especial'
+      : publisher.pioneerStatus === 'regular'
+      ? 'Precursor Regular'
+      : publisher.spiritualStatus === 'anciano'
+      ? 'Anciano'
+      : publisher.spiritualStatus === 'siervo_ministerial'
+      ? 'Siervo Ministerial'
+      : 'Publicador';
+
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(51, 65, 85);
+  doc.text('Condición / Privilegio:', col2, curY + 18.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(79, 70, 229);
+  doc.text(privilegio, col2 + 34, curY + 18.5);
+
+  curY += 30;
+
+  // Monthly Table
+  const thY = curY;
+  const thH = 7.5;
+  doc.setFillColor(241, 245, 249);
+  doc.rect(marginX, thY, contentW, thH, 'F');
+  doc.setDrawColor(203, 213, 225);
+  doc.rect(marginX, thY, contentW, thH, 'S');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.setTextColor(30, 41, 59);
+
+  const cMes = marginX + 3;
+  const cPart = marginX + contentW * 0.22;
+  const cHoras = marginX + contentW * 0.40;
+  const cEst = marginX + contentW * 0.54;
+  const cPrec = marginX + contentW * 0.68;
+  const cNotas = marginX + contentW * 0.82;
+
+  doc.text('Mes', cMes, thY + 5.2);
+  doc.text('Participó', cPart, thY + 5.2);
+  doc.text('Horas', cHoras, thY + 5.2);
+  doc.text('Estudios', cEst, thY + 5.2);
+  doc.text('P. Auxiliar', cPrec, thY + 5.2);
+  doc.text('Notas / Observaciones', cNotas, thY + 5.2);
+
+  curY += thH;
+
+  // 12 Months Rows
+  const rowH = orientation === 'landscape' ? 6.5 : 7.2;
+  card.months.forEach((m, idx) => {
+    const rY = curY + idx * rowH;
+    if (idx % 2 === 1) {
+      doc.setFillColor(248, 250, 252);
+      doc.rect(marginX, rY, contentW, rowH, 'F');
+    }
+    doc.setDrawColor(226, 232, 240);
+    doc.line(marginX, rY + rowH, marginX + contentW, rY + rowH);
+
+    doc.setFontSize(7.8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(51, 65, 85);
+    doc.text(m.monthName, cMes, rY + 4.8);
+
+    doc.setFont('helvetica', 'normal');
+    if (m.hasReport) {
+      if (m.participated) {
+        doc.setTextColor(16, 185, 129);
+        doc.text('✓ Sí', cPart, rY + 4.8);
+      } else {
+        doc.setTextColor(239, 68, 68);
+        doc.text('✗ No', cPart, rY + 4.8);
+      }
+    } else {
+      doc.setTextColor(148, 163, 184);
+      doc.text('---', cPart, rY + 4.8);
+    }
+
+    doc.setTextColor(15, 23, 42);
+    doc.text(
+      m.hours !== undefined && m.hours > 0 ? String(m.hours) : m.participated ? '✓' : '---',
+      cHoras,
+      rY + 4.8
+    );
+    doc.text(m.bibleStudies > 0 ? String(m.bibleStudies) : m.hasReport ? '0' : '---', cEst, rY + 4.8);
+
+    if (m.isAuxiliaryPioneer) {
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(79, 70, 229);
+      doc.text('Sí', cPrec, rY + 4.8);
+      doc.setFont('helvetica', 'normal');
+    } else {
+      doc.setTextColor(148, 163, 184);
+      doc.text('-', cPrec, rY + 4.8);
+    }
+
+    doc.setTextColor(71, 85, 105);
+    const maxNoteLen = orientation === 'landscape' ? 40 : 25;
+    const noteText = (m.notes || '').substring(0, maxNoteLen);
+    doc.text(noteText, cNotas, rY + 4.8);
+  });
+
+  curY += card.months.length * rowH;
+
+  // Totals Row
+  doc.setFillColor(238, 242, 255);
+  doc.rect(marginX, curY, contentW, 8.5, 'F');
+  doc.setDrawColor(199, 210, 254);
+  doc.rect(marginX, curY, contentW, 8.5, 'S');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.setTextColor(67, 56, 202);
+  doc.text('TOTAL / PROMEDIO ANUAL', cMes, curY + 5.6);
+
+  doc.setFontSize(8);
+  doc.setTextColor(30, 41, 59);
+  doc.text(`${card.totalMonthsActive} meses`, cPart, curY + 5.6);
+  doc.text(card.totalHours > 0 ? `${card.totalHours} hrs` : '---', cHoras, curY + 5.6);
+  doc.text(`Prom: ${card.avgStudiesPerMonth}`, cEst, curY + 5.6);
+  doc.text(`${card.auxiliaryPioneerMonthsCount} m.`, cPrec, curY + 5.6);
+
+  curY += 13;
+
+  // Footer notes & status
+  doc.setDrawColor(203, 213, 225);
+  doc.setFillColor(255, 255, 255);
+  doc.roundedRect(marginX, curY, contentW, 20, 2, 2, 'S');
+
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(71, 85, 105);
+  doc.text('NOTAS Y DISPOSICIONES ADICIONALES (SECRETARIO):', marginX + 3, curY + 5);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 116, 139);
+  const contactInfo = publisher.phone ? `Tel: ${publisher.phone}` : 'Sin teléfono';
+  const addressInfo = publisher.address ? ` • Dir: ${publisher.address}` : '';
+  const emergencyInfo = publisher.emergencyContactName
+    ? ` • Emergencia: ${publisher.emergencyContactName} (${publisher.emergencyContactPhone || 'sin tel'})`
+    : '';
+  doc.text(`${contactInfo}${addressInfo}${emergencyInfo}`.substring(0, 105), marginX + 3, curY + 10);
+
+  doc.setFontSize(7);
+  doc.setTextColor(148, 163, 184);
+  doc.text(
+    'Formulario oficial S-21 para uso exclusivo de la congregación local. Información estrictamente confidencial.',
+    marginX + 3,
+    curY + 15
+  );
+
+  return doc;
+}
+
+export function generateS21Pdf(
+  publisher: Publisher,
+  serviceYear: string,
+  monthlyReports: MonthlyServiceReport[],
+  congregationName: string = 'Congregación',
+  pageSize: 'letter' | 'a4' = 'letter',
+  orientation: 'portrait' | 'landscape' = 'portrait'
+) {
+  const doc = buildS21PdfDoc(
+    publisher,
+    serviceYear,
+    monthlyReports,
+    congregationName,
+    pageSize,
+    orientation
+  );
+  const cleanName = (publisher.name || 'Publicador').replace(/[^a-zA-Z0-9ÁÉÍÓÚáéíóúÑñ_-]/g, '_');
+  doc.save(`S21_${cleanName}_${serviceYear}.pdf`);
+}
+
+export function generateS21PdfBlobUrl(
+  publisher: Publisher,
+  serviceYear: string,
+  monthlyReports: MonthlyServiceReport[],
+  congregationName: string = 'Congregación',
+  pageSize: 'letter' | 'a4' = 'letter',
+  orientation: 'portrait' | 'landscape' = 'portrait'
+): string {
+  const doc = buildS21PdfDoc(
+    publisher,
+    serviceYear,
+    monthlyReports,
+    congregationName,
+    pageSize,
+    orientation
+  );
+  const blob = doc.output('blob');
+  return URL.createObjectURL(blob);
+}
+

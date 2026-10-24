@@ -190,54 +190,64 @@
     </header>
 
     <main class="card">
-      <h1>Términos de Uso Teocrático</h1>
-      <div class="meta">Última actualización: 23 de Octubre de 2026 • Versión 2.12.9</div>
+      <h1>Marco Normativo y Términos de Uso Teocrático</h1>
+      <div class="meta">Última actualización: 23 de Octubre de 2026 • Versión 2.12.14 • Vigencia Inmediata</div>
 
       <div class="banner">
-        <strong>⚖️ Compromiso de Uso Ordenado y Teocrático</strong>
-        Al acceder o registrar una congregación en Kongre, aceptas utilizar esta herramienta auxiliar exclusivamente para apoyar la organización de las reuniones, asignaciones y el ministerio cristiano con apego a los principios espirituales.
+        <strong>⚖️ Resumen Ejecutivo y Naturaleza del Acuerdo</strong>
+        El presente documento establece las condiciones jurídicas, éticas y operativas que regulan el acceso y uso de <strong>Kongre (Gestor Teocrático Integral)</strong>. Al registrar una congregación, vincular una cuenta o ingresar mediante credenciales de acceso, el usuario acepta vincularse al presente marco normativo diseñado para preservar el orden, la confidencialidad y la seguridad de la congregación local.
       </div>
 
-      <h2>1. Naturaleza y Propósito de la Aplicación</h2>
+      <h2>1. Objeto, Alcance Operativo e Independencia Institucional</h2>
       <p>
-        <strong>Kongre</strong> es una aplicación web y móvil progresiva (PWA) de carácter independiente y auxiliar, desarrollada para apoyar a los cuerpos de ancianos, siervos ministeriales y publicadores en la organización práctica de:
+        <strong>1.1. Propósito de la Plataforma:</strong> Kongre es una Aplicación Web Progresiva (PWA) de carácter estrictamente auxiliar, sin fines de lucro comerciales ni publicitarios, concebida para facilitar a los cuerpos de ancianos, siervos ministeriales y publicadores la administración interna de:
       </p>
       <ul>
-        <li>Programas semanales de las reuniones (Vida y Ministerio Cristiano y Reunión Pública / Estudio de La Atalaya).</li>
-        <li>Hojas y papeletas de asignación de estudiantes (S-89).</li>
-        <li>Tarjetas digitales de territorio, mapas de manzanas y direcciones de no visitar.</li>
-        <li>Turnos de predicación pública y carritos.</li>
-        <li>Registro de asistencia a las reuniones (S-88).</li>
-        <li>Programas de aseo y mantenimiento del Salón del Reino.</li>
+        <li>Programación de la Reunión Vida y Ministerio Cristianos (S-140) y asignación de partes estudiantiles (S-89).</li>
+        <li>Coordinación de discursos públicos, hospitalidad, acomodadores, audio/video y lectores de estudio.</li>
+        <li>Administración cartográfica de territorios, registro de manzanas, historial de cobertura (S-13) y direcciones de «No visitar».</li>
+        <li>Organización de turnos de predicación pública (exhibidores móviles y mesas).</li>
+        <li>Control estadístico de asistencia a las reuniones (S-88), informes de servicio y programas de aseo y mantenimiento del Salón del Reino.</li>
       </ul>
       <p>
-        Esta aplicación es una ayuda de organización interna para uso de congregaciones locales y <strong>no representa un sitio web oficial de la organización ni sustituye las directrices o publicaciones oficiales</strong>.
+        <strong>1.2. Declaración de Independencia y No Oficialidad:</strong> Se deja constancia expresa de que Kongre es un desarrollo tecnológico privado e independiente. <strong>No pertenece, no está patrocinada, ni representa un canal o sitio web oficial de Watch Tower Bible and Tract Society of Pennsylvania ni de ninguna de sus entidades legales asociadas (jw.org).</strong> El uso de esta herramienta es completamente voluntario por decisión autónoma de cada cuerpo de ancianos local y jamás sustituye las pautas, cartas, formularios o instrucciones vigentes de la organización.
       </p>
 
-      <h2>2. Roles, Accesos y Custodia de Credenciales</h2>
+      <h2>2. Gobernanza de Accesos, Roles Teocráticos (RBAC) y Custodia de Credenciales</h2>
       <p>
-        La aplicación implementa un estricto control de acceso basado en roles teocráticos (RBAC):
+        La seguridad de la información congregacional descansa sobre un modelo de Control de Acceso Basado en Roles (RBAC) y segregación de privilegios en tres niveles de credenciales independientes:
       </p>
       <ul>
-        <li><strong>Coordinador / Cuerpo de Ancianos:</strong> Administran las llaves de seguridad, otorgan o revocan PINs personales y supervisan los programas de la congregación.</li>
-        <li><strong>PIN de la Congregación:</strong> Es la clave compartida que permite unirse a la congregación. Debe comunicarse con prudencia solo a miembros bautizados y publicadores autorizados.</li>
-        <li><strong>PIN Personal Único:</strong> Cada publicador o siervo con privilegios de edición dispone de un PIN personal intransferible. Está prohibido ceder credenciales a terceros.</li>
-        <li><strong>Aprobación Obligatoria:</strong> Toda vinculación de cuenta requiere aprobación expresa de un anciano autorizado antes de habilitar el acceso.</li>
+        <li><strong>PIN de la Congregación (Puerta de Enlace General):</strong> Código compartido que permite a los miembros localizar y conectarse al entorno de su congregación en modo de consulta general. Debe comunicarse exclusivamente a publicadores aprobados de la congregación local.</li>
+        <li><strong>PIN Maestro de Administración (Custodia del Cuerpo de Ancianos):</strong> Credencial de alto privilegio reservada al Coordinador del Cuerpo de Ancianos, Secretario y Superintendente de Servicio para configurar parámetros maestros, aprobar solicitudes de vinculación y administrar copias de seguridad.</li>
+        <li><strong>PIN Personal e Intransferible y Verificación en Dos Pasos (2FA TOTP):</strong> Cada publicador o hermano nombrado con responsabilidades operativas dispone de un PIN personal único, complementable con autenticación de dos factores (RFC 6238 / Microsoft o Google Authenticator). Las credenciales personales son estrictamente intransferibles.</li>
       </ul>
-
-      <h2>3. Uso Ético y Confidencial de la Información</h2>
       <p>
-        Los usuarios se comprometen a custodiar los nombres, teléfonos y datos de las familias cristianas con absoluto respeto y reserva. Queda terminantemente prohibido extraer, divulgar o utilizar los directorios de la congregación para actividades comerciales, cadenas de mensajes ajenas al culto o cualquier fin que vulnere la tranquilidad y privacidad de los hermanos.
+        <strong>Responsabilidad por Dispositivos Compartidos:</strong> Cuando un usuario acceda desde un equipo familiar, público o compartido en el Salón del Reino, es su obligación cerrar la sesión administrativa o utilizar el botón de bloqueo inmediato al concluir sus gestiones.
       </p>
 
-      <h2>4. Disponibilidad Offline y Resguardos Locales</h2>
+      <h2>3. Confidencialidad, Ética Cristiana y Uso Aceptable de los Datos</h2>
       <p>
-        Kongre opera bajo una arquitectura diseñada para funcionar 100% sin conexión a internet dentro del Salón del Reino o en predicación de campo. Toda la información se guarda cifrada en el dispositivo y se sincroniza al restablecerse la red. Se recomienda a los ancianos realizar periódicamente una exportación de respaldo desde la sección de Ajustes.
+        Toda información contenida en el Directorio Teocrático (nombres, teléfonos, direcciones de emergencia, grupos de servicio y privilegios) se suministra única y exclusivamente para el cuidado pastoral, la comunicación teocrática y la coordinación de las reuniones y el ministerio del campo.
+      </p>
+      <p>
+        <strong>Restricciones Expresas:</strong> Queda terminantemente prohibido extraer, exportar, comercializar, indexar o reutilizar los datos personales de los hermanos para fines comerciales, proselitismo ajeno al ministerio, envío de cadenas masivas no solicitadas, listas de difusión ajenas a los anuncios oficiales o cualquier actividad que vulnere la intimidad y tranquilidad de las familias de la congregación. Asimismo, está prohibido realizar ingeniería inversa, pruebas de penetración no autorizadas o intentos de vulnerar el aislamiento criptográfico entre congregaciones.
       </p>
 
-      <h2>5. Desvinculación y Cancelación del Servicio</h2>
+      <h2>4. Arquitectura Offline-First, Sincronización y Responsabilidad de Respaldo</h2>
       <p>
-        Cualquier congregación puede solicitar la eliminación total de sus datos y registros en cualquier momento a través del panel de administración o contactando a <strong>soporte@kongre-app.com</strong>.
+        Kongre opera mediante una arquitectura <em>Offline-First</em> que almacena los datos de manera cifrada en la memoria local del dispositivo para permitir su uso continuo dentro del Salón del Reino o en zonas sin cobertura móvil, sincronizando los cambios de forma cifrada (Zero-Knowledge) cuando se restablece la conexión.
+      </p>
+      <p>
+        Dado que los servidores centrales no poseen las llaves criptográficas para desencriptar ni reconstruir los datos por cuenta propia, <strong>es responsabilidad directa del Comité de Servicio o del Administrador de la Congregación conservar en lugar seguro la clave maestra y generar periódicamente copias de respaldo (Archivos JSON / Excel) desde el módulo de Ajustes</strong>.
+      </p>
+
+      <h2>5. Disponibilidad del Servicio, Limitación de Responsabilidad y Baja Definitiva</h2>
+      <p>
+        La plataforma se proporciona «tal cual» (<em>as-is</em>) como un servicio de apoyo comunitario. Aunque se aplican estándares rigurosos de alta disponibilidad y redundancia en la nube, los desarrolladores no asumen responsabilidad patrimonial por interrupciones temporales de red, pérdida de credenciales maestras no respaldadas por los administradores locales o mal uso de las cuentas por negligencia en la custodia de PINs.
+      </p>
+      <p>
+        Cualquier cuerpo de ancianos puede dar de baja su congregación y ejecutar el borrado criptográfico definitivo e irreversible de todos sus registros en cualquier momento desde el panel de Administración o solicitándolo formalmente a <strong>soporte@kongre-app.com</strong>.
       </p>
 
       <div class="nav-links">
@@ -247,7 +257,7 @@
     </main>
 
     <footer>
-      Kongre © 2026 • Gestor Teocrático Integral • Todos los derechos reservados
+      Kongre © 2026 • Gestor Teocrático Integral • Versión 2.12.14 • Todos los derechos reservados
     </footer>
   </div>
 </body>

@@ -25,18 +25,125 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.11';
-export const CURRENT_BUILD_CODE = '2026.10.23.6200';
+export const CURRENT_APP_VERSION = '2.12.16';
+export const CURRENT_BUILD_CODE = '2026.10.23.6700';
 export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.16',
+    buildCode: '2026.10.23.6700',
+    date: '23 de Octubre, 2026',
+    title: 'Optimización Integral de Experiencia Móvil (Auditoría UI/UX, Gestos Táctiles y Ergonomía)',
+    isCurrent: true,
+    highlight: 'Cabecera móvil despejada, barra de semanas fija con navegación por gestos swipe, KPIs interactivos deslizables en Territorios y Publicadores, modales estilo Bottom Sheet y alertas posicionadas sobre la barra inferior',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Cabecera Superior y Pie de Página Móvil Simplificados: Se redujo la densidad de iconos secundarios en la cabecera móvil (< 640px) trasladándolos al menú de cuenta y hoja inferior, y se compactó el pie de página interno a una sola línea discreta.',
+      },
+      {
+        category: 'feature',
+        text: 'Navegación Táctil en Programa de Reuniones: Sub-cabecera de semanas fija (sticky) con soporte para deslizar horizontalmente (swipe izquierda/derecha) entre semanas, botón directo "Hoy" y agrupación de herramientas secundarias.',
+      },
+      {
+        category: 'improvement',
+        text: 'Cintas de KPIs Interactivas, Tablas con Primera Columna Fija y Modales Bottom Sheet: Los KPIs de Territorios y Publicadores ahora funcionan como filtros rápidos deslizables en una sola fila móvil, las tablas fijan su primera columna al desplazar y los modales clave abren como hoja inferior.',
+      },
+    ],
+  },
+  {
+    version: '2.12.15',
+    buildCode: '2026.10.23.6600',
+    date: '23 de Octubre, 2026',
+    title: 'Indicador de Carga Global (LoadingSpinner) durante la Sincronización con Supabase',
+    isCurrent: false,
+    highlight: 'Nuevo componente LoadingSpinner con animación orbital concéntrica y velo translúcido sobre el contenido de cada pestaña mientras se sincronizan y cifran los datos con Supabase',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Componente Global LoadingSpinner: Nuevo indicador visual con anillos orbitales en rotación inversa, barra luminosa superior y estado contextual de la pestaña activa durante operaciones de sincronización.',
+      },
+      {
+        category: 'improvement',
+        text: 'Superposición en Pestañas Activas: El indicador se despliega de forma elegante sobre el área de contenido de cada pestaña mientras se realiza la descarga, descifrado o subida cifrada AES-256-GCM con Supabase.',
+      },
+    ],
+  },
+  {
+    version: '2.12.14',
+    buildCode: '2026.10.23.6500',
+    date: '23 de Octubre, 2026',
+    title: 'Redacción Institucional y Profesional de Términos de Uso y Política de Privacidad',
+    isCurrent: false,
+    highlight: 'Actualización integral de los Términos de Uso y la Política de Privacidad con estructura normativa profesional, cláusulas técnicas de cifrado (AES-256-GCM / PBKDF2), gobernanza de roles (RBAC), declaración de independencia institucional y derechos ARCO+',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Marco Normativo de Términos de Uso: Redacción estructurada por cláusulas profesionales que detallan el alcance operativo teocrático (S-140, S-89, S-13, S-88), la declaración explícita de independencia institucional respecto a jw.org, el modelo de custodia de credenciales en tres niveles (PIN de Congregación, PIN Maestro de Ancianos y PIN Personal + 2FA TOTP) y la responsabilidad sobre copias de respaldo locales.',
+      },
+      {
+        category: 'security',
+        text: 'Política de Privacidad, Cifrado y Protección de Datos: Especificación técnica y jurídica del modelo de Conocimiento Cero (Zero-Knowledge), cifrado en cliente AES-256-GCM con derivación PBKDF2-HMAC-SHA256 (hasta 600.000 iteraciones), minimización de datos, cumplimiento de Uso Limitado (Limited Use) de Google OAuth 2.0 y ejercicio de derechos ARCO+.',
+      },
+      {
+        category: 'improvement',
+        text: 'Sincronización con Páginas Oficiales Estáticas: Actualización de los documentos públicos (/terms y /privacy) en español e inglés para mantener total coherencia entre las vistas internas de la aplicación y la verificación oficial de Google Trust & Safety.',
+      },
+    ],
+  },
+  {
+    version: '2.12.13',
+    buildCode: '2026.10.23.6400',
+    date: '23 de Octubre, 2026',
+    title: 'Vistas Dedicadas de Página Completa para Registro de Versiones (Changelog) y Términos y Privacidad',
+    isCurrent: false,
+    highlight: 'Conversión del Registro de Versiones (Changelog) y de los Términos de Uso y Política de Privacidad de ventanas emergentes (pop-ups) a vistas limpias de página completa con navegación de regreso',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Registro de Versiones (Changelog) en Página Completa: Se eliminó el contenedor flotante tipo pop-up para presentar el historial completo de versiones en una vista amplia de pantalla completa con barra superior de retorno («Volver atrás»).',
+      },
+      {
+        category: 'improvement',
+        text: 'Términos de Uso y Política de Privacidad en Página Completa: Tanto la consulta de documentos legales desde el pie de página y casillas de consentimiento como la pantalla de primer ingreso se muestran ahora como páginas completas sin ventanas emergentes recortadas.',
+      },
+    ],
+  },
+  {
+    version: '2.12.12',
+    buildCode: '2026.10.23.6300',
+    date: '23 de Octubre, 2026',
+    title: 'Aceptación Obligatoria de Términos de Uso y Política de Privacidad en Registro y Primer Ingreso',
+    isCurrent: false,
+    highlight: 'Casilla interactiva y modal de consentimiento obligatorio de Términos de Uso y Política de Privacidad al registrar una congregación o ingresar por primera vez a la aplicación',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Consentimiento en Registro de Congregación: En el paso final del Asistente de Registro de Congregación se exige aceptar expresamente los Términos de Uso y la Política de Privacidad antes de crear y activar la congregación.',
+      },
+      {
+        category: 'security',
+        text: 'Consentimiento en Primer Inicio de Sesión: Se incorporó la casilla interactiva de aceptación legal con lectura directa de los Términos de Uso y la Política de Privacidad en todos los métodos de acceso (Google Sign-In, ID y PIN de Congregación, Código de Invitación y Modal de Conexión).',
+      },
+      {
+        category: 'improvement',
+        text: 'Guardia de Primer Ingreso Directo: Si un usuario accede por primera vez mediante un enlace directo o código QR sin haber aceptado previamente los términos en su dispositivo, se muestra una ventana de bienvenida legal para su lectura y aceptación antes de continuar.',
+      },
+    ],
+  },
+  {
     version: '2.12.11',
     buildCode: '2026.10.23.6200',
     date: '23 de Octubre, 2026',
     title: 'Autenticación de Dos Pasos (2FA) con Microsoft Authenticator y Códigos de Respaldo',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Verificación en dos factores opcional (TOTP RFC 6238) compatible con Microsoft Authenticator y Google Authenticator, 100% offline, códigos de recuperación y dispositivos de confianza',
     environment: 'Producción Cloud (Kongre)',
     changes: [

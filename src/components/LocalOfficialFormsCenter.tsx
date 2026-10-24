@@ -953,7 +953,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
                 </div>
               ) : (
                 <>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                     <div className="relative flex-1">
                       <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                       <input
@@ -970,7 +970,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
                         setActiveSubView('autofill');
                         handleGenerateFilledPdf(false);
                       }}
-                      className="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer shrink-0"
+                      className="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer shrink-0 text-center"
                     >
                       Aplicar Cambios y Ver PDF
                     </button>
@@ -982,7 +982,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
                       return (
                         <div
                           key={field.name}
-                          className="p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 flex items-center justify-between gap-3"
+                          className="p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3"
                         >
                           <div className="min-w-0 flex-1">
                             <span className="text-[11px] font-mono font-bold text-slate-700 dark:text-slate-200 block truncate">
@@ -1003,7 +1003,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
                                   [field.name]: e.target.checked,
                                 }))
                               }
-                              className="w-4 h-4 rounded text-indigo-600 cursor-pointer"
+                              className="w-4 h-4 rounded text-indigo-600 cursor-pointer self-start sm:self-center"
                             />
                           ) : (
                             <input
@@ -1016,7 +1016,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
                                 }))
                               }
                               placeholder="Valor del campo..."
-                              className="w-56 sm:w-64 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium text-slate-900 dark:text-white"
+                              className="w-full sm:w-64 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium text-slate-900 dark:text-white"
                             />
                           )}
                         </div>
@@ -1027,7 +1027,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
               )}
             </div>
           ) : previewBlobUrl ? (
-            <div className="w-full h-[560px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950">
+            <div className="w-full h-[65dvh] sm:h-[560px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-950">
               <iframe
                 src={previewBlobUrl}
                 title="Vista Previa PDF Oficial Local"

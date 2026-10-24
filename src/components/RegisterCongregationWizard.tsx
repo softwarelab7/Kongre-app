@@ -22,6 +22,11 @@ import { Select } from './Select';
 import { IosTimePicker } from './IosTimePicker';
 import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
+import {
+  LegalConsentCheckbox,
+  hasAcceptedLegalTerms,
+  recordLegalTermsAcceptance,
+} from './TermsAndPrivacyModal';
 
 const MIDWEEK_DAY_OPTIONS = [
   { value: 'Lunes', label: 'Lunes' },
@@ -146,6 +151,15 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
 
   const [pinRegeneratedCong, setPinRegeneratedCong] = useState(false);
   const [pinRegeneratedPers, setPinRegeneratedPers] = useState(false);
+  const [acceptedLegalTerms, setAcceptedLegalTerms] = useState<boolean>(() =>
+    hasAcceptedLegalTerms()
+  );
+
+  React.useEffect(() => {
+    const syncConsent = () => setAcceptedLegalTerms(hasAcceptedLegalTerms());
+    window.addEventListener('kongre_legal_terms_accepted', syncConsent);
+    return () => window.removeEventListener('kongre_legal_terms_accepted', syncConsent);
+  }, []);
 
   const handleCopyCongPin = (textToCopy: string) => {
     if (!textToCopy) return;
@@ -361,6 +375,10 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   const handleFinalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (!acceptedLegalTerms) {
+      setError('Debes aceptar los Términos de Uso y la Política de Privacidad para registrar la congregación.');
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -372,6 +390,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
       // 0. Limpiar completamente cualquier dato de demostración o sesión previa antes de registrar la nueva congregación
       resetAllCongregationData();
       localStorage.removeItem('kongre_demo_mode');
+      recordLegalTermsAcceptance();
 
       // 1. Guardar credenciales y PINs inmediatamente en almacenamiento local cifrado
       setSecureLocalPin('kongre_session_pin_v2', cleanPersonalPin);
@@ -1268,6 +1287,14 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
                 </div>
               </div>
             </div>
+
+            <LegalConsentCheckbox
+              checked={acceptedLegalTerms}
+              onChange={(val) => {
+                setAcceptedLegalTerms(val);
+                if (val) setError(null);
+              }}
+            />
           </div>
         )}
       </div>
@@ -1308,8 +1335,8 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
           <button
             type="button"
             onClick={handleFinalSubmit}
-            disabled={isSubmitting}
-            className="px-4 py-1.5 sm:px-5 sm:py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-xs flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md shadow-emerald-600/20 transition-all disabled:opacity-50 ml-auto sm:ml-0"
+            disabled={isSubmitting || !acceptedLegalTerms}
+            className="px-4 py-1.5 sm:px-5 sm:py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-xs flex items-center gap-1.5 sm:gap-2 cursor-pointer shadow-md shadow-emerald-600/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed ml-auto sm:ml-0"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>{isSubmitting ? 'Registrando...' : 'Registrar y Comenzar'}</span>

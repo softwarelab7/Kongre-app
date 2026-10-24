@@ -1756,6 +1756,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       if (activePin) {
         setSyncStatus('saving');
+        setIsSupabaseSyncing(true);
         try {
           const res = await supabaseSyncService.fetchAndDecryptCongregation(syncCongId, activePin);
           if (res.success && res.data && !isCancelled) {
@@ -1766,6 +1767,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
           }
         } catch {
           setSyncStatus('synced');
+        } finally {
+          if (!isCancelled) {
+            setIsSupabaseSyncing(false);
+          }
         }
       } else {
         setSyncStatus('synced');
@@ -2004,42 +2009,47 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId?.toUpperCase() || '');
 
           if (pinMaestro && congDocId && !isCurrentDemo) {
-            await supabaseSyncService.uploadCongregation({
-              congregationId: congDocId,
-              data: {
-                settings: resolvedSettings,
-                publishers: newPubs,
-                weeks: newWeeks,
-                territories: newTerritories,
-                notices: newNotices,
-                transactions: newTransactions,
-                audits: newQuarterlyAudits,
-                literatureItems: newLiteratureItems,
-                literatureOrders: newSpecialOrders,
-                literatureDistributions: newGroupDistributions,
-                literatureInventory: newInventoryRecords,
-                preachingGroups: resolvedGroups || [],
-                customDuties: newDuties,
-                outgoingSpeakers: newOutgoing,
-                fieldServiceMeetings: newFieldService,
-                cartLocations: newCartLocs,
-                cartShifts: newCartShifts,
-                monthlyReports: newReports,
-                circuitVisit: newCircuitVisit,
-                memorialPlans: newMemorialPlans,
-                theocraticAssemblies: newAssemblies,
-                congregationEvents: resolvedEvents,
-                accountLinkRequests: newAccountLinkRequests,
-                clmProgramas: newClm,
-                hospitalityHosts: latestHospitalityHostsRef.current,
-                breakers: latestBreakersRef.current,
-                maintenanceSheets: latestMaintenanceSheetsRef.current,
-                auxPioneerRequests: latestAuxPioneerRef.current,
-                branchReportsS1: latestBranchS1Ref.current,
-              },
-              pinMaestro,
-              pinCongregacion,
-            });
+            setIsSupabaseSyncing(true);
+            try {
+              await supabaseSyncService.uploadCongregation({
+                congregationId: congDocId,
+                data: {
+                  settings: resolvedSettings,
+                  publishers: newPubs,
+                  weeks: newWeeks,
+                  territories: newTerritories,
+                  notices: newNotices,
+                  transactions: newTransactions,
+                  audits: newQuarterlyAudits,
+                  literatureItems: newLiteratureItems,
+                  literatureOrders: newSpecialOrders,
+                  literatureDistributions: newGroupDistributions,
+                  literatureInventory: newInventoryRecords,
+                  preachingGroups: resolvedGroups || [],
+                  customDuties: newDuties,
+                  outgoingSpeakers: newOutgoing,
+                  fieldServiceMeetings: newFieldService,
+                  cartLocations: newCartLocs,
+                  cartShifts: newCartShifts,
+                  monthlyReports: newReports,
+                  circuitVisit: newCircuitVisit,
+                  memorialPlans: newMemorialPlans,
+                  theocraticAssemblies: newAssemblies,
+                  congregationEvents: resolvedEvents,
+                  accountLinkRequests: newAccountLinkRequests,
+                  clmProgramas: newClm,
+                  hospitalityHosts: latestHospitalityHostsRef.current,
+                  breakers: latestBreakersRef.current,
+                  maintenanceSheets: latestMaintenanceSheetsRef.current,
+                  auxPioneerRequests: latestAuxPioneerRef.current,
+                  branchReportsS1: latestBranchS1Ref.current,
+                },
+                pinMaestro,
+                pinCongregacion,
+              });
+            } finally {
+              setIsSupabaseSyncing(false);
+            }
           }
         } catch (sbErr) {
           console.warn('Aviso Supabase sync:', sbErr);
@@ -2325,6 +2335,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       getSecureLocalPin('kongre_last_cong_pin') ||
       pinMaestro;
 
+    setIsSupabaseSyncing(true);
     try {
       // 1. Intentar descifrar primero con el PIN proporcionado (o PIN de Congregación)
       const pinsToTry = Array.from(
@@ -2381,6 +2392,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       };
     } catch (err: any) {
       return { success: false, message: err?.message || 'Error al conectar con la nube de Supabase.' };
+    } finally {
+      setIsSupabaseSyncing(false);
     }
   };
 

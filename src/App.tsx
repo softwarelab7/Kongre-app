@@ -52,6 +52,7 @@ import { ResumenInicioTab } from './components/ResumenInicioTab';
 import { PanoramaGeneralTab } from './components/PanoramaGeneralTab';
 import { MinisterioPublicadorTab } from './components/MinisterioPublicadorTab';
 import { RolesManagerTab } from './components/RolesManagerTab';
+import { MobileMenuTab } from './components/MobileMenuTab';
 import { AccessRestrictedView } from './components/AccessRestrictedView';
 import { SecurityProvider } from './context/SecurityContext';
 import { SessionLockModal } from './components/SessionLockModal';
@@ -69,6 +70,8 @@ import { AppFooter } from './components/AppFooter';
 import { VersionHistoryModal } from './components/VersionHistoryModal';
 import { OfflineSyncQueueModal } from './components/OfflineSyncQueueModal';
 import { DemoNoticeModal } from './components/DemoNoticeModal';
+import { FirstTimeLegalConsentModal, hasAcceptedLegalTerms } from './components/TermsAndPrivacyModal';
+import { LoadingSpinner } from './components/LoadingSpinner';
 import { Building2 } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import {
@@ -130,6 +133,10 @@ export const VALID_TABS_MAP: Record<string, ActiveTab> = {
   'roles-permisos': 'roles',
   'roles_permisos': 'roles',
   seguridad_roles: 'roles',
+  menu: 'menu',
+  menú: 'menu',
+  navegacion: 'menu',
+  departamentos: 'menu',
 };
 
 export function parseAppHash(hashString: string) {
@@ -261,6 +268,8 @@ const AppContent: React.FC = () => {
     loadCongregationFromCloud,
     isOnline,
     syncOfflineQueueNow,
+    isSupabaseSyncing,
+    syncStatus,
     isDemoMode,
     loadDemoData,
     exitDemoMode,
@@ -272,6 +281,16 @@ const AppContent: React.FC = () => {
       sessionStorage.getItem('kongre_demo_notice_shown') !== 'true'
     );
   });
+
+  const [hasAcceptedTermsState, setHasAcceptedTermsState] = useState<boolean>(() =>
+    hasAcceptedLegalTerms()
+  );
+
+  useEffect(() => {
+    const syncConsent = () => setHasAcceptedTermsState(hasAcceptedLegalTerms());
+    window.addEventListener('kongre_legal_terms_accepted', syncConsent);
+    return () => window.removeEventListener('kongre_legal_terms_accepted', syncConsent);
+  }, []);
 
   useEffect(() => {
     if (isDemoMode && sessionStorage.getItem('kongre_demo_notice_shown') !== 'true') {
@@ -341,30 +360,32 @@ const AppContent: React.FC = () => {
   const openModalWithHistory = useCallback(
     (modalName: string, setter: React.Dispatch<React.SetStateAction<boolean>>) => {
       setter(true);
-      const nextHash = `#${activeTab}?modal=${modalName}`;
+      const baseRoute = showWelcomeLanding ? 'portal' : activeTab;
+      const nextHash = `#${baseRoute}?modal=${modalName}`;
       const nextState = {
         tab: activeTab,
         modal: modalName,
-        landing: false,
+        landing: showWelcomeLanding,
       };
       window.history.pushState(nextState, '', nextHash);
     },
-    [activeTab]
+    [activeTab, showWelcomeLanding]
   );
 
   const closeModalWithHistory = useCallback(
     (modalName: string, setter: React.Dispatch<React.SetStateAction<boolean>>) => {
+      setter(false);
       if (window.history.state?.modal === modalName) {
         window.history.back();
       } else {
-        setter(false);
         const parsed = parseAppHash(window.location.hash);
         if (parsed?.modal === modalName) {
-          window.history.replaceState({ tab: activeTab, modal: null, landing: false }, '', `#${activeTab}`);
+          const fallbackHash = showWelcomeLanding ? '#portal' : `#${activeTab}`;
+          window.history.replaceState({ tab: activeTab, modal: null, landing: showWelcomeLanding }, '', fallbackHash);
         }
       }
     },
-    [activeTab]
+    [activeTab, showWelcomeLanding]
   );
 
   // Synchronize browser history events (Back / Forward button in browser)
@@ -372,6 +393,7 @@ const AppContent: React.FC = () => {
     const onPopState = (event: PopStateEvent) => {
       const state = event.state;
       const hashInfo = parseAppHash(window.location.hash);
+      const targetModal = state?.modal ?? hashInfo?.modal ?? null;
 
       const isLanding = state?.landing ?? hashInfo?.isLanding ?? hashInfo?.isLegal ?? false;
       if (isLanding) {
@@ -383,13 +405,13 @@ const AppContent: React.FC = () => {
         setIsSearchModalOpen(false);
         setIsRoleModalOpen(false);
         setIsThemeModalOpen(false);
-        setIsJoinModalOpen(false);
+        setIsJoinModalOpen(targetModal === 'unirse');
         setIsInviteManagerOpen(false);
         setIsLinkRequestsModalOpen(false);
         setIsPinsModalOpen(false);
         setIsAuditLogOpen(false);
         setIsRegisterWizardOpen(false);
-        setIsVersionModalOpen(false);
+        setIsVersionModalOpen(targetModal === 'versiones');
         setIsQueueModalOpen(false);
         return;
       }
@@ -397,7 +419,6 @@ const AppContent: React.FC = () => {
       setShowWelcomeLanding(false);
 
       const targetTab = state?.tab || hashInfo?.tab || 'inicio';
-      const targetModal = state?.modal ?? hashInfo?.modal ?? null;
       const targetWeekId = state?.weekId || hashInfo?.semana || null;
 
       if (targetWeekId) {
@@ -942,6 +963,16 @@ const AppContent: React.FC = () => {
     (settings.isRegistered || Boolean(localStorage.getItem('kongre_congregation_id')) || Boolean(localStorage.getItem('kongre_congregation_number'))))
   );
 
+  // Full-page Version History / Changelog view (NO pop-up)
+  if (isVersionModalOpen) {
+    return (
+      <VersionHistoryModal
+        isOpen={true}
+        onClose={() => closeModalWithHistory('versiones', setIsVersionModalOpen)}
+      />
+    );
+  }
+
   if (showWelcomeLanding || !isCongregationRegistered) {
     return (
       <>
@@ -972,10 +1003,6 @@ const AppContent: React.FC = () => {
             localStorage.setItem('kongre_is_registered_congregation', 'true');
             window.history.pushState({ tab: activeTab, modal: null, landing: false }, '', `#${activeTab}`);
           }}
-        />
-        <VersionHistoryModal
-          isOpen={isVersionModalOpen}
-          onClose={() => closeModalWithHistory('versiones', setIsVersionModalOpen)}
         />
         <OfflineSyncQueueModal
           isOpen={isQueueModalOpen}
@@ -1049,7 +1076,11 @@ const AppContent: React.FC = () => {
       />
 
       <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200 flex flex-col justify-between overflow-x-hidden`}>
-        <div className="w-full mx-auto px-2.5 sm:px-6 lg:px-8 2xl:px-12 py-2.5 sm:py-6 pb-6">
+        <div className="relative flex-1 w-full mx-auto px-2.5 sm:px-6 lg:px-8 2xl:px-12 py-2.5 sm:py-6 pb-6">
+          <LoadingSpinner
+            isVisible={!isDemoMode && (isSupabaseSyncing || syncStatus === 'saving')}
+            activeTab={activeTab}
+          />
           {!isTabAllowedForRole(effectiveRoleInfo.id, activeTab) ? (
           <AccessRestrictedView
             requiredRoleName={
@@ -1175,6 +1206,19 @@ const AppContent: React.FC = () => {
                 onNavigateToProfile={() => setActiveTab('perfil')}
                 onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
                 onNavigateToRoles={() => setActiveTab('roles')}
+              />
+            )}
+            {activeTab === 'menu' && (
+              <MobileMenuTab
+                setActiveTab={setActiveTab}
+                onOpenConflictsModal={() => openModalWithHistory('conflictos', setIsConflictsModalOpen)}
+                onOpenQrModal={() => openModalWithHistory('qr', setIsQrModalOpen)}
+                onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
+                onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
+                onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
+                onOpenRoleModal={() => openModalWithHistory('roles_permisos', setIsRoleModalOpen)}
+                onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
+                onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
               />
             )}
           </>
@@ -1339,6 +1383,12 @@ const AppContent: React.FC = () => {
           sessionStorage.setItem('kongre_demo_notice_shown', 'true');
           openModalWithHistory('registro_congregacion', setIsRegisterWizardOpen);
         }}
+      />
+
+      {/* First-Time Legal Consent Modal (Mandatory if entering the app for the first time without prior acceptance) */}
+      <FirstTimeLegalConsentModal
+        isOpen={!isDemoMode && !isSafeDemoMode() && !hasAcceptedTermsState}
+        onAccepted={() => setHasAcceptedTermsState(true)}
       />
 
     </div>

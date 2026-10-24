@@ -883,97 +883,122 @@ export const PublishersTab: React.FC = () => {
         </div>
       )}
 
-      {/* Panel de Métricas Rápidas Teocráticas */}
-      <div className="flex sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-3 overflow-x-auto no-scrollbar pb-1.5 sm:pb-0 touch-pan-x">
+      {/* Panel de Métricas Rápidas Teocráticas (Compacto y Deslizable en Móvil) */}
+      <div className="flex sm:grid sm:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 overflow-x-auto no-scrollbar pb-1 sm:pb-0 touch-pan-x">
           <div
             onClick={() => {
               setRoleFilter('all');
+              setGenderFilter('all');
               setStatusFilter('active');
             }}
-            className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06] shadow-xs cursor-pointer hover:border-indigo-400/40 transition-all group shrink-0 min-w-[125px] sm:min-w-0 flex-1 active:scale-[0.98]"
+            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+              roleFilter === 'all' && genderFilter === 'all' && statusFilter === 'active'
+                ? 'border-emerald-500/60 ring-2 ring-emerald-500/15'
+                : 'border-black/[0.06] dark:border-white/[0.06] hover:border-indigo-400/40'
+            }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Activos</span>
-              <UserCheck size={16} className="text-emerald-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Activos</span>
+              <UserCheck size={15} className="text-emerald-500 group-hover:scale-110 transition-transform" />
             </div>
-            <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{stats.active}</div>
-            <div className="text-[10px] text-zinc-400 mt-0.5">de {stats.total} registrados</div>
+            <div className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 sm:mt-1 leading-tight">{stats.active}</div>
+            <div className="text-[10px] text-zinc-400 mt-0.5 truncate">de {stats.total} reg.</div>
           </div>
 
           <div
-            onClick={() => setRoleFilter('elder')}
-            className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06] shadow-xs cursor-pointer hover:border-indigo-400/40 transition-all group shrink-0 min-w-[125px] sm:min-w-0 flex-1 active:scale-[0.98]"
+            onClick={() => setRoleFilter(roleFilter === 'elder' ? 'all' : 'elder')}
+            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+              roleFilter === 'elder'
+                ? 'border-indigo-500/60 ring-2 ring-indigo-500/15'
+                : 'border-black/[0.06] dark:border-white/[0.06] hover:border-indigo-400/40'
+            }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Ancianos</span>
-              <Shield size={16} className="text-indigo-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Ancianos</span>
+              <Shield size={15} className="text-indigo-500 group-hover:scale-110 transition-transform" />
             </div>
-            <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{stats.elders}</div>
-            <div className="text-[10px] text-zinc-400 mt-0.5">cuerpo de ancianos</div>
+            <div className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 sm:mt-1 leading-tight">{stats.elders}</div>
+            <div className="text-[10px] text-zinc-400 mt-0.5 truncate">cuerpo ancianos</div>
           </div>
 
           <div
-            onClick={() => setRoleFilter('servant')}
-            className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06] shadow-xs cursor-pointer hover:border-indigo-400/40 transition-all group shrink-0 min-w-[125px] sm:min-w-0 flex-1 active:scale-[0.98]"
+            onClick={() => setRoleFilter(roleFilter === 'servant' ? 'all' : 'servant')}
+            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+              roleFilter === 'servant'
+                ? 'border-amber-500/60 ring-2 ring-amber-500/15'
+                : 'border-black/[0.06] dark:border-white/[0.06] hover:border-indigo-400/40'
+            }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Siervos Min.</span>
-              <Award size={16} className="text-amber-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Siervos</span>
+              <Award size={15} className="text-amber-500 group-hover:scale-110 transition-transform" />
             </div>
-            <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{stats.servants}</div>
-            <div className="text-[10px] text-zinc-400 mt-0.5">ministeriales</div>
+            <div className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 sm:mt-1 leading-tight">{stats.servants}</div>
+            <div className="text-[10px] text-zinc-400 mt-0.5 truncate">ministeriales</div>
           </div>
 
           <div
-            onClick={() => setRoleFilter('pioneer')}
-            className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06] shadow-xs cursor-pointer hover:border-indigo-400/40 transition-all group shrink-0 min-w-[125px] sm:min-w-0 flex-1 active:scale-[0.98]"
+            onClick={() => setRoleFilter(roleFilter === 'pioneer' ? 'all' : 'pioneer')}
+            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+              roleFilter === 'pioneer'
+                ? 'border-teal-500/60 ring-2 ring-teal-500/15'
+                : 'border-black/[0.06] dark:border-white/[0.06] hover:border-indigo-400/40'
+            }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Precursores</span>
-              <Sparkles size={16} className="text-teal-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Precursores</span>
+              <Sparkles size={15} className="text-teal-500 group-hover:scale-110 transition-transform" />
             </div>
-            <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{stats.pioneers}</div>
-            <div className="text-[10px] text-zinc-400 mt-0.5">regulares/auxiliares</div>
+            <div className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 sm:mt-1 leading-tight">{stats.pioneers}</div>
+            <div className="text-[10px] text-zinc-400 mt-0.5 truncate">regulares/aux.</div>
           </div>
 
           <div
-            onClick={() => setGenderFilter('brothers')}
-            className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06] shadow-xs cursor-pointer hover:border-indigo-400/40 transition-all group shrink-0 min-w-[125px] sm:min-w-0 flex-1 active:scale-[0.98]"
+            onClick={() => setGenderFilter(genderFilter === 'brothers' ? 'all' : 'brothers')}
+            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+              genderFilter === 'brothers'
+                ? 'border-blue-500/60 ring-2 ring-blue-500/15'
+                : 'border-black/[0.06] dark:border-white/[0.06] hover:border-indigo-400/40'
+            }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Hermanos</span>
-              <Users size={16} className="text-blue-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Hermanos</span>
+              <Users size={15} className="text-blue-500 group-hover:scale-110 transition-transform" />
             </div>
-            <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{stats.brothers}</div>
-            <div className="text-[10px] text-zinc-400 mt-0.5">varones</div>
+            <div className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 sm:mt-1 leading-tight">{stats.brothers}</div>
+            <div className="text-[10px] text-zinc-400 mt-0.5 truncate">varones</div>
           </div>
 
           <div
-            onClick={() => setGenderFilter('sisters')}
-            className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06] shadow-xs cursor-pointer hover:border-indigo-400/40 transition-all group shrink-0 min-w-[125px] sm:min-w-0 flex-1 active:scale-[0.98]"
+            onClick={() => setGenderFilter(genderFilter === 'sisters' ? 'all' : 'sisters')}
+            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+              genderFilter === 'sisters'
+                ? 'border-pink-500/60 ring-2 ring-pink-500/15'
+                : 'border-black/[0.06] dark:border-white/[0.06] hover:border-indigo-400/40'
+            }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Hermanas</span>
-              <Users size={16} className="text-pink-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Hermanas</span>
+              <Users size={15} className="text-pink-500 group-hover:scale-110 transition-transform" />
             </div>
-            <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{stats.sisters}</div>
-            <div className="text-[10px] text-zinc-400 mt-0.5">mujeres</div>
+            <div className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 sm:mt-1 leading-tight">{stats.sisters}</div>
+            <div className="text-[10px] text-zinc-400 mt-0.5 truncate">mujeres</div>
           </div>
 
           <div
             onClick={() => setStatusFilter(statusFilter === 'absent' ? 'all' : 'absent')}
-            className={`p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[125px] sm:min-w-0 flex-1 active:scale-[0.98] ${
+            className={`p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-white/[0.03] border shadow-xs cursor-pointer transition-all group shrink-0 min-w-[112px] sm:min-w-0 flex-1 active:scale-[0.98] ${
               statusFilter === 'absent'
-                ? 'border-rose-500/50 bg-rose-50/20 dark:bg-rose-500/10'
+                ? 'border-rose-500/50 bg-rose-50/20 dark:bg-rose-500/10 ring-2 ring-rose-500/15'
                 : 'border-black/[0.06] dark:border-white/[0.06] hover:border-rose-400/40'
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Ausencias</span>
-              <Plane size={16} className="text-rose-500 group-hover:scale-110 transition-transform" />
+              <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Ausencias</span>
+              <Plane size={15} className="text-rose-500 group-hover:scale-110 transition-transform" />
             </div>
-            <div className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-1">{stats.absentToday}</div>
-            <div className="text-[10px] text-zinc-400 mt-0.5">fuera / viaje hoy</div>
+            <div className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-0.5 sm:mt-1 leading-tight">{stats.absentToday}</div>
+            <div className="text-[10px] text-zinc-400 mt-0.5 truncate">fuera hoy</div>
           </div>
         </div>
 

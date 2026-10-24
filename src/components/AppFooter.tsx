@@ -71,11 +71,57 @@ export const AppFooter: React.FC<AppFooterProps> = ({
         }`}
       >
         <div
-          className={`w-full mx-auto px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 ${
+          className={`w-full mx-auto px-4 sm:px-6 md:px-8 ${
+            variant === 'app' ? 'py-2 md:py-3.5' : 'py-3 sm:py-3.5'
+          } ${
             variant === 'landing' ? 'max-w-[1240px] 2xl:max-w-[1360px]' : '2xl:px-12'
           }`}
         >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-2.5 md:gap-4 text-xs text-slate-500 dark:text-slate-400">
+          {/* Ultra-compact single-line bar on mobile for in-app view */}
+          {variant === 'app' && (
+            <div className="flex md:hidden items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-1.5 min-w-0 truncate">
+                <Logo variant="isotipo" className="w-4 h-4 object-contain shrink-0" />
+                <span className="font-bold text-slate-700 dark:text-slate-200">Kongre</span>
+                <span className="text-slate-300 dark:text-slate-700">·</span>
+                <button
+                  type="button"
+                  onClick={() => handleOpenLegal('terms')}
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors cursor-pointer"
+                >
+                  Términos
+                </button>
+                <span className="text-slate-300 dark:text-slate-700">·</span>
+                <button
+                  type="button"
+                  onClick={() => handleOpenLegal('privacy')}
+                  className="hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors cursor-pointer"
+                >
+                  Privacidad
+                </button>
+              </div>
+
+              {onOpenVersionModal ? (
+                <button
+                  type="button"
+                  onClick={onOpenVersionModal}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 font-semibold text-[10.5px] shrink-0 active:scale-95 cursor-pointer"
+                  title="Ver registro de cambios y versiones"
+                >
+                  <ScrollText className="w-3 h-3 text-indigo-500" />
+                  <span>v{CURRENT_APP_VERSION}</span>
+                </button>
+              ) : (
+                <span className="text-[10.5px] text-slate-400 shrink-0">v{CURRENT_APP_VERSION}</span>
+              )}
+            </div>
+          )}
+
+          <div
+            className={`${
+              variant === 'app' ? 'hidden md:flex' : 'flex flex-col md:flex-row'
+            } items-center justify-between gap-2.5 md:gap-4 text-xs text-slate-500 dark:text-slate-400`}
+          >
             {/* Top / Left Group: Brand, Online/Offline Status & Version on Mobile */}
             <div className="w-full md:w-auto flex items-center justify-between md:justify-start gap-2.5">
               <div className="flex items-center gap-2 min-w-0">
@@ -103,7 +149,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
                 )}
               </div>
 
-              {/* Mobile-only Version Button on top row for compact symmetry */}
+              {/* Mobile-only Version Button on top row for landing footer */}
               {onOpenVersionModal && (
                 <button
                   type="button"

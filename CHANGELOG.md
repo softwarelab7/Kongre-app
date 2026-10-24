@@ -6,6 +6,55 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.15] — 23 de Octubre, 2026
+**Indicador de Carga Global (`LoadingSpinner`) durante la Sincronización con Supabase**
+
+- ✨ **Componente Global `LoadingSpinner`:**
+  - Nuevo indicador de carga con diseño *glassmorphism*, doble anillo orbital en rotación inversa e indicación de cifrado **Zero-Knowledge AES-256-GCM**.
+- 🔄 **Superposición sobre el Contenido de cada Pestaña:**
+  - Se muestra automáticamente sobre el contenedor de la pestaña activa mientras se realiza la sincronización de datos (carga inicial, subida cifrada o sincronización bidireccional) con Supabase, indicando el nombre de la vista en actualización.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
+### [v2.12.14] — 23 de Octubre, 2026
+**Redacción Institucional y Profesional de Términos de Uso y Política de Privacidad**
+
+- ⚖️ **Marco Normativo de Términos de Uso Teocrático:**
+  - Reestructuración integral con lenguaje formal, claro e institucional dividido en 5 cláusulas normativas: Alcance Operativo e Independencia Institucional (aclaración expresa de no afiliación oficial con *jw.org*), Gobernanza de Accesos y Roles (RBAC en 3 niveles de PIN + 2FA TOTP), Confidencialidad y Uso Ético del Directorio, Arquitectura *Offline-First* y Responsabilidad de Respaldo, y Limitación de Responsabilidad y Baja Definitiva.
+- 🔒 **Política de Privacidad, Cifrado y Protección de Datos:**
+  - Documentación detallada de la arquitectura de **Conocimiento Cero (*Zero-Knowledge*)**, especificando el cifrado en el cliente mediante **AES-256-GCM** y derivación de llaves **PBKDF2-HMAC-SHA256** (hasta 600.000 iteraciones), principio de minimización de datos, cumplimiento de la cláusula de *Uso Limitado (Limited Use)* de Google OAuth 2.0 y ejercicio de derechos **ARCO+** (Acceso, Rectificación, Cancelación, Oposición, Portabilidad y Olvido Digital).
+- 🌐 **Sincronización con Páginas Estáticas Oficiales (`/terms` y `/privacy`):**
+  - Las páginas públicas estáticas en español e inglés han sido actualizadas con el mismo estándar profesional para usuarios y revisores de seguridad.
+
+---
+
+### [v2.12.13] — 23 de Octubre, 2026
+**Vistas Dedicadas de Página Completa para Registro de Versiones (Changelog) y Términos y Privacidad**
+
+- 📄 **Registro de Versiones (Changelog) en Página Completa:**
+  - El historial de versiones y novedades ya no se abre en un cuadro emergente (*pop-up*), sino como una página completa de lectura cómoda con su botón superior «← Volver atrás».
+- ⚖️ **Términos de Uso y Política de Privacidad en Página Completa:**
+  - Los Términos de Uso y la Política de Privacidad (así como la pantalla de aceptación de primer ingreso) ahora se despliegan en una vista dedicada de página completa sin ventanas flotantes ni fondos superpuestos.
+
+---
+
+### [v2.12.12] — 23 de Octubre, 2026
+**Aceptación Obligatoria de Términos de Uso y Política de Privacidad en Registro y Primer Ingreso**
+
+- ⚖️ **Aceptación en el Registro de Congregación:**
+  - En el último paso del asistente de registro, el coordinador debe confirmar que ha leído y acepta los **Términos de Uso** y la **Política de Privacidad** antes de registrar y activar la congregación.
+- 🔐 **Aceptación en el Primer Inicio de Sesión:**
+  - Al ingresar por primera vez mediante **Google**, **ID y PIN de Congregación** o **Código de Invitación**, se presenta una casilla interactiva obligatoria con enlaces directos para abrir y leer los Términos de Uso y la Política de Privacidad sin salir de la pantalla.
+  - Al pulsar «Entendido y Aceptar» dentro del visor legal, la casilla queda marcada automáticamente y se guarda la aceptación en el dispositivo para no volver a solicitarla en futuros ingresos.
+- 🛡️ **Ventana de Consentimiento en Acceso por Enlace Directo o QR:**
+  - Si un hermano ingresa por primera vez escaneando un código QR o abriendo un enlace directo sin haber aceptado aún las condiciones, el sistema muestra el resumen interactivo de Términos y Privacidad para su aceptación previa.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.11] — 23 de Octubre, 2026
 **Autenticación de Dos Pasos (2FA) con Microsoft Authenticator y Códigos de Respaldo**
 

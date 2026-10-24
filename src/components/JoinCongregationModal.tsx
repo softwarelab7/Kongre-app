@@ -73,7 +73,7 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
     const urlParams = new URLSearchParams(window.location.search);
     const decodedTk = decodeSecureShareToken(urlParams.get('tk'));
     const tkCong = decodedTk?.cong || urlParams.get('cong');
-    const tkCpin = decodedTk?.cpin || urlParams.get('cpin');
+    const tkCpin = decodedTk?.cpin; // L-04: Solo aceptar cpin desde token cifrado tk, nunca en texto plano
     const tkInvite = decodedTk?.invite || urlParams.get('invite');
 
     if (tkCong && !tkCong.toUpperCase().includes('DEMO')) {
@@ -86,8 +86,16 @@ export const JoinCongregationModal: React.FC<JoinCongregationModalProps> = ({
       setPersonalPinInput(tkInvite);
     }
 
-    if (urlParams.has('tk') || urlParams.has('invite') || urlParams.has('cpin')) {
-      const cleanUrl = window.location.pathname + (window.location.hash || '');
+    if (
+      urlParams.has('tk') ||
+      urlParams.has('invite') ||
+      urlParams.has('cpin') ||
+      urlParams.has('pin') ||
+      window.location.hash.includes('cpin=') ||
+      window.location.hash.includes('pin=')
+    ) {
+      const cleanHash = (window.location.hash || '').split('?')[0];
+      const cleanUrl = window.location.pathname + cleanHash;
       window.history.replaceState({}, document.title, cleanUrl);
     }
   }, [isOpen]);

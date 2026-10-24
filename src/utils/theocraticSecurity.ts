@@ -15,7 +15,7 @@ export interface EncryptedPayload {
 }
 
 // Convert ArrayBuffer to Hex String
-function bufferToHex(buffer: ArrayBuffer): string {
+function bufferToHex(buffer: ArrayBufferLike): string {
   const bytes = new Uint8Array(buffer);
   return Array.from(bytes)
     .map((b) => b.toString(16).padStart(2, '0'))
@@ -30,6 +30,38 @@ function hexToBuffer(hex: string): Uint8Array {
   }
   return bytes;
 }
+
+/**
+ * Obtiene bytes pseudoaleatorios criptográficamente seguros usando CSPRNG.
+ * L-01: Evita degradación silenciosa a Math.random(). Lanza excepción si Web Crypto no está disponible.
+ */
+export function getSecureRandomBytes(len: number): Uint8Array {
+  const bytes = new Uint8Array(len);
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    crypto.getRandomValues(bytes);
+    return bytes;
+  }
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+    window.crypto.getRandomValues(bytes);
+    return bytes;
+  }
+  throw new Error('Entorno criptográficamente inseguro: Web Crypto API no disponible.');
+}
+
+/**
+ * Genera un entero aleatorio en [0, maxExclusive) sin sesgo de módulo (rejection sampling).
+ */
+export function secureRandomInt(maxExclusive: number): number {
+  if (maxExclusive <= 1) return 0;
+  const maxValid = Math.floor(256 / maxExclusive) * maxExclusive;
+  while (true) {
+    const byte = getSecureRandomBytes(1)[0];
+    if (byte < maxValid) {
+      return byte % maxExclusive;
+    }
+  }
+}
+
 
 // Convert Uint8Array to Base64
 function bufferToBase64(buffer: ArrayBuffer): string {
@@ -225,16 +257,7 @@ export function maskPrivateNotes(notes?: string): string {
  */
 export function generateMilitaryGradeCongregationId(_optionalSeed?: string): string {
   const CHARSET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // 32 caracteres seguros Crockford
-
-  // Generamos entropía aleatoria criptográfica con Web Crypto API (CSPRNG)
-  const randomBytes = new Uint8Array(8);
-  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-    window.crypto.getRandomValues(randomBytes);
-  } else {
-    for (let i = 0; i < 8; i++) {
-      randomBytes[i] = Math.floor(Math.random() * 256);
-    }
-  }
+  const randomBytes = getSecureRandomBytes(8);
 
   let block1 = '';
   let block2 = '';
@@ -369,15 +392,7 @@ export function generateSecureCongregationPin(): string {
   const DIGITS = '23456789';
   const CHARSET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 
-  const randomBytes = new Uint8Array(8);
-  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-    window.crypto.getRandomValues(randomBytes);
-  } else {
-    for (let i = 0; i < 8; i++) {
-      randomBytes[i] = Math.floor(Math.random() * 256);
-    }
-  }
-
+  const randomBytes = getSecureRandomBytes(8);
   const chars = Array.from(randomBytes).map((b) => CHARSET[b % CHARSET.length]);
 
   // Asegurar que contiene al menos 2 números y al menos 2 letras
@@ -393,9 +408,9 @@ export function generateSecureCongregationPin(): string {
     chars[3] = LETTERS[randomBytes[3] % LETTERS.length];
   }
 
-  // Mezclar orden con Fisher-Yates CSPRNG
+  // Mezclar orden con Fisher-Yates sin sesgo (L-01)
   for (let i = chars.length - 1; i > 0; i--) {
-    const j = randomBytes[i] % (i + 1);
+    const j = secureRandomInt(i + 1);
     [chars[i], chars[j]] = [chars[j], chars[i]];
   }
 
@@ -853,47 +868,127 @@ export function hashPersonalPin(pin?: string | null, saltContext?: string): stri
 }
 
 /**
- * Ofusca simétricamente un PIN para almacenamiento local en reposo (evita que inspeccionar
- * `localStorage` en DevTools muestre texto plano de forma inmediata).
- * Nota: es una medida de defensa en profundidad local / ofuscación, no una barrera criptográfica absoluta.
+ * Obtiene o genera una sal aleatoria única por dispositivo en localStorage.
+ * Garantiza que el cifrado local en reposo varíe entre navegadores y no dependa únicamente de claves fijas.
+ */
+export function getDeviceEntropySalt(): string {
+  if (typeof window === 'undefined') return 'server_side_device_entropy_salt_2026';
+  try {
+    let salt = typeof localStorage !== 'undefined' ? localStorage.getItem('kongre_device_entropy_salt_v1') : null;
+    if (!salt || salt.length < 32) {
+      const bytes = getSecureRandomBytes(16);
+      salt = bufferToHex(bytes.buffer);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('kongre_device_entropy_salt_v1', salt);
+      }
+    }
+    return salt;
+  } catch {
+    return 'fallback_device_entropy_salt_2026';
+  }
+}
+
+/**
+ * Cifra un PIN en reposo para almacenamiento local (H-01).
+ * Usa una clave derivada de la entropía única del dispositivo (kongre_device_entropy_salt_v1),
+ * con nonce CSPRNG de 128 bits y modo CTR autenticado (kgr_v2:...).
+ * Evita el uso de constantes estáticas del código (AT_REST_CIPHER_KEY) que permitían reversión inmediata.
  */
 export function encryptPinAtRest(pin?: string | null): string {
   if (!pin) return '';
   const clean = String(pin).trim();
-  if (!clean || clean === '••••') return '';
-  if (clean.startsWith('kgr_v1:')) return clean;
+  if (!clean || clean === '••••' || clean === '••••••••') return '';
+  if (clean.startsWith('kgr_v2:')) return clean;
 
-  const keyHash = sha256HexSync(AT_REST_CIPHER_KEY);
-  const plainBytes = new TextEncoder().encode(clean);
-  const out = new Uint8Array(plainBytes.length);
-  for (let i = 0; i < plainBytes.length; i++) {
-    const keyByte = parseInt(keyHash.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
-    out[i] = plainBytes[i] ^ keyByte;
+  try {
+    const deviceKey = sha256HexSync(`kgr_pin_rest_v2:${getDeviceEntropySalt()}`);
+    const plainBytes = new TextEncoder().encode(clean);
+    const nonce = getSecureRandomBytes(16);
+    const nonceHex = bufferToHex(nonce.buffer);
+
+    const out = new Uint8Array(plainBytes.length);
+    let currentBlock = -1;
+    let currentKeyHex = '';
+    for (let i = 0; i < plainBytes.length; i++) {
+      const blockIdx = Math.floor(i / 32);
+      const byteInBlock = i % 32;
+      if (blockIdx !== currentBlock) {
+        currentBlock = blockIdx;
+        currentKeyHex = sha256HexSync(`${deviceKey}:${nonceHex}:${blockIdx}:ctr`);
+      }
+      const kByte = parseInt(currentKeyHex.slice(byteInBlock * 2, byteInBlock * 2 + 2), 16);
+      out[i] = plainBytes[i] ^ kByte;
+    }
+    const cipherHex = bufferToHex(out.buffer);
+    const macTag = sha256HexSync(`${deviceKey}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
+    return `kgr_v2:${nonceHex}:${macTag}:${cipherHex}`;
+  } catch {
+    return '';
   }
-  return `kgr_v1:${bufferToHex(out.buffer)}`;
 }
 
 /**
- * Descifra en memoria un PIN cifrado en reposo
+ * Descifra en memoria un PIN cifrado en reposo.
+ * Soporta kgr_v2 (derivado de entropía del dispositivo) y retrocompatibilidad con kgr_v1 (legado).
  */
 export function decryptPinAtRest(encoded?: string | null): string {
   if (!encoded) return '';
   const clean = String(encoded).trim();
-  if (!clean.startsWith('kgr_v1:')) return '';
-  try {
-    const hexPart = clean.slice('kgr_v1:'.length);
-    if (!hexPart || hexPart.length % 2 !== 0) return '';
-    const cipherBytes = hexToBuffer(hexPart);
-    const keyHash = sha256HexSync(AT_REST_CIPHER_KEY);
-    const out = new Uint8Array(cipherBytes.length);
-    for (let i = 0; i < cipherBytes.length; i++) {
-      const keyByte = parseInt(keyHash.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
-      out[i] = cipherBytes[i] ^ keyByte;
+  if (!clean) return '';
+
+  // 1. Formato kgr_v2 (entropía de dispositivo + nonce 128 bits + CTR + MAC)
+  if (clean.startsWith('kgr_v2:')) {
+    try {
+      const parts = clean.slice('kgr_v2:'.length).split(':');
+      if (parts.length !== 3) return '';
+      const [nonceHex, macTag, cipherHex] = parts;
+      if (!nonceHex || !macTag || !cipherHex || cipherHex.length % 2 !== 0) return '';
+
+      const deviceKey = sha256HexSync(`kgr_pin_rest_v2:${getDeviceEntropySalt()}`);
+      const expectedMac = sha256HexSync(`${deviceKey}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
+      if (macTag.toLowerCase() !== expectedMac.toLowerCase()) {
+        return '';
+      }
+
+      const cipherBytes = hexToBuffer(cipherHex);
+      const out = new Uint8Array(cipherBytes.length);
+      let currentBlock = -1;
+      let currentKeyHex = '';
+      for (let i = 0; i < cipherBytes.length; i++) {
+        const blockIdx = Math.floor(i / 32);
+        const byteInBlock = i % 32;
+        if (blockIdx !== currentBlock) {
+          currentBlock = blockIdx;
+          currentKeyHex = sha256HexSync(`${deviceKey}:${nonceHex}:${blockIdx}:ctr`);
+        }
+        const kByte = parseInt(currentKeyHex.slice(byteInBlock * 2, byteInBlock * 2 + 2), 16);
+        out[i] = cipherBytes[i] ^ kByte;
+      }
+      return new TextDecoder().decode(out);
+    } catch {
+      return '';
     }
-    return new TextDecoder().decode(out);
-  } catch {
-    return '';
   }
+
+  // 2. Formato kgr_v1 (legado con AT_REST_CIPHER_KEY para migración fluida)
+  if (clean.startsWith('kgr_v1:')) {
+    try {
+      const hexPart = clean.slice('kgr_v1:'.length);
+      if (!hexPart || hexPart.length % 2 !== 0) return '';
+      const cipherBytes = hexToBuffer(hexPart);
+      const keyHash = sha256HexSync(AT_REST_CIPHER_KEY);
+      const out = new Uint8Array(cipherBytes.length);
+      for (let i = 0; i < cipherBytes.length; i++) {
+        const keyByte = parseInt(keyHash.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
+        out[i] = cipherBytes[i] ^ keyByte;
+      }
+      return new TextDecoder().decode(out);
+    } catch {
+      return '';
+    }
+  }
+
+  return '';
 }
 
 /**
@@ -941,7 +1036,7 @@ export function verifyPersonalPinMatch(
 
   // 3. Compatibilidad con registros legados o en memoria que aún posean personalPin / pin en texto plano
   const rawStoredPin = String(record.personalPin || record.pin || '').trim();
-  if (rawStoredPin && rawStoredPin !== '••••' && !rawStoredPin.startsWith('kgr_v1:')) {
+  if (rawStoredPin && rawStoredPin !== '••••' && !rawStoredPin.startsWith('kgr_v1:') && !rawStoredPin.startsWith('kgr_v2:')) {
     if (/^[a-f0-9]{64}$/i.test(rawStoredPin)) {
       const lowerStored = rawStoredPin.toLowerCase();
       if (lowerStored === candidateHash || lowerStored === legacyHash) return true;
@@ -957,33 +1052,8 @@ export function verifyPersonalPinMatch(
 }
 
 /**
- * Obtiene o genera una sal aleatoria única por dispositivo en localStorage.
- * Garantiza que el cifrado local en reposo varíe entre navegadores y no dependa únicamente de claves fijas.
- */
-function getDeviceEntropySalt(): string {
-  if (typeof window === 'undefined') return 'server_side_device_entropy_salt_2026';
-  try {
-    let salt = localStorage.getItem('kongre_device_entropy_salt_v1');
-    if (!salt || salt.length < 32) {
-      const bytes = new Uint8Array(16);
-      if (window.crypto && window.crypto.getRandomValues) {
-        window.crypto.getRandomValues(bytes);
-      } else {
-        for (let i = 0; i < 16; i++) bytes[i] = Math.floor(Math.random() * 256);
-      }
-      salt = bufferToHex(bytes.buffer);
-      localStorage.setItem('kongre_device_entropy_salt_v1', salt);
-    }
-    return salt;
-  } catch {
-    return 'fallback_device_entropy_salt_2026';
-  }
-}
-
-/**
  * Deriva una clave única para cifrar datos sensibles en reposo (salud, contactos de emergencia, teléfonos)
- * combinando la sesión activa del usuario (PIN personal o congregación) con la entropía del dispositivo.
- * Resuelve los hallazgos 4 y 6 de la auditoría de seguridad (cumplimiento Ley 1581 de 2012 de Colombia).
+ * combinando la sesión activa del usuario (PIN personal o congregación) con la entropía del dispositivo (v2).
  */
 export function getSensitiveDataAtRestKey(): string {
   const sessionPin =
@@ -994,7 +1064,24 @@ export function getSensitiveDataAtRestKey(): string {
         getSecureLocalPin('kongre_last_cong_pin')
       : '') || '';
   const congId =
-    typeof window !== 'undefined'
+    typeof window !== 'undefined' && typeof localStorage !== 'undefined'
+      ? localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_canonical_cong_id') || ''
+      : '';
+  const deviceSalt = getDeviceEntropySalt();
+  return sha256HexSync(`kgr_health_contacts_rest_v2:${sessionPin}:${congId}:${deviceSalt}`);
+}
+
+/** Clave para descifrar datos sensibles guardados con formato v1 legado (kgr_sec2:) */
+function getSensitiveDataAtRestKeyV1(): string {
+  const sessionPin =
+    (typeof window !== 'undefined'
+      ? getSecureLocalPin('kongre_session_pin_v2') ||
+        getSecureLocalPin('kongre_coordinator_pin') ||
+        getSecureLocalPin('kongre_registered_cong_pin') ||
+        getSecureLocalPin('kongre_last_cong_pin')
+      : '') || '';
+  const congId =
+    typeof window !== 'undefined' && typeof localStorage !== 'undefined'
       ? localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_canonical_cong_id') || ''
       : '';
   const deviceSalt = getDeviceEntropySalt();
@@ -1003,30 +1090,36 @@ export function getSensitiveDataAtRestKey(): string {
 
 /**
  * Cifra en reposo un campo sensible (salud, teléfono, contacto de emergencia, notas médicas)
- * mediante un flujo simétrico ligado a la clave de sesión del dispositivo (`kgr_sec2:...`).
+ * mediante Counter-Mode (CTR) con nonce CSPRNG de 128 bits y etiqueta de autenticación (kgr_sec3:...).
+ * Evita repetición de keystream y manipulación de datos (H-02).
  */
 export function encryptSensitiveFieldAtRest(val: any): any {
   if (val === null || val === undefined || val === '') return val;
-  if (typeof val === 'string' && val.startsWith('kgr_sec2:')) return val;
+  if (typeof val === 'string' && (val.startsWith('kgr_sec3:') || val.startsWith('kgr_sec2:'))) return val;
 
   try {
     const rawStr = typeof val === 'object' ? `json:${JSON.stringify(val)}` : String(val);
     const key = getSensitiveDataAtRestKey();
     const plainBytes = new TextEncoder().encode(rawStr);
-    const nonce = new Uint8Array(4);
-    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-      window.crypto.getRandomValues(nonce);
-    } else {
-      for (let i = 0; i < 4; i++) nonce[i] = Math.floor(Math.random() * 256);
-    }
+    const nonce = getSecureRandomBytes(16);
     const nonceHex = bufferToHex(nonce.buffer);
-    const stream = sha256HexSync(`${key}:${nonceHex}:stream`);
+
     const out = new Uint8Array(plainBytes.length);
+    let currentBlock = -1;
+    let currentKeyHex = '';
     for (let i = 0; i < plainBytes.length; i++) {
-      const kByte = parseInt(stream.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
+      const blockIdx = Math.floor(i / 32);
+      const byteInBlock = i % 32;
+      if (blockIdx !== currentBlock) {
+        currentBlock = blockIdx;
+        currentKeyHex = sha256HexSync(`${key}:${nonceHex}:${blockIdx}:ctr`);
+      }
+      const kByte = parseInt(currentKeyHex.slice(byteInBlock * 2, byteInBlock * 2 + 2), 16);
       out[i] = plainBytes[i] ^ kByte;
     }
-    return `kgr_sec2:${nonceHex}${bufferToHex(out.buffer)}`;
+    const cipherHex = bufferToHex(out.buffer);
+    const authTag = sha256HexSync(`${key}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
+    return `kgr_sec3:${nonceHex}:${authTag}:${cipherHex}`;
   } catch {
     return val;
   }
@@ -1034,31 +1127,75 @@ export function encryptSensitiveFieldAtRest(val: any): any {
 
 /**
  * Descifra en memoria un valor sensible leído desde localStorage.
- * Si el dato es legado o texto plano (sin prefijo kgr_sec2:), se devuelve tal cual (compatibilidad garantizada).
+ * Soporta kgr_sec3 (CTR autenticado), kgr_sec2 (legado) y texto plano (compatibilidad garantizada).
  */
 export function decryptSensitiveFieldAtRest(val: any): any {
-  if (typeof val !== 'string' || !val.startsWith('kgr_sec2:')) return val;
-  try {
-    const payloadHex = val.slice('kgr_sec2:'.length);
-    if (payloadHex.length < 8) return val;
-    const nonceHex = payloadHex.slice(0, 8);
-    const cipherHex = payloadHex.slice(8);
-    const cipherBytes = hexToBuffer(cipherHex);
-    const key = getSensitiveDataAtRestKey();
-    const stream = sha256HexSync(`${key}:${nonceHex}:stream`);
-    const out = new Uint8Array(cipherBytes.length);
-    for (let i = 0; i < cipherBytes.length; i++) {
-      const kByte = parseInt(stream.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
-      out[i] = cipherBytes[i] ^ kByte;
+  if (typeof val !== 'string') return val;
+
+  // 1. Formato kgr_sec3: Counter-Mode autenticado con nonce de 128 bits (H-02)
+  if (val.startsWith('kgr_sec3:')) {
+    try {
+      const parts = val.slice('kgr_sec3:'.length).split(':');
+      if (parts.length !== 3) return val;
+      const [nonceHex, authTag, cipherHex] = parts;
+      if (!nonceHex || !authTag || !cipherHex || cipherHex.length % 2 !== 0) return val;
+
+      const key = getSensitiveDataAtRestKey();
+      const expectedTag = sha256HexSync(`${key}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
+      if (authTag.toLowerCase() !== expectedTag.toLowerCase()) {
+        return val;
+      }
+
+      const cipherBytes = hexToBuffer(cipherHex);
+      const out = new Uint8Array(cipherBytes.length);
+      let currentBlock = -1;
+      let currentKeyHex = '';
+      for (let i = 0; i < cipherBytes.length; i++) {
+        const blockIdx = Math.floor(i / 32);
+        const byteInBlock = i % 32;
+        if (blockIdx !== currentBlock) {
+          currentBlock = blockIdx;
+          currentKeyHex = sha256HexSync(`${key}:${nonceHex}:${blockIdx}:ctr`);
+        }
+        const kByte = parseInt(currentKeyHex.slice(byteInBlock * 2, byteInBlock * 2 + 2), 16);
+        out[i] = cipherBytes[i] ^ kByte;
+      }
+      const decoded = new TextDecoder().decode(out);
+      if (decoded.startsWith('json:')) {
+        return JSON.parse(decoded.slice(5));
+      }
+      return decoded;
+    } catch {
+      return val;
     }
-    const decoded = new TextDecoder().decode(out);
-    if (decoded.startsWith('json:')) {
-      return JSON.parse(decoded.slice(5));
-    }
-    return decoded;
-  } catch {
-    return val;
   }
+
+  // 2. Formato kgr_sec2: compatibilidad con datos cifrados en versiones anteriores
+  if (val.startsWith('kgr_sec2:')) {
+    try {
+      const payloadHex = val.slice('kgr_sec2:'.length);
+      if (payloadHex.length < 8) return val;
+      const nonceHex = payloadHex.slice(0, 8);
+      const cipherHex = payloadHex.slice(8);
+      const cipherBytes = hexToBuffer(cipherHex);
+      const key = getSensitiveDataAtRestKeyV1();
+      const stream = sha256HexSync(`${key}:${nonceHex}:stream`);
+      const out = new Uint8Array(cipherBytes.length);
+      for (let i = 0; i < cipherBytes.length; i++) {
+        const kByte = parseInt(stream.slice((i * 2) % 60, ((i * 2) % 60) + 2), 16);
+        out[i] = cipherBytes[i] ^ kByte;
+      }
+      const decoded = new TextDecoder().decode(out);
+      if (decoded.startsWith('json:')) {
+        return JSON.parse(decoded.slice(5));
+      }
+      return decoded;
+    } catch {
+      return val;
+    }
+  }
+
+  return val;
 }
 
 const SENSITIVE_HEALTH_AND_CONTACT_KEYS = [
@@ -1084,7 +1221,7 @@ export function sanitizePublishersForLocalStorage<T extends Record<string, any>>
   return publishers.map((p) => {
     if (!p || typeof p !== 'object') return p;
     const rawPin = p.personalPin ? String(p.personalPin).trim() : '';
-    const hasPlainPin = rawPin.length >= 4 && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !/^[a-f0-9]{64}$/i.test(rawPin);
+    const hasPlainPin = rawPin.length >= 4 && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !rawPin.startsWith('kgr_v2:') && !/^[a-f0-9]{64}$/i.test(rawPin);
     const pinHash = hasPlainPin ? hashPersonalPin(rawPin) : (p.personalPinHash || '');
     const encryptedPin = hasPlainPin ? encryptPinAtRest(rawPin) : (p.encryptedPin || '');
 
@@ -1113,7 +1250,7 @@ export function restorePublishersFromLocalStorage<T extends Record<string, any>>
     if (!p || typeof p !== 'object') return p;
     const rawPin = p.personalPin ? String(p.personalPin).trim() : '';
     const restoredPin =
-      rawPin && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !/^[a-f0-9]{64}$/i.test(rawPin)
+      rawPin && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !rawPin.startsWith('kgr_v2:') && !/^[a-f0-9]{64}$/i.test(rawPin)
         ? rawPin
         : p.encryptedPin
         ? decryptPinAtRest(p.encryptedPin)
@@ -1147,7 +1284,7 @@ export function sanitizePinRecordsForLocalStorage<T extends Record<string, any>>
   return records.map((rec) => {
     if (!rec || typeof rec !== 'object') return rec;
     const rawPin = rec.pin ? String(rec.pin).trim() : '';
-    const hasPlainPin = rawPin.length >= 4 && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !/^[a-f0-9]{64}$/i.test(rawPin);
+    const hasPlainPin = rawPin.length >= 4 && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !rawPin.startsWith('kgr_v2:') && !/^[a-f0-9]{64}$/i.test(rawPin);
     const pinHash = hasPlainPin ? hashPersonalPin(rawPin) : (rec.pinHash || rec.personalPinHash || '');
     const encryptedPin = hasPlainPin ? encryptPinAtRest(rawPin) : (rec.encryptedPin || '');
 
@@ -1170,7 +1307,7 @@ export function restorePinRecordsFromLocalStorage<T extends Record<string, any>>
     if (!rec || typeof rec !== 'object') return rec;
     const rawPin = rec.pin ? String(rec.pin).trim() : '';
     const restoredPin =
-      rawPin && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !/^[a-f0-9]{64}$/i.test(rawPin)
+      rawPin && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !rawPin.startsWith('kgr_v2:') && !/^[a-f0-9]{64}$/i.test(rawPin)
         ? rawPin
         : rec.encryptedPin
         ? decryptPinAtRest(rec.encryptedPin)
@@ -1192,7 +1329,7 @@ const ROLE_SESSION_SIG_KEY = 'kongre_role_session_sig_v1';
 
 /**
  * Almacena un PIN sensible (como kongre_coordinator_pin, kongre_session_pin_v2, kongre_registered_cong_pin)
- * cifrado en reposo (`kgr_v1:...`) junto con su hash SHA-256 (`${key}_hash`), evitando texto plano en localStorage.
+ * cifrado en reposo (`kgr_v2:...`) junto con su hash SHA-256 (`${key}_hash`), y lo conserva en memoria de sesión activa (H-01).
  */
 export function setSecureLocalPin(key: string, rawPin?: string | null): void {
   if (typeof window === 'undefined') return;
@@ -1201,10 +1338,26 @@ export function setSecureLocalPin(key: string, rawPin?: string | null): void {
     if (!clean || clean === '••••' || clean === '••••••••') {
       localStorage.removeItem(key);
       localStorage.removeItem(`${key}_hash`);
+      try {
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.removeItem(key);
+        }
+      } catch {}
       return;
     }
-    const plain = clean.startsWith('kgr_v1:') ? decryptPinAtRest(clean) : clean;
+    const plain = clean.startsWith('kgr_v2:') || clean.startsWith('kgr_v1:')
+      ? decryptPinAtRest(clean)
+      : clean;
     if (!plain) return;
+
+    // 1. Conservar en memoria de sesión activa (sessionStorage se destruye al cerrar la pestaña)
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem(key, plain);
+      }
+    } catch {}
+
+    // 2. En localStorage: Cifrar con kgr_v2 ligado a entropía única de dispositivo + hash
     const encrypted = encryptPinAtRest(plain);
     const hashed = hashPersonalPin(plain);
     localStorage.setItem(key, encrypted);
@@ -1215,26 +1368,50 @@ export function setSecureLocalPin(key: string, rawPin?: string | null): void {
 }
 
 /**
- * Recupera y descifra en memoria un PIN almacenado en localStorage.
- * Si detecta un valor legado en texto plano, lo migra automáticamente a formato cifrado `kgr_v1:...`.
+ * Recupera y descifra en memoria un PIN almacenado.
+ * Prioriza lectura desde sessionStorage (memoria) y migra automáticamente formatos legados a kgr_v2 (H-01).
  */
 export function getSecureLocalPin(key: string): string {
   if (typeof window === 'undefined') return '';
   try {
+    // 1. Priorizar lectura desde memoria de sesión activa (sessionStorage)
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        const sessionVal = sessionStorage.getItem(key);
+        if (sessionVal && sessionVal.trim() && sessionVal !== '••••' && sessionVal !== '••••••••') {
+          return sessionVal.trim();
+        }
+      }
+    } catch {}
+
+    // 2. Si no está en sessionStorage, recuperar de localStorage
     const stored = localStorage.getItem(key);
     if (!stored) return '';
     const trimmed = stored.trim();
     if (!trimmed || trimmed === '••••' || trimmed === '••••••••') return '';
-    if (trimmed.startsWith('kgr_v1:')) {
-      return decryptPinAtRest(trimmed);
+
+    let plain = '';
+    if (trimmed.startsWith('kgr_v2:')) {
+      plain = decryptPinAtRest(trimmed);
+    } else if (trimmed.startsWith('kgr_v1:')) {
+      // Migración automática de kgr_v1 a kgr_v2
+      plain = decryptPinAtRest(trimmed);
+      if (plain) {
+        setSecureLocalPin(key, plain);
+      }
+    } else if (!/^[a-f0-9]{64}$/i.test(trimmed)) {
+      plain = trimmed;
+      setSecureLocalPin(key, plain);
     }
-    // Si es un hash de 64 caracteres hexadecimales, no es reversible a texto plano
-    if (/^[a-f0-9]{64}$/i.test(trimmed)) {
-      return '';
+
+    if (plain) {
+      try {
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.setItem(key, plain);
+        }
+      } catch {}
     }
-    // Migrar automáticamente PIN legado en texto plano a formato cifrado en reposo
-    setSecureLocalPin(key, trimmed);
-    return trimmed;
+    return plain;
   } catch {
     return '';
   }
@@ -1326,14 +1503,7 @@ export function verifyRoleSessionSignature(role: string, roles?: string[]): bool
  */
 export function generateSecureInvitationCode(rolePrefix: string = 'KONG'): string {
   const CHARSET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-  const randomBytes = new Uint8Array(10);
-  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-    window.crypto.getRandomValues(randomBytes);
-  } else {
-    for (let i = 0; i < 10; i++) {
-      randomBytes[i] = Math.floor(Math.random() * 256);
-    }
-  }
+  const randomBytes = getSecureRandomBytes(10);
   const token = Array.from(randomBytes)
     .map((b) => CHARSET[b % CHARSET.length])
     .join('');
@@ -1373,12 +1543,7 @@ export function encodeSecureShareToken(payload: SecureShareTokenPayload): string
 
     const json = JSON.stringify(compact);
     const plainBytes = new TextEncoder().encode(json);
-    const nonceBytes = new Uint8Array(4);
-    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
-      window.crypto.getRandomValues(nonceBytes);
-    } else {
-      for (let i = 0; i < 4; i++) nonceBytes[i] = Math.floor(Math.random() * 256);
-    }
+    const nonceBytes = getSecureRandomBytes(4);
     const nonceHex = bufferToHex(nonceBytes.buffer);
     const streamHash = sha256HexSync(`${SHARE_TOKEN_CIPHER_KEY}:${nonceHex}:stream`);
     const cipherBytes = new Uint8Array(plainBytes.length);

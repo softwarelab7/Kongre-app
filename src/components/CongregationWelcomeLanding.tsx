@@ -447,7 +447,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
       const inviteParam = decodedTk?.invite || decodedTk?.pin || searchParams.get('invite') || hashParams.get('invite');
       const congParam = decodedTk?.cong || searchParams.get('cong') || hashParams.get('cong');
-      const cpinParam = decodedTk?.cpin || searchParams.get('cpin') || hashParams.get('cpin');
+      const cpinParam = decodedTk?.cpin; // L-04: Solo aceptar cpin desde token cifrado tk
 
       if (inviteParam) {
         const cleanInvite = inviteParam.trim();
@@ -462,8 +462,16 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         setRawActiveTab('invite_code_login');
       }
 
-      if (searchParams.has('tk') || searchParams.has('invite') || searchParams.has('cpin') || searchParams.has('pin')) {
-        window.history.replaceState({}, document.title, window.location.pathname + (window.location.hash.split('?')[0] || ''));
+      if (
+        searchParams.has('tk') ||
+        searchParams.has('invite') ||
+        searchParams.has('cpin') ||
+        searchParams.has('pin') ||
+        window.location.hash.includes('cpin=') ||
+        window.location.hash.includes('pin=')
+      ) {
+        const cleanHash = (window.location.hash || '').split('?')[0];
+        window.history.replaceState({}, document.title, window.location.pathname + cleanHash);
       }
     } catch {}
   }, []);
@@ -539,7 +547,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             const urlParams = new URLSearchParams(queryPart);
             const tkData = decodeSecureShareToken(urlParams.get('tk'));
             const uCong = tkData?.cong || urlParams.get('cong');
-            const uCpin = tkData?.cpin || urlParams.get('cpin');
+            const uCpin = tkData?.cpin;
             const uInvite = tkData?.invite || tkData?.pin || urlParams.get('invite') || urlParams.get('pin');
             if (uCong && uCpin && uInvite) {
               cleanCode = `${formatCanonicalCongregationId(uCong)}::${uCpin.trim()}::${uInvite.trim()}`;

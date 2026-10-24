@@ -1,11 +1,12 @@
 {
   "name": "react-example",
   "private": true,
-  "version": "2.12.5",
+  "version": "2.12.6",
   "type": "module",
   "scripts": {
-    "dev": "vite --port=3050 --host=0.0.0.0",
-    "build": "vite build",
+    "dev": "vite --port=3050",
+    "dev:host": "vite --port=3050 --host=0.0.0.0",
+    "build": "KONGRE_CSP=enforce vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",

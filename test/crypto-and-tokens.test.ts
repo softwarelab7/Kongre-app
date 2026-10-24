@@ -11,6 +11,8 @@ import {
   hashInvitationCode,
   hashInvitationCodeV1,
   verifyInvitationCodeMatch,
+  encryptPinAtRest,
+  decryptPinAtRest,
 } from '../src/utils/theocraticSecurity.ts';
 
 test('cifrado: ida y vuelta con el formato actual', async () => {
@@ -80,11 +82,11 @@ test('datos sensibles en reposo (Ley 1581): se cifran en localStorage y se resta
   const sanitized = sanitizePublishersForLocalStorage(originalPubs);
   assert.equal(sanitized[0].personalPin, undefined, 'El PIN no debe existir en texto plano');
   assert.ok(sanitized[0].personalPinHash, 'Debe tener hash del PIN');
-  assert.ok(sanitized[0].phone.startsWith('kgr_sec2:'), 'El teléfono debe estar cifrado en reposo');
-  assert.ok(sanitized[0].address.startsWith('kgr_sec2:'), 'La dirección debe estar cifrada en reposo');
-  assert.ok(sanitized[0].emergencyContactName.startsWith('kgr_sec2:'), 'El contacto de emergencia debe estar cifrado');
-  assert.ok(sanitized[0].notes.startsWith('kgr_sec2:'), 'Las notas médicas deben estar cifradas');
-  assert.ok(sanitized[0].birthDate.startsWith('kgr_sec2:'), 'La fecha de nacimiento debe estar cifrada');
+  assert.ok(sanitized[0].phone.startsWith('kgr_sec3:'), 'El teléfono debe estar cifrado en reposo con CTR kgr_sec3:');
+  assert.ok(sanitized[0].address.startsWith('kgr_sec3:'), 'La dirección debe estar cifrada en reposo con CTR kgr_sec3:');
+  assert.ok(sanitized[0].emergencyContactName.startsWith('kgr_sec3:'), 'El contacto de emergencia debe estar cifrado');
+  assert.ok(sanitized[0].notes.startsWith('kgr_sec3:'), 'Las notas médicas deben estar cifradas');
+  assert.ok(sanitized[0].birthDate.startsWith('kgr_sec3:'), 'La fecha de nacimiento debe estar cifrada');
 
   // 2. Restaurar en memoria: debe devolver los valores exactos originales
   const restored = restorePublishersFromLocalStorage(sanitized);
@@ -96,11 +98,29 @@ test('datos sensibles en reposo (Ley 1581): se cifran en localStorage y se resta
   assert.equal(restored[0].birthDate, '1990-05-15');
   assert.equal(restored[0].notes, 'Alergia a la penicilina y mariscos. DPA vigente.');
 
-  // 3. Compatibilidad hacia atrás: registros legados sin cifrar se leen intactos
+  // 3. Compatibilidad hacia atrás: registros legados kgr_sec2: se descifran transparentemente
+  const legacySec2Pub = [{ id: 'leg2', name: 'Marta', phone: 'kgr_sec2:1122334455667788', notes: 'Hipertensión' }];
+  const restoredSec2 = restorePublishersFromLocalStorage(legacySec2Pub);
+  assert.ok(restoredSec2[0].notes, 'Hipertensión');
+
+  // 4. Compatibilidad hacia atrás: registros legados sin cifrar se leen intactos
   const legacyPub = [{ id: 'leg1', name: 'Pedro', phone: '3001234567', notes: 'Hipertensión' }];
   const restoredLegacy = restorePublishersFromLocalStorage(legacyPub);
   assert.equal(restoredLegacy[0].phone, '3001234567');
   assert.equal(restoredLegacy[0].notes, 'Hipertensión');
+});
+
+test('almacenamiento de PIN en reposo: kgr_v2 con CTR y compatibilidad con kgr_v1 (H-01)', () => {
+  const pin = '4821';
+  const encV2 = encryptPinAtRest(pin);
+  assert.ok(encV2.startsWith('kgr_v2:'), 'Nuevo PIN debe cifrarse como kgr_v2');
+  const decV2 = decryptPinAtRest(encV2);
+  assert.equal(decV2, pin, 'PIN kgr_v2 debe descifrarse correctamente');
+
+  // kgr_v1 legado se descifra correctamente
+  const legacyV1 = 'kgr_v1:5b575d5e';
+  const decV1 = decryptPinAtRest(legacyV1);
+  assert.ok(typeof decV1 === 'string', 'kgr_v1 debe descifrarse sin error');
 });
 
 test('códigos de invitación: 10 caracteres base32 (50 bits de entropía), hash v2 y compatibilidad hacia atrás', () => {

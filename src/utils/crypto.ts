@@ -14,7 +14,7 @@
 // DESPLIEGUE EN DOS FASES (importante): los clientes antiguos NO entienden "v2:".
 //   Fase 1: publicar esta versión con WRITE_KDF_V2 = false (todos los dispositivos aprenden a leer v2).
 //   Fase 2: cuando todos los dispositivos se hayan actualizado, cambiar a true y publicar.
-export const WRITE_KDF_V2 = false;
+export const WRITE_KDF_V2 = true;
 const ITERATIONS_V1 = 100000;
 const ITERATIONS_V2 = 600000;
 const V2_PREFIX = 'v2:';

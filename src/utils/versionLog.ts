@@ -25,18 +25,61 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.5';
-export const CURRENT_BUILD_CODE = '2026.10.23.5600';
+export const CURRENT_APP_VERSION = '2.12.6';
+export const CURRENT_BUILD_CODE = '2026.10.23.5700';
 export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.6',
+    buildCode: '2026.10.23.5700',
+    date: '23 de Octubre, 2026',
+    title: 'Remediación Integral de Seguridad: Cifrado en Reposo CTR con Tag MAC, CSP Estricta sin Unsafe-Inline y Claves Ligadas a Entropía',
+    isCurrent: true,
+    highlight: 'Cifrado local de salud/PINs en modo CTR no repetitivo, sesión activa en memoria y eliminación de inline scripts en CSP',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Cifrado en reposo no repetitivo (H-02): Migración de datos sensibles de salud, contactos de emergencia y teléfonos a Counter-Mode (CTR) con nonce CSPRNG de 128 bits y etiqueta de integridad MAC (kgr_sec3:...), eliminando la repetición de keystream cada 30 bytes.',
+      },
+      {
+        category: 'security',
+        text: 'Almacenamiento de PIN en memoria y dispositivo (H-01): El PIN activo se mantiene en memoria (sessionStorage) y se cifra en localStorage con clave ligada a la sal de entropía del dispositivo (kgr_v2:...), eliminando claves de cifrado fijas en el bundle público.',
+      },
+      {
+        category: 'security',
+        text: 'CSP Estricto sin scripts inline (H-03): Externalización del script de inicialización de tema a /theme-init.js y eliminación de unsafe-inline en script-src en la política Content-Security-Policy en vercel.json.',
+      },
+      {
+        category: 'security',
+        text: 'KDF v2 a 600.000 iteraciones (M-07): Activación de WRITE_KDF_V2 = true en el motor criptográfico PBKDF2-SHA256 según estándares OWASP, preservando lectura transparente de versiones legadas.',
+      },
+      {
+        category: 'security',
+        text: 'CSPRNG Obligatorio sin degradación (L-01): Eliminación de respaldos silenciosos a Math.random(), reemplazados por getSecureRandomBytes() con excepciones explícitas y Fisher-Yates sin sesgo de módulo.',
+      },
+      {
+        category: 'security',
+        text: 'Validación de esquema HTTPS en mapas (L-02): Enlaces a mapas digitales y Google Maps restringidos estrictamente al protocolo https://.',
+      },
+      {
+        category: 'security',
+        text: 'Manejo seguro de enlaces de notificación (L-03): El Service Worker push-sw.js valida que cualquier URL de apertura pertenezca al origen de la aplicación.',
+      },
+      {
+        category: 'security',
+        text: 'Rechazo de credenciales en URL directa (L-04): Bloqueo total de parámetros cpin o pin en texto plano en la barra de direcciones y limpieza automática del historial de navegación.',
+      },
+    ],
+  },
+  {
     version: '2.12.5',
     buildCode: '2026.10.23.5600',
     date: '23 de Octubre, 2026',
     title: 'CSP Activo en Producción, Higiene de PWA Caching y Orígenes Restringidos en Errores 500',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Content-Security-Policy activo bloqueador y limpieza total de runtime caching',
     environment: 'Producción Cloud (Kongre)',
     changes: [

@@ -25,7 +25,31 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.12.5] - 23 de Octubre, 2026 (Compilación Activa)
+### [v2.12.6] - 23 de Octubre, 2026 (Compilación Activa)
+**Título:** Remediación Integral de Seguridad: Cifrado en Reposo CTR con Tag MAC, CSP Estricta sin Unsafe-Inline y Claves Ligadas a Entropía
+- **Cifrado en Reposo no Repetitivo (`kgr_sec3:`, Hallazgo H-02):**
+  - Se sustituyó el flujo de cifrado repetitivo cada 30 bytes por un generador de flujo en modo contador (CTR) por bloques de 32 bytes derivados por SHA-256 con nonce CSPRNG de 128 bits.
+  - Se incorporó una etiqueta de integridad y autenticación (MAC tag de 16 bytes) para validar la autenticidad antes de descifrar.
+  - Compatibilidad total hacia atrás garantizada para registros legados `kgr_sec2:` y texto plano previo.
+- **Protección de PINs en Memoria y Cifrado Ligado a Dispositivo (`kgr_v2:`, Hallazgo H-01):**
+  - La sesión de credenciales activas del usuario se mantiene en memoria volátil de la pestaña (`sessionStorage`), minimizando la ventana de persistencia en disco.
+  - Para persistencia local en `localStorage`, se reemplazó la ofuscación XOR con constante fija por cifrado CTR autenticado (`kgr_v2:`) derivado de la sal de entropía única del dispositivo (`kongre_device_entropy_salt_v1`).
+- **Política de Seguridad de Contenido Estricta sin 'unsafe-inline' (Hallazgo H-03):**
+  - Se extrajo el script inline de inicialización de tema en `index.html` hacia el archivo estático `/theme-init.js`.
+  - Se eliminó `'unsafe-inline'` de `script-src` en la política `Content-Security-Policy` de `vercel.json` y se fijó `KONGRE_CSP=enforce` en el comando de compilación.
+- **KDF v2 a 600.000 Iteraciones (Hallazgo M-07):**
+  - Se activó `WRITE_KDF_V2 = true` en `src/utils/crypto.ts` para aplicar 600.000 iteraciones PBKDF2-SHA256 (estándar OWASP), manteniendo la capacidad de leer payloads v1 de 100.000 iteraciones.
+- **CSPRNG Obligatorio sin Fallbacks a Math.random (Hallazgo L-01):**
+  - Creación del helper `getSecureRandomBytes` que arroja excepciones explícitas si la Web Crypto API no está disponible en el entorno, evitando silenciosamente la degradación a generadores pseudoaleatorios predecibles.
+  - Eliminación de sesgo de módulo en el algoritmo Fisher-Yates de mezcla de PINs mediante `secureRandomInt` (muestreo por rechazo).
+- **Validación de Esquema HTTPS en Mapas (Hallazgo L-02):**
+  - Sanitización de `mapUrl` en territorios digitales para requerir estrictamente el esquema `https://`.
+- **Navegación Restringida a Mismo Origen en Notificaciones Push (Hallazgo L-03):**
+  - Se restringió `openWindow` en el evento `notificationclick` de `public/push-sw.js` para aceptar únicamente rutas relativas del mismo origen.
+- **Rechazo Total de Credenciales en URL Directa (Hallazgo L-04):**
+  - Bloqueo de parámetros `cpin` o `pin` en texto plano en la barra de direcciones o fragmentos hash, limpiando de inmediato el historial de navegación.
+
+### [v2.12.5] - 23 de Octubre, 2026
 **Título:** CSP Activo en Producción, Higiene de PWA Caching y Orígenes Restringidos en Errores 500
 - **Content-Security-Policy Activa (Modo Enforce):**
   - Transición definitiva de `Content-Security-Policy-Report-Only` a `Content-Security-Policy` bloqueador en `vercel.json`.

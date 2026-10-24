@@ -506,7 +506,7 @@ const AppContent: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const decodedTk = decodeSecureShareToken(urlParams.get('tk'));
     let urlCong = (decodedTk?.cong || urlParams.get('cong') || '').trim();
-    let urlCpin = (decodedTk?.cpin || urlParams.get('cpin') || '').trim();
+    let urlCpin = (decodedTk?.cpin || '').trim(); // L-04: Solo aceptar cpin desde token cifrado tk
     const urlPub = (decodedTk?.pub || urlParams.get('pub') || '').trim();
     const urlPin = (decodedTk?.pin || urlParams.get('pin') || '').trim();
     let urlInvite = (decodedTk?.invite || urlParams.get('invite') || '').trim();
@@ -529,8 +529,9 @@ const AppContent: React.FC = () => {
       const cleanCpin = urlCpin || getSecureLocalPin('kongre_registered_cong_pin') || getSecureLocalPin('kongre_last_cong_pin') || '';
       const cleanInvite = urlInvite.trim();
 
-      // Limpiar URL sensible de la barra de direcciones
-      const cleanUrl = window.location.pathname + (window.location.hash || '');
+      // Limpiar URL sensible de la barra de direcciones y hash (L-04)
+      const cleanHash = (window.location.hash || '').split('?')[0];
+      const cleanUrl = window.location.pathname + cleanHash;
       window.history.replaceState({}, document.title, cleanUrl);
 
       (async () => {

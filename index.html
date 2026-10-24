@@ -84,26 +84,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <!-- Aplica el tema guardado ANTES de pintar (evita parpadeo). Dos modos: claro y oscuro. -->
-    <script>
-      (function () {
-        try {
-          var t = localStorage.getItem('kongre-theme') || localStorage.getItem('kongre_theme');
-          if (t !== 'dark' && t !== 'light') {
-            t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-          }
-          document.documentElement.dataset.theme = t;
-          if (t === 'dark') {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-          }
-          document.documentElement.classList.remove('theme-cabina');
-          var c = t === 'dark' ? '#111827' : '#4C3AED';
-          var m = document.querySelector('meta[name="theme-color"]');
-          if (m) m.setAttribute('content', c);
-        } catch (e) {}
-      })();
-    </script>
+    <script src="/theme-init.js"></script>
   </head>
   <body class="bg-slate-50 text-slate-900 antialiased selection:bg-indigo-500 selection:text-white">
     <div id="root"></div>

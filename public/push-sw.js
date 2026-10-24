@@ -533,7 +533,15 @@ self.addEventListener('notificationclick', (event) => {
         return;
       }
 
-      const targetUrl = data.url || '/#mi_vista';
+      let targetUrl = '/#mi_vista';
+      if (data.url && typeof data.url === 'string') {
+        try {
+          const parsed = new URL(data.url, self.location.origin);
+          if (parsed.origin === self.location.origin) {
+            targetUrl = parsed.pathname + parsed.search + parsed.hash;
+          }
+        } catch {}
+      }
 
       // Si ya hay una pestaña de Kongre abierta, enfocarla y navegar al Portal del Publicador
       for (const client of windowClients) {

@@ -335,7 +335,9 @@ export const TerritoriosTab: React.FC = () => {
   const handleShareWhatsApp = (t: Territory) => {
     const assignee = t.currentAssigneeId ? publishersMap.get(t.currentAssigneeId) : null;
     const assigneeName = assignee?.name || 'Publicador';
-    const mapLink = t.mapUrl || `https://maps.google.com/?q=${encodeURIComponent(`${t.name} ${settings.congregationName}`)}`;
+    const mapLink = (t.mapUrl && /^https:\/\//i.test(t.mapUrl.trim()))
+      ? t.mapUrl.trim()
+      : `https://maps.google.com/?q=${encodeURIComponent(`${t.name} ${settings.congregationName}`)}`;
 
     let noVisitsText = '';
     if (t.noVisits && t.noVisits.length > 0) {
@@ -882,9 +884,9 @@ ${mapLink}${noVisitsText}
                     >
                       <Map className="w-4 h-4" />
                     </button>
-                    {terr.mapUrl ? (
+                    {terr.mapUrl && /^https:\/\//i.test(terr.mapUrl.trim()) ? (
                       <a
-                        href={terr.mapUrl}
+                        href={terr.mapUrl.trim()}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-100/70 rounded-md transition"
@@ -1488,9 +1490,9 @@ ${mapLink}${noVisitsText}
                 >
                   <Map className="w-3.5 h-3.5" /> Delimitar Polígono
                 </button>
-                {detailModalTerritory.mapUrl ? (
+                {detailModalTerritory.mapUrl && /^https:\/\//i.test(detailModalTerritory.mapUrl.trim()) ? (
                   <a
-                    href={detailModalTerritory.mapUrl}
+                    href={detailModalTerritory.mapUrl.trim()}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-3 py-1 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition flex items-center gap-1"

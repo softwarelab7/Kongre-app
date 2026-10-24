@@ -77,7 +77,10 @@ export const DigitalTerritoryModal: React.FC<DigitalTerritoryModalProps> = ({
   // Google Maps link
   const googleMapsUrl = useMemo(() => {
     if (territory.mapUrl && territory.mapUrl.trim()) {
-      return territory.mapUrl;
+      const cleanMap = territory.mapUrl.trim();
+      if (/^https:\/\//i.test(cleanMap)) {
+        return cleanMap;
+      }
     }
     const query = `${territory.name}, ${territory.zone}, ${settings.congregationName || ''} ${settings.hallAddress || ''}`;
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query.trim())}`;

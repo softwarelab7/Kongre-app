@@ -35,9 +35,12 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
   - **Auto-cierre por Inactividad (5 min):** Para proteger la privacidad en tabletas o dispositivos compartidos del Salón del Reino, el portal personal se cierra y purga credenciales tras 5 minutos sin interacción del usuario.
   - **Blindaje contra Autocompletado del Navegador:** Atributos `autoComplete="one-time-code"`, `data-lpignore="true"` y `data-1p-ignore="true"` para prevenir autoguardado del PIN en navegadores compartidos.
   - **Feedback Háptico y Animación de Sacudida:** Respuesta vibratoria (`navigator.vibrate`) y animación CSS `.animate-shake` ante fallos de autenticación.
-- **Mitigación de DoS y Agotamiento de Tabla en Edge Function `kongre-sync`:**
+- **Mitigación de DoS, Inyección y Agotamiento de Tabla en Edge Function `kongre-sync`:**
   - En la acción `verify_personal_pin`, se verifica la existencia previa de `publisher_id` en `row.personal_verifiers` antes de instanciar contadores en la tabla `sync_rate_limits`.
   - Si el publicador no existe en la congregación, la solicitud es rechazada de forma estandarizada (`401 invalid_credentials`) sin crear buckets de contadores arbitrarios en Postgres, previniendo ataques de agotamiento de almacenamiento y DoS.
+  - **Validación Estricta de Formato (`PUB_ID_RE`):** Se restringe `publisher_id` a `^[a-zA-Z0-9_-]{1,80}$`, rechazando de inmediato caracteres de control (`\n`, `\r`), espacios, dos puntos (`:`) o símbolos de inyección con `400 bad_publisher_id`.
+  - **Límite de Carga de Publicadores (`MAX_PERSONAL_PINS = 500`):** Se restringe la cantidad de publicadores que pueden sincronizarse por congregación a 500 para evitar sobrecarga de CPU por cálculo masivo de HMAC-SHA256 en solicitudes de actualización (`push`).
+  - **Saneamiento de Metadatos de Publicador:** Se limitan las longitudes de campos en verifiers (`name <= 120`, `role <= 40`, `privilege <= 40`, `theocraticRoles[] <= 40`) para salvaguardar el tamaño de la base de datos JSONB.
 - **Sincronización Transparente de Prefijos con `isEncryptedPinAtRest`:**
   - Se implementó el helper canónico `isEncryptedPinAtRest` para reconocer tanto `kgr_v2:` como `kgr_v1:`, resolviendo inconsistencias en `AuthContext.tsx`, `App.tsx`, `SecurityContext.tsx`, `supabaseSyncService.ts` y `CongregationContext.tsx`.
 - **Blindaje Anti-Bypass en Pantalla de Bloqueo y Firmas (Función `isSafeDemoMode`):**

@@ -58,8 +58,10 @@ type Tier = 'master' | 'public';
 
 const TOKEN_RE = /^[a-f0-9]{64}$/;
 const ID_RE = /^[A-Z0-9]{4,64}$/;
+const PUB_ID_RE = /^[a-zA-Z0-9_-]{1,80}$/;
 const MAX_BODY_CHARS = 8_000_000;
 const MAX_PAYLOAD_CHARS = 4_000_000;
+const MAX_PERSONAL_PINS = 500;
 
 const LIMITS = {
   congIp: { limit: 8, window: 900, lock: 900 },
@@ -97,16 +99,16 @@ async function buildPersonalVerifiers(pepper: string, congId: string, list: any[
     if (!item || typeof item !== 'object') continue;
     const pubId = typeof item.id === 'string' ? item.id.trim() : '';
     const token = typeof item.token === 'string' ? item.token.trim() : '';
-    if (!pubId || !TOKEN_RE.test(token)) continue;
+    if (!pubId || !PUB_ID_RE.test(pubId) || !TOKEN_RE.test(token)) continue;
     const verifier = await verifierOfPersonal(pepper, congId, token);
     out.push({
       id: pubId,
       verifier,
-      name: typeof item.name === 'string' ? item.name.trim() : '',
-      role: typeof item.role === 'string' ? item.role.trim() : 'publico',
-      privilege: typeof item.privilege === 'string' ? item.privilege.trim() : undefined,
+      name: typeof item.name === 'string' ? item.name.trim().slice(0, 120) : '',
+      role: typeof item.role === 'string' ? item.role.trim().slice(0, 40) : 'publico',
+      privilege: typeof item.privilege === 'string' ? item.privilege.trim().slice(0, 40) : undefined,
       theocraticRoles: Array.isArray(item.theocraticRoles)
-        ? item.theocraticRoles.filter((r: any) => typeof r === 'string')
+        ? item.theocraticRoles.filter((r: any) => typeof r === 'string').map((r: string) => r.trim().slice(0, 40))
         : undefined,
     });
   }
@@ -241,6 +243,7 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
       if (lim && lim > now()) return 'limited';
       let personalVerifiers: PersonalVerifier[] | null = null;
       if (Array.isArray(body.personal_pins)) {
+        if (body.personal_pins.length > MAX_PERSONAL_PINS) return 'bad';
         personalVerifiers = await buildPersonalVerifiers(env.pepper, id, body.personal_pins);
       }
       const ok = await db.insertRow({
@@ -278,6 +281,7 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
       if (typeof payload === 'string' && !(body.preserve_master && current.payload)) patch.payload = payload;
       if (typeof payloadPublic === 'string') patch.payload_public = payloadPublic;
       if (Array.isArray(body.personal_pins)) {
+        if (body.personal_pins.length > MAX_PERSONAL_PINS) return reject();
         patch.personal_verifiers = await buildPersonalVerifiers(env.pepper, id, body.personal_pins);
       }
       await db.updateRow(id, patch);
@@ -299,6 +303,9 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     if (typeof payloadPublic === 'string') patch.payload_public = payloadPublic;
     if (typeof payload === 'string' && !body.preserve_master) patch.payload = payload;
     if (Array.isArray(body.personal_pins)) {
+      if (body.personal_pins.length > MAX_PERSONAL_PINS) {
+        return json(req, env, 400, { ok: false, error: 'too_many_publishers' });
+      }
       patch.personal_verifiers = await buildPersonalVerifiers(env.pepper, id, body.personal_pins);
     }
     const rot = body.rotate_to;
@@ -331,8 +338,8 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
       return json(req, env, 400, { ok: false, error: 'publisher_id_required' });
     }
 
-    // Evita claves de contador arbitrariamente largas (el atacante controla publisher_id).
-    if (publisherId.length > 100) {
+    // Evita claves de contador arbitrariamente largas y rechaza caracteres no permitidos.
+    if (!PUB_ID_RE.test(publisherId)) {
       return json(req, env, 400, { ok: false, error: 'bad_publisher_id' });
     }
     const verifiers = Array.isArray(row.personal_verifiers) ? row.personal_verifiers : [];

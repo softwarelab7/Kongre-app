@@ -280,6 +280,11 @@ test('PIN personal: publisher_id demasiado largo se rechaza (no se crean contado
   const r = await call({ action: 'verify_personal_pin', id: 'CONGLONG', tokens: { public: T.publicA }, pin_token: hex('f'), publisher_id: 'x'.repeat(101) });
   assert.equal(r.status, 400);
   assert.equal(r.body.error, 'bad_publisher_id');
+
+  // Caracteres no permitidos (inyección / caracteres de control)
+  const rInvalid = await call({ action: 'verify_personal_pin', id: 'CONGLONG', tokens: { public: T.publicA }, pin_token: hex('f'), publisher_id: 'pub:admin\n' });
+  assert.equal(rInvalid.status, 400);
+  assert.equal(rInvalid.body.error, 'bad_publisher_id');
 });
 
 test('PIN personal: publisher_id inexistente se rechaza sin crear registros de publicador falso en rate_limits', async () => {
@@ -301,6 +306,25 @@ test('PIN personal: publisher_id inexistente se rechaza sin crear registros de p
   });
   assert.equal(r.status, 401);
   assert.equal(r.body.error, 'invalid_credentials');
+});
+
+test('PIN personal: límite de publicadores por congregación (>500 rechazado)', async () => {
+  const { call } = setup();
+  await create(call, 'CONGMANY');
+  const manyPublishers = Array.from({ length: 501 }, (_, i) => ({
+    id: `pub_${i}`,
+    token: hex('1'),
+    name: `Pub ${i}`,
+    role: 'publico',
+  }));
+  const r = await call({
+    action: 'push',
+    id: 'CONGMANY',
+    tokens: { master: T.masterA, public: T.publicA },
+    personal_pins: manyPublishers,
+  });
+  assert.equal(r.status, 400);
+  assert.equal(r.body.error, 'too_many_publishers');
 });
 
 

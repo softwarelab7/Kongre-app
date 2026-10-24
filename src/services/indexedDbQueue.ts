@@ -348,29 +348,43 @@ export async function clearCompletedOfflineOperations(): Promise<void> {
 }
 
 /**
- * Calcula estadísticas rápidas de la cola para los componentes de interfaz
+ * Calcula estadísticas rápidas de la cola para los componentes de interfaz en tiempo real
  */
 export async function getOfflineQueueStats(): Promise<QueueStats> {
   const pending = await getPendingOfflineOperations();
-  const pendingCount = pending.filter((i) => i.status === 'pending' || i.status === 'error').length;
+  let pendingCount = pending.filter((i) => i.status === 'pending' || i.status === 'error').length;
   const syncingCount = pending.filter((i) => i.status === 'syncing').length;
   const errorCount = pending.filter((i) => i.status === 'error').length;
-  const lastQueuedAt = pending.length > 0 ? pending[pending.length - 1].timestamp : null;
+  let lastQueuedAt = pending.length > 0 ? pending[pending.length - 1].timestamp : null;
+
+  if (pendingCount === 0 && typeof window !== 'undefined') {
+    try {
+      const rawLegacy = localStorage.getItem('kongre_offline_supabase_queue_v1');
+      if (rawLegacy) {
+        const parsed = JSON.parse(rawLegacy);
+        if (parsed && (parsed.encryptedData || parsed.data)) {
+          pendingCount = 1;
+          lastQueuedAt = parsed.queuedAt || new Date().toISOString();
+        }
+      }
+    } catch {}
+  }
 
   return {
     pendingCount,
     syncingCount,
     errorCount,
-    totalCount: pending.length,
+    totalCount: Math.max(pending.length, pendingCount + syncingCount),
     lastQueuedAt,
   };
 }
 
 /**
- * Emite evento personalizado en window para mantener reactiva la UI
+ * Emite evento personalizado en window para mantener reactiva la UI en tiempo real
  */
-function notifyQueueChanged() {
+export function notifyQueueChanged() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('kongre_indexeddb_queue_changed'));
   }
 }
+

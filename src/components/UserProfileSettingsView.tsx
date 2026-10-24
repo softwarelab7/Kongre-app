@@ -37,6 +37,7 @@ import {
   getPushSubscriptionRecord,
 } from '../services/notificationService';
 import { PushSubscriptionModal } from './PushSubscriptionModal';
+import { PushNotificationQuickGuideCard } from './PushNotificationQuickGuideCard';
 import { isSafeDemoMode } from '../utils/theocraticSecurity';
 
 // Preset avatar styles with clean SVG iconography and theocratic themes
@@ -916,6 +917,26 @@ export const UserProfileSettingsView: React.FC = () => {
                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600"></div>
               </label>
             </div>
+
+            {/* Guía Visual y Botón de Suscripción Push en 1 clic */}
+            <PushNotificationQuickGuideCard
+              publisherId={currentPublisherId || user?.uid || 'usuario'}
+              publisherName={displayName || currentBrotherName || user?.displayName || 'Hermano'}
+              congregationName={settings?.congregationName}
+              weeks={weeks}
+              cartShifts={cartShifts}
+              cartLocations={cartLocations}
+              settings={settings}
+              publishersMap={publishersMap}
+              onOpenPushModal={() => setIsPushModalOpen(true)}
+              onSubscribedChange={(sub) => {
+                setPushSubRecord(sub);
+                setBrowserPermission(getNotificationPermission());
+                setNotifPrefs(getNotificationPreferences());
+                if (sub?.active) setNotificationsEnabled(true);
+              }}
+              compact
+            />
 
             {/* Estado de Permiso del Navegador */}
             <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 flex-wrap">

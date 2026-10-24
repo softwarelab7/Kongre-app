@@ -1297,8 +1297,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
             </button>
 
-            {/* Unified Cloud & Offline Sync Badge (Supabase & IndexedDB) */}
-            {onOpenQueueModal && !isDemoMode && (
+            {/* Real-time Cloud & Offline Sync Queue Indicator (Supabase & IndexedDB) */}
+            {onOpenQueueModal && (
               <OfflineSyncBadge
                 isOnline={isOnline}
                 onOpenQueueModal={onOpenQueueModal}

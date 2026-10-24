@@ -29,6 +29,7 @@ import {
   getAllOfflineOperations,
   removeOfflineOperation,
   clearCompletedOfflineOperations,
+  enqueueOfflineOperation,
   OfflineQueueItem,
   QueueStats,
   getOfflineQueueStats,
@@ -83,12 +84,39 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
       loadQueue();
     };
     window.addEventListener('kongre_indexeddb_queue_changed', handleQueueChange);
+    window.addEventListener('kongre_offline_sync_queued', handleQueueChange);
     return () => {
       window.removeEventListener('kongre_indexeddb_queue_changed', handleQueueChange);
+      window.removeEventListener('kongre_offline_sync_queued', handleQueueChange);
     };
   }, []);
 
   if (!isOpen) return null;
+
+  const handleEnqueueCheckpoint = async () => {
+    try {
+      const congId =
+        (typeof window !== 'undefined' &&
+          (localStorage.getItem('kongre_congregation_number') ||
+            localStorage.getItem('kongre_congregation_id'))) ||
+        'LOCAL';
+      await enqueueOfflineOperation({
+        congregationId: congId,
+        actionType: 'FULL_SYNC',
+        description: `Punto de respaldo manual (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`,
+      });
+      await loadQueue();
+      setSyncFeedback({
+        type: 'success',
+        message: 'Se agregó un nuevo elemento a la cola offline. Observa el contador en tiempo real en la barra superior.',
+      });
+    } catch (e: any) {
+      setSyncFeedback({
+        type: 'error',
+        message: e?.message || 'No se pudo agregar a la cola offline.',
+      });
+    }
+  };
 
   const handleManualSync = async () => {
     if (
@@ -96,10 +124,20 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
       (isSafeDemoMode() ||
         localStorage.getItem('kongre_is_guest') === 'true')
     ) {
-      setSyncFeedback({
-        type: 'error',
-        message: 'El modo de demostración opera de manera 100% local sin conexión a Supabase.',
-      });
+      setIsProcessing(true);
+      try {
+        const res = await supabaseSyncService.flushOfflineQueue('DEMO', 'DEMO');
+        await loadQueue();
+        setSyncFeedback({
+          type: 'success',
+          message:
+            res.syncedCount > 0
+              ? `¡Cola offline procesada localmente! (${res.syncedCount} elemento(s) sincronizado(s)).`
+              : 'La cola offline está al día (0 elementos pendientes).',
+        });
+      } finally {
+        setIsProcessing(false);
+      }
       return;
     }
 
@@ -266,12 +304,26 @@ export const OfflineSyncQueueModal: React.FC<OfflineSyncQueueModalProps> = ({
             )}
           </div>
 
-          {/* Pending counter */}
+          {/* Pending counter & quick checkpoint action */}
           <div className="flex items-center gap-2">
-            <span className="text-slate-500 dark:text-slate-400">Pendientes en IndexedDB:</span>
-            <span className="font-bold text-slate-800 dark:text-slate-200 px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+            <span className="text-slate-500 dark:text-slate-400">Pendientes en cola:</span>
+            <span
+              className={`font-extrabold px-2 py-0.5 rounded-md border ${
+                stats.pendingCount > 0
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700'
+              }`}
+            >
               {stats.pendingCount}
             </span>
+            <button
+              type="button"
+              onClick={handleEnqueueCheckpoint}
+              className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-semibold text-[11px] transition cursor-pointer active:scale-95"
+              title="Encolar un respaldo manual para verificar la cola en tiempo real"
+            >
+              + Encolar respaldo
+            </button>
           </div>
         </div>
 

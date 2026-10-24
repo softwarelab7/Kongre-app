@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react';
-import { supabaseSyncService, mergeMonthlyReports, mergePublishers } from '../services/supabaseSyncService';
+import { supabaseSyncService, mergeMonthlyReports, mergePublishers, isDemoModeActive } from '../services/supabaseSyncService';
 import { QueueStats, getOfflineQueueStats } from '../services/indexedDbQueue';
 import { useAuth } from './AuthContext';
 import {
@@ -1971,6 +1971,53 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       updatedAt: nowISO,
     });
 
+    const snapshotData = {
+      settings: resolvedSettings,
+      publishers: newPubs,
+      weeks: newWeeks,
+      territories: newTerritories,
+      notices: newNotices,
+      transactions: newTransactions,
+      audits: newQuarterlyAudits,
+      literatureItems: newLiteratureItems,
+      literatureOrders: newSpecialOrders,
+      literatureDistributions: newGroupDistributions,
+      literatureInventory: newInventoryRecords,
+      preachingGroups: resolvedGroups || [],
+      customDuties: newDuties,
+      outgoingSpeakers: newOutgoing,
+      fieldServiceMeetings: newFieldService,
+      cartLocations: newCartLocs,
+      cartShifts: newCartShifts,
+      monthlyReports: newReports,
+      circuitVisit: newCircuitVisit,
+      memorialPlans: newMemorialPlans,
+      theocraticAssemblies: newAssemblies,
+      congregationEvents: resolvedEvents,
+      accountLinkRequests: newAccountLinkRequests,
+      clmProgramas: newClm,
+      hospitalityHosts: latestHospitalityHostsRef.current,
+      breakers: latestBreakersRef.current,
+      maintenanceSheets: latestMaintenanceSheetsRef.current,
+      auxPioneerRequests: latestAuxPioneerRef.current,
+      branchReportsS1: latestBranchS1Ref.current,
+    };
+
+    // Si estamos sin conexión a internet, encolar automáticamente en IndexedDB y actualizar el contador en tiempo real
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      await supabaseSyncService.enqueueOfflineChange(
+        congDocId || 'LOCAL',
+        snapshotData,
+        {
+          actionType: 'FULL_SYNC',
+          description: `Actualización sin conexión (${resolvedSettings.congregationName || 'Congregación'})`,
+        }
+      );
+      await refreshQueueStats();
+      setSyncStatus('offline');
+      return;
+    }
+
     // El respaldo es SIEMPRE automático y por ID de congregación, sin requerir Google ni usar la cuenta personal.
     if (!congDocId || congDocId.length < 3 || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId)) {
       localStorage.setItem('kongre_needs_cloud_upload', 'true');
@@ -2004,51 +2051,20 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
           const isCurrentDemo =
             isDemoMode ||
-            (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true') ||
-            congDocId?.toUpperCase().startsWith('DEMO') ||
-            ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(congDocId?.toUpperCase() || '');
+            isDemoModeActive(congDocId || '');
 
           if (pinMaestro && congDocId && !isCurrentDemo) {
             setIsSupabaseSyncing(true);
             try {
               await supabaseSyncService.uploadCongregation({
                 congregationId: congDocId,
-                data: {
-                  settings: resolvedSettings,
-                  publishers: newPubs,
-                  weeks: newWeeks,
-                  territories: newTerritories,
-                  notices: newNotices,
-                  transactions: newTransactions,
-                  audits: newQuarterlyAudits,
-                  literatureItems: newLiteratureItems,
-                  literatureOrders: newSpecialOrders,
-                  literatureDistributions: newGroupDistributions,
-                  literatureInventory: newInventoryRecords,
-                  preachingGroups: resolvedGroups || [],
-                  customDuties: newDuties,
-                  outgoingSpeakers: newOutgoing,
-                  fieldServiceMeetings: newFieldService,
-                  cartLocations: newCartLocs,
-                  cartShifts: newCartShifts,
-                  monthlyReports: newReports,
-                  circuitVisit: newCircuitVisit,
-                  memorialPlans: newMemorialPlans,
-                  theocraticAssemblies: newAssemblies,
-                  congregationEvents: resolvedEvents,
-                  accountLinkRequests: newAccountLinkRequests,
-                  clmProgramas: newClm,
-                  hospitalityHosts: latestHospitalityHostsRef.current,
-                  breakers: latestBreakersRef.current,
-                  maintenanceSheets: latestMaintenanceSheetsRef.current,
-                  auxPioneerRequests: latestAuxPioneerRef.current,
-                  branchReportsS1: latestBranchS1Ref.current,
-                },
+                data: snapshotData,
                 pinMaestro,
                 pinCongregacion,
               });
             } finally {
               setIsSupabaseSyncing(false);
+              await refreshQueueStats();
             }
           }
         } catch (sbErr) {
@@ -2109,7 +2125,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   ): Promise<{ success: boolean; message: string; action?: string }> => {
     if (
       isDemoMode ||
-      (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')
+      isDemoModeActive()
     ) {
       return { success: true, message: 'El modo de demostración opera de manera 100% local sin conexión a Supabase.' };
     }
@@ -2228,7 +2244,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setIsOnline(true);
       if (
         isDemoMode ||
-        (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')
+        isDemoModeActive()
       ) {
         refreshQueueStats();
         return;
@@ -2275,7 +2291,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if (typeof navigator !== 'undefined' && navigator.onLine) {
         if (
           isDemoMode ||
-          (typeof window !== 'undefined' && localStorage.getItem('kongre_demo_mode') === 'true')
+          isDemoModeActive()
         ) {
           return;
         }

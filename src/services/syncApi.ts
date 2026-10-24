@@ -62,27 +62,87 @@ export async function tokensFromSinglePin(pin: string, congregationId: string): 
   return { master, public: pub };
 }
 
-async function call<T>(body: Record<string, unknown>): Promise<SyncResult<T>> {
-  // Si fetch falla por red lanza TypeError('Failed to fetch'); se deja propagar a propósito
-  // para que la UI existente siga mostrando su mensaje de conexión/bloqueadores.
-  const res = await fetch(FUNCTION_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  let json: any = null;
-  try {
-    json = await res.json();
-  } catch {
-    /* respuesta no JSON */
+function getSyncEndpoint(): string {
+  if (typeof window !== 'undefined') {
+    const host = window.location?.hostname || '';
+    if (
+      (typeof import.meta !== 'undefined' && import.meta.env?.DEV) ||
+      host.includes('.run.app') ||
+      host === 'localhost' ||
+      host === '127.0.0.1'
+    ) {
+      return '/api/kongre-sync';
+    }
   }
-  if (res.ok && json?.ok) return json as SyncResult<T>;
-  return {
-    ok: false,
-    status: res.status,
-    error: json?.error || 'server_error',
-    retryAfter: typeof json?.retry_after === 'number' ? json.retry_after : undefined,
-  };
+  return FUNCTION_URL;
+}
+
+function shouldSkipCloudCall(body: Record<string, unknown>): boolean {
+  if (typeof window !== 'undefined') {
+    try {
+      if (
+        localStorage.getItem('kongre_demo_mode') === 'true' ||
+        sessionStorage.getItem('kongre_demo_mode') === 'true' ||
+        localStorage.getItem('kongre_is_guest') === 'true'
+      ) {
+        return true;
+      }
+    } catch {}
+  }
+  const rawId = String(body?.id || '').trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  if (
+    !rawId ||
+    rawId.startsWith('DEMO') ||
+    ['1001', 'CENTRAL', 'MAIN', 'ID', 'CONGCENTRAL', 'CONGREGACIONCENTRAL'].includes(rawId)
+  ) {
+    return true;
+  }
+  return false;
+}
+
+async function call<T>(body: Record<string, unknown>): Promise<SyncResult<T>> {
+  if (shouldSkipCloudCall(body)) {
+    return {
+      ok: false,
+      status: 200,
+      error: 'demo_mode',
+    };
+  }
+
+  try {
+    const endpoint = getSyncEndpoint();
+    let res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (res.status === 404 && endpoint !== FUNCTION_URL) {
+      res = await fetch(FUNCTION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    }
+    let json: any = null;
+    try {
+      json = await res.json();
+    } catch {
+      /* respuesta no JSON */
+    }
+    if (res.ok && json?.ok) return json as SyncResult<T>;
+    return {
+      ok: false,
+      status: res.status,
+      error: json?.error || 'server_error',
+      retryAfter: typeof json?.retry_after === 'number' ? json.retry_after : undefined,
+    };
+  } catch {
+    return {
+      ok: false,
+      status: 0,
+      error: 'network_error',
+    };
+  }
 }
 
 export interface PullData {
@@ -223,6 +283,9 @@ export function syncDelete(id: string, masterPin: string) {
 
 /** Mensaje en español para el usuario a partir de un resultado de error. */
 export function describeSyncError(r: { status: number; error: string; retryAfter?: number }): string {
+  if (r.status === 0 || r.error === 'network_error') {
+    return 'No se pudo conectar con el servidor en la nube (Failed to fetch). Tus cambios se guardaron localmente.';
+  }
   if (r.status === 429) {
     const mins = r.retryAfter ? Math.max(1, Math.ceil(r.retryAfter / 60)) : 1;
     return `Demasiados intentos. Espera ${mins} minuto${mins === 1 ? '' : 's'} antes de volver a intentar.`;

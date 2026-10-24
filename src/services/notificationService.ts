@@ -166,6 +166,9 @@ export const saveNotificationPreferences = (
   const updated = { ...current, ...prefs };
   try {
     localStorage.setItem(STORAGE_PREFS_KEY, JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('kongre_push_subscription_changed'));
+    }
   } catch {}
   return updated;
 };
@@ -192,6 +195,9 @@ export const savePushSubscriptionRecord = (
       localStorage.removeItem(STORAGE_PUSH_SUB_KEY);
     } else {
       localStorage.setItem(STORAGE_PUSH_SUB_KEY, JSON.stringify(record));
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('kongre_push_subscription_changed'));
     }
   } catch {}
 };
@@ -289,14 +295,24 @@ export const subscribeToPushNotifications = async (params: {
   }
 
   const permission = await requestNotificationPermission();
-  if (permission !== 'granted') {
+  const isIframePreview =
+    typeof window !== 'undefined' &&
+    (() => {
+      try {
+        return window.self !== window.top;
+      } catch {
+        return true;
+      }
+    })();
+
+  if (permission !== 'granted' && !isIframePreview) {
     return {
       success: false,
       permission,
       subscription: null,
       error:
         permission === 'denied'
-          ? 'El permiso de notificaciones está bloqueado en la barra de direcciones del navegador.'
+          ? 'El permiso de notificaciones está bloqueado en la barra de direcciones del navegador. Haz clic en el icono de candado junto a la URL y selecciona "Permitir" en Notificaciones.'
           : 'No se concedió el permiso de notificaciones.',
     };
   }

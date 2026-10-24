@@ -68,6 +68,7 @@ import { AutoLockSettingsCard } from './AutoLockSettingsCard';
 import { Select } from './Select';
 import { IosTimePicker } from './IosTimePicker';
 import { PushSubscriptionModal } from './PushSubscriptionModal';
+import { PushNotificationQuickGuideCard } from './PushNotificationQuickGuideCard';
 import {
   isNotificationSupported,
   getNotificationPermission,
@@ -1219,6 +1220,29 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
               </div>
             )}
 
+            {/* Guía Visual Interactiva y Botón de Suscripción Push Rápida */}
+            <PushNotificationQuickGuideCard
+              publisherId={activeNotifPublisher?.id || selectedNotifPubId || 'pub-local'}
+              publisherName={
+                activeNotifPublisher?.name ||
+                (typeof window !== 'undefined' ? localStorage.getItem('kongre_my_publisher_name') : '') ||
+                'Publicador'
+              }
+              congregationName={settings.congregationName}
+              weeks={weeks}
+              cartShifts={cartShifts}
+              cartLocations={cartLocations}
+              settings={settings}
+              publishersMap={publishersMap}
+              onOpenPushModal={() => setIsPushModalOpen(true)}
+              onSubscribedChange={(sub) => {
+                setPushSubRecord(sub);
+                setNotifPermission(getNotificationPermission());
+                setNotifPrefs(getNotificationPreferences());
+              }}
+              compact
+            />
+
             {/* Selector principal de días de anticipación (1, 2, 3, 5 o 7 días antes) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
               <div className="lg:col-span-7 space-y-2">
@@ -1845,6 +1869,28 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                   </button>
                 </div>
               )}
+
+              {/* Guía Visual Interactiva y Botón de Suscripción a Notificaciones Push */}
+              <PushNotificationQuickGuideCard
+                publisherId={activeNotifPublisher?.id || selectedNotifPubId || 'pub-local'}
+                publisherName={
+                  activeNotifPublisher?.name ||
+                  (typeof window !== 'undefined' ? localStorage.getItem('kongre_my_publisher_name') : '') ||
+                  'Publicador'
+                }
+                congregationName={settings.congregationName}
+                weeks={weeks}
+                cartShifts={cartShifts}
+                cartLocations={cartLocations}
+                settings={settings}
+                publishersMap={publishersMap}
+                onOpenPushModal={() => setIsPushModalOpen(true)}
+                onSubscribedChange={(sub) => {
+                  setPushSubRecord(sub);
+                  setNotifPermission(getNotificationPermission());
+                  setNotifPrefs(getNotificationPreferences());
+                }}
+              />
 
               {/* Interruptor General + Selección de Publicador */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

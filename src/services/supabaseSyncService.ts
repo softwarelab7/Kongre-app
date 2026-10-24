@@ -70,17 +70,22 @@ export function normalizeCongregationId(rawId: string): string {
  * para desactivar absolutamente cualquier intento de conexión con Supabase.
  */
 export function isDemoModeActive(congregationId?: string): boolean {
-  if (congregationId) {
-    const clean = normalizeCongregationId(congregationId);
-    if (!clean || clean.startsWith('DEMO') || ['1001', 'CENTRAL', 'MAIN', 'ID'].includes(clean)) {
-      return true;
-    }
-    return false;
-  }
   if (typeof window !== 'undefined') {
     if (
       isSafeDemoMode() ||
+      localStorage.getItem('kongre_demo_mode') === 'true' ||
+      sessionStorage.getItem('kongre_demo_mode') === 'true' ||
       localStorage.getItem('kongre_is_guest') === 'true'
+    ) {
+      return true;
+    }
+  }
+  if (congregationId) {
+    const clean = normalizeCongregationId(congregationId);
+    if (
+      !clean ||
+      clean.startsWith('DEMO') ||
+      ['1001', 'CENTRAL', 'MAIN', 'ID', 'CONGCENTRAL', 'CONGREGACIONCENTRAL'].includes(clean)
     ) {
       return true;
     }
@@ -351,6 +356,7 @@ export const supabaseSyncService = {
     data: CongregationFullData;
     pinMaestro: string;
     pinCongregacion?: string;
+    skipOfflineEnqueue?: boolean;
     /**
      * Rotación de PIN: si el PIN maestro o el de congregación cambiaron, indica aquí los PINs ANTERIORES.
      * Se usarán para autenticar la operación y los nuevos (pinMaestro / pinCongregacion) pasarán a ser
@@ -365,14 +371,16 @@ export const supabaseSyncService = {
     if (!cleanId) return { success: false, error: 'ID de congregación requerido' };
     if (!cleanMasterPin) return { success: false, error: 'PIN maestro requerido para cifrar' };
 
-    // En modo demo no se conecta ni sube nada a Supabase
-    if (isDemoModeActive(cleanId)) {
+    // Si estamos en navegador sin conexión a internet, guardar en cola offline
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && !navigator.onLine) {
+      if (!params.skipOfflineEnqueue) {
+        this.enqueueOfflineChange(cleanId, params.data);
+      }
       return { success: true };
     }
 
-    // Si estamos en navegador sin conexión a internet, guardar en cola offline
-    if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && !navigator.onLine) {
-      this.enqueueOfflineChange(cleanId, params.data);
+    // En modo demo no se conecta ni sube nada a Supabase
+    if (isDemoModeActive(cleanId)) {
       return { success: true };
     }
 
@@ -557,7 +565,9 @@ export const supabaseSyncService = {
           };
         }
         console.warn('Sync push error:', pushRes.status, pushRes.error);
-        this.enqueueOfflineChange(cleanId, params.data);
+        if (!params.skipOfflineEnqueue) {
+          this.enqueueOfflineChange(cleanId, params.data);
+        }
         return { success: false, error: message };
       }
 
@@ -569,8 +579,10 @@ export const supabaseSyncService = {
 
       return { success: true };
     } catch (err: any) {
-      console.error('Error en cifrado o subida a Supabase:', err);
-      this.enqueueOfflineChange(cleanId, params.data);
+      console.warn('Aviso en cifrado o subida a Supabase (encolado localmente):', err?.message || err);
+      if (!params.skipOfflineEnqueue) {
+        this.enqueueOfflineChange(cleanId, params.data);
+      }
       return { success: false, error: err?.message || 'Error en cifrado' };
     }
   },
@@ -827,8 +839,7 @@ export const supabaseSyncService = {
     }
   ) {
     if (typeof window === 'undefined') return;
-    const cleanId = normalizeCongregationId(congregationId);
-    if (isDemoModeActive(cleanId)) return;
+    const cleanId = normalizeCongregationId(congregationId || 'LOCAL') || 'LOCAL';
     const actionType = options?.actionType || 'FULL_SYNC';
     const description = options?.description || 'Actualización de congregación';
 
@@ -904,11 +915,19 @@ export const supabaseSyncService = {
     pinCongregacion?: string
   ): Promise<{ success: boolean; syncedCount: number }> {
     if (typeof window === 'undefined') return { success: false, syncedCount: 0 };
-    if (isDemoModeActive()) return { success: true, syncedCount: 0 };
 
     try {
       // 1. Obtener todas las operaciones pendientes de IndexedDB
       const pendingItems = await getPendingOfflineOperations();
+
+      if (isDemoModeActive()) {
+        for (const item of pendingItems) {
+          await removeOfflineOperation(item.id);
+        }
+        localStorage.removeItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY);
+        window.dispatchEvent(new CustomEvent('kongre_indexeddb_queue_changed'));
+        return { success: true, syncedCount: pendingItems.length };
+      }
 
       if (pendingItems.length === 0) {
         // Verificar si queda algún elemento en el localStorage antiguo o cifrado
@@ -925,9 +944,11 @@ export const supabaseSyncService = {
                 data: restoredData,
                 pinMaestro,
                 pinCongregacion,
+                skipOfflineEnqueue: true,
               });
               if (res.success) {
                 localStorage.removeItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY);
+                window.dispatchEvent(new CustomEvent('kongre_indexeddb_queue_changed'));
                 return { success: true, syncedCount: 1 };
               }
             }
@@ -947,8 +968,6 @@ export const supabaseSyncService = {
       }
 
       // Encontrar el snapshot más reciente o por congregación
-      // Dado que cada snapshotData acumula el estado completo fusionado,
-      // la versión más reciente con snapshotData tiene el estado fiel.
       const itemsWithSnapshot = pendingItems.filter((i) => i.snapshotData && i.congregationId);
       const latestItem = itemsWithSnapshot.length > 0
         ? itemsWithSnapshot[itemsWithSnapshot.length - 1]
@@ -960,6 +979,7 @@ export const supabaseSyncService = {
           data: latestItem.snapshotData,
           pinMaestro,
           pinCongregacion,
+          skipOfflineEnqueue: true,
         });
 
         if (res.success) {
@@ -968,6 +988,7 @@ export const supabaseSyncService = {
             await removeOfflineOperation(item.id);
           }
           localStorage.removeItem(LOCAL_STORAGE_OFFLINE_QUEUE_KEY);
+          window.dispatchEvent(new CustomEvent('kongre_indexeddb_queue_changed'));
           return { success: true, syncedCount: pendingItems.length };
         } else {
           // Marcar con error
@@ -1014,7 +1035,7 @@ export const supabaseSyncService = {
     intervalMs: number = 30000
   ) {
     const cleanId = normalizeCongregationId(rawId);
-    if (!cleanId || !rawPin) return null;
+    if (!cleanId || !rawPin || isDemoModeActive(cleanId)) return null;
 
     const timer = setInterval(async () => {
       if (typeof navigator !== 'undefined' && !navigator.onLine) return;

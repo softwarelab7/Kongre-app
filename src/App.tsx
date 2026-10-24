@@ -142,7 +142,9 @@ export function parseAppHash(hashString: string) {
   const modal = searchParams.get('modal') || null;
   const semana = searchParams.get('semana') || null;
   const isLanding = normalizedRoute === 'portal' || normalizedRoute === 'bienvenida';
-  return { tab, modal, semana, isLanding };
+  const isLegal = normalizedRoute === 'privacy' || normalizedRoute === 'terms' ||
+                  normalizedRoute === 'privacidad' || normalizedRoute === 'terminos';
+  return { tab, modal, semana, isLanding, isLegal };
 }
 
 const AppContent: React.FC = () => {
@@ -371,7 +373,7 @@ const AppContent: React.FC = () => {
       const state = event.state;
       const hashInfo = parseAppHash(window.location.hash);
 
-      const isLanding = state?.landing ?? hashInfo?.isLanding ?? false;
+      const isLanding = state?.landing ?? hashInfo?.isLanding ?? hashInfo?.isLegal ?? false;
       if (isLanding) {
         setShowWelcomeLanding(true);
         setIsConflictsModalOpen(false);
@@ -451,6 +453,11 @@ const AppContent: React.FC = () => {
         return;
       }
       const currentHash = window.location.hash || '';
+      const isLegalHash = currentHash.startsWith('#privacy') || currentHash.startsWith('#terms') ||
+                          currentHash.startsWith('#privacidad') || currentHash.startsWith('#terminos');
+      if (isLegalHash) {
+        return;
+      }
       const landingHash = (currentHash.startsWith('#portal') || currentHash.startsWith('#bienvenida'))
         ? currentHash
         : '#portal';

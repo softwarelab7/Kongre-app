@@ -25,18 +25,41 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.9';
-export const CURRENT_BUILD_CODE = '2026.10.23.6000';
+export const CURRENT_APP_VERSION = '2.12.10';
+export const CURRENT_BUILD_CODE = '2026.10.23.6100';
 export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.10',
+    buildCode: '2026.10.23.6100',
+    date: '23 de Octubre, 2026',
+    title: 'Páginas Legales Oficiales y Rutas Directas de Privacidad y Términos para Verificación de Google',
+    isCurrent: true,
+    highlight: 'Rutas directas #privacy, #terms, /privacy, /terms y páginas estáticas dedicadas en cumplimiento estricto con la Google API Services User Data Policy',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Rutas públicas directas de Privacidad y Términos: Detección y despliegue automático del documento legal correspondiente ante enlaces directos #privacy, #terms, #privacidad, #terminos, /privacy y /terms.',
+      },
+      {
+        category: 'feature',
+        text: 'Páginas estáticas autónomas (privacy.html y terms.html): Creación de documentos HTML completos e independientes con diseño adaptativo y reglas de rewrite en vercel.json para acceso universal de evaluadores y crawlers de Google.',
+      },
+      {
+        category: 'security',
+        text: 'Cláusula formal de cumplimiento Google OAuth (Limited Use): Inclusión detallada del tratamiento exclusivo de datos de perfil de Google, no comercialización, retención mínima y apego a la Google API User Data Policy.',
+      },
+    ],
+  },
+  {
     version: '2.12.9',
     buildCode: '2026.10.23.6000',
     date: '23 de Octubre, 2026',
     title: 'Corrección de Re-autenticación y Selector de Cuentas con Google',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'URL de retorno OAuth canónica sin fragmentos hash, activación de prompt=select_account y preservación de parámetros de autorización en montaje',
     environment: 'Producción Cloud (Kongre)',
     changes: [

@@ -6,6 +6,19 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.10] — 23 de Octubre, 2026
+**Páginas Oficiales de Privacidad y Términos de Uso para Verificación de Google**
+
+- 📜 **Acceso Directo y Universal a Términos y Privacidad:**
+  - Los enlaces directos `https://kongre-app.com/#privacy` y `https://kongre-app.com/#terms` (así como `/privacy` y `/terms`) abren de inmediato los documentos legales correspondientes tanto en la aplicación interactiva como en navegadores sin iniciar sesión.
+  - Se crearon páginas web dedicadas e independientes (`/privacy` y `/terms`) que cargan al instante incluso sin conexión o en navegadores antiguos.
+- 🛡️ **Claridad Total sobre el Acceso con Google:**
+  - Se añadió la declaración oficial de cumplimiento con la *Política de Datos de Usuario de Google* (Google API Services User Data Policy) y los requisitos de Uso Limitado (Limited Use), explicando con total transparencia que solo se accede al nombre, correo y foto para verificar al usuario y que los datos jamás se comparten ni comercializan.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.9] — 23 de Octubre, 2026
 **Corrección en Cambio de Cuenta con Google**
 

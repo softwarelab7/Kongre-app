@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollText, ShieldCheck, Scale, CloudOff } from 'lucide-react';
 import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
 import Logo from '../Logo';
 import { OfflineSyncBadge } from './OfflineSyncBadge';
-import { TermsAndPrivacyModal, LegalModalTab } from './TermsAndPrivacyModal';
+import { TermsAndPrivacyModal, LegalModalTab, detectLegalRoute } from './TermsAndPrivacyModal';
 
 interface AppFooterProps {
   onOpenVersionModal?: () => void;
@@ -20,12 +20,47 @@ export const AppFooter: React.FC<AppFooterProps> = ({
   isDemoMode = false,
   variant = 'app',
 }) => {
-  const [legalModalOpen, setLegalModalOpen] = useState(false);
-  const [legalModalTab, setLegalModalTab] = useState<LegalModalTab>('terms');
+  const [legalModalOpen, setLegalModalOpen] = useState(() => {
+    return detectLegalRoute() !== null;
+  });
+  const [legalModalTab, setLegalModalTab] = useState<LegalModalTab>(() => {
+    return detectLegalRoute() || 'terms';
+  });
+
+  useEffect(() => {
+    const handleRouteCheck = () => {
+      const detected = detectLegalRoute();
+      if (detected) {
+        setLegalModalTab(detected);
+        setLegalModalOpen(true);
+      }
+    };
+    handleRouteCheck();
+    window.addEventListener('hashchange', handleRouteCheck);
+    window.addEventListener('popstate', handleRouteCheck);
+    return () => {
+      window.removeEventListener('hashchange', handleRouteCheck);
+      window.removeEventListener('popstate', handleRouteCheck);
+    };
+  }, []);
 
   const handleOpenLegal = (tab: LegalModalTab) => {
     setLegalModalTab(tab);
     setLegalModalOpen(true);
+    if (typeof window !== 'undefined') {
+      window.history.pushState({ legal: true, tab }, '', `#${tab}`);
+    }
+  };
+
+  const handleCloseLegal = () => {
+    setLegalModalOpen(false);
+    if (typeof window !== 'undefined') {
+      const curHash = (window.location.hash || '').replace(/^#\/?/, '').toLowerCase().split('?')[0];
+      if (curHash === 'privacy' || curHash === 'privacidad' || curHash === 'terms' || curHash === 'terminos') {
+        const fallback = variant === 'landing' ? '#portal' : '#inicio';
+        window.history.pushState(null, '', fallback);
+      }
+    }
   };
 
   return (
@@ -149,7 +184,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
 
       <TermsAndPrivacyModal
         isOpen={legalModalOpen}
-        onClose={() => setLegalModalOpen(false)}
+        onClose={handleCloseLegal}
         initialTab={legalModalTab}
       />
     </>

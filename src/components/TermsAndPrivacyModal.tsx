@@ -13,10 +13,25 @@ import {
   Trash2,
   FileCheck2,
   Scale,
+  Globe,
+  Mail,
 } from 'lucide-react';
 import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
 
 export type LegalModalTab = 'terms' | 'privacy';
+
+export function detectLegalRoute(): LegalModalTab | null {
+  if (typeof window === 'undefined') return null;
+  const hash = (window.location.hash || '').replace(/^#\/?/, '').toLowerCase().split('?')[0];
+  const path = (window.location.pathname || '').replace(/^\//, '').toLowerCase().split('/')[0];
+  if (hash === 'privacy' || hash === 'privacidad' || path === 'privacy' || path === 'privacidad') {
+    return 'privacy';
+  }
+  if (hash === 'terms' || hash === 'terminos' || path === 'terms' || path === 'terminos') {
+    return 'terms';
+  }
+  return null;
+}
 
 interface TermsAndPrivacyModalProps {
   isOpen: boolean;
@@ -29,11 +44,18 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
   onClose,
   initialTab = 'terms',
 }) => {
-  const [activeTab, setActiveTab] = useState<LegalModalTab>(initialTab);
+  const [activeTab, setActiveTabState] = useState<LegalModalTab>(initialTab);
+
+  const handleSelectTab = (tab: LegalModalTab) => {
+    setActiveTabState(tab);
+    if (typeof window !== 'undefined') {
+      window.history.replaceState({ legal: true, tab }, '', `#${tab}`);
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
-      setActiveTab(initialTab);
+      setActiveTabState(initialTab);
     }
   }, [isOpen, initialTab]);
 
@@ -93,7 +115,7 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
         <div className="px-5 pt-3 pb-2.5 sm:px-6 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center gap-2 shrink-0">
           <button
             type="button"
-            onClick={() => setActiveTab('terms')}
+            onClick={() => handleSelectTab('terms')}
             className={`flex-1 py-2 px-3.5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeTab === 'terms'
                 ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/25'
@@ -106,7 +128,7 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
 
           <button
             type="button"
-            onClick={() => setActiveTab('privacy')}
+            onClick={() => handleSelectTab('privacy')}
             className={`flex-1 py-2 px-3.5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeTab === 'privacy'
                 ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/25'
@@ -244,25 +266,64 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
               {/* Privacy Section 3 */}
               <div className="space-y-2">
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span>3. Uso de Datos de Cuentas de Google (Google API User Data Policy)</span>
+                </h4>
+                <p>
+                  Kongre permite la autenticación opcional con <strong>Google Sign-In</strong> para verificar la identidad de publicadores y ancianos. En estricto cumplimiento con la <em>Google API Services User Data Policy</em>:
+                </p>
+                <ul className="list-disc list-inside space-y-1.5 pl-1 text-slate-600 dark:text-slate-300">
+                  <li>
+                    <strong>Datos solicitados:</strong> Solo la información básica de perfil (nombre, dirección de correo electrónico y foto de perfil). No solicitamos acceso a Google Drive, Gmail, contactos ni ningún otro servicio privado.
+                  </li>
+                  <li>
+                    <strong>Uso exclusivo:</strong> La información se utiliza únicamente para identificar al usuario y enlazarlo con su congregación aprobada.
+                  </li>
+                  <li>
+                    <strong>No comercialización:</strong> Jamás vendemos, transferimos ni utilizamos los datos de Google para publicidad o mercadeo.
+                  </li>
+                  <li>
+                    <strong>Cumplimiento de Uso Limitado (Limited Use):</strong> El uso y transferencia de información recibida de las APIs de Google se apegan rigurosamente a la <em>Política de Datos de Usuario de los Servicios de las APIs de Google</em>, incluidos los requisitos de Uso Limitado.
+                  </li>
+                  <li>
+                    <strong>Desvinculación inmediata:</strong> Puedes desconectar tu cuenta de Google en cualquier momento pulsando «Cambiar cuenta» dentro del portal de acceso.
+                  </li>
+                </ul>
+              </div>
+
+              {/* Privacy Section 4 */}
+              <div className="space-y-2">
+                <h4 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
                   <EyeOff className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>3. Sin Publicidad, Sin Venta de Datos ni Rastreo Comercial</span>
+                  <span>4. Sin Publicidad, Sin Venta de Datos ni Rastreo Comercial</span>
                 </h4>
                 <p>
                   Kongre es un proyecto libre de publicidad comercial. <strong>Jamás vendemos, alquilamos, cedemos ni compartimos</strong> información de las congregaciones ni de los publicadores con terceros, anunciantes ni plataformas externas. Tampoco utilizamos cookies de seguimiento publicitario.
                 </p>
               </div>
 
-              {/* Privacy Section 4 */}
+              {/* Privacy Section 5 */}
               <div className="space-y-2">
                 <h4 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
                   <Trash2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>4. Almacenamiento Local, Control y Eliminación Definitiva</span>
+                  <span>5. Almacenamiento Local, Control y Eliminación Definitiva</span>
                 </h4>
                 <p>
-                  Para garantizar que la aplicación funcione sin internet y proteja la sesión en dispositivos compartidos (como la cabina de audio y video), los datos locales se resguardan en el almacenamiento del navegador (`IndexedDB` / `localStorage`) y cuentan con bloqueo automático por PIN tras inactividad.
+                  Para garantizar que la aplicación funcione sin internet y proteja la sesión en dispositivos compartidos (como la cabina de audio y video), los datos locales se resguardan en el almacenamiento del navegador (<code>IndexedDB</code> / <code>localStorage</code>) y cuentan con bloqueo automático por PIN tras inactividad.
                 </p>
                 <p>
                   El Cuerpo de Ancianos puede modificar, exportar o <strong>eliminar de manera definitiva e irreversible</strong> todos los datos locales y remotos de la congregación en cualquier momento desde el panel de Ajustes.
+                </p>
+              </div>
+
+              {/* Privacy Section 6 */}
+              <div className="space-y-2">
+                <h4 className="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span>6. Canal de Contacto y Soporte</span>
+                </h4>
+                <p>
+                  Para cualquier consulta sobre privacidad o solicitud de supresión de datos, puedes contactarnos en <strong>soporte@kongre-app.com</strong> o visitar nuestro sitio oficial en <strong>https://kongre-app.com</strong>.
                 </p>
               </div>
             </>

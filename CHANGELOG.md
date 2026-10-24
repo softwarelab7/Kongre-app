@@ -43,6 +43,9 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
   - **Saneamiento de Metadatos de Publicador:** Se limitan las longitudes de campos en verifiers (`name <= 120`, `role <= 40`, `privilege <= 40`, `theocraticRoles[] <= 40`) para salvaguardar el tamaño de la base de datos JSONB.
 - **Sincronización Transparente de Prefijos con `isEncryptedPinAtRest`:**
   - Se implementó el helper canónico `isEncryptedPinAtRest` para reconocer tanto `kgr_v2:` como `kgr_v1:`, resolviendo inconsistencias en `AuthContext.tsx`, `App.tsx`, `SecurityContext.tsx`, `supabaseSyncService.ts` y `CongregationContext.tsx`.
+  - **Auto-migración en Caliente de `kgr_v1` a `kgr_v2`:** `encryptPinAtRest` y `getSecureLocalPin` detectan registros legados y los re-cifran al vuelo usando CTR autenticado y la sal de hardware del dispositivo.
+  - **Soporte Bidireccional en `verifyPersonalPinMatch`:** Reconocimiento de PINs cuando el registro posee `personalPin` cifrado (`kgr_v2:` o `kgr_v1:`), evitando fallos de autenticación tras sincronizaciones en la nube.
+  - **Sanitización y Restauración Resiliente de Directorios:** `sanitizePublishersForLocalStorage`, `sanitizePinRecordsForLocalStorage`, `restorePublishersFromLocalStorage` y `restorePinRecordsFromLocalStorage` preservan y recuperan credenciales incluso si los registros ya estaban cifrados en reposo, garantizando cero pérdida de hashes ni PINs.
 - **Blindaje Anti-Bypass en Pantalla de Bloqueo y Firmas (Función `isSafeDemoMode`):**
   - Implementación de `isSafeDemoMode()`, que valida que el modo de demostración solo pueda activarse en congregaciones no registradas o de prueba (`DEMO`).
   - Si el usuario se encuentra en una congregación real registrada, cualquier intento de inyección manual de `kongre_demo_mode=true` en DevTools es automáticamente purgado y deshabilitado, impidiendo la elusión de la pantalla de bloqueo (`SessionLockModal`) o la falsificación de firmas de rol.

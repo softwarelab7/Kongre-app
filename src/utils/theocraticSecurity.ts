@@ -928,6 +928,11 @@ export function encryptPinAtRest(pin?: string | null): string {
   const clean = String(pin).trim();
   if (!clean || clean === '••••' || clean === '••••••••') return '';
   if (clean.startsWith('kgr_v2:')) return clean;
+  if (clean.startsWith('kgr_v1:')) {
+    const migrated = decryptPinAtRest(clean);
+    if (!migrated) return '';
+    return encryptPinAtRest(migrated);
+  }
 
   try {
     const deviceKey = sha256HexSync(`kgr_pin_rest_v2:${getDeviceEntropySalt()}`);
@@ -1064,9 +1069,10 @@ export function verifyPersonalPinMatch(
     }
   }
 
-  // 2. Verificar contra PIN cifrado en reposo si existe
-  if (record.encryptedPin) {
-    const decrypted = normalizePersonalPinInput(decryptPinAtRest(record.encryptedPin));
+  // 2. Verificar contra PIN cifrado en reposo si existe (encryptedPin o personalPin cifrado)
+  const encCandidate = record.encryptedPin || (isEncryptedPinAtRest(record.personalPin) ? record.personalPin : undefined);
+  if (encCandidate) {
+    const decrypted = normalizePersonalPinInput(decryptPinAtRest(encCandidate));
     if (decrypted && decrypted.length >= 4 && decrypted === cleanCandidate) {
       return true;
     }
@@ -1074,7 +1080,7 @@ export function verifyPersonalPinMatch(
 
   // 3. Compatibilidad con registros legados o en memoria que aún posean personalPin / pin en texto plano
   const rawStoredPin = String(record.personalPin || record.pin || '').trim();
-  if (rawStoredPin && rawStoredPin !== '••••' && !rawStoredPin.startsWith('kgr_v1:') && !rawStoredPin.startsWith('kgr_v2:')) {
+  if (rawStoredPin && rawStoredPin !== '••••' && !isEncryptedPinAtRest(rawStoredPin)) {
     if (/^[a-f0-9]{64}$/i.test(rawStoredPin)) {
       const lowerStored = rawStoredPin.toLowerCase();
       if (lowerStored === candidateHash || lowerStored === legacyHash) return true;
@@ -1259,9 +1265,17 @@ export function sanitizePublishersForLocalStorage<T extends Record<string, any>>
   return publishers.map((p) => {
     if (!p || typeof p !== 'object') return p;
     const rawPin = p.personalPin ? String(p.personalPin).trim() : '';
-    const hasPlainPin = rawPin.length >= 4 && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !rawPin.startsWith('kgr_v2:') && !/^[a-f0-9]{64}$/i.test(rawPin);
-    const pinHash = hasPlainPin ? hashPersonalPin(rawPin) : (p.personalPinHash || '');
-    const encryptedPin = hasPlainPin ? encryptPinAtRest(rawPin) : (p.encryptedPin || '');
+    const hasPlainPin = rawPin.length >= 4 && rawPin !== '••••' && !isEncryptedPinAtRest(rawPin) && !/^[a-f0-9]{64}$/i.test(rawPin);
+    const pinHash = hasPlainPin
+      ? hashPersonalPin(rawPin)
+      : isEncryptedPinAtRest(rawPin)
+      ? hashPersonalPin(decryptPinAtRest(rawPin))
+      : (p.personalPinHash || '');
+    const encryptedPin = hasPlainPin
+      ? encryptPinAtRest(rawPin)
+      : isEncryptedPinAtRest(rawPin)
+      ? rawPin
+      : (p.encryptedPin || '');
 
     const clone: Record<string, any> = { ...p };
     delete clone.personalPin;
@@ -1288,10 +1302,12 @@ export function restorePublishersFromLocalStorage<T extends Record<string, any>>
     if (!p || typeof p !== 'object') return p;
     const rawPin = p.personalPin ? String(p.personalPin).trim() : '';
     const restoredPin =
-      rawPin && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !rawPin.startsWith('kgr_v2:') && !/^[a-f0-9]{64}$/i.test(rawPin)
+      rawPin && rawPin !== '••••' && !isEncryptedPinAtRest(rawPin) && !/^[a-f0-9]{64}$/i.test(rawPin)
         ? rawPin
         : p.encryptedPin
         ? decryptPinAtRest(p.encryptedPin)
+        : isEncryptedPinAtRest(rawPin)
+        ? decryptPinAtRest(rawPin)
         : '';
     const pinHash =
       p.personalPinHash ||
@@ -1322,9 +1338,17 @@ export function sanitizePinRecordsForLocalStorage<T extends Record<string, any>>
   return records.map((rec) => {
     if (!rec || typeof rec !== 'object') return rec;
     const rawPin = rec.pin ? String(rec.pin).trim() : '';
-    const hasPlainPin = rawPin.length >= 4 && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !rawPin.startsWith('kgr_v2:') && !/^[a-f0-9]{64}$/i.test(rawPin);
-    const pinHash = hasPlainPin ? hashPersonalPin(rawPin) : (rec.pinHash || rec.personalPinHash || '');
-    const encryptedPin = hasPlainPin ? encryptPinAtRest(rawPin) : (rec.encryptedPin || '');
+    const hasPlainPin = rawPin.length >= 4 && rawPin !== '••••' && !isEncryptedPinAtRest(rawPin) && !/^[a-f0-9]{64}$/i.test(rawPin);
+    const pinHash = hasPlainPin
+      ? hashPersonalPin(rawPin)
+      : isEncryptedPinAtRest(rawPin)
+      ? hashPersonalPin(decryptPinAtRest(rawPin))
+      : (rec.pinHash || rec.personalPinHash || '');
+    const encryptedPin = hasPlainPin
+      ? encryptPinAtRest(rawPin)
+      : isEncryptedPinAtRest(rawPin)
+      ? rawPin
+      : (rec.encryptedPin || '');
 
     const clone: Record<string, any> = {
       ...rec,
@@ -1345,10 +1369,12 @@ export function restorePinRecordsFromLocalStorage<T extends Record<string, any>>
     if (!rec || typeof rec !== 'object') return rec;
     const rawPin = rec.pin ? String(rec.pin).trim() : '';
     const restoredPin =
-      rawPin && rawPin !== '••••' && !rawPin.startsWith('kgr_v1:') && !rawPin.startsWith('kgr_v2:') && !/^[a-f0-9]{64}$/i.test(rawPin)
+      rawPin && rawPin !== '••••' && !isEncryptedPinAtRest(rawPin) && !/^[a-f0-9]{64}$/i.test(rawPin)
         ? rawPin
         : rec.encryptedPin
         ? decryptPinAtRest(rec.encryptedPin)
+        : isEncryptedPinAtRest(rawPin)
+        ? decryptPinAtRest(rawPin)
         : '';
     const pinHash =
       rec.pinHash ||
@@ -1383,7 +1409,7 @@ export function setSecureLocalPin(key: string, rawPin?: string | null): void {
       } catch {}
       return;
     }
-    const plain = clean.startsWith('kgr_v2:') || clean.startsWith('kgr_v1:')
+    const plain = isEncryptedPinAtRest(clean)
       ? decryptPinAtRest(clean)
       : clean;
     if (!plain) return;
@@ -1429,12 +1455,10 @@ export function getSecureLocalPin(key: string): string {
     if (!trimmed || trimmed === '••••' || trimmed === '••••••••') return '';
 
     let plain = '';
-    if (trimmed.startsWith('kgr_v2:')) {
+    if (isEncryptedPinAtRest(trimmed)) {
       plain = decryptPinAtRest(trimmed);
-    } else if (trimmed.startsWith('kgr_v1:')) {
       // Migración automática de kgr_v1 a kgr_v2
-      plain = decryptPinAtRest(trimmed);
-      if (plain) {
+      if (plain && trimmed.startsWith('kgr_v1:')) {
         setSecureLocalPin(key, plain);
       }
     } else if (!/^[a-f0-9]{64}$/i.test(trimmed)) {

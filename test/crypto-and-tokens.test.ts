@@ -14,6 +14,7 @@ import {
   encryptPinAtRest,
   decryptPinAtRest,
   isEncryptedPinAtRest,
+  verifyPersonalPinMatch,
   isSafeDemoMode,
   signRoleSession,
   verifyRoleSessionSignature,
@@ -160,6 +161,25 @@ test('isEncryptedPinAtRest: detecta formatos kgr_v2: y kgr_v1:', () => {
   assert.equal(isEncryptedPinAtRest(''), false);
   assert.equal(isEncryptedPinAtRest(null), false);
   assert.equal(isEncryptedPinAtRest(undefined), false);
+
+  // Auto-migración al cifrar con formato legado kgr_v1:
+  const encFromV1 = encryptPinAtRest('kgr_v1:5b575d5e');
+  assert.ok(encFromV1.startsWith('kgr_v2:'), 'Debe migrar automáticamente de kgr_v1 a kgr_v2');
+
+  // verifyPersonalPinMatch con personalPin cifrado con kgr_v2
+  const plainPin = '7392';
+  const encV2Pin = encryptPinAtRest(plainPin);
+  const recordWithEncPersonalPin = { id: 'pub1', personalPin: encV2Pin };
+  assert.ok(verifyPersonalPinMatch(plainPin, recordWithEncPersonalPin), 'Debe verificar correctamente contra personalPin cifrado con kgr_v2');
+
+  // sanitizePublishersForLocalStorage con personalPin ya cifrado
+  const pubsToSanitize = [{ id: 'pub1', name: 'Hermano', personalPin: encV2Pin }];
+  const sanitized = sanitizePublishersForLocalStorage(pubsToSanitize);
+  assert.equal(sanitized[0].personalPin, undefined, 'personalPin debe ser removido');
+  assert.ok(sanitized[0].encryptedPin.startsWith('kgr_v2:'), 'encryptedPin debe mantenerse');
+  assert.ok(sanitized[0].personalPinHash, 'personalPinHash debe derivarse del PIN descifrado');
+  const restored = restorePublishersFromLocalStorage(sanitized);
+  assert.equal(restored[0].personalPin, plainPin, 'restorePublishersFromLocalStorage debe recuperar el PIN en memoria');
 });
 
 test('isSafeDemoMode: impide omisión de seguridad en congregaciones reales', () => {

@@ -463,9 +463,10 @@ export const supabaseSyncService = {
         },
         invitations: sanitizeInvitationsForPublicPayload(normalizedAdminInvitations),
         publishers: (params.data.publishers || []).map((p) => {
-          // Seguridad: NUNCA incluir personalPinHash en payload_public.
+          // Seguridad: NUNCA incluir personalPin ni personalPinHash en payload_public.
           // Los PINs personales se verifican en la Edge Function con límite de intentos,
           // impidiendo ataques de fuerza bruta offline sobre PINs de 4 dígitos.
+          // Minimización de datos (Ley 1581 / RGPD): no enviar correos personales en el payload público.
           return {
             id: p.id,
             name: p.name,
@@ -475,7 +476,6 @@ export const supabaseSyncService = {
             privilege: p.privilege,
             theocraticRole: p.theocraticRole,
             theocraticRoles: (p as any).theocraticRoles,
-            email: p.email,
             roles: p.roles,
           };
         }),
@@ -496,7 +496,8 @@ export const supabaseSyncService = {
         congregationEvents: params.data.congregationEvents || [],
         memorialPlans: params.data.memorialPlans || [],
         theocraticAssemblies: params.data.theocraticAssemblies || [],
-        monthlyReports: params.data.monthlyReports || [],
+        // Seguridad y Minimización (Ley 1581): los informes mensuales de predicación son privados
+        // y solo viajan en el payload maestro para el cuerpo de ancianos, nunca en el payload público común.
       };
 
       // 3. Extraer PINs personales para verificación segura en la Edge Function

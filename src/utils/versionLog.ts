@@ -25,18 +25,37 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.2';
-export const CURRENT_BUILD_CODE = '2026.10.23.5300';
+export const CURRENT_APP_VERSION = '2.12.3';
+export const CURRENT_BUILD_CODE = '2026.10.23.5400';
 export const BUILD_DATE = '23 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.3',
+    buildCode: '2026.10.23.5400',
+    date: '23 de Octubre, 2026',
+    title: 'Minimización de Datos en Nube (Ley 1581) e Higiene de Dependencias (0 Vulnerabilidades)',
+    isCurrent: true,
+    highlight: 'Payload público minimizado y dependencias auditadas al 100%',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Minimización de datos en payload_public (Ley 1581 / Privacidad): Se retiraron los informes mensuales de predicación (monthlyReports) y los correos electrónicos de publicadores del payload público, restringiéndolos exclusivamente al payload maestro del cuerpo de ancianos.',
+      },
+      {
+        category: 'security',
+        text: 'Higiene total de dependencias: Desinstalación de paquetes residuales express, @types/express y dotenv. Corrección y auditoría completa vía npm audit alcanzando 0 vulnerabilidades.',
+      },
+    ],
+  },
+  {
     version: '2.12.2',
     buildCode: '2026.10.23.5300',
     date: '23 de Octubre, 2026',
     title: 'Blindaje de Seguridad Integral: Cifrado en Reposo (Ley 1581), Cabeceras HTTP y Dominio Oficial',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Última versión compilada y activa con suite completa de seguridad',
     environment: 'Producción Cloud (Kongre)',
     changes: [

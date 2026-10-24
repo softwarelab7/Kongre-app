@@ -25,7 +25,16 @@ Cada vez que se solicite un cambio o actualización en el sistema, se debe segui
 
 ## 🚀 Historial de Versiones
 
-### [v2.12.2] - 23 de Octubre, 2026 (Compilación Activa)
+### [v2.12.3] - 23 de Octubre, 2026 (Compilación Activa)
+**Título:** Minimización de Datos en Nube (Ley 1581) e Higiene de Dependencias (0 Vulnerabilidades)
+- **Minimización de Datos en `payload_public` (Ley 1581 / Privacidad):**
+  - Se eliminaron los informes mensuales de predicación (`monthlyReports`) del payload público cifrado con PIN de congregación. Los informes de horas y estudios bíblicos ahora residen estrictamente en el payload maestro accesible solo por el cuerpo de ancianos.
+  - Se removieron los correos electrónicos personales (`email`) de la lista de publicadores en el payload público, evitando la exposición innecesaria de datos de contacto a cualquier usuario con el PIN de congregación.
+- **Higiene de Dependencias y Resolución de Vulnerabilidades (`0 vulnerabilities`):**
+  - Desinstalación de librerías innecesarias en el frontend: `express`, `@types/express` y `dotenv`.
+  - Actualización limpia de `dompurify`, `esbuild` y `vite` a sus versiones seguras, alcanzando `0 vulnerabilidades` en `npm audit`.
+
+### [v2.12.2] - 23 de Octubre, 2026
 **Título:** Blindaje de Seguridad Integral: Cifrado en Reposo (Ley 1581), Cabeceras HTTP y Dominio Oficial
 - **Cifrado de Datos Sensibles en Reposo (Ley 1581 / Salud y Contactos):**
   - Implementación de cifrado autenticado AES-256-GCM para todos los datos de salud y contacto en el almacenamiento local (`localStorage`).

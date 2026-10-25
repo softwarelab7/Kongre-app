@@ -637,11 +637,83 @@ export const PublishersTab: React.FC = () => {
       last_visit_date: lastVisit,
       last_shepherding_visit: lastVisit,
       printed_guide: !!data.printed_guide,
+      large_print: !!(data as any).large_print,
+      languages: Array.isArray(data.languages) ? data.languages : [],
+      skills: Array.isArray(data.skills) ? data.skills : [],
+      address_reference: (data as any).address_reference || '',
+      maps_url: (data as any).maps_url || '',
+      vehicle_seats: (data as any).vehicle_seats ?? (data.has_vehicle ? 4 : 0),
+      appointment_date: (data as any).appointment_date || '',
+      pioneer_school_date: (data as any).pioneer_school_date || '',
+      shepherding_elders: (data as any).shepherding_elders || '',
+      pastoral_priority: (data as any).pastoral_priority || 'normal',
+      is_reproved: !!(data as any).is_reproved,
+      dpa_copy_on_file: !!(data as any).dpa_copy_on_file,
+      zoom_regular: !!(data as any).zoom_regular,
+      special_seating: !!(data as any).special_seating,
+      moved_congregation_name: (data as any).moved_congregation_name || '',
+      moved_date: (data as any).moved_date || '',
+      letter_of_introduction_sent: !!(data as any).letter_of_introduction_sent,
     };
 
     try {
       const existing = publishers.find((p) => p.id === targetPayload.id);
       if (existing) {
+        // Registrar auditoría de cambios en navegador
+        const trackedFields: (keyof Publisher)[] = [
+          'full_name',
+          'role',
+          'pioneer_type',
+          'id_grupo',
+          'group_responsibility',
+          'baptism_date',
+          'publisher_date',
+          'is_active',
+          'has_dpa',
+          'phone',
+          'address',
+          'is_disfellowshipped',
+          'is_reinstated',
+          'is_reproved',
+          'is_moved',
+        ];
+        const newLogs: any[] = [];
+        const nowIso = new Date().toISOString();
+        trackedFields.forEach((f, idx) => {
+          const oldVal = existing[f] !== undefined && existing[f] !== null ? String(existing[f]) : '';
+          const newVal =
+            targetPayload[f] !== undefined && targetPayload[f] !== null
+              ? String(targetPayload[f])
+              : '';
+          if (oldVal !== newVal) {
+            newLogs.push({
+              id: String(Date.now() + idx),
+              nid: resolvedNid,
+              campo: String(f),
+              valor_ant: oldVal,
+              valor_new: newVal,
+              cambiado_por: 'Secretaría',
+              fecha: nowIso,
+            });
+          }
+        });
+        if (newLogs.length > 0) {
+          const prevHistory = Array.isArray(targetPayload.change_history)
+            ? targetPayload.change_history
+            : Array.isArray(existing.change_history)
+            ? existing.change_history
+            : [];
+          const combinedHistory = [...newLogs, ...prevHistory].slice(0, 100);
+          targetPayload.change_history = combinedHistory;
+          try {
+            localStorage.setItem(
+              `kongre_pub_history_${resolvedNid}`,
+              JSON.stringify(combinedHistory)
+            );
+          } catch {
+            // ignore storage errors
+          }
+        }
         updatePublisher(targetPayload);
         showToast('¡Cambios guardados con éxito!', 'success');
       } else {

@@ -169,32 +169,57 @@ export interface Publisher {
   fixed_cart_partner_nid?: string;
 
   // Información Personal Extendida & Teocrática
-  marital_status?: 'soltero' | 'casado' | 'viudo' | 'divorciado' | string;
+  marital_status?: 'soltero' | 'casado' | 'viudo' | 'divorciado' | 'separado' | string;
   spouse_name?: string;
   spouse_nid?: string;
+  parent_guardian_nid?: string;
+  parent_guardian_name?: string;
   familyId?: string; // Identificador de núcleo familiar (ej. 'FAM-PEREZ')
   familyMemberIds?: string[]; // IDs de otros publicadores que pertenecen al mismo núcleo familiar
   groupWithFamilyInMeetings?: boolean; // Preferencia: Agrupar con miembros de su familia en la misma reunión/turno
   neighborhood?: string;
   city?: string;
   postal_code?: string;
+  address_reference?: string; // Referencias de llegada / Entre calles
+  maps_url?: string; // Enlace de ubicación GPS / Google Maps
   has_vehicle?: boolean;
+  vehicle_seats?: number; // Asientos disponibles para apoyo
   needs_ride?: boolean;
   occupation?: string;
   skills?: string[];
   languages?: string[];
   preferred_contact_method?: 'whatsapp' | 'call' | 'email';
-  
+
+  // Trayectoria Espiritual y Pastoreo Extendido
+  appointment_date?: string; // Fecha de nombramiento como Anciano / Siervo
+  pioneer_school_date?: string; // Fecha de última Escuela del Servicio de Precursor
+  last_shepherding_visit?: string; // YYYY-MM-DD
+  shepherding_elders?: string; // Ancianos que realizaron la última visita
+  pastoral_priority?: 'normal' | 'atencion' | 'urgente';
+  is_reproved?: boolean;
+
+  // Necesidades Especiales, Publicaciones y Mudanza
+  large_print?: boolean;
+  zoom_regular?: boolean;
+  special_seating?: boolean;
+  moved_congregation_name?: string;
+  moved_date?: string;
+  letter_of_introduction_sent?: boolean;
+
   // Directriz Médica Anticipada (DPA / Asuntos Médicos)
   has_dpa?: boolean;
   dpa_date?: string;
   dpa_expiry_date?: string;
+  dpa_copy_on_file?: boolean;
   healthcare_agent_name?: string;
   healthcare_agent_phone?: string;
   healthcare_agent_alternate_name?: string;
   healthcare_agent_alternate_phone?: string;
   medical_allergies?: string;
   medical_conditions?: string;
+
+  // Historial de Auditoría Local
+  change_history?: PublisherChangeLog[];
 
   assignments?: {
     chairman?: boolean;

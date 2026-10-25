@@ -1,85 +1,115 @@
+// src/components/PublisherEditor/PublisherHistoryPanel.tsx
 import React, { useEffect, useState, useCallback } from 'react';
-import { PublisherChangeLog } from '../../types';
-import { History, RotateCcw, ChevronDown, ChevronUp, AlertCircle, Clock } from 'lucide-react';
+import { Publisher, PublisherChangeLog } from '../../types';
+import { History, RotateCcw, AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
 import { useModal } from '../../context/ModalContext';
 import { useToast } from '../../context/ToastContext';
 
-// ---------------------------------------------------------------------------
-// Campo labels & badge colors
-// ---------------------------------------------------------------------------
-
 const FIELD_LABELS: Record<string, string> = {
-  rol: 'Rol',
+  rol: 'Rol Teocrático',
+  role: 'Rol Teocrático',
   estado: 'Estado',
-  pioneer_type: 'Tipo de Pionero',
-  is_disfellowshipped: 'Excluido',
-  is_reinstated: 'Reinstalado',
+  status: 'Estado',
+  pioneer_type: 'Precursorado',
+  is_disfellowshipped: 'Sacado',
+  is_reinstated: 'Readmitido',
+  is_reproved: 'Censurado',
   is_inactive: 'Inactivo',
   is_active: 'Activo',
   is_imprisoned: 'Encarcelado',
   is_moved: 'Se mudó',
   group_responsibility: 'Resp. en Grupo',
-  id_grupo: 'Grupo asignado',
+  id_grupo: 'Grupo de Servicio',
   baptism_date: 'Fecha de Bautismo',
-  publisher_date: 'Fecha como Publicador',
-  privilegios: 'Privilegios',
-  aprobado: 'Aprobado',
+  publisher_date: 'Inicio Publicador',
+  privilegios: 'Responsabilidades',
+  privileges: 'Responsabilidades',
   nombre: 'Nombre completo',
+  full_name: 'Nombre completo',
+  phone: 'Teléfono',
+  address: 'Dirección',
+  has_dpa: 'Directriz DPA',
   spiritual_notes: 'Notas espirituales',
 };
 
 const FIELD_BADGE: Record<string, string> = {
   rol: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+  role: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
   estado: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+  status: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
   is_disfellowshipped: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
   is_reinstated: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
   privilegios: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
+  privileges: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20',
   spiritual_notes: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
 };
 
 function fieldBadge(campo: string): string {
-  return FIELD_BADGE[campo] ?? 'bg-zinc-100 dark:bg-white/[0.06] text-zinc-500 dark:text-zinc-400 border-zinc-200 dark:border-white/[0.08]';
+  return (
+    FIELD_BADGE[campo] ??
+    'bg-zinc-100 dark:bg-white/[0.06] text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-white/[0.08]'
+  );
 }
 
 function formatValue(campo: string, val: string | null): string {
-  if (val === null || val === '') return '(vacío)';
+  if (val === null || val === undefined || val === '') return '(vacío)';
 
-  // Boolean fields stored as '0'/'1'
-  const boolFields = ['is_disfellowshipped', 'is_reinstated', 'is_inactive', 'is_active',
-    'is_imprisoned', 'is_moved', 'aprobado'];
-  if (boolFields.includes(campo)) return val === '1' ? 'Sí' : 'No';
+  const boolFields = [
+    'is_disfellowshipped',
+    'is_reinstated',
+    'is_reproved',
+    'is_inactive',
+    'is_active',
+    'is_imprisoned',
+    'is_moved',
+    'has_dpa',
+    'aprobado',
+  ];
+  if (boolFields.includes(campo)) {
+    return val === '1' || val === 'true' ? 'Sí' : 'No';
+  }
 
-  // Pioneer type map
   if (campo === 'pioneer_type') {
     const map: Record<string, string> = {
-      none: 'Ninguno', auxiliary_continuous: 'P. Auxiliar continuo',
-      regular: 'P. Regular', special: 'P. Especial', missionary: 'Misionero',
+      none: 'Ninguno',
+      auxiliary: 'P. Auxiliar',
+      auxiliary_continuous: 'P. Auxiliar continuo',
+      regular: 'P. Regular',
+      special: 'P. Especial',
+      missionary: 'Misionero',
     };
     return map[val] ?? val;
   }
 
-  // Role map
-  if (campo === 'rol') {
+  if (campo === 'rol' || campo === 'role') {
     const map: Record<string, string> = {
-      super_admin: 'Admin', elder: 'Anciano', servant: 'Siervo',
-      publisher: 'Publicador', unbaptized: 'No bautizado',
+      super_admin: 'Admin',
+      elder: 'Anciano',
+      servant: 'Siervo Ministerial',
+      publisher: 'Publicador Bautizado',
+      unbaptized: 'No bautizado',
     };
     return map[val] ?? val;
   }
 
-  // Group responsibility
   if (campo === 'group_responsibility') {
-    const map: Record<string, string> = { none: 'Ninguna', overseer: 'Encargado', assistant: 'Auxiliar' };
+    const map: Record<string, string> = {
+      miembro: 'Publicador',
+      none: 'Ninguna',
+      overseer: 'Sup. de Grupo',
+      assistant: 'Auxiliar de Grupo',
+    };
     return map[val] ?? val;
   }
 
-  // Privilege JSON arrays — pretty print
-  if (campo === 'privilegios') {
+  if (campo === 'privilegios' || campo === 'privileges') {
     try {
       const arr = JSON.parse(val);
       if (Array.isArray(arr) && arr.length === 0) return '(ninguno)';
       return Array.isArray(arr) ? arr.join(', ') : val;
-    } catch { return val; }
+    } catch {
+      return val;
+    }
   }
 
   return val;
@@ -100,21 +130,40 @@ function isRevert(row: PublisherChangeLog): boolean {
   return row.cambiado_por?.startsWith('revert:') ?? false;
 }
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
+export const getBrowserPublisherHistory = (nid: string): PublisherChangeLog[] => {
+  if (!nid) return [];
+  try {
+    const raw = localStorage.getItem(`kongre_pub_history_${nid}`);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+export const saveBrowserPublisherHistory = (nid: string, logs: PublisherChangeLog[]) => {
+  if (!nid) return;
+  try {
+    localStorage.setItem(`kongre_pub_history_${nid}`, JSON.stringify(logs.slice(0, 100)));
+  } catch {
+    // ignore storage quota errors
+  }
+};
 
 interface PublisherHistoryPanelProps {
   publisherNid: string | undefined;
-  /** Called after a successful revert so the parent can reload publisher data */
+  formData?: Publisher;
+  handleChange?: (field: keyof Publisher, value: any) => void;
   onRevertSuccess?: () => void;
 }
 
 export const PublisherHistoryPanel: React.FC<PublisherHistoryPanelProps> = ({
   publisherNid,
+  formData,
+  handleChange,
   onRevertSuccess,
 }) => {
-  const [open, setOpen] = useState(false);
   const [history, setHistory] = useState<PublisherChangeLog[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -122,169 +171,228 @@ export const PublisherHistoryPanel: React.FC<PublisherHistoryPanelProps> = ({
   const { showToast } = useToast();
 
   const loadHistory = useCallback(async () => {
-    if (!publisherNid || !(window as any)?.electronAPI?.getHistorialPublicador) return;
+    if (!publisherNid) return;
     setLoading(true);
     setError(null);
     try {
-      const data = await (window as any).electronAPI.getHistorialPublicador(publisherNid);
-      setHistory(data);
+      if ((window as any)?.electronAPI?.getHistorialPublicador) {
+        const data = await (window as any).electronAPI.getHistorialPublicador(publisherNid);
+        setHistory(data);
+      } else {
+        const stored = getBrowserPublisherHistory(publisherNid);
+        const fromRecord = formData?.change_history || [];
+        const mergedMap = new Map<string, PublisherChangeLog>();
+        [...fromRecord, ...stored].forEach((item) => {
+          if (item && item.id) mergedMap.set(String(item.id), item);
+        });
+        const sorted = Array.from(mergedMap.values()).sort(
+          (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+        );
+        setHistory(sorted);
+      }
     } catch (err: any) {
       setError(err.message ?? 'Error al cargar historial');
     } finally {
       setLoading(false);
     }
-  }, [publisherNid]);
+  }, [publisherNid, formData?.change_history]);
 
-  // Load when panel opens
   useEffect(() => {
-    if (open) loadHistory();
-  }, [open, loadHistory]);
+    loadHistory();
+  }, [loadHistory]);
 
-  const handleRevert = useCallback(async (row: PublisherChangeLog) => {
-    const label = FIELD_LABELS[row.campo] ?? row.campo;
-    const confirmed = await confirm({
-      title: `Revertir "${label}"`,
-      message: `¿Restaurar el campo "${label}" al valor anterior?\n\nAnterior: ${formatValue(row.campo, row.valor_ant)}\nActual:    ${formatValue(row.campo, row.valor_new)}`,
-      confirmText: 'Revertir',
-      type: 'danger',
-    });
-    if (!confirmed) return;
+  const handleRevert = useCallback(
+    async (row: PublisherChangeLog) => {
+      const label = FIELD_LABELS[row.campo] ?? row.campo;
+      const confirmed = await confirm({
+        title: `Revertir "${label}"`,
+        message: `¿Restaurar el campo "${label}" al valor anterior?\n\nAnterior: ${formatValue(
+          row.campo,
+          row.valor_ant
+        )}\nActual: ${formatValue(row.campo, row.valor_new)}`,
+        confirmText: 'Revertir cambio',
+        type: 'danger',
+      });
+      if (!confirmed) return;
 
-    try {
-      if ((window as any)?.electronAPI?.revertirCambioPublicador) {
-        await (window as any).electronAPI.revertirCambioPublicador(row.id);
-        showToast(`"${label}" restaurado correctamente`, 'success');
-        await loadHistory();
-        onRevertSuccess?.();
-      } else {
-        showToast('Acción de revertir no disponible en navegador', 'info');
+      try {
+        if ((window as any)?.electronAPI?.revertirCambioPublicador) {
+          await (window as any).electronAPI.revertirCambioPublicador(row.id);
+          showToast(`"${label}" restaurado correctamente`, 'success');
+          await loadHistory();
+          onRevertSuccess?.();
+        } else if (handleChange && publisherNid) {
+          let restoredVal: any = row.valor_ant;
+          if (restoredVal === 'true' || restoredVal === '1') restoredVal = true;
+          else if (restoredVal === 'false' || restoredVal === '0') restoredVal = false;
+          else if (row.campo === 'privileges' || row.campo === 'privilegios') {
+            try {
+              restoredVal = JSON.parse(row.valor_ant || '[]');
+            } catch {
+              restoredVal = [];
+            }
+          }
+
+          const targetField = (row.campo === 'rol' ? 'role' : row.campo) as keyof Publisher;
+          handleChange(targetField, restoredVal);
+
+          const revertEntry: PublisherChangeLog = {
+            id: String(Date.now()),
+            nid: publisherNid,
+            campo: row.campo,
+            valor_ant: row.valor_new,
+            valor_new: row.valor_ant,
+            cambiado_por: `revert:${row.id}`,
+            fecha: new Date().toISOString(),
+          };
+          const nextHistory = [revertEntry, ...history];
+          saveBrowserPublisherHistory(publisherNid, nextHistory);
+          handleChange('change_history', nextHistory);
+          setHistory(nextHistory);
+          showToast(`"${label}" restaurado en la ficha (recuerda presionar Guardar)`, 'success');
+        }
+      } catch (err: any) {
+        showToast(`Error al revertir: ${err.message}`, 'error');
       }
-    } catch (err: any) {
-      showToast(`Error al revertir: ${err.message}`, 'error');
-    }
-  }, [confirm, loadHistory, onRevertSuccess, showToast]);
+    },
+    [confirm, loadHistory, onRevertSuccess, showToast, handleChange, publisherNid, history]
+  );
 
-  // Don't render if no NID (new publisher)
   if (!publisherNid) return null;
 
   return (
-    <div className="mt-6 bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl shadow-sm overflow-hidden">
-      {/* Header / toggle */}
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-6 md:px-8 py-5 hover:bg-zinc-50/60 dark:hover:bg-white/[0.02] transition-colors group"
-      >
+    <div className="bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.06] rounded-3xl shadow-sm overflow-hidden">
+      <div className="flex items-center justify-between px-6 md:px-8 py-5 border-b border-zinc-100 dark:border-white/[0.06]">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-            <History size={18} />
+          <div className="p-2.5 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+            <History size={20} />
           </div>
-          <div className="text-left">
-            <h3 className="text-[15px] font-semibold text-zinc-800 dark:text-zinc-200">
-              Historial de cambios
-            </h3>
-            {!open && history.length > 0 && (
-              <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mt-0.5">
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                Historial de Auditoría y Cambios
+              </h3>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300 border border-indigo-200/50">
                 {history.length} {history.length === 1 ? 'registro' : 'registros'}
-              </p>
-            )}
+              </span>
+            </div>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              Registro cronológico de modificaciones en la ficha del publicador con opción de reversión
+            </p>
           </div>
         </div>
-        <div className="text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
-          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </div>
-      </button>
+      </div>
 
-      {/* Content */}
-      {open && (
-        <div className="border-t border-zinc-100 dark:border-white/[0.06]">
-          {loading && (
-            <div className="flex items-center justify-center py-10 gap-3 text-zinc-400">
-              <Clock size={18} className="animate-spin" />
-              <span className="text-sm font-semibold">Cargando historial…</span>
-            </div>
-          )}
+      <div>
+        {loading && (
+          <div className="flex items-center justify-center py-10 gap-3 text-zinc-400">
+            <Clock size={18} className="animate-spin" />
+            <span className="text-sm font-semibold">Cargando historial…</span>
+          </div>
+        )}
 
-          {error && (
-            <div className="flex items-center gap-3 px-5 py-4 text-rose-600 dark:text-rose-400">
-              <AlertCircle size={16} />
-              <span className="text-xs font-semibold">{error}</span>
-            </div>
-          )}
+        {error && (
+          <div className="flex items-center gap-3 px-5 py-4 text-rose-600 dark:text-rose-400">
+            <AlertCircle size={16} />
+            <span className="text-xs font-semibold">{error}</span>
+          </div>
+        )}
 
-          {!loading && !error && history.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-10 gap-3 text-zinc-400 dark:text-zinc-600">
-              <History size={28} strokeWidth={1.5} />
-              <p className="text-xs font-semibold">Sin cambios registrados aún</p>
-            </div>
-          )}
+        {!loading && !error && history.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12 gap-2 text-zinc-400 dark:text-zinc-500">
+            <CheckCircle2 size={28} strokeWidth={1.5} className="text-emerald-500/70" />
+            <p className="text-xs font-bold text-zinc-600 dark:text-zinc-300">
+              Sin cambios registrados todavía
+            </p>
+            <p className="text-[11px] text-zinc-400 max-w-md text-center">
+              Cada vez que guardes cambios en el rol, grupo, bautismo, DPA o estado del publicador, aparecerán aquí para futura referencia o reversión.
+            </p>
+          </div>
+        )}
 
-          {!loading && !error && history.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-zinc-50/50 dark:bg-white/[0.01]">
-                    <th className="px-6 md:px-8 py-3 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Fecha</th>
-                    <th className="px-6 md:px-8 py-3 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Campo</th>
-                    <th className="px-6 md:px-8 py-3 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Antes</th>
-                    <th className="px-6 md:px-8 py-3 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">Después</th>
-                    <th className="px-6 md:px-8 py-3 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 text-right">Acción</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100 dark:divide-white/[0.04]">
-                  {history.map(row => {
-                    const label = FIELD_LABELS[row.campo] ?? row.campo;
-                    const reverted = isRevert(row);
-                    return (
-                      <tr
-                        key={row.id}
-                        className={`transition-colors hover:bg-zinc-50/60 dark:hover:bg-white/[0.02] ${reverted ? 'opacity-60' : ''}`}
-                      >
-                        <td className="px-6 md:px-8 py-3 whitespace-nowrap">
-                          <div className="flex flex-col">
-                            <span className="text-[12px] font-medium text-zinc-700 dark:text-zinc-300">
-                              {formatDate(row.fecha)}
-                            </span>
-                            <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 mt-0.5">
-                              {reverted ? '↩ Revert' : (row.cambiado_por ?? 'ADMIN')}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 md:px-8 py-3">
-                          <span className={`px-2 py-1 rounded-md text-[11px] font-medium border ${fieldBadge(row.campo)}`}>
-                            {label}
+        {!loading && !error && history.length > 0 && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-zinc-50/70 dark:bg-white/[0.02]">
+                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                    Fecha
+                  </th>
+                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                    Campo Modificado
+                  </th>
+                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                    Valor Anterior
+                  </th>
+                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
+                    Valor Nuevo
+                  </th>
+                  <th className="px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400 text-right">
+                    Acción
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100 dark:divide-white/[0.04]">
+                {history.map((row) => {
+                  const label = FIELD_LABELS[row.campo] ?? row.campo;
+                  const reverted = isRevert(row);
+                  return (
+                    <tr
+                      key={row.id}
+                      className={`transition-colors hover:bg-zinc-50/60 dark:hover:bg-white/[0.02] ${
+                        reverted ? 'opacity-65' : ''
+                      }`}
+                    >
+                      <td className="px-6 py-3.5 whitespace-nowrap">
+                        <div className="flex flex-col">
+                          <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+                            {formatDate(row.fecha)}
                           </span>
-                        </td>
-                        <td className="px-6 md:px-8 py-3 max-w-[140px]">
-                          <span className="text-[11px] text-zinc-400 dark:text-zinc-500 line-clamp-2 break-words">
-                            {formatValue(row.campo, row.valor_ant)}
+                          <span className="text-[10px] font-medium text-zinc-400 mt-0.5">
+                            {reverted ? '↩ Restauración' : row.cambiado_por ?? 'Secretaría'}
                           </span>
-                        </td>
-                        <td className="px-6 md:px-8 py-3 max-w-[140px]">
-                          <span className="text-[11px] font-medium text-zinc-700 dark:text-zinc-300 line-clamp-2 break-words">
-                            {formatValue(row.campo, row.valor_new)}
-                          </span>
-                        </td>
-                        <td className="px-6 md:px-8 py-3 text-right">
-                          {!reverted && row.valor_ant !== null && (
-                            <button
-                              onClick={() => handleRevert(row)}
-                              title={`Revertir "${label}" al valor anterior`}
-                              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-medium text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-white/[0.08] hover:border-rose-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all active:scale-95"
-                            >
-                              <RotateCcw size={11} />
-                              Revertir
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-3.5">
+                        <span
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border ${fieldBadge(
+                            row.campo
+                          )}`}
+                        >
+                          {label}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3.5 max-w-[180px]">
+                        <span className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 break-words">
+                          {formatValue(row.campo, row.valor_ant)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3.5 max-w-[180px]">
+                        <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 line-clamp-2 break-words">
+                          {formatValue(row.campo, row.valor_new)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3.5 text-right">
+                        {!reverted && row.valor_ant !== null && (
+                          <button
+                            type="button"
+                            onClick={() => handleRevert(row)}
+                            title={`Revertir "${label}" al valor anterior`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-white/[0.08] hover:border-rose-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all cursor-pointer"
+                          >
+                            <RotateCcw size={12} />
+                            Revertir
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,16 +1,18 @@
-import React from 'react';
+// src/components/PublisherEditor/sections/S21RecordsSection.tsx
+import React, { useMemo } from 'react';
 import { Publisher } from '../../../types';
-import { 
-  Check, 
-  Clock, 
-  Sparkles,
-  TrendingUp,
-  Download,
+import {
+  Check,
+  Clock,
+  FileSpreadsheet,
   CalendarDays,
   Award,
-  Lock
+  Lock,
+  CheckCheck,
+  Copy,
+  BarChart3,
+  Download,
 } from 'lucide-react';
-
 import { useToast } from '../../../context/ToastContext';
 import { usePermissions } from '../../../context/AuthContext';
 
@@ -21,178 +23,502 @@ interface S21RecordsSectionProps {
   handleS21ChangeLocal: (monthIdx: number, field: string, value: any) => void;
 }
 
+const SERVICE_YEARS = ['2024', '2025', '2026', '2027'];
+
+const MONTHS = [
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+];
+
 export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
   formData,
   selectedServiceYear,
   setSelectedServiceYear,
-  handleS21ChangeLocal
+  handleS21ChangeLocal,
 }) => {
-
-  const months = ['septiembre', 'octubre', 'noviembre', 'diciembre', 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto'];
-  const currentRecords = (formData.s21_records || {})[selectedServiceYear] || Array(12).fill(null).map((_, i) => ({
-    month: months[i],
-    participated: false,
-    bible_studies: 0,
-    auxiliary_pioneer: false,
-    hours: 0,
-    credit: 0,
-    late: false,
-    comments: ''
-  }));
-
   const { showToast } = useToast();
   const { canEditS21 } = usePermissions();
 
-  const chartData = currentRecords.map((record: any) => ({
-    name: record.month.substring(0, 3).toUpperCase(),
-    horas: (record.hours || 0) + (record.credit || 0),
-    estudios: record.bible_studies || 0
-  }));
+  const currentRecords = useMemo(() => {
+    const existing = (formData.s21_records || {})[selectedServiceYear];
+    if (Array.isArray(existing) && existing.length === 12) {
+      return existing;
+    }
+    return MONTHS.map((m, i) => ({
+      month: m,
+      participated: existing?.[i]?.participated ?? false,
+      bible_studies: existing?.[i]?.bible_studies ?? 0,
+      auxiliary_pioneer: existing?.[i]?.auxiliary_pioneer ?? false,
+      hours: existing?.[i]?.hours ?? 0,
+      credit: existing?.[i]?.credit ?? 0,
+      late: existing?.[i]?.late ?? false,
+      comments: existing?.[i]?.comments ?? '',
+    }));
+  }, [formData.s21_records, selectedServiceYear]);
+
+  const metrics = useMemo(() => {
+    const activeMonths = currentRecords.filter(
+      (r: any) => r.participated || (r.hours || 0) > 0
+    ).length;
+    const totalHours = currentRecords.reduce(
+      (acc: number, r: any) => acc + (Number(r.hours) || 0),
+      0
+    );
+    const totalCredit = currentRecords.reduce(
+      (acc: number, r: any) => acc + (Number(r.credit) || 0),
+      0
+    );
+    const combinedHours = totalHours + totalCredit;
+    const avgHours = activeMonths > 0 ? (totalHours / activeMonths).toFixed(1) : '0.0';
+    const maxStudies = Math.max(
+      0,
+      ...currentRecords.map((r: any) => Number(r.bible_studies) || 0)
+    );
+    const avgStudies =
+      activeMonths > 0
+        ? (
+            currentRecords.reduce(
+              (acc: number, r: any) => acc + (Number(r.bible_studies) || 0),
+              0
+            ) / activeMonths
+          ).toFixed(1)
+        : '0.0';
+    const auxMonths = currentRecords.filter((r: any) => r.auxiliary_pioneer).length;
+
+    return {
+      activeMonths,
+      totalHours,
+      totalCredit,
+      combinedHours,
+      avgHours,
+      maxStudies,
+      avgStudies,
+      auxMonths,
+    };
+  }, [currentRecords]);
+
+  const chartData = useMemo(
+    () =>
+      currentRecords.map((record: any) => ({
+        name: record.month.substring(0, 3).toUpperCase(),
+        horas: (Number(record.hours) || 0) + (Number(record.credit) || 0),
+        estudios: Number(record.bible_studies) || 0,
+        participated: Boolean(record.participated || (Number(record.hours) || 0) > 0),
+      })),
+    [currentRecords]
+  );
+
+  const handleMarkAllActive = () => {
+    if (!canEditS21) return;
+    currentRecords.forEach((_: any, idx: number) => {
+      handleS21ChangeLocal(idx, 'participated', true);
+    });
+    showToast(`Los 12 meses de ${selectedServiceYear} fueron marcados con participación`);
+  };
+
+  const handleCopyPreviousMonth = (idx: number) => {
+    if (!canEditS21 || idx <= 0) return;
+    const prev = currentRecords[idx - 1];
+    handleS21ChangeLocal(idx, 'participated', Boolean(prev.participated));
+    handleS21ChangeLocal(idx, 'bible_studies', Number(prev.bible_studies) || 0);
+    handleS21ChangeLocal(idx, 'auxiliary_pioneer', Boolean(prev.auxiliary_pioneer));
+    handleS21ChangeLocal(idx, 'hours', Number(prev.hours) || 0);
+    handleS21ChangeLocal(idx, 'credit', Number(prev.credit) || 0);
+    showToast(`Datos copiados de ${prev.month} a ${currentRecords[idx].month}`);
+  };
+
+  const handleExportCsv = () => {
+    const pubName = (formData.full_name || formData.name || 'Publicador').replace(/,/g, ' ');
+    const headers = [
+      'Mes',
+      'Participo',
+      'Cursos Biblicos',
+      'Precursor Auxiliar',
+      'Horas',
+      'Credito',
+      'Entregado Tarde',
+      'Observaciones',
+    ];
+    const rows = currentRecords.map((r: any) => [
+      r.month,
+      r.participated ? 'Si' : 'No',
+      r.bible_studies || 0,
+      r.auxiliary_pioneer ? 'Si' : 'No',
+      r.hours || 0,
+      r.credit || 0,
+      r.late ? 'Si' : 'No',
+      `"${(r.comments || '').replace(/"/g, '""')}"`,
+    ]);
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `S21_${pubName.replace(/\s+/g, '_')}_${selectedServiceYear}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast(`Registro S-21 (${selectedServiceYear}) exportado en CSV`);
+  };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 pb-10 max-w-4xl mx-auto w-full">
+    <div className="space-y-6 animate-in fade-in duration-300 pb-8">
       {!canEditS21 && (
-        <div className="flex items-center gap-2.5 p-3 text-xs font-medium text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl shadow-2xs">
+        <div className="flex items-center gap-2.5 px-4 py-3 text-xs font-medium text-amber-800 dark:text-amber-200 bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-2xl">
           <Lock size={15} className="shrink-0 text-amber-600 dark:text-amber-400" />
           <span>
-            <strong>Modo solo lectura:</strong> Las tarjetas de registro S-21 solo pueden ser modificadas por el Secretario o el Coordinador.
+            <strong>Modo consulta:</strong> El registro oficial S-21 solo puede ser modificado por el Secretario o el Coordinador.
           </span>
         </div>
       )}
-      
-      {/* CONTENEDOR PRINCIPAL */}
-      <div className="bg-white dark:bg-[#0f1623] p-4 md:p-6 rounded-[2rem] border border-zinc-100 dark:border-white/[0.04] shadow-sm">
-        
-        {/* CABECERA INTEGRADA */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#f59e0b] text-white rounded-xl flex items-center justify-center shadow-md shadow-[#f59e0b]/20">
-                 <TrendingUp size={16} />
+
+      {/* CONTENEDOR PRINCIPAL S-21 */}
+      <section className="bg-white dark:bg-[#0f1623] rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-xs overflow-hidden">
+        {/* Cabecera Editorial */}
+        <div className="p-6 md:px-8 border-b border-zinc-100 dark:border-white/[0.05] flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-200/50 dark:border-amber-500/20">
+              <FileSpreadsheet size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                  Registro de Publicador de la Congregación (S-21)
+                </h3>
+                <span className="text-xs font-mono tabular-nums text-zinc-400 dark:text-zinc-500">
+                  · Año de servicio {selectedServiceYear}
+                </span>
               </div>
-              <span className="text-[13px] font-bold text-zinc-800 dark:text-zinc-200">Registro Predicación</span>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                Control mensual de participación en el ministerio, cursos bíblicos, precursorado auxiliar y horas acreditadas
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-             <div className="flex items-center bg-[#f4f4f7] dark:bg-zinc-800/80 p-1 rounded-xl border border-zinc-200/50 dark:border-white/[0.06]">
-                {['2025', '2026'].map(year => (
-                  <button
-                    key={year}
-                    onClick={() => setSelectedServiceYear(year)}
-                    className={`px-4 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
-                      selectedServiceYear === year 
-                      ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/20' 
-                      : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'
-                    }`}
-                  >
-                    Año {year}
-                  </button>
-                ))}
-             </div>
-             
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Selector de Año de Servicio */}
+            <div className="inline-flex items-center bg-zinc-100 dark:bg-zinc-900 p-1 rounded-xl border border-zinc-200/70 dark:border-white/[0.06]">
+              {SERVICE_YEARS.map((year) => (
+                <button
+                  key={year}
+                  type="button"
+                  onClick={() => setSelectedServiceYear(year)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold tabular-nums transition-all cursor-pointer ${
+                    selectedServiceYear === year
+                      ? 'bg-white dark:bg-amber-500 text-amber-700 dark:text-white shadow-2xs'
+                      : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                  }`}
+                >
+                  {year}
+                </button>
+              ))}
+            </div>
 
+            {canEditS21 && (
+              <button
+                type="button"
+                onClick={handleMarkAllActive}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/50 dark:hover:bg-amber-900/60 text-amber-700 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/50 text-xs font-semibold transition-colors cursor-pointer"
+                title="Marcar participación en los 12 meses del año seleccionado"
+              >
+                <CheckCheck size={14} />
+                <span>Año activo</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={handleExportCsv}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-200 border border-zinc-200/60 dark:border-white/[0.06] text-xs font-semibold transition-colors cursor-pointer"
+              title="Descargar tarjeta S-21 en formato CSV"
+            >
+              <Download size={14} />
+              <span>CSV</span>
+            </button>
           </div>
         </div>
 
-        <div className="overflow-x-auto no-scrollbar pb-2">
-          <table className="w-full text-left border-separate border-spacing-y-1">
+        {/* Cinta de Métricas Anuales (Tabular Nums) */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-zinc-100 dark:divide-white/[0.05] bg-zinc-50/60 dark:bg-white/[0.01] border-b border-zinc-100 dark:border-white/[0.05]">
+          <div className="px-5 py-3.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
+              Meses Activos
+            </span>
+            <p className="text-lg font-bold font-mono tabular-nums text-zinc-900 dark:text-zinc-100 mt-0.5">
+              {metrics.activeMonths}{' '}
+              <span className="text-xs font-normal text-zinc-400">/ 12</span>
+            </p>
+          </div>
+          <div className="px-5 py-3.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
+              Total Horas
+            </span>
+            <p className="text-lg font-bold font-mono tabular-nums text-amber-600 dark:text-amber-400 mt-0.5">
+              {metrics.totalHours}
+              {metrics.totalCredit > 0 && (
+                <span className="text-xs font-semibold text-sky-600 dark:text-sky-400 ml-1">
+                  (+{metrics.totalCredit} cr.)
+                </span>
+              )}
+            </p>
+          </div>
+          <div className="px-5 py-3.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
+              Promedio Horas
+            </span>
+            <p className="text-lg font-bold font-mono tabular-nums text-zinc-900 dark:text-zinc-100 mt-0.5">
+              {metrics.avgHours} <span className="text-xs font-normal text-zinc-400">h/mes</span>
+            </p>
+          </div>
+          <div className="px-5 py-3.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
+              Cursos Bíblicos
+            </span>
+            <p className="text-lg font-bold font-mono tabular-nums text-violet-600 dark:text-violet-400 mt-0.5">
+              {metrics.avgStudies}{' '}
+              <span className="text-xs font-normal text-zinc-400">
+                prom. (máx {metrics.maxStudies})
+              </span>
+            </p>
+          </div>
+          <div className="px-5 py-3.5 col-span-2 sm:col-span-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block">
+              P. Auxiliar
+            </span>
+            <p className="text-lg font-bold font-mono tabular-nums text-emerald-600 dark:text-emerald-400 mt-0.5">
+              {metrics.auxMonths}{' '}
+              <span className="text-xs font-normal text-zinc-400">
+                {metrics.auxMonths === 1 ? 'mes' : 'meses'}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        {/* Tabla Oficial de 12 Meses */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="text-[12px] font-bold text-zinc-500 dark:text-zinc-400">
-                <th className="pb-3 px-3 font-black">Mes</th>
-                <th className="pb-3 px-2 text-center">Part.</th>
-                <th className="pb-3 px-2 text-center">Estudios</th>
-                <th className="pb-3 px-2 text-center">P. Aux.</th>
-                <th className="pb-3 px-2 text-center">Horas</th>
-                <th className="pb-3 px-2 text-center">Crédito</th>
-                <th className="pb-3 px-2 text-center">Tarde</th>
-                <th className="pb-3 px-3 min-w-[150px]">Observaciones</th>
+              <tr className="border-b border-zinc-100 dark:border-white/[0.05] text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 bg-zinc-50/30 dark:bg-white/[0.01]">
+                <th className="py-3 pl-6 pr-3">Mes</th>
+                <th className="py-3 px-2 text-center">Participó</th>
+                <th className="py-3 px-2 text-center">Cursos B.</th>
+                <th className="py-3 px-2 text-center">P. Aux.</th>
+                <th className="py-3 px-2 text-center">Horas</th>
+                <th className="py-3 px-2 text-center">Crédito</th>
+                <th className="py-3 px-2 text-center">Tarde</th>
+                <th className="py-3 pl-3 pr-6 min-w-[200px]">Observaciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-zinc-100 dark:divide-white/[0.04]">
               {currentRecords.map((record: any, idx: number) => {
-                const displayMonth = record.month.charAt(0).toUpperCase() + record.month.slice(1);
-                const isActive = record.participated || record.hours > 0;
-                
+                const displayMonth =
+                  record.month.charAt(0).toUpperCase() + record.month.slice(1);
+                const isActive = Boolean(record.participated || (record.hours || 0) > 0);
+
                 return (
-                  <tr key={idx} className={`group transition-all rounded-xl ${isActive ? 'bg-[#fffbeb] dark:bg-amber-900/10' : 'hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30'}`}>
-                    <td className="py-1.5 px-3 rounded-l-xl">
-                      <div className="flex items-center gap-2">
-                         <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition-colors ${isActive ? 'bg-amber-100 dark:bg-amber-900/30 border-amber-500/20 text-amber-600' : 'bg-zinc-50 dark:bg-zinc-800 border-zinc-200/50 dark:border-white/5 text-zinc-400'}`}>
-                           <CalendarDays size={12} />
-                         </div>
-                         <span className={`text-[12px] font-bold ${isActive ? 'text-amber-700 dark:text-amber-400' : 'text-zinc-500 dark:text-zinc-400'}`}>
-                           {displayMonth}
-                         </span>
+                  <tr
+                    key={record.month}
+                    className={`group transition-colors ${
+                      isActive
+                        ? 'bg-amber-50/30 dark:bg-amber-500/[0.04]'
+                        : 'hover:bg-zinc-50/70 dark:hover:bg-white/[0.02]'
+                    }`}
+                  >
+                    <td className="py-2.5 pl-6 pr-3 whitespace-nowrap">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5">
+                          <span
+                            className={`w-2 h-2 rounded-full shrink-0 ${
+                              isActive
+                                ? 'bg-amber-500'
+                                : 'bg-zinc-200 dark:bg-zinc-700'
+                            }`}
+                          />
+                          <span
+                            className={`text-xs font-bold ${
+                              isActive
+                                ? 'text-zinc-900 dark:text-zinc-100'
+                                : 'text-zinc-500 dark:text-zinc-400'
+                            }`}
+                          >
+                            {displayMonth}
+                          </span>
+                        </div>
+                        {canEditS21 && idx > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => handleCopyPreviousMonth(idx)}
+                            className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 rounded-md text-zinc-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/50 transition-all cursor-pointer"
+                            title={`Copiar valores del mes anterior (${currentRecords[idx - 1].month})`}
+                          >
+                            <Copy size={12} />
+                          </button>
+                        )}
                       </div>
                     </td>
-                    <td className="py-1.5 px-2">
-                      <button 
+
+                    {/* Participó */}
+                    <td className="py-2 px-2 text-center">
+                      <button
+                        type="button"
                         disabled={!canEditS21}
-                        onClick={() => handleS21ChangeLocal(idx, 'participated', !record.participated)}
-                        className={`w-7 h-7 mx-auto rounded-lg border transition-all flex items-center justify-center ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''} ${record.participated ? 'bg-amber-500 border-transparent text-white shadow-sm shadow-amber-500/30' : 'bg-white dark:bg-zinc-800 border-zinc-200 dark:border-white/[0.08] hover:border-amber-300'}`}
+                        onClick={() =>
+                          handleS21ChangeLocal(idx, 'participated', !record.participated)
+                        }
+                        className={`w-7 h-7 mx-auto rounded-lg border transition-all flex items-center justify-center cursor-pointer ${
+                          !canEditS21 ? 'opacity-60 cursor-not-allowed' : ''
+                        } ${
+                          record.participated
+                            ? 'bg-amber-500 border-amber-500 text-white shadow-2xs'
+                            : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-white/[0.1] hover:border-amber-400'
+                        }`}
+                        aria-label={`Participó en ${displayMonth}`}
                       >
-                        {record.participated && <Check size={14} strokeWidth={4} />}
+                        {record.participated && <Check size={14} strokeWidth={3.5} />}
                       </button>
                     </td>
-                    <td className="py-1.5 px-2 text-center">
-                      <div className="relative inline-block w-14">
-                        <input 
-                          type="number" 
-                          disabled={!canEditS21}
-                          value={record.bible_studies || ''} 
-                          onChange={e => handleS21ChangeLocal(idx, 'bible_studies', parseInt(e.target.value) || 0)}
-                          className={`w-full h-8 bg-white dark:bg-zinc-900 border rounded-lg text-center text-[12px] font-black focus:ring-0 outline-none transition-all ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''} ${record.bible_studies > 0 ? 'border-amber-500/30 text-amber-600 bg-amber-50/50 dark:bg-amber-900/20' : 'border-zinc-200/50 dark:border-white/[0.04] text-zinc-600 focus:border-amber-500/50'}`}
-                          placeholder="0"
-                        />
-                      </div>
-                    </td>
-                    <td className="py-1.5 px-2">
-                      <button 
+
+                    {/* Cursos Bíblicos */}
+                    <td className="py-2 px-2 text-center">
+                      <input
+                        type="number"
+                        min={0}
                         disabled={!canEditS21}
-                        onClick={() => handleS21ChangeLocal(idx, 'auxiliary_pioneer', !record.auxiliary_pioneer)}
-                        className={`w-7 h-7 mx-auto rounded-lg border transition-all flex items-center justify-center ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''} ${record.auxiliary_pioneer ? 'bg-[#10b981] border-transparent text-white shadow-sm shadow-[#10b981]/30' : 'bg-white dark:bg-zinc-800 border-zinc-200 dark:border-white/[0.08] hover:border-[#10b981]/40'}`}
+                        value={record.bible_studies || ''}
+                        onChange={(e) =>
+                          handleS21ChangeLocal(
+                            idx,
+                            'bible_studies',
+                            Math.max(0, parseInt(e.target.value, 10) || 0)
+                          )
+                        }
+                        placeholder="0"
+                        className={`w-14 h-8 mx-auto bg-white dark:bg-zinc-900 border rounded-lg text-center text-xs font-mono tabular-nums font-bold focus:outline-none transition-all ${
+                          !canEditS21 ? 'opacity-60 cursor-not-allowed' : ''
+                        } ${
+                          record.bible_studies > 0
+                            ? 'border-violet-300 dark:border-violet-500/40 text-violet-700 dark:text-violet-300 bg-violet-50/50 dark:bg-violet-950/30'
+                            : 'border-zinc-200/80 dark:border-white/[0.06] text-zinc-600 dark:text-zinc-300 focus:border-amber-500'
+                        }`}
+                      />
+                    </td>
+
+                    {/* Precursor Auxiliar */}
+                    <td className="py-2 px-2 text-center">
+                      <button
+                        type="button"
+                        disabled={!canEditS21}
+                        onClick={() =>
+                          handleS21ChangeLocal(
+                            idx,
+                            'auxiliary_pioneer',
+                            !record.auxiliary_pioneer
+                          )
+                        }
+                        className={`w-7 h-7 mx-auto rounded-lg border transition-all flex items-center justify-center cursor-pointer ${
+                          !canEditS21 ? 'opacity-60 cursor-not-allowed' : ''
+                        } ${
+                          record.auxiliary_pioneer
+                            ? 'bg-emerald-600 border-emerald-600 text-white shadow-2xs'
+                            : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-white/[0.1] hover:border-emerald-400'
+                        }`}
+                        aria-label={`Precursor auxiliar en ${displayMonth}`}
                       >
-                        {record.auxiliary_pioneer && <Award size={14} strokeWidth={4} />}
+                        {record.auxiliary_pioneer && <Award size={13} strokeWidth={2.5} />}
                       </button>
                     </td>
-                    <td className="py-1.5 px-2 text-center">
-                      <input 
-                        type="number" 
+
+                    {/* Horas */}
+                    <td className="py-2 px-2 text-center">
+                      <input
+                        type="number"
+                        min={0}
                         disabled={!canEditS21}
-                        value={record.hours || ''} 
-                        onChange={e => handleS21ChangeLocal(idx, 'hours', parseInt(e.target.value) || 0)}
-                        className={`w-14 h-8 mx-auto bg-white dark:bg-zinc-900 border rounded-lg text-center text-[12px] font-black focus:ring-0 outline-none transition-all ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''} ${record.hours > 0 ? 'border-amber-500/30 text-amber-600 bg-amber-50/50 dark:bg-amber-900/20' : 'border-zinc-200/50 dark:border-white/[0.04] text-zinc-600 focus:border-amber-500/50'}`}
+                        value={record.hours || ''}
+                        onChange={(e) => {
+                          const val = Math.max(0, parseInt(e.target.value, 10) || 0);
+                          handleS21ChangeLocal(idx, 'hours', val);
+                          if (val > 0 && !record.participated) {
+                            handleS21ChangeLocal(idx, 'participated', true);
+                          }
+                        }}
                         placeholder="0"
+                        className={`w-16 h-8 mx-auto bg-white dark:bg-zinc-900 border rounded-lg text-center text-xs font-mono tabular-nums font-bold focus:outline-none transition-all ${
+                          !canEditS21 ? 'opacity-60 cursor-not-allowed' : ''
+                        } ${
+                          record.hours > 0
+                            ? 'border-amber-300 dark:border-amber-500/40 text-amber-700 dark:text-amber-300 bg-amber-50/50 dark:bg-amber-950/30'
+                            : 'border-zinc-200/80 dark:border-white/[0.06] text-zinc-600 dark:text-zinc-300 focus:border-amber-500'
+                        }`}
                       />
                     </td>
-                    <td className="py-1.5 px-2 text-center">
-                      <input 
-                        type="number" 
+
+                    {/* Crédito */}
+                    <td className="py-2 px-2 text-center">
+                      <input
+                        type="number"
+                        min={0}
                         disabled={!canEditS21}
-                        value={record.credit || ''} 
-                        onChange={e => handleS21ChangeLocal(idx, 'credit', parseInt(e.target.value) || 0)}
-                        className={`w-14 h-8 mx-auto bg-white dark:bg-zinc-900 border rounded-lg text-center text-[12px] font-black focus:ring-0 outline-none transition-all ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''} ${record.credit > 0 ? 'border-blue-500/30 text-blue-600 bg-blue-50/50 dark:bg-blue-900/20' : 'border-zinc-200/50 dark:border-white/[0.04] text-zinc-600 focus:border-blue-500/50'}`}
+                        value={record.credit || ''}
+                        onChange={(e) =>
+                          handleS21ChangeLocal(
+                            idx,
+                            'credit',
+                            Math.max(0, parseInt(e.target.value, 10) || 0)
+                          )
+                        }
                         placeholder="0"
+                        className={`w-14 h-8 mx-auto bg-white dark:bg-zinc-900 border rounded-lg text-center text-xs font-mono tabular-nums font-bold focus:outline-none transition-all ${
+                          !canEditS21 ? 'opacity-60 cursor-not-allowed' : ''
+                        } ${
+                          record.credit > 0
+                            ? 'border-sky-300 dark:border-sky-500/40 text-sky-700 dark:text-sky-300 bg-sky-50/50 dark:bg-sky-950/30'
+                            : 'border-zinc-200/80 dark:border-white/[0.06] text-zinc-600 dark:text-zinc-300 focus:border-sky-500'
+                        }`}
                       />
                     </td>
-                    <td className="py-1.5 px-2 text-center">
-                      <button 
+
+                    {/* Entregado Tarde */}
+                    <td className="py-2 px-2 text-center">
+                      <button
+                        type="button"
                         disabled={!canEditS21}
                         onClick={() => handleS21ChangeLocal(idx, 'late', !record.late)}
-                        className={`w-7 h-7 mx-auto rounded-lg border transition-all flex items-center justify-center ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''} ${record.late ? 'bg-rose-500 border-transparent text-white shadow-sm shadow-rose-500/30' : 'bg-white dark:bg-zinc-800 border-zinc-200 dark:border-white/[0.08] hover:border-rose-300'}`}
+                        className={`w-7 h-7 mx-auto rounded-lg border transition-all flex items-center justify-center cursor-pointer ${
+                          !canEditS21 ? 'opacity-60 cursor-not-allowed' : ''
+                        } ${
+                          record.late
+                            ? 'bg-rose-500 border-rose-500 text-white shadow-2xs'
+                            : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-white/[0.1] hover:border-rose-400'
+                        }`}
+                        title="Informe entregado después del cierre mensual"
                       >
-                        {record.late && <Clock size={14} strokeWidth={4} />}
+                        {record.late && <Clock size={13} strokeWidth={2.5} />}
                       </button>
                     </td>
-                    <td className="py-1.5 px-3 rounded-r-xl">
-                      <input 
-                        type="text" 
+
+                    {/* Observaciones */}
+                    <td className="py-2 pl-3 pr-6">
+                      <input
+                        type="text"
                         disabled={!canEditS21}
-                        value={record.comments || ''} 
-                        onChange={e => handleS21ChangeLocal(idx, 'comments', e.target.value)}
-                        placeholder="Observaciones..."
-                        className={`kf-input ${!canEditS21 ? 'opacity-60 cursor-not-allowed' : ''}`}
+                        value={record.comments || ''}
+                        onChange={(e) => handleS21ChangeLocal(idx, 'comments', e.target.value)}
+                        placeholder="Nota mensual (ej. P. Aux. 15h, salud...)"
+                        className={`w-full h-8 px-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-white/[0.06] text-xs text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:border-amber-500 ${
+                          !canEditS21 ? 'opacity-60 cursor-not-allowed' : ''
+                        }`}
                       />
                     </td>
                   </tr>
@@ -201,57 +527,81 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
 
-      {/* GRÁFICO HISTÓRICO */}
-      <div className="bg-white dark:bg-[#0f1623] p-4 md:p-6 rounded-[2rem] border border-zinc-100 dark:border-white/[0.04] shadow-sm mt-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h4 className="text-base font-bold text-zinc-800 dark:text-zinc-200">Rendimiento del Año {selectedServiceYear}</h4>
-          <div className="flex items-center gap-4 text-xs font-bold">
+      {/* GRÁFICO DE TENDENCIA ANUAL */}
+      <section className="bg-white dark:bg-[#0f1623] p-6 md:p-8 rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+          <div className="flex items-center gap-2.5">
+            <BarChart3 size={18} className="text-amber-500" />
+            <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+              Curva de Actividad del Año de Servicio {selectedServiceYear}
+            </h4>
+          </div>
+          <div className="flex items-center gap-4 text-xs font-semibold">
             <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
-              <span className="w-3 h-3 rounded-sm bg-amber-500 inline-block" /> Horas
+              <span className="w-2.5 h-2.5 rounded-xs bg-amber-500 inline-block" /> Horas (con crédito)
             </span>
             <span className="flex items-center gap-1.5 text-violet-600 dark:text-violet-400">
-              <span className="w-3 h-1 bg-violet-500 inline-block rounded-full" /> Estudios
+              <span className="w-3 h-0.5 bg-violet-500 inline-block rounded-full" /> Cursos bíblicos
             </span>
           </div>
         </div>
-        <div className="h-56 w-full relative pt-2">
-          <svg className="w-full h-full overflow-visible" viewBox="0 0 600 200" preserveAspectRatio="none">
-            {/* Grid lines */}
+
+        <div className="h-52 w-full relative">
+          <svg
+            className="w-full h-full overflow-visible"
+            viewBox="0 0 600 190"
+            preserveAspectRatio="none"
+          >
             {[20, 65, 110, 155].map((y, idx) => (
-              <line key={idx} x1="10" y1={y} x2="590" y2={y} stroke="currentColor" className="text-zinc-200 dark:text-white/5" strokeDasharray="3 3" />
+              <line
+                key={idx}
+                x1="10"
+                y1={y}
+                x2="590"
+                y2={y}
+                stroke="currentColor"
+                className="text-zinc-100 dark:text-white/[0.05]"
+                strokeDasharray="3 3"
+              />
             ))}
-            {/* Bars for Horas */}
+
             {chartData.map((d: any, idx: number) => {
               const maxHours = Math.max(30, ...chartData.map((c: any) => c.horas));
-              const height = maxHours > 0 ? (d.horas / maxHours) * 135 : 0;
+              const height = maxHours > 0 ? (d.horas / maxHours) * 130 : 0;
               const x = idx * 48 + 22;
-              const y = 160 - height;
+              const y = 155 - height;
               return (
-                <g key={idx} className="group cursor-pointer">
+                <g key={idx} className="group">
                   <rect
                     x={x}
-                    y={y}
+                    y={d.horas > 0 ? y : 151}
                     width={22}
-                    height={Math.max(2, height)}
+                    height={d.horas > 0 ? Math.max(4, height) : 4}
                     rx={4}
-                    className="fill-amber-500 hover:fill-amber-400 transition-colors"
+                    className={
+                      d.horas > 0
+                        ? 'fill-amber-500 hover:fill-amber-400 transition-colors'
+                        : d.participated
+                        ? 'fill-amber-500/35'
+                        : 'fill-zinc-200 dark:fill-zinc-800'
+                    }
                   />
                   <text
                     x={x + 11}
-                    y={180}
+                    y={175}
                     textAnchor="middle"
-                    className="text-[10px] font-bold fill-zinc-400 select-none"
+                    className="text-[10px] font-mono font-bold fill-zinc-400 select-none"
                   >
                     {d.name}
                   </text>
                   {d.horas > 0 && (
                     <text
                       x={x + 11}
-                      y={Math.max(14, y - 4)}
+                      y={Math.max(12, y - 5)}
                       textAnchor="middle"
-                      className="text-[9px] font-bold fill-amber-600 dark:fill-amber-400 select-none opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="text-[9px] font-mono font-bold fill-amber-600 dark:fill-amber-400 select-none"
                     >
                       {d.horas}h
                     </text>
@@ -259,31 +609,33 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
                 </g>
               );
             })}
-            {/* Line for Estudios */}
+
             {(() => {
               const maxEstudios = Math.max(5, ...chartData.map((c: any) => c.estudios));
-              const points = chartData.map((d: any, idx: number) => {
-                const x = idx * 48 + 33;
-                const y = 160 - (d.estudios / maxEstudios) * 120;
-                return `${x},${y}`;
-              }).join(' ');
+              const points = chartData
+                .map((d: any, idx: number) => {
+                  const x = idx * 48 + 33;
+                  const y = 155 - (d.estudios / maxEstudios) * 115;
+                  return `${x},${y}`;
+                })
+                .join(' ');
               return (
                 <>
                   <polyline
                     fill="none"
                     stroke="#8b5cf6"
-                    strokeWidth={2.5}
+                    strokeWidth={2}
                     points={points}
                   />
                   {chartData.map((d: any, idx: number) => {
                     const x = idx * 48 + 33;
-                    const y = 160 - (d.estudios / maxEstudios) * 120;
+                    const y = 155 - (d.estudios / maxEstudios) * 115;
                     return (
                       <circle
                         key={idx}
                         cx={x}
                         cy={y}
-                        r={3.5}
+                        r={3}
                         fill="#fff"
                         stroke="#8b5cf6"
                         strokeWidth={2}
@@ -295,41 +647,7 @@ export const S21RecordsSection: React.FC<S21RecordsSectionProps> = ({
             })()}
           </svg>
         </div>
-      </div>
-
-      {/* RESUMEN ANUAL TIPO BANNER */}
-      <div className="bg-amber-500 dark:bg-[#d97706] rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-xl shadow-amber-500/20">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-20 -mt-32 blur-3xl group-hover:bg-white/20 transition-all duration-700 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/5 rounded-full -ml-20 -mb-20 blur-2xl pointer-events-none" />
-        
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-6">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-inner border border-white/30 transform group-hover:rotate-12 transition-transform duration-500">
-              <Sparkles size={32} />
-            </div>
-            <div>
-              <h4 className="text-2xl font-bold leading-none text-white">Resumen Anual</h4>
-              <p className="text-[12px] font-bold text-white/80 mt-2">Cierre de año de servicio {selectedServiceYear}</p>
-            </div>
-          </div>
-          
-          <div className="flex gap-1 bg-black/10 backdrop-blur-md p-1.5 rounded-3xl border border-white/10 w-full md:w-auto overflow-x-auto">
-            <div className="flex flex-col items-center justify-center px-8 py-3 bg-white/5 rounded-2xl min-w-[120px]">
-              <p className="text-[11px] font-bold text-white/70 mb-1">Total Horas</p>
-              <p className="text-3xl font-black text-white">{currentRecords.reduce((acc: number, r: any) => acc + (r.hours || 0) + (r.credit || 0), 0)}</p>
-            </div>
-            <div className="flex flex-col items-center justify-center px-8 py-3 bg-white/5 rounded-2xl min-w-[120px]">
-              <p className="text-[11px] font-bold text-white/70 mb-1">Promedio</p>
-              <p className="text-3xl font-black text-white">{(currentRecords.reduce((acc: number, r: any) => acc + (r.hours || 0), 0) / (currentRecords.filter((r: any) => r.participated).length || 1)).toFixed(1)}</p>
-            </div>
-            <div className="flex flex-col items-center justify-center px-8 py-3 bg-white/5 rounded-2xl min-w-[120px]">
-              <p className="text-[11px] font-bold text-white/70 mb-1">Max. Estudios</p>
-              <p className="text-3xl font-black text-white">{Math.max(0, ...currentRecords.map((r: any) => r.bible_studies || 0))}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      </section>
     </div>
   );
 };

@@ -8,7 +8,6 @@ import { evaluatePinStrength } from '../../../utils/theocraticSecurity';
 import {
   KeyRound,
   Shield,
-  ShieldCheck,
   RefreshCw,
   Copy,
   Check,
@@ -17,14 +16,10 @@ import {
   Eye,
   EyeOff,
   Printer,
-  Sparkles,
-  AlertCircle,
   CheckCircle2,
   UserCheck,
-  ExternalLink,
   Trash2,
   X,
-  Smartphone,
   Lock,
   Save,
 } from 'lucide-react';
@@ -42,13 +37,11 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
   handleChange,
   showToast,
   onSavePublisher,
-  isSaving = false,
 }) => {
   const {
     assignPersonalPinToPublisher,
     generateUniquePublisherPin,
     removePublisherPin,
-    publisherPinsList,
   } = useAuth();
 
   const { settings, updatePublisher, publishers } = useCongregation();
@@ -70,7 +63,6 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
   const currentPin = formData.personalPin || (formData as any).pin || '';
   const currentRole: TheocraticRole = formData.theocraticRole || 'publico';
 
-  // Explicit Save PIN handler
   const handleSavePin = async () => {
     if (!currentPin || currentPin.trim().length < 4) {
       if (showToast) {
@@ -83,7 +75,6 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
     try {
       const cleanPin = currentPin.trim();
 
-      // 1. Asignar en AuthContext (lista reactiva de PINs de publicadores)
       assignPersonalPinToPublisher(
         publisherId,
         cleanPin,
@@ -93,11 +84,9 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
         formData.privilege || formData.role
       );
 
-      // 2. Actualizar el estado local de formData
       handleChange('personalPin', cleanPin);
       handleChange('theocraticRole', currentRole);
 
-      // 3. Persistir en la congregación (Firestore y LocalStorage)
       const existingPub = publishers.find(
         (p) => p.id === publisherId || (p as any).nid === publisherId
       );
@@ -109,7 +98,6 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
         });
       }
 
-      // 4. Si el formulario padre tiene un callback onSavePublisher, ejecutarlo
       if (onSavePublisher) {
         onSavePublisher();
       }
@@ -118,7 +106,7 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
       setTimeout(() => setSaveSuccess(false), 3000);
 
       if (showToast) {
-        showToast(`¡PIN personal (${cleanPin}) guardado con éxito para ${publisherName}!`, 'success');
+        showToast(`PIN personal (${cleanPin}) guardado con éxito para ${publisherName}`, 'success');
       }
     } catch (err) {
       console.error('Error guardando PIN:', err);
@@ -134,12 +122,10 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
     return evaluatePinStrength(currentPin);
   }, [currentPin]);
 
-  // Generate unique PIN handler
   const handleGenerateNewPin = () => {
     const newUniquePin = generateUniquePublisherPin();
     handleChange('personalPin', newUniquePin);
 
-    // Sync to auth context
     assignPersonalPinToPublisher(
       publisherId,
       newUniquePin,
@@ -150,11 +136,10 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
     );
 
     if (showToast) {
-      showToast(`¡PIN único ${newUniquePin} generado con éxito!`, 'success');
+      showToast(`PIN único ${newUniquePin} generado con éxito`, 'success');
     }
   };
 
-  // Change PIN manually handler
   const handlePinInputChange = (val: string) => {
     const numericVal = val.replace(/\D/g, '').slice(0, 8);
     handleChange('personalPin', numericVal);
@@ -171,7 +156,6 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
     }
   };
 
-  // Change system role handler
   const handleRoleChange = (role: TheocraticRole) => {
     handleChange('theocraticRole', role);
 
@@ -191,33 +175,35 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
     }
   };
 
-  // Revoke PIN handler
   const handleRevokePin = () => {
-    if (window.confirm(`¿Estás seguro de que deseas revocar el PIN personal de ${publisherName}?`)) {
-      handleChange('personalPin', '');
-      removePublisherPin(publisherId);
-      if (showToast) {
-        showToast('PIN personal revocado correctamente', 'info');
-      }
+    handleChange('personalPin', '');
+    removePublisherPin(publisherId);
+    if (showToast) {
+      showToast('PIN personal revocado correctamente', 'info');
     }
   };
 
-  // Credentials text for copy and WhatsApp
   const credentialsText = useMemo(() => {
     const congTitle = settings.congregationName?.trim() || 'Mi Congregación';
     const congId = settings.congregationNumber || settings.congregationId || 'Configurado';
     const roleTitle = THEOCRATIC_ROLES[currentRole]?.name || 'Publicador';
 
-    return `🔐 CREDENCIALES TEOCRÁTICAS KONGRE (PORTAL DEL PUBLICADOR)
+    return `CREDENCIALES DEL PORTAL CONGREGACIONAL
 ━━━━━━━━━━━━━━━━━━━━
-👤 Hermano(a): ${publisherName}
-🏛️ Congregación: ${congTitle}
-📋 ID de Congregación: ${congId}
-👔 Rol Asignado: ${roleTitle}
-🔑 Tu PIN Personal Único: ${currentPin || 'Sin asignar'}
+Hermano(a): ${publisherName}
+Congregación: ${congTitle} (ID: ${congId})
+Rol asignado: ${roleTitle}
+PIN Personal Único: ${currentPin || 'Sin asignar'}
 ━━━━━━━━━━━━━━━━━━━━
-📲 Usa este PIN personal para identificarte en la aplicación de la congregación, consultar tus asignaciones en vivo, confirmar asistencia y registrar tu informe mensual de predicación.`;
-  }, [publisherName, settings.congregationName, settings.congregationNumber, settings.congregationId, currentRole, currentPin]);
+Usa este PIN personal para consultar tus asignaciones en vivo, confirmar asistencia y enviar tu informe mensual de predicación.`;
+  }, [
+    publisherName,
+    settings.congregationName,
+    settings.congregationNumber,
+    settings.congregationId,
+    currentRole,
+    currentPin,
+  ]);
 
   const handleCopyCredentials = () => {
     if (!currentPin) {
@@ -242,10 +228,9 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
       ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encoded}`
       : `https://api.whatsapp.com/send?text=${encoded}`;
 
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  // Generate QR code when slip modal opens
   useEffect(() => {
     if (showSlipModal && qrCanvasRef.current && currentPin) {
       const congId = settings.congregationNumber || settings.congregationId || 'cong_default';
@@ -271,70 +256,44 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
           },
         },
         (error) => {
-          if (error) console.error('Error generando QR teocrático:', error);
+          if (error) console.error('Error generando QR:', error);
         }
       );
     }
   }, [showSlipModal, currentPin, settings, publisherId, publisherName, currentRole]);
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      {/* 1. Header con Resumen de Acceso Teocrático */}
-      <div className="bg-white dark:bg-[#0f1623] p-6 rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="p-3 bg-purple-50 dark:bg-purple-500/10 rounded-2xl text-purple-600 dark:text-purple-400 font-bold shadow-xs shrink-0 ring-4 ring-purple-500/5">
-            <KeyRound size={24} />
+    <section className="bg-white dark:bg-[#0f1623] p-6 md:p-8 rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-xs space-y-6 animate-in fade-in duration-300">
+      {/* 1. Cabecera Unificada de Credenciales */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-zinc-100 dark:border-white/[0.05]">
+        <div className="flex items-start gap-3.5">
+          <div className="w-11 h-11 bg-purple-50 dark:bg-purple-500/10 rounded-2xl text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 border border-purple-200/50 dark:border-purple-500/20">
+            <KeyRound size={20} />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-                Acceso Teocrático y PIN Personal
+                Credenciales de Acceso y PIN Personal
               </h3>
-              <span
-                className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                  currentPin
-                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
-                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700'
-                }`}
-              >
-                {currentPin ? '✓ PIN Asignado' : 'Sin PIN Asignado'}
+              <span className="text-xs font-mono tabular-nums text-zinc-400 dark:text-zinc-500">
+                · {currentPin ? `PIN activo (${currentPin.length} dígitos)` : 'Sin PIN configurado'} ·{' '}
+                {THEOCRATIC_ROLES[currentRole]?.shortName || 'Publicador'}
               </span>
             </div>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Identificación individual segura para la aplicación móvil y portal del publicador.
+              Identificación individual segura para el portal móvil del publicador y control de permisos por rol
             </p>
           </div>
         </div>
 
-        {/* Acciones Rápidas */}
+        {/* Acciones de Compartir y Guardar */}
         <div className="flex items-center gap-2 flex-wrap">
-          <button
-            type="button"
-            onClick={handleSavePin}
-            disabled={!currentPin || currentPin.length < 4 || isSavingLocal}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-xs cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed ${
-              saveSuccess
-                ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-500/20'
-                : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/20'
-            }`}
-            title="Guardar PIN personal inmediatamente"
-          >
-            {isSavingLocal ? (
-              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : saveSuccess ? (
-              <Check size={14} className="text-white" />
-            ) : (
-              <Save size={14} />
-            )}
-            <span>{saveSuccess ? '¡Guardado!' : 'Guardar PIN'}</span>
-          </button>
-
           <button
             type="button"
             onClick={handleCopyCredentials}
             disabled={!currentPin}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-zinc-200 border border-slate-200/60 dark:border-white/[0.06] text-xs font-semibold transition-all cursor-pointer disabled:opacity-50 active:scale-95"
-            title="Copiar credenciales teocráticas"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-200 border border-zinc-200/60 dark:border-white/[0.06] text-xs font-semibold transition-all cursor-pointer disabled:opacity-40"
+            title="Copiar credenciales"
           >
             {copiedText ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
             <span>{copiedText ? 'Copiado' : 'Copiar'}</span>
@@ -344,7 +303,7 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
             type="button"
             onClick={handleShareWhatsApp}
             disabled={!currentPin}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-semibold transition-all shadow-xs disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all shadow-2xs disabled:opacity-40 cursor-pointer"
             title="Enviar credenciales por WhatsApp"
           >
             <Share2 size={14} />
@@ -355,36 +314,53 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
             type="button"
             onClick={() => setShowSlipModal(true)}
             disabled={!currentPin}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 active:scale-95 text-white text-xs font-semibold transition-all shadow-xs disabled:opacity-50 cursor-pointer"
-            title="Ver papeleta de acceso teocrático para imprimir o escanear QR"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition-all shadow-2xs disabled:opacity-40 cursor-pointer"
+            title="Generar papeleta con código QR"
           >
             <QrCode size={14} />
             <span>Papeleta QR</span>
           </button>
+
+          <button
+            type="button"
+            onClick={handleSavePin}
+            disabled={!currentPin || currentPin.length < 4 || isSavingLocal}
+            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-40 ${
+              saveSuccess
+                ? 'bg-emerald-600 hover:bg-emerald-500'
+                : 'bg-indigo-600 hover:bg-indigo-500'
+            }`}
+          >
+            {isSavingLocal ? (
+              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : saveSuccess ? (
+              <Check size={14} />
+            ) : (
+              <Save size={14} />
+            )}
+            <span>{saveSuccess ? 'PIN Guardado' : 'Guardar PIN'}</span>
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 2. Tarjeta: Configuración del PIN Personal */}
-        <div className="bg-white dark:bg-[#0f1623] p-6 rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-xs space-y-5">
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-white/[0.04]">
-            <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                PIN Personal del Publicador
-              </h4>
+      {/* 2. Espacio de Trabajo en 2 Columnas */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Columna Izquierda: Configuración del PIN (5 cols) */}
+        <div className="lg:col-span-5 bg-zinc-50/70 dark:bg-white/[0.02] p-5 rounded-2xl border border-zinc-200/70 dark:border-white/[0.06] flex flex-col justify-between space-y-5">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Lock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                  PIN Personal (4 a 8 dígitos)
+                </h4>
+              </div>
+              {currentPin && (
+                <span className="text-xs font-mono tabular-nums font-bold text-purple-600 dark:text-purple-400">
+                  {currentPin.length} dígitos
+                </span>
+              )}
             </div>
-            {currentPin && (
-              <span className="text-[11px] font-mono font-bold text-purple-600 dark:text-purple-400">
-                {currentPin.length} dígitos
-              </span>
-            )}
-          </div>
-
-          <div className="space-y-3">
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-              Código PIN Personal (4 a 8 dígitos)
-            </label>
 
             <div className="relative">
               <input
@@ -393,25 +369,24 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
                 maxLength={8}
                 value={currentPin}
                 onChange={(e) => handlePinInputChange(e.target.value)}
-                placeholder="Ej. 5832"
-                className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-center tracking-widest text-xl font-bold focus:ring-2 focus:ring-purple-500 focus:outline-hidden transition-all"
+                placeholder="••••"
+                className="w-full px-4 py-3.5 rounded-2xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white font-mono tabular-nums text-center tracking-[0.35em] text-xl font-bold focus:border-purple-500 focus:outline-none transition-all"
               />
               <button
                 type="button"
                 onClick={() => setShowPin(!showPin)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-all cursor-pointer"
-                title={showPin ? 'Ocultar PIN' : 'Ver PIN'}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1.5 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-all cursor-pointer"
+                title={showPin ? 'Ocultar PIN' : 'Mostrar PIN'}
               >
-                {showPin ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPin ? <EyeOff size={17} /> : <Eye size={17} />}
               </button>
             </div>
 
-            {/* Indicador de Fortaleza del PIN */}
             {currentPin ? (
-              <div className="flex items-center justify-between gap-2 pt-1 text-xs">
+              <div className="flex items-center justify-between gap-2 text-xs pt-0.5">
                 <div className="flex items-center gap-1.5">
-                  <div
-                    className={`w-2.5 h-2.5 rounded-full ${
+                  <span
+                    className={`w-2 h-2 rounded-full ${
                       pinEvaluation.isWeak
                         ? 'bg-rose-500'
                         : pinEvaluation.score >= 3
@@ -424,295 +399,198 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
                   </span>
                 </div>
                 {pinEvaluation.message && (
-                  <span className="text-[11px] text-slate-400 text-right">
+                  <span className="text-[11px] text-zinc-400 text-right">
                     {pinEvaluation.message}
                   </span>
                 )}
               </div>
             ) : (
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                El publicador usará este PIN para ingresar a su vista personal desde cualquier dispositivo en el Salón del Reino o desde su teléfono.
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                Genera o escribe un código numérico único para que {publisherName} pueda ingresar a su portal personal.
               </p>
             )}
+          </div>
 
-            {/* Botones de Acción de PIN */}
-            <div className="flex items-center gap-2 pt-3 flex-wrap">
+          <div className="pt-4 border-t border-zinc-200/60 dark:border-white/[0.05] flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={handleGenerateNewPin}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white dark:bg-zinc-900 hover:bg-purple-50 dark:hover:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800/50 text-xs font-bold transition-all cursor-pointer"
+            >
+              <RefreshCw size={13} />
+              <span>Generar PIN Único</span>
+            </button>
+
+            {currentPin && (
               <button
                 type="button"
-                onClick={handleSavePin}
-                disabled={!currentPin || currentPin.length < 4 || isSavingLocal}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-xs sm:text-sm font-bold transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
-                  saveSuccess
-                    ? 'bg-emerald-600 shadow-emerald-600/20'
-                    : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/20'
-                }`}
-                title="Guardar PIN personal en el sistema"
+                onClick={handleRevokePin}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white dark:bg-zinc-900 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-zinc-200 dark:border-white/[0.08] text-xs font-bold transition-all cursor-pointer"
+                title="Revocar PIN"
               >
-                {isSavingLocal ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Guardando PIN...</span>
-                  </>
-                ) : saveSuccess ? (
-                  <>
-                    <CheckCircle2 size={16} />
-                    <span>¡PIN Guardado Exitosamente!</span>
-                  </>
-                ) : (
-                  <>
-                    <Save size={16} />
-                    <span>Guardar PIN Personal</span>
-                  </>
-                )}
+                <Trash2 size={13} />
+                <span>Revocar</span>
               </button>
-
-              <button
-                type="button"
-                onClick={handleGenerateNewPin}
-                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-bold transition-all cursor-pointer active:scale-95"
-              >
-                <Sparkles size={14} className="text-purple-600 dark:text-purple-400" />
-                <span>Generar PIN Seguro</span>
-              </button>
-
-              {currentPin && (
-                <button
-                  type="button"
-                  onClick={handleRevokePin}
-                  className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all cursor-pointer active:scale-95"
-                  title="Revocar PIN"
-                >
-                  <Trash2 size={14} />
-                  <span>Revocar</span>
-                </button>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
-        {/* 3. Tarjeta: Rol Operativo en el Sistema (Permisos de Aplicación) */}
-        <div className="bg-white dark:bg-[#0f1623] p-6 rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-xs space-y-5">
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-white/[0.04]">
+        {/* Columna Derecha: Rol Operativo en el Sistema (7 cols) */}
+        <div className="lg:col-span-7 bg-zinc-50/70 dark:bg-white/[0.02] p-5 rounded-2xl border border-zinc-200/70 dark:border-white/[0.06] space-y-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-              <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                Rol del Sistema (Permisos de Aplicación)
+              <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
+                Nivel de Acceso y Permisos en la Aplicación
               </h4>
             </div>
-            <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                THEOCRATIC_ROLES[currentRole]?.badgeColor || 'bg-slate-100 text-slate-700'
-              }`}
-            >
+            <span className="text-xs font-semibold text-purple-600 dark:text-purple-400">
               {THEOCRATIC_ROLES[currentRole]?.shortName || 'Publicador'}
             </span>
           </div>
 
-          <div className="space-y-3">
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-              Nivel de Acceso Teocrático
-            </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {(Object.keys(THEOCRATIC_ROLES) as TheocraticRole[]).map((rKey) => {
+              const rInfo = THEOCRATIC_ROLES[rKey];
+              const isSelected = currentRole === rKey;
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              {(Object.keys(THEOCRATIC_ROLES) as TheocraticRole[]).map((rKey) => {
-                const rInfo = THEOCRATIC_ROLES[rKey];
-                const isSelected = currentRole === rKey;
-
-                return (
-                  <button
-                    key={rKey}
-                    type="button"
-                    onClick={() => handleRoleChange(rKey)}
-                    className={`flex items-start gap-2.5 p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+              return (
+                <button
+                  key={rKey}
+                  type="button"
+                  onClick={() => handleRoleChange(rKey)}
+                  className={`flex items-start gap-2.5 p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-purple-50/70 dark:bg-purple-950/30 border-purple-500 dark:border-purple-500/70 shadow-2xs'
+                      : 'bg-white dark:bg-zinc-900 border-zinc-200/80 dark:border-white/[0.06] hover:border-zinc-300'
+                  }`}
+                >
+                  <div
+                    className={`w-4 h-4 rounded-full mt-0.5 border flex items-center justify-center shrink-0 ${
                       isSelected
-                        ? 'bg-purple-50/70 dark:bg-purple-950/40 border-purple-500 dark:border-purple-500/80 ring-2 ring-purple-500/20'
-                        : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                        ? 'border-purple-600 bg-purple-600 text-white'
+                        : 'border-zinc-300 dark:border-zinc-600'
                     }`}
                   >
-                    <div
-                      className={`w-4 h-4 rounded-full mt-0.5 border flex items-center justify-center shrink-0 ${
+                    {isSelected && <Check size={10} />}
+                  </div>
+                  <div className="min-w-0">
+                    <p
+                      className={`font-bold text-xs ${
                         isSelected
-                          ? 'border-purple-600 bg-purple-600 text-white'
-                          : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
+                          ? 'text-purple-950 dark:text-purple-200'
+                          : 'text-zinc-800 dark:text-zinc-200'
                       }`}
                     >
-                      {isSelected && <Check size={10} />}
-                    </div>
-                    <div className="min-w-0">
-                      <p
-                        className={`font-bold text-xs ${
-                          isSelected
-                            ? 'text-purple-900 dark:text-purple-200'
-                            : 'text-slate-800 dark:text-slate-200'
-                        }`}
-                      >
-                        {rInfo.shortName}
-                      </p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
-                        {rInfo.description}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                      {rInfo.shortName}
+                    </p>
+                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-1 mt-0.5">
+                      {rInfo.description}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
 
-            <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 space-y-1">
-              <p className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                <UserCheck size={14} className="text-purple-600 dark:text-purple-400" />
-                <span>Permisos actuales de {THEOCRATIC_ROLES[currentRole]?.shortName}:</span>
-              </p>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+          <div className="pt-3 border-t border-zinc-200/60 dark:border-white/[0.05] flex items-center justify-between gap-3 text-xs text-zinc-500 dark:text-zinc-400">
+            <div className="flex items-center gap-2 min-w-0">
+              <UserCheck size={14} className="text-purple-600 dark:text-purple-400 shrink-0" />
+              <span className="truncate">
+                <strong className="text-zinc-800 dark:text-zinc-200">
+                  {THEOCRATIC_ROLES[currentRole]?.shortName}:
+                </strong>{' '}
                 {THEOCRATIC_ROLES[currentRole]?.description}
-              </p>
+              </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 4. Barra Inferior de Confirmación y Guardado de Credenciales */}
-      <div className="bg-white dark:bg-[#0f1623] p-5 rounded-3xl border border-zinc-200 dark:border-white/[0.06] shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-            <ShieldCheck size={20} />
-          </div>
-          <div>
-            <h5 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
-              Guardar Credenciales y Rol del Publicador
-            </h5>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              {currentPin ? `PIN listo (${currentPin}) con rol ${THEOCRATIC_ROLES[currentRole]?.shortName}. Pulsa para guardar.` : 'Asigna un PIN de al menos 4 dígitos para guardar.'}
-            </p>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleSavePin}
-          disabled={!currentPin || currentPin.length < 4 || isSavingLocal}
-          className={`w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-white text-xs sm:text-sm font-bold transition-all shadow-md active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
-            saveSuccess
-              ? 'bg-emerald-600 shadow-emerald-600/20'
-              : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-600/20'
-          }`}
-          title="Guardar PIN y credenciales en el sistema"
-        >
-          {isSavingLocal ? (
-            <>
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span>Guardando...</span>
-            </>
-          ) : saveSuccess ? (
-            <>
-              <CheckCircle2 size={16} />
-              <span>¡Credenciales Guardadas!</span>
-            </>
-          ) : (
-            <>
-              <Save size={16} />
-              <span>Guardar Credenciales y PIN</span>
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* 5. MODAL: PAPELETA DE ACCESO TEOCRÁTICO (SLIP / QR) */}
+      {/* 3. MODAL: PAPELETA DE ACCESO TEOCRÁTICO (SLIP / QR) */}
       {showSlipModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl space-y-5">
-            {/* Cabecera del Modal */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-950 flex items-center justify-center text-purple-600 dark:text-purple-400">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/70 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-white dark:bg-[#0f1623] border border-zinc-200 dark:border-white/[0.08] rounded-3xl p-6 shadow-2xl space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-white/[0.06]">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400">
                   <QrCode size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900 dark:text-white text-sm">
-                    Papeleta de Acceso Teocrático
+                  <h4 className="font-bold text-zinc-900 dark:text-white text-sm">
+                    Papeleta de Credencial Personal
                   </h4>
-                  <p className="text-[11px] text-slate-500">Credencial personal del publicador</p>
+                  <p className="text-[11px] text-zinc-500">Acceso rápido por QR o PIN</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setShowSlipModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer"
               >
                 <X size={18} />
               </button>
             </div>
 
-            {/* Ficha Imprimible / Credencial */}
             <div
               id="printable-theocratic-slip"
-              className="p-5 rounded-2xl bg-gradient-to-br from-slate-50 via-white to-purple-50/30 dark:from-slate-800/80 dark:via-slate-900 dark:to-purple-950/20 border-2 border-dashed border-purple-300 dark:border-purple-800/60 space-y-4 text-center shadow-xs"
+              className="p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/[0.08] space-y-4 text-center"
             >
-              {/* Header de la papeleta */}
-              <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-700 pb-2.5">
+              <div className="flex items-center justify-between border-b border-zinc-200/80 dark:border-white/[0.06] pb-2.5">
                 <div className="text-left">
                   <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest block">
-                    KONGRE TEOCRÁTICO
+                    PORTAL CONGREGACIONAL
                   </span>
-                  <h5 className="text-sm font-bold text-slate-900 dark:text-white">
-                    {settings.congregationName || 'Congregación Central'}
+                  <h5 className="text-sm font-bold text-zinc-900 dark:text-white">
+                    {settings.congregationName || 'Congregación Local'}
                   </h5>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200 font-bold">
+                <span className="text-[10px] font-mono tabular-nums px-2 py-0.5 rounded-md bg-zinc-200/70 dark:bg-white/[0.06] text-zinc-700 dark:text-zinc-300 font-bold">
                   ID: {settings.congregationNumber || settings.congregationId || 'Salón'}
                 </span>
               </div>
 
-              {/* Nombre y Rol */}
               <div className="space-y-0.5 py-1">
-                <span className="text-[11px] text-slate-400 uppercase tracking-wider block">
-                  Publicador Autorizado
+                <span className="text-[10px] text-zinc-400 uppercase tracking-wider block">
+                  Publicador
                 </span>
-                <p className="text-lg font-bold text-slate-900 dark:text-white">
-                  {publisherName}
-                </p>
-                <span className="inline-block text-[11px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-100/70 dark:bg-purple-900/40 px-2.5 py-0.5 rounded-full">
+                <p className="text-lg font-bold text-zinc-900 dark:text-white">{publisherName}</p>
+                <p className="text-xs font-medium text-purple-600 dark:text-purple-400">
                   {THEOCRATIC_ROLES[currentRole]?.name || 'Publicador'}
-                </span>
+                </p>
               </div>
 
-              {/* Código QR */}
               <div className="flex justify-center py-1">
-                <div className="p-2 bg-white rounded-2xl shadow-sm border border-slate-200">
+                <div className="p-2.5 bg-white rounded-2xl shadow-2xs border border-zinc-200">
                   <canvas ref={qrCanvasRef} className="rounded-lg" />
                 </div>
               </div>
 
-              {/* PIN Destacado */}
-              <div className="bg-purple-600 text-white rounded-2xl p-3 shadow-md">
-                <span className="text-[10px] uppercase font-bold tracking-widest block opacity-90">
-                  Tu PIN Personal Único
+              <div className="bg-zinc-900 dark:bg-purple-950/60 text-white rounded-2xl p-3 border border-purple-500/20">
+                <span className="text-[10px] uppercase font-bold tracking-widest block text-zinc-400">
+                  PIN Personal Único
                 </span>
-                <span className="text-2xl font-mono font-bold tracking-widest">
+                <span className="text-2xl font-mono tabular-nums font-bold tracking-[0.25em]">
                   {currentPin || '••••'}
                 </span>
               </div>
-
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 italic leading-tight">
-                * Guarda esta papeleta en privado. Escanea el código con tu celular o introduce tu PIN para activar tu vista personal.
-              </p>
             </div>
 
-            {/* Acciones de la Papeleta */}
-            <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between gap-2 pt-2 border-t border-zinc-100 dark:border-white/[0.06]">
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-bold transition-all cursor-pointer"
               >
                 <Printer size={14} />
-                <span>Imprimir Papeleta</span>
+                <span>Imprimir</span>
               </button>
 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleShareWhatsApp}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all cursor-pointer"
                 >
                   <Share2 size={14} />
                   <span>WhatsApp</span>
@@ -720,15 +598,15 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
                 <button
                   type="button"
                   onClick={() => setShowSlipModal(false)}
-                  className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                  className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-all cursor-pointer"
                 >
-                  Listo
+                  Cerrar
                 </button>
               </div>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 };

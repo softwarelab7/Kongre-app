@@ -25,18 +25,72 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.20';
-export const CURRENT_BUILD_CODE = '2026.10.25.7100';
+export const CURRENT_APP_VERSION = '2.12.22';
+export const CURRENT_BUILD_CODE = '2026.10.25.7300';
 export const BUILD_DATE = '25 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.22',
+    buildCode: '2026.10.25.7300',
+    date: '25 de Octubre, 2026',
+    title: 'Rediseño Editorial Completo de las 11 Tarjetas del Publicador, el Hub de Categorías, Registro S-21, Contactos de Emergencia y Credenciales PIN/QR',
+    isCurrent: true,
+    highlight: 'Arquitectura visual unificada con cabecera ejecutiva, pestañas numeradas (01–11), navegación secuencial entre tarjetas, nuevo libro S-21 multi-año con exportación CSV, directorio de contactos de emergencia con llamada/WhatsApp y espacio de credenciales PIN/QR',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Cabecera Ejecutiva y Hub Editorial de 11 Tarjetas (PublisherEditor): Nueva cabecera de perfil con avatar de iniciales, edición rápida de nombre, línea tipográfica limpia (ID · Rol · Grupo · Edad · Estado de sincronización), medidor de integridad de ficha, barra de pestañas numeradas (01 a 11), tarjetas del Hub con filas limpias sin cajas anidadas redundantes y pie de navegación secuencial («Anterior / Siguiente tarjeta»).',
+      },
+      {
+        category: 'feature',
+        text: 'Rediseño del Registro Oficial S-21 (S21RecordsSection): Selector dinámico de años de servicio (2024 a 2027), cinta superior de métricas anuales en tipografía tabular (meses activos, horas totales con crédito, promedio mensual, cursos bíblicos y meses de precursor auxiliar), botón rápido «Año activo», botón por fila para copiar valores del mes anterior, exportación directa a CSV y curva anual de actividad.',
+      },
+      {
+        category: 'feature',
+        text: 'Rediseño de Contactos de Emergencia (EmergencyContactsSection): Contenedor editorial unificado con buscador para vincular cualquier hermano del directorio de la congregación en un clic, sugerencia de importación rápida desde el representante médico DPA, botones rápidos de parentesco en el modal y tarjetas de contacto con acciones siempre visibles de Llamada, WhatsApp, Correo y Copiar teléfono.',
+      },
+      {
+        category: 'improvement',
+        text: 'Unificación Visual de Credenciales PIN/QR (AccessCredentialsSection) y todas las Secciones del Publicador: Espacio de trabajo en dos columnas para PIN personal y nivel de acceso, papeleta QR imprimible renovada y cabeceras limpias con metadatos en línea en Información Personal, Contacto, DPA, Estado Espiritual, Asignaciones, Condiciones Especiales, Ausencias e Historial.',
+      },
+    ],
+  },
+  {
+    version: '2.12.21',
+    buildCode: '2026.10.25.7200',
+    date: '25 de Octubre, 2026',
+    title: 'Renovación Integral de las Tarjetas del Publicador: Información Personal, Contacto y GPS, Estado Espiritual, DPA, Asignaciones e Historial',
+    isCurrent: false,
+    highlight: 'Tarjetas modulares enriquecidas con filiación familiar, idiomas/oficios, geolocalización GPS, trayectoria espiritual S-21, seguimiento de pastoreo, representantes DPA del directorio y auditoría en navegador',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Tarjeta de Información Personal (BasicInfoSection): Auto-separación de nombre completo en 4 campos, cálculo automático de etapa de vida con sugerencia de indicadores (Menor / Edad Avanzada 65+), selector de padre/madre o tutor para menores, vinculación conyugal y núcleo familiar, y etiquetas interactivas de Idiomas (incluyendo LSM) y Oficios/Habilidades Prácticas para mantenimiento y apoyo.',
+      },
+      {
+        category: 'feature',
+        text: 'Tarjeta de Contacto, Ubicación y Movilidad (ContactSection): Botones directos para copiar, llamar, enviar WhatsApp o correo, selector de medio preferido de contacto, referencias de llegada al domicilio, captura de coordenadas GPS en vivo con enlaces directos a Google Maps y Waze, selector de plazas disponibles en vehículo (2 a 7 asientos) y preferencia de publicaciones en Letra Grande.',
+      },
+      {
+        category: 'feature',
+        text: 'Tarjeta de Estado Espiritual y Privilegios (PrivilegesSection): Selector directo de los 4 roles teocráticos (Anciano, Siervo Ministerial, Publicador Bautizado y No Bautizado), selector explícito de Esperanza S-21 (Otras ovejas / Ungido), fecha de nombramiento, fecha de inicio de precursorado y última Escuela de Precursores, terminología teocrática en grupos (Sup. Grupo / Auxiliar) y panel de pastoreo con prioridad de atención y ancianos visitadores.',
+      },
+      {
+        category: 'improvement',
+        text: 'Tarjetas de Directriz Médica DPA, Asignaciones, Condiciones Especiales e Historial: Búsqueda de representantes médicos en el directorio de la congregación con llamada/WhatsApp directo y alerta de revisión anual (+1 año), selector de lección actual S-38 y bosquejos de discursos públicos (1–194) con estilos estáticos Tailwind v4, seguimiento de traslado de congregación (envío de S-21 y carta de presentación), indicador de integridad de ficha en el Hub y auditoría de cambios con reversión en navegador.',
+      },
+    ],
+  },
+  {
     version: '2.12.20',
     buildCode: '2026.10.25.7100',
     date: '25 de Octubre, 2026',
     title: 'Analítica Gráfica con Recharts y Selector Multi-Grupo de Servicio en el Tablero de Equidad (EquidadDashboardTab)',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Nuevos gráficos interactivos con Recharts para comparar la carga ponderada entre publicadores, privilegios y grupos de servicio específicos, con detección visual de desequilibrios e inspección rápida',
     environment: 'Producción Cloud (Kongre)',
     changes: [

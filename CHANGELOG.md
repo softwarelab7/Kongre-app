@@ -6,6 +6,46 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.22] — 25 de Octubre, 2026
+**Rediseño Editorial Completo de las 11 Tarjetas del Publicador, el Hub de Categorías, Registro S-21, Contactos de Emergencia y Credenciales PIN/QR**
+
+- 🏛️ **Cabecera Ejecutiva, Pestañas Numeradas (`01–11`) y Nuevo Hub de Tarjetas (`PublisherEditor`):**
+  - **Cabecera Ejecutiva Unificada:** Avatar con iniciales del publicador, edición rápida del nombre en línea, metadatos tipográficos separados por punto medio (`ID · Rol · Grupo · Edad · Estado de sincronización`) y medidor compacto de integridad de la ficha.
+  - **Mosaico Editorial sin Cajas Anidadas:** Rediseño de las 11 tarjetas del Hub eliminando sub-cajas redundantes en favor de filas limpias separadas por líneas sutiles (*hairlines*) y numeración `tabular-nums`.
+  - **Navegación Secuencial entre Tarjetas:** Nueva barra inferior dentro de cada sección que permite avanzar o retroceder directamente entre las 11 tarjetas (*Anterior / Siguiente tarjeta*) sin tener que regresar cada vez al Hub.
+- 📊 **Rediseño del Registro Oficial de Publicador `S-21` (`S21RecordsSection`):**
+  - **Selector Multi-Año (`2024–2027`) y Cinta de KPIs Anuales:** Resumen superior con cifras tabulares de *Meses Activos (`X/12`)*, *Total de Horas (con crédito)*, *Promedio Mensual*, *Cursos Bíblicos (promedio y máximo)* y *Meses de Precursor Auxiliar*.
+  - **Acciones Rápidas de Secretaría y Exportación:** Botón **«Año activo»** para marcar los 12 meses de participación en un clic, botón por fila para **copiar los datos del mes anterior** y descarga directa de la tarjeta anual en formato **CSV**, acompañado de una curva anual limpia de horas y cursos bíblicos.
+- 🚨 **Rediseño de Contactos de Emergencia (`EmergencyContactsSection`):**
+  - **Importación desde el Directorio y desde el DPA:** Buscador integrado para vincular a cualquier hermano de la congregación como contacto de emergencia, estado vacío asistido con botón para importar en un clic al representante médico del DPA y etiquetas rápidas de parentesco en el modal (*Esposo(a)*, *Padre / Madre*, *Hijo(a)*, *Hermano(a) carnal*, *Hermano(a) de la congregación*).
+  - **Acciones Directas Siempre Accesibles:** Botones de edición y eliminación visibles en pantallas táctiles y móviles, junto con botones de un clic para **Llamar**, abrir **WhatsApp**, **Copiar teléfono** y enviar **Correo**.
+- 🔐 **Rediseño de Credenciales de Acceso y PIN Personal (`AccessCredentialsSection`) y Coherencia en las 11 Secciones:**
+  - Espacio de trabajo unificado en dos columnas (*PIN Personal y Fortaleza* + *Nivel de Acceso y Permisos en la Aplicación*), papeleta imprimible con código QR renovada y cabeceras editoriales consistentes en las 11 tarjetas del publicador.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
+### [v2.12.21] — 25 de Octubre, 2026
+**Renovación Integral de las Tarjetas del Publicador: Información Personal, Contacto y Ubicación, Estado Espiritual, DPA, Asignaciones e Historial**
+
+- 👤 **Tarjeta de Información Personal (`BasicInfoSection`):**
+  - **Nombre y Edad Inteligente:** Edición rápida de nombre completo con auto-separación en 4 campos, cálculo automático de edad y etapa de vida (*Niño(a)*, *Joven menor*, *Joven adulto*, *Adulto*, *Edad Avanzada 65+*) con botones de sugerencia rápida para marcar indicadores congregacionales.
+  - **Filiación, Núcleo Familiar, Idiomas y Oficios:** Selector de 5 estados civiles, interruptores siempre visibles de *Cabeza de Familia* y *Menor de Edad*, selector de Padre/Madre o Tutor responsable, vinculación de cónyuge y etiquetas interactivas de **Idiomas** (incluyendo Lengua de Señas) y **Oficios / Habilidades Prácticas** para mantenimiento y emergencias.
+- 📍 **Tarjeta de Contacto, Ubicación y Movilidad (`ContactSection`):**
+  - **Acciones Directas y Ubicación GPS:** Botones de un clic para copiar, llamar, abrir WhatsApp o redactar correo, selector de medio preferido de contacto, campo de *Referencias del domicilio / entre calles*, captura de coordenadas GPS actuales y enlaces directos a **Google Maps** y **Waze**.
+  - **Transporte y Literatura Impresa:** Selector de asientos disponibles en vehículo (`2` a `7` plazas) para apoyo al grupo de predicación y preferencias de publicaciones impresas incluyendo **Letra Grande**.
+- 🛡️ **Tarjeta de Estado Espiritual y Privilegios (`PrivilegesSection`):**
+  - **Trayectoria S-21 y Precursorado:** Botones directos para los 4 roles (*Anciano*, *Siervo Ministerial*, *Publicador Bautizado* y *No Bautizado*), selector explícito de **Esperanza S-21** (*Otras ovejas* / *Ungido*), fecha de nombramiento, fecha de inicio de precursorado y fecha de la última **Escuela del Servicio de Precursor**.
+  - **Grupos de Servicio y Pastoreo:** Terminología teocrática oficial (*Publicador*, *Sup. Grupo*, *Auxiliar*), seguimiento de la última visita de pastoreo con antigüedad automática, ancianos visitadores, nivel de prioridad pastoral (*Normal*, *Pronto*, *Urgente*) y notas de progreso espiritual.
+- 🏥 **Directriz Médica DPA, Asignaciones, Condiciones Especiales e Historial:**
+  - **DPA y Salud (`MedicalDpaSection`):** Buscador de representantes de atención médica en el directorio de la congregación, botones de llamada/WhatsApp de urgencia, indicador de copia en archivo, alerta de revisión anual (`+1 año`) y campos separados para alergias y condiciones médicas.
+  - **Asignaciones (`AssignmentsSection`), Condiciones (`SpecialConditionsSection`) e Historial (`PublisherHistoryPanel`):** Corrección de colores estáticos en Tailwind v4, selector de lección actual del folleto *Maestros* (`1–20`), registro de bosquejos de discursos públicos (`1–194`), indicadores de conexión regular por Zoom y asiento preferencial, panel de seguimiento de mudanza de congregación (carta de presentación y tarjeta `S-21`), barra de integridad de ficha en el Hub y auditoría de cambios con reversión en navegador.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.20] — 25 de Octubre, 2026
 **Analítica Gráfica con Recharts y Selector Multi-Grupo de Servicio en el Tablero de Equidad (`EquidadDashboardTab`)**
 

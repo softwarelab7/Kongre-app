@@ -174,7 +174,7 @@ export interface Publisher {
   spouse_nid?: string;
   familyId?: string; // Identificador de núcleo familiar (ej. 'FAM-PEREZ')
   familyMemberIds?: string[]; // IDs de otros publicadores que pertenecen al mismo núcleo familiar
-  groupWithFamilyInMeetings?: boolean; // Preferencia KHS: Agrupar con miembros de su familia en la misma reunión/turno
+  groupWithFamilyInMeetings?: boolean; // Preferencia: Agrupar con miembros de su familia en la misma reunión/turno
   neighborhood?: string;
   city?: string;
   postal_code?: string;
@@ -255,6 +255,8 @@ export interface MeetingMidweek {
   duties: Record<string, string[]>; // dutyKey -> array of publisherIds (e.g. microfonos: [id1, id2])
 }
 
+export type HospitalityMealType = 'almuerzo' | 'cena' | 'desayuno' | 'refrigerio' | 'hospedaje';
+
 export interface MeetingWeekend {
   date: string; // YYYY-MM-DD
   presidentId?: string;
@@ -262,9 +264,18 @@ export interface MeetingWeekend {
   publicTalkOutlineNumber?: number;
   publicTalkTheme?: string;
   isVisitingSpeaker?: boolean;
+  visitingSpeakerId?: string; // ID del Directorio de Oradores Visitantes
+  neighboringCongregationId?: string; // ID del Directorio de Congregaciones Vecinas
   visitingSpeakerCongregation?: string;
   visitingSpeakerPhone?: string;
-  hospitalityPublisherId?: string; // Hermano asignado para la hospitalidad / comida del orador
+  visitingSpeakerCompanions?: number; // Acompañantes (ej. 1 si viene con su esposa)
+  visitingSpeakerDietaryNotes?: string; // Alergias o notas de alimentación del orador y acompañantes
+  speakerConfirmed?: boolean; // Confirmación del orador (local o visitante)
+  hospitalityPublisherId?: string; // Hermano / familia asignada para la hospitalidad / comida del orador
+  hospitalityMealType?: HospitalityMealType; // Tipo de atención (Almuerzo, Cena, Refrigerio, Hospedaje)
+  hospitalityStatus?: 'pendiente' | 'confirmada';
+  hospitalityLocation?: string;
+  hospitalityNotes?: string;
   atalayaConductorId?: string;
   atalayaLectorId?: string;
   watchtowerTheme?: string;
@@ -416,6 +427,9 @@ export interface MeetingAttendance {
   weekend: { inPerson: number; zoom: number; total: number };
 }
 
+export type CleaningProgramType = 'semanal' | 'profunda' | 'visita_sc' | 'evento_especial';
+export type CleaningSuppliesStatus = 'abastecido' | 'reponer_pronto' | 'urgente';
+
 export interface WeekSchedule {
   id: string; // e.g. '2026-W40' or start date '2026-09-28'
   weekStartDate: string; // YYYY-MM-DD (Monday)
@@ -425,6 +439,10 @@ export interface WeekSchedule {
   weekend: MeetingWeekend;
   attendance?: MeetingAttendance;
   cleaningGroupNumbers: number[]; // Numbers of preaching groups assigned to clean
+  cleaningType?: CleaningProgramType;
+  cleaningChecklistCompleted?: string[]; // IDs of completed S-28 cleaning tasks
+  cleaningSuppliesStatus?: CleaningSuppliesStatus;
+  cleaningNotes?: string;
   notes?: string;
 }
 
@@ -452,13 +470,54 @@ export interface PublicTalkOutline {
   category?: string;
 }
 
+export interface NeighboringCongregation {
+  id: string;
+  name: string; // ej. 'Congregación Las Acacias'
+  congregationNumber?: string;
+  circuit?: string; // ej. 'CO-04'
+  city?: string;
+  address?: string; // Dirección del Salón del Reino vecino
+  weekendMeetingDay: string; // ej. 'Domingo' | 'Sábado'
+  weekendMeetingTime: string; // ej. '10:00'
+  talkCoordinatorName?: string; // Coordinador de Discursos Públicos vecino
+  talkCoordinatorPhone?: string; // WhatsApp / Teléfono
+  talkCoordinatorEmail?: string;
+  distanceKm?: number;
+  notes?: string;
+  active: boolean;
+}
+
+export interface VisitingSpeakerDirectoryEntry {
+  id: string;
+  name: string;
+  phone?: string;
+  email?: string;
+  privilege: 'anciano' | 'siervo_ministerial';
+  congregationId?: string; // Referencia a NeighboringCongregation.id
+  congregationName: string;
+  preparedOutlines: number[]; // Números de bosquejos preparados (1-194)
+  companionsDefault?: number; // Acompañantes habituales (ej. 1 = esposa)
+  spouseName?: string;
+  dietaryNotes?: string; // Alergias o preferencias alimentarias registradas
+  needsTransportation?: boolean;
+  lastVisitDate?: string; // YYYY-MM-DD
+  notes?: string;
+  active: boolean;
+}
+
 export interface OutgoingSpeakerAssignment {
   id: string;
   publisherId: string;
   date: string;
   destinationCongregation: string;
+  destinationCongregationId?: string;
+  destinationMeetingTime?: string;
+  destinationAddress?: string;
+  destinationCoordinatorName?: string;
+  destinationCoordinatorPhone?: string;
   outlineNumber: number;
   outlineTitle: string;
+  status?: 'pendiente' | 'confirmado';
   notes?: string;
 }
 
@@ -492,7 +551,7 @@ export interface ConflictRuleSettings {
   maxConsecutiveWeeksWithPart: number; // e.g. 2
   enforceSisterDemonstrationRules: boolean; // sisters only with sisters or family
   warnOutlineRepeatedWithinMonths: number; // e.g. 12 months
-  prioritizeFamilySameMeeting?: boolean; // KHS Same-Night Family Grouping
+  prioritizeFamilySameMeeting?: boolean; // Agrupación familiar en la misma reunión
 }
 
 export interface ConflictAlert {
@@ -544,6 +603,8 @@ export interface CongregationSettings {
     duties: boolean;
     cleaning: boolean;
   };
+  neighboringCongregations?: NeighboringCongregation[];
+  visitingSpeakersDirectory?: VisitingSpeakerDirectoryEntry[];
 }
 
 export interface AssignmentHistoryRecord {

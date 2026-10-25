@@ -40,6 +40,18 @@ import { TerritoryMapView } from './territories/TerritoryMapView';
 import { TerritoryPolygonEditorModal } from './territories/TerritoryPolygonEditorModal';
 import { TerritoryCardMap } from './territories/TerritoryCardMap';
 import { SAMPLE_TERRITORIES_WITH_POLYGONS } from './territories/sampleTerritoriesWithMaps';
+import {
+  evaluateTerritoryS13Radar,
+  buildOverdueTerritoryWhatsAppReminder,
+} from '../utils/khsPublicWitnessingEngine';
+import { openWhatsAppLink } from '../utils/whatsapp';
+import { MessageCircle, Upload } from 'lucide-react';
+import { LocalOfficialFormsModal } from './LocalOfficialFormsCenter';
+import {
+  getLocalOfficialFormBytes,
+  fillOfficialS13Pdf,
+  downloadPdfBytesLocally,
+} from '../services/localOfficialFormsService';
 
 export const TerritoriosTab: React.FC = () => {
   const {
@@ -88,6 +100,7 @@ export const TerritoriosTab: React.FC = () => {
 
   const [editTerritoryModal, setEditTerritoryModal] = useState<Territory | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [isS13ModalOpen, setIsS13ModalOpen] = useState(false);
 
   // Form state for Create / Edit Territory
   const [formData, setFormData] = useState<{
@@ -199,6 +212,10 @@ export const TerritoriosTab: React.FC = () => {
       coveragePercentage,
       completedLastYear,
     };
+  }, [territories]);
+
+  const s13Radar = useMemo(() => {
+    return evaluateTerritoryS13Radar(territories);
   }, [territories]);
 
   // Filtered territories
@@ -361,8 +378,25 @@ ${mapLink}${noVisitsText}
 
 💡 *Recordatorio:* De acuerdo con las pautas de la congregación, favor de trabajar el territorio con esmero y devolverlo dentro del plazo estipulado. ¡Que Jehová bendiga tu ministerio!`;
 
-    const encoded = encodeURIComponent(message);
-    window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+    openWhatsAppLink('', message);
+  };
+
+  const handleDownloadOfficialS13 = async () => {
+    try {
+      const stored = await getLocalOfficialFormBytes('S-13');
+      if (!stored) {
+        setIsS13ModalOpen(true);
+        return;
+      }
+      const filledBytes = await fillOfficialS13Pdf(stored.bytes, territories, '2025-2026');
+      downloadPdfBytesLocally(
+        filledBytes,
+        `S-13_Oficial_Relleno_${settings.congregationName.replace(/\s+/g, '_')}.pdf`
+      );
+      showToast('PDF Oficial S-13 rellenado y descargado con tus datos de territorios.');
+    } catch {
+      setIsS13ModalOpen(true);
+    }
   };
 
   // Open Assign Modal
@@ -560,12 +594,12 @@ ${mapLink}${noVisitsText}
 
         <div className="flex items-center gap-2 shrink-0">
           <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-white/[0.08] rounded-xl transition cursor-pointer shadow-2xs"
-            title="Imprimir listado"
+            onClick={handleDownloadOfficialS13}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 rounded-xl transition cursor-pointer shadow-2xs"
+            title="Cargar el PDF oficial S-13 de JW Hub para que la app lo rellene y descargue"
           >
-            <Printer className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-            <span className="hidden sm:inline">Imprimir</span>
+            <Upload className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span>PDF S-13 Oficial</span>
           </button>
 
           <button
@@ -669,6 +703,99 @@ ${mapLink}${noVisitsText}
           </div>
         </div>
       </div>
+
+      {/* Radar S-13: Alertas de Territorios Vencidos (>4 meses) o Por Vencer */}
+      {(s13Radar.overdue.length > 0 || s13Radar.expiringSoon.length > 0) && (
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-amber-200 dark:border-amber-800/60 p-4 shadow-xs space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+              <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+                Radar S-13: Control de Plazo de 4 Meses ({s13Radar.overdue.length} vencidos •{' '}
+                {s13Radar.expiringSoon.length} por vencer)
+              </h3>
+            </div>
+            <span className="text-[11px] text-slate-500">
+              Envía recordatorio amigable por WhatsApp o registra la devolución en 1 clic
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            {[...s13Radar.overdue, ...s13Radar.expiringSoon].slice(0, 6).map((terr) => {
+              const assignee = terr.currentAssigneeId
+                ? publishersMap.get(terr.currentAssigneeId)
+                : undefined;
+              const isOver = s13Radar.overdue.some((o) => o.id === terr.id);
+              return (
+                <div
+                  key={terr.id}
+                  className={`p-3 rounded-xl border flex flex-col justify-between gap-2 text-xs ${
+                    isOver
+                      ? 'bg-rose-50/50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800/60'
+                      : 'bg-amber-50/50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/60'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-extrabold text-slate-900 dark:text-white">
+                        Territorio #{terr.number} — {terr.name}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          isOver
+                            ? 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-200'
+                            : 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200'
+                        }`}
+                      >
+                        {isOver ? 'Vencido (+4m)' : 'Por vencer'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1">
+                      Tenencia: <strong>{assignee?.name || 'Por verificar'}</strong> • Vence:{' '}
+                      <strong>{terr.dueDate || '—'}</strong>
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-slate-200/60 dark:border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const msg = buildOverdueTerritoryWhatsAppReminder(
+                          terr,
+                          assignee,
+                          settings.congregationName
+                        );
+                        openWhatsAppLink(assignee?.phone || '', msg);
+                      }}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition-colors cursor-pointer"
+                    >
+                      <MessageCircle className="w-3 h-3" />
+                      <span>Recordar S-13</span>
+                    </button>
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => openReturnModal(terr)}
+                        className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-bold hover:bg-slate-50 cursor-pointer"
+                      >
+                        Recibir
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openExtendModal(terr)}
+                        className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-bold hover:bg-slate-50 cursor-pointer"
+                      >
+                        Prorrogar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Controls & Filter Bar */}
       <div className="bg-white dark:bg-[#131d2e] p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs space-y-3">
@@ -1108,14 +1235,23 @@ ${mapLink}${noVisitsText}
       ) : (
         /* OFFICIAL S-13 BATCH FICHERO VIEW */
         <div className="space-y-4">
-          <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-start gap-3 text-amber-900 text-sm">
-            <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold">Registro Oficial de Asignación de Territorio (Formulario S-13)</p>
-              <p className="text-xs text-amber-800 mt-0.5">
-                Esta vista replica el formato físico oficial archivado por el siervo de territorios. Cada tarjeta registra el historial de rotación, fechas de asignación y devolución reglamentarias.
-              </p>
+          <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-amber-900 text-sm">
+            <div className="flex items-start gap-3">
+              <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold">Registro de Asignación de Territorio (Formulario S-13)</p>
+                <p className="text-xs text-amber-800 mt-0.5">
+                  Para descargar el formato oficial S-13 de JW, carga tu PDF oficial en blanco y la aplicación lo rellenará automáticamente con este historial de rotación.
+                </p>
+              </div>
             </div>
+            <button
+              onClick={() => setIsS13ModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs shrink-0 cursor-pointer"
+            >
+              <Upload className="w-4 h-4" />
+              <span>Cargar y Rellenar S-13 Oficial (PDF)</span>
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1919,6 +2055,12 @@ ${mapLink}${noVisitsText}
           }}
         />
       )}
+
+      <LocalOfficialFormsModal
+        isOpen={isS13ModalOpen}
+        onClose={() => setIsS13ModalOpen(false)}
+        initialFormCode="S-13"
+      />
     </div>
   );
 };

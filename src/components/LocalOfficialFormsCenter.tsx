@@ -17,6 +17,10 @@ import {
   fillOfficialS88Pdf,
   fillOfficialS140Pdf,
   fillOfficialS13Pdf,
+  fillOfficialS26Pdf,
+  fillOfficialS30Pdf,
+  fillOfficialS25Pdf,
+  fillOfficialS28Pdf,
   fillCustomOfficialPdf,
   inspectPdfBytes,
   downloadPdfBytesLocally,
@@ -26,6 +30,7 @@ import {
   saveGeneratedS89PdfToIndexedDb,
 } from '../services/s89IndexedDbService';
 import { getAvailableServiceYears, getCurrentServiceYear } from '../utils/s21Helper';
+import { computeMonthlyS26, formatMonthLabel } from '../utils/accountsHelper';
 import {
   ShieldCheck,
   Upload,
@@ -51,11 +56,12 @@ import {
   X,
 } from 'lucide-react';
 
-interface LocalOfficialFormsCenterProps {
+export interface LocalOfficialFormsCenterProps {
   initialFormCode?: OfficialFormCode;
   initialPublisherId?: string;
   initialServiceYear?: string;
   initialWeekId?: string;
+  initialMonth?: string;
   compactHeader?: boolean;
 }
 
@@ -64,6 +70,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
   initialPublisherId,
   initialServiceYear,
   initialWeekId,
+  initialMonth,
   compactHeader = false,
 }) => {
   const {
@@ -76,6 +83,10 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
     currentWeekId,
     getS89SlipsForWeek,
     territories,
+    transactions,
+    quarterlyAudits,
+    literatureItems,
+    branchReportsS1,
     settings,
   } = useCongregation();
   const { showToast } = useToast();
@@ -110,6 +121,15 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
   const [selectedWeekId, setSelectedWeekId] = useState<string>(
     initialWeekId || currentWeekId || weeks[0]?.id || ''
   );
+  const [selectedMonth, setSelectedMonth] = useState<string>(() => {
+    if (initialMonth) return initialMonth;
+    if (transactions && transactions.length > 0) {
+      const months = Array.from(new Set(transactions.map((t) => t.month))).sort();
+      if (months.length > 0) return months[months.length - 1];
+    }
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  });
 
   // Inspector AcroForm interactivo y vista previa en vivo
   const [activeSubView, setActiveSubView] = useState<'autofill' | 'inspector'>('autofill');
@@ -122,6 +142,21 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const availableServiceYears = useMemo(() => getAvailableServiceYears(), []);
+  const availableMonths = useMemo(() => {
+    const set = new Set<string>();
+    const now = new Date();
+    for (let i = -6; i <= 6; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      set.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+    }
+    transactions.forEach((t) => {
+      if (t.month) set.add(t.month);
+    });
+    monthlyReports.forEach((r) => {
+      if (r.month) set.add(r.month);
+    });
+    return Array.from(set).sort().reverse();
+  }, [transactions, monthlyReports]);
 
   const refreshLocalForms = useCallback(async () => {
     const list = await listLocalOfficialForms();
@@ -140,8 +175,20 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
   }, [refreshLocalForms]);
 
   useEffect(() => {
+    if (initialFormCode) setSelectedCode(initialFormCode);
+  }, [initialFormCode]);
+
+  useEffect(() => {
     if (initialPublisherId) setSelectedPublisherId(initialPublisherId);
   }, [initialPublisherId]);
+
+  useEffect(() => {
+    if (initialWeekId) setSelectedWeekId(initialWeekId);
+  }, [initialWeekId]);
+
+  useEffect(() => {
+    if (initialMonth) setSelectedMonth(initialMonth);
+  }, [initialMonth]);
 
   useEffect(() => {
     if (!selectedPublisherId && activePublishers.length > 0) {
@@ -165,94 +212,30 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
     };
   }, [previewBlobUrl]);
 
-  // Cargar archivo PDF desde el dispositivo
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    setIsUploading(true);
-    try {
-      let lastSaved: LocalOfficialFormMetadata | null = null;
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        if (!file.name.toLowerCase().endsWith('.pdf')) {
-          showToast(`El archivo "${file.name}" no es un documento PDF válido.`, 'error');
-          continue;
-        }
-        const saved = await saveLocalOfficialForm(
-          file,
-          files.length === 1 ? selectedCode : undefined,
-          sessionOnlyMode
-        );
-        lastSaved = saved;
-      }
-
-      await refreshLocalForms();
-      if (lastSaved) {
-        setSelectedCode(lastSaved.code);
-        setSelectedFormId(lastSaved.id);
-        showToast(
-          `Formato oficial "${lastSaved.fileName}" cargado localmente (${lastSaved.fieldCount} campos interactivos detectados).`,
-          'success'
-        );
-      }
-    } catch (err: any) {
-      console.error('Error cargando formato oficial local:', err);
-      showToast(`No se pudo leer el archivo PDF: ${err.message || 'Error desconocido'}`, 'error');
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-  };
-
-  // Eliminar una plantilla local
-  const handleDeleteTemplate = async (id: string, name: string) => {
-    await deleteLocalOfficialForm(id);
-    if (selectedFormId === id) {
-      setSelectedFormId(null);
-      setPreviewBlobUrl(null);
-      setLastFilledBytes(null);
-    }
-    await refreshLocalForms();
-    showToast(`Plantilla "${name}" eliminada de este dispositivo.`, 'info');
-  };
-
-  // Purgar todas las plantillas locales
-  const handlePurgeAll = async () => {
-    await purgeAllLocalOfficialForms();
-    setLocalForms([]);
-    setSelectedFormId(null);
-    setPreviewBlobUrl(null);
-    setLastFilledBytes(null);
-    showToast(
-      'Todos los formatos oficiales locales han sido borrados de este dispositivo.',
-      'success'
-    );
-  };
-
   // Ejecutar el rellenado automático en memoria local y actualizar la vista previa
   const handleGenerateFilledPdf = useCallback(
-    async (autoDownload = false) => {
-      if (!currentFormMeta) {
+    async (autoDownload = false, overrideFormMeta?: LocalOfficialFormMetadata) => {
+      const targetMeta = overrideFormMeta || currentFormMeta;
+      if (!targetMeta) {
         showToast('Primero selecciona o carga el archivo PDF oficial desde tu dispositivo.', 'error');
         return;
       }
 
       setIsGenerating(true);
       try {
-        const stored = await getLocalOfficialFormBytes(currentFormMeta.id);
+        const stored = await getLocalOfficialFormBytes(targetMeta.id);
         if (!stored) {
           showToast('No se encontró el archivo en la memoria local. Por favor cárgalo nuevamente.', 'error');
           return;
         }
 
         let filledBytes: Uint8Array;
-        let outFileName = `Rellenado_${currentFormMeta.fileName}`;
+        let outFileName = `Rellenado_${targetMeta.fileName}`;
 
-        if (activeSubView === 'inspector' && Object.keys(inspectorFields).length > 0) {
+        if (activeSubView === 'inspector' && Object.keys(inspectorFields).length > 0 && !overrideFormMeta) {
           filledBytes = await fillCustomOfficialPdf(stored.bytes, inspectorFields);
-          outFileName = `${currentFormMeta.code}_Personalizado_${new Date().toISOString().slice(0, 10)}.pdf`;
-        } else if (currentFormMeta.code === 'S-21') {
+          outFileName = `${targetMeta.code}_Personalizado_${new Date().toISOString().slice(0, 10)}.pdf`;
+        } else if (targetMeta.code === 'S-21') {
           if (s21TargetMode === 'single') {
             const pub =
               publishersMap.get(selectedPublisherId) ||
@@ -300,7 +283,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
             );
             outFileName = `S-21_Congregacion_Completa_${selectedServiceYear}.pdf`;
           }
-        } else if (currentFormMeta.code === 'S-89') {
+        } else if (targetMeta.code === 'S-89') {
           const targetWeek = weeks.find((w) => w.id === selectedWeekId) || currentWeek || weeks[0];
           if (!targetWeek) {
             showToast('Selecciona una semana válida para rellenar las hojas S-89.', 'error');
@@ -323,7 +306,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
             outFileName,
             slips.length
           );
-        } else if (currentFormMeta.code === 'S-140') {
+        } else if (targetMeta.code === 'S-140') {
           const targetWeek = weeks.find((w) => w.id === selectedWeekId) || currentWeek || weeks[0];
           if (!targetWeek) {
             showToast('Selecciona una semana válida para rellenar el programa S-140.', 'error');
@@ -336,7 +319,7 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
             settings
           );
           outFileName = `S-140_Semana_${targetWeek.weekStartDate}.pdf`;
-        } else if (currentFormMeta.code === 'S-88') {
+        } else if (targetMeta.code === 'S-88') {
           filledBytes = await fillOfficialS88Pdf(
             stored.bytes,
             weeks,
@@ -344,17 +327,70 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
             settings
           );
           outFileName = `S-88_Asistencia_${selectedServiceYear}.pdf`;
-        } else if (currentFormMeta.code === 'S-13') {
+        } else if (targetMeta.code === 'S-13') {
           filledBytes = await fillOfficialS13Pdf(
             stored.bytes,
             territories,
             selectedServiceYear
           );
           outFileName = `S-13_Territorios_${selectedServiceYear}.pdf`;
+        } else if (targetMeta.code === 'S-26') {
+          filledBytes = await fillOfficialS26Pdf(
+            stored.bytes,
+            selectedMonth,
+            transactions,
+            settings
+          );
+          outFileName = `S-26_Cuentas_${selectedMonth}.pdf`;
+        } else if (targetMeta.code === 'S-30') {
+          filledBytes = await fillOfficialS30Pdf(
+            stored.bytes,
+            selectedMonth,
+            transactions,
+            settings
+          );
+          outFileName = `S-30_Informe_Mensual_Cuentas_${selectedMonth}.pdf`;
+        } else if (targetMeta.code === 'S-25') {
+          filledBytes = await fillOfficialS25Pdf(
+            stored.bytes,
+            quarterlyAudits,
+            settings
+          );
+          outFileName = `S-25_Auditoria_Cuentas_${selectedMonth}.pdf`;
+        } else if (targetMeta.code === 'S-28') {
+          filledBytes = await fillOfficialS28Pdf(
+            stored.bytes,
+            literatureItems,
+            settings
+          );
+          outFileName = `S-28_Inventario_Publicaciones_${new Date().toISOString().slice(0, 10)}.pdf`;
+        } else if (targetMeta.code === 'S-1') {
+          const monthRpts = monthlyReports.filter((r) => r.month === selectedMonth);
+          const pubsRpts = monthRpts.filter((r) => !r.isPioneer && !r.isAuxiliaryPioneer);
+          const auxRpts = monthRpts.filter((r) => r.isAuxiliaryPioneer && !r.isPioneer);
+          const regRpts = monthRpts.filter((r) => r.isPioneer);
+          const s1CustomMap: Record<string, string | boolean> = {
+            Congregacion: settings.congregationName || '',
+            Congregation: settings.congregationName || '',
+            Mes: formatMonthLabel(selectedMonth),
+            Month: formatMonthLabel(selectedMonth),
+            PublicadoresActivos: String(activePublishers.length),
+            PublicadoresInformes: String(pubsRpts.length),
+            PublicadoresCursos: String(pubsRpts.reduce((s, r) => s + (r.bibleStudies || 0), 0)),
+            AuxiliaresInformes: String(auxRpts.length),
+            AuxiliaresHoras: String(auxRpts.reduce((s, r) => s + (r.hours || 0), 0)),
+            AuxiliaresCursos: String(auxRpts.reduce((s, r) => s + (r.bibleStudies || 0), 0)),
+            RegularesInformes: String(regRpts.length),
+            RegularesHoras: String(regRpts.reduce((s, r) => s + (r.hours || 0), 0)),
+            RegularesCursos: String(regRpts.reduce((s, r) => s + (r.bibleStudies || 0), 0)),
+            ...inspectorFields,
+          };
+          filledBytes = await fillCustomOfficialPdf(stored.bytes, s1CustomMap);
+          outFileName = `S-1_Informe_Sucursal_${selectedMonth}.pdf`;
         } else {
-          // Formato personalizado o S-26 / S-30 / S-205b
+          // Formato personalizado o S-205b
           filledBytes = await fillCustomOfficialPdf(stored.bytes, inspectorFields);
-          outFileName = `${currentFormMeta.code}_${new Date().toISOString().slice(0, 10)}.pdf`;
+          outFileName = `${targetMeta.code}_${new Date().toISOString().slice(0, 10)}.pdf`;
         }
 
         // Sincronizar los valores resultantes en el Inspector para que el usuario pueda verlos o retocarlos
@@ -377,9 +413,9 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
 
         if (autoDownload) {
           downloadPdfBytesLocally(filledBytes, outFileName);
-          showToast(`Archivo "${outFileName}" generado y descargado localmente.`, 'success');
+          showToast(`Archivo oficial "${outFileName}" rellenado y descargado.`, 'success');
         } else {
-          showToast('Formato oficial rellenado en memoria local. Revisa la vista previa.', 'success');
+          showToast(`Formato oficial "${targetMeta.code}" rellenado con los datos de la congregación.`, 'success');
         }
       } catch (err: any) {
         console.error('Error rellenando PDF oficial en local:', err);
@@ -405,9 +441,81 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
       getS89SlipsForWeek,
       settings,
       territories,
+      selectedMonth,
+      transactions,
+      quarterlyAudits,
+      literatureItems,
+      branchReportsS1,
       showToast,
     ]
   );
+
+  // Cargar archivo PDF desde el dispositivo y rellenarlo inmediatamente
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    try {
+      let lastSaved: LocalOfficialFormMetadata | null = null;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+          showToast(`El archivo "${file.name}" no es un documento PDF válido.`, 'error');
+          continue;
+        }
+        const saved = await saveLocalOfficialForm(
+          file,
+          files.length === 1 ? selectedCode : undefined,
+          sessionOnlyMode
+        );
+        lastSaved = saved;
+      }
+
+      await refreshLocalForms();
+      if (lastSaved) {
+        setSelectedCode(lastSaved.code);
+        setSelectedFormId(lastSaved.id);
+        showToast(
+          `Formato oficial "${lastSaved.fileName}" cargado (${lastSaved.fieldCount} campos detectados). Rellenando automáticamente...`,
+          'success'
+        );
+        // Auto-rellenar inmediatamente después de cargar el PDF oficial
+        await handleGenerateFilledPdf(false, lastSaved);
+      }
+    } catch (err: any) {
+      console.error('Error cargando formato oficial local:', err);
+      showToast(`No se pudo leer el archivo PDF: ${err.message || 'Error desconocido'}`, 'error');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  // Eliminar una plantilla local
+  const handleDeleteTemplate = async (id: string, name: string) => {
+    await deleteLocalOfficialForm(id);
+    if (selectedFormId === id) {
+      setSelectedFormId(null);
+      setPreviewBlobUrl(null);
+      setLastFilledBytes(null);
+    }
+    await refreshLocalForms();
+    showToast(`Plantilla "${name}" eliminada de este dispositivo.`, 'info');
+  };
+
+  // Purgar todas las plantillas locales
+  const handlePurgeAll = async () => {
+    await purgeAllLocalOfficialForms();
+    setLocalForms([]);
+    setSelectedFormId(null);
+    setPreviewBlobUrl(null);
+    setLastFilledBytes(null);
+    showToast(
+      'Todos los formatos oficiales locales han sido borrados de este dispositivo.',
+      'success'
+    );
+  };
 
   // Cuando cambia la plantilla seleccionada, inicializar el inspector con sus campos originales
   useEffect(() => {
@@ -886,6 +994,34 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
               </div>
             )}
 
+            {/* Controles específicos para S-26, S-30, S-25 o S-1 */}
+            {(currentFormMeta?.code === 'S-26' ||
+              currentFormMeta?.code === 'S-30' ||
+              currentFormMeta?.code === 'S-25' ||
+              currentFormMeta?.code === 'S-1' ||
+              (!currentFormMeta &&
+                (selectedCode === 'S-26' ||
+                  selectedCode === 'S-30' ||
+                  selectedCode === 'S-25' ||
+                  selectedCode === 'S-1'))) && (
+              <div>
+                <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 block mb-1">
+                  Mes del Informe / Registro ({selectedCode})
+                </label>
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-900 dark:text-white"
+                >
+                  {availableMonths.map((m) => (
+                    <option key={m} value={m}>
+                      {formatMonthLabel(m)} ({m})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {/* Botones de Acción Local */}
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
               <button
@@ -1064,3 +1200,51 @@ export const LocalOfficialFormsCenter: React.FC<LocalOfficialFormsCenterProps> =
     </div>
   );
 };
+
+export interface LocalOfficialFormsModalProps extends LocalOfficialFormsCenterProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
+}
+
+export const LocalOfficialFormsModal: React.FC<LocalOfficialFormsModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  ...centerProps
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+      <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl w-full max-w-6xl max-h-[92dvh] flex flex-col overflow-hidden">
+        <div className="px-5 py-3.5 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-sm font-black text-slate-900 dark:text-white">
+                {title || `Cargar y Rellenar Formato Oficial (${centerProps.initialFormCode || 'S-21'})`}
+              </h3>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Sube el formato oficial descargado de JW Hub para que la aplicación lo rellene con los datos de la congregación y lo descargues.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+          <LocalOfficialFormsCenter {...centerProps} />
+        </div>
+      </div>
+    </div>
+  );
+};
+

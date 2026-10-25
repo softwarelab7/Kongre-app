@@ -183,7 +183,7 @@ export const ClmReplacementModal: React.FC<ClmReplacementModalProps> = ({
         if (a.isCompanionFamily !== b.isCompanionFamily) {
           return a.isCompanionFamily ? -1 : 1;
         }
-        // 4. Agrupación Familiar KHS (familiar ya asignado esta misma noche)
+        // 4. Agrupación Familiar (familiar ya asignado esta misma noche)
         const hasFamA =
           a.publisher.groupWithFamilyInMeetings !== false && a.familyNames.length > 0;
         const hasFamB =

@@ -58,7 +58,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
     circuitVisit,
   } = useCongregation();
 
-  // Tab principal: 'semanal' (parte por parte) vs 'mensual_unificado' (1 resumen KHS por hermano)
+  // Tab principal: 'semanal' (parte por parte) vs 'mensual_unificado' (1 resumen por hermano)
   const [dispatchMode, setDispatchMode] = useState<'semanal' | 'mensual_unificado'>('mensual_unificado');
 
   // Estado modo semanal
@@ -69,7 +69,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [allCopied, setAllCopied] = useState(false);
 
-  // Estado modo mensual unificado (KHS)
+  // Estado modo mensual unificado
   const [selectedMonthKey, setSelectedMonthKey] = useState<string>(() =>
     (week?.weekStartDate || new Date().toISOString()).slice(0, 7)
   );
@@ -112,7 +112,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
     });
   }, [allAssignments, meetingFilter, statusFilter]);
 
-  // Extract unified monthly bundles per publisher (Modo Mensual Unificado KHS)
+  // Extract unified monthly bundles per publisher (Modo Mensual Unificado)
   const monthlyBundles = useMemo(() => {
     return extractAllPublishersMonthlyBundles(
       {
@@ -288,7 +288,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full">
-                  Hoja Unificada KHS + WhatsApp
+                  Hoja Unificada + WhatsApp
                 </span>
                 <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   {dispatchMode === 'mensual_unificado'
@@ -312,7 +312,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
           </button>
         </div>
 
-        {/* Selector de Modo Principal: Resumen Mensual Unificado (KHS) vs Por Asignación Individual */}
+        {/* Selector de Modo Principal: Resumen Mensual Unificado vs Por Asignación Individual */}
         <div className="px-4 sm:px-5 py-2.5 bg-slate-100/80 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
           <div className="inline-flex p-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-2xs">
             <button
@@ -325,7 +325,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
               }`}
             >
               <Layers className="w-3.5 h-3.5" />
-              <span>Resumen Único del Mes por Hermano (KHS)</span>
+              <span>Resumen Único del Mes por Hermano</span>
             </button>
             <button
               type="button"
@@ -351,7 +351,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
           </button>
         </div>
 
-        {/* MODO 1: RESUMEN MENSUAL UNIFICADO POR HERMANO (ESTILO KHS) */}
+        {/* MODO 1: RESUMEN MENSUAL UNIFICADO POR HERMANO */}
         {dispatchMode === 'mensual_unificado' ? (
           <>
             {/* Barra de Filtros del Mes */}
@@ -509,7 +509,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
                               )
                             }
                             className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
-                            title="Imprimir Hoja Personal del Mes (Estilo KHS)"
+                            title="Imprimir Hoja Personal del Mes"
                           >
                             <Printer className="w-4 h-4" />
                           </button>
@@ -806,7 +806,7 @@ export const BatchWhatsAppModal: React.FC<BatchWhatsAppModalProps> = ({
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
             <span>
-              El <strong>Resumen Único del Mes (KHS)</strong> combina Vida y Ministerio, Fin de Semana, Audio/Micrófonos, Limpieza y Carritos en 1 solo envío.
+              El <strong>Resumen Único del Mes</strong> combina Vida y Ministerio, Fin de Semana, Audio/Micrófonos, Limpieza y Carritos en 1 solo envío.
             </span>
           </div>
           <button

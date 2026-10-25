@@ -7,12 +7,14 @@ import {
   getPubDisplayName,
   isValidDemonstrationPair,
 } from './familyGrouping';
+import { loadKhsWeights } from './khsWorkloadWeighting';
 
 export interface CandidateScore {
   publisher: Publisher;
   lastAssignedDate?: string;
   daysSinceLastAssignment: number; // larger is better
   totalHistoricalAssignments: number; // lower is better
+  weightedPoints?: number; // KHS Workload Weighting (lower is better)
   isRecommended: boolean;
   hasConflictWarning?: string;
   familyMembersInMeeting?: string[]; // KHS Same-Night Family Grouping
@@ -22,10 +24,14 @@ export interface CandidateScore {
 
 // Compute all historical assignments for every publisher across all weeks
 export function computePublisherAssignmentStats(allWeeks: WeekSchedule[], publishers: Publisher[]) {
-  const stats = new Map<string, { total: number; lastDate?: string; byRole: Record<string, number> }>();
+  const weights = loadKhsWeights();
+  const stats = new Map<
+    string,
+    { total: number; weightedPoints: number; lastDate?: string; byRole: Record<string, number> }
+  >();
 
   publishers.forEach(p => {
-    stats.set(p.id, { total: 0, lastDate: undefined, byRole: {} });
+    stats.set(p.id, { total: 0, weightedPoints: 0, lastDate: undefined, byRole: {} });
   });
 
   const sortedWeeks = [...allWeeks].sort((a, b) => a.weekStartDate.localeCompare(b.weekStartDate));
@@ -36,7 +42,9 @@ export function computePublisherAssignmentStats(allWeeks: WeekSchedule[], publis
       if (!pid) return;
       const s = stats.get(pid);
       if (s) {
+        const pts = weights[role] !== undefined ? weights[role] : 2.0;
         s.total += 1;
+        s.weightedPoints = Math.round((s.weightedPoints + pts) * 10) / 10;
         s.lastDate = date;
         s.byRole[role] = (s.byRole[role] || 0) + 1;
       }
@@ -68,7 +76,7 @@ export function computePublisherAssignmentStats(allWeeks: WeekSchedule[], publis
 
     // Weekend
     record(w.weekend.presidentId, 'fds_presidente', w.weekend.date);
-    record(w.weekend.atalayaConductorId, 'fds_presidente', w.weekend.date);
+    record(w.weekend.atalayaConductorId, 'fds_atalaya_conductor', w.weekend.date);
     record(w.weekend.atalayaLectorId, 'fds_atalaya_lector', w.weekend.date);
     record(w.weekend.initialPrayerId, 'fds_oracion', w.weekend.date);
     record(w.weekend.finalPrayerId, 'fds_oracion', w.weekend.date);
@@ -156,6 +164,7 @@ export function getEligibleCandidates(
       lastAssignedDate: pubStat?.lastDate,
       daysSinceLastAssignment: daysSinceLast,
       totalHistoricalAssignments: pubStat?.total || 0,
+      weightedPoints: pubStat?.weightedPoints || 0,
       isRecommended: false,
       hasConflictWarning: alreadyInMeeting ? 'Ya tiene otra asignación en esta misma reunión' : undefined,
       familyMembersInMeeting: familyNames.length > 0 ? familyNames : undefined,
@@ -168,7 +177,7 @@ export function getEligibleCandidates(
   // 1. Without conflict warning first
   // 2. If selecting demonstration companion, prioritize family match or same-night family grouping (when rested >= 14 days)
   // 3. Longest time since last assignment (with +21 days virtual boost for KHS Same-Night Family Grouping)
-  // 4. Fewest total assignments
+  // 4. Lowest KHS Weighted Workload Points, then fewest total assignments
   candidates.sort((a, b) => {
     if (a.hasConflictWarning && !b.hasConflictWarning) return 1;
     if (!a.hasConflictWarning && b.hasConflictWarning) return -1;
@@ -185,6 +194,11 @@ export function getEligibleCandidates(
 
     if (effectiveDaysB !== effectiveDaysA) {
       return effectiveDaysB - effectiveDaysA;
+    }
+    const ptsA = a.weightedPoints || 0;
+    const ptsB = b.weightedPoints || 0;
+    if (ptsA !== ptsB) {
+      return ptsA - ptsB;
     }
     return a.totalHistoricalAssignments - b.totalHistoricalAssignments;
   });

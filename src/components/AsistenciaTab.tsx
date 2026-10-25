@@ -22,6 +22,7 @@ import {
   Smartphone,
   ArrowUpRight,
   ArrowDownRight,
+  Upload,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -35,10 +36,12 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { AttendanceTrendsDashboard } from './charts/AttendanceTrendsDashboard';
+import { LocalOfficialFormsModal } from './LocalOfficialFormsCenter';
 
 export const AsistenciaTab: React.FC = () => {
   const { weeks, updateMeetingAttendance, settings, currentWeek } = useCongregation();
   const [mainView, setMainView] = useState<'dashboard' | 'registro'>('dashboard');
+  const [isS88ModalOpen, setIsS88ModalOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
     // Current year-month (e.g. 2026-10)
     const now = new Date();
@@ -318,18 +321,29 @@ export const AsistenciaTab: React.FC = () => {
           </button>
         </div>
 
-        <button
-          onClick={() => {
-            if (!counterTarget.weekId && monthWeeks.length > 0) {
-              setCounterTarget((prev) => ({ ...prev, weekId: monthWeeks[0].id }));
-            }
-            setIsCounterOpen(true);
-          }}
-          className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
-        >
-          <Smartphone className="w-4 h-4" />
-          <span>Contador en Vivo</span>
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => setIsS88ModalOpen(true)}
+            className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm shadow-sm transition-all active:scale-95 cursor-pointer"
+          >
+            <Upload className="w-4 h-4" />
+            <span>Cargar y Rellenar S-88 Oficial (PDF)</span>
+          </button>
+
+          <button
+            onClick={() => {
+              if (!counterTarget.weekId && monthWeeks.length > 0) {
+                setCounterTarget((prev) => ({ ...prev, weekId: monthWeeks[0].id }));
+              }
+              setIsCounterOpen(true);
+            }}
+            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm shadow-md shadow-emerald-600/20 transition-all active:scale-95 cursor-pointer self-start sm:self-auto"
+          >
+            <Smartphone className="w-4 h-4" />
+            <span>Contador en Vivo</span>
+          </button>
+        </div>
       </div>
 
       {/* 1. VISUAL DASHBOARD VIEW: RECHARTS HISTORICAL SERVICE YEAR TRENDS */}
@@ -1176,6 +1190,13 @@ export const AsistenciaTab: React.FC = () => {
           </div>
         );
       })()}
+
+      <LocalOfficialFormsModal
+        isOpen={isS88ModalOpen}
+        onClose={() => setIsS88ModalOpen(false)}
+        initialFormCode="S-88"
+        title="Cargar y Rellenar Formato Oficial S-88 (Registro de Asistencia)"
+      />
     </div>
   );
 };

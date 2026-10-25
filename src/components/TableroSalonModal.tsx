@@ -17,7 +17,12 @@ import {
   Compass,
   Building,
   Printer,
+  Download,
 } from 'lucide-react';
+import {
+  printUnifiedKingdomHallBoardA4,
+  downloadCongregationMasterCalendarIcs,
+} from '../utils/khsInformationBoardEngine';
 
 interface TableroSalonModalProps {
   isOpen: boolean;
@@ -25,18 +30,36 @@ interface TableroSalonModalProps {
 }
 
 export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, onClose }) => {
-  const { currentWeek, publishersMap, settings, preachingGroups, fieldServiceMeetings, notices } =
-    useCongregation();
+  const {
+    weeks,
+    currentWeek,
+    publishersMap,
+    settings,
+    preachingGroups,
+    fieldServiceMeetings,
+    notices,
+    customDuties,
+    cartShifts,
+    cartLocations,
+    circuitVisit,
+    memorialPlans,
+    theocraticAssemblies,
+  } = useCongregation();
 
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeMeetingView, setActiveMeetingView] = useState<'midweek' | 'weekend'>('midweek');
+  const [selectedWeekId, setSelectedWeekId] = useState<string>(() => currentWeek?.id || weeks[0]?.id || '');
 
   // Real-time clock tick
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const w = useMemo(() => {
+    return weeks.find((wk) => wk.id === selectedWeekId) || currentWeek || weeks[0];
+  }, [weeks, selectedWeekId, currentWeek]);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -50,9 +73,8 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
     }
   };
 
-  if (!isOpen || !currentWeek) return null;
+  if (!isOpen || !w) return null;
 
-  const w = currentWeek;
   const isMidweek = activeMeetingView === 'midweek';
 
   // Cleaning group
@@ -86,6 +108,42 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
     day: 'numeric',
   });
 
+  const handlePrintA4Board = () => {
+    printUnifiedKingdomHallBoardA4({
+      week: w,
+      weeks,
+      publishersMap,
+      settings,
+      preachingGroups,
+      fieldServiceMeetings,
+      notices,
+      customDuties,
+      cartShifts,
+      cartLocations,
+      circuitVisit,
+      memorialPlans,
+      theocraticAssemblies,
+    });
+  };
+
+  const handleDownloadIcs = () => {
+    downloadCongregationMasterCalendarIcs({
+      week: w,
+      weeks,
+      publishersMap,
+      settings,
+      preachingGroups,
+      fieldServiceMeetings,
+      notices,
+      customDuties,
+      cartShifts,
+      cartLocations,
+      circuitVisit,
+      memorialPlans,
+      theocraticAssemblies,
+    });
+  };
+
   return (
     <div
       role="dialog"
@@ -108,7 +166,7 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
         </div>
 
         {/* Real-time Clock & Action Buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           <div className="bg-slate-800/80 px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-xl border border-slate-700 flex items-center gap-1.5 text-amber-400 font-mono text-sm sm:text-xl font-bold tracking-wider shadow-inner">
             <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400" />
             <span>{formattedTime}</span>
@@ -116,13 +174,24 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
 
           <button
             type="button"
-            onClick={() => window.print()}
-            aria-label="Imprimir Tablero Mural para el Salón"
+            onClick={handleDownloadIcs}
+            aria-label="Descargar Calendario .ics del Salón"
+            className="p-2 sm:p-2.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center gap-1.5 px-3 font-semibold text-xs cursor-pointer"
+            title="Descargar Calendario General del Salón (.ics)"
+          >
+            <Download className="w-4 h-4" />
+            <span className="hidden md:inline">Calendario (.ics)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handlePrintA4Board}
+            aria-label="Imprimir Tablero Mural A4 para el Salón"
             className="p-2 sm:p-2.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center gap-1.5 px-3 font-semibold text-xs cursor-pointer"
-            title="Imprimir Tablero Mural para el Salón"
+            title="Imprimir Cartelera A4 Todo-en-Uno (S-140 / S-28 / Deberes)"
           >
             <Printer className="w-4 h-4" />
-            <span className="hidden sm:inline">Imprimir Tablero</span>
+            <span className="hidden sm:inline">Imprimir Cartelera A4</span>
           </button>
 
           <button
@@ -151,19 +220,33 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
       <main className="flex-1 w-full mx-auto p-4 sm:p-6 2xl:p-10 space-y-4 sm:space-y-6">
         {/* Meeting Switcher & Week Banner */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4 bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
-          <div>
+          <div className="space-y-1">
             <div className="text-[10px] sm:text-xs font-bold text-indigo-400 uppercase tracking-widest">
-              Semana Actual
+              Tablero de Información del Salón del Reino
             </div>
-            <h2 className="text-lg sm:text-2xl font-black text-white mt-0.5">
-              Semana del {w.weekStartDate} al {w.weekEndDate}
-            </h2>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h2 className="text-lg sm:text-2xl font-black text-white">
+                Semana del {w.weekStartDate} al {w.weekEndDate}
+              </h2>
+              <select
+                value={w.id}
+                onChange={(e) => setSelectedWeekId(e.target.value)}
+                aria-label="Cambiar semana en el Tablero del Salón"
+                className="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-indigo-200 cursor-pointer"
+              >
+                {weeks.map((wk) => (
+                  <option key={wk.id} value={wk.id}>
+                    {wk.weekStartDate} al {wk.weekEndDate}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 w-full sm:w-auto rounded-xl bg-slate-800 p-1 border border-slate-700">
             <button
               onClick={() => setActiveMeetingView('midweek')}
-              className={`px-3 sm:px-4 py-2 rounded-lg font-bold text-xs transition-all text-center ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-bold text-xs transition-all text-center cursor-pointer ${
                 isMidweek
                   ? 'bg-indigo-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-white'
@@ -173,7 +256,7 @@ export const TableroSalonModal: React.FC<TableroSalonModalProps> = ({ isOpen, on
             </button>
             <button
               onClick={() => setActiveMeetingView('weekend')}
-              className={`px-3 sm:px-4 py-2 rounded-lg font-bold text-xs transition-all text-center ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-bold text-xs transition-all text-center cursor-pointer ${
                 !isMidweek
                   ? 'bg-blue-600 text-white shadow-md'
                   : 'text-slate-400 hover:text-white'

@@ -25,18 +25,138 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.16';
-export const CURRENT_BUILD_CODE = '2026.10.23.6700';
-export const BUILD_DATE = '23 de Octubre, 2026';
+export const CURRENT_APP_VERSION = '2.12.20';
+export const CURRENT_BUILD_CODE = '2026.10.25.7100';
+export const BUILD_DATE = '25 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '2.12.20',
+    buildCode: '2026.10.25.7100',
+    date: '25 de Octubre, 2026',
+    title: 'Analítica Gráfica con Recharts y Selector Multi-Grupo de Servicio en el Tablero de Equidad (EquidadDashboardTab)',
+    isCurrent: true,
+    highlight: 'Nuevos gráficos interactivos con Recharts para comparar la carga ponderada entre publicadores, privilegios y grupos de servicio específicos, con detección visual de desequilibrios e inspección rápida',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Visualización Comparativa con Recharts en el Tablero de Equidad (EquidadDashboardTab): Incorporación de 4 modos gráficos interactivos («Por Áreas Apilado», «Brecha vs. Privilegio», «Cuerpos y Estados» y «Por Grupos») con líneas de referencia de promedio y umbral de sobrecarga (140%), selector de muestra (Contraste 8 Más vs. 8 Menos Cargados, Top 15 Mayor Carga, Top 15 Menor Carga y Vista General) e inspector rápido al hacer clic en cualquier barra.',
+      },
+      {
+        category: 'feature',
+        text: 'Selector y Filtro Multi-Grupo de Servicio en Comparativa de Carga: Nuevo selector desplegable rápido y barra interactiva de chips multi-grupo que permiten aislar un grupo de servicio o comparar simultáneamente varios grupos específicos en todos los gráficos, tablas y métricas de equidad.',
+      },
+      {
+        category: 'improvement',
+        text: 'Tarjetas de Grupos de Predicación Interactivas y Etiquetas Contextuales: Las tarjetas inferiores de grupos de servicio ahora funcionan como filtros directos al hacer clic, mostrando en tiempo real el promedio de puntos por publicador y añadiendo el identificador de grupo (G#N) en las gráficas cuando se comparan múltiples grupos.',
+      },
+    ],
+  },
+  {
+    version: '2.12.19',
+    buildCode: '2026.10.25.7000',
+    date: '25 de Octubre, 2026',
+    title: 'Centro Local y Motor Universal de Carga y Relleno Automático de Plantillas PDF Oficiales (S-21, S-89, S-140, S-88, S-13, S-26, S-30, S-25, S-28 y S-1)',
+    isCurrent: false,
+    highlight: 'Cumplimiento estricto de derechos de autor: la aplicación nunca genera formularios oficiales desde cero; el usuario carga su archivo PDF oficial en blanco desde su dispositivo y el sistema detecta y rellena automáticamente sus campos interactivos AcroForm en el navegador (100% local)',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Motor Universal y Servicio Local de Formatos Oficiales (localOfficialFormsService.ts & officialFormFiller.ts): Integración completa con pdf-lib para cargar plantillas oficiales en blanco provistas por el usuario y rellenarlas automáticamente con datos reales de la congregación sin alterar su diseño original ni recrear formularios desde cero.',
+      },
+      {
+        category: 'feature',
+        text: 'Ordenamiento Visual Inteligente de Campos AcroForm (sortPdfFieldsVisually): Detección y ordenamiento espacial de cuadros de texto, casillas de verificación, listas desplegables y grupos de opción por coordenadas visuales (página, fila superior a inferior y columna izquierda a derecha), garantizando compatibilidad universal con cualquier idioma o revisión oficial de los formularios.',
+      },
+      {
+        category: 'feature',
+        text: 'Soporte Integral para los 10 Formularios Teocráticos Oficiales: Relleno automático especializado para Tarjetas de Publicador S-21 (individual, por grupo de servicio o congregación completa en lote multipágina), Hojas de Asignación S-89 (1 por página o 4 por página), Programa VMC S-140, Asistencia a las Reuniones S-88, Registro de Territorios S-13, Cuentas S-26, S-30 y S-25, Inventario de Literatura S-28 e Informe Mensual S-1.',
+      },
+      {
+        category: 'improvement',
+        text: 'Centro Local de Formatos Oficiales (LocalOfficialFormsCenter y OfficialPdfModal): Almacenamiento local de plantillas PDF en el navegador (IndexedDB persistente o modo exclusivo en memoria RAM por sesión), inspector interactivo de campos AcroForm detectados y botones directos de «PDF Oficial» en cada módulo.',
+      },
+      {
+        category: 'security',
+        text: 'Eliminación de Generadores de Réplicas desde Cero: Se reemplazaron los antiguos trazadores manuales de tarjetas S-21 y hojas S-89 para asegurar que todo documento oficial descargado provenga exclusivamente de la plantilla PDF oficial cargada por el usuario.',
+      },
+    ],
+  },
+  {
+    version: '2.12.18',
+    buildCode: '2026.10.25.6900',
+    date: '25 de Octubre, 2026',
+    title: 'Auditoría de Secretaría, Carpeta Ejecutiva de Visita del Sup. de Circuito, Literatura (S-28/S-14), Mantenimiento/Emergencias y Contabilidad (S-26/S-30/S-25)',
+    isCurrent: false,
+    highlight: 'Nuevos motores administrativos para seguimiento anual de precursores (meta 600 h), Dossier Ejecutivo para el Superintendente de Circuito, inventario de literatura y pedidos especiales por grupo, calendario anual de mantenimiento con plan de desastres y contabilidad congregacional completa',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Auditoría de Secretaría y Meta Anual de Precursores (secretaryAuditEngine.ts & TarjetasS21Tab): Seguimiento del ritmo anual de precursores regulares (meta de 600 horas y créditos de horas con semáforo En Meta / Atención / Rezagado) y auditoría pastoral de publicadores irregulares o en riesgo de inactividad.',
+      },
+      {
+        category: 'feature',
+        text: 'Carpeta Ejecutiva para la Visita del Superintendente de Circuito (VisitaSuperintendenteTab): Generador automático del Dossier Ejecutivo imprimible A4 y resumen por WhatsApp con métricas consolidadas de publicadores, precursores, cursos bíblicos, asistencia S-88, cobertura de territorios S-13 y radiografía por grupo de servicio.',
+      },
+      {
+        category: 'feature',
+        text: 'Gestión Integral de Literatura, Pedidos Especiales y Recuento S-14 (literatureHelper.ts & LiteraturaTab): Análisis de stock crítico y agotado, cálculo automático de pedido sugerido de reposición, control de pedidos especiales agrupados por grupo de servicio con aviso por WhatsApp al llegar al Salón, distribución a superintendentes de grupo y recuento físico.',
+      },
+      {
+        category: 'feature',
+        text: 'Calendario Anual de Mantenimiento Preventivo y Plan de Preparación ante Emergencias (maintenanceEmergencyEngine.ts & MantenimientoTab): Matriz de 12 meses del año de servicio (Septiembre a Agosto) con cálculo de cumplimiento y horas anuales, junto con el Plan de Emergencias y Desastres (árbol de contacto por grupo, hermanos con formación médica/primeros auxilios, vehículos de apoyo, custodia de llaves y mapa de cortacircuitos eléctricos).',
+      },
+      {
+        category: 'feature',
+        text: 'Contabilidad Congregacional S-26, Informe Mensual S-30 y Auditoría Trimestral S-25 (accountsHelper.ts & CuentasTab): Libro mensual S-26 con saldo acumulado línea por línea, conciliación interactiva de extracto bancario y efectivo en caja, cálculo de reserva operativa recomendada (2 meses de gastos locales), generador del anuncio mensual S-30 para plataforma y panel de Auditoría Trimestral S-25 con verificación de comprobantes.',
+      },
+    ],
+  },
+  {
+    version: '2.12.17',
+    buildCode: '2026.10.25.6800',
+    date: '25 de Octubre, 2026',
+    title: 'Suite Integral de Gestión Congregacional: Intercambio de Oradores, Deberes y Aseo, Carritos, Agrupación Familiar, Salidas al Campo, Cartelera Digital y Equidad Ponderada',
+    isCurrent: false,
+    highlight: 'Siete motores teocráticos interconectados para gestionar congregaciones vecinas y hospitalidad, deberes logísticos e insumos de aseo, emparejamiento en carritos, sincronización de núcleos familiares, resumen mensual unificado por hermano, cuadrante de predicación y auditoría ponderada de carga',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Motor de Intercambio de Oradores, Congregaciones Vecinas y Hospitalidad Inteligente (DiscursosPublicosTab & HospitalidadTab): Directorio unificado de congregaciones vecinas y oradores visitantes, detector de repetición de bosquejos públicos, validación cruzada de choques para oradores salientes y sugeridor inteligente de familias anfitrionas según equidad histórica, capacidad y alergias/dieta.',
+      },
+      {
+        category: 'feature',
+        text: 'Motor de Deberes Logísticos y Programa de Aseo con Control de Insumos (CleaningDutiesTab): Auto-asignador de Audio, Video, Micrófonos, Acomodadores, Plataforma, Seguridad y Zoom sin conflictos intra-reunión; matriz de equidad y programación de aseo semanal, limpieza profunda (S-28) y eventos especiales con lista de verificación por áreas y semáforo de insumos.',
+      },
+      {
+        category: 'feature',
+        text: 'Motor de Predicación Pública con Carritos y Emparejamiento Teocrático (CarritosTab): Validación automática de turnos de exhibidores públicos (matrimonios/familiares, compañeros fijos, alerta de parejas mixtas sin parentesco, choques de horario y ausencias), auto-asignación equitativa e impresión A4 del cuadrante.',
+      },
+      {
+        category: 'feature',
+        text: 'Agrupación Familiar Inteligente y Despacho Mensual Unificado en 8 Módulos (familyGrouping.ts, BasicInfoSection, ClmReplacementModal, unifiedMonthlyAssignments.ts, BatchWhatsAppModal & PersonalViewTab): Vinculación de núcleo familiar con sugerencias por apellido/dirección, priorización de familiares asignados en la misma reunión y consolidación mensual de todas las asignaciones de cada hermano (VMC, Fin de Semana, Deberes, Limpieza, Carritos, Salidas al Campo, Orador Saliente y Hospitalidad) en un solo mensaje de WhatsApp, hoja imprimible y calendario .ics.',
+      },
+      {
+        category: 'feature',
+        text: 'Cartelera Digital del Salón del Reino y Generador de Salidas al Campo (TableroAnunciosTab, fieldServiceGenerator.ts & GruposServicioTab): Cartelera unificada lista para vitrina A4 y boletín semanal consolidado por WhatsApp; generador automático de salidas al servicio del campo por bloques horarios y modalidades con rotación de conductores y sugerencia de territorios rezagados.',
+      },
+      {
+        category: 'feature',
+        text: 'Auditoría Ponderada de Carga Teocrática y Equidad Transversal (EquidadDashboardTab): Puntuación ponderada personalizable por rol (Enseñanza Principal, Partes Estudiantiles, Deberes/Logística, Ministerio del Campo y Oraciones) que mide el esfuerzo real acumulado por hermano, detecta sobrecarga o subutilización y genera reportes imprimibles de equidad.',
+      },
+    ],
+  },
   {
     version: '2.12.16',
     buildCode: '2026.10.23.6700',
     date: '23 de Octubre, 2026',
     title: 'Optimización Integral de Experiencia Móvil (Auditoría UI/UX, Gestos Táctiles y Ergonomía)',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Cabecera móvil despejada, barra de semanas fija con navegación por gestos swipe, KPIs interactivos deslizables en Territorios y Publicadores, modales estilo Bottom Sheet y alertas posicionadas sobre la barra inferior',
     environment: 'Producción Cloud (Kongre)',
     changes: [

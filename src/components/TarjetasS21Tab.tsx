@@ -10,6 +10,11 @@ import {
   computeSecretaryMetrics,
 } from '../utils/s21Helper';
 import {
+  computePioneerServiceYearAudit,
+  computeCircuitVisitExecutiveReport,
+  printCircuitOverseerExecutiveDossierA4,
+} from '../utils/secretaryAuditEngine';
+import {
   FileText,
   Printer,
   Search,
@@ -32,11 +37,20 @@ import {
   Calendar,
   Sparkles,
   ExternalLink,
+  Download,
+  Upload,
 } from 'lucide-react';
 import { SplashCheckbox } from './SplashCheckbox';
 import { LocalOfficialFormsCenter } from './LocalOfficialFormsCenter';
+import {
+  getLocalOfficialFormBytes,
+  fillOfficialS21Pdf,
+  downloadPdfBytesLocally,
+} from '../services/localOfficialFormsService';
+import { useToast } from '../context/ToastContext';
 
 export const TarjetasS21Tab: React.FC = () => {
+  const { showToast } = useToast();
   const {
     publishers,
     monthlyReports,
@@ -44,6 +58,10 @@ export const TarjetasS21Tab: React.FC = () => {
     updatePublisher,
     preachingGroups,
     settings,
+    auxPioneerRequests,
+    weeks,
+    territories,
+    circuitVisit,
   } = useCongregation();
 
   // Selected Service Year (default current service year, e.g. '2025-2026' or '2026-2027')
@@ -53,8 +71,8 @@ export const TarjetasS21Tab: React.FC = () => {
     return '2025-2026';
   });
 
-  // Active view: 'fichero' (tarjetero general), 'tarjeta' (detalle S-21), 'pastoral' (irregulares/inactivos), 'formato_local' (rellenador PDF oficial en local)
-  const [activeView, setActiveView] = useState<'fichero' | 'tarjeta' | 'pastoral' | 'formato_local'>('fichero');
+  // Active view: 'fichero' (tarjetero general), 'tarjeta' (detalle S-21), 'auditoria_precursores' (meta 600h), 'pastoral' (irregulares/inactivos), 'formato_local' (rellenador PDF oficial en local)
+  const [activeView, setActiveView] = useState<'fichero' | 'tarjeta' | 'auditoria_precursores' | 'pastoral' | 'formato_local'>('fichero');
 
   // Selected publisher for single S-21 card view
   const [selectedPublisherId, setSelectedPublisherId] = useState<string>(() => {
@@ -97,6 +115,26 @@ export const TarjetasS21Tab: React.FC = () => {
   const metrics = useMemo(() => {
     return computeSecretaryMetrics(publishers, monthlyReports, selectedServiceYear);
   }, [publishers, monthlyReports, selectedServiceYear]);
+
+  // Pioneer Service Year Audit (600h / 50h)
+  const pioneerAudit = useMemo(() => {
+    return computePioneerServiceYearAudit(publishers, monthlyReports, auxPioneerRequests, selectedServiceYear);
+  }, [publishers, monthlyReports, auxPioneerRequests, selectedServiceYear]);
+
+  // Executive Report for A4 Dossier
+  const executiveReport = useMemo(() => {
+    return computeCircuitVisitExecutiveReport({
+      publishers,
+      weeks,
+      monthlyReports,
+      territories,
+      preachingGroups,
+      auxPioneerRequests,
+      circuitVisit,
+      settings,
+      serviceYear: selectedServiceYear,
+    });
+  }, [publishers, weeks, monthlyReports, territories, preachingGroups, auxPioneerRequests, circuitVisit, settings, selectedServiceYear]);
 
   // Filtered publishers for fichero view
   const filteredPublishers = useMemo(() => {
@@ -250,24 +288,62 @@ export const TarjetasS21Tab: React.FC = () => {
       `"Jehová está cerca de los que tienen el corazón destrozado" (Salmo 34:18). ¡Le enviamos un fuerte abrazo fraternal!`
     );
     const url = cleanPhone ? `https://wa.me/${cleanPhone}?text=${text}` : `https://wa.me/?text=${text}`;
-    window.open(url, '_blank');
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
-  // Batch Print handler
-  const handlePrint = () => {
-    window.print();
+  // Rellenar y descargar el PDF oficial S-21 cargado por el usuario (o redirigir a cargarlo si aún no está en la bóveda local)
+  const handleDownloadOfficialS21ForPublisher = async (pub?: Publisher) => {
+    const targetPub = pub || currentPublisher || publishers[0];
+    if (!targetPub) return;
+    setSelectedPublisherId(targetPub.id);
+
+    const stored = await getLocalOfficialFormBytes('S-21');
+    if (!stored) {
+      setActiveView('formato_local');
+      showToast(
+        'Carga primero tu archivo oficial S-21.pdf descargado de JW Hub para que la aplicación lo rellene y puedas descargarlo.',
+        'info'
+      );
+      return;
+    }
+
+    try {
+      const filledBytes = await fillOfficialS21Pdf(
+        stored.bytes,
+        targetPub,
+        selectedServiceYear,
+        monthlyReports
+      );
+      const cleanName = (targetPub.name || 'Publicador').replace(
+        /[^a-zA-Z0-9ÁÉÍÓÚáéíóúÑñ_-]/g,
+        '_'
+      );
+      const outFileName = `S-21_${cleanName}_${selectedServiceYear}.pdf`;
+      downloadPdfBytesLocally(filledBytes, outFileName);
+      showToast(`Tarjeta oficial "${outFileName}" rellenada y descargada.`, 'success');
+    } catch (err: any) {
+      console.error('Error rellenando S-21 oficial:', err);
+      setActiveView('formato_local');
+      showToast('Verifica o vuelve a cargar tu plantilla oficial S-21.pdf.', 'error');
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Barra de Acciones de Tarjetas S-21 (Opción 1: arranque directo sin banner redundante) */}
+      {/* Barra de Acciones de Tarjetas S-21 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
         <div className="flex items-center gap-2">
           <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
             Formulario S-21
           </span>
           <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
-            Fichero oficial de 12 meses por año de servicio teocrático
+            Carga tu PDF oficial S-21 de JW Hub para que la app lo rellene y descargue
           </span>
         </div>
 
@@ -294,16 +370,25 @@ export const TarjetasS21Tab: React.FC = () => {
             onClick={() => setActiveView('formato_local')}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer active:scale-95"
           >
-            <ShieldCheck className="w-4 h-4" />
-            <span>Rellenar S-21 (Local)</span>
+            <Upload className="w-4 h-4" />
+            <span>Cargar y Rellenar PDF Oficial S-21</span>
           </button>
 
           <button
-            onClick={handlePrint}
+            onClick={() => handleDownloadOfficialS21ForPublisher(currentPublisher)}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer active:scale-95"
           >
+            <Download className="w-4 h-4" />
+            <span>Descargar S-21 Oficial Rellenado</span>
+          </button>
+
+          <button
+            onClick={() => printCircuitOverseerExecutiveDossierA4(executiveReport, settings, circuitVisit)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer active:scale-95"
+            title="Imprimir Resumen Analítico Interno para la Visita"
+          >
             <Printer className="w-4 h-4" />
-            <span>Imprimir Tarjetas S-21</span>
+            <span>Resumen Estadístico Visita</span>
           </button>
         </div>
       </div>
@@ -382,6 +467,18 @@ export const TarjetasS21Tab: React.FC = () => {
           >
             <FileText className="w-3.5 h-3.5" />
             <span>Tarjeta Oficial S-21 Individual</span>
+          </button>
+
+          <button
+            onClick={() => setActiveView('auditoria_precursores')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+              activeView === 'auditoria_precursores'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'bg-indigo-50 text-indigo-800 hover:bg-indigo-100 border border-indigo-200'
+            }`}
+          >
+            <Award className="w-3.5 h-3.5" />
+            <span>Auditoría de Precursores 600h ({pioneerAudit.summary.totalRegularPioneers})</span>
           </button>
 
           <button
@@ -613,12 +710,28 @@ export const TarjetasS21Tab: React.FC = () => {
                       </div>
                     </div>
 
-                    <button
-                      className="text-xs font-bold text-indigo-600 group-hover:text-indigo-700 flex items-center gap-1"
-                    >
-                      <span>Abrir S-21</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDownloadOfficialS21ForPublisher(pub);
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-[11px] font-bold flex items-center gap-1 transition cursor-pointer"
+                        title="Rellenar y descargar el PDF oficial S-21 cargado"
+                      >
+                        <Download className="w-3 h-3" />
+                        <span>PDF S-21 Oficial</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="text-xs font-bold text-indigo-600 group-hover:text-indigo-700 flex items-center gap-1"
+                      >
+                        <span>Ver Registro</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -628,7 +741,7 @@ export const TarjetasS21Tab: React.FC = () => {
       )}
 
       {/* ============================================================== */}
-      {/* VIEW 2: TARJETA OFICIAL S-21 INDIVIDUAL (RÉPLICA FÍSICA)       */}
+      {/* VIEW 2: TARJETA S-21 INDIVIDUAL (HISTORIAL DE REGISTROS)       */}
       {/* ============================================================== */}
       {activeView === 'tarjeta' && currentPublisher && currentS21Card && (
         <div className="space-y-6">
@@ -643,37 +756,45 @@ export const TarjetasS21Tab: React.FC = () => {
                 <span>Volver al Fichero</span>
               </button>
               <h2 className="text-base font-bold text-slate-800">
-                Tarjeta de {currentPublisher.name} ({selectedServiceYear})
+                Registro de {currentPublisher.name} ({selectedServiceYear})
               </h2>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={handleOpenEditPersonal}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition cursor-pointer"
               >
                 <Edit2 className="w-3.5 h-3.5 text-indigo-600" />
                 <span>Editar Datos Personales S-21</span>
               </button>
 
               <button
-                onClick={handlePrint}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition"
+                onClick={() => setActiveView('formato_local')}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition cursor-pointer"
               >
-                <Printer className="w-3.5 h-3.5" />
-                <span>Imprimir Esta Tarjeta</span>
+                <Upload className="w-3.5 h-3.5" />
+                <span>Cargar / Previsualizar S-21 Oficial</span>
+              </button>
+
+              <button
+                onClick={() => handleDownloadOfficialS21ForPublisher(currentPublisher)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Rellenar y Descargar S-21 Oficial (PDF)</span>
               </button>
             </div>
           </div>
 
           {/* ========================================================== */}
-          {/* OFFICIAL S-21 PRINTABLE PHYSICAL CARD CONTAINER            */}
+          {/* TARJETA DE CONSULTA INTERNA DEL HISTORIAL DE INFORMES       */}
           {/* ========================================================== */}
           <div className="bg-white border-2 border-slate-800 p-6 sm:p-8 rounded-2xl shadow-lg max-w-4xl mx-auto space-y-6 print:border print:shadow-none print:m-0 print:p-4">
-            {/* Header: Exact S-21 Theocratic Heading */}
+            {/* Header */}
             <div className="border-b-2 border-slate-800 pb-4 text-center space-y-1">
               <span className="text-[10px] uppercase tracking-widest text-slate-500 font-bold block">
-                Formulario Oficial de la Congregación
+                Vista de Consulta Interna • Para exportar usa el formato oficial S-21 PDF cargado
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-wider uppercase font-serif">
                 REGISTRO DE PUBLICADOR DE LA CONGREGACIÓN
@@ -1221,6 +1342,220 @@ export const TarjetasS21Tab: React.FC = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* VIEW 3.5: AUDITORÍA DE PRECURSORES REGULARES (600H) Y AUX.     */}
+      {/* ============================================================== */}
+      {activeView === 'auditoria_precursores' && (
+        <div className="space-y-5 no-print">
+          {/* Summary Banner */}
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+              <span className="text-[11px] font-bold text-slate-500 uppercase block">Precursores Regulares</span>
+              <span className="text-2xl font-black text-slate-900">{pioneerAudit.summary.totalRegularPioneers}</span>
+              <span className="text-xs text-slate-500 block mt-0.5">Meta: 600 h anuales (50 h/mes)</span>
+            </div>
+            <div className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200 shadow-xs">
+              <span className="text-[11px] font-bold text-emerald-700 uppercase block">En Meta Pro-Rata</span>
+              <span className="text-2xl font-black text-emerald-700">{pioneerAudit.summary.onTrackCount}</span>
+              <span className="text-xs text-emerald-800 block mt-0.5">Ritmo saludable (≥ 50 h/mes)</span>
+            </div>
+            <div className="bg-amber-50/70 p-4 rounded-2xl border border-amber-200 shadow-xs">
+              <span className="text-[11px] font-bold text-amber-700 uppercase block">En Observación / Déficit</span>
+              <span className="text-2xl font-black text-amber-700">
+                {pioneerAudit.summary.warningCount + pioneerAudit.summary.behindCount}
+              </span>
+              <span className="text-xs text-amber-800 block mt-0.5">
+                {pioneerAudit.summary.warningCount} observación • {pioneerAudit.summary.behindCount} rezagados
+              </span>
+            </div>
+            <div className="bg-indigo-50/70 p-4 rounded-2xl border border-indigo-200 shadow-xs">
+              <span className="text-[11px] font-bold text-indigo-700 uppercase block">Promedio Mensual</span>
+              <span className="text-2xl font-black text-indigo-700">{pioneerAudit.summary.avgRegularPioneerMonthlyHours} h</span>
+              <span className="text-xs text-indigo-800 block mt-0.5">
+                {pioneerAudit.summary.combinedPioneerHours} h acumuladas en {selectedServiceYear}
+              </span>
+            </div>
+          </div>
+
+          {/* Regular Pioneers Table */}
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <Award className="w-4 h-4 text-indigo-600" />
+                  <span>Control Anual de Horas de Precursores Regulares y Especiales ({selectedServiceYear})</span>
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Seguimiento del requisito anual de 600 horas (50 h mensuales promedio) más horas de crédito teocrático para la revisión del Comité de Servicio y visita del Superintendente de Circuito.
+                </p>
+              </div>
+              <button
+                onClick={() => printCircuitOverseerExecutiveDossierA4(executiveReport, settings, circuitVisit)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shrink-0 cursor-pointer"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Imprimir Auditoría A4</span>
+              </button>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                  <tr>
+                    <th className="py-3 px-4">Precursor</th>
+                    <th className="py-3 px-3 text-center">Grupo</th>
+                    <th className="py-3 px-3 text-center">Meses Inf.</th>
+                    <th className="py-3 px-3 text-right">Horas Pred.</th>
+                    <th className="py-3 px-3 text-right">Crédito</th>
+                    <th className="py-3 px-3 text-right">Total Efectivo</th>
+                    <th className="py-3 px-3 text-right">Prom. / Mes</th>
+                    <th className="py-3 px-3 text-right">Meta Pro-Rata</th>
+                    <th className="py-3 px-3 text-right">Balance</th>
+                    <th className="py-3 px-3 text-right">Faltan (600h)</th>
+                    <th className="py-3 px-3 text-center">Estado</th>
+                    <th className="py-3 px-4 text-right">Acción</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {pioneerAudit.regularPioneers.length === 0 ? (
+                    <tr>
+                      <td colSpan={12} className="py-8 text-center text-slate-400">
+                        No hay precursores regulares registrados en el fichero.
+                      </td>
+                    </tr>
+                  ) : (
+                    pioneerAudit.regularPioneers.map((row) => {
+                      const progressPct = Math.min(
+                        100,
+                        Math.round((row.effectiveHours / row.annualGoalHours) * 100)
+                      );
+                      return (
+                        <tr key={row.publisher.id} className="hover:bg-slate-50/80 transition">
+                          <td className="py-3 px-4">
+                            <div className="font-bold text-slate-900">{row.publisher.name}</div>
+                            <div className="w-32 bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1">
+                              <div
+                                className={`h-full rounded-full ${
+                                  row.paceStatus === 'en_meta'
+                                    ? 'bg-emerald-500'
+                                    : row.paceStatus === 'atencion'
+                                    ? 'bg-amber-500'
+                                    : 'bg-rose-500'
+                                }`}
+                                style={{ width: `${progressPct}%` }}
+                              />
+                            </div>
+                          </td>
+                          <td className="py-3 px-3 text-center font-semibold text-slate-600">
+                            G-{row.publisher.groupNumber || '-'}
+                          </td>
+                          <td className="py-3 px-3 text-center font-semibold text-slate-700">
+                            {row.monthsReported} / 12
+                          </td>
+                          <td className="py-3 px-3 text-right font-semibold text-slate-800">
+                            {row.totalHours} h
+                          </td>
+                          <td className="py-3 px-3 text-right text-indigo-600 font-semibold">
+                            {row.totalCreditHours > 0 ? `+${row.totalCreditHours} h` : '-'}
+                          </td>
+                          <td className="py-3 px-3 text-right font-black text-slate-900">
+                            {row.effectiveHours} h
+                          </td>
+                          <td className="py-3 px-3 text-right font-bold text-slate-800">
+                            {row.avgMonthlyHours} h
+                          </td>
+                          <td className="py-3 px-3 text-right text-slate-500">
+                            {row.proRataTargetHours} h
+                          </td>
+                          <td
+                            className={`py-3 px-3 text-right font-bold ${
+                              row.hoursDelta >= 0
+                                ? 'text-emerald-600'
+                                : row.hoursDelta >= -20
+                                ? 'text-amber-600'
+                                : 'text-rose-600'
+                            }`}
+                          >
+                            {row.hoursDelta >= 0 ? `+${row.hoursDelta} h` : `${row.hoursDelta} h`}
+                          </td>
+                          <td className="py-3 px-3 text-right text-slate-600 font-medium">
+                            {row.remainingToAnnualGoal} h
+                          </td>
+                          <td className="py-3 px-3 text-center">
+                            {row.paceStatus === 'en_meta' ? (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                                En Meta
+                              </span>
+                            ) : row.paceStatus === 'atencion' ? (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                                Observación
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">
+                                Déficit
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-right">
+                            <button
+                              onClick={() => handleSelectPublisher(row.publisher.id)}
+                              className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg font-bold text-[11px] transition cursor-pointer"
+                            >
+                              Abrir S-21
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Auxiliary Pioneers Summary */}
+          {pioneerAudit.auxPioneers.length > 0 && (
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 space-y-3">
+              <div>
+                <h4 className="font-bold text-slate-900 text-sm">
+                  Precursores Auxiliares en el Año de Servicio ({pioneerAudit.auxPioneers.length})
+                </h4>
+                <p className="text-xs text-slate-500">
+                  Publicadores que han servido como precursores auxiliares (continuos o temporales de 15h / 30h).
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {pioneerAudit.auxPioneers.map((aux) => (
+                  <div
+                    key={aux.publisher.id}
+                    onClick={() => handleSelectPublisher(aux.publisher.id)}
+                    className="p-3 rounded-xl border border-slate-200 hover:border-indigo-300 bg-slate-50/60 cursor-pointer flex items-center justify-between gap-2 text-xs transition"
+                  >
+                    <div>
+                      <div className="font-bold text-slate-800 flex items-center gap-1.5">
+                        <span>{aux.publisher.name}</span>
+                        {aux.isContinuous && (
+                          <span className="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 text-[10px] font-bold">
+                            Continuo
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">
+                        {aux.monthsServed} mes(es): {aux.monthsLabels.join(', ') || 'Activo'}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-black text-indigo-700">{aux.totalHours} h</div>
+                      <div className="text-[10px] text-slate-500">Prom: {aux.avgHours} h/m</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

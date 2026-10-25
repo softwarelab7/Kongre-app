@@ -2,10 +2,28 @@
 import React, { useState, useMemo } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
-import { PreachingGroup, CustomDuty, FieldServiceMeeting, Gender, WeekSchedule } from '../types';
+import {
+  PreachingGroup,
+  CustomDuty,
+  FieldServiceMeeting,
+  Gender,
+  WeekSchedule,
+  CleaningProgramType,
+  CleaningSuppliesStatus,
+} from '../types';
 import { AssignmentSelectorModal } from './AssignmentSelectorModal';
 import { SplashCheckbox } from './SplashCheckbox';
 import { openWhatsAppLink } from '../utils/whatsapp';
+import {
+  KHS_CLEANING_CHECKLIST_ITEMS,
+  CLEANING_TYPE_LABELS,
+  CLEANING_SUPPLIES_LABELS,
+  evaluateDutyAssignmentStatus,
+  getWeekDutyConflicts,
+  autoAssignWeekDutiesOnly,
+  computeDutyEquitabilityMatrix,
+  buildGroupOverseerCleaningWhatsApp,
+} from '../utils/khsDutiesCleaningEngine';
 import {
   Brush,
   Users,
@@ -31,6 +49,13 @@ import {
   Video,
   Mic,
   Check,
+  AlertTriangle,
+  Printer,
+  BarChart3,
+  HeartHandshake,
+  Wand2,
+  CheckSquare,
+  PackageCheck,
 } from 'lucide-react';
 
 export const CleaningDutiesTab: React.FC = () => {
@@ -54,6 +79,7 @@ export const CleaningDutiesTab: React.FC = () => {
     updateWeek,
     publishersMap,
     clearWeekAssignments,
+    outgoingSpeakers,
   } = useCongregation();
   const { effectiveRoleInfo } = useAuth();
   const isReadOnly = effectiveRoleInfo.isReadOnly || !effectiveRoleInfo.canEditSchedule;
@@ -90,6 +116,13 @@ export const CleaningDutiesTab: React.FC = () => {
   });
 
   const [copiedFsSuccess, setCopiedFsSuccess] = useState(false);
+  const [autoAssignToast, setAutoAssignToast] = useState<string | null>(null);
+  const [showEquityPanel, setShowEquityPanel] = useState(false);
+
+  const showToast = (msg: string) => {
+    setAutoAssignToast(msg);
+    setTimeout(() => setAutoAssignToast(null), 3500);
+  };
 
   const handleOpenAddFs = () => {
     setEditingFs(null);
@@ -282,21 +315,30 @@ export const CleaningDutiesTab: React.FC = () => {
     setIsDutyModalOpen(false);
   };
 
-  // Auto-rotate cleaning groups across all weeks
+  // Auto-rotate cleaning groups across all weeks (with automatic monthly deep cleaning on 1st week of each month)
   const handleAutoRotateCleaning = () => {
     if (preachingGroups.length === 0) return;
     const sorted = [...weeks].sort((a, b) => a.weekStartDate.localeCompare(b.weekStartDate));
+    let lastMonth = '';
     sorted.forEach((w, idx) => {
       const groupNum = preachingGroups[idx % preachingGroups.length].number;
+      const monthKey = w.weekStartDate.slice(0, 7);
+      const isFirstWeekOfMonth = monthKey !== lastMonth;
+      lastMonth = monthKey;
       updateWeek({
         ...w,
         cleaningGroupNumbers: [groupNum],
+        cleaningType: w.cleaningType || (isFirstWeekOfMonth && idx > 0 ? 'profunda' : 'semanal'),
+        cleaningSuppliesStatus: w.cleaningSuppliesStatus || 'abastecido',
       });
     });
+    showToast('Rotación de grupos de limpieza actualizada en todas las semanas.');
   };
 
   // Sub-section navigation
-  const [activeSection, setActiveSection] = useState<'turnos' | 'limpieza' | 'catalogo' | 'grupos' | 'salidas'>('turnos');
+  const [activeSection, setActiveSection] = useState<
+    'turnos' | 'matriz_khs' | 'limpieza' | 'catalogo' | 'grupos' | 'salidas'
+  >('turnos');
 
   // Sorted weeks & selected week for Duty Assignment Board
   const sortedWeeks = useMemo(() => {
@@ -329,6 +371,103 @@ export const CleaningDutiesTab: React.FC = () => {
     if (currentIndex < sortedWeeks.length - 1) {
       setSelectedWeekId(sortedWeeks[currentIndex + 1].id);
     }
+  };
+
+  // Live conflicts in selected week duties
+  const activeWeekDutyConflicts = useMemo(() => {
+    if (!selectedWeek) return [];
+    return getWeekDutyConflicts(
+      selectedWeek,
+      publishers,
+      publishersMap,
+      customDuties,
+      outgoingSpeakers
+    );
+  }, [selectedWeek, publishers, publishersMap, customDuties, outgoingSpeakers]);
+
+  // Equitability Matrix across all weeks
+  const dutyEquityRows = useMemo(() => {
+    return computeDutyEquitabilityMatrix(weeks, publishers, customDuties);
+  }, [weeks, publishers, customDuties]);
+
+  // 1-Click Smart Auto-Assign Duties for Selected Week
+  const handleAutoAssignSelectedWeekDuties = (scope: 'both' | 'midweek' | 'weekend' = 'both') => {
+    if (!selectedWeek || isReadOnly) return;
+    const updated = autoAssignWeekDutiesOnly(
+      selectedWeek,
+      weeks,
+      publishers,
+      customDuties,
+      outgoingSpeakers,
+      scope,
+      false
+    );
+    updateWeek(updated);
+    const scopeLabel =
+      scope === 'midweek'
+        ? 'Entre Semana'
+        : scope === 'weekend'
+        ? 'Fin de Semana'
+        : 'toda la semana';
+    showToast(`Turnos de ${scopeLabel} auto-asignados con equidad y agrupación familiar.`);
+  };
+
+  // 1-Click Smart Auto-Rotate Duties across ALL weeks
+  const handleAutoAssignAllWeeksDuties = () => {
+    if (isReadOnly || sortedWeeks.length === 0) return;
+    const simulatedWeeks: WeekSchedule[] = JSON.parse(JSON.stringify(sortedWeeks));
+    for (let i = 0; i < simulatedWeeks.length; i++) {
+      const updatedW = autoAssignWeekDutiesOnly(
+        simulatedWeeks[i],
+        simulatedWeeks,
+        publishers,
+        customDuties,
+        outgoingSpeakers,
+        'both',
+        false
+      );
+      simulatedWeeks[i] = updatedW;
+      updateWeek(updatedW);
+    }
+    showToast(`Rotación completada en ${simulatedWeeks.length} semanas sin choques de plataforma.`);
+  };
+
+  // Toggle S-28 Cleaning Checklist item for a week
+  const handleToggleCleaningChecklist = (weekObj: WeekSchedule, areaId: string) => {
+    if (isReadOnly) return;
+    const current = new Set(weekObj.cleaningChecklistCompleted || []);
+    if (current.has(areaId)) {
+      current.delete(areaId);
+    } else {
+      current.add(areaId);
+    }
+    updateWeek({
+      ...weekObj,
+      cleaningChecklistCompleted: Array.from(current),
+    });
+  };
+
+  // Send 1-click WhatsApp S-28 Cleaning Reminder to Group Overseer or Assistant
+  const handleSendGroupCleaningWhatsApp = (
+    weekObj: WeekSchedule,
+    group: PreachingGroup,
+    roleTarget: 'overseer' | 'assistant'
+  ) => {
+    const leaderId = roleTarget === 'overseer' ? group.overseerId : group.assistantId;
+    const leader = leaderId ? publishersMap.get(leaderId) : undefined;
+    const members = publishers.filter(
+      (p) => p.active && (p.groupNumber === group.number || group.memberIds.includes(p.id))
+    );
+    const msg = buildGroupOverseerCleaningWhatsApp({
+      week: weekObj,
+      group,
+      recipientName: leader?.name || `Encargado ${group.name}`,
+      recipientRoleLabel:
+        roleTarget === 'overseer' ? 'Superintendente de Grupo' : 'Auxiliar de Grupo',
+      members,
+      settings,
+    });
+    openWhatsAppLink(leader?.phone || '', msg);
   };
 
   // Assignment Selector Modal State
@@ -376,14 +515,15 @@ export const CleaningDutiesTab: React.FC = () => {
     });
   };
 
-  // Toggle Duty Publisher in Selected Week
+  // Toggle Duty Publisher in Selected Week (or any target week)
   const handleToggleDutyPublisher = (
     meetingType: 'midweek' | 'weekend',
     dutyKey: string,
-    publisherId: string
+    publisherId: string,
+    targetWeek: WeekSchedule | undefined = selectedWeek
   ) => {
-    if (!selectedWeek) return;
-    const updated = JSON.parse(JSON.stringify(selectedWeek)) as WeekSchedule;
+    if (!targetWeek) return;
+    const updated = JSON.parse(JSON.stringify(targetWeek)) as WeekSchedule;
     const dutiesObj = meetingType === 'midweek' ? updated.midweek.duties : updated.weekend.duties;
     if (!dutiesObj[dutyKey]) dutiesObj[dutyKey] = [];
 
@@ -393,6 +533,31 @@ export const CleaningDutiesTab: React.FC = () => {
       list.splice(idx, 1);
     } else {
       list.push(publisherId);
+    }
+    updateWeek(updated);
+  };
+
+  // Replace a conflicted publisher in a duty slot
+  const handleReplaceDutyPublisher = (
+    meetingType: 'midweek' | 'weekend',
+    dutyKey: string,
+    oldPublisherId: string,
+    newPublisherId: string
+  ) => {
+    if (!selectedWeek) return;
+    const updated = JSON.parse(JSON.stringify(selectedWeek)) as WeekSchedule;
+    const dutiesObj = meetingType === 'midweek' ? updated.midweek.duties : updated.weekend.duties;
+    if (!dutiesObj[dutyKey]) dutiesObj[dutyKey] = [];
+    const list = dutiesObj[dutyKey];
+    const idx = list.indexOf(oldPublisherId);
+    if (idx >= 0) {
+      if (!list.includes(newPublisherId)) {
+        list[idx] = newPublisherId;
+      } else {
+        list.splice(idx, 1);
+      }
+    } else if (!list.includes(newPublisherId)) {
+      list.push(newPublisherId);
     }
     updateWeek(updated);
   };
@@ -443,23 +608,24 @@ export const CleaningDutiesTab: React.FC = () => {
     let text = `🛡️ *SERVICIOS DE LA CONGREGACIÓN - ${settings.congregationName?.toUpperCase() || 'SALÓN DEL REINO'}*\n`;
     text += `Programa de Deberes y Turnos: ${selectedWeek.weekStartDate} al ${selectedWeek.weekEndDate}\n\n`;
 
-    text += `📍 *DEBERES DE ENTRE SEMANA:*\n`;
+    text += `📍 *DEBERES DE ENTRE SEMANA (${selectedWeek.midweek?.date || selectedWeek.weekStartDate}):*\n`;
     customDuties.filter((d) => d.midweek).forEach((duty) => {
       const ids = selectedWeek.midweek?.duties?.[duty.key] || [];
       const names = ids.map((id) => publishersMap.get(id)?.name).filter(Boolean).join(', ') || 'Sin asignar';
       text += `• ${duty.name}: ${names}\n`;
     });
 
-    text += `\n📍 *DEBERES DE FIN DE SEMANA:*\n`;
+    text += `\n📍 *DEBERES DE FIN DE SEMANA (${selectedWeek.weekend?.date || selectedWeek.weekEndDate}):*\n`;
     customDuties.filter((d) => d.weekend).forEach((duty) => {
       const ids = selectedWeek.weekend?.duties?.[duty.key] || [];
       const names = ids.map((id) => publishersMap.get(id)?.name).filter(Boolean).join(', ') || 'Sin asignar';
       text += `• ${duty.name}: ${names}\n`;
     });
 
-    const cleaningGroup = selectedWeek.cleaningGroupNumbers?.[0];
-    if (cleaningGroup) {
-      text += `\n🧹 *Aseo y Limpieza:* Grupo #${cleaningGroup}\n`;
+    const cleaningGroups = selectedWeek.cleaningGroupNumbers || [];
+    if (cleaningGroups.length > 0) {
+      const typeLabel = CLEANING_TYPE_LABELS[selectedWeek.cleaningType || 'semanal'];
+      text += `\n🧹 *Aseo y Limpieza (${typeLabel}):* Grupo(s) #${cleaningGroups.join(', #')}\n`;
     }
 
     navigator.clipboard.writeText(text);
@@ -467,9 +633,31 @@ export const CleaningDutiesTab: React.FC = () => {
     setTimeout(() => setCopiedDutiesSuccess(false), 3000);
   };
 
+  // Printable KHS Duties & Cleaning Matrix Window
+  const handlePrintKhsDutiesMatrix = () => {
+    window.print();
+  };
+
   return (
     <div className="space-y-6">
-      {/* Barra Unificada de Pestañas y Acciones (Opción 1: arranque directo sin banner redundante) */}
+      {/* Toast Notification Banner */}
+      {autoAssignToast && (
+        <div className="p-3.5 rounded-2xl bg-indigo-600 text-white text-xs sm:text-sm font-bold shadow-lg flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 shrink-0" />
+            <span>{autoAssignToast}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setAutoAssignToast(null)}
+            className="text-white/80 hover:text-white p-1 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Barra Unificada de Pestañas y Acciones */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         {/* Subtab Navigation Pills */}
         <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 dark:bg-slate-900/60 rounded-2xl border border-slate-200/80 dark:border-white/10 w-fit overflow-x-auto max-w-full shadow-2xs">
@@ -483,6 +671,23 @@ export const CleaningDutiesTab: React.FC = () => {
           >
             <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             <span>Deberes y Turnos Semanales</span>
+            {activeWeekDutyConflicts.length > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full bg-rose-600 text-white text-[10px] font-extrabold">
+                {activeWeekDutyConflicts.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveSection('matriz_khs')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              activeSection === 'matriz_khs'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+            }`}
+          >
+            <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span>Matriz Mensual (Tablero)</span>
           </button>
 
           <button
@@ -493,8 +698,8 @@ export const CleaningDutiesTab: React.FC = () => {
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Brush className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            <span>Rotación de Limpieza ({weeks.length} sem.)</span>
+            <Brush className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            <span>Programa de Aseo S-28 ({weeks.length} sem.)</span>
           </button>
 
           <button
@@ -535,6 +740,18 @@ export const CleaningDutiesTab: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 shrink-0 justify-end">
+          {!isReadOnly && (
+            <button
+              type="button"
+              onClick={() => handleAutoAssignSelectedWeekDuties('both')}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-2xs"
+              title="Auto-asignar turnos de esta semana evitando choques de plataforma y agrupando familias"
+            >
+              <Wand2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <span>Auto-Asignar Deberes (1-Clic)</span>
+            </button>
+          )}
+
           <button
             onClick={handleCopyWeeklyDutiesSummary}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-2xs"
@@ -579,45 +796,70 @@ export const CleaningDutiesTab: React.FC = () => {
             <Users className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">{preachingGroups.length}</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Grupos de Predicación</div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">{preachingGroups.length} Grupos</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Aseo y Servicio del Campo</div>
           </div>
         </div>
 
         <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-            <Brush className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">{weeks.length} Semanas</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Cronograma de Limpieza</div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">{customDuties.length} Activos</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Privilegios Especiales</div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">
+              {dutyEquityRows.length} Hermanos
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Habilitados en Deberes</div>
           </div>
         </div>
 
         <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-            <Compass className="w-5 h-5" />
+          <div
+            className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+              activeWeekDutyConflicts.length > 0
+                ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+            }`}
+          >
+            {activeWeekDutyConflicts.length > 0 ? (
+              <AlertTriangle className="w-5 h-5" />
+            ) : (
+              <CheckCircle2 className="w-5 h-5" />
+            )}
           </div>
           <div>
-            <div className="text-xl font-bold text-slate-900 dark:text-white">{fieldServiceMeetings.length} Puntos</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">Salidas a la Predicación</div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">
+              {activeWeekDutyConflicts.length === 0
+                ? '0 Choques'
+                : `${activeWeekDutyConflicts.length} Alerta(s)`}
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+              Radar Plataforma vs Deberes
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-[#131d2e] rounded-2xl border border-slate-200/80 dark:border-white/[0.06] p-4 shadow-xs flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+            <Brush className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-xl font-bold text-slate-900 dark:text-white">
+              {selectedWeek?.cleaningGroupNumbers?.length
+                ? `Grupo #${selectedWeek.cleaningGroupNumbers.join(', #')}`
+                : 'Sin asignar'}
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+              {CLEANING_TYPE_LABELS[selectedWeek?.cleaningType || 'semanal']}
+            </div>
           </div>
         </div>
       </div>
-      {/* ── SECCIÓN PRINCIPAL: DEBERES Y TURNOS SEMANALES (CATEGORÍA APARTE) ── */}
+
+      {/* ── SECCIÓN PRINCIPAL: DEBERES Y TURNOS SEMANALES ── */}
       {activeSection === 'turnos' && (
         <div className="space-y-6 animate-in fade-in duration-200">
-          {/* Barra de navegación de semanas y acciones rápidas */}
+          {/* Barra de navegación de semanas y acciones rápidas KHS */}
           <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3 flex-wrap">
               {/* Flechas de navegación semanal */}
@@ -657,26 +899,51 @@ export const CleaningDutiesTab: React.FC = () => {
                   </option>
                 ))}
               </select>
+
+              {settings.conflictRules?.prioritizeFamilySameMeeting !== false && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/50 text-[11px] font-bold">
+                  <HeartHandshake className="w-3.5 h-3.5" />
+                  <span>Agrupación Familiar Activa</span>
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
+              {!isReadOnly && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => handleAutoAssignSelectedWeekDuties('both')}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                    title="Auto-asignar los deberes vacíos de esta semana sin chocar con partes de plataforma"
+                  >
+                    <Wand2 className="w-3.5 h-3.5" />
+                    <span>Auto-Asignar Semana</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleAutoAssignAllWeeksDuties}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-violet-50 dark:bg-violet-950/40 hover:bg-violet-100 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800/60 text-xs font-bold transition-all cursor-pointer"
+                    title="Auto-rotar deberes en todas las semanas programadas con equidad histórica"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Rotar Todas ({weeks.length} sem.)</span>
+                  </button>
+                </>
+              )}
+
               <button
                 type="button"
-                onClick={handleCopyWeeklyDutiesSummary}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs font-bold transition-all cursor-pointer"
-                title="Copiar asignaciones de turnos de esta semana para WhatsApp"
+                onClick={() => setShowEquityPanel((prev) => !prev)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                  showEquityPanel
+                    ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900'
+                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-white/10 hover:bg-slate-100'
+                }`}
               >
-                {copiedDutiesSuccess ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>¡Copiado!</span>
-                  </>
-                ) : (
-                  <>
-                    <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>WhatsApp Turnos</span>
-                  </>
-                )}
+                <BarChart3 className="w-3.5 h-3.5" />
+                <span>Equidad</span>
               </button>
 
               {!isReadOnly && (
@@ -692,6 +959,161 @@ export const CleaningDutiesTab: React.FC = () => {
               )}
             </div>
           </div>
+
+          {/* RADAR DE CHOQUES EN VIVO (PLATAFORMA / SALIENTES / AUSENCIAS VS DEBERES) */}
+          {activeWeekDutyConflicts.length > 0 && selectedWeek && (
+            <div className="bg-rose-50/90 dark:bg-rose-950/30 rounded-3xl border border-rose-200 dark:border-rose-800/60 p-4 sm:p-5 space-y-3 shadow-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-300 flex items-center justify-center shrink-0">
+                    <AlertTriangle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-extrabold text-rose-900 dark:text-rose-200">
+                      Detector de Choques en Deberes ({activeWeekDutyConflicts.length} alerta{activeWeekDutyConflicts.length > 1 ? 's' : ''})
+                    </h4>
+                    <p className="text-xs text-rose-700 dark:text-rose-300">
+                      Hermanos asignados a Audio/Video, Micrófonos o Acomodadores que tienen parte en plataforma, discurso saliente o ausencia en la misma reunión:
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                {activeWeekDutyConflicts.map((c, idx) => {
+                  const mDate =
+                    c.meetingType === 'midweek'
+                      ? selectedWeek.midweek?.date || selectedWeek.weekStartDate
+                      : selectedWeek.weekend?.date || selectedWeek.weekEndDate;
+                  return (
+                    <div
+                      key={`${c.meetingType}-${c.dutyKey}-${c.publisherId}-${idx}`}
+                      className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-rose-200/90 dark:border-rose-800/60 flex items-center justify-between gap-3 shadow-2xs"
+                    >
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-extrabold text-slate-900 dark:text-white">
+                            {c.publisherName}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300">
+                            {c.dutyName} ({c.meetingType === 'midweek' ? 'Entre Semana' : 'Fin de Semana'})
+                          </span>
+                        </div>
+                        <div className="mt-1 space-y-0.5 text-[11px] text-rose-600 dark:text-rose-400 font-medium">
+                          {c.platformClashes.length > 0 && (
+                            <div>• Parte en plataforma: {c.platformClashes.join(', ')}</div>
+                          )}
+                          {c.otherDutyClashes.length > 0 && (
+                            <div>• Otro deber simultáneo: {c.otherDutyClashes.join(', ')}</div>
+                          )}
+                          {c.outgoingSpeakerClash && <div>• {c.outgoingSpeakerClash}</div>}
+                          {c.absenceClash && <div>• {c.absenceClash}</div>}
+                        </div>
+                      </div>
+
+                      {!isReadOnly && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            openSelector(
+                              `Reemplazar a ${c.publisherName} en ${c.dutyName}`,
+                              c.dutyKey,
+                              'any',
+                              mDate,
+                              c.meetingType,
+                              c.publisherId,
+                              (newPid) =>
+                                handleReplaceDutyPublisher(
+                                  c.meetingType,
+                                  c.dutyKey,
+                                  c.publisherId,
+                                  newPid
+                                ),
+                              () => handleToggleDutyPublisher(c.meetingType, c.dutyKey, c.publisherId)
+                            )
+                          }
+                          className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold shrink-0 cursor-pointer transition-colors"
+                        >
+                          Reemplazar
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* PANEL DESPLEGABLE DE EQUIDAD Y ROTACIÓN DE DEBERES */}
+          {showEquityPanel && (
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-5 shadow-xs space-y-3 animate-in fade-in duration-150">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    <span>Distribución y Equidad de Turnos Mecánicos</span>
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Conteo acumulado de turnos asignados en las {weeks.length} semanas del programa actual
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowEquityPanel(false)}
+                  className="text-xs font-bold text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  Cerrar ✕
+                </button>
+              </div>
+
+              <div className="overflow-x-auto max-h-72">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400">
+                      <th className="py-2 pr-3 font-bold">Hermano</th>
+                      <th className="py-2 px-2 font-bold text-center">Total Turnos</th>
+                      <th className="py-2 px-2 font-bold text-center">Entre Sem.</th>
+                      <th className="py-2 px-2 font-bold text-center">Fin Sem.</th>
+                      {customDuties.slice(0, 5).map((d) => (
+                        <th key={d.key} className="py-2 px-2 font-bold text-center truncate max-w-[100px]">
+                          {d.name}
+                        </th>
+                      ))}
+                      <th className="py-2 pl-2 font-bold text-right">Último Turno</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/[0.06]">
+                    {dutyEquityRows.map((row) => (
+                      <tr key={row.publisher.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
+                        <td className="py-2 pr-3 font-semibold text-slate-900 dark:text-white">
+                          {row.publisher.name}
+                        </td>
+                        <td className="py-2 px-2 text-center">
+                          <span className="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 font-bold">
+                            {row.totalDuties}
+                          </span>
+                        </td>
+                        <td className="py-2 px-2 text-center text-slate-600 dark:text-slate-300">
+                          {row.midweekDuties}
+                        </td>
+                        <td className="py-2 px-2 text-center text-slate-600 dark:text-slate-300">
+                          {row.weekendDuties}
+                        </td>
+                        {customDuties.slice(0, 5).map((d) => (
+                          <td key={d.key} className="py-2 px-2 text-center text-slate-500 dark:text-slate-400">
+                            {row.byDutyKey[d.key] || 0}
+                          </td>
+                        ))}
+                        <td className="py-2 pl-2 text-right text-slate-500 dark:text-slate-400 font-mono text-[11px]">
+                          {row.lastDutyDate || '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {selectedWeek && (
             <>
@@ -714,6 +1136,17 @@ export const CleaningDutiesTab: React.FC = () => {
                       </p>
                     </div>
                   </div>
+
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() => handleAutoAssignSelectedWeekDuties('midweek')}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 text-xs font-bold transition-colors cursor-pointer self-start sm:self-auto"
+                    >
+                      <Wand2 className="w-3.5 h-3.5" />
+                      <span>Completar Entre Semana</span>
+                    </button>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -731,16 +1164,21 @@ export const CleaningDutiesTab: React.FC = () => {
                               <h4 className="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wider">
                                 {duty.name}
                               </h4>
-                              {assignedIds.length > 0 && !isReadOnly && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleClearDuty('midweek', duty.key)}
-                                  className="text-[10px] text-rose-500 hover:text-rose-700 font-bold cursor-pointer"
-                                  title={`Quitar a todos los asignados a ${duty.name}`}
-                                >
-                                  Limpiar
-                                </button>
-                              )}
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] font-semibold text-slate-400">
+                                  {assignedIds.length}/{duty.maxPeople || 1}
+                                </span>
+                                {assignedIds.length > 0 && !isReadOnly && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleClearDuty('midweek', duty.key)}
+                                    className="text-[10px] text-rose-500 hover:text-rose-700 font-bold cursor-pointer"
+                                    title={`Quitar a todos los asignados a ${duty.name}`}
+                                  >
+                                    Limpiar
+                                  </button>
+                                )}
+                              </div>
                             </div>
 
                             {duty.description && (
@@ -749,7 +1187,7 @@ export const CleaningDutiesTab: React.FC = () => {
                               </p>
                             )}
 
-                            {/* Assigned brothers list */}
+                            {/* Assigned brothers list with KHS live conflict & family badges */}
                             <div className="mt-3 space-y-1.5">
                               {assignedIds.length === 0 ? (
                                 <p className="text-xs text-slate-400 dark:text-slate-500 italic py-1">
@@ -758,36 +1196,80 @@ export const CleaningDutiesTab: React.FC = () => {
                               ) : (
                                 assignedIds.map((pid) => {
                                   const pub = publishersMap.get(pid);
+                                  const liveStatus = evaluateDutyAssignmentStatus(
+                                    selectedWeek,
+                                    'midweek',
+                                    duty.key,
+                                    duty.name,
+                                    pid,
+                                    publishers,
+                                    publishersMap,
+                                    customDuties,
+                                    outgoingSpeakers
+                                  );
                                   return (
                                     <div
                                       key={pid}
-                                      className="flex items-center justify-between p-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-white/10 text-xs"
+                                      className={`p-2 rounded-xl border text-xs transition-all ${
+                                        liveStatus.hasConflict
+                                          ? 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700'
+                                          : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-white/10'
+                                      }`}
                                     >
-                                      <span className="font-semibold text-slate-800 dark:text-slate-200 truncate pr-1">
-                                        {pub?.name || 'Hno.'}
-                                      </span>
-                                      <div className="flex items-center gap-1 shrink-0">
-                                        {pub?.phone && (
-                                          <button
-                                            type="button"
-                                            onClick={() => handleSendDutyWhatsApp(pid, duty.name, 'midweek')}
-                                            className="text-emerald-600 hover:text-emerald-700 p-0.5 transition-colors cursor-pointer"
-                                            title="Enviar recordatorio por WhatsApp"
-                                          >
-                                            <MessageCircle className="w-3.5 h-3.5" />
-                                          </button>
-                                        )}
-                                        {!isReadOnly && (
-                                          <button
-                                            type="button"
-                                            onClick={() => handleToggleDutyPublisher('midweek', duty.key, pid)}
-                                            className="text-slate-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
-                                            title="Quitar"
-                                          >
-                                            <X className="w-3.5 h-3.5" />
-                                          </button>
-                                        )}
+                                      <div className="flex items-center justify-between gap-1">
+                                        <span className="font-semibold text-slate-800 dark:text-slate-200 truncate pr-1">
+                                          {pub?.name || 'Hno.'}
+                                        </span>
+                                        <div className="flex items-center gap-1 shrink-0">
+                                          {pub?.phone && (
+                                            <button
+                                              type="button"
+                                              onClick={() => handleSendDutyWhatsApp(pid, duty.name, 'midweek')}
+                                              className="text-emerald-600 hover:text-emerald-700 p-0.5 transition-colors cursor-pointer"
+                                              title="Enviar recordatorio por WhatsApp"
+                                            >
+                                              <MessageCircle className="w-3.5 h-3.5" />
+                                            </button>
+                                          )}
+                                          {!isReadOnly && (
+                                            <button
+                                              type="button"
+                                              onClick={() => handleToggleDutyPublisher('midweek', duty.key, pid)}
+                                              className="text-slate-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
+                                              title="Quitar"
+                                            >
+                                              <X className="w-3.5 h-3.5" />
+                                            </button>
+                                          )}
+                                        </div>
                                       </div>
+
+                                      {/* Live Conflict Alert Pill */}
+                                      {liveStatus.hasConflict && (
+                                        <div className="mt-1 flex items-start gap-1 text-[10px] font-bold text-rose-700 dark:text-rose-300">
+                                          <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" />
+                                          <span>
+                                            {[
+                                              ...liveStatus.platformClashes,
+                                              ...liveStatus.otherDutyClashes.map((d) => `Doble deber: ${d}`),
+                                              liveStatus.absenceClash,
+                                            ]
+                                              .filter(Boolean)
+                                              .join(' • ')}
+                                          </span>
+                                        </div>
+                                      )}
+
+                                      {/* Live KHS Family Grouping Pill */}
+                                      {!liveStatus.hasConflict &&
+                                        liveStatus.familyMembersInMeeting.length > 0 && (
+                                          <div className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
+                                            <HeartHandshake className="w-3 h-3 shrink-0" />
+                                            <span className="truncate">
+                                              Familia hoy: {liveStatus.familyMembersInMeeting.join(', ')}
+                                            </span>
+                                          </div>
+                                        )}
                                     </div>
                                   );
                                 })
@@ -841,6 +1323,17 @@ export const CleaningDutiesTab: React.FC = () => {
                       </p>
                     </div>
                   </div>
+
+                  {!isReadOnly && (
+                    <button
+                      type="button"
+                      onClick={() => handleAutoAssignSelectedWeekDuties('weekend')}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 text-xs font-bold transition-colors cursor-pointer self-start sm:self-auto"
+                    >
+                      <Wand2 className="w-3.5 h-3.5" />
+                      <span>Completar Fin de Semana</span>
+                    </button>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -858,16 +1351,21 @@ export const CleaningDutiesTab: React.FC = () => {
                               <h4 className="font-bold text-slate-900 dark:text-white text-xs uppercase tracking-wider">
                                 {duty.name}
                               </h4>
-                              {assignedIds.length > 0 && !isReadOnly && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleClearDuty('weekend', duty.key)}
-                                  className="text-[10px] text-rose-500 hover:text-rose-700 font-bold cursor-pointer"
-                                  title={`Quitar a todos los asignados a ${duty.name}`}
-                                >
-                                  Limpiar
-                                </button>
-                              )}
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] font-semibold text-slate-400">
+                                  {assignedIds.length}/{duty.maxPeople || 1}
+                                </span>
+                                {assignedIds.length > 0 && !isReadOnly && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleClearDuty('weekend', duty.key)}
+                                    className="text-[10px] text-rose-500 hover:text-rose-700 font-bold cursor-pointer"
+                                    title={`Quitar a todos los asignados a ${duty.name}`}
+                                  >
+                                    Limpiar
+                                  </button>
+                                )}
+                              </div>
                             </div>
 
                             {duty.description && (
@@ -876,7 +1374,7 @@ export const CleaningDutiesTab: React.FC = () => {
                               </p>
                             )}
 
-                            {/* Assigned brothers list */}
+                            {/* Assigned brothers list with KHS live conflict & family badges */}
                             <div className="mt-3 space-y-1.5">
                               {assignedIds.length === 0 ? (
                                 <p className="text-xs text-slate-400 dark:text-slate-500 italic py-1">
@@ -885,36 +1383,81 @@ export const CleaningDutiesTab: React.FC = () => {
                               ) : (
                                 assignedIds.map((pid) => {
                                   const pub = publishersMap.get(pid);
+                                  const liveStatus = evaluateDutyAssignmentStatus(
+                                    selectedWeek,
+                                    'weekend',
+                                    duty.key,
+                                    duty.name,
+                                    pid,
+                                    publishers,
+                                    publishersMap,
+                                    customDuties,
+                                    outgoingSpeakers
+                                  );
                                   return (
                                     <div
                                       key={pid}
-                                      className="flex items-center justify-between p-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-white/10 text-xs"
+                                      className={`p-2 rounded-xl border text-xs transition-all ${
+                                        liveStatus.hasConflict
+                                          ? 'bg-rose-50/90 dark:bg-rose-950/40 border-rose-300 dark:border-rose-700'
+                                          : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-white/10'
+                                      }`}
                                     >
-                                      <span className="font-semibold text-slate-800 dark:text-slate-200 truncate pr-1">
-                                        {pub?.name || 'Hno.'}
-                                      </span>
-                                      <div className="flex items-center gap-1 shrink-0">
-                                        {pub?.phone && (
-                                          <button
-                                            type="button"
-                                            onClick={() => handleSendDutyWhatsApp(pid, duty.name, 'weekend')}
-                                            className="text-emerald-600 hover:text-emerald-700 p-0.5 transition-colors cursor-pointer"
-                                            title="Enviar recordatorio por WhatsApp"
-                                          >
-                                            <MessageCircle className="w-3.5 h-3.5" />
-                                          </button>
-                                        )}
-                                        {!isReadOnly && (
-                                          <button
-                                            type="button"
-                                            onClick={() => handleToggleDutyPublisher('weekend', duty.key, pid)}
-                                            className="text-slate-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
-                                            title="Quitar"
-                                          >
-                                            <X className="w-3.5 h-3.5" />
-                                          </button>
-                                        )}
+                                      <div className="flex items-center justify-between gap-1">
+                                        <span className="font-semibold text-slate-800 dark:text-slate-200 truncate pr-1">
+                                          {pub?.name || 'Hno.'}
+                                        </span>
+                                        <div className="flex items-center gap-1 shrink-0">
+                                          {pub?.phone && (
+                                            <button
+                                              type="button"
+                                              onClick={() => handleSendDutyWhatsApp(pid, duty.name, 'weekend')}
+                                              className="text-emerald-600 hover:text-emerald-700 p-0.5 transition-colors cursor-pointer"
+                                              title="Enviar recordatorio por WhatsApp"
+                                            >
+                                              <MessageCircle className="w-3.5 h-3.5" />
+                                            </button>
+                                          )}
+                                          {!isReadOnly && (
+                                            <button
+                                              type="button"
+                                              onClick={() => handleToggleDutyPublisher('weekend', duty.key, pid)}
+                                              className="text-slate-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
+                                              title="Quitar"
+                                            >
+                                              <X className="w-3.5 h-3.5" />
+                                            </button>
+                                          )}
+                                        </div>
                                       </div>
+
+                                      {/* Live Conflict Alert Pill */}
+                                      {liveStatus.hasConflict && (
+                                        <div className="mt-1 flex items-start gap-1 text-[10px] font-bold text-rose-700 dark:text-rose-300">
+                                          <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" />
+                                          <span>
+                                            {[
+                                              ...liveStatus.platformClashes,
+                                              ...liveStatus.otherDutyClashes.map((d) => `Doble deber: ${d}`),
+                                              liveStatus.outgoingSpeakerClash,
+                                              liveStatus.absenceClash,
+                                            ]
+                                              .filter(Boolean)
+                                              .join(' • ')}
+                                          </span>
+                                        </div>
+                                      )}
+
+                                      {/* Live KHS Family Grouping Pill */}
+                                      {!liveStatus.hasConflict &&
+                                        liveStatus.familyMembersInMeeting.length > 0 && (
+                                          <div className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                                            <HeartHandshake className="w-3 h-3 shrink-0" />
+                                            <span className="truncate">
+                                              Familia hoy: {liveStatus.familyMembersInMeeting.join(', ')}
+                                            </span>
+                                          </div>
+                                        )}
                                     </div>
                                   );
                                 })
@@ -949,19 +1492,22 @@ export const CleaningDutiesTab: React.FC = () => {
                 </div>
               </div>
 
-              {/* BLOQUE 3: LIMPIEZA DEL SALÓN PARA ESTA SEMANA */}
-              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-4">
+              {/* BLOQUE 3: ASEO DEL SALÓN DEL REINO S-28 + RECORDATORIO 1-CLIC AL SUPERINTENDENTE DE GRUPO */}
+              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-white/[0.06]">
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                       <Brush className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                        Aseo y Limpieza del Salón (Esta Semana)
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
+                        <span>Aseo y Mantenimiento del Salón del Reino (S-28)</span>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300">
+                          {CLEANING_TYPE_LABELS[selectedWeek.cleaningType || 'semanal']}
+                        </span>
                       </h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Grupo de predicación asignado para la limpieza antes y después de las reuniones
+                        Grupo de predicación encargado, lista de verificación S-28 y aviso directo por WhatsApp al Superintendente de Grupo
                       </p>
                     </div>
                   </div>
@@ -971,41 +1517,212 @@ export const CleaningDutiesTab: React.FC = () => {
                     onClick={() => setActiveSection('limpieza')}
                     className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
                   >
-                    Ver cronograma completo →
+                    Ver cronograma anual S-28 →
                   </button>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 pt-1">
-                  <span className="text-xs text-slate-600 dark:text-slate-400 font-semibold mr-2">
-                    Grupo(s) a cargo:
-                  </span>
-                  {preachingGroups.map((g) => {
-                    const isSelected = selectedWeek.cleaningGroupNumbers.includes(g.number);
-                    return (
-                      <button
-                        key={g.number}
-                        type="button"
-                        onClick={() => {
-                          if (isReadOnly) return;
-                          const list = [...selectedWeek.cleaningGroupNumbers];
-                          const idx = list.indexOf(g.number);
-                          if (idx >= 0) {
-                            if (list.length > 1) list.splice(idx, 1);
-                          } else {
-                            list.push(g.number);
-                          }
-                          updateWeek({ ...selectedWeek, cleaningGroupNumbers: list });
-                        }}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-indigo-600 text-white shadow-xs'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                        }`}
+                {/* Selector de Grupo(s), Modalidad y Estado de Insumos */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="lg:col-span-2 space-y-2">
+                    <span className="text-xs text-slate-600 dark:text-slate-400 font-bold block">
+                      Grupo(s) de Predicación a cargo esta semana:
+                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {preachingGroups.map((g) => {
+                        const isSelected = selectedWeek.cleaningGroupNumbers.includes(g.number);
+                        return (
+                          <button
+                            key={g.number}
+                            type="button"
+                            onClick={() => {
+                              if (isReadOnly) return;
+                              const list = [...selectedWeek.cleaningGroupNumbers];
+                              const idx = list.indexOf(g.number);
+                              if (idx >= 0) {
+                                if (list.length > 1) list.splice(idx, 1);
+                              } else {
+                                list.push(g.number);
+                              }
+                              updateWeek({ ...selectedWeek, cleaningGroupNumbers: list });
+                            }}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-indigo-600 text-white shadow-xs'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                            }`}
+                          >
+                            {isSelected ? '✓ ' : ''}Grupo #{g.number}: {g.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">
+                        Modalidad de Aseo
+                      </label>
+                      <select
+                        disabled={isReadOnly}
+                        value={selectedWeek.cleaningType || 'semanal'}
+                        onChange={(e) =>
+                          updateWeek({
+                            ...selectedWeek,
+                            cleaningType: e.target.value as CleaningProgramType,
+                          })
+                        }
+                        className="w-full px-2.5 py-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white"
                       >
-                        {isSelected ? '✓ ' : ''}Grupo #{g.number}: {g.name}
-                      </button>
-                    );
-                  })}
+                        <option value="semanal">Semanal Regular</option>
+                        <option value="profunda">Limpieza Profunda (S-28)</option>
+                        <option value="visita_sc">Visita Sup. Circuito</option>
+                        <option value="evento_especial">Pre-Asamblea / Conmem.</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">
+                        Insumos de Aseo
+                      </label>
+                      <select
+                        disabled={isReadOnly}
+                        value={selectedWeek.cleaningSuppliesStatus || 'abastecido'}
+                        onChange={(e) =>
+                          updateWeek({
+                            ...selectedWeek,
+                            cleaningSuppliesStatus: e.target.value as CleaningSuppliesStatus,
+                          })
+                        }
+                        className="w-full px-2.5 py-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white"
+                      >
+                        <option value="abastecido">✓ Insumos Completos</option>
+                        <option value="reponer_pronto">⚠ Reponer Pronto</option>
+                        <option value="urgente">🚨 Urgente Comprar</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tarjetas de Aviso 1-Clic al Superintendente y Auxiliar del Grupo Asignado */}
+                {selectedWeek.cleaningGroupNumbers.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                    {selectedWeek.cleaningGroupNumbers.map((gNum) => {
+                      const grp = preachingGroups.find((g) => g.number === gNum);
+                      if (!grp) return null;
+                      const overseer = grp.overseerId ? publishersMap.get(grp.overseerId) : undefined;
+                      const assistant = grp.assistantId ? publishersMap.get(grp.assistantId) : undefined;
+                      const grpMembers = publishers.filter(
+                        (p) => p.active && (p.groupNumber === grp.number || grp.memberIds.includes(p.id))
+                      );
+
+                      return (
+                        <div
+                          key={grp.number}
+                          className="p-3.5 rounded-2xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                        >
+                          <div>
+                            <div className="text-xs font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                              <span>Grupo #{grp.number}: {grp.name}</span>
+                              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10">
+                                {grpMembers.length} integrantes
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-600 dark:text-slate-400 mt-1">
+                              <span>Sup: <strong>{overseer?.name || 'Sin designar'}</strong></span>
+                              {' • '}
+                              <span>Aux: <strong>{assistant?.name || 'Sin designar'}</strong></span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleSendGroupCleaningWhatsApp(selectedWeek, grp, 'overseer')}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-2xs"
+                              title="Enviar recordatorio y lista S-28 por WhatsApp al Superintendente de Grupo"
+                            >
+                              <MessageCircle className="w-3.5 h-3.5" />
+                              <span>WhatsApp Sup.</span>
+                            </button>
+                            {assistant && (
+                              <button
+                                type="button"
+                                onClick={() => handleSendGroupCleaningWhatsApp(selectedWeek, grp, 'assistant')}
+                                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs font-bold transition-colors cursor-pointer"
+                                title="Enviar recordatorio por WhatsApp al Auxiliar de Grupo"
+                              >
+                                <MessageCircle className="w-3.5 h-3.5" />
+                                <span>Aux.</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Lista de Verificación Interactiva S-28 */}
+                <div className="pt-2 border-t border-slate-100 dark:border-white/[0.06] space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                      <CheckSquare className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                      <span>Lista de Verificación S-28 para esta semana:</span>
+                    </span>
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                      {(selectedWeek.cleaningChecklistCompleted || []).length} completadas
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                    {KHS_CLEANING_CHECKLIST_ITEMS.filter(
+                      (item) =>
+                        (selectedWeek.cleaningType &&
+                          selectedWeek.cleaningType !== 'semanal') ||
+                        item.scope === 'semanal'
+                    ).map((item) => {
+                      const isDone = (selectedWeek.cleaningChecklistCompleted || []).includes(
+                        item.id
+                      );
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => handleToggleCleaningChecklist(selectedWeek, item.id)}
+                          className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-2 ${
+                            isDone
+                              ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800/70'
+                              : 'bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/80 dark:border-white/10 hover:bg-white dark:hover:bg-slate-800'
+                          }`}
+                        >
+                          <div
+                            className={`w-4 h-4 rounded-md mt-0.5 flex items-center justify-center shrink-0 border ${
+                              isDone
+                                ? 'bg-emerald-600 border-emerald-600 text-white'
+                                : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-600'
+                            }`}
+                          >
+                            {isDone && <Check className="w-3 h-3" />}
+                          </div>
+                          <div className="min-w-0">
+                            <div
+                              className={`text-xs font-bold leading-tight ${
+                                isDone
+                                  ? 'line-through text-emerald-900 dark:text-emerald-200'
+                                  : 'text-slate-800 dark:text-slate-200'
+                              }`}
+                            >
+                              {item.label}
+                            </div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">
+                              {item.detail}
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </>
@@ -1013,78 +1730,359 @@ export const CleaningDutiesTab: React.FC = () => {
         </div>
       )}
 
-      {/* 1. SECCIÓN: LIMPIEZA DEL SALÓN DEL REINO */}
+      {/* ── SECCIÓN NUEVA: MATRIZ MENSUAL (TABLERO DE ANUNCIOS IMPRIMIBLE) ── */}
+      {activeSection === 'matriz_khs' && (
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-5 animate-in fade-in duration-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-white/10">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <span>Matriz Mensual de Deberes y Aseo (Tablero del Salón)</span>
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Vista consolidada multicolumna para el Tablero de Anuncios del Salón del Reino (Audio/Video, Micrófonos, Acomodadores y Limpieza)
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {!isReadOnly && (
+                <button
+                  type="button"
+                  onClick={handleAutoAssignAllWeeksDuties}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
+                >
+                  <Wand2 className="w-4 h-4" />
+                  <span>Auto-Completar Matriz ({sortedWeeks.length} sem.)</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={handlePrintKhsDutiesMatrix}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-white text-xs font-bold transition-all cursor-pointer"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Imprimir Tablero A4</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="bg-slate-100/90 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-white/10">
+                  <th className="py-3 px-3 font-extrabold">Semana</th>
+                  <th className="py-3 px-2 font-extrabold">Reunión</th>
+                  {customDuties.map((d) => (
+                    <th key={d.key} className="py-3 px-2.5 font-extrabold">
+                      {d.name}
+                    </th>
+                  ))}
+                  <th className="py-3 px-3 font-extrabold text-amber-700 dark:text-amber-300">
+                    Aseo S-28
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200/70 dark:divide-white/10">
+                {sortedWeeks.map((w) => {
+                  const cleaningLabel =
+                    w.cleaningGroupNumbers?.length > 0
+                      ? `Grupo #${w.cleaningGroupNumbers.join(', #')}`
+                      : 'Sin asignar';
+                  const cType = CLEANING_TYPE_LABELS[w.cleaningType || 'semanal'];
+                  return (
+                    <React.Fragment key={w.id}>
+                      {/* Fila Entre Semana */}
+                      <tr className="hover:bg-indigo-50/30 dark:hover:bg-indigo-950/20">
+                        <td
+                          rowSpan={2}
+                          className="py-3 px-3 font-bold text-slate-900 dark:text-white align-top border-r border-slate-200/60 dark:border-white/10 whitespace-nowrap"
+                        >
+                          <div>{w.weekStartDate}</div>
+                          <div className="text-[10px] font-medium text-slate-400">
+                            al {w.weekEndDate}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedWeekId(w.id);
+                              setActiveSection('turnos');
+                            }}
+                            className="mt-1.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                          >
+                            Editar semana →
+                          </button>
+                        </td>
+                        <td className="py-2.5 px-2 font-bold text-indigo-700 dark:text-indigo-300 whitespace-nowrap">
+                          Entre Semana
+                          <div className="text-[10px] font-normal text-slate-400">
+                            {w.midweek?.date || w.weekStartDate}
+                          </div>
+                        </td>
+                        {customDuties.map((d) => {
+                          if (!d.midweek) {
+                            return (
+                              <td key={d.key} className="py-2.5 px-2.5 text-slate-300 dark:text-slate-600">
+                                —
+                              </td>
+                            );
+                          }
+                          const ids = w.midweek?.duties?.[d.key] || [];
+                          return (
+                            <td key={d.key} className="py-2.5 px-2.5">
+                              {ids.length === 0 ? (
+                                <span className="text-slate-400 italic">Sin asignar</span>
+                              ) : (
+                                <div className="flex flex-col gap-0.5">
+                                  {ids.map((id) => {
+                                    const p = publishersMap.get(id);
+                                    const st = evaluateDutyAssignmentStatus(
+                                      w,
+                                      'midweek',
+                                      d.key,
+                                      d.name,
+                                      id,
+                                      publishers,
+                                      publishersMap,
+                                      customDuties,
+                                      outgoingSpeakers
+                                    );
+                                    return (
+                                      <span
+                                        key={id}
+                                        className={`font-semibold ${
+                                          st.hasConflict
+                                            ? 'text-rose-600 dark:text-rose-400 underline decoration-wavy'
+                                            : 'text-slate-800 dark:text-slate-200'
+                                        }`}
+                                        title={
+                                          st.hasConflict
+                                            ? `Choque: ${[...st.platformClashes, ...st.otherDutyClashes, st.absenceClash].filter(Boolean).join(', ')}`
+                                            : undefined
+                                        }
+                                      >
+                                        {p?.name || 'Hno.'}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </td>
+                          );
+                        })}
+                        <td
+                          rowSpan={2}
+                          className="py-3 px-3 align-middle border-l border-slate-200/60 dark:border-white/10 bg-amber-50/30 dark:bg-amber-950/10"
+                        >
+                          <div className="font-extrabold text-amber-800 dark:text-amber-300">
+                            {cleaningLabel}
+                          </div>
+                          <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                            {cType}
+                          </div>
+                        </td>
+                      </tr>
+
+                      {/* Fila Fin de Semana */}
+                      <tr className="bg-slate-50/50 dark:bg-white/[0.02] hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20">
+                        <td className="py-2.5 px-2 font-bold text-emerald-700 dark:text-emerald-300 whitespace-nowrap">
+                          Fin de Semana
+                          <div className="text-[10px] font-normal text-slate-400">
+                            {w.weekend?.date || w.weekEndDate}
+                          </div>
+                        </td>
+                        {customDuties.map((d) => {
+                          if (!d.weekend) {
+                            return (
+                              <td key={d.key} className="py-2.5 px-2.5 text-slate-300 dark:text-slate-600">
+                                —
+                              </td>
+                            );
+                          }
+                          const ids = w.weekend?.duties?.[d.key] || [];
+                          return (
+                            <td key={d.key} className="py-2.5 px-2.5">
+                              {ids.length === 0 ? (
+                                <span className="text-slate-400 italic">Sin asignar</span>
+                              ) : (
+                                <div className="flex flex-col gap-0.5">
+                                  {ids.map((id) => {
+                                    const p = publishersMap.get(id);
+                                    const st = evaluateDutyAssignmentStatus(
+                                      w,
+                                      'weekend',
+                                      d.key,
+                                      d.name,
+                                      id,
+                                      publishers,
+                                      publishersMap,
+                                      customDuties,
+                                      outgoingSpeakers
+                                    );
+                                    return (
+                                      <span
+                                        key={id}
+                                        className={`font-semibold ${
+                                          st.hasConflict
+                                            ? 'text-rose-600 dark:text-rose-400 underline decoration-wavy'
+                                            : 'text-slate-800 dark:text-slate-200'
+                                        }`}
+                                        title={
+                                          st.hasConflict
+                                            ? `Choque: ${[...st.platformClashes, ...st.otherDutyClashes, st.outgoingSpeakerClash, st.absenceClash].filter(Boolean).join(', ')}`
+                                            : undefined
+                                        }
+                                      >
+                                        {p?.name || 'Hno.'}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* 1. SECCIÓN: LIMPIEZA DEL SALÓN DEL REINO S-28 */}
       {activeSection === 'limpieza' && (
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-4 animate-in fade-in duration-200">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-xs space-y-5 animate-in fade-in duration-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-white/10">
           <div>
-            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Brush className="w-5 h-5 text-indigo-600" />
-              <span>Limpieza del Salón del Reino (Rotación)</span>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Brush className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <span>Programa de Aseo del Salón del Reino (Estándar S-28)</span>
             </h3>
-            <p className="text-xs text-slate-500">
-              Rotación secuencial de grupos de predicación semana a semana para el mantenimiento teocrático.
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Rotación de grupos de predicación, control de limpieza profunda e insumos, y aviso en 1 clic al Superintendente de Grupo.
             </p>
           </div>
-          <button
-            onClick={handleAutoRotateCleaning}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs font-bold transition-all"
-          >
-            <Brush className="w-4 h-4" />
-            <span>Rotar Grupos Automáticamente</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleAutoRotateCleaning}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 text-xs font-bold transition-all cursor-pointer shadow-xs"
+            >
+              <Brush className="w-4 h-4" />
+              <span>Auto-Rotar Grupos y Limpieza Profunda</span>
+            </button>
+          </div>
         </div>
 
         {/* Cleaning weeks timeline view */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {weeks.map(w => {
-            const assignedGroupNums = w.cleaningGroupNumbers;
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {sortedWeeks.map((w) => {
+            const assignedGroupNums = w.cleaningGroupNumbers || [];
+            const cType: CleaningProgramType = w.cleaningType || 'semanal';
+            const sStatus: CleaningSuppliesStatus = w.cleaningSuppliesStatus || 'abastecido';
+            const completedCount = (w.cleaningChecklistCompleted || []).length;
+            const firstGroup =
+              assignedGroupNums.length > 0
+                ? preachingGroups.find((g) => g.number === assignedGroupNums[0])
+                : undefined;
+            const overseer = firstGroup?.overseerId
+              ? publishersMap.get(firstGroup.overseerId)
+              : undefined;
+
             return (
               <div
                 key={w.id}
-                className="p-3.5 rounded-2xl border border-slate-200 bg-slate-50 flex flex-col justify-between"
+                className="p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-slate-800/40 flex flex-col justify-between space-y-3 hover:bg-white dark:hover:bg-slate-800 transition-all shadow-2xs"
               >
-                <div>
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {w.weekStartDate}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <span className="flex items-center gap-1 font-bold text-slate-700 dark:text-slate-200">
+                      <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                      {w.weekStartDate} al {w.weekEndDate}
                     </span>
-                    <span className="text-[10px] font-semibold text-slate-400">al {w.weekEndDate}</span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${CLEANING_SUPPLIES_LABELS[sStatus].badgeClass}`}
+                    >
+                      {CLEANING_SUPPLIES_LABELS[sStatus].label}
+                    </span>
                   </div>
-                  <h4 className="text-sm font-bold text-slate-900 mt-2">
-                    {assignedGroupNums.length === 0
-                      ? 'Sin grupo asignado'
-                      : `Grupo(s): #${assignedGroupNums.join(', #')}`}
-                  </h4>
+
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                      {assignedGroupNums.length === 0
+                        ? 'Sin grupo asignado'
+                        : `Grupo(s): #${assignedGroupNums.join(', #')}`}
+                    </h4>
+                    <select
+                      disabled={isReadOnly}
+                      value={cType}
+                      onChange={(e) =>
+                        updateWeek({
+                          ...w,
+                          cleaningType: e.target.value as CleaningProgramType,
+                        })
+                      }
+                      className="text-[11px] font-bold px-2 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-indigo-700 dark:text-indigo-300"
+                    >
+                      <option value="semanal">Aseo Semanal</option>
+                      <option value="profunda">Limpieza Profunda</option>
+                      <option value="visita_sc">Visita Sup. Circuito</option>
+                      <option value="evento_especial">Pre-Asamblea</option>
+                    </select>
+                  </div>
+
+                  {firstGroup && (
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Sup. Grupo: <strong className="text-slate-700 dark:text-slate-200">{overseer?.name || 'Sin designar'}</strong>
+                      {' • '}Checklist S-28: <strong>{completedCount} áreas</strong>
+                    </p>
+                  )}
                 </div>
 
-                <div className="mt-3 pt-2 border-t border-slate-200 flex flex-wrap gap-1">
-                  {preachingGroups.map(g => {
-                    const isSelected = assignedGroupNums.includes(g.number);
-                    return (
-                      <button
-                        key={g.number}
-                        onClick={() => {
-                          const list = [...assignedGroupNums];
-                          const idx = list.indexOf(g.number);
-                          if (idx >= 0) {
-                            if (list.length > 1) list.splice(idx, 1);
-                          } else {
-                            list.push(g.number);
-                          }
-                          updateWeek({ ...w, cleaningGroupNumbers: list });
-                        }}
-                        className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all ${
-                          isSelected
-                            ? 'bg-indigo-600 text-white'
-                            : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-                        }`}
-                      >
-                        G#{g.number}
-                      </button>
-                    );
-                  })}
+                <div className="pt-2.5 border-t border-slate-200/80 dark:border-white/10 flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex flex-wrap gap-1">
+                    {preachingGroups.map((g) => {
+                      const isSelected = assignedGroupNums.includes(g.number);
+                      return (
+                        <button
+                          key={g.number}
+                          type="button"
+                          onClick={() => {
+                            if (isReadOnly) return;
+                            const list = [...assignedGroupNums];
+                            const idx = list.indexOf(g.number);
+                            if (idx >= 0) {
+                              if (list.length > 1) list.splice(idx, 1);
+                            } else {
+                              list.push(g.number);
+                            }
+                            updateWeek({ ...w, cleaningGroupNumbers: list });
+                          }}
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-indigo-600 text-white'
+                              : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+                          }`}
+                        >
+                          G#{g.number}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {firstGroup && (
+                    <button
+                      type="button"
+                      onClick={() => handleSendGroupCleaningWhatsApp(w, firstGroup, 'overseer')}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-[11px] font-bold transition-colors cursor-pointer"
+                      title="Enviar recordatorio S-28 por WhatsApp al Superintendente de Grupo"
+                    >
+                      <MessageCircle className="w-3 h-3" />
+                      <span>WhatsApp Sup.</span>
+                    </button>
+                  )}
                 </div>
               </div>
             );

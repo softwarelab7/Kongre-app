@@ -6,6 +6,93 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.20] — 25 de Octubre, 2026
+**Analítica Gráfica con Recharts y Selector Multi-Grupo de Servicio en el Tablero de Equidad (`EquidadDashboardTab`)**
+
+- 📊 **Visualización Comparativa con Recharts y Detección Gráfica de Desequilibrios:**
+  - **4 Modos de Análisis Gráfico:** *Por Áreas (Apilado)* (desglose de puntos en Enseñanza, Estudiantil/Lectura, Deberes/Audio, Campo/Carritos y Oraciones junto con curva de N° de asignaciones), *Brecha vs. Privilegio* (comparación de cada publicador frente al promedio de su cuerpo/privilegio), *Cuerpos y Estados* (rango mínimo, promedio y máximo por cuerpo junto con gráfico de dona interactivo) y *Por Grupos* (comparativa directa entre grupos de servicio).
+  - **Líneas de Referencia y Selector de Muestra:** Indicadores visuales del promedio filtrado y del umbral de sobrecarga (`140%`), con vistas rápidas de contraste (*8 Más vs. 8 Menos Cargados*, *Top 15 Mayor Carga*, *Top 15 Menor Carga* y *Vista General*) e inspector detallado al hacer clic en cualquier barra.
+- 👥 **Selector y Filtro Multi-Grupo de Servicio en Tiempo Real:**
+  - Selector desplegable rápido y barra interactiva de *chips* por grupo de predicación que permiten filtrar un único grupo o comparar varios grupos de servicio específicos de forma simultánea.
+  - Sincronización integral entre el selector superior, la barra multi-grupo, la tabla de radiografía por publicador y las tarjetas inferiores de grupos de predicación, incluyendo sufijos identificadores `(G#N)` en los gráficos al comparar múltiples grupos.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
+### [v2.12.19] — 25 de Octubre, 2026
+**Centro Local y Motor Universal de Carga y Relleno Automático de Plantillas PDF Oficiales (`S-21`, `S-89`, `S-140`, `S-88`, `S-13`, `S-26`, `S-30`, `S-25`, `S-28` y `S-1`)**
+
+- 📄 **Carga de Plantillas PDF Oficiales en Blanco (100% Local):**
+  - En cumplimiento estricto con las políticas de propiedad intelectual, **Kongre jamás genera ni dibuja formularios oficiales desde cero**.
+  - Cada usuario carga localmente desde su dispositivo su propio archivo PDF oficial en blanco (descargado de *jw.org* / *JW Hub*) y la aplicación lo rellena automáticamente en el navegador con los datos reales de la congregación usando `pdf-lib`.
+- 🧠 **Ordenamiento Visual Inteligente de Campos Interactivos (`AcroForm`):**
+  - Algoritmo de inspección espacial (`sortPdfFieldsVisually`) que ordena todos los cuadros de texto, casillas de verificación, listas desplegables y botones de opción por coordenadas visuales `(página, fila superior a inferior, columna izquierda a derecha)`.
+  - Garantiza compatibilidad universal con cualquier idioma, edición o revisión de los formularios oficiales sin depender de nombres internos rígidos de campos, e incluye estampado por coordenadas como respaldo para PDFs aplanados.
+- 🗂️ **Cobertura Completa de los 10 Formularios Teocráticos (`LocalOfficialFormsCenter` y `OfficialPdfModal`):**
+  - **Registro de Publicador (`S-21`):** Relleno individual o generación de un único PDF multipágina por lotes (por grupo de servicio, precursores o toda la congregación), marcando sexo, esperanza, privilegios, horas, cursos bíblicos, notas y totales anuales.
+  - **Asignaciones VMC (`S-89`) y Programa (`S-140`):** Relleno de hojas `S-89` (plantillas de 1 por página o 4 por página en cuadrícula con paginación automática) y plantilla semanal `S-140`.
+  - **Asistencia (`S-88`), Territorios (`S-13`), Cuentas (`S-26`, `S-30`, `S-25`), Literatura (`S-28`) e Informe a la Sucursal (`S-1`):** Almacenamiento local en `IndexedDB` (o modo exclusivo en memoria RAM por sesión), inspector de campos detectados y botones directos de **«PDF Oficial»** integrados en cada módulo.
+
+---
+
+### [v2.12.18] — 25 de Octubre, 2026
+**Auditoría de Secretaría, Carpeta Ejecutiva de Visita del Sup. de Circuito, Literatura (`S-28`/`S-14`), Mantenimiento/Emergencias y Contabilidad (`S-26`/`S-30`/`S-25`)**
+
+- 📋 **Auditoría de Secretaría y Meta Anual de Precursores (600 h):**
+  - Seguimiento en tiempo real del ritmo anual de los precursores regulares y especiales durante el año de servicio (meta de 600 horas, créditos de horas aprobados, promedio mensual y semáforo visual *En Meta / Atención / Rezagado*).
+  - Panel de cuidado pastoral para identificar oportunamente publicadores irregulares o en riesgo de inactividad.
+- 🧳 **Carpeta Ejecutiva (Dossier A4) para la Visita del Superintendente de Circuito:**
+  - Nueva pestaña en **Visita del Sup. de Circuito** y en **Tarjetas S-21** que consolida automáticamente la radiografía completa de la congregación: estructura de publicadores y nombrados, precursores, promedios de estudios bíblicos, asistencia `S-88`, cobertura de territorios `S-13` y estado por grupo de servicio, lista para imprimir en formato A4 o compartir por WhatsApp.
+- 📚 **Gestión Integral de Literatura (`S-28` / `S-14`) y Pedidos Especiales por Grupo:**
+  - Diagnóstico automático de inventario (artículos agotados, stock bajo y cálculo de cantidad sugerida de reposición a la sucursal).
+  - Seguimiento de pedidos especiales agrupados por grupo de servicio con avisos directos por WhatsApp al publicador o superintendente de grupo cuando el artículo llega al Salón del Reino, entregas por grupo y registro de recuentos físicos.
+- 🛠️ **Calendario Anual de Mantenimiento Preventivo y Plan de Preparación ante Emergencias:**
+  - **Matriz Anual de Mantenimiento (Septiembre – Agosto):** Programación visual de todas las fichas técnicas a lo largo de los 12 meses del año de servicio con porcentaje de cumplimiento y estimación de horas anuales.
+  - **Plan de Preparación ante Emergencias y Desastres:** Árbol de contacto pastoral por grupo de servicio, directorio de hermanos con capacitación médica/primeros auxilios, vehículos disponibles para evacuación o apoyo, responsables con llaves del Salón e integración con el mapa de cortacircuitos del panel eléctrico (imprimible en A4 y enviable por WhatsApp).
+- 🏦 **Contabilidad Congregacional Avanzada (`S-26`, `S-30` y Auditoría Trimestral `S-25`):**
+  - Libro mensual `S-26` con cálculo de saldo acumulado línea por línea (`runningBalance`), desglose por fondos y conciliación interactiva entre extracto bancario y efectivo en caja.
+  - Cálculo automático de la reserva operativa recomendada (2 meses de gastos locales) y excedente disponible para transferir a la sucursal.
+  - Generador automático del texto oficial del anuncio mensual de cuentas (`S-30`) para lectura en la plataforma y módulo de **Auditoría Trimestral (`S-25`)** con verificación de comprobantes e impresión A4.
+
+---
+
+### [v2.12.17] — 25 de Octubre, 2026
+**Suite Integral de Gestión Congregacional: Intercambio de Oradores, Deberes y Aseo, Carritos, Agrupación Familiar, Salidas al Campo, Cartelera Digital y Equidad Ponderada**
+
+- 🎙️ **Motor de Intercambio de Oradores, Congregaciones Vecinas y Hospitalidad Inteligente:**
+  - Directorio unificado de congregaciones vecinas (con horarios de reunión y datos de coordinadores) y catálogo de oradores visitantes.
+  - Evaluador automático de repetición de bosquejos públicos y detector transversal de choques de agenda para oradores salientes (reunión de fin de semana, deberes, hospitalidad, carritos, salidas al campo y ausencias).
+  - Sugeridor inteligente de familias anfitrionas de hospitalidad clasificado por puntaje de equidad, capacidad de invitados y alertas de alergias o dieta, con plantillas de WhatsApp para orador, anfitrión y coordinador vecino.
+- 🧹 **Motor de Deberes Logísticos y Programa de Aseo Semanal/Profundo con Control de Insumos:**
+  - Auto-asignación inteligente de Audio, Video, Micrófonos, Acomodadores, Plataforma, Seguridad y Zoom validando que ningún hermano tenga choque en la misma reunión o esté ausente.
+  - Matriz de equidad de deberes y programación por grupos para aseo semanal regular, limpieza profunda (`S-28`), visita del superintendente de circuito y eventos especiales, incluyendo lista de verificación por áreas del Salón y semáforo de estado de insumos de aseo (*Insumos Completos / Reponer Pronto / Urgente Comprar*).
+- 🛒 **Motor de Predicación Pública con Carritos y Emparejamiento Teocrático:**
+  - Validación automática de cada turno de exhibidor público: reconocimiento de matrimonios/familiares y compañeros fijos, alerta ante parejas mixtas sin parentesco, detección de turnos solapados el mismo día y ausencias.
+  - Auto-asignador equitativo según disponibilidad diaria de cada publicador/precursor, matriz de equidad y cuadrante imprimible A4.
+- 👨‍👩‍👧‍👦 **Agrupación Familiar Inteligente, Reemplazos VMC y Despacho Mensual Unificado en 8 Módulos:**
+  - Vinculación de núcleos familiares en la ficha del publicador con sugerencias automáticas por apellido o dirección compartida, e insignias en los selectores de asignación y reemplazos VMC cuando otro miembro de la familia ya participa en esa misma reunión.
+  - **Consolidador Mensual Unificado (`unifiedMonthlyAssignments`):** Agrupa en un único resumen por hermano todas sus asignaciones del mes a través de 8 módulos (*Vida y Ministerio, Fin de Semana, Deberes, Limpieza, Carritos, Salidas al Campo, Orador Saliente y Hospitalidad*), permitiendo enviarlo en un solo WhatsApp desde `BatchWhatsAppModal` o `Mi Vista`, imprimir su hoja mensual personal o descargar un archivo de calendario `.ics` unificado.
+- 📌 **Cartelera Digital del Salón del Reino y Generador Automático de Salidas al Campo:**
+  - **Cartelera Digital Unificada:** Vista previa oficial e impresión A4 unificada para el tablero físico del Salón, boletín semanal consolidado para WhatsApp y descarga del calendario maestro `.ics` de la congregación.
+  - **Generador de Salidas al Servicio del Campo:** Plantillas de bloques semanales (mañana, tarde, noche) y modalidades (*Casa en casa, Carritos, Revisitas/Estudios, Telefónica/Cartas, Negocios*) con asignación rotativa de conductores elegibles y recomendación automática de territorios con más tiempo sin trabajar.
+- ⚖️ **Auditoría Ponderada de Carga Teocrática y Equidad Transversal (`EquidadDashboardTab`):**
+  - Sistema de pesos configurables por rol y categoría (*Enseñanza Principal, Partes Estudiantiles, Deberes/Logística, Ministerio del Campo y Oraciones*) que calcula los puntos de esfuerzo real acumulados por cada hermano, identifica sobrecarga o subutilización, mide rachas semanales y genera informes de equidad imprimibles.
+
+---
+
+### [v2.12.16] — 23 de Octubre, 2026
+**Optimización Integral de Experiencia Móvil (Auditoría UI/UX, Gestos Táctiles y Ergonomía)**
+
+- 📱 **Cabecera Superior y Pie de Página Móvil Simplificados:**
+  - Se redujo la densidad de iconos secundarios en la cabecera móvil (`< 640px`) trasladándolos al menú de cuenta y hoja inferior, y se compactó el pie de página interno a una sola línea discreta.
+- 👆 **Navegación Táctil en Programa de Reuniones:**
+  - Sub-cabecera de semanas fija (*sticky*) con soporte para deslizar horizontalmente (*swipe* izquierda/derecha) entre semanas, botón directo «Hoy» y agrupación de herramientas secundarias.
+- 📊 **Cintas de KPIs Interactivas, Tablas con Primera Columna Fija y Modales *Bottom Sheet*:**
+  - Los KPIs de Territorios y Publicadores funcionan como filtros rápidos deslizables en una sola fila móvil, las tablas fijan su primera columna al desplazar y los modales clave abren como hoja inferior.
+
+---
+
 ### [v2.12.15] — 23 de Octubre, 2026
 **Indicador de Carga Global (`LoadingSpinner`) durante la Sincronización con Supabase**
 
@@ -15,8 +102,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Se muestra automáticamente sobre el contenedor de la pestaña activa mientras se realiza la sincronización de datos (carga inicial, subida cifrada o sincronización bidireccional) con Supabase, indicando el nombre de la vista en actualización.
 
 ---
-
-## 📅 Historial de Actualizaciones Anteriores
 
 ### [v2.12.14] — 23 de Octubre, 2026
 **Redacción Institucional y Profesional de Términos de Uso y Política de Privacidad**

@@ -664,7 +664,7 @@ export const GruposServicioTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Conmutador Superior: Grupos de Servicio vs Programa de Salidas al Campo (KHS) */}
+      {/* Conmutador Superior: Grupos de Servicio vs Programa de Salidas al Campo */}
       <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
           <button
@@ -690,7 +690,7 @@ export const GruposServicioTab: React.FC = () => {
             }`}
           >
             <Compass className="w-4 h-4" />
-            <span>Salidas al Campo • KHS ({fieldServiceMeetings.length})</span>
+            <span>Salidas al Campo ({fieldServiceMeetings.length})</span>
           </button>
         </div>
 
@@ -711,7 +711,7 @@ export const GruposServicioTab: React.FC = () => {
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-linear-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-95"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Auto-Generar Salidas (KHS)</span>
+              <span>Auto-Generar Salidas</span>
             </button>
 
             <button
@@ -728,10 +728,10 @@ export const GruposServicioTab: React.FC = () => {
               onClick={handlePrintFsmSchedule}
               disabled={filteredFieldServiceMeetings.length === 0}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-40 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
-              title="Imprimir Programa de Salidas para el Tablero del Salón (Formato KHS)"
+              title="Imprimir Programa de Salidas para el Tablero del Salón"
             >
               <Printer className="w-4 h-4 text-indigo-600" />
-              <span className="hidden sm:inline">Imprimir KHS</span>
+              <span className="hidden sm:inline">Imprimir</span>
             </button>
 
             <button
@@ -1086,7 +1086,7 @@ export const GruposServicioTab: React.FC = () => {
       )}
 
       {/* ========================================================= */}
-      {/* SUB-VISTA 2: GENERADOR Y CUADRANTE DE SALIDAS AL CAMPO KHS */}
+      {/* SUB-VISTA 2: GENERADOR Y CUADRANTE DE SALIDAS AL CAMPO    */}
       {/* ========================================================= */}
       {activeSubTab === 'salidas_khs' && (
         <div className="space-y-5">
@@ -1129,7 +1129,7 @@ export const GruposServicioTab: React.FC = () => {
 
             <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
               <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 block">
-                Acción Rápida KHS
+                Acción Rápida
               </span>
               <div className="flex items-center gap-2 mt-2">
                 <button
@@ -1266,7 +1266,7 @@ export const GruposServicioTab: React.FC = () => {
                   No hay salidas al servicio del campo en esta vista
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  Utiliza el <strong>Generador Automático KHS</strong> para crear el cuadrante semanal o mensual con rotación equitativa de conductores autorizados y sugerencia automática de territorios disponibles en S-13.
+                  Utiliza el <strong>Generador Automático</strong> para crear el cuadrante semanal o mensual con rotación equitativa de conductores autorizados y sugerencia automática de territorios disponibles en S-13.
                 </p>
               </div>
               <div className="flex items-center justify-center gap-3 flex-wrap pt-1">
@@ -1276,7 +1276,7 @@ export const GruposServicioTab: React.FC = () => {
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition-colors cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4" />
-                  <span>Auto-Generar Cuadrante de Salidas (KHS)</span>
+                  <span>Auto-Generar Cuadrante de Salidas</span>
                 </button>
                 <button
                   type="button"
@@ -1654,7 +1654,7 @@ export const GruposServicioTab: React.FC = () => {
       )}
 
       {/* ========================================================= */}
-      {/* MODAL 3: GENERADOR AUTOMÁTICO DE SALIDAS AL CAMPO (KHS)   */}
+      {/* MODAL 3: GENERADOR AUTOMÁTICO DE SALIDAS AL CAMPO         */}
       {/* ========================================================= */}
       {isGeneratorModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
@@ -1662,7 +1662,7 @@ export const GruposServicioTab: React.FC = () => {
             <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">
-                  MOTOR AUTOMÁTICO KHS • SERVICIO DEL CAMPO
+                  MOTOR AUTOMÁTICO • SERVICIO DEL CAMPO
                 </span>
                 <h3 className="text-lg font-extrabold text-slate-900 mt-1 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-indigo-600" />
@@ -1764,7 +1764,7 @@ export const GruposServicioTab: React.FC = () => {
               </div>
             </div>
 
-            {/* Paso 2: Reglas Inteligentes KHS */}
+            {/* Paso 2: Reglas Inteligentes */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <label className="flex items-start gap-2.5 p-3 rounded-2xl border border-slate-200 bg-white cursor-pointer hover:border-indigo-300">
                 <input
@@ -1809,7 +1809,7 @@ export const GruposServicioTab: React.FC = () => {
                 />
                 <div>
                   <span className="font-bold text-slate-900 block">
-                    Agrupación Familiar KHS
+                    Agrupación Familiar
                   </span>
                   <span className="text-[11px] text-slate-500">
                     Respeta ausencias y sincroniza conductores del mismo núcleo familiar.

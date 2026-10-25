@@ -15,6 +15,10 @@ import {
   buildSpecialOrderArrivedWhatsApp,
   buildLowStockReportWhatsApp,
   buildGroupDistributionWhatsApp,
+  computeLiteratureInventoryAnalysis,
+  buildGroupSpecialOrdersWhatsApp,
+  openSafeWhatsAppUrl,
+  printLiteratureInventoryS28A4,
 } from '../utils/literatureHelper';
 import {
   BookOpen,
@@ -40,8 +44,15 @@ import {
   Users,
   Flame,
   ArrowUpDown,
+  Upload,
 } from 'lucide-react';
 import { SplashCheckbox } from './SplashCheckbox';
+import { LocalOfficialFormsModal } from './LocalOfficialFormsCenter';
+import {
+  getLocalOfficialFormBytes,
+  fillOfficialS28Pdf,
+  downloadPdfBytesLocally,
+} from '../services/localOfficialFormsService';
 
 export const LiteraturaTab: React.FC = () => {
   const {
@@ -51,6 +62,7 @@ export const LiteraturaTab: React.FC = () => {
     specialOrders,
     groupDistributions,
     inventoryRecords,
+    settings,
     addLiteratureItem,
     updateLiteratureItem,
     deleteLiteratureItem,
@@ -66,16 +78,43 @@ export const LiteraturaTab: React.FC = () => {
     'inventario' | 'pedidos' | 'grupos' | 'recuento_s14'
   >('inventario');
 
-  // Filters for items
+  // Filters for items & orders
   const [categoryFilter, setCategoryFilter] = useState<string>('todos');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [onlyLowStock, setOnlyLowStock] = useState<boolean>(false);
+  const [orderGroupFilter, setOrderGroupFilter] = useState<string>('todos');
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>('todos');
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3500);
+  };
 
   // Modals state
   const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
   const [isAddOrderModalOpen, setIsAddOrderModalOpen] = useState(false);
   const [isCountModalOpen, setIsCountModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<LiteratureItem | null>(null);
+  const [isS28ModalOpen, setIsS28ModalOpen] = useState(false);
+
+  const handleDownloadOfficialS28 = async () => {
+    try {
+      const stored = await getLocalOfficialFormBytes('S-28');
+      if (!stored) {
+        setIsS28ModalOpen(true);
+        return;
+      }
+      const filledBytes = await fillOfficialS28Pdf(stored.bytes, literatureItems, settings);
+      downloadPdfBytesLocally(
+        filledBytes,
+        `S-28_Oficial_Relleno_${settings.congregationName.replace(/\s+/g, '_')}.pdf`
+      );
+      showToast('PDF Oficial S-28 rellenado y descargado con las existencias de literatura.');
+    } catch {
+      setIsS28ModalOpen(true);
+    }
+  };
 
   // Form states
   const [newItem, setNewItem] = useState<{
@@ -169,15 +208,35 @@ export const LiteraturaTab: React.FC = () => {
     });
   }, [literatureItems, categoryFilter, onlyLowStock, searchQuery]);
 
-  // WhatsApp helper
+  // Comprehensive S-28 / S-14 Inventory Analysis
+  const inventoryAnalysis = useMemo(() => {
+    return computeLiteratureInventoryAnalysis(
+      literatureItems,
+      specialOrders,
+      publishers,
+      preachingGroups
+    );
+  }, [literatureItems, specialOrders, publishers, preachingGroups]);
+
+  // Filtered Special Orders
+  const filteredSpecialOrders = useMemo(() => {
+    return specialOrders.filter(order => {
+      if (orderStatusFilter !== 'todos' && order.status !== orderStatusFilter) return false;
+      if (orderGroupFilter !== 'todos') {
+        const gNum = Number(orderGroupFilter);
+        const pub = publishers.find(p => p.id === order.publisherId);
+        const groupObj = preachingGroups.find(g => g.number === gNum);
+        const belongsToGroup =
+          pub?.groupNumber === gNum || Boolean(groupObj?.memberIds.includes(order.publisherId));
+        if (!belongsToGroup) return false;
+      }
+      return true;
+    });
+  }, [specialOrders, orderStatusFilter, orderGroupFilter, publishers, preachingGroups]);
+
+  // WhatsApp helper (iframe-safe anchor dispatch)
   const handleOpenWhatsApp = (text: string, phone?: string) => {
-    const encoded = encodeURIComponent(text);
-    if (phone) {
-      const cleanPhone = phone.replace(/[^\d+]/g, '');
-      window.open(`https://wa.me/${cleanPhone}?text=${encoded}`, '_blank');
-    } else {
-      window.open(`https://wa.me/?text=${encoded}`, '_blank');
-    }
+    openSafeWhatsAppUrl(text, phone);
   };
 
   // Adjust stock
@@ -188,6 +247,12 @@ export const LiteraturaTab: React.FC = () => {
       currentStock: newStock,
       lastCountDate: new Date().toISOString().split('T')[0],
     });
+  };
+
+  // Receive suggested restock for an item
+  const handleReceiveSuggestedShipment = (item: LiteratureItem, qty: number) => {
+    handleAdjustStock(item, qty);
+    showToast(`Recibidos +${qty} ejemplares de "${item.title}" en inventario S-28`);
   };
 
   // Handle Add Item
@@ -360,21 +425,31 @@ export const LiteraturaTab: React.FC = () => {
               handleOpenWhatsApp(msg);
             }}
             className="inline-flex items-center gap-1.5 px-3 py-2 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-xl border border-amber-200 dark:border-amber-800 transition-all shadow-2xs active:scale-95 cursor-pointer"
-            title="Enviar reporte de stock bajo por WhatsApp"
+            title="Enviar solicitud sugerida de stock bajo por WhatsApp"
           >
             <Share2 className="w-3.5 h-3.5" />
-            <span>Reporte Stock Bajo</span>
+            <span>Pedido Sugerido S-14</span>
           </button>
 
           <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 font-semibold text-xs rounded-xl border border-slate-200/80 dark:border-white/[0.08] transition-all shadow-2xs active:scale-95 cursor-pointer"
+            onClick={handleDownloadOfficialS28}
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer"
+            title="Cargar el PDF oficial S-28 de JW Hub para que la app lo rellene y descargue"
           >
-            <Printer className="w-3.5 h-3.5" />
-            <span>Imprimir Ficha S-14</span>
+            <Upload className="w-3.5 h-3.5" />
+            <span>Cargar / Rellenar S-28 Oficial (PDF)</span>
           </button>
         </div>
       </div>
+
+      {toastMsg && (
+        <div className="bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md flex items-center justify-between animate-in fade-in duration-200">
+          <span>✓ {toastMsg}</span>
+          <button onClick={() => setToastMsg(null)} className="text-white/80 hover:text-white">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* KPI Cards Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -595,6 +670,67 @@ export const LiteraturaTab: React.FC = () => {
               </div>
             )}
           </div>
+
+          {/* Asistente de Reposición S-14 / S-28 para Artículos con Stock Bajo */}
+          {inventoryAnalysis.suggestedReorderList.length > 0 && (
+            <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-xs font-extrabold text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
+                    <AlertTriangle className="w-4 h-4 text-amber-600" />
+                    <span>
+                      Asistente de Reposición a la Sucursal (S-14) •{' '}
+                      {inventoryAnalysis.suggestedReorderList.length} Publicaciones por Debajo del Mínimo
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-amber-800 mt-0.5">
+                    Cantidades sugeridas para restablecer el inventario mensual (S-28) al doble del stock mínimo de seguridad.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    const msg = buildLowStockReportWhatsApp(literatureItems);
+                    handleOpenWhatsApp(msg);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer self-start sm:self-auto"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Compartir Lista de Pedido (WhatsApp)</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                {inventoryAnalysis.suggestedReorderList.map(({ item, suggestedOrderQty }) => (
+                  <div
+                    key={item.id}
+                    className="bg-white p-3 rounded-xl border border-amber-200/80 flex items-center justify-between gap-2 shadow-2xs"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono font-bold text-[11px] text-indigo-700 bg-indigo-50 px-1.5 py-0.5 rounded">
+                          {item.code}
+                        </span>
+                        <span className="text-xs font-bold text-slate-900 truncate">
+                          {item.title}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">
+                        Actual: <strong className="text-rose-600">{item.currentStock}</strong> / Mín:{' '}
+                        {item.minimumStock} • Sugerido: <strong>+{suggestedOrderQty}</strong>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleReceiveSuggestedShipment(item, suggestedOrderQty)}
+                      className="px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-[11px] font-bold whitespace-nowrap cursor-pointer"
+                      title="Registrar recepción de este envío en el inventario S-28"
+                    >
+                      +{suggestedOrderQty} Recibir
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -603,31 +739,100 @@ export const LiteraturaTab: React.FC = () => {
       {/* ========================================================= */}
       {activeSubTab === 'pedidos' && (
         <div className="space-y-4">
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
               <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <Truck className="w-5 h-5 text-indigo-600" />
-                <span>Pedidos Especiales de los Publicadores</span>
+                <span>Solicitudes Especiales de Literatura por Grupo (S-14)</span>
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Seguimiento de Biblias en letra grande, publicaciones en idiomas foráneos y cancioneros
-                solicitados personalmente.
+                Control de Biblias de estudio, letra grande, publicaciones en otros idiomas y despacho por Grupo de Predicación.
               </p>
             </div>
 
-            <button
-              onClick={() => setIsAddOrderModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Registrar Pedido</span>
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <select
+                value={orderGroupFilter}
+                onChange={e => setOrderGroupFilter(e.target.value)}
+                className="text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white font-semibold text-slate-700"
+              >
+                <option value="todos">Todos los Grupos</option>
+                {preachingGroups.map(g => (
+                  <option key={g.number} value={String(g.number)}>
+                    Grupo {g.number} — {g.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={orderStatusFilter}
+                onChange={e => setOrderStatusFilter(e.target.value)}
+                className="text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white font-semibold text-slate-700"
+              >
+                <option value="todos">Todos los Estados</option>
+                <option value="solicitado">1. Solicitado</option>
+                <option value="pedido_a_betel">2. Pedido a Sucursal</option>
+                <option value="recibido_en_salon">3. Recibido en el Salón</option>
+                <option value="entregado">4. Entregado</option>
+              </select>
+
+              <button
+                onClick={() => setIsAddOrderModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Registrar Pedido</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Tarjetas de Despacho por Grupo de Predicación */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {inventoryAnalysis.ordersByGroup.map(gSummary => (
+              <div
+                key={gSummary.groupNumber}
+                className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs flex flex-col justify-between gap-2"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold text-indigo-900">
+                      Grupo {gSummary.groupNumber} • {gSummary.groupName}
+                    </span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                      {gSummary.totalOrders} pedidos
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-0.5 truncate">
+                    Sup.: <strong className="text-slate-700">{gSummary.overseerName}</strong>
+                  </p>
+                  <div className="flex items-center gap-2 mt-2 text-[11px]">
+                    <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 font-bold">
+                      En mostrador: {gSummary.readyToDeliverCount}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200 font-semibold">
+                      En trámite: {gSummary.pendingCount}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    const msg = buildGroupSpecialOrdersWhatsApp(gSummary);
+                    handleOpenWhatsApp(msg, gSummary.overseerPhone);
+                  }}
+                  className="w-full mt-1 py-1.5 px-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <Send className="w-3 h-3" />
+                  <span>Avisar a Sup. de Grupo</span>
+                </button>
+              </div>
+            ))}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {specialOrders.map(order => {
+            {filteredSpecialOrders.map(order => {
               const pub = publishers.find(p => p.id === order.publisherId);
               const pubName = pub?.name || 'Publicador';
+              const groupBadge = pub?.groupNumber ? `G${pub.groupNumber}` : null;
               const statusCfg = SPECIAL_ORDER_STATUS_CONFIG[order.status] || {
                 label: order.status,
                 badgeClass: 'bg-slate-100 text-slate-700',
@@ -639,12 +844,19 @@ export const LiteraturaTab: React.FC = () => {
                   className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-3 flex flex-col justify-between"
                 >
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-900 truncate block">
-                        👤 {pubName}
-                      </span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        {groupBadge && (
+                          <span className="px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-800 text-[10px] font-black shrink-0">
+                            {groupBadge}
+                          </span>
+                        )}
+                        <span className="text-xs font-bold text-slate-900 truncate block">
+                          {pubName}
+                        </span>
+                      </div>
                       <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusCfg.badgeClass}`}
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${statusCfg.badgeClass}`}
                       >
                         {statusCfg.label}
                       </span>
@@ -659,7 +871,8 @@ export const LiteraturaTab: React.FC = () => {
                         {order.language && `• Idioma: ${order.language}`}
                       </p>
                       <p className="text-[11px] text-slate-400">
-                        Fecha pedido: {order.requestDate}
+                        Fecha solicitud: {order.requestDate}
+                        {order.deliveredDate ? ` • Entregado: ${order.deliveredDate}` : ''}
                       </p>
                     </div>
 
@@ -682,7 +895,7 @@ export const LiteraturaTab: React.FC = () => {
                         className="text-xs p-1.5 rounded-lg border border-slate-300 bg-white"
                       >
                         <option value="solicitado">1. Solicitado</option>
-                        <option value="pedido_a_betel">2. Pedido a Betel</option>
+                        <option value="pedido_a_betel">2. Pedido a Sucursal</option>
                         <option value="recibido_en_salon">3. Recibido en el Salón</option>
                         <option value="entregado">4. Entregado</option>
                         <option value="cancelado">Cancelado</option>
@@ -696,15 +909,15 @@ export const LiteraturaTab: React.FC = () => {
                           const msg = buildSpecialOrderArrivedWhatsApp(order, pubName);
                           handleOpenWhatsApp(msg, pub?.phone);
                         }}
-                        className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                        className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 cursor-pointer"
                       >
                         <Send className="w-3.5 h-3.5" />
-                        <span>Avisar de llegada WhatsApp</span>
+                        <span>Avisar al publicador (WhatsApp)</span>
                       </button>
 
                       <button
                         onClick={() => deleteSpecialOrder(order.id)}
-                        className="text-slate-400 hover:text-red-500 p-1"
+                        className="text-slate-400 hover:text-red-500 p-1 cursor-pointer"
                         title="Eliminar pedido"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -716,9 +929,9 @@ export const LiteraturaTab: React.FC = () => {
             })}
           </div>
 
-          {specialOrders.length === 0 && (
+          {filteredSpecialOrders.length === 0 && (
             <div className="p-8 text-center text-slate-400 bg-white rounded-2xl border border-slate-200 text-xs">
-              No hay pedidos especiales registrados actualmente.
+              No hay pedidos especiales que coincidan con los filtros seleccionados.
             </div>
           )}
         </div>
@@ -1379,6 +1592,12 @@ export const LiteraturaTab: React.FC = () => {
           </div>
         </div>
       )}
+
+      <LocalOfficialFormsModal
+        isOpen={isS28ModalOpen}
+        onClose={() => setIsS28ModalOpen(false)}
+        initialFormCode="S-28"
+      />
     </div>
   );
 };

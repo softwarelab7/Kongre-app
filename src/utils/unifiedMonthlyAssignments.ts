@@ -1177,7 +1177,7 @@ export function printPublisherUnifiedMonthlySheet(
         <div class="header">
           <div>
             <div style="font-size:11px;font-weight:700;color:#4f46e5;text-transform:uppercase;letter-spacing:0.08em;">
-              Congregación ${congName} • Hoja Personal KHS
+              Congregación ${congName} • Hoja Personal de Asignaciones
             </div>
             <h1 class="title">Mis Asignaciones del Mes: ${publisher.name}</h1>
             <div class="subtitle">Periodo: ${monthLabel} • Total de privilegios programados: ${assignments.length}</div>

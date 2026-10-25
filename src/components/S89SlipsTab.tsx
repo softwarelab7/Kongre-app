@@ -27,6 +27,7 @@ import {
   Clock,
   Send,
   Download,
+  Upload,
   Filter,
   Layers,
   ChevronLeft,
@@ -43,8 +44,15 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { LocalOfficialFormsCenter } from './LocalOfficialFormsCenter';
+import {
+  getLocalOfficialFormBytes,
+  fillOfficialS89Pdf,
+  downloadPdfBytesLocally,
+} from '../services/localOfficialFormsService';
+import { useToast } from '../context/ToastContext';
 
 export const S89SlipsTab: React.FC = () => {
+  const { showToast } = useToast();
   const {
     weeks,
     currentWeek,
@@ -220,11 +228,42 @@ export const S89SlipsTab: React.FC = () => {
     const url = cleanPhone
       ? `https://wa.me/${cleanPhone}?text=${msg}`
       : `https://wa.me/?text=${msg}`;
-    window.open(url, '_blank');
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
-  const handlePrint = () => {
-    window.print();
+  // Rellenar y descargar el PDF oficial S-89 cargado por el usuario
+  const handleDownloadOfficialS89Pdf = async () => {
+    const stored = await getLocalOfficialFormBytes('S-89');
+    if (!stored) {
+      setPrintLayout('formato_local');
+      showToast(
+        'Carga primero tu archivo oficial S-89.pdf descargado de JW Hub para que la aplicación lo rellene y puedas descargarlo.',
+        'info'
+      );
+      return;
+    }
+
+    if (filteredSlips.length === 0) {
+      showToast('No hay asignaciones estudiantiles en la semana seleccionada para rellenar en el S-89.', 'error');
+      return;
+    }
+
+    try {
+      const filledBytes = await fillOfficialS89Pdf(stored.bytes, filteredSlips);
+      const outFileName = `S-89_Semana_${activeWeek?.weekStartDate || 'VMC'}.pdf`;
+      downloadPdfBytesLocally(filledBytes, outFileName);
+      showToast(`Hojas oficiales "${outFileName}" rellenadas y descargadas.`, 'success');
+    } catch (err) {
+      console.error('Error rellenando S-89 oficial:', err);
+      setPrintLayout('formato_local');
+      showToast('Verifica o vuelve a cargar tu plantilla oficial S-89.pdf.', 'error');
+    }
   };
 
   const handleAdvanceLesson = (studentId: string, currentLessonNum: number) => {
@@ -248,7 +287,7 @@ export const S89SlipsTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Barra de Acciones de Hojas S-89 (Opción 1: arranque directo sin banner redundante) */}
+      {/* Barra de Acciones de Hojas S-89 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
@@ -277,7 +316,7 @@ export const S89SlipsTab: React.FC = () => {
           {activeWeek && (
             <button
               onClick={() => setIsBatchWhatsAppOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
               title="Abrir panel de envío masivo de WhatsApp para toda la semana"
             >
               <MessageCircle className="w-4 h-4" />
@@ -285,7 +324,7 @@ export const S89SlipsTab: React.FC = () => {
             </button>
           )}
 
-          {/* Toggle between 4-per-page grid print, Cards view, and Local Official PDF Filler */}
+          {/* Toggle between Cards view and Local Official PDF Filler */}
           <div className="inline-flex p-1 bg-slate-100 rounded-xl text-xs font-semibold flex-wrap">
             <button
               onClick={() => setPrintLayout('cards')}
@@ -298,16 +337,6 @@ export const S89SlipsTab: React.FC = () => {
               Tarjetas & Lecciones
             </button>
             <button
-              onClick={() => setPrintLayout('sheet4')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                printLayout === 'sheet4'
-                  ? 'bg-white text-indigo-700 shadow-xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Hoja Impresión 4x1
-            </button>
-            <button
               onClick={() => setPrintLayout('formato_local')}
               className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1 cursor-pointer ${
                 printLayout === 'formato_local'
@@ -315,17 +344,17 @@ export const S89SlipsTab: React.FC = () => {
                   : 'text-emerald-700 hover:text-emerald-900'
               }`}
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>PDF S-89 Oficial (Local)</span>
+              <Upload className="w-3.5 h-3.5" />
+              <span>Cargar y Rellenar PDF S-89 Oficial</span>
             </button>
           </div>
 
           <button
-            onClick={handlePrint}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors shadow-xs"
+            onClick={handleDownloadOfficialS89Pdf}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors shadow-xs cursor-pointer"
           >
-            <Printer className="w-4 h-4" />
-            <span>Imprimir</span>
+            <Download className="w-4 h-4" />
+            <span>Descargar S-89 Oficial Rellenado</span>
           </button>
         </div>
       </div>
@@ -390,8 +419,14 @@ export const S89SlipsTab: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content: Either Individual Cards View or Sheet 4x1 View */}
-      {filteredSlips.length === 0 ? (
+      {/* Main Content: Either Local Official Form Filler or Individual Cards View */}
+      {printLayout === 'formato_local' ? (
+        <LocalOfficialFormsCenter
+          initialFormCode="S-89"
+          initialWeekId={activeWeek?.id}
+          compactHeader={true}
+        />
+      ) : filteredSlips.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
           <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <h3 className="text-base font-bold text-slate-800 mb-1">
@@ -399,15 +434,9 @@ export const S89SlipsTab: React.FC = () => {
           </h3>
           <p className="text-xs text-slate-500 max-w-md mx-auto mb-4">
             Asigne estudiantes a la Lectura de la Biblia o a las partes de Seamos Mejores Maestros en el
-            Programa de la Reunión para generar automáticamente sus hojas S-89.
+            Programa de la Reunión para rellenar automáticamente el formato oficial S-89.
           </p>
         </div>
-      ) : printLayout === 'formato_local' ? (
-        <LocalOfficialFormsCenter
-          initialFormCode="S-89"
-          initialWeekId={activeWeek?.id}
-          compactHeader={true}
-        />
       ) : printLayout === 'sheet4' ? (
         /* PRINT-READY 4-UP SHEET (Standard S-89 Official Paper Layout) */
         <div className="bg-slate-100 p-4 sm:p-6 rounded-2xl border border-slate-200 overflow-x-auto">

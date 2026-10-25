@@ -793,7 +793,7 @@ export function printFieldServiceScheduleKHS(
     </div>
     <div style="text-align:right;">
       <div style="font-size:12px;font-weight:800;color:#0f172a;">${periodLabel}</div>
-      <div style="font-size:10px;color:#64748b;">Tablero de Información del Salón del Reino (Formato KHS)</div>
+      <div style="font-size:10px;color:#64748b;">Tablero de Información del Salón del Reino</div>
     </div>
   </div>
   <table>

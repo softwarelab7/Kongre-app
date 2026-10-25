@@ -255,13 +255,17 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
                         </div>
                       )}
 
-                      <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500 truncate">
+                      <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500 flex-wrap">
                         <span>Grupo {c.publisher.groupNumber || 1}</span>
+                        <span>•</span>
+                        <span className="font-semibold text-indigo-700 dark:text-indigo-300">
+                          Carga Ponderada: {c.weightedPoints ?? 0} pts ({c.totalHistoricalAssignments} asig.)
+                        </span>
                         <span>•</span>
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3 text-slate-400" />
                           {c.lastAssignedDate
-                            ? `Última vez: ${c.lastAssignedDate} (${c.daysSinceLastAssignment} días)`
+                            ? `Última: ${c.lastAssignedDate} (${c.daysSinceLastAssignment}d)`
                             : 'Sin participaciones previas'}
                         </span>
                       </div>

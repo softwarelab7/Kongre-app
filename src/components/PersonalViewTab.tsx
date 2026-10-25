@@ -581,7 +581,7 @@ export const PersonalViewTab: React.FC = () => {
     ? publishersMap.get(myPreachingGroup.assistantId)
     : null;
 
-  // Filtros de la Hoja Unificada Mensual (Estilo KHS)
+  // Filtros de la Hoja Unificada Mensual
   const [unifiedMonthFilter, setUnifiedMonthFilter] = useState<string>('all_upcoming');
   const [unifiedCategoryFilter, setUnifiedCategoryFilter] = useState<'todas' | UnifiedAssignmentCategory>('todas');
   const [copiedSummaryToast, setCopiedSummaryToast] = useState(false);
@@ -661,7 +661,7 @@ export const PersonalViewTab: React.FC = () => {
     }));
   }, [myUnifiedAssignmentsAll, unifiedCategoryFilter]);
 
-  // Acciones de la Hoja Unificada Mensual (KHS)
+  // Acciones de la Hoja Unificada Mensual
   const handleDownloadAllUnifiedIcs = () => {
     if (!selectedPublisher || myUnifiedAssignmentsAll.length === 0) return;
     downloadPublisherUnifiedIcs(
@@ -1217,16 +1217,16 @@ export const PersonalViewTab: React.FC = () => {
 
       {/* 2.3 CONTENIDO DEL MÓDULO SELECCIONADO */}
 
-      {/* MÓDULO 1: MIS ASIGNACIONES (HOJA UNIFICADA DEL MES KHS + CALENDARIO .ICS + WHATSAPP ÚNICO) */}
+      {/* MÓDULO 1: MIS ASIGNACIONES (HOJA UNIFICADA DEL MES + CALENDARIO .ICS + WHATSAPP ÚNICO) */}
       {activeModule === 'asignaciones' && (
         <div className="space-y-4">
-          {/* BARRA MAESTRA KHS: HOJA UNIFICADA DE MIS ASIGNACIONES DEL MES */}
+          {/* BARRA MAESTRA: HOJA UNIFICADA DE MIS ASIGNACIONES DEL MES */}
           <div className="p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3.5">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
-                    <Layers size={11} /> Hoja Personal Unificada KHS
+                    <Layers size={11} /> Hoja Personal Unificada
                   </span>
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                     VMC • Fin de Semana • Audio/Acomodadores • Limpieza • Carritos
@@ -1948,7 +1948,7 @@ export const PersonalViewTab: React.FC = () => {
               </div>
             )}
 
-            {/* Salidas de Predicación del Grupo y Congregación (KHS) */}
+            {/* Salidas de Predicación del Grupo y Congregación */}
             {fieldServiceMeetings.length > 0 && (
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
                 <div className="flex items-center justify-between">

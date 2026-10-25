@@ -24,8 +24,13 @@ import { createAssignmentWhatsAppMessage, openWhatsAppLink } from '../utils/what
 import { getOrganizedScheduleForWeek, applyOrganizedToWeek, isWeekNeedingOrganizedSync } from '../utils/organizedSync';
 import { createDefaultPrograma } from '../utils/clmDefaultProgram';
 import { OFFICIAL_PUBLIC_TALK_OUTLINES, findOutlineByNumber } from '../utils/theocraticData';
-import { generateS89Pdf as generateS89PdfFillers } from '../utils/pdfFillers';
-import { generateS89Pdf as generateS89PdfLegacy } from '../utils/pdfGenerator';
+import {
+  getLocalOfficialFormBytes,
+  fillOfficialS89Pdf,
+  downloadPdfBytesLocally,
+  OfficialFormCode,
+} from '../services/localOfficialFormsService';
+import { LocalOfficialFormsModal } from './LocalOfficialFormsCenter';
 import {
   formatTheocraticWeekRange,
   formatTheocraticWeekRangeShort,
@@ -100,6 +105,7 @@ export const ScheduleTab: React.FC = () => {
     advancePublisherLesson,
     repeatPublisherLesson,
     updatePublisher,
+    getS89SlipsForWeek,
   } = useCongregation();
   const { effectiveRoleInfo } = useAuth();
   const isReadOnly = effectiveRoleInfo.isReadOnly || !effectiveRoleInfo.canEditSchedule;
@@ -224,17 +230,35 @@ export const ScheduleTab: React.FC = () => {
     }
   };
 
-  const handlePrintS89 = () => {
+  const [officialFormModalCode, setOfficialFormModalCode] = useState<OfficialFormCode | null>(null);
+
+  const handlePrintS89 = async () => {
     if (!currentWeek) return;
-    const clmProg = getClmPrograma(currentWeek.weekStartDate);
-    if (clmProg && clmProg.partes && clmProg.partes.length > 0) {
-      generateS89PdfFillers(clmProg, publishers);
-      setToastNotification('Hojas oficiales S-89 generadas en PDF.');
-    } else {
-      generateS89PdfLegacy(currentWeek, publishersMap, settings?.congregationName || 'Congregación');
-      setToastNotification('Hojas oficiales S-89 generadas en PDF.');
+    const stored = await getLocalOfficialFormBytes('S-89');
+    if (!stored) {
+      setOfficialFormModalCode('S-89');
+      setToastNotification('Carga primero el archivo oficial S-89.pdf descargado de JW Hub para rellenarlo.');
+      setTimeout(() => setToastNotification(null), 4000);
+      return;
     }
-    setTimeout(() => setToastNotification(null), 3000);
+
+    const slips = getS89SlipsForWeek(currentWeek);
+    if (slips.length === 0) {
+      setToastNotification('No hay partes estudiantiles asignadas en esta semana.');
+      setTimeout(() => setToastNotification(null), 3500);
+      return;
+    }
+
+    try {
+      const filledBytes = await fillOfficialS89Pdf(stored.bytes, slips);
+      const outName = `S-89_Semana_${currentWeek.weekStartDate}.pdf`;
+      downloadPdfBytesLocally(filledBytes, outName);
+      setToastNotification(`Formato oficial "${outName}" rellenado y descargado.`);
+    } catch (err) {
+      console.error('Error rellenando S-89 oficial:', err);
+      setOfficialFormModalCode('S-89');
+    }
+    setTimeout(() => setToastNotification(null), 3500);
   };
 
   const handleQuickSyncOrganized = (scope: 'all' | 'midweek' | 'weekend' = 'all') => {
@@ -2610,6 +2634,14 @@ export const ScheduleTab: React.FC = () => {
           <span>{toastNotification}</span>
         </div>
       )}
+
+      {/* Modal para Cargar y Rellenar Formatos Oficiales (S-89 / S-140) */}
+      <LocalOfficialFormsModal
+        isOpen={Boolean(officialFormModalCode)}
+        onClose={() => setOfficialFormModalCode(null)}
+        initialFormCode={officialFormModalCode || 'S-89'}
+        initialWeekId={currentWeek?.id}
+      />
     </div>
   );
 };

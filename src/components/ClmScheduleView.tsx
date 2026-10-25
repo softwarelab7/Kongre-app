@@ -2,7 +2,13 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import type { Publisher, ClmPrograma, ClmParte, TurnoDeber, WeekendPrograma, ClmHistorialItem } from '../types';
 import { autoAsignarLocal, isPublisherEligibleForPart } from '../utils/clmAutoAssignLocal';
 export { isPublisherEligibleForPart };
-import { generateS89Pdf } from '../utils/pdfFillers';
+import {
+  getLocalOfficialFormBytes,
+  fillOfficialS89Pdf,
+  downloadPdfBytesLocally,
+  OfficialFormCode,
+} from '../services/localOfficialFormsService';
+import { LocalOfficialFormsModal } from './LocalOfficialFormsCenter';
 import { Select } from './Select';
 import { StudentS38HistoryModal } from './StudentS38HistoryModal';
 import { ClmReplacementModal } from './ClmReplacementModal';
@@ -285,6 +291,7 @@ export default function ClmScheduleView({
   const [timerInitialPartId, setTimerInitialPartId] = useState<string | undefined>(undefined);
   const [editingSongPart, setEditingSongPart] = useState<ClmParte | null>(null);
   const [songNumberInput, setSongNumberInput] = useState('');
+  const [officialFormModalCode, setOfficialFormModalCode] = useState<OfficialFormCode | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const auxCounselorPart = useMemo(() => {
@@ -851,10 +858,48 @@ export default function ClmScheduleView({
     }
   };
 
-  // Generar comprobantes oficiales S-89
-  const handleGenerateS89 = () => {
+  // Rellenar y descargar el formato oficial S-89 cargado por el usuario (o abrir el modal para cargarlo)
+  const handleGenerateS89 = async () => {
     if (!programa) return;
-    generateS89Pdf(programa, publishers);
+    const stored = await getLocalOfficialFormBytes('S-89');
+    if (!stored) {
+      setOfficialFormModalCode('S-89');
+      showToast('Carga primero el archivo oficial S-89.pdf descargado de JW Hub para rellenarlo.');
+      return;
+    }
+
+    const studentParts = (programa.partes || []).filter(
+      (p) => (p.seccion === 'maestros' || p.tipo === 'lectura_biblica') && (p.asignado_nid || p.asignado_nombre)
+    );
+    if (studentParts.length === 0) {
+      showToast('No hay partes estudiantiles asignadas en esta semana.');
+      return;
+    }
+
+    const slips = studentParts.map((p, idx) => ({
+      id: p.id || `slip-${idx}`,
+      weekId: programa.id || programa.semana_fecha,
+      date: programa.semana_fecha,
+      studentId: p.asignado_nid || '',
+      studentName: p.asignado_nombre || '',
+      assistantId: p.asignado_auxiliar_nid || undefined,
+      assistantName: p.asignado_auxiliar_nombre || undefined,
+      partNumber: idx + 1,
+      partTitle: p.titulo,
+      room: (p.es_clase_auxiliar ? 'auxiliar' : 'principal') as 'principal' | 'auxiliar',
+      lessonNumber: p.leccion_numero,
+      deliveredStatus: 'pendiente' as const,
+    }));
+
+    try {
+      const filledBytes = await fillOfficialS89Pdf(stored.bytes, slips);
+      const outName = `S-89_Semana_${programa.semana_fecha}.pdf`;
+      downloadPdfBytesLocally(filledBytes, outName);
+      showToast(`Formato oficial "${outName}" rellenado y descargado.`);
+    } catch (err) {
+      console.error('Error rellenando S-89 oficial:', err);
+      setOfficialFormModalCode('S-89');
+    }
   };
 
   // Auto-asignación inteligente
@@ -2607,6 +2652,14 @@ export default function ClmScheduleView({
         initialMeetingType="midweek"
         initialRoom={currentRoom}
         initialPartId={timerInitialPartId}
+      />
+
+      {/* Modal para Cargar y Rellenar Formatos Oficiales (S-89 / S-140) */}
+      <LocalOfficialFormsModal
+        isOpen={Boolean(officialFormModalCode)}
+        onClose={() => setOfficialFormModalCode(null)}
+        initialFormCode={officialFormModalCode || 'S-89'}
+        initialWeekId={currentWeek?.id}
       />
     </div>
   );

@@ -414,7 +414,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
         </div>
       )}
 
-      {/* NÚCLEO FAMILIAR Y AGRUPACIÓN INTELIGENTE (ESTILO KHS FAMILY SCHEDULING) */}
+      {/* NÚCLEO FAMILIAR Y AGRUPACIÓN INTELIGENTE */}
       <div className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 dark:bg-white/[0.02] border border-zinc-200/80 dark:border-white/[0.06] space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-start gap-3">
@@ -424,10 +424,10 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, ha
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h4 className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                  Núcleo Familiar y Agrupación en Reuniones (KHS)
+                  Núcleo Familiar y Agrupación en Reuniones
                 </h4>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
-                  Same-Night Grouping
+                  Misma Noche
                 </span>
               </div>
               <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">

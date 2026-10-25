@@ -37,6 +37,11 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { SplashCheckbox } from './SplashCheckbox';
+import {
+  computeCircuitVisitExecutiveReport,
+  printCircuitOverseerExecutiveDossierA4,
+  buildCircuitVisitExecutiveWhatsAppSummary,
+} from '../utils/secretaryAuditEngine';
 
 export const VisitaSuperintendenteTab: React.FC = () => {
   const {
@@ -44,6 +49,11 @@ export const VisitaSuperintendenteTab: React.FC = () => {
     publishers,
     publishersMap,
     settings,
+    weeks,
+    monthlyReports,
+    territories,
+    preachingGroups,
+    auxPioneerRequests,
     updateCircuitVisit,
     updateMealArrangement,
     updateMinistryArrangement,
@@ -53,7 +63,10 @@ export const VisitaSuperintendenteTab: React.FC = () => {
   } = useCongregation();
 
   // Active sub-tab
-  const [activeSubTab, setActiveSubTab] = useState<'programa' | 'comidas' | 'predicacion' | 'checklist'>('programa');
+  const [activeSubTab, setActiveSubTab] = useState<
+    'programa' | 'comidas' | 'predicacion' | 'checklist' | 'carpeta_ejecutiva'
+  >('programa');
+  const [selectedServiceYear, setSelectedServiceYear] = useState<string>('2025-2026');
 
   // Modals
   const [isEditVisitModalOpen, setIsEditVisitModalOpen] = useState(false);
@@ -146,6 +159,31 @@ export const VisitaSuperintendenteTab: React.FC = () => {
     const confirmed = circuitVisit.meals.filter(m => m.isConfirmed).length;
     return { total, confirmed };
   }, [circuitVisit.meals]);
+
+  // Executive Report (S-1, S-21, S-88, S-13) for Circuit Overseer Visit
+  const executiveReport = useMemo(() => {
+    return computeCircuitVisitExecutiveReport({
+      publishers,
+      weeks,
+      monthlyReports,
+      territories,
+      preachingGroups,
+      auxPioneerRequests,
+      circuitVisit,
+      settings,
+      serviceYear: selectedServiceYear,
+    });
+  }, [
+    publishers,
+    weeks,
+    monthlyReports,
+    territories,
+    preachingGroups,
+    auxPioneerRequests,
+    circuitVisit,
+    settings,
+    selectedServiceYear,
+  ]);
 
   // WhatsApp Share: Full Program
   const handleShareFullProgramWhatsApp = () => {
@@ -355,12 +393,12 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
           </button>
 
           <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 text-xs font-bold rounded-xl transition border border-slate-200/80 dark:border-white/[0.08] shadow-2xs active:scale-95 cursor-pointer"
-            title="Imprimir programa oficial"
+            onClick={() => printCircuitOverseerExecutiveDossierA4(executiveReport, settings, circuitVisit)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-xs active:scale-95 cursor-pointer"
+            title="Imprimir Carpeta Ejecutiva A4 para el Superintendente de Circuito"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>Imprimir</span>
+            <span>Imprimir Carpeta Ejecutiva A4</span>
           </button>
 
           <button
@@ -462,6 +500,18 @@ ${meal.notes ? `\n📝 *Notas:* ${meal.notes}` : ''}
         >
           <CheckSquare className="w-4 h-4 text-indigo-600" />
           <span>Registros & Archivo ({checklistStats.percent}%)</span>
+        </button>
+
+        <button
+          onClick={() => setActiveSubTab('carpeta_ejecutiva')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition shrink-0 cursor-pointer ${
+            activeSubTab === 'carpeta_ejecutiva'
+              ? 'bg-indigo-600 text-white font-semibold shadow-xs'
+              : 'bg-indigo-50/70 text-indigo-800 hover:bg-indigo-100'
+          }`}
+        >
+          <FileCheck className="w-4 h-4" />
+          <span>Carpeta Ejecutiva (S-1 / S-21 / S-88 / S-13)</span>
         </button>
       </div>
 
@@ -919,6 +969,335 @@ ${ministryList}`;
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* SUB-TAB 5: CARPETA EJECUTIVA DE SECRETARÍA Y SERVICIO     */}
+      {/* ========================================================= */}
+      {activeSubTab === 'carpeta_ejecutiva' && (
+        <div className="space-y-6">
+          {/* Header & Actions */}
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <FileCheck className="w-5 h-5 text-indigo-600" />
+                <span>Dossier Ejecutivo de Auditoría para la Visita del Superintendente de Circuito</span>
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Consolidado automático de Tarjetas S-21, Asistencia S-88, Precursores Regulares (600 h), Grupos de Servicio y Territorios S-13.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap shrink-0">
+              <select
+                value={selectedServiceYear}
+                onChange={(e) => setSelectedServiceYear(e.target.value)}
+                className="px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 bg-slate-50"
+              >
+                <option value="2025-2026">Año de Servicio 2025-2026</option>
+                <option value="2026-2027">Año de Servicio 2026-2027</option>
+                <option value="2024-2025">Año de Servicio 2024-2025</option>
+              </select>
+
+              <button
+                onClick={() => {
+                  const text = buildCircuitVisitExecutiveWhatsAppSummary(
+                    executiveReport,
+                    settings,
+                    circuitVisit
+                  );
+                  const a = document.createElement('a');
+                  a.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+                  a.target = '_blank';
+                  a.rel = 'noopener noreferrer';
+                  a.click();
+                }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span>Enviar Resumen WhatsApp</span>
+              </button>
+
+              <button
+                onClick={() =>
+                  printCircuitOverseerExecutiveDossierA4(executiveReport, settings, circuitVisit)
+                }
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Imprimir Dossier A4</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 4 Executive Summary Blocks */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Roster Block */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
+              <div className="text-[11px] font-bold uppercase text-slate-500">
+                1. Publicadores y Nombramientos
+              </div>
+              <div className="text-2xl font-black text-slate-900">
+                {executiveReport.roster.totalPublishers}{' '}
+                <span className="text-xs font-semibold text-emerald-600">
+                  ({executiveReport.roster.activeCount} activos)
+                </span>
+              </div>
+              <div className="text-xs text-slate-600 space-y-0.5 pt-1 border-t border-slate-100">
+                <div className="flex justify-between">
+                  <span>Ancianos / Siervos Min.:</span>
+                  <strong>
+                    {executiveReport.roster.eldersCount} / {executiveReport.roster.ministerialServantsCount}
+                  </strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>Precursores Regulares:</span>
+                  <strong>{executiveReport.roster.regularPioneersCount}</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>Irregulares / Inactivos:</span>
+                  <strong className="text-amber-700">
+                    {executiveReport.roster.irregularCount} / {executiveReport.roster.inactiveCount}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            {/* S-88 Attendance Block */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
+              <div className="text-[11px] font-bold uppercase text-slate-500">
+                2. Asistencia S-88 (Promedios)
+              </div>
+              <div className="text-2xl font-black text-indigo-700">
+                {executiveReport.attendanceS88.avgWeekendTotal}{' '}
+                <span className="text-xs font-semibold text-slate-500">fin de semana</span>
+              </div>
+              <div className="text-xs text-slate-600 space-y-0.5 pt-1 border-t border-slate-100">
+                <div className="flex justify-between">
+                  <span>Entre Semana (Salón/Zoom):</span>
+                  <strong>
+                    {executiveReport.attendanceS88.avgMidweekTotal} (
+                    {executiveReport.attendanceS88.avgMidweekInPerson}+
+                    {executiveReport.attendanceS88.avgMidweekZoom})
+                  </strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>Fin de Semana (Salón/Zoom):</span>
+                  <strong>
+                    {executiveReport.attendanceS88.avgWeekendTotal} (
+                    {executiveReport.attendanceS88.avgWeekendInPerson}+
+                    {executiveReport.attendanceS88.avgWeekendZoom})
+                  </strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>Proporción vs Activos:</span>
+                  <strong className="text-emerald-700">
+                    {executiveReport.attendanceS88.weekendToPublisherRatioPercent}%
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Pioneer 600h Audit Block */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
+              <div className="text-[11px] font-bold uppercase text-slate-500">
+                3. Auditoría Precursores (600h)
+              </div>
+              <div className="text-2xl font-black text-emerald-700">
+                {executiveReport.ministryS1.pioneerAudit.summary.onTrackCount} /{' '}
+                {executiveReport.ministryS1.pioneerAudit.summary.totalRegularPioneers}{' '}
+                <span className="text-xs font-semibold text-slate-500">en meta</span>
+              </div>
+              <div className="text-xs text-slate-600 space-y-0.5 pt-1 border-t border-slate-100">
+                <div className="flex justify-between">
+                  <span>Promedio mensual PR:</span>
+                  <strong>
+                    {executiveReport.ministryS1.pioneerAudit.summary.avgRegularPioneerMonthlyHours} h/mes
+                  </strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>En observación / Déficit:</span>
+                  <strong className="text-amber-700">
+                    {executiveReport.ministryS1.pioneerAudit.summary.warningCount} /{' '}
+                    {executiveReport.ministryS1.pioneerAudit.summary.behindCount}
+                  </strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>Cursos Bíblicos (Prom. Mes):</span>
+                  <strong>{executiveReport.ministryS1.totalBibleStudiesPerMonthAvg}</strong>
+                </div>
+              </div>
+            </div>
+
+            {/* S-13 Territories Block */}
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-2">
+              <div className="text-[11px] font-bold uppercase text-slate-500">
+                4. Territorios S-13 (Cobertura)
+              </div>
+              <div className="text-2xl font-black text-blue-700">
+                {executiveReport.territoriesS13.coveragePercent}%{' '}
+                <span className="text-xs font-semibold text-slate-500">anual</span>
+              </div>
+              <div className="text-xs text-slate-600 space-y-0.5 pt-1 border-t border-slate-100">
+                <div className="flex justify-between">
+                  <span>Disponibles / Asignados:</span>
+                  <strong>
+                    {executiveReport.territoriesS13.availableCount} /{' '}
+                    {executiveReport.territoriesS13.assignedCount}
+                  </strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>Vencidos (&gt; 4 meses):</span>
+                  <strong
+                    className={
+                      executiveReport.territoriesS13.overdueCount > 0
+                        ? 'text-rose-600'
+                        : 'text-emerald-600'
+                    }
+                  >
+                    {executiveReport.territoriesS13.overdueCount}
+                  </strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>Direcciones "No Visitar":</span>
+                  <strong>{executiveReport.territoriesS13.totalNoVisitAddresses}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Groups Breakdown Table */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-slate-200">
+              <h4 className="font-bold text-slate-800 text-sm">
+                Estado por Grupos de Servicio del Campo (Revisión con el Superintendente de Servicio)
+              </h4>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                  <tr>
+                    <th className="py-3 px-4">Grupo</th>
+                    <th className="py-3 px-4">Superintendente / Auxiliar</th>
+                    <th className="py-3 px-3 text-center">Publicadores</th>
+                    <th className="py-3 px-3 text-center">Activos</th>
+                    <th className="py-3 px-3 text-center">Irregulares</th>
+                    <th className="py-3 px-3 text-center">Inactivos</th>
+                    <th className="py-3 px-3 text-center">Prec. Regulares</th>
+                    <th className="py-3 px-3 text-right">Horas Año</th>
+                    <th className="py-3 px-4 text-right">Cursos Bíblicos</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {executiveReport.ministryS1.groupsSummary.map((g) => (
+                    <tr key={g.groupNumber} className="hover:bg-slate-50/80">
+                      <td className="py-3 px-4 font-bold text-slate-900">
+                        Grupo {g.groupNumber}: {g.groupName}
+                      </td>
+                      <td className="py-3 px-4 text-slate-600">
+                        {g.overseerName} <span className="text-slate-400">/</span> {g.assistantName}
+                      </td>
+                      <td className="py-3 px-3 text-center font-bold text-slate-800">
+                        {g.totalMembers}
+                      </td>
+                      <td className="py-3 px-3 text-center font-bold text-emerald-600">
+                        {g.activeMembers}
+                      </td>
+                      <td className="py-3 px-3 text-center font-bold text-amber-600">
+                        {g.irregularMembers}
+                      </td>
+                      <td className="py-3 px-3 text-center font-bold text-rose-600">
+                        {g.inactiveMembers}
+                      </td>
+                      <td className="py-3 px-3 text-center font-semibold text-indigo-600">
+                        {g.regularPioneers}
+                      </td>
+                      <td className="py-3 px-3 text-right font-bold text-slate-800">
+                        {g.totalHoursYear} h
+                      </td>
+                      <td className="py-3 px-4 text-right font-bold text-slate-800">
+                        {g.avgBibleStudies}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Pioneer Audit Table inside Circuit Visit */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-slate-200">
+              <h4 className="font-bold text-slate-800 text-sm">
+                Revisión de Tarjetas S-21 de Precursores Regulares (Meta Anual: 600 h / 50 h mensuales)
+              </h4>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 text-slate-600 uppercase text-[10px] font-bold border-b border-slate-200">
+                  <tr>
+                    <th className="py-3 px-4">Precursor</th>
+                    <th className="py-3 px-3 text-center">Grupo</th>
+                    <th className="py-3 px-3 text-center">Meses Inf.</th>
+                    <th className="py-3 px-3 text-right">Horas Pred.</th>
+                    <th className="py-3 px-3 text-right">Crédito</th>
+                    <th className="py-3 px-3 text-right">Total Efectivo</th>
+                    <th className="py-3 px-3 text-right">Promedio / Mes</th>
+                    <th className="py-3 px-3 text-right">Balance Pro-Rata</th>
+                    <th className="py-3 px-4 text-center">Estado</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {executiveReport.ministryS1.pioneerAudit.regularPioneers.map((p) => (
+                    <tr key={p.publisher.id} className="hover:bg-slate-50/80">
+                      <td className="py-3 px-4 font-bold text-slate-900">{p.publisher.name}</td>
+                      <td className="py-3 px-3 text-center text-slate-600">
+                        G-{p.publisher.groupNumber || '-'}
+                      </td>
+                      <td className="py-3 px-3 text-center font-semibold">
+                        {p.monthsReported} / 12
+                      </td>
+                      <td className="py-3 px-3 text-right">{p.totalHours} h</td>
+                      <td className="py-3 px-3 text-right text-indigo-600">
+                        {p.totalCreditHours > 0 ? `+${p.totalCreditHours} h` : '-'}
+                      </td>
+                      <td className="py-3 px-3 text-right font-black text-slate-900">
+                        {p.effectiveHours} h
+                      </td>
+                      <td className="py-3 px-3 text-right font-semibold">{p.avgMonthlyHours} h</td>
+                      <td
+                        className={`py-3 px-3 text-right font-bold ${
+                          p.hoursDelta >= 0
+                            ? 'text-emerald-600'
+                            : p.hoursDelta >= -20
+                            ? 'text-amber-600'
+                            : 'text-rose-600'
+                        }`}
+                      >
+                        {p.hoursDelta >= 0 ? `+${p.hoursDelta} h` : `${p.hoursDelta} h`}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        {p.paceStatus === 'en_meta' ? (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            En Meta
+                          </span>
+                        ) : p.paceStatus === 'atencion' ? (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                            Observación
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">
+                            Déficit
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

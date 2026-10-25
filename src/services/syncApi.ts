@@ -217,12 +217,27 @@ export function syncVerifyPersonalPin(
     deriveAuthToken(congregationPin, id, 'public'),
     derivePersonalPinToken(personalPin, id),
   ]).then(([publicToken, pinToken]) =>
-    call<{ publisher: VerifiedPublisher }>({
+    call<{ publisher: VerifiedPublisher; session_token?: string; expires_at?: number }>({
       action: 'verify_personal_pin',
       id,
       tokens: { public: publicToken },
       pin_token: pinToken,
       publisher_id: publisherId.trim(),
+    })
+  );
+}
+
+export function syncVerifyRoleToken(
+  id: string,
+  congregationPin: string,
+  token: string
+) {
+  return deriveAuthToken(congregationPin, id, 'public').then((publicToken) =>
+    call<{ valid: boolean; publisher_id: string; role: string; roles: string[]; expires_at: number }>({
+      action: 'verify_role_token',
+      id,
+      tokens: { public: publicToken },
+      token,
     })
   );
 }

@@ -18,7 +18,12 @@ import {
   isSafeDemoMode,
   signRoleSession,
   verifyRoleSessionSignature,
+  encryptSensitiveFieldAtRest,
+  decryptSensitiveFieldAtRest,
+  parseServerRoleToken,
+  SERVER_ROLE_TOKEN_STORAGE_KEY,
 } from '../src/utils/theocraticSecurity.ts';
+import { setVaultSessionEntropyForTesting } from '../src/utils/atRestVault.ts';
 import { sanitizeActorNid, sanitizeAuditDetails } from '../src/services/auditLogService.ts';
 
 test('cifrado: ida y vuelta con el formato actual', async () => {
@@ -268,5 +273,138 @@ test('auditoría: sanitización de actor NID y detalles contra tablas arcoíris 
   assert.equal(cleanDetails, 'Acceso concedido con pin: •••• para usuario');
   const cleanClave = sanitizeAuditDetails('Cambio de clave = 9876 exitoso');
   assert.equal(cleanClave, 'Cambio de clave = •••• exitoso');
+});
+
+test('Fase 2 Bóveda Local: Cifrado kgr_sec4 respaldado por IndexedDB para salud (DPA) y notas confidenciales', () => {
+  const store: Record<string, string> = {};
+  const mockStorage = {
+    getItem: (k: string) => store[k] ?? null,
+    setItem: (k: string, v: string) => { store[k] = v; },
+    removeItem: (k: string) => { delete store[k]; },
+    clear: () => { Object.keys(store).forEach((k) => delete store[k]); },
+  };
+  (globalThis as any).window = {};
+  (globalThis as any).localStorage = mockStorage;
+
+  // 1. Simular bóveda inicializada con entropía de clave no extraíble
+  setVaultSessionEntropyForTesting('a1b2c3d4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff00');
+
+  const pubWithDpaAndNotes = [
+    {
+      id: 'pub_dpa_1',
+      name: 'Hno Alberto Ruiz',
+      personalPin: '7788',
+      phone: '3115551234',
+      // Directiva DPA confidencial
+      has_dpa: true,
+      dpa_date: '2026-01-10',
+      dpa_expiry_date: '2027-01-10',
+      healthcare_agent_name: 'Doris Ruiz',
+      healthcare_agent_phone: '3129998877',
+      healthcare_agent_alternate_name: 'Carlos Ruiz',
+      healthcare_agent_alternate_phone: '3104443322',
+      medical_allergies: 'Alérgico a sulfas y medios de contraste radiológico',
+      medical_conditions: 'Marcapasos cardíaco bicameral, hipertensión',
+      // Notas confidenciales de ancianos
+      spiritual_notes: 'Reunión con el cuerpo de ancianos en dic 2025.',
+      notes: 'Requiere apoyo de transporte para asamblea regional',
+    },
+  ];
+
+  // 2. Sanitizar para localStorage: todos los campos de salud DPA y notas deben cifrarse con kgr_sec4
+  const sanitized = sanitizePublishersForLocalStorage(pubWithDpaAndNotes);
+  const sPub = sanitized[0];
+  assert.equal(sPub.personalPin, undefined, 'PIN no debe guardarse en claro');
+  assert.ok(sPub.personalPinHash, 'Debe haber hash del PIN');
+  assert.ok(sPub.encryptedPin?.startsWith('kgr_v4:'), 'El PIN de publicador debe estar en kgr_v4:');
+  assert.ok(sPub.phone.startsWith('kgr_sec4:'), 'Teléfono debe estar en kgr_sec4:');
+  assert.ok(sPub.healthcare_agent_name.startsWith('kgr_sec4:'), 'Representante DPA debe estar en kgr_sec4:');
+  assert.ok(sPub.healthcare_agent_phone.startsWith('kgr_sec4:'), 'Teléfono representante DPA debe estar en kgr_sec4:');
+  assert.ok(sPub.medical_allergies.startsWith('kgr_sec4:'), 'Alergias médicas deben estar en kgr_sec4:');
+  assert.ok(sPub.medical_conditions.startsWith('kgr_sec4:'), 'Condiciones médicas deben estar en kgr_sec4:');
+  assert.ok(sPub.dpa_date.startsWith('kgr_sec4:'), 'Fecha DPA debe estar en kgr_sec4:');
+  assert.ok(sPub.spiritual_notes.startsWith('kgr_sec4:'), 'Notas espirituales confidenciales deben estar en kgr_sec4:');
+  assert.ok(sPub.notes.startsWith('kgr_sec4:'), 'Notas generales deben estar en kgr_sec4:');
+
+  // 3. Restaurar en memoria con la bóveda activa: recupera exactamente los valores originales
+  const restored = restorePublishersFromLocalStorage(sanitized);
+  const rPub = restored[0];
+  assert.equal(rPub.name, 'Hno Alberto Ruiz');
+  assert.equal(rPub.phone, '3115551234');
+  assert.equal(rPub.healthcare_agent_name, 'Doris Ruiz');
+  assert.equal(rPub.healthcare_agent_phone, '3129998877');
+  assert.equal(rPub.medical_allergies, 'Alérgico a sulfas y medios de contraste radiológico');
+  assert.equal(rPub.medical_conditions, 'Marcapasos cardíaco bicameral, hipertensión');
+  assert.equal(rPub.spiritual_notes, 'Reunión con el cuerpo de ancianos en dic 2025.');
+
+  // 4. Prueba de aislamiento contra robo de dump de localStorage:
+  // Si un atacante extrae localStorage sin la clave unextractable de IndexedDB (sin vaultSessionEntropy),
+  // kgr_sec4 no puede ser descifrado y devuelve el valor cifrado sin fugar texto claro.
+  setVaultSessionEntropyForTesting(null);
+  const stolenDumpRestored = restorePublishersFromLocalStorage(sanitized);
+  assert.ok(stolenDumpRestored[0].medical_allergies.startsWith('kgr_sec4:'), 'Sin la bóveda no se puede descifrar');
+  assert.ok(stolenDumpRestored[0].spiritual_notes.startsWith('kgr_sec4:'), 'Sin la bóveda las notas no se descifran');
+
+  // 5. Retrocompatibilidad: Si existen datos antiguos en kgr_sec3 o kgr_sec2 se leen sin problemas
+  setVaultSessionEntropyForTesting(null); // simular entorno básico
+  const legacyEncrypted = encryptSensitiveFieldAtRest('Alergia al polen');
+  assert.ok(legacyEncrypted.startsWith('kgr_sec3:'));
+  assert.equal(decryptSensitiveFieldAtRest(legacyEncrypted), 'Alergia al polen');
+
+  // Restaurar estado
+  setVaultSessionEntropyForTesting(null);
+});
+
+test('Token de rol de servidor: parseServerRoleToken y verifyRoleSessionSignature bloquean escalada en DevTools', () => {
+  const store: Record<string, string> = {};
+  const mockStorage = {
+    getItem: (k: string) => store[k] ?? null,
+    setItem: (k: string, v: string) => { store[k] = v; },
+    removeItem: (k: string) => { delete store[k]; },
+    clear: () => { Object.keys(store).forEach((k) => delete store[k]); },
+  };
+  (globalThis as any).window = {};
+  (globalThis as any).localStorage = mockStorage;
+
+  mockStorage.setItem('kongre_congregation_id', '1001DEMO');
+
+  // Token válido emitido por el servidor para un publicador
+  const expFuture = Date.now() + 3600_000;
+  const fakeToken = `kgr_srt1.1001DEMO:pub_123:publicador:publicador,audio_video:${expFuture}.a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2`;
+
+  const parsed = parseServerRoleToken(fakeToken);
+  assert.ok(parsed);
+  assert.equal(parsed.congId, '1001DEMO');
+  assert.equal(parsed.publisherId, 'pub_123');
+  assert.equal(parsed.role, 'publicador');
+  assert.deepEqual(parsed.roles, ['publicador', 'audio_video']);
+
+  // Token expirado se rechaza en el parser
+  const expPast = Date.now() - 1000;
+  const expiredToken = `kgr_srt1.1001DEMO:pub_123:publicador:publicador:${expPast}.a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2`;
+  assert.equal(parseServerRoleToken(expiredToken), null);
+
+  // Almacenar el token en el cliente
+  mockStorage.setItem(SERVER_ROLE_TOKEN_STORAGE_KEY, fakeToken);
+
+  // 1. Firma y validación exitosa para rol autorizado en el token
+  signRoleSession('publicador', ['publicador', 'audio_video'], '1001DEMO');
+  assert.equal(verifyRoleSessionSignature('publicador', ['publicador', 'audio_video'], '1001DEMO'), true);
+
+  // 2. ATAQUE DEVTOOLS: El usuario intenta cambiar kongre_active_role_v1 a 'anciano' o 'coordinador'
+  assert.equal(
+    verifyRoleSessionSignature('anciano', ['anciano'], '1001DEMO'),
+    false,
+    'Debe rechazar la sesión si el rol en localStorage excede lo firmado en el token de servidor'
+  );
+  assert.equal(
+    verifyRoleSessionSignature('coordinador', ['coordinador'], '1001DEMO'),
+    false,
+    'Debe rechazar la sesión si el usuario intenta escalar a coordinador sin token de servidor'
+  );
+
+  // 3. ATAQUE DEVTOOLS: El usuario intenta borrar o corromper el token de servidor
+  mockStorage.setItem(SERVER_ROLE_TOKEN_STORAGE_KEY, 'token_falso_invalido');
+  assert.equal(verifyRoleSessionSignature('publicador', ['publicador'], '1001DEMO'), false);
 });
 

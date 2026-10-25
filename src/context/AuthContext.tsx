@@ -42,6 +42,7 @@ import {
   isEncryptedPinAtRest,
   signRoleSession,
   verifyRoleSessionSignature,
+  SERVER_ROLE_TOKEN_STORAGE_KEY,
   getPinLockoutRemainingSeconds,
   recordFailedPinAttempt,
   resetFailedPinAttempts,
@@ -1613,6 +1614,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('kongre_active_role_v1');
       localStorage.removeItem(LOCAL_STORAGE_ACTIVE_ROLES_KEY);
       localStorage.removeItem('kongre_role_session_sig_v1');
+      localStorage.removeItem(SERVER_ROLE_TOKEN_STORAGE_KEY);
       setSecureLocalPin('kongre_session_pin_v2', null);
     } catch (err: any) {
       console.error('Error signing out:', err);

@@ -115,6 +115,52 @@ async function buildPersonalVerifiers(pepper: string, congId: string, list: any[
   return out;
 }
 
+export async function signServerRoleToken(
+  pepper: string,
+  congId: string,
+  pub: { id: string; role: string; theocraticRoles?: string[] },
+  expiresAt: number
+): Promise<string> {
+  const rolesList = (pub.theocraticRoles && pub.theocraticRoles.length > 0)
+    ? pub.theocraticRoles.map((r) => r.trim()).filter(Boolean).join(',')
+    : (pub.role || 'publico');
+  const payload = `${congId}:${pub.id}:${pub.role || 'publico'}:${rolesList}:${expiresAt}`;
+  const key = await crypto.subtle.importKey('raw', enc.encode(pepper), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(`server_role_token_v1|${payload}`));
+  return `kgr_srt1.${payload}.${toHex(sig)}`;
+}
+
+export async function verifyServerRoleToken(
+  pepper: string,
+  token: string,
+  currentTime = Date.now()
+): Promise<{ valid: boolean; congId?: string; publisherId?: string; role?: string; roles?: string[]; expiresAt?: number }> {
+  if (!token || typeof token !== 'string' || !token.startsWith('kgr_srt1.')) {
+    return { valid: false };
+  }
+  const parts = token.split('.');
+  if (parts.length !== 3) return { valid: false };
+  const [, payload, sigHex] = parts;
+  const payloadParts = payload.split(':');
+  if (payloadParts.length < 5) return { valid: false };
+  const [congId, pubId, role, rolesStr, expStr] = payloadParts;
+  const exp = parseInt(expStr, 10);
+  if (isNaN(exp) || exp < currentTime) return { valid: false };
+
+  const key = await crypto.subtle.importKey('raw', enc.encode(pepper), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const expectedSig = toHex(await crypto.subtle.sign('HMAC', key, enc.encode(`server_role_token_v1|${payload}`)));
+  if (!safeEqual(expectedSig, sigHex)) return { valid: false };
+
+  return {
+    valid: true,
+    congId,
+    publisherId: pubId,
+    role,
+    roles: rolesStr.split(',').filter(Boolean),
+    expiresAt: exp,
+  };
+}
+
 function safeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
   let diff = 0;
@@ -182,7 +228,7 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
   const action = body?.action;
   const id = typeof body?.id === 'string' ? body.id.trim().toUpperCase() : '';
   if (!ID_RE.test(id)) return json(req, env, 400, { ok: false, error: 'bad_id' });
-  if (!['pull', 'meta', 'push', 'delete', 'verify_personal_pin'].includes(action)) return json(req, env, 400, { ok: false, error: 'bad_action' });
+  if (!['pull', 'meta', 'push', 'delete', 'verify_personal_pin', 'verify_role_token'].includes(action)) return json(req, env, 400, { ok: false, error: 'bad_action' });
   const tokens = parseTokens(body.tokens);
   if (!tokens) return json(req, env, 400, { ok: false, error: 'bad_tokens' });
 
@@ -370,6 +416,8 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
 
     await db.clearFailures(kCongIp);
     await db.clearFailures(kPub);
+    const tokenExp = now() + 30 * 24 * 3600 * 1000; // 30 días de vigencia
+    const sessionToken = await signServerRoleToken(env.pepper, id, targetPublisher, tokenExp);
     return json(req, env, 200, {
       ok: true,
       publisher: {
@@ -379,6 +427,29 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
         privilege: targetPublisher.privilege,
         theocraticRoles: targetPublisher.theocraticRoles || [],
       },
+      session_token: sessionToken,
+      expires_at: tokenExp,
+    });
+  }
+
+  // ---------- VERIFY ROLE TOKEN ----------
+  if (action === 'verify_role_token') {
+    if (!row || !row.master_verifier) return reject();
+    const tier = await tierOf(row);
+    if (!tier) return reject();
+    const rawToken = typeof body?.token === 'string' ? body.token.trim() : '';
+    const verification = await verifyServerRoleToken(env.pepper, rawToken, now());
+    if (!verification.valid || verification.congId !== id) {
+      return json(req, env, 401, { ok: false, error: 'invalid_or_expired_token' });
+    }
+    await db.clearFailures(kCongIp);
+    return json(req, env, 200, {
+      ok: true,
+      valid: true,
+      publisher_id: verification.publisherId,
+      role: verification.role,
+      roles: verification.roles,
+      expires_at: verification.expiresAt,
     });
   }
 

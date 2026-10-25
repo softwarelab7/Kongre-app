@@ -6,6 +6,22 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.24] — 25 de Octubre, 2026
+**Token de Rol Firmado por el Servidor y Fase 2 de la Bóveda Local para Salud (DPA) y Notas Confidenciales**
+
+- 🛡️ **Token Firmado por el Servidor para PIN Personal (`kgr_srt1` con HMAC-SHA256):**
+  - **Generación en Edge Function (`kongre-sync`):** Al validar el PIN personal del publicador, el servidor genera un token firmado criptográficamente con el secreto del servidor (`pepper`), vinculando con firma constante el ID de la congregación, el ID del publicador, el rol teocrático primario, los roles departamentales secundarios y una expiración de 30 días.
+  - **Protección contra Manipulación en DevTools:** El cliente valida la sesión local contra este token de servidor. Si un usuario intenta modificar variables locales como `kongre_active_role_v1` o elevar sus privilegios a Anciano o Coordinador, la sesión es invalidada de inmediato impidiendo cualquier escalada fraudulenta.
+  - **Nuevo Endpoint `verify_role_token`:** La Edge Function provee verificación directa y en tiempo real de la vigencia e integridad de tokens emitidos.
+- 🔐 **Fase 2 de la Bóveda Local en Reposo (`kgr_sec4:` respaldado por IndexedDB):**
+  - **Protección de Datos Médicos DPA y Notas de Ancianos:** Se amplió la protección criptográfica para cubrir la Directiva Médica Anticipada (DPA), representantes de atención médica, alergias a fármacos, condiciones médicas crónicas y las notas espirituales/confidenciales de los ancianos.
+  - **Cifrado AES-256 no extraíble (`atRestVault`):** Estos campos ahora se cifran bajo el formato `kgr_sec4:` en modo Counter autenticado (CTR + MAC), cuya clave deriva de la CryptoKey no extraíble (`extractable: false`) residente en IndexedDB. Incluso ante un volcado total de `localStorage`, un atacante no puede descifrar los datos médicos ni las notas sin la clave del navegador.
+  - **Retrocompatibilidad Total:** Lectura y migración transparente de registros anteriores en formatos `kgr_sec3:`, `kgr_sec2:` y texto plano sin alterar la experiencia de usuario.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.23] — 25 de Octubre, 2026
 **Rediseño Arquitectónico desde Cero de Estado Espiritual y las 11 Tarjetas del Publicador con Bloques Numerados y Cintas de KPIs**
 

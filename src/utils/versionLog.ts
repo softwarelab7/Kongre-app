@@ -25,18 +25,45 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.23';
-export const CURRENT_BUILD_CODE = '2026.10.25.7400';
+export const CURRENT_APP_VERSION = '2.12.24';
+export const CURRENT_BUILD_CODE = '2026.10.25.7500';
 export const BUILD_DATE = '25 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.24',
+    buildCode: '2026.10.25.7500',
+    date: '25 de Octubre, 2026',
+    title: 'Token de Rol Firmado por Servidor y Fase 2 de Bóveda Local para Salud (DPA) y Notas Confidenciales',
+    isCurrent: true,
+    highlight: 'Sesión protegida contra manipulación en DevTools mediante tokens HMAC firmados en la Edge Function y migración de datos médicos DPA y notas de ancianos a la Bóveda Local atRestVault respaldada por CryptoKey no extraíble en IndexedDB',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Token Firmado por el Servidor para PIN Personal: La Edge Function kongre-sync genera ahora un token criptográfico HMAC-SHA256 (kgr_srt1) con el secreto interno del servidor (pepper) que vincula congregación, publicador, rol activo y roles teocráticos. Cualquier intento de alterar el rol en localStorage o DevTools resulta en la invalidación inmediata de la sesión.',
+      },
+      {
+        category: 'security',
+        text: 'Nuevo Endpoint de Verificación en Servidor (verify_role_token): Validación directa en la nube de la autenticidad y vigencia del token de rol emitido.',
+      },
+      {
+        category: 'security',
+        text: 'Fase 2 de la Bóveda Local (kgr_sec4 respaldado por IndexedDB): Migración de datos sensibles de salud (directiva médica anticipada DPA, representantes médicos, alergias a fármacos, condiciones crónicas) y notas confidenciales para que su clave derive de la CryptoKey no extraíble (extractable: false) de IndexedDB. Un volcado de localStorage sin la clave de IndexedDB no puede descifrar estos registros.',
+      },
+      {
+        category: 'security',
+        text: 'Retrocompatibilidad Total Garantizada: Lectura fluida y transparente de registros existentes en formatos previos (kgr_sec3, kgr_sec2 y texto plano) con actualización automática en memoria.',
+      },
+    ],
+  },
+  {
     version: '2.12.23',
     buildCode: '2026.10.25.7400',
     date: '25 de Octubre, 2026',
     title: 'Rediseño Arquitectónico desde Cero de Estado Espiritual y las 11 Tarjetas del Publicador con Bloques Numerados y Cintas de KPIs',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Nueva arquitectura multi-bloque desde cero en Estado Espiritual (PrivilegesSection) con línea de tiempo de hitos S-21, tarjetas de rol, matriz filtrable de 16 departamentos y cintas superiores de indicadores tabulares en todas las secciones del publicador',
     environment: 'Producción Cloud (Kongre)',
     changes: [

@@ -327,5 +327,83 @@ test('PIN personal: límite de publicadores por congregación (>500 rechazado)',
   assert.equal(r.body.error, 'too_many_publishers');
 });
 
+test('PIN personal: verify_personal_pin devuelve session_token firmado por el servidor y verify_role_token lo valida', async () => {
+  const { call, clock } = setup();
+  await call({
+    action: 'push',
+    id: 'CONGTOKEN',
+    tokens: { master: T.masterA, public: T.publicA },
+    payload: 'ADMIN',
+    payload_public: 'PUB',
+    personal_pins: [{
+      id: 'pub1',
+      token: hex('1'),
+      name: 'Hno Juan',
+      role: 'publicador',
+      privilege: 'publicador',
+      theocraticRoles: ['publicador', 'lector_atalaya'],
+    }],
+  });
+
+  // 1. Verificación exitosa de PIN devuelve session_token
+  const r1 = await call({
+    action: 'verify_personal_pin',
+    id: 'CONGTOKEN',
+    tokens: { public: T.publicA },
+    pin_token: hex('1'),
+    publisher_id: 'pub1',
+  });
+  assert.equal(r1.status, 200);
+  assert.equal(r1.body.ok, true);
+  assert.ok(r1.body.session_token);
+  assert.ok(r1.body.session_token.startsWith('kgr_srt1.CONGTOKEN:pub1:publicador:'));
+  assert.ok(r1.body.expires_at > clock.t);
+
+  // 2. verify_role_token valida el token emitido
+  const r2 = await call({
+    action: 'verify_role_token',
+    id: 'CONGTOKEN',
+    tokens: { public: T.publicA },
+    token: r1.body.session_token,
+  });
+  assert.equal(r2.status, 200);
+  assert.equal(r2.body.ok, true);
+  assert.equal(r2.body.valid, true);
+  assert.equal(r2.body.publisher_id, 'pub1');
+  assert.equal(r2.body.role, 'publicador');
+  assert.deepEqual(r2.body.roles, ['publicador', 'lector_atalaya']);
+
+  // 3. Token con firma manipulada (intento de falsificación) es rechazado con 401
+  const tamperedToken = r1.body.session_token.slice(0, -4) + 'abcd';
+  const r3 = await call({
+    action: 'verify_role_token',
+    id: 'CONGTOKEN',
+    tokens: { public: T.publicA },
+    token: tamperedToken,
+  });
+  assert.equal(r3.status, 401);
+  assert.equal(r3.body.error, 'invalid_or_expired_token');
+
+  // 4. Token usado en una congregación distinta es rechazado
+  const r4 = await call({
+    action: 'verify_role_token',
+    id: 'CONGOTHER',
+    tokens: { public: T.publicA },
+    token: r1.body.session_token,
+  });
+  assert.equal(r4.status, 401);
+
+  // 5. Token expirado es rechazado
+  clock.t += 31 * 24 * 3600 * 1000; // Avanzar 31 días
+  const r5 = await call({
+    action: 'verify_role_token',
+    id: 'CONGTOKEN',
+    tokens: { public: T.publicA },
+    token: r1.body.session_token,
+  });
+  assert.equal(r5.status, 401);
+  assert.equal(r5.body.error, 'invalid_or_expired_token');
+});
+
 
 

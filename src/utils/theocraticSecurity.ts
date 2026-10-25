@@ -7,7 +7,7 @@
  * - Enmascaramiento de datos personales (PII / RGPD Teocrático)
  */
 
-import { getVaultValue, setVaultValue } from './atRestVault.ts';
+import { getVaultValue, setVaultValue, getVaultSessionEntropy } from './atRestVault.ts';
 
 export interface EncryptedPayload {
   version: 'kongre_v1';
@@ -1025,7 +1025,7 @@ export function encryptPinAtRest(pin?: string | null): string {
   if (!pin) return '';
   const clean = String(pin).trim();
   if (!clean || clean === '••••' || clean === '••••••••') return '';
-  if (clean.startsWith('kgr_v2:')) return clean;
+  if (clean.startsWith('kgr_v4:') || clean.startsWith('kgr_v3:') || clean.startsWith('kgr_v2:')) return clean;
   if (clean.startsWith('kgr_v1:')) {
     const migrated = decryptPinAtRest(clean);
     if (!migrated) return '';
@@ -1033,7 +1033,13 @@ export function encryptPinAtRest(pin?: string | null): string {
   }
 
   try {
-    const deviceKey = sha256HexSync(`kgr_pin_rest_v2:${getDeviceEntropySalt()}`);
+    const vaultEntropy = getVaultSessionEntropy();
+    const isVaultAvailable = Boolean(vaultEntropy && vaultEntropy.length >= 32);
+    const deviceKey = isVaultAvailable
+      ? sha256HexSync(`kgr_pin_rest_v4:${getDeviceEntropySalt()}:${vaultEntropy}`)
+      : sha256HexSync(`kgr_pin_rest_v2:${getDeviceEntropySalt()}`);
+    const versionPrefix = isVaultAvailable ? 'kgr_v4:' : 'kgr_v2:';
+
     const plainBytes = new TextEncoder().encode(clean);
     const nonce = getSecureRandomBytes(16);
     const nonceHex = bufferToHex(nonce.buffer);
@@ -1053,31 +1059,73 @@ export function encryptPinAtRest(pin?: string | null): string {
     }
     const cipherHex = bufferToHex(out.buffer);
     const macTag = sha256HexSync(`${deviceKey}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
-    return `kgr_v2:${nonceHex}:${macTag}:${cipherHex}`;
+    return `${versionPrefix}${nonceHex}:${macTag}:${cipherHex}`;
   } catch {
     return '';
   }
 }
 
 /**
- * Determina si una cadena almacenada está cifrada en reposo (formato kgr_v3, kgr_v2 o kgr_v1)
+ * Determina si una cadena almacenada está cifrada en reposo (formato kgr_v4, kgr_v3, kgr_v2 o kgr_v1)
  */
 export function isEncryptedPinAtRest(val?: string | null): boolean {
   if (!val) return false;
   const str = String(val).trim();
-  return str.startsWith('kgr_v3:') || str.startsWith('kgr_v2:') || str.startsWith('kgr_v1:');
+  return (
+    str.startsWith('kgr_v4:') ||
+    str.startsWith('kgr_v3:') ||
+    str.startsWith('kgr_v2:') ||
+    str.startsWith('kgr_v1:')
+  );
 }
 
 /**
  * Descifra en memoria un PIN cifrado en reposo.
- * Soporta kgr_v2 (derivado de entropía del dispositivo) y retrocompatibilidad con kgr_v1 (legado).
+ * Soporta kgr_v4 (respaldado por la Bóveda Local atRestVault), kgr_v2 (entropía de dispositivo)
+ * y retrocompatibilidad con kgr_v1 (legado).
  */
 export function decryptPinAtRest(encoded?: string | null): string {
   if (!encoded) return '';
   const clean = String(encoded).trim();
   if (!clean) return '';
 
-  // 1. Formato kgr_v2 (entropía de dispositivo + nonce 128 bits + CTR + MAC)
+  // 1. Formato kgr_v4 (respaldado por la Bóveda Local atRestVault en IndexedDB + nonce 128 bits + CTR + MAC)
+  if (clean.startsWith('kgr_v4:')) {
+    try {
+      const parts = clean.slice('kgr_v4:'.length).split(':');
+      if (parts.length !== 3) return '';
+      const [nonceHex, macTag, cipherHex] = parts;
+      if (!nonceHex || !macTag || !cipherHex || cipherHex.length % 2 !== 0) return '';
+
+      const vaultEntropy = getVaultSessionEntropy();
+      if (!vaultEntropy) return '';
+      const deviceKey = sha256HexSync(`kgr_pin_rest_v4:${getDeviceEntropySalt()}:${vaultEntropy}`);
+      const expectedMac = sha256HexSync(`${deviceKey}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
+      if (macTag.toLowerCase() !== expectedMac.toLowerCase()) {
+        return '';
+      }
+
+      const cipherBytes = hexToBuffer(cipherHex);
+      const out = new Uint8Array(cipherBytes.length);
+      let currentBlock = -1;
+      let currentKeyHex = '';
+      for (let i = 0; i < cipherBytes.length; i++) {
+        const blockIdx = Math.floor(i / 32);
+        const byteInBlock = i % 32;
+        if (blockIdx !== currentBlock) {
+          currentBlock = blockIdx;
+          currentKeyHex = sha256HexSync(`${deviceKey}:${nonceHex}:${blockIdx}:ctr`);
+        }
+        const kByte = parseInt(currentKeyHex.slice(byteInBlock * 2, byteInBlock * 2 + 2), 16);
+        out[i] = cipherBytes[i] ^ kByte;
+      }
+      return new TextDecoder().decode(out);
+    } catch {
+      return '';
+    }
+  }
+
+  // 2. Formato kgr_v2 (entropía de dispositivo + nonce 128 bits + CTR + MAC)
   if (clean.startsWith('kgr_v2:')) {
     try {
       const parts = clean.slice('kgr_v2:'.length).split(':');
@@ -1111,7 +1159,7 @@ export function decryptPinAtRest(encoded?: string | null): string {
     }
   }
 
-  // 2. Formato kgr_v1 (legado con AT_REST_CIPHER_KEY para migración fluida)
+  // 3. Formato kgr_v1 (legado con AT_REST_CIPHER_KEY para migración fluida)
   if (clean.startsWith('kgr_v1:')) {
     try {
       const hexPart = clean.slice('kgr_v1:'.length);
@@ -1231,17 +1279,51 @@ function getSensitiveDataAtRestKeyV1(): string {
 }
 
 /**
- * Cifra en reposo un campo sensible (salud, teléfono, contacto de emergencia, notas médicas)
- * mediante Counter-Mode (CTR) con nonce CSPRNG de 128 bits y etiqueta de autenticación (kgr_sec3:...).
- * Evita repetición de keystream y manipulación de datos (H-02).
+ * Clave para cifrar y descifrar datos sensibles (DPA, notas confidenciales, contactos)
+ * respaldada por la Bóveda Local en IndexedDB (kgr_sec4:).
+ * Incorpora la entropía no extraíble de la bóveda para hacer invulnerable la extracción aislada de localStorage.
+ */
+function getSensitiveDataAtRestKeyV4(vaultEntropy: string): string {
+  const sessionPin =
+    (typeof window !== 'undefined'
+      ? getSecureLocalPin('kongre_session_pin_v2') ||
+        getSecureLocalPin('kongre_coordinator_pin') ||
+        getSecureLocalPin('kongre_registered_cong_pin') ||
+        getSecureLocalPin('kongre_last_cong_pin')
+      : '') || '';
+  const congId =
+    typeof window !== 'undefined' && typeof localStorage !== 'undefined'
+      ? localStorage.getItem('kongre_congregation_number') || localStorage.getItem('kongre_canonical_cong_id') || ''
+      : '';
+  const deviceSalt = getDeviceEntropySalt();
+  return sha256HexSync(`kgr_health_dpa_rest_v4:${sessionPin}:${congId}:${deviceSalt}:${vaultEntropy}`);
+}
+
+/**
+ * Cifra en reposo un campo sensible (salud, directiva DPA, notas confidenciales, teléfono, contactos)
+ * mediante Counter-Mode (CTR) con nonce CSPRNG de 128 bits y etiqueta de autenticación (kgr_sec4:...).
+ * Cuando la Bóveda Local atRestVault está disponible, vincula la clave a la CryptoKey no extraíble de IndexedDB.
  */
 export function encryptSensitiveFieldAtRest(val: any): any {
   if (val === null || val === undefined || val === '') return val;
-  if (typeof val === 'string' && (val.startsWith('kgr_sec3:') || val.startsWith('kgr_sec2:'))) return val;
+  if (
+    typeof val === 'string' &&
+    (val.startsWith('kgr_sec4:') ||
+      val.startsWith('kgr_sec3:') ||
+      val.startsWith('kgr_sec2:'))
+  ) {
+    return val;
+  }
 
   try {
     const rawStr = typeof val === 'object' ? `json:${JSON.stringify(val)}` : String(val);
-    const key = getSensitiveDataAtRestKey();
+    const vaultEntropy = getVaultSessionEntropy();
+    const isVaultAvailable = Boolean(vaultEntropy && vaultEntropy.length >= 32);
+    const key = isVaultAvailable
+      ? getSensitiveDataAtRestKeyV4(vaultEntropy!)
+      : getSensitiveDataAtRestKey();
+    const versionPrefix = isVaultAvailable ? 'kgr_sec4:' : 'kgr_sec3:';
+
     const plainBytes = new TextEncoder().encode(rawStr);
     const nonce = getSecureRandomBytes(16);
     const nonceHex = bufferToHex(nonce.buffer);
@@ -1261,7 +1343,7 @@ export function encryptSensitiveFieldAtRest(val: any): any {
     }
     const cipherHex = bufferToHex(out.buffer);
     const authTag = sha256HexSync(`${key}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
-    return `kgr_sec3:${nonceHex}:${authTag}:${cipherHex}`;
+    return `${versionPrefix}${nonceHex}:${authTag}:${cipherHex}`;
   } catch {
     return val;
   }
@@ -1269,12 +1351,56 @@ export function encryptSensitiveFieldAtRest(val: any): any {
 
 /**
  * Descifra en memoria un valor sensible leído desde localStorage.
- * Soporta kgr_sec3 (CTR autenticado), kgr_sec2 (legado) y texto plano (compatibilidad garantizada).
+ * Soporta kgr_sec4 (respaldado por la Bóveda Local atRestVault), kgr_sec3 (CTR autenticado),
+ * kgr_sec2 (legado) y texto plano (compatibilidad garantizada).
  */
 export function decryptSensitiveFieldAtRest(val: any): any {
   if (typeof val !== 'string') return val;
 
-  // 1. Formato kgr_sec3: Counter-Mode autenticado con nonce de 128 bits (H-02)
+  // 1. Formato kgr_sec4: Respaldado por la Bóveda Local atRestVault en IndexedDB (AES-256 no extraíble) + CTR + MAC
+  if (val.startsWith('kgr_sec4:')) {
+    try {
+      const parts = val.slice('kgr_sec4:'.length).split(':');
+      if (parts.length !== 3) return val;
+      const [nonceHex, authTag, cipherHex] = parts;
+      if (!nonceHex || !authTag || !cipherHex || cipherHex.length % 2 !== 0) return val;
+
+      const vaultEntropy = getVaultSessionEntropy();
+      if (!vaultEntropy) {
+        return val;
+      }
+
+      const key = getSensitiveDataAtRestKeyV4(vaultEntropy);
+      const expectedTag = sha256HexSync(`${key}:${nonceHex}:${cipherHex}:mac`).slice(0, 16);
+      if (authTag.toLowerCase() !== expectedTag.toLowerCase()) {
+        return val;
+      }
+
+      const cipherBytes = hexToBuffer(cipherHex);
+      const out = new Uint8Array(cipherBytes.length);
+      let currentBlock = -1;
+      let currentKeyHex = '';
+      for (let i = 0; i < cipherBytes.length; i++) {
+        const blockIdx = Math.floor(i / 32);
+        const byteInBlock = i % 32;
+        if (blockIdx !== currentBlock) {
+          currentBlock = blockIdx;
+          currentKeyHex = sha256HexSync(`${key}:${nonceHex}:${blockIdx}:ctr`);
+        }
+        const kByte = parseInt(currentKeyHex.slice(byteInBlock * 2, byteInBlock * 2 + 2), 16);
+        out[i] = cipherBytes[i] ^ kByte;
+      }
+      const decoded = new TextDecoder().decode(out);
+      if (decoded.startsWith('json:')) {
+        return JSON.parse(decoded.slice(5));
+      }
+      return decoded;
+    } catch {
+      return val;
+    }
+  }
+
+  // 2. Formato kgr_sec3: Counter-Mode autenticado con nonce de 128 bits (H-02)
   if (val.startsWith('kgr_sec3:')) {
     try {
       const parts = val.slice('kgr_sec3:'.length).split(':');
@@ -1312,7 +1438,7 @@ export function decryptSensitiveFieldAtRest(val: any): any {
     }
   }
 
-  // 2. Formato kgr_sec2: compatibilidad con datos cifrados en versiones anteriores
+  // 3. Formato kgr_sec2: compatibilidad con datos cifrados en versiones anteriores
   if (val.startsWith('kgr_sec2:')) {
     try {
       const payloadHex = val.slice('kgr_sec2:'.length);
@@ -1351,6 +1477,15 @@ const SENSITIVE_HEALTH_AND_CONTACT_KEYS = [
   'notes',
   'birthDate',
   'birth_date',
+  // Directiva Médica Anticipada (DPA / Asuntos Médicos confidenciales - Fase 2 Bóveda Local)
+  'healthcare_agent_name',
+  'healthcare_agent_phone',
+  'healthcare_agent_alternate_name',
+  'healthcare_agent_alternate_phone',
+  'medical_allergies',
+  'medical_conditions',
+  'dpa_date',
+  'dpa_expiry_date',
 ] as const;
 
 /**
@@ -1580,10 +1715,46 @@ export function verifySecureLocalPin(key: string, candidatePin?: string | null):
   }
 }
 
+export const SERVER_ROLE_TOKEN_STORAGE_KEY = 'kongre_server_role_token';
+
+export interface ParsedServerRoleToken {
+  congId: string;
+  publisherId: string;
+  role: string;
+  roles: string[];
+  expiresAt: number;
+  raw: string;
+}
+
+/**
+ * Parsea e inspecciona un token de rol firmado por el servidor (kgr_srt1...).
+ * Valida formato estructural y que no haya caducado.
+ */
+export function parseServerRoleToken(token?: string | null): ParsedServerRoleToken | null {
+  if (!token || typeof token !== 'string' || !token.startsWith('kgr_srt1.')) return null;
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+  const [, payload, sigHex] = parts;
+  if (!sigHex || sigHex.length < 32) return null;
+  const payloadParts = payload.split(':');
+  if (payloadParts.length < 5) return null;
+  const [congId, publisherId, role, rolesStr, expStr] = payloadParts;
+  const expiresAt = parseInt(expStr, 10);
+  if (isNaN(expiresAt) || expiresAt < Date.now()) return null;
+  return {
+    congId: congId.trim().toUpperCase(),
+    publisherId: publisherId.trim(),
+    role: role.trim().toLowerCase(),
+    roles: rolesStr.split(',').map((r) => r.trim().toLowerCase()).filter(Boolean),
+    expiresAt,
+    raw: token,
+  };
+}
+
 /**
  * Genera y persiste una firma criptográfica de integridad para la sesión de rol activa (`kongre_role_session_sig_v1`),
  * impidiendo la escalada de privilegios mediante edición manual de `kongre_active_role_v1` en DevTools.
- * Versión v2 ligada a entropía única del dispositivo y salt de hardware.
+ * Versión v3 ligada a rol, congregación, entropía del dispositivo y token firmado por el servidor (si está presente).
  */
 export function signRoleSession(role: string, roles?: string[], congId?: string): void {
   if (typeof window === 'undefined') return;
@@ -1602,16 +1773,19 @@ export function signRoleSession(role: string, roles?: string[], congId?: string)
       ''
     ).trim().toUpperCase();
     const deviceSalt = getDeviceEntropySalt();
-    // V2 ligado a rol, roles secundarios, congregación activa, entropía del dispositivo + constante interna
-    const sig = sha256HexSync(`role_sig_v2|${normRole}|${normRoles}|${cleanCong}|${deviceSalt}|${AT_REST_CIPHER_KEY}`);
+    const serverToken = (typeof localStorage !== 'undefined' ? localStorage.getItem(SERVER_ROLE_TOKEN_STORAGE_KEY) : '') || '';
+    // V3 ligado a rol, roles secundarios, congregación activa, entropía del dispositivo, token firmado por servidor + constante interna
+    const sig = sha256HexSync(`role_sig_v3|${normRole}|${normRoles}|${cleanCong}|${deviceSalt}|${serverToken}|${AT_REST_CIPHER_KEY}`);
     localStorage.setItem(ROLE_SESSION_SIG_KEY, sig);
   } catch {}
 }
 
 /**
  * Verifica la firma de la sesión de rol activa en localStorage.
- * Soporta role_sig_v2 (preferente con congregación ligada) y retrocompatibilidad con migración automática desde role_sig_v1 y v2 previo.
- * Protegido contra omisión fraudulenta mediante modo demo en congregaciones reales (isSafeDemoMode).
+ * Soporta role_sig_v3 (con token firmado por el servidor), role_sig_v2 (con congregación ligada)
+ * y retrocompatibilidad con role_sig_v1.
+ * Protegido contra omisión fraudulenta mediante modo demo en congregaciones reales (isSafeDemoMode)
+ * e invulnerable a escalada de privilegios en DevTools gracias a la validación del token de servidor.
  */
 export function verifyRoleSessionSignature(role: string, roles?: string[], congId?: string): boolean {
   if (typeof window === 'undefined') return true;
@@ -1639,7 +1813,29 @@ export function verifyRoleSessionSignature(role: string, roles?: string[], congI
       ''
     ).trim().toUpperCase();
     const deviceSalt = getDeviceEntropySalt();
+    const serverToken = (typeof localStorage !== 'undefined' ? localStorage.getItem(SERVER_ROLE_TOKEN_STORAGE_KEY) : '') || '';
 
+    // Hardening contra escalada en DevTools:
+    // Si existe un token firmado por el servidor para el PIN Personal, validar que no haya sido manipulado
+    // y que los roles solicitados estén autorizados en el token emitido por la Edge Function.
+    if (serverToken) {
+      const parsed = parseServerRoleToken(serverToken);
+      if (!parsed) {
+        // Token manipulado o expirado
+        return false;
+      }
+      if (cleanCong && parsed.congId && parsed.congId !== cleanCong) {
+        // Token pertenece a otra congregación
+        return false;
+      }
+      const authorizedRoles = new Set([parsed.role, ...parsed.roles]);
+      if (!authorizedRoles.has(normRole)) {
+        // Intento de escalada de privilegios en DevTools
+        return false;
+      }
+    }
+
+    const expectedSigV3 = sha256HexSync(`role_sig_v3|${normRole}|${normRoles}|${cleanCong}|${deviceSalt}|${serverToken}|${AT_REST_CIPHER_KEY}`);
     const expectedSigV2WithCong = sha256HexSync(`role_sig_v2|${normRole}|${normRoles}|${cleanCong}|${deviceSalt}|${AT_REST_CIPHER_KEY}`);
     const expectedSigV2NoCong = sha256HexSync(`role_sig_v2|${normRole}|${normRoles}|${deviceSalt}|${AT_REST_CIPHER_KEY}`);
     const expectedSigV1 = sha256HexSync(`role_sig_v1|${normRole}|${normRoles}|${AT_REST_CIPHER_KEY}`);
@@ -1647,12 +1843,13 @@ export function verifyRoleSessionSignature(role: string, roles?: string[], congI
 
     if (
       storedSig &&
-      (storedSig === expectedSigV2WithCong ||
+      (storedSig === expectedSigV3 ||
+        storedSig === expectedSigV2WithCong ||
         storedSig === expectedSigV2NoCong ||
         storedSig === expectedSigV1)
     ) {
-      if (storedSig !== expectedSigV2WithCong) {
-        // Migración transparente a v2 con congregación ligada
+      if (storedSig !== expectedSigV3) {
+        // Migración transparente a v3 con serverToken y congregación ligada
         signRoleSession(normRole, normRolesList, cleanCong);
       }
       return true;

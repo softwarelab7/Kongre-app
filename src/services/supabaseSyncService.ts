@@ -1056,7 +1056,7 @@ export const supabaseSyncService = {
     rawPublicPin: string,
     rawPersonalPin: string,
     publisherId: string
-  ): Promise<{ success: boolean; publisher?: VerifiedPublisher; error?: string }> {
+  ): Promise<{ success: boolean; publisher?: VerifiedPublisher; session_token?: string; error?: string }> {
     const cleanId = normalizeCongregationId(rawCongId);
     const cleanPubId = (publisherId || '').trim();
     if (!cleanId || !rawPublicPin || !rawPersonalPin || !cleanPubId) {
@@ -1070,7 +1070,12 @@ export const supabaseSyncService = {
       if (!res.ok) {
         return { success: false, error: describeSyncError(res) };
       }
-      return { success: true, publisher: res.publisher };
+      if (res.session_token && typeof localStorage !== 'undefined') {
+        try {
+          localStorage.setItem('kongre_server_role_token', res.session_token);
+        } catch {}
+      }
+      return { success: true, publisher: res.publisher, session_token: res.session_token };
     } catch (err: any) {
       return { success: false, error: err?.message || 'Error al conectar con el servidor de sincronización' };
     }

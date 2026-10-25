@@ -35,6 +35,42 @@ export const KNOWN_SECURE_PIN_KEYS = [
 const vaultCache = new Map<string, string>();
 let vaultCryptoKey: CryptoKey | null = null;
 let isVaultInitialized = false;
+let vaultSessionEntropy: string | null = null;
+
+/**
+ * Deriva determinísticamente un bloque de entropía de 256 bits a partir de la CryptoKey no extraíble
+ * de IndexedDB. Este bloque solo puede calcularse si la clave reside en el navegador actual,
+ * garantizando que una extracción aislada de localStorage no pueda descifrar los datos sensibles.
+ */
+export async function deriveVaultSessionEntropy(key: CryptoKey): Promise<string> {
+  const subtle = globalThis.crypto?.subtle;
+  if (!subtle) return '';
+  try {
+    const fixedIv = new Uint8Array(12);
+    const seed = new TextEncoder().encode('kongre_vault_session_entropy_v2_at_rest');
+    const encrypted = await subtle.encrypt(
+      { name: 'AES-GCM', iv: fixedIv },
+      key,
+      seed
+    );
+    return bufferToHex(encrypted).slice(0, 64);
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Retorna la entropía de sesión derivada de la bóveda no extraíble (IndexedDB).
+ * Permite que utilidades síncronas (como encryptSensitiveFieldAtRest) incorporen
+ * la seguridad de la bóveda sin requerir Promesas en cada llamada de renderizado.
+ */
+export function getVaultSessionEntropy(): string | null {
+  return vaultSessionEntropy;
+}
+
+export function setVaultSessionEntropyForTesting(entropy: string | null): void {
+  vaultSessionEntropy = entropy;
+}
 
 // Helpers de conversión Hex
 export function bufferToHex(buf: ArrayBuffer | Uint8Array): string {
@@ -328,6 +364,7 @@ export async function initAtRestVault(timeoutMs = 2500): Promise<boolean> {
   const initPromise = (async () => {
     try {
       const key = await getOrCreateVaultKey();
+      vaultSessionEntropy = await deriveVaultSessionEntropy(key);
       await migrateAndHydrateVault(key);
       isVaultInitialized = true;
       return true;
@@ -449,6 +486,7 @@ export function setVaultValue(key: string, plainValue: string | null | undefined
 export function resetVaultForTesting(): void {
   vaultCache.clear();
   vaultCryptoKey = null;
+  vaultSessionEntropy = null;
   isVaultInitialized = false;
 }
 
@@ -457,7 +495,14 @@ export function resetVaultForTesting(): void {
  */
 export function setVaultKeyForTesting(key: CryptoKey | null): void {
   vaultCryptoKey = key;
-  if (key) isVaultInitialized = true;
+  if (key) {
+    isVaultInitialized = true;
+    void deriveVaultSessionEntropy(key).then((ent) => {
+      vaultSessionEntropy = ent;
+    });
+  } else {
+    vaultSessionEntropy = null;
+  }
 }
 
 /**

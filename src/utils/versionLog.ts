@@ -52,6 +52,10 @@ export const VERSION_HISTORY: VersionRecord[] = [
         category: 'improvement',
         text: 'Rediseño Multi-Bloque de Asignaciones (AssignmentsSection), Condiciones Especiales (SpecialConditionsSection) y Ausencias y Notas (AbsenceAndNotesSection): Cintas de KPIs de habilitación por reunión, filtro interactivo por áreas (Todas, Activas, Vida y Ministerio, Fin de Semana y Campo, Acomodación y Salón), panel pedagógico S-38 y bosquejos (1–194), matriz de accesibilidad/traslados y calendario de ausencias con conteo automático de días.',
       },
+      {
+        category: 'security',
+        text: 'Hardening Cero Conocimiento y Bóveda Criptográfica en Reposo (atRestVault): Bóveda con clave AES-256-GCM no extraíble en IndexedDB con autenticación de datos asociados (AAD), migración automática de hashes locales a PBKDF2 (200.000 iteraciones), eliminación total de claves en texto claro en sessionStorage y nuevo modal de rotación segura de credenciales (RotateCredentialsModal) en Supabase.',
+      },
     ],
   },
   {

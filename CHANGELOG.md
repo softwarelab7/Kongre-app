@@ -6,6 +6,22 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.23] — 25 de Octubre, 2026
+**Rediseño Arquitectónico desde Cero de Estado Espiritual y las 11 Tarjetas del Publicador con Bloques Numerados y Cintas de KPIs**
+
+- 🛡️ **Rediseño Total desde Cero de Estado Espiritual (`PrivilegesSection`):**
+  - **Bloque 1 — Cabecera Ejecutiva, Selector de Rol y Cinta de KPIs:** Conmutador superior de **Esperanza S-21** (*Otras ovejas* / *Ungido*), 4 tarjetas arquitectónicas de rol teocrático (*Anciano*, *Siervo Ministerial*, *Publicador Bautizado* y *Publicador No Bautizado*) y cinta de 4 indicadores en tiempo real (*Tiempo de Bautismo*, *Modalidad de Servicio*, *Grupo de Servicio* y *Cuidado Pastoral*).
+  - **Bloque 2 — Línea de Tiempo de Hitos Espirituales (`01–04`):** Tarjetas cronológicas para *Inicio como Publicador*, *Fecha de Bautismo S-21*, *Nombramiento / Inicio de Precursorado* y *Última Escuela de Precursores*, cada una con cálculo automático de tiempo transcurrido (`X años, Y meses`).
+  - **Bloque 3 — Espacio Operativo en Dos Columnas:** Panel izquierdo para *Modalidad del Servicio de Precursor* (con meta de horas) y *Asignación en Grupo de Servicio del Campo* (*Publicador*, *Sup. Grupo*, *Auxiliar*); panel derecho para *Visitas de Pastoreo y Progreso Espiritual*, *Estado de Actividad Mensual* y un cajón colapsable discreto de *Registro Confidencial del Comité*.
+  - **Bloque 4 — Matriz Filtrable de 16 Departamentos y Responsabilidades:** Pestañas de filtro (*Todos (16)*, *Asignados*, *Enseñanza y Comité*, *Cuentas y Territorios*, *Salón y Audio/Video*) y filas con controles segmentados de 3 estados (`No | Titular | Auxiliar`).
+- 🏛️ **Arquitectura Multi-Bloque con Cintas de KPIs en Todas las Tarjetas del Publicador (`01` a `11`):**
+  - **Información Personal (`01`), Contacto y Ubicación (`02`) y Directriz Médica DPA (`04`):** Cintas superiores de 4 indicadores tabulares y bloques numerados (`1.`, `2.`, `3.`) para filiación familiar, separación automática de nombres, captura GPS con enlaces a Google Maps/Waze, plazas de vehículo y representantes médicos del directorio.
+  - **Asignaciones (`06`), Condiciones Especiales (`09`) y Ausencias y Notas (`10`):** Cinta de KPIs de habilitación por reunión, barra de filtros por área (*Todas*, *Activas*, *Vida y Ministerio*, *Fin de Semana y Campo*, *Acomodación, A/V y Salón*), panel pedagógico `S-38` y bosquejos (`1–194`), matriz de accesibilidad/traslado de congregación y calendario de ausencias con cálculo de días acumulados.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.22] — 25 de Octubre, 2026
 **Rediseño Editorial Completo de las 11 Tarjetas del Publicador, el Hub de Categorías, Registro S-21, Contactos de Emergencia y Credenciales PIN/QR**
 

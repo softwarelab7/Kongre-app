@@ -25,18 +25,41 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.22';
-export const CURRENT_BUILD_CODE = '2026.10.25.7300';
+export const CURRENT_APP_VERSION = '2.12.23';
+export const CURRENT_BUILD_CODE = '2026.10.25.7400';
 export const BUILD_DATE = '25 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.23',
+    buildCode: '2026.10.25.7400',
+    date: '25 de Octubre, 2026',
+    title: 'Rediseño Arquitectónico desde Cero de Estado Espiritual y las 11 Tarjetas del Publicador con Bloques Numerados y Cintas de KPIs',
+    isCurrent: true,
+    highlight: 'Nueva arquitectura multi-bloque desde cero en Estado Espiritual (PrivilegesSection) con línea de tiempo de hitos S-21, tarjetas de rol, matriz filtrable de 16 departamentos y cintas superiores de indicadores tabulares en todas las secciones del publicador',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Rediseño Total desde Cero de Estado Espiritual y Privilegios (PrivilegesSection): Arquitectura en 4 bloques independientes con selector S-21 de Esperanza («Otras ovejas» / «Ungido»), 4 tarjetas arquitectónicas de rol teocrático, cinta de KPIs en vivo (Tiempo de Bautismo, Modalidad de Servicio, Grupo y Cuidado Pastoral), Línea de Tiempo de 4 Hitos Espirituales con cálculo automático de antigüedad, espacio operativo de Precursorado/Grupo/Pastoreo, cajón discreto de Registro Confidencial del Comité y matriz filtrable de 16 Departamentos con controles segmentados (No | Titular | Auxiliar).',
+      },
+      {
+        category: 'feature',
+        text: 'Rediseño Multi-Bloque de Información Personal (BasicInfoSection), Contacto y Ubicación (ContactSection) y Directriz DPA (MedicalDpaSection): Cintas superiores de 4 indicadores demográficos, de movilidad y de vigencia médica, bloques funcionales numerados (1., 2., 3...) para identidad S-21, separación automática de nombre, geolocalización GPS con enlaces a Google Maps/Waze, plazas de vehículo y buscador de representantes médicos en el directorio.',
+      },
+      {
+        category: 'improvement',
+        text: 'Rediseño Multi-Bloque de Asignaciones (AssignmentsSection), Condiciones Especiales (SpecialConditionsSection) y Ausencias y Notas (AbsenceAndNotesSection): Cintas de KPIs de habilitación por reunión, filtro interactivo por áreas (Todas, Activas, Vida y Ministerio, Fin de Semana y Campo, Acomodación y Salón), panel pedagógico S-38 y bosquejos (1–194), matriz de accesibilidad/traslados y calendario de ausencias con conteo automático de días.',
+      },
+    ],
+  },
+  {
     version: '2.12.22',
     buildCode: '2026.10.25.7300',
     date: '25 de Octubre, 2026',
     title: 'Rediseño Editorial Completo de las 11 Tarjetas del Publicador, el Hub de Categorías, Registro S-21, Contactos de Emergencia y Credenciales PIN/QR',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Arquitectura visual unificada con cabecera ejecutiva, pestañas numeradas (01–11), navegación secuencial entre tarjetas, nuevo libro S-21 multi-año con exportación CSV, directorio de contactos de emergencia con llamada/WhatsApp y espacio de credenciales PIN/QR',
     environment: 'Producción Cloud (Kongre)',
     changes: [

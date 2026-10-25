@@ -1281,7 +1281,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
 
             {/* Real-time Cloud & Offline Sync Queue Indicator (Supabase & IndexedDB) */}
-            {onOpenQueueModal && (
+            {!isDemoMode && onOpenQueueModal && (
               <OfflineSyncBadge
                 isOnline={isOnline}
                 onOpenQueueModal={onOpenQueueModal}

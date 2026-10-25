@@ -1,6 +1,12 @@
 -- ============================================================================
 -- ROLLBACK de emergencia del cierre. VUELVE A ABRIR el acceso público a las tablas
 -- (el estado inseguro original). Úsalo solo para recuperar servicio mientras arreglas algo.
+-- 
+-- ADVERTENCIA: Este archivo NO debe estar dentro de supabase/migrations/ porque
+-- herramientas como 'supabase db push' o 'supabase db reset' lo ejecutarían
+-- automáticamente por orden alfabético después de la migración 02, reabriendo
+-- el acceso público a sync_queue. Ejecutar únicamente de forma manual en el
+-- SQL Editor si se requiere una vuelta atrás urgente.
 -- ============================================================================
 grant select, insert, update, delete on public.sync_queue to anon, authenticated;
 create policy sync_queue_read   on public.sync_queue for select to public using (true);

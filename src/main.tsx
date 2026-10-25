@@ -4,8 +4,14 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import App from './App.tsx';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
+import { initAtRestVault } from './utils/atRestVault.ts';
 import './index.css';
 import './kongre-autolock.css';
+
+// Inicializar la bóveda criptográfica de claves no extraíbles antes de montar React (tope de 2.5s)
+await initAtRestVault(2500).catch((err) => {
+  console.warn('[atRestVault] Arranque con almacenamiento de respaldo:', err);
+});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

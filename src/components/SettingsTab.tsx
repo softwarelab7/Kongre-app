@@ -39,6 +39,7 @@ import {
   Loader2,
   ChevronRight,
   ChevronLeft,
+  ArrowLeft,
   Layers,
   ShieldAlert,
   LogOut,
@@ -62,6 +63,7 @@ import {
 } from 'lucide-react';
 import { JoinCongregationModal } from './JoinCongregationModal';
 import { InvitationManagerModal } from './InvitationManagerModal';
+import { RotateCredentialsModal } from './RotateCredentialsModal';
 import { SplashCheckbox } from './SplashCheckbox';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 import { AutoLockSettingsCard } from './AutoLockSettingsCard';
@@ -254,6 +256,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
     checkGranularStatus,
     forceSubcollectionsMigration,
     syncNowWithSupabase,
+    rotateCredentials,
     lastSupabaseSyncAt,
     isSupabaseSyncing,
     isDemoMode,
@@ -262,6 +265,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
   const { user, signOutUser } = useAuth();
 
   const [activeTab, setActiveTab] = useState<SettingsCategoryTab>('all');
+  const [isRotateCredentialsModalOpen, setIsRotateCredentialsModalOpen] = useState(false);
 
   // Preferencias de Notificación de Asignaciones
   const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences>(() =>
@@ -1736,17 +1740,20 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
         <div className="space-y-4 animate-in fade-in duration-300">
           {/* Navegación sutil y directa al Panel de Tarjetas (Único botón, sin duplicados) */}
           <div className="flex items-center justify-between gap-3 pb-1">
-            <button
-              type="button"
-              onClick={() => setActiveTab('all')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.05] dark:hover:bg-white/[0.1] text-slate-700 dark:text-zinc-200 border border-slate-200/60 dark:border-white/[0.06] text-xs font-bold transition-all cursor-pointer active:scale-95"
-            >
-              <ChevronLeft size={16} className="text-indigo-600 dark:text-indigo-400" />
-              <span>Volver al Panel de Tarjetas</span>
-            </button>
-            <span className="text-xs text-slate-400 font-medium hidden sm:inline">
-              Ajustes • {SETTINGS_TABS_CONFIG[activeTab]?.label}
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveTab('all')}
+                className="p-2 -ml-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 shrink-0"
+                title="Volver al Panel de Tarjetas"
+                aria-label="Volver al Panel de Tarjetas"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
+                Ajustes • {SETTINGS_TABS_CONFIG[activeTab]?.label}
+              </span>
+            </div>
           </div>
 
           {/* CONTENEDOR 0: PREFERENCIAS DE NOTIFICACIÓN */}
@@ -2687,6 +2694,32 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                   <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                 </label>
               </div>
+
+              {/* Rotación Cero Conocimiento de Credenciales */}
+              <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                    <RefreshCw className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-amber-950 dark:text-amber-200 block mb-0.5">
+                      Rotación Cero Conocimiento de Credenciales en la Nube
+                    </span>
+                    <p className="text-xs text-amber-900/70 dark:text-amber-300/70">
+                      Cambia el PIN que conocen los publicadores o el PIN maestro del coordinador. Las credenciales anteriores quedan invalidadas de inmediato en Supabase.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  disabled={isDemoMode}
+                  onClick={() => setIsRotateCredentialsModalOpen(true)}
+                  className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-all shadow-xs hover:shadow whitespace-nowrap self-stretch sm:self-auto cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+                >
+                  <KeyRound className="w-3.5 h-3.5" />
+                  <span>Rotar Credenciales</span>
+                </button>
+              </div>
             </div>
           )}
 
@@ -3071,6 +3104,16 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                       >
                         <Upload className="w-3.5 h-3.5" />
                         <span>Forzar Subida</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsRotateCredentialsModalOpen(true)}
+                        disabled={isSupabaseSyncing}
+                        className="px-3 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        title="Rotar PIN de congregación o PIN maestro con revocación inmediata en la nube"
+                      >
+                        <KeyRound className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        <span>Rotar Credenciales</span>
                       </button>
                     </div>
                   )}
@@ -3858,6 +3901,15 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
           setNotifPrefs(getNotificationPreferences());
           setNotifPermission(getNotificationPermission());
         }}
+      />
+
+      {/* Modal de Rotación Segura de Credenciales */}
+      <RotateCredentialsModal
+        isOpen={isRotateCredentialsModalOpen}
+        onClose={() => setIsRotateCredentialsModalOpen(false)}
+        onRotate={rotateCredentials}
+        congregationId={settings?.congregationId || settings?.congregationNumber}
+        congregationName={settings?.congregationName}
       />
     </div>
   );

@@ -27,6 +27,7 @@ import {
   Award,
   ChevronLeft,
   ChevronRight,
+  ArrowLeft,
   Share2,
   Edit2,
   MessageCircle,
@@ -749,13 +750,15 @@ export const TarjetasS21Tab: React.FC = () => {
           <div className="flex items-center justify-between flex-wrap gap-3 no-print">
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={() => setActiveView('fichero')}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition"
+                className="p-2 -ml-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 shrink-0"
+                title="Volver al Fichero"
+                aria-label="Volver al Fichero"
               >
-                <ChevronLeft className="w-4 h-4" />
-                <span>Volver al Fichero</span>
+                <ArrowLeft className="w-5 h-5" />
               </button>
-              <h2 className="text-base font-bold text-slate-800">
+              <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">
                 Registro de {currentPublisher.name} ({selectedServiceYear})
               </h2>
             </div>

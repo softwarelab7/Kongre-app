@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   hashPasscode,
+  hashPasscodeSlow,
+  isSlowHash,
   verifyPasscode,
   generateSecureInvitationCode,
   encryptPinAtRest,
@@ -226,6 +228,14 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         if (valid) {
           setIsLocked(false);
           sessionStorage.removeItem('kongre_session_locked');
+          // Auto-migración a PBKDF2 si estaba en formato legado
+          if (!isSlowHash(pinHash)) {
+            try {
+              const newHash = await hashPasscodeSlow(enteredPin.trim());
+              localStorage.setItem(PIN_STORAGE_KEY, newHash);
+              setPinHash(newHash);
+            } catch {}
+          }
           return true;
         }
         return false;
@@ -242,7 +252,15 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const verifyPersonalPin = useCallback(
     async (enteredPin: string): Promise<boolean> => {
       if (!enteredPin || !enteredPin.trim() || !pinHash) return false;
-      return await verifyPasscode(enteredPin.trim(), pinHash);
+      const valid = await verifyPasscode(enteredPin.trim(), pinHash);
+      if (valid && !isSlowHash(pinHash)) {
+        try {
+          const newHash = await hashPasscodeSlow(enteredPin.trim());
+          localStorage.setItem(PIN_STORAGE_KEY, newHash);
+          setPinHash(newHash);
+        } catch {}
+      }
+      return valid;
     },
     [pinHash]
   );
@@ -258,7 +276,7 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setIsLocked(false);
       }
     } else {
-      const hashed = await hashPasscode(newPin.trim());
+      const hashed = await hashPasscodeSlow(newPin.trim());
       localStorage.setItem(PIN_STORAGE_KEY, hashed);
       setPinHash(hashed);
     }
@@ -290,7 +308,7 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       localStorage.removeItem(MASTER_KEY_STORAGE);
       setMasterPassphraseHash(null);
     } else {
-      const hashed = await hashPasscode(passphrase.trim());
+      const hashed = await hashPasscodeSlow(passphrase.trim());
       localStorage.setItem(MASTER_KEY_STORAGE, hashed);
       setMasterPassphraseHash(hashed);
     }
@@ -299,7 +317,15 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const verifyMasterPassphrase = useCallback(
     async (passphrase: string): Promise<boolean> => {
       if (!passphrase || !passphrase.trim() || !masterPassphraseHash) return false;
-      return await verifyPasscode(passphrase.trim(), masterPassphraseHash);
+      const valid = await verifyPasscode(passphrase.trim(), masterPassphraseHash);
+      if (valid && !isSlowHash(masterPassphraseHash)) {
+        try {
+          const newHash = await hashPasscodeSlow(passphrase.trim());
+          localStorage.setItem(MASTER_KEY_STORAGE, newHash);
+          setMasterPassphraseHash(newHash);
+        } catch {}
+      }
+      return valid;
     },
     [masterPassphraseHash]
   );

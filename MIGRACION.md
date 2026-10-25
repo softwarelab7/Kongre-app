@@ -20,7 +20,7 @@ Mantiene el cero conocimiento: el servidor nunca ve PINs ni claves de cifrado.
 - `supabase/migrations/20261022_01_sync_auth_prepare.sql` — aditiva, segura antes de desplegar.
 - `supabase/migrations/20261023_03_personal_pin_verifiers.sql` — agrega personal_verifiers para validación segura de PINs personales.
 - `supabase/migrations/20261022_02_sync_lockdown.sql` — el cierre. **Solo al final.**
-- `supabase/migrations/20261022_99_rollback_lockdown.sql` — emergencia (reabre el acceso inseguro).
+- `supabase/rollback/rollback_lockdown.sql` — emergencia (reabre el acceso inseguro). **Solo para ejecutar a mano** en el SQL Editor si se requiere vuelta atrás. Se movió fuera de `migrations/` porque herramientas como `supabase db push` o `db reset` lo aplicarían automáticamente por orden alfabético después de la `02_lockdown`, reabriendo el acceso público a `sync_queue`.
 - `supabase/functions/kongre-sync/{core.ts,index.ts}` y `supabase/config.toml.snippet`.
 - `src/services/syncApi.ts` (nuevo) y 4 archivos modificados (ver `cambios-src.patch`).
 - `test/` — pruebas del servidor y de integración cliente↔servidor.
@@ -56,6 +56,11 @@ Mantiene el cero conocimiento: el servidor nunca ve PINs ni claves de cifrado.
    `select id_congregacion, created_at from sync_queue where master_verifier is null;`
 8. **Migración 02** (el cierre). Las versiones antiguas de la app dejan de sincronizar; los usuarios deben recargar/actualizar la PWA.
 9. Verifica con las consultas comentadas al final de la 02 (deben devolver 0 filas).
+   Especialmente comprueba que no existan políticas públicas residuales:
+   ```sql
+   select * from pg_policies where schemaname='public' and tablename='sync_queue';
+   ```
+   (debe devolver 0 filas). Asegúrate también de que `LEGACY_CLAIM=false`.
 
 ## Qué probé y qué no
 
@@ -67,16 +72,14 @@ prueba de humo del paso 4 y un ciclo completo (alta → login → sync) en una c
 
 ## Riesgos que siguen abiertos
 
-- **Cualquier publicador con el PIN de congregación puede reescribir `payload_public`** (nombres, roles que viajen ahí).
-  Siguiente paso: acción dedicada para enviar informes y firmar el payload público con la clave maestra.
+- **Reescritura de payload_public (Resuelto en kongre-sync/core.ts)**: La Edge Function ya exige `tier === 'master'` para ejecutar `push`, respondiendo con HTTP `403 push_requires_master_tier` a cualquier intento de escritura con el PIN de congregación. Por ende, los publicadores solo tienen acceso de solo lectura sobre `payload_public`.
 - **La fuerza del PIN maestro sigue importando.** El límite frena ataques en línea, pero un atacante con muchas IPs
   tiene un tope de ~300 intentos/hora por congregación. Exige PIN maestro de 8+ caracteres.
 - El límite por IP depende de `cf-connecting-ip` (es el mejor esfuerzo); el tope por congregación es la red de seguridad.
   Contrapartida: un atacante con muchas IPs puede bloquear 5 min a todos los usuarios de una congregación.
-- **Fuera de alcance de este cambio** (siguen pendientes de mi revisión anterior): los hashes de PIN personal dentro del
-  payload público, la firma de rol con clave embebida, el "cifrado en reposo" XOR y la matriz de permisos.
-- El soporte de rotación de PIN (`rotateFrom` / `rotate_to`) existe y está probado, pero la app no tiene hoy
-  un flujo de "cambiar PIN maestro", así que no está conectado a ninguna pantalla.
+- **Cifrado en reposo y Vault (Resuelto en v2.12.23)**: Se reemplazó el XOR por AES-256-GCM con clave no extraíble (`extractable: false`) en IndexedDB (`src/utils/atRestVault.ts`), con eliminación de hashes rápidos `${key}_hash`, purga de `sessionStorage` y migración a PBKDF2 (200.000 iteraciones).
+- **Rotación de Credenciales (Resuelto en v2.12.23)**: Implementado el flujo completo de rotación en cliente y servidor con `RotateCredentialsModal.tsx`, integrado en `SettingsTab.tsx` (pestañas de Seguridad y Nube) y orquestado mediante `rotateCredentials` en `CongregationContext.tsx` con revocación inmediata en Supabase.
+- **Fuera de alcance que sigue pendiente**: los hashes de PIN personal dentro del payload público y la firma de rol en el servidor (`verify_personal_pin`).
 
 ## Dos bugs preexistentes que corregí de paso
 

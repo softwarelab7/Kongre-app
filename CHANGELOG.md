@@ -17,6 +17,11 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 - 🏛️ **Arquitectura Multi-Bloque con Cintas de KPIs en Todas las Tarjetas del Publicador (`01` a `11`):**
   - **Información Personal (`01`), Contacto y Ubicación (`02`) y Directriz Médica DPA (`04`):** Cintas superiores de 4 indicadores tabulares y bloques numerados (`1.`, `2.`, `3.`) para filiación familiar, separación automática de nombres, captura GPS con enlaces a Google Maps/Waze, plazas de vehículo y representantes médicos del directorio.
   - **Asignaciones (`06`), Condiciones Especiales (`09`) y Ausencias y Notas (`10`):** Cinta de KPIs de habilitación por reunión, barra de filtros por área (*Todas*, *Activas*, *Vida y Ministerio*, *Fin de Semana y Campo*, *Acomodación, A/V y Salón*), panel pedagógico `S-38` y bosquejos (`1–194`), matriz de accesibilidad/traslado de congregación y calendario de ausencias con cálculo de días acumulados.
+- 🔐 **Endurecimiento de Seguridad Cero Conocimiento y Bóveda Criptográfica en Reposo:**
+  - **Bóveda no extraíble `atRestVault` (IndexedDB AES-256-GCM):** Almacenamiento seguro de credenciales con clave criptográfica creada con `extractable: false`, autenticación de datos asociados (AAD) y migración transparente de credenciales previas.
+  - **Derivación Robusta PBKDF2 (200.000 iteraciones):** Sustitución de hashes locales rápidos por PBKDF2 con sal aleatoria criptográfica, purga de `${key}_hash` en localStorage y erradicación de almacenamiento en texto claro en `sessionStorage`.
+  - **Rotación Segura de Credenciales en la Nube (`RotateCredentialsModal`):** Asistente interactivo en Ajustes para rotar de forma independiente o simultánea el PIN de Congregación (Crockford Base32 `XXXX-XXXX`) y el PIN Maestro (12 dígitos), con re-cifrado en el cliente e invalidación inmediata de accesos anteriores en Supabase.
+  - **Blindaje del Despliegue de Base de Datos:** Reubicación del rollback de emergencia fuera del directorio de migraciones automáticas (`supabase/rollback/`) para garantizar que `supabase db push` preserve siempre el cierre de permisos públicos.
 
 ---
 

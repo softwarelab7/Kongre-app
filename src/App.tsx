@@ -1307,7 +1307,9 @@ const AppContent: React.FC = () => {
       />
 
       {/* Offline Connectivity & Cloud Sync Status Banner */}
-      <OfflineSyncBanner onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)} />
+      {!isDemoMode && (
+        <OfflineSyncBanner onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)} />
+      )}
 
       {/* Roles & Theocratic Permissions are now a dedicated full-page view (activeTab === 'roles') */}
 

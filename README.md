@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-2.12.11-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión 2.12.11" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-2.12.23-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión 2.12.23" />
   <img src="https://img.shields.io/badge/Google%20OAuth-Brand%20Verified-4285F4?style=flat-square&logo=google&logoColor=white" alt="Google OAuth Brand Verified" />
   <img src="https://img.shields.io/badge/2FA-Microsoft%20Authenticator-00A4EF?style=flat-square&logo=microsoft&logoColor=white" alt="2FA Microsoft Authenticator" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
@@ -41,7 +41,7 @@
 - **Asistencia S-88 y Dashboard Analítico**: Gráficos de tendencias mensuales y semanales con Recharts, desglose presencial/Zoom y métricas del año de servicio.
 - **Cuentas, Literatura y Mantenimiento del Salón**: Libro de transacciones, hojas de auditoría, inventario físico de publicaciones y cuadro de disyuntores eléctricos.
 - **Autenticación en Dos Pasos (2FA) TOTP**: Verificación opcional con **Microsoft Authenticator** (RFC 6238), códigos de respaldo y dispositivos de confianza por 30 días, 100% calculada en cliente de forma desconectada.
-- **Seguridad Cero Conocimiento (Zero-Knowledge)**: Cifrado en el dispositivo mediante **AES-256-GCM** y derivación **PBKDF2 (100,000 iteraciones)** antes de sincronizarse con la nube mediante **Supabase**.
+- **Seguridad Cero Conocimiento (Zero-Knowledge)**: Cifrado en el dispositivo mediante **AES-256-GCM** y derivación **PBKDF2 (600.000 iteraciones en sincronización, 200.000 iteraciones en bóveda local)**, claves no extraíbles en IndexedDB (`extractable: false`) y rotación asistida de credenciales antes de sincronizarse con la nube mediante **Supabase**.
 - **Modo Offline & Modo Demo**: Soporte PWA 100% desconectado y entorno de demostración precargado para explorar sin modificar datos reales.
 
 ---

@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { WifiOff, Wifi, ShieldCheck, RefreshCw, ChevronRight, X } from 'lucide-react';
 import { getOfflineQueueStats, QueueStats } from '../services/indexedDbQueue';
+import { useCongregation } from '../context/CongregationContext';
+import { isSafeDemoMode } from '../utils/theocraticSecurity';
 
 interface OfflineSyncBannerProps {
   onOpenQueueModal?: () => void;
 }
 
 export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ onOpenQueueModal }) => {
+  const { isDemoMode, settings } = useCongregation();
   const { isOnline, wasOffline } = useOnlineStatus();
   const [dismissed, setDismissed] = useState(false);
   const [stats, setStats] = useState<QueueStats>({
@@ -50,6 +53,13 @@ export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ onOpenQueu
       return () => window.clearTimeout(timer);
     }
   }, [isOnline, stats.pendingCount, stats.syncingCount]);
+
+  if (
+    isDemoMode ||
+    isSafeDemoMode(settings?.congregationNumber || settings?.congregationId, settings?.isRegistered)
+  ) {
+    return null;
+  }
 
   if (dismissed) {
     return null;

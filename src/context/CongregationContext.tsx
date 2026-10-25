@@ -101,10 +101,13 @@ import {
   encryptPinAtRest,
   decryptPinAtRest,
   isEncryptedPinAtRest,
+  hashPasscode,
+  hashPasscodeSlow,
   sanitizeImportedBackupObject,
   computeBackupIntegritySeal,
   verifyBackupIntegritySeal,
 } from '../utils/theocraticSecurity';
+import { normalizePin } from '../utils/crypto';
 import { insertAuditLog } from '../services/auditLogService';
 import {
   normalizePersonName,
@@ -374,6 +377,11 @@ interface CongregationContextType {
   lastSupabaseSyncAt: string | null;
   isSupabaseSyncing: boolean;
   syncNowWithSupabase: (forceUpload?: boolean) => Promise<{ success: boolean; message: string; action?: string }>;
+  rotateCredentials: (params: {
+    currentMasterPin: string;
+    newCongregationPin?: string;
+    newMasterPin?: string;
+  }) => Promise<{ success: boolean; message: string }>;
 
   // Cola de sincronización Offline en IndexedDB
   isOnline: boolean;
@@ -2234,7 +2242,157 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
   };
 
-  // Sincronización continua en segundo plano y reconexión automática con Supabase & IndexedDB
+  /**
+   * Rotación Cero Conocimiento de Credenciales en Supabase:
+   * Re-cifra los payloads locales con las nuevas claves, actualiza los verificadores HMAC
+   * en la Edge Function kongre-sync y revoca inmediatamente el acceso a las claves anteriores.
+   */
+  const rotateCredentials = async (params: {
+    currentMasterPin: string;
+    newCongregationPin?: string;
+    newMasterPin?: string;
+  }): Promise<{ success: boolean; message: string }> => {
+    const congDocId = resolveCongregationDocId();
+    if (!congDocId) {
+      return { success: false, message: 'No se encontró un ID de congregación activo.' };
+    }
+    if (isDemoMode || isDemoModeActive()) {
+      return { success: false, message: 'La rotación de credenciales no está disponible en modo demostración.' };
+    }
+
+    const cleanCurrentMaster = normalizePin(params.currentMasterPin);
+    if (!cleanCurrentMaster) {
+      return { success: false, message: 'Se requiere el PIN Maestro actual para autorizar la rotación en el servidor.' };
+    }
+
+    const cleanNewCongPin = params.newCongregationPin ? normalizePin(params.newCongregationPin) : undefined;
+    const cleanNewMasterPin = params.newMasterPin ? normalizePin(params.newMasterPin) : undefined;
+
+    if (!cleanNewCongPin && !cleanNewMasterPin) {
+      return { success: false, message: 'Debes indicar al menos un PIN nuevo para rotar.' };
+    }
+
+    if (cleanNewMasterPin && cleanNewMasterPin.length < 8) {
+      return { success: false, message: 'El nuevo PIN Maestro debe tener al menos 8 caracteres (se recomiendan 12 dígitos).' };
+    }
+
+    if (cleanNewCongPin && cleanNewCongPin.length < 4) {
+      return { success: false, message: 'El nuevo PIN de congregación debe tener al menos 4 caracteres.' };
+    }
+
+    const currentPublicPin =
+      getSecureLocalPin('kongre_registered_cong_pin') ||
+      getSecureLocalPin('kongre_last_cong_pin') ||
+      cleanCurrentMaster;
+
+    const targetMasterPin = cleanNewMasterPin || cleanCurrentMaster;
+    const targetPublicPin = cleanNewCongPin || currentPublicPin;
+
+    setIsSupabaseSyncing(true);
+    try {
+      const fresh = getFreshLocalCongregationData();
+      const uploadRes = await supabaseSyncService.uploadCongregation({
+        congregationId: congDocId,
+        data: {
+          settings: fresh.settings,
+          publishers: fresh.publishers,
+          weeks: fresh.weeks,
+          territories: fresh.territories,
+          notices: fresh.notices,
+          transactions: fresh.transactions,
+          audits: fresh.quarterlyAudits,
+          literatureItems: fresh.literatureItems,
+          literatureOrders: fresh.specialOrders,
+          literatureDistributions: fresh.groupDistributions,
+          literatureInventory: fresh.inventoryRecords,
+          preachingGroups: fresh.preachingGroups,
+          customDuties: fresh.customDuties,
+          outgoingSpeakers: fresh.outgoingSpeakers,
+          fieldServiceMeetings: fresh.fieldServiceMeetings,
+          cartLocations: fresh.cartLocations,
+          cartShifts: fresh.cartShifts,
+          monthlyReports: fresh.monthlyReports,
+          circuitVisit: fresh.circuitVisit,
+          memorialPlans: fresh.memorialPlans,
+          theocraticAssemblies: fresh.theocraticAssemblies,
+          congregationEvents: fresh.congregationEvents,
+          accountLinkRequests: fresh.accountLinkRequests,
+          clmProgramas: fresh.clmProgramas,
+          hospitalityHosts: fresh.hospitalityHosts,
+          breakers: fresh.breakers,
+          maintenanceSheets: fresh.maintenanceSheets,
+          auxPioneerRequests: fresh.auxPioneerRequests,
+          branchReportsS1: fresh.branchReportsS1,
+        },
+        pinMaestro: targetMasterPin,
+        pinCongregacion: targetPublicPin,
+        rotateFrom: {
+          pinMaestro: cleanNewMasterPin ? cleanCurrentMaster : undefined,
+          pinCongregacion: cleanNewCongPin ? currentPublicPin : undefined,
+        },
+      });
+
+      if (!uploadRes.success) {
+        return { success: false, message: uploadRes.error || 'Error al rotar credenciales en el servidor.' };
+      }
+
+      // 2. Actualizar almacenamiento seguro local
+      if (cleanNewMasterPin) {
+        setSecureLocalPin('kongre_coordinator_pin', cleanNewMasterPin);
+        setSecureLocalPin('kongre_session_pin_v2', cleanNewMasterPin);
+        try {
+          const slowHash = await hashPasscodeSlow(cleanNewMasterPin);
+          localStorage.setItem('kongre_security_master_key_hash', slowHash);
+        } catch {}
+      }
+
+      if (cleanNewCongPin) {
+        setSecureLocalPin('kongre_registered_cong_pin', cleanNewCongPin);
+        setSecureLocalPin('kongre_last_cong_pin', cleanNewCongPin);
+        try {
+          const hash = await hashPasscode(cleanNewCongPin);
+          localStorage.setItem('kongre_security_congregation_pin_hash', hash);
+        } catch {}
+      }
+
+      const updatedTime = supabaseSyncService.getLastSyncTimestamp();
+      if (updatedTime) {
+        setLastSupabaseSyncAt(updatedTime);
+      }
+
+      // 3. Registrar auditoría de seguridad
+      try {
+        await insertAuditLog({
+          accion: 'ROTACION_CREDENCIALES',
+          modulo: 'seguridad',
+          hermano_nid: 'coordinador',
+          detalles: `Rotación exitosa de credenciales: ${[
+            cleanNewCongPin && 'PIN de Congregación',
+            cleanNewMasterPin && 'PIN Maestro',
+          ]
+            .filter(Boolean)
+            .join(', ')}`,
+        });
+      } catch {}
+
+      const rotatedItems = [
+        cleanNewCongPin && 'PIN de Congregación',
+        cleanNewMasterPin && 'PIN Maestro',
+      ]
+        .filter(Boolean)
+        .join(' y ');
+
+      return {
+        success: true,
+        message: `Se ha rotado con éxito: ${rotatedItems}. Las credenciales anteriores quedaron invalidadas de inmediato en la nube.`,
+      };
+    } catch (err: any) {
+      console.warn('Error rotando credenciales:', err);
+      return { success: false, message: err?.message || 'Error inesperado al rotar credenciales.' };
+    } finally {
+      setIsSupabaseSyncing(false);
+    }
+  };
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -6096,6 +6254,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         lastSupabaseSyncAt,
         isSupabaseSyncing,
         syncNowWithSupabase,
+        rotateCredentials,
         isOnline,
         offlineQueueStats,
         syncOfflineQueueNow,

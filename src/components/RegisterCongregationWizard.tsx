@@ -1526,23 +1526,6 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col py-2 sm:py-4 px-3 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="w-full max-w-4xl xl:max-w-5xl 2xl:max-w-6xl mx-auto flex-1 flex flex-col">
-        {/* Top Back Navigation Bar */}
-        <div className="mb-2.5 sm:mb-4 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={step > 1 ? handleBack : onClose}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200 dark:border-slate-800 font-bold text-xs shadow-xs transition-all cursor-pointer"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>{step > 1 ? 'Paso anterior' : 'Volver al Inicio'}</span>
-          </button>
-
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <Logo variant="isotipo" className="w-4 h-4 object-contain" />
-            <span className="hidden sm:inline">Kongre • Registro de Congregación</span>
-          </div>
-        </div>
-
         {/* Main Card */}
         <div className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden flex flex-col flex-1 kg-register-box-enter">
           {/* Header */}
@@ -1551,8 +1534,9 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               <button
                 type="button"
                 onClick={step > 1 ? handleBack : onClose}
-                className="p-1.5 -ml-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center gap-1"
-                title={step > 1 ? 'Paso anterior' : 'Volver atrás'}
+                className="p-1.5 -ml-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer flex items-center"
+                title={step > 1 ? 'Paso anterior' : 'Volver'}
+                aria-label={step > 1 ? 'Paso anterior' : 'Volver'}
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
@@ -1578,14 +1562,21 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-              title="Cerrar y volver atrás"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 mr-1">
+                <Logo variant="isotipo" className="w-4 h-4 object-contain" />
+                <span>Kongre</span>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                title="Cerrar"
+                aria-label="Cerrar"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {wizardContent}

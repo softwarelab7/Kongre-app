@@ -7,6 +7,8 @@
  * - Enmascaramiento de datos personales (PII / RGPD Teocrático)
  */
 
+import { getVaultValue, setVaultValue } from './atRestVault.ts';
+
 export interface EncryptedPayload {
   version: 'kongre_v1';
   salt: string; // Hex
@@ -14,9 +16,9 @@ export interface EncryptedPayload {
   ciphertext: string; // Base64
 }
 
-// Convert ArrayBuffer to Hex String
-function bufferToHex(buffer: ArrayBufferLike): string {
-  const bytes = new Uint8Array(buffer);
+// Convert ArrayBuffer or Uint8Array to Hex String
+function bufferToHex(buffer: ArrayBufferLike | Uint8Array): string {
+  const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
   return Array.from(bytes)
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
@@ -180,8 +182,11 @@ export async function decryptTheocraticData(encryptedJson: string, passphrase: s
   }
 }
 
+export const SLOW_HASH_PREFIX = 'pbkdf2:';
+export const DEFAULT_SLOW_HASH_ITERATIONS = 200000;
+
 /**
- * Genera un hash seguro con sal para el PIN de bloqueo de pantalla
+ * Genera un hash seguro con sal fija para el PIN de congregación (mantiene compatibilidad de red y sincronización).
  */
 export async function hashPasscode(pin: string): Promise<string> {
   const enc = new TextEncoder();
@@ -192,16 +197,109 @@ export async function hashPasscode(pin: string): Promise<string> {
 }
 
 /**
- * Verifica si un PIN / clave ingresada coincide con el hash almacenado
- * - Soporta comparación exacta
- * - Soporta comparación insensible a mayúsculas/minúsculas para claves alfanuméricas
- * - Soporta comparación con o sin guiones y espacios (ej. 8X4W-9M2K equivale a 8X4W9M2K)
- * - Mantiene total retrocompatibilidad con PINs numéricos existentes
+ * Genera un hash lento con PBKDF2 (200.000 iteraciones SHA-256) y sal aleatoria única de 128 bits.
+ * Protege contra fuerza bruta offline por GPU en caso de robo o copia de localStorage.
+ */
+export async function hashPasscodeSlow(
+  pin: string,
+  iterations: number = DEFAULT_SLOW_HASH_ITERATIONS
+): Promise<string> {
+  const clean = pin.trim();
+  const enc = new TextEncoder();
+  const saltBytes = globalThis.crypto.getRandomValues(new Uint8Array(16));
+  const baseKey = await globalThis.crypto.subtle.importKey(
+    'raw',
+    enc.encode(clean),
+    'PBKDF2',
+    false,
+    ['deriveBits']
+  );
+  const derivedBits = await globalThis.crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: saltBytes,
+      iterations,
+      hash: 'SHA-256',
+    },
+    baseKey,
+    256
+  );
+  const saltHex = bufferToHex(saltBytes);
+  const hashHex = bufferToHex(derivedBits);
+  return `${SLOW_HASH_PREFIX}${iterations}:${saltHex}:${hashHex}`;
+}
+
+/**
+ * Determina si una cadena es un hash lento PBKDF2
+ */
+export function isSlowHash(hash?: string | null): boolean {
+  return typeof hash === 'string' && hash.startsWith(SLOW_HASH_PREFIX);
+}
+
+/**
+ * Verifica si un PIN / clave ingresada coincide con el hash almacenado:
+ * - Soporta el formato lento PBKDF2 (pbkdf2:200000:salt:hash)
+ * - Mantiene total retrocompatibilidad con hashes SHA-256 existentes
+ * - Soporta comparación exacta, insensible a mayúsculas y sin guiones
  */
 export async function verifyPasscode(pin: string, storedHash: string): Promise<boolean> {
   if (!pin || !storedHash) return false;
   const clean = pin.trim();
 
+  // 1. Si el hash almacenado es PBKDF2
+  if (storedHash.startsWith(SLOW_HASH_PREFIX)) {
+    try {
+      const parts = storedHash.slice(SLOW_HASH_PREFIX.length).split(':');
+      if (parts.length !== 3) return false;
+      const iters = parseInt(parts[0], 10);
+      const saltHex = parts[1];
+      const expectedHashHex = parts[2];
+      if (!iters || isNaN(iters) || !saltHex || !expectedHashHex) return false;
+
+      const saltBytes = hexToBuffer(saltHex);
+      const enc = new TextEncoder();
+
+      // Variantes candidatas (directa, mayúsculas, sin guiones, con guión 4-4)
+      const candidates: string[] = [clean];
+      const upper = clean.toUpperCase();
+      if (!candidates.includes(upper)) candidates.push(upper);
+      const unhyphenated = upper.replace(/[-\s]/g, '');
+      if (!candidates.includes(unhyphenated)) candidates.push(unhyphenated);
+      if (unhyphenated.length === 8) {
+        const formatted = `${unhyphenated.slice(0, 4)}-${unhyphenated.slice(4)}`;
+        if (!candidates.includes(formatted)) candidates.push(formatted);
+      }
+
+      for (const cand of candidates) {
+        const baseKey = await globalThis.crypto.subtle.importKey(
+          'raw',
+          enc.encode(cand),
+          'PBKDF2',
+          false,
+          ['deriveBits']
+        );
+        const derivedBits = await globalThis.crypto.subtle.deriveBits(
+          {
+            name: 'PBKDF2',
+            salt: new Uint8Array(saltBytes),
+            iterations: iters,
+            hash: 'SHA-256',
+          },
+          baseKey,
+          256
+        );
+        const derivedHex = bufferToHex(derivedBits);
+        if (derivedHex.toLowerCase() === expectedHashHex.toLowerCase()) {
+          return true;
+        }
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  // 2. Formato legado SHA-256 rápido con sal fija
   // 1. Coincidencia directa exacta
   if ((await hashPasscode(clean)) === storedHash) return true;
 
@@ -962,12 +1060,12 @@ export function encryptPinAtRest(pin?: string | null): string {
 }
 
 /**
- * Determina si una cadena almacenada está cifrada en reposo (formato kgr_v2 o kgr_v1)
+ * Determina si una cadena almacenada está cifrada en reposo (formato kgr_v3, kgr_v2 o kgr_v1)
  */
 export function isEncryptedPinAtRest(val?: string | null): boolean {
   if (!val) return false;
   const str = String(val).trim();
-  return str.startsWith('kgr_v2:') || str.startsWith('kgr_v1:');
+  return str.startsWith('kgr_v3:') || str.startsWith('kgr_v2:') || str.startsWith('kgr_v1:');
 }
 
 /**
@@ -1393,20 +1491,15 @@ const ROLE_SESSION_SIG_KEY = 'kongre_role_session_sig_v1';
 
 /**
  * Almacena un PIN sensible (como kongre_coordinator_pin, kongre_session_pin_v2, kongre_registered_cong_pin)
- * cifrado en reposo (`kgr_v2:...`) junto con su hash SHA-256 (`${key}_hash`), y lo conserva en memoria de sesión activa (H-01).
+ * utilizando la bóveda criptográfica no extraíble en IndexedDB (kgr_v3:...) y su caché en memoria.
+ * Ya no almacena hashes débiles (${key}_hash) en localStorage ni copias en texto claro en sessionStorage.
  */
 export function setSecureLocalPin(key: string, rawPin?: string | null): void {
   if (typeof window === 'undefined') return;
   try {
     const clean = rawPin ? String(rawPin).trim() : '';
     if (!clean || clean === '••••' || clean === '••••••••') {
-      localStorage.removeItem(key);
-      localStorage.removeItem(`${key}_hash`);
-      try {
-        if (typeof sessionStorage !== 'undefined') {
-          sessionStorage.removeItem(key);
-        }
-      } catch {}
+      setVaultValue(key, null);
       return;
     }
     const plain = isEncryptedPinAtRest(clean)
@@ -1414,51 +1507,37 @@ export function setSecureLocalPin(key: string, rawPin?: string | null): void {
       : clean;
     if (!plain) return;
 
-    // 1. Conservar en memoria de sesión activa (sessionStorage se destruye al cerrar la pestaña)
-    try {
-      if (typeof sessionStorage !== 'undefined') {
-        sessionStorage.setItem(key, plain);
-      }
-    } catch {}
-
-    // 2. En localStorage: Cifrar con kgr_v2 ligado a entropía única de dispositivo + hash
-    const encrypted = encryptPinAtRest(plain);
-    const hashed = hashPersonalPin(plain);
-    localStorage.setItem(key, encrypted);
-    if (hashed) {
-      localStorage.setItem(`${key}_hash`, hashed);
-    }
+    setVaultValue(key, plain);
   } catch {}
 }
 
 /**
  * Recupera y descifra en memoria un PIN almacenado.
- * Prioriza lectura desde sessionStorage (memoria) y migra automáticamente formatos legados a kgr_v2 (H-01).
+ * Prioriza lectura desde la bóveda de claves no extraíbles (atRestVault) y migra automáticamente formatos legados.
  */
 export function getSecureLocalPin(key: string): string {
   if (typeof window === 'undefined') return '';
   try {
-    // 1. Priorizar lectura desde memoria de sesión activa (sessionStorage)
-    try {
-      if (typeof sessionStorage !== 'undefined') {
-        const sessionVal = sessionStorage.getItem(key);
-        if (sessionVal && sessionVal.trim() && sessionVal !== '••••' && sessionVal !== '••••••••') {
-          return sessionVal.trim();
-        }
-      }
-    } catch {}
+    // 1. Priorizar lectura desde la bóveda criptográfica en memoria
+    const vaultVal = getVaultValue(key);
+    if (vaultVal && vaultVal.trim() && vaultVal !== '••••' && vaultVal !== '••••••••') {
+      return vaultVal.trim();
+    }
 
-    // 2. Si no está en sessionStorage, recuperar de localStorage
+    // 2. Si no está en la bóveda, fallback a localStorage para datos aún no hidratados
+    if (typeof localStorage === 'undefined') return '';
     const stored = localStorage.getItem(key);
     if (!stored) return '';
     const trimmed = stored.trim();
     if (!trimmed || trimmed === '••••' || trimmed === '••••••••') return '';
 
     let plain = '';
-    if (isEncryptedPinAtRest(trimmed)) {
+    if (trimmed.startsWith('kgr_v3:')) {
+      // Valor de bóveda no hidratado aún en caché
+      return '';
+    } else if (isEncryptedPinAtRest(trimmed)) {
       plain = decryptPinAtRest(trimmed);
-      // Migración automática de kgr_v1 a kgr_v2
-      if (plain && trimmed.startsWith('kgr_v1:')) {
+      if (plain) {
         setSecureLocalPin(key, plain);
       }
     } else if (!/^[a-f0-9]{64}$/i.test(trimmed)) {
@@ -1466,13 +1545,6 @@ export function getSecureLocalPin(key: string): string {
       setSecureLocalPin(key, plain);
     }
 
-    if (plain) {
-      try {
-        if (typeof sessionStorage !== 'undefined') {
-          sessionStorage.setItem(key, plain);
-        }
-      } catch {}
-    }
     return plain;
   } catch {
     return '';
@@ -1480,20 +1552,29 @@ export function getSecureLocalPin(key: string): string {
 }
 
 /**
- * Verifica si un PIN candidato coincide con el PIN almacenado bajo `key` en localStorage (vía hash o valor descifrado)
+ * Verifica si un PIN candidato coincide con el PIN almacenado bajo `key` en la bóveda o localStorage
  */
 export function verifySecureLocalPin(key: string, candidatePin?: string | null): boolean {
   if (typeof window === 'undefined' || !candidatePin) return false;
   const cleanCandidate = normalizePersonalPinInput(candidatePin);
   if (cleanCandidate.length < 4) return false;
   try {
-    const storedHash = localStorage.getItem(`${key}_hash`);
-    const candidateHash = hashPersonalPin(cleanCandidate);
-    if (storedHash && candidateHash && storedHash.toLowerCase() === candidateHash.toLowerCase()) {
+    const decrypted = normalizePersonalPinInput(getSecureLocalPin(key));
+    if (decrypted && decrypted.length >= 4 && decrypted === cleanCandidate) {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(`${key}_hash`);
+      }
       return true;
     }
-    const decrypted = normalizePersonalPinInput(getSecureLocalPin(key));
-    return Boolean(decrypted && decrypted.length >= 4 && decrypted === cleanCandidate);
+    if (typeof localStorage !== 'undefined') {
+      const storedHash = localStorage.getItem(`${key}_hash`);
+      const candidateHash = hashPersonalPin(cleanCandidate);
+      if (storedHash && candidateHash && storedHash.toLowerCase() === candidateHash.toLowerCase()) {
+        localStorage.removeItem(`${key}_hash`);
+        return true;
+      }
+    }
+    return false;
   } catch {
     return false;
   }

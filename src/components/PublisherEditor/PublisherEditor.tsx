@@ -908,15 +908,19 @@ export const PublisherEditor: React.FC<PublisherEditorProps> = ({
                 handleBack();
               }
             }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100/80 dark:bg-white/[0.05] hover:bg-zinc-200/80 dark:hover:bg-white/[0.1] text-zinc-700 dark:text-zinc-200 border border-zinc-200/80 dark:border-white/[0.08] text-xs font-bold transition-all cursor-pointer active:scale-95 shrink-0"
+            className="p-2 -ml-1 rounded-xl text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer active:scale-95 shrink-0"
             title={
               activeTab !== 'all'
                 ? 'Volver al panel de tarjetas'
                 : 'Volver al directorio de publicadores'
             }
+            aria-label={
+              activeTab !== 'all'
+                ? 'Volver al panel de tarjetas'
+                : 'Volver al directorio de publicadores'
+            }
           >
-            <ArrowLeft size={15} />
-            <span>{activeTab !== 'all' ? 'Tarjetas' : 'Directorio'}</span>
+            <ArrowLeft className="w-5 h-5" />
           </button>
 
           <div className="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm tracking-wider shrink-0 shadow-xs">

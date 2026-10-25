@@ -24,6 +24,8 @@ import { insertAuditLog } from '../services/auditLogService';
 import {
   generateSecurePublisherPin,
   verifyPasscode,
+  hashPasscodeSlow,
+  isSlowHash,
   sanitizeForFirestore,
   isGenericIdentityName,
   formatCanonicalCongregationId,
@@ -1071,6 +1073,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const isValid = await verifyPasscode(cleanPin, coordLockPinHash);
         if (isValid) {
+          if (!isSlowHash(coordLockPinHash)) {
+            try {
+              const newHash = await hashPasscodeSlow(cleanPin);
+              localStorage.setItem('kongre_security_pin_hash', newHash);
+            } catch {}
+          }
           resetFailedPinAttempts();
           setActiveRole('coordinador');
           setSecureLocalPin('kongre_session_pin_v2', cleanPin);

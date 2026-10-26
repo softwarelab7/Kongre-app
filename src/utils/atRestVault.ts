@@ -33,9 +33,18 @@ export const KNOWN_SECURE_PIN_KEYS = [
 
 // Estado en memoria de la bóveda
 const vaultCache = new Map<string, string>();
+// Contador monótono por clave para que escrituras/borrados consecutivos nunca queden pisados
+// por un cifrado asíncrono anterior que termine más tarde.
+const writeSeq = new Map<string, number>();
 let vaultCryptoKey: CryptoKey | null = null;
 let isVaultInitialized = false;
 let vaultSessionEntropy: string | null = null;
+
+function bumpSeq(key: string): number {
+  const next = (writeSeq.get(key) || 0) + 1;
+  writeSeq.set(key, next);
+  return next;
+}
 
 /**
  * Deriva determinísticamente un bloque de entropía de 256 bits a partir de la CryptoKey no extraíble
@@ -114,42 +123,6 @@ function openVaultIndexedDB(): Promise<IDBDatabase> {
 }
 
 /**
- * Recupera la CryptoKey desde IndexedDB
- */
-function getKeyFromIndexedDB(db: IDBDatabase): Promise<CryptoKey | null> {
-  return new Promise((resolve, reject) => {
-    try {
-      const tx = db.transaction(STORE_NAME, 'readonly');
-      const store = tx.objectStore(STORE_NAME);
-      const request = store.get(MASTER_KEY_ID);
-
-      request.onsuccess = () => resolve((request.result as CryptoKey) || null);
-      request.onerror = () => reject(request.error || new Error('Error al leer clave de IndexedDB'));
-    } catch (err) {
-      reject(err);
-    }
-  });
-}
-
-/**
- * Guarda la CryptoKey en IndexedDB
- */
-function saveKeyToIndexedDB(db: IDBDatabase, key: CryptoKey): Promise<void> {
-  return new Promise((resolve, reject) => {
-    try {
-      const tx = db.transaction(STORE_NAME, 'readwrite');
-      const store = tx.objectStore(STORE_NAME);
-      const request = store.put(key, MASTER_KEY_ID);
-
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error || new Error('Error al guardar clave en IndexedDB'));
-    } catch (err) {
-      reject(err);
-    }
-  });
-}
-
-/**
  * Genera una clave AES-GCM de 256 bits NO extraíble (extractable: false)
  */
 async function generateNonExtractableKey(): Promise<CryptoKey> {
@@ -168,19 +141,42 @@ async function generateNonExtractableKey(): Promise<CryptoKey> {
 }
 
 /**
- * Obtiene o crea la clave no extraíble en IndexedDB
+ * Obtiene o crea la clave no extraíble en IndexedDB en una única transacción `readwrite`
+ * para evitar que dos pestañas que abran a la vez se pisen la clave mutuamente.
+ * (Nota: no se permite hacer `await` de WebCrypto dentro de una transacción IDB porque se
+ * cierra por inactividad; por eso se pre-genera una candidata antes de abrir la transacción
+ * y solo se persiste si el almacén sigue vacío).
  */
 export async function getOrCreateVaultKey(): Promise<CryptoKey> {
   if (vaultCryptoKey) return vaultCryptoKey;
 
+  const fresh = await generateNonExtractableKey();
   const db = await openVaultIndexedDB();
   try {
-    let key = await getKeyFromIndexedDB(db);
-    if (!key) {
-      key = await generateNonExtractableKey();
-      await saveKeyToIndexedDB(db, key);
-    }
-    vaultCryptoKey = key;
+    const key = await new Promise<CryptoKey>((resolve, reject) => {
+      try {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const getReq = store.get(MASTER_KEY_ID);
+        let chosen: CryptoKey = fresh;
+
+        getReq.onsuccess = () => {
+          const existing = (getReq.result as CryptoKey) || null;
+          if (existing) {
+            chosen = existing;
+            resolve(chosen);
+            return;
+          }
+          const putReq = store.put(fresh, MASTER_KEY_ID);
+          putReq.onsuccess = () => resolve(chosen);
+          putReq.onerror = () => reject(putReq.error || new Error('Error al guardar clave en IndexedDB'));
+        };
+        getReq.onerror = () => reject(getReq.error || new Error('Error al leer clave de IndexedDB'));
+        tx.onerror = () => reject(tx.error || new Error('Transacción IndexedDB fallida'));
+      } catch (err) {
+        reject(err);
+      }
+    });
     return key;
   } finally {
     try {
@@ -272,21 +268,24 @@ export async function decryptWithVaultKey(
   return new TextDecoder().decode(decryptedBuffer);
 }
 
+interface HydrationEntry {
+  key: string;
+  plain: string | null;
+  needsRecipher: boolean;
+}
+
 /**
- * Migra las claves guardadas en formatos antiguos (kgr_v2, kgr_v1 o plano)
- * hacia el nuevo formato kgr_v3 respaldado por la clave no extraíble,
- * purgando los hashes inseguros (${key}_hash) y copias en sessionStorage.
+ * Fase 1 (solo lectura): descifra e inspecciona las entradas actuales de localStorage sin mutar
+ * ni `vaultCache` ni `localStorage`. Si el tiempo límite vence durante esta fase, se puede abortar
+ * sin dejar ningún estado a medias.
  */
-async function migrateAndHydrateVault(key: CryptoKey): Promise<void> {
-  if (typeof localStorage === 'undefined') return;
+async function planVaultHydration(key: CryptoKey, isCancelled: () => boolean): Promise<HydrationEntry[]> {
+  if (typeof localStorage === 'undefined') return [];
 
   const keysToProcess = new Set<string>();
-
-  // 1. Identificar todas las claves conocidas y las que comiencen con kongre_
   for (const k of KNOWN_SECURE_PIN_KEYS) {
     keysToProcess.add(k);
   }
-
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
     if (!k) continue;
@@ -295,53 +294,66 @@ async function migrateAndHydrateVault(key: CryptoKey): Promise<void> {
     }
   }
 
+  const plan: HydrationEntry[] = [];
   for (const k of keysToProcess) {
+    if (isCancelled()) return [];
     const rawVal = localStorage.getItem(k);
     if (!rawVal) continue;
     const trimmed = rawVal.trim();
     if (!trimmed || trimmed === '••••' || trimmed === '••••••••') continue;
 
-    // A. Si ya es kgr_v3, descifrarlo e hidratar la caché
     if (trimmed.startsWith(VAULT_CIPHER_PREFIX)) {
+      let plain: string | null = null;
       try {
-        const plain = await decryptWithVaultKey(k, trimmed, key);
-        if (plain) {
-          vaultCache.set(k, plain);
-        }
+        plain = (await decryptWithVaultKey(k, trimmed, key)) || null;
       } catch {
-        // Si no se puede descifrar (clave manipulada o IndexedDB borrada), no se añade
+        plain = null;
       }
-      // Limpiar hash obsoleto si aún existía
-      localStorage.removeItem(`${k}_hash`);
+      plan.push({ key: k, plain, needsRecipher: false });
       continue;
     }
 
-    // B. Si es kgr_v2 o kgr_v1, descifrar con el método previo y migrar a kgr_v3
     if (isEncryptedPinAtRest(trimmed)) {
-      const plain = decryptPinAtRest(trimmed);
-      if (plain) {
-        vaultCache.set(k, plain);
-        try {
-          const newCipher = await encryptWithVaultKey(k, plain, key);
-          localStorage.setItem(k, newCipher);
-        } catch {}
-      }
-      localStorage.removeItem(`${k}_hash`);
+      const plain = decryptPinAtRest(trimmed) || null;
+      plan.push({ key: k, plain, needsRecipher: Boolean(plain) });
       continue;
     }
 
-    // C. Si es una de las claves de PIN conocidas y está en texto plano (o migración previa)
     if (KNOWN_SECURE_PIN_KEYS.includes(k as any) && !/^[a-f0-9]{64}$/i.test(trimmed)) {
-      vaultCache.set(k, trimmed);
+      plan.push({ key: k, plain: trimmed, needsRecipher: true });
+    }
+  }
+  return plan;
+}
+
+/**
+ * Fase 2 (compromiso): una vez decidido que la inicialización NO venció por tiempo límite,
+ * vuelca los valores leídos a `vaultCache` (respetando escrituras que hayan ocurrido entre medias)
+ * y promueve en segundo plano los formatos antiguos a `kgr_v3:`.
+ */
+async function commitVaultHydration(key: CryptoKey, plan: HydrationEntry[]): Promise<void> {
+  if (typeof localStorage === 'undefined') return;
+
+  for (const entry of plan) {
+    // Si el usuario escribió/borró esta clave mientras la bóveda arrancaba, no pisar su valor.
+    const touchedSinceStart = (writeSeq.get(entry.key) || 0) > 0;
+    if (!touchedSinceStart && entry.plain) {
+      vaultCache.set(entry.key, entry.plain);
+    }
+    try {
+      localStorage.removeItem(`${entry.key}_hash`);
+    } catch {}
+    if (!touchedSinceStart && entry.needsRecipher && entry.plain) {
+      const seqAtMigrate = writeSeq.get(entry.key) || 0;
       try {
-        const newCipher = await encryptWithVaultKey(k, trimmed, key);
-        localStorage.setItem(k, newCipher);
+        const newCipher = await encryptWithVaultKey(entry.key, entry.plain, key);
+        if ((writeSeq.get(entry.key) || 0) === seqAtMigrate) {
+          localStorage.setItem(entry.key, newCipher);
+        }
       } catch {}
-      localStorage.removeItem(`${k}_hash`);
     }
   }
 
-  // Purgar cualquier copia en texto claro que haya quedado en sessionStorage
   if (typeof sessionStorage !== 'undefined') {
     for (const k of KNOWN_SECURE_PIN_KEYS) {
       try {
@@ -354,6 +366,8 @@ async function migrateAndHydrateVault(key: CryptoKey): Promise<void> {
 /**
  * Inicializa la bóveda criptográfica con timeout máximo (por defecto 2500ms).
  * Se invoca en main.tsx antes de renderizar la aplicación React.
+ * Si el timeout vence antes del punto de compromiso, la inicialización se cancela de verdad:
+ * no deja `vaultCryptoKey`, `vaultSessionEntropy` ni `localStorage` modificados a espaldas del llamador.
  */
 export async function initAtRestVault(timeoutMs = 2500): Promise<boolean> {
   if (typeof indexedDB === 'undefined') {
@@ -361,29 +375,44 @@ export async function initAtRestVault(timeoutMs = 2500): Promise<boolean> {
   }
 
   let timerId: any;
+  let cancelled = false;
+  let committed = false;
+
   const initPromise = (async () => {
     try {
       const key = await getOrCreateVaultKey();
-      vaultSessionEntropy = await deriveVaultSessionEntropy(key);
-      await migrateAndHydrateVault(key);
+      if (cancelled) return false;
+      const entropy = await deriveVaultSessionEntropy(key);
+      if (cancelled) return false;
+      const plan = await planVaultHydration(key, () => cancelled);
+      if (cancelled) return false;
+
+      // Punto de no retorno: a partir de aquí ya no se puede cancelar por timeout.
+      committed = true;
+      vaultCryptoKey = key;
+      vaultSessionEntropy = entropy;
       isVaultInitialized = true;
+      await commitVaultHydration(key, plan);
       return true;
     } catch (err) {
-      console.warn('[atRestVault] No se pudo inicializar la bóveda con IndexedDB:', err);
+      if (!cancelled) {
+        console.warn('[atRestVault] No se pudo inicializar la bóveda con IndexedDB:', err);
+      }
       return false;
     }
   })();
 
   const timeoutPromise = new Promise<boolean>((resolve) => {
     timerId = setTimeout(() => {
+      if (committed) return; // ya comprometida; dejar que initPromise resuelva true
+      cancelled = true;
       console.warn(`[atRestVault] Inicialización excedió el tiempo límite de ${timeoutMs}ms; usando fallback.`);
       resolve(false);
     }, timeoutMs);
   });
 
   try {
-    const res = await Promise.race([initPromise, timeoutPromise]);
-    return res;
+    return await Promise.race([initPromise, timeoutPromise]);
   } finally {
     if (timerId) clearTimeout(timerId);
   }
@@ -433,6 +462,7 @@ export function getVaultValue(key: string): string | null {
  */
 export function setVaultValue(key: string, plainValue: string | null | undefined): void {
   const clean = plainValue ? String(plainValue).trim() : '';
+  const seq = bumpSeq(key);
 
   if (!clean || clean === '••••' || clean === '••••••••') {
     vaultCache.delete(key);
@@ -464,6 +494,8 @@ export function setVaultValue(key: string, plainValue: string | null | undefined
   // 3. Persistir cifrado con clave no extraíble
   if (vaultCryptoKey) {
     void encryptWithVaultKey(key, clean, vaultCryptoKey).then((cipher) => {
+      // Si hubo otra escritura o un borrado después de iniciar este cifrado, descartar el resultado viejo.
+      if (writeSeq.get(key) !== seq) return;
       try {
         if (typeof localStorage !== 'undefined') {
           localStorage.setItem(key, cipher);
@@ -485,6 +517,7 @@ export function setVaultValue(key: string, plainValue: string | null | undefined
  */
 export function resetVaultForTesting(): void {
   vaultCache.clear();
+  writeSeq.clear();
   vaultCryptoKey = null;
   vaultSessionEntropy = null;
   isVaultInitialized = false;

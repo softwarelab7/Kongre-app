@@ -379,9 +379,10 @@ interface CongregationContextType {
   syncNowWithSupabase: (forceUpload?: boolean) => Promise<{ success: boolean; message: string; action?: string }>;
   rotateCredentials: (params: {
     currentMasterPin: string;
+    currentCongregationPin?: string;
     newCongregationPin?: string;
     newMasterPin?: string;
-  }) => Promise<{ success: boolean; message: string }>;
+  }) => Promise<{ success: boolean; message: string; code?: 'needs_current_congregation_pin' }>;
 
   // Cola de sincronización Offline en IndexedDB
   isOnline: boolean;
@@ -2249,9 +2250,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
    */
   const rotateCredentials = async (params: {
     currentMasterPin: string;
+    currentCongregationPin?: string;
     newCongregationPin?: string;
     newMasterPin?: string;
-  }): Promise<{ success: boolean; message: string }> => {
+  }): Promise<{ success: boolean; message: string; code?: 'needs_current_congregation_pin' }> => {
     const congDocId = resolveCongregationDocId();
     if (!congDocId) {
       return { success: false, message: 'No se encontró un ID de congregación activo.' };
@@ -2272,29 +2274,48 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return { success: false, message: 'Debes indicar al menos un PIN nuevo para rotar.' };
     }
 
-    if (cleanNewMasterPin && cleanNewMasterPin.length < 8) {
-      return { success: false, message: 'El nuevo PIN Maestro debe tener al menos 8 caracteres (se recomiendan 12 dígitos).' };
+    if (cleanNewMasterPin && cleanNewMasterPin.length < 12) {
+      return { success: false, message: 'El nuevo PIN Maestro debe tener al menos 12 caracteres (se recomiendan 12 dígitos).' };
     }
 
-    if (cleanNewCongPin && cleanNewCongPin.length < 4) {
-      return { success: false, message: 'El nuevo PIN de congregación debe tener al menos 4 caracteres.' };
+    if (cleanNewCongPin && cleanNewCongPin.length < 8) {
+      return { success: false, message: 'El nuevo PIN de congregación debe tener al menos 8 caracteres.' };
     }
 
-    const currentPublicPin =
+    // No hacer fallback silencioso al PIN Maestro: si el coordinador está en un dispositivo donde
+    // nunca se guardó el PIN de congregación y solo rota el PIN Maestro, cifrar payload_public con
+    // el PIN Maestro dejaría fuera a todos los publicadores (su PIN dejaría de abrir el bloque público).
+    const explicitCurrentPublic = params.currentCongregationPin ? normalizePin(params.currentCongregationPin) : '';
+    const knownPublicPin =
+      explicitCurrentPublic ||
       getSecureLocalPin('kongre_registered_cong_pin') ||
       getSecureLocalPin('kongre_last_cong_pin') ||
-      cleanCurrentMaster;
+      '';
+
+    if (!cleanNewCongPin && !knownPublicPin) {
+      return {
+        success: false,
+        code: 'needs_current_congregation_pin',
+        message: 'Este dispositivo no tiene guardado el PIN de congregación actual. Ingrésalo para continuar.',
+      };
+    }
 
     const targetMasterPin = cleanNewMasterPin || cleanCurrentMaster;
-    const targetPublicPin = cleanNewCongPin || currentPublicPin;
+    const targetPublicPin = cleanNewCongPin || knownPublicPin;
+    // Para autenticar la petición basta el PIN Maestro (tiene prioridad en el servidor); solo enviamos
+    // token público viejo si lo conocemos o si también estamos rotando el PIN de congregación.
+    const currentPublicForAuth = knownPublicPin || targetPublicPin;
 
     setIsSupabaseSyncing(true);
     try {
       const fresh = getFreshLocalCongregationData();
+      const newCongPinHash = cleanNewCongPin ? await hashPasscode(cleanNewCongPin) : undefined;
       const uploadRes = await supabaseSyncService.uploadCongregation({
         congregationId: congDocId,
         data: {
-          settings: fresh.settings,
+          settings: newCongPinHash
+            ? { ...fresh.settings, congregationPinHash: newCongPinHash }
+            : fresh.settings,
           publishers: fresh.publishers,
           weeks: fresh.weeks,
           territories: fresh.territories,
@@ -2328,7 +2349,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         pinCongregacion: targetPublicPin,
         rotateFrom: {
           pinMaestro: cleanNewMasterPin ? cleanCurrentMaster : undefined,
-          pinCongregacion: cleanNewCongPin ? currentPublicPin : undefined,
+          pinCongregacion: cleanNewCongPin ? currentPublicForAuth : undefined,
         },
       });
 
@@ -2336,23 +2357,24 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         return { success: false, message: uploadRes.error || 'Error al rotar credenciales en el servidor.' };
       }
 
-      // 2. Actualizar almacenamiento seguro local
+      // 2. Actualizar almacenamiento seguro local (nota: kongre_security_master_key_hash es el hash de la
+      //    Llave Maestra de Recuperación de 16 caracteres, una credencial distinta al PIN Maestro; no tocarlo aquí).
       if (cleanNewMasterPin) {
         setSecureLocalPin('kongre_coordinator_pin', cleanNewMasterPin);
         setSecureLocalPin('kongre_session_pin_v2', cleanNewMasterPin);
-        try {
-          const slowHash = await hashPasscodeSlow(cleanNewMasterPin);
-          localStorage.setItem('kongre_security_master_key_hash', slowHash);
-        } catch {}
       }
 
       if (cleanNewCongPin) {
         setSecureLocalPin('kongre_registered_cong_pin', cleanNewCongPin);
         setSecureLocalPin('kongre_last_cong_pin', cleanNewCongPin);
         try {
-          const hash = await hashPasscode(cleanNewCongPin);
-          localStorage.setItem('kongre_security_congregation_pin_hash', hash);
+          localStorage.setItem('kongre_security_congregation_pin_hash', newCongPinHash!);
         } catch {}
+        setSettings((prev) => ({ ...prev, congregationPinHash: newCongPinHash }));
+      } else if (explicitCurrentPublic) {
+        // Persistir el PIN de congregación que el coordinador acaba de confirmar para futuros syncs
+        setSecureLocalPin('kongre_registered_cong_pin', explicitCurrentPublic);
+        setSecureLocalPin('kongre_last_cong_pin', explicitCurrentPublic);
       }
 
       const updatedTime = supabaseSyncService.getLastSyncTimestamp();
@@ -2384,7 +2406,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
       return {
         success: true,
-        message: `Se ha rotado con éxito: ${rotatedItems}. Las credenciales anteriores quedaron invalidadas de inmediato en la nube.`,
+        message: `Se ha rotado con éxito: ${rotatedItems}. Las credenciales anteriores quedaron invalidadas en la nube. Los dispositivos que ya descargaron datos los conservan, y los demás deberán ingresar el PIN nuevo.`,
       };
     } catch (err: any) {
       console.warn('Error rotando credenciales:', err);

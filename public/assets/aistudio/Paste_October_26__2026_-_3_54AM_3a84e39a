@@ -1,0 +1,890 @@
+diff --git a/MIGRACION.md b/MIGRACION.md
+index 29c43e0..5750388 100644
+--- a/MIGRACION.md
++++ b/MIGRACION.md
+@@ -12,7 +12,7 @@ Mantiene el cero conocimiento: el servidor nunca ve PINs ni claves de cifrado.
+ | "Verificación de propiedad" en el navegador | Verificación en el servidor (token derivado del PIN + pepper) |
+ | Anti-fuerza-bruta en `localStorage` | Límite en base de datos: 8 fallos/15 min por congregación+IP, 40 por IP, 300/h por congregación |
+ | El PIN de congregación descargaba también el payload maestro | Solo recibe `payload_public`; el maestro únicamente con el PIN maestro |
+-| El PIN de congregación podía sobrescribir el payload maestro | Solo puede escribir `payload_public` |
++| El PIN de congregación podía sobrescribir el payload maestro | **No puede escribir nada** (`403 push_requires_master_tier`); solo el PIN maestro hace `push` |
+ | Realtime sobre la tabla | Sondeo cada 30 s a la función |
+ 
+ ## Archivos
+@@ -77,9 +77,9 @@ prueba de humo del paso 4 y un ciclo completo (alta → login → sync) en una c
+   tiene un tope de ~300 intentos/hora por congregación. Exige PIN maestro de 8+ caracteres.
+ - El límite por IP depende de `cf-connecting-ip` (es el mejor esfuerzo); el tope por congregación es la red de seguridad.
+   Contrapartida: un atacante con muchas IPs puede bloquear 5 min a todos los usuarios de una congregación.
+-- **Cifrado en reposo y Vault (Resuelto en v2.12.23)**: Se reemplazó el XOR por AES-256-GCM con clave no extraíble (`extractable: false`) en IndexedDB (`src/utils/atRestVault.ts`), con eliminación de hashes rápidos `${key}_hash`, purga de `sessionStorage` y migración a PBKDF2 (200.000 iteraciones).
+-- **Rotación de Credenciales (Resuelto en v2.12.23)**: Implementado el flujo completo de rotación en cliente y servidor con `RotateCredentialsModal.tsx`, integrado en `SettingsTab.tsx` (pestañas de Seguridad y Nube) y orquestado mediante `rotateCredentials` en `CongregationContext.tsx` con revocación inmediata en Supabase.
+-- **Fuera de alcance que sigue pendiente**: los hashes de PIN personal dentro del payload público y la firma de rol en el servidor (`verify_personal_pin`).
++- **Cifrado en reposo y Vault (parcial)**: los PIN del coordinador, de sesión y de congregación se guardan con AES-256-GCM y una clave no extraíble (`extractable: false`) en IndexedDB (`src/utils/atRestVault.ts`); ya no hay `${key}_hash` rápido ni copia en `sessionStorage`, y los hashes locales del PIN de bloqueo y de la clave maestra pasan a PBKDF2 (200.000 iteraciones). Límites: un XSS activo puede pedirle al navegador que descifre mientras la pestaña está abierta (lo mitiga la CSP), y `deriveVaultSessionEntropy` obtiene la entropía cifrando un texto fijo con IV en ceros: es funcional pero no estándar y se dejó sin cambiar porque modificarla invalidaría datos ya cifrados (migrar a una clave HMAC no extraíble dedicada, con versión). Los campos de salud/contactos de las fichas dependen de esa entropía; los PIN dentro de las fichas siguen en `kgr_v2`.
++- **Rotación de Credenciales**: `RotateCredentialsModal.tsx` → `rotateCredentials` (`CongregationContext.tsx`) → `push` con `rotate_to`. Garantías: solo con el PIN maestro actual; verificadores y payload nuevos se guardan en una sola actualización; el servidor rechaza (`400 rotation_requires_master_payload` / `rotation_requires_public_payload`) cambiar un verificador sin recibir el payload cifrado con la clave nueva, porque esos datos quedarían ilegibles; el hash en `settings.congregationPinHash` se actualiza con el PIN nuevo; no se toca la clave maestra (frase) del usuario; exige las mismas longitudes que el alta (12 dígitos / 8 caracteres); si el dispositivo no conoce el PIN de congregación vigente lo pide en vez de usar el maestro. **Límites**: la rotación no recupera datos que un dispositivo ya descargó, y los demás dispositivos deberán ingresar el PIN nuevo.
++- **Token de rol firmado por el servidor** (`kgr_srt1`, 30 días): `verify_role_token` lo revalida contra el estado actual (publicador eliminado o rol cambiado → `401`), y los roles se normalizan para no romper los separadores. No se auditó qué decisiones del cliente dependen de él; mientras el cliente siga decidiendo permisos con su propia copia local del rol, el control real sigue siendo el servidor (qué payload entrega a cada nivel). Un cambio de PIN personal aún no invalida un token ya emitido (solo sirve junto con credenciales de congregación vigentes).
+ 
+ ## Dos bugs preexistentes que corregí de paso
+ 
+diff --git a/src/components/RotateCredentialsModal.tsx b/src/components/RotateCredentialsModal.tsx
+index 58517b0..9ddafba 100644
+--- a/src/components/RotateCredentialsModal.tsx
++++ b/src/components/RotateCredentialsModal.tsx
+@@ -37,9 +37,10 @@ interface RotateCredentialsModalProps {
+   onClose: () => void;
+   onRotate: (params: {
+     currentMasterPin: string;
++    currentCongregationPin?: string;
+     newCongregationPin?: string;
+     newMasterPin?: string;
+-  }) => Promise<{ success: boolean; message: string }>;
++  }) => Promise<{ success: boolean; message: string; code?: 'needs_current_congregation_pin' }>;
+   congregationId?: string;
+   congregationName?: string;
+ }
+@@ -54,6 +55,9 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
+   // Estado del formulario
+   const [currentMasterPin, setCurrentMasterPin] = useState('');
+   const [showCurrentMaster, setShowCurrentMaster] = useState(false);
++  // Solo se pide cuando este dispositivo no tiene guardado el PIN de congregación vigente.
++  const [needsCurrentCong, setNeedsCurrentCong] = useState(false);
++  const [currentCongPin, setCurrentCongPin] = useState('');
+ 
+   // Opciones de rotación
+   const [rotateCongPin, setRotateCongPin] = useState(true);
+@@ -99,6 +103,14 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
+       await navigator.clipboard.writeText(text);
+       setCopiedKey(label);
+       setTimeout(() => setCopiedKey(null), 2500);
++      // Un PIN no debe quedarse en el portapapeles: se vacía a los 30 s (solo si sigue siendo este PIN, cuando el navegador deja comprobarlo).
++      setTimeout(async () => {
++        try {
++          let still = true;
++          try { still = (await navigator.clipboard.readText()) === text; } catch { /* sin permiso de lectura: se vacía igualmente */ }
++          if (still) await navigator.clipboard.writeText('');
++        } catch { /* ignorar */ }
++      }, 30000);
+     } catch {
+       // Fallback
+     }
+@@ -106,6 +118,8 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
+ 
+   const resetForm = () => {
+     setCurrentMasterPin('');
++    setCurrentCongPin('');
++    setNeedsCurrentCong(false);
+     setNewCongPin('');
+     setConfirmCongPin('');
+     setNewMasterPin('');
+@@ -145,8 +159,8 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
+         setErrorMsg('Ingresa o genera el nuevo PIN de la congregación.');
+         return;
+       }
+-      if (cleanNewCong.length < 4) {
+-        setErrorMsg('El PIN de congregación debe tener al menos 4 caracteres.');
++      if (cleanNewCong.length < 8) {
++        setErrorMsg('El PIN de congregación debe tener al menos 8 caracteres.');
+         return;
+       }
+       if (cleanNewCong !== cleanConfirmCong) {
+@@ -163,8 +177,8 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
+         setErrorMsg('Ingresa o genera el nuevo PIN Maestro del coordinador.');
+         return;
+       }
+-      if (cleanNewMaster.length < 8) {
+-        setErrorMsg('El PIN Maestro debe tener un mínimo de 8 caracteres (se recomiendan 12 dígitos).');
++      if (cleanNewMaster.length < 12) {
++        setErrorMsg('El PIN Maestro debe tener un mínimo de 12 caracteres (se recomiendan 12 dígitos).');
+         return;
+       }
+       if (cleanNewMaster !== cleanConfirmMaster) {
+@@ -177,11 +191,13 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
+     try {
+       const res = await onRotate({
+         currentMasterPin: cleanCurrentMaster,
++        currentCongregationPin: needsCurrentCong && currentCongPin.trim() ? currentCongPin.trim() : undefined,
+         newCongregationPin: rotateCongPin ? cleanNewCong : undefined,
+         newMasterPin: rotateMasterPin ? cleanNewMaster : undefined,
+       });
+ 
+       if (!res.success) {
++        if (res.code === 'needs_current_congregation_pin') setNeedsCurrentCong(true);
+         setErrorMsg(res.message);
+         return;
+       }
+@@ -378,6 +394,24 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
+                 </div>
+               </div>
+ 
++              {needsCurrentCong && (
++                <div className="space-y-2">
++                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200">
++                    PIN de Congregación actual:
++                  </label>
++                  <input
++                    type="password"
++                    value={currentCongPin}
++                    onChange={(e) => setCurrentCongPin(e.target.value)}
++                    placeholder="Ingresa el PIN de congregación vigente..."
++                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 font-mono tracking-wider"
++                  />
++                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
++                    Hace falta para re-cifrar la parte pública con el PIN que ya usan los publicadores.
++                  </p>
++                </div>
++              )}
++
+               {/* Selector de qué rotar */}
+               <div className="space-y-4">
+                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+diff --git a/src/context/CongregationContext.tsx b/src/context/CongregationContext.tsx
+index 1178772..1259116 100644
+--- a/src/context/CongregationContext.tsx
++++ b/src/context/CongregationContext.tsx
+@@ -379,9 +379,10 @@ interface CongregationContextType {
+   syncNowWithSupabase: (forceUpload?: boolean) => Promise<{ success: boolean; message: string; action?: string }>;
+   rotateCredentials: (params: {
+     currentMasterPin: string;
++    currentCongregationPin?: string;
+     newCongregationPin?: string;
+     newMasterPin?: string;
+-  }) => Promise<{ success: boolean; message: string }>;
++  }) => Promise<{ success: boolean; message: string; code?: 'needs_current_congregation_pin' }>;
+ 
+   // Cola de sincronización Offline en IndexedDB
+   isOnline: boolean;
+@@ -2249,9 +2250,10 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({
+    */
+   const rotateCredentials = async (params: {
+     currentMasterPin: string;
++    currentCongregationPin?: string;
+     newCongregationPin?: string;
+     newMasterPin?: string;
+-  }): Promise<{ success: boolean; message: string }> => {
++  }): Promise<{ success: boolean; message: string; code?: 'needs_current_congregation_pin' }> => {
+     const congDocId = resolveCongregationDocId();
+     if (!congDocId) {
+       return { success: false, message: 'No se encontró un ID de congregación activo.' };
+@@ -2272,21 +2274,43 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({
+       return { success: false, message: 'Debes indicar al menos un PIN nuevo para rotar.' };
+     }
+ 
+-    if (cleanNewMasterPin && cleanNewMasterPin.length < 8) {
+-      return { success: false, message: 'El nuevo PIN Maestro debe tener al menos 8 caracteres (se recomiendan 12 dígitos).' };
++    // Mismas exigencias que el registro: una rotación no puede dejar credenciales más débiles que el alta.
++    if (cleanNewMasterPin && cleanNewMasterPin.length < 12) {
++      return { success: false, message: 'El nuevo PIN Maestro debe tener al menos 12 caracteres.' };
+     }
+ 
+-    if (cleanNewCongPin && cleanNewCongPin.length < 4) {
+-      return { success: false, message: 'El nuevo PIN de congregación debe tener al menos 4 caracteres.' };
++    if (cleanNewCongPin && cleanNewCongPin.length < 8) {
++      return { success: false, message: 'El nuevo PIN de congregación debe tener al menos 8 caracteres.' };
+     }
+ 
+-    const currentPublicPin =
++    // PIN de congregación ACTUAL conocido (parámetro explícito o guardado en este dispositivo).
++    // Ya NO se usa el PIN maestro como sustituto: cifraría payload_public con una clave que los
++    // publicadores no tienen y dejaría la sección pública ilegible para ellos.
++    const explicitCurrentPublic = params.currentCongregationPin ? normalizePin(params.currentCongregationPin) : '';
++    const knownPublicPin =
++      explicitCurrentPublic ||
+       getSecureLocalPin('kongre_registered_cong_pin') ||
+       getSecureLocalPin('kongre_last_cong_pin') ||
+-      cleanCurrentMaster;
++      '';
++
++    // Si solo se rota el PIN Maestro, payload_public debe re-cifrarse con el PIN de congregación vigente.
++    if (!cleanNewCongPin && !knownPublicPin) {
++      return {
++        success: false,
++        code: 'needs_current_congregation_pin',
++        message: 'Este dispositivo no tiene guardado el PIN de congregación actual. Ingrésalo para continuar.',
++      };
++    }
+ 
+     const targetMasterPin = cleanNewMasterPin || cleanCurrentMaster;
+-    const targetPublicPin = cleanNewCongPin || currentPublicPin;
++    const targetPublicPin = cleanNewCongPin || knownPublicPin;
++    // Al rotar el PIN de congregación el servidor autentica con el maestro; el token público "viejo" es
++    // solo un marcador de que se rota, por eso se admite el PIN maestro como relleno si no se conoce.
++    const currentPublicForAuth = knownPublicPin || cleanCurrentMaster;
++
++    // El hash que viaja en settings (y con el que otros dispositivos verifican el PIN) debe ser el del PIN nuevo.
++    // Se conserva el formato heredado porque este valor se sincroniza con versiones anteriores de la app.
++    const newCongPinHash = cleanNewCongPin ? await hashPasscode(cleanNewCongPin) : undefined;
+ 
+     setIsSupabaseSyncing(true);
+     try {
+@@ -2294,7 +2318,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({
+       const uploadRes = await supabaseSyncService.uploadCongregation({
+         congregationId: congDocId,
+         data: {
+-          settings: fresh.settings,
++          settings: newCongPinHash ? { ...fresh.settings, congregationPinHash: newCongPinHash } : fresh.settings,
+           publishers: fresh.publishers,
+           weeks: fresh.weeks,
+           territories: fresh.territories,
+@@ -2328,7 +2352,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({
+         pinCongregacion: targetPublicPin,
+         rotateFrom: {
+           pinMaestro: cleanNewMasterPin ? cleanCurrentMaster : undefined,
+-          pinCongregacion: cleanNewCongPin ? currentPublicPin : undefined,
++          pinCongregacion: cleanNewCongPin ? currentPublicForAuth : undefined,
+         },
+       });
+ 
+@@ -2340,19 +2364,17 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({
+       if (cleanNewMasterPin) {
+         setSecureLocalPin('kongre_coordinator_pin', cleanNewMasterPin);
+         setSecureLocalPin('kongre_session_pin_v2', cleanNewMasterPin);
+-        try {
+-          const slowHash = await hashPasscodeSlow(cleanNewMasterPin);
+-          localStorage.setItem('kongre_security_master_key_hash', slowHash);
+-        } catch {}
++        // OJO: 'kongre_security_master_key_hash' es la "clave maestra" (frase) independiente que el usuario fija en
++        // Invitaciones; NO es el PIN maestro de sincronización. No se toca para no reemplazarla sin aviso.
+       }
+ 
+       if (cleanNewCongPin) {
+         setSecureLocalPin('kongre_registered_cong_pin', cleanNewCongPin);
+         setSecureLocalPin('kongre_last_cong_pin', cleanNewCongPin);
+         try {
+-          const hash = await hashPasscode(cleanNewCongPin);
+-          localStorage.setItem('kongre_security_congregation_pin_hash', hash);
++          localStorage.setItem('kongre_security_congregation_pin_hash', newCongPinHash!);
+         } catch {}
++        setSettings((prev) => ({ ...prev, congregationPinHash: newCongPinHash }));
+       }
+ 
+       const updatedTime = supabaseSyncService.getLastSyncTimestamp();
+@@ -2384,7 +2406,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({
+ 
+       return {
+         success: true,
+-        message: `Se ha rotado con éxito: ${rotatedItems}. Las credenciales anteriores quedaron invalidadas de inmediato en la nube.`,
++        message: `Se ha rotado con éxito: ${rotatedItems}. Las credenciales anteriores quedaron invalidadas en la nube. Los dispositivos que ya descargaron datos los conservan, y los demás deberán ingresar el PIN nuevo.`,
+       };
+     } catch (err: any) {
+       console.warn('Error rotando credenciales:', err);
+diff --git a/src/services/syncApi.ts b/src/services/syncApi.ts
+index 412cd34..2297e02 100644
+--- a/src/services/syncApi.ts
++++ b/src/services/syncApi.ts
+@@ -308,5 +308,11 @@ export function describeSyncError(r: { status: number; error: string; retryAfter
+   if (r.status === 401) return 'El ID de congregación o el PIN no son correctos.';
+   if (r.status === 403) return 'Tu nivel de acceso no permite esta operación.';
+   if (r.status === 413) return 'Los datos son demasiado grandes para sincronizar.';
++  if (r.error === 'rotation_requires_master_payload') {
++    return 'No se puede rotar el PIN Maestro porque este dispositivo no tiene la lista completa de publicadores sincronizada. Sincroniza primero y vuelve a intentarlo.';
++  }
++  if (r.error === 'rotation_requires_public_payload') {
++    return 'No se puede rotar el PIN de congregación sin los datos públicos. Sincroniza primero y vuelve a intentarlo.';
++  }
+   return 'El servidor de sincronización no pudo procesar la solicitud. Inténtalo de nuevo.';
+ }
+diff --git a/src/utils/atRestVault.ts b/src/utils/atRestVault.ts
+index 9b8ebda..14509de 100644
+--- a/src/utils/atRestVault.ts
++++ b/src/utils/atRestVault.ts
+@@ -113,42 +113,6 @@ function openVaultIndexedDB(): Promise<IDBDatabase> {
+   });
+ }
+ 
+-/**
+- * Recupera la CryptoKey desde IndexedDB
+- */
+-function getKeyFromIndexedDB(db: IDBDatabase): Promise<CryptoKey | null> {
+-  return new Promise((resolve, reject) => {
+-    try {
+-      const tx = db.transaction(STORE_NAME, 'readonly');
+-      const store = tx.objectStore(STORE_NAME);
+-      const request = store.get(MASTER_KEY_ID);
+-
+-      request.onsuccess = () => resolve((request.result as CryptoKey) || null);
+-      request.onerror = () => reject(request.error || new Error('Error al leer clave de IndexedDB'));
+-    } catch (err) {
+-      reject(err);
+-    }
+-  });
+-}
+-
+-/**
+- * Guarda la CryptoKey en IndexedDB
+- */
+-function saveKeyToIndexedDB(db: IDBDatabase, key: CryptoKey): Promise<void> {
+-  return new Promise((resolve, reject) => {
+-    try {
+-      const tx = db.transaction(STORE_NAME, 'readwrite');
+-      const store = tx.objectStore(STORE_NAME);
+-      const request = store.put(key, MASTER_KEY_ID);
+-
+-      request.onsuccess = () => resolve();
+-      request.onerror = () => reject(request.error || new Error('Error al guardar clave en IndexedDB'));
+-    } catch (err) {
+-      reject(err);
+-    }
+-  });
+-}
+-
+ /**
+  * Genera una clave AES-GCM de 256 bits NO extraíble (extractable: false)
+  */
+@@ -168,20 +132,29 @@ async function generateNonExtractableKey(): Promise<CryptoKey> {
+ }
+ 
+ /**
+- * Obtiene o crea la clave no extraíble en IndexedDB
++ * Obtiene o crea la clave no extraíble en IndexedDB.
++ * Lectura y creación ocurren en UNA transacción readwrite: si dos pestañas arrancan a la vez por primera vez,
++ * ambas terminan con la misma clave (la segunda lee la que guardó la primera) y no se invalidan entre sí.
+  */
+ export async function getOrCreateVaultKey(): Promise<CryptoKey> {
+   if (vaultCryptoKey) return vaultCryptoKey;
+ 
+   const db = await openVaultIndexedDB();
+   try {
+-    let key = await getKeyFromIndexedDB(db);
+-    if (!key) {
+-      key = await generateNonExtractableKey();
+-      await saveKeyToIndexedDB(db, key);
+-    }
+-    vaultCryptoKey = key;
+-    return key;
++    const fresh = await generateNonExtractableKey();
++    return await new Promise<CryptoKey>((resolve, reject) => {
++      const tx = db.transaction(STORE_NAME, 'readwrite');
++      const store = tx.objectStore(STORE_NAME);
++      let chosen: CryptoKey = fresh;
++      const getReq = store.get(MASTER_KEY_ID);
++      getReq.onsuccess = () => {
++        if (getReq.result) chosen = getReq.result as CryptoKey;
++        else store.put(fresh, MASTER_KEY_ID);
++      };
++      tx.oncomplete = () => resolve(chosen);
++      tx.onerror = () => reject(tx.error || new Error('Error en la transacción de la bóveda'));
++      tx.onabort = () => reject(tx.error || new Error('Transacción de la bóveda abortada'));
++    });
+   } finally {
+     try {
+       db.close();
+@@ -272,101 +245,126 @@ export async function decryptWithVaultKey(
+   return new TextDecoder().decode(decryptedBuffer);
+ }
+ 
+-/**
+- * Migra las claves guardadas en formatos antiguos (kgr_v2, kgr_v1 o plano)
+- * hacia el nuevo formato kgr_v3 respaldado por la clave no extraíble,
+- * purgando los hashes inseguros (${key}_hash) y copias en sessionStorage.
+- */
+-async function migrateAndHydrateVault(key: CryptoKey): Promise<void> {
+-  if (typeof localStorage === 'undefined') return;
++/** Número de secuencia por clave: una escritura lenta nunca pisa a una más reciente (ni resucita una borrada). */
++const writeSeq = new Map<string, number>();
++function bumpSeq(key: string): number {
++  const n = (writeSeq.get(key) ?? 0) + 1;
++  writeSeq.set(key, n);
++  return n;
++}
+ 
+-  const keysToProcess = new Set<string>();
++interface HydrationPlan {
++  cache: Map<string, string>;
++  rewrite: Map<string, string>;
++  dropHash: string[];
++}
+ 
+-  // 1. Identificar todas las claves conocidas y las que comiencen con kongre_
+-  for (const k of KNOWN_SECURE_PIN_KEYS) {
+-    keysToProcess.add(k);
+-  }
++/**
++ * FASE 1 de la hidratación: solo LEE y descifra. No modifica localStorage ni el estado del módulo,
++ * de modo que si el tiempo límite vence a mitad, se descarta sin dejar nada a medias.
++ */
++async function planVaultHydration(key: CryptoKey, isCancelled: () => boolean): Promise<HydrationPlan | null> {
++  const plan: HydrationPlan = { cache: new Map(), rewrite: new Map(), dropHash: [] };
++  if (typeof localStorage === 'undefined') return plan;
+ 
++  const keysToProcess = new Set<string>(KNOWN_SECURE_PIN_KEYS);
+   for (let i = 0; i < localStorage.length; i++) {
+     const k = localStorage.key(i);
+-    if (!k) continue;
+-    if (k.startsWith('kongre_') && !k.endsWith('_hash')) {
+-      keysToProcess.add(k);
+-    }
++    if (k && k.startsWith('kongre_') && !k.endsWith('_hash')) keysToProcess.add(k);
+   }
+ 
+   for (const k of keysToProcess) {
++    if (isCancelled()) return null;
+     const rawVal = localStorage.getItem(k);
+     if (!rawVal) continue;
+     const trimmed = rawVal.trim();
+     if (!trimmed || trimmed === '••••' || trimmed === '••••••••') continue;
+ 
+-    // A. Si ya es kgr_v3, descifrarlo e hidratar la caché
++    // A. Ya es kgr_v3
+     if (trimmed.startsWith(VAULT_CIPHER_PREFIX)) {
+       try {
+         const plain = await decryptWithVaultKey(k, trimmed, key);
+-        if (plain) {
+-          vaultCache.set(k, plain);
+-        }
++        if (plain) plan.cache.set(k, plain);
+       } catch {
+-        // Si no se puede descifrar (clave manipulada o IndexedDB borrada), no se añade
++        // clave manipulada o IndexedDB borrada: se trata como "sin PIN guardado"
+       }
+-      // Limpiar hash obsoleto si aún existía
+-      localStorage.removeItem(`${k}_hash`);
++      plan.dropHash.push(k);
+       continue;
+     }
+ 
+-    // B. Si es kgr_v2 o kgr_v1, descifrar con el método previo y migrar a kgr_v3
++    // B. kgr_v2 / kgr_v1 -> migrar
+     if (isEncryptedPinAtRest(trimmed)) {
+       const plain = decryptPinAtRest(trimmed);
+       if (plain) {
+-        vaultCache.set(k, plain);
+-        try {
+-          const newCipher = await encryptWithVaultKey(k, plain, key);
+-          localStorage.setItem(k, newCipher);
+-        } catch {}
++        plan.cache.set(k, plain);
++        plan.rewrite.set(k, plain);
+       }
+-      localStorage.removeItem(`${k}_hash`);
++      plan.dropHash.push(k);
+       continue;
+     }
+ 
+-    // C. Si es una de las claves de PIN conocidas y está en texto plano (o migración previa)
+-    if (KNOWN_SECURE_PIN_KEYS.includes(k as any) && !/^[a-f0-9]{64}$/i.test(trimmed)) {
+-      vaultCache.set(k, trimmed);
+-      try {
+-        const newCipher = await encryptWithVaultKey(k, trimmed, key);
+-        localStorage.setItem(k, newCipher);
+-      } catch {}
+-      localStorage.removeItem(`${k}_hash`);
++    // C. Claves de PIN conocidas en texto plano
++    if ((KNOWN_SECURE_PIN_KEYS as readonly string[]).includes(k) && !/^[a-f0-9]{64}$/i.test(trimmed)) {
++      plan.cache.set(k, trimmed);
++      plan.rewrite.set(k, trimmed);
++      plan.dropHash.push(k);
+     }
+   }
++  return plan;
++}
+ 
+-  // Purgar cualquier copia en texto claro que haya quedado en sessionStorage
+-  if (typeof sessionStorage !== 'undefined') {
+-    for (const k of KNOWN_SECURE_PIN_KEYS) {
+-      try {
+-        sessionStorage.removeItem(k);
+-      } catch {}
++/** FASE 2: aplica el plan (la bóveda ya está activa). Las reescrituras respetan el orden por secuencia. */
++async function commitVaultHydration(key: CryptoKey, plan: HydrationPlan): Promise<void> {
++  for (const [k, v] of plan.cache) vaultCache.set(k, v);
++
++  try {
++    for (const k of plan.dropHash) localStorage.removeItem(`${k}_hash`);
++    if (typeof sessionStorage !== 'undefined') {
++      for (const k of KNOWN_SECURE_PIN_KEYS) {
++        try {
++          sessionStorage.removeItem(k);
++        } catch {}
++      }
+     }
++  } catch {}
++
++  for (const [k, plain] of plan.rewrite) {
++    const seq = bumpSeq(k);
++    try {
++      const cipher = await encryptWithVaultKey(k, plain, key);
++      if (writeSeq.get(k) === seq) localStorage.setItem(k, cipher);
++    } catch {}
+   }
+ }
+ 
+ /**
+- * Inicializa la bóveda criptográfica con timeout máximo (por defecto 2500ms).
+- * Se invoca en main.tsx antes de renderizar la aplicación React.
++ * Inicializa la bóveda con un tiempo máximo (por defecto 2500 ms). Se invoca en main.tsx antes de montar React.
++ * Si el tiempo vence ANTES de que la bóveda esté confirmada, la inicialización se cancela por completo
++ * (no se activa tarde, a mitad de sesión) y la app sigue con el almacenamiento anterior.
+  */
+ export async function initAtRestVault(timeoutMs = 2500): Promise<boolean> {
+   if (typeof indexedDB === 'undefined') {
+     return false;
+   }
+ 
++  let cancelled = false;
++  let committed = false;
+   let timerId: any;
++
+   const initPromise = (async () => {
+     try {
+       const key = await getOrCreateVaultKey();
+-      vaultSessionEntropy = await deriveVaultSessionEntropy(key);
+-      await migrateAndHydrateVault(key);
++      if (cancelled) return false;
++      const entropy = await deriveVaultSessionEntropy(key);
++      const plan = await planVaultHydration(key, () => cancelled);
++      if (!plan || cancelled) return false;
++
++      // Punto sin retorno: desde aquí el tiempo límite ya no puede cancelar.
++      committed = true;
++      vaultCryptoKey = key;
++      vaultSessionEntropy = entropy;
+       isVaultInitialized = true;
++      await commitVaultHydration(key, plan);
+       return true;
+     } catch (err) {
+       console.warn('[atRestVault] No se pudo inicializar la bóveda con IndexedDB:', err);
+@@ -376,14 +374,15 @@ export async function initAtRestVault(timeoutMs = 2500): Promise<boolean> {
+ 
+   const timeoutPromise = new Promise<boolean>((resolve) => {
+     timerId = setTimeout(() => {
++      if (committed) return; // ya está activa: dejar que termine
++      cancelled = true;
+       console.warn(`[atRestVault] Inicialización excedió el tiempo límite de ${timeoutMs}ms; usando fallback.`);
+       resolve(false);
+     }, timeoutMs);
+   });
+ 
+   try {
+-    const res = await Promise.race([initPromise, timeoutPromise]);
+-    return res;
++    return await Promise.race([initPromise, timeoutPromise]);
+   } finally {
+     if (timerId) clearTimeout(timerId);
+   }
+@@ -430,11 +429,13 @@ export function getVaultValue(key: string): string | null {
+ 
+ /**
+  * Almacena o elimina síncronamente un valor en la bóveda y lo persiste de forma segura.
++ * La persistencia es asíncrona; el número de secuencia garantiza que gane siempre la escritura más reciente.
+  */
+ export function setVaultValue(key: string, plainValue: string | null | undefined): void {
+   const clean = plainValue ? String(plainValue).trim() : '';
+ 
+   if (!clean || clean === '••••' || clean === '••••••••') {
++    bumpSeq(key); // invalida cualquier escritura en vuelo para esta clave
+     vaultCache.delete(key);
+     try {
+       if (typeof localStorage !== 'undefined') {
+@@ -448,8 +449,9 @@ export function setVaultValue(key: string, plainValue: string | null | undefined
+     return;
+   }
+ 
+-  // 1. Inmediatamente actualizar la memoria síncrona
++  // 1. Memoria síncrona
+   vaultCache.set(key, clean);
++  const seq = bumpSeq(key);
+ 
+   // 2. Limpiar hashes y textos en claro de almacenamientos expuestos
+   try {
+@@ -463,13 +465,14 @@ export function setVaultValue(key: string, plainValue: string | null | undefined
+ 
+   // 3. Persistir cifrado con clave no extraíble
+   if (vaultCryptoKey) {
+-    void encryptWithVaultKey(key, clean, vaultCryptoKey).then((cipher) => {
+-      try {
+-        if (typeof localStorage !== 'undefined') {
+-          localStorage.setItem(key, cipher);
+-        }
+-      } catch {}
+-    });
++    void encryptWithVaultKey(key, clean, vaultCryptoKey)
++      .then((cipher) => {
++        if (writeSeq.get(key) !== seq) return; // llegó una escritura más nueva
++        try {
++          if (typeof localStorage !== 'undefined') localStorage.setItem(key, cipher);
++        } catch {}
++      })
++      .catch(() => {});
+   } else {
+     // Fallback seguro con kgr_v2 si la bóveda aún no cargó
+     try {
+@@ -484,6 +487,7 @@ export function setVaultValue(key: string, plainValue: string | null | undefined
+  * Limpia el estado de la bóveda (útil para pruebas unitarias)
+  */
+ export function resetVaultForTesting(): void {
++  writeSeq.clear();
+   vaultCache.clear();
+   vaultCryptoKey = null;
+   vaultSessionEntropy = null;
+diff --git a/supabase/functions/kongre-sync/core.ts b/supabase/functions/kongre-sync/core.ts
+index 39b8af1..d0ee978 100644
+--- a/supabase/functions/kongre-sync/core.ts
++++ b/supabase/functions/kongre-sync/core.ts
+@@ -115,16 +115,22 @@ async function buildPersonalVerifiers(pepper: string, congId: string, list: any[
+   return out;
+ }
+ 
++/** El token usa ':' ',' '.' como separadores; un rol con esos caracteres lo rompería o lo haría ambiguo. */
++export function tokenSafe(value: string): string {
++  return String(value ?? '').replace(/[.:,\s]/g, '_');
++}
++
+ export async function signServerRoleToken(
+   pepper: string,
+   congId: string,
+   pub: { id: string; role: string; theocraticRoles?: string[] },
+   expiresAt: number
+ ): Promise<string> {
++  const safeRole = tokenSafe(pub.role || 'publico');
+   const rolesList = (pub.theocraticRoles && pub.theocraticRoles.length > 0)
+-    ? pub.theocraticRoles.map((r) => r.trim()).filter(Boolean).join(',')
+-    : (pub.role || 'publico');
+-  const payload = `${congId}:${pub.id}:${pub.role || 'publico'}:${rolesList}:${expiresAt}`;
++    ? pub.theocraticRoles.map((r) => tokenSafe(r.trim())).filter(Boolean).join(',')
++    : safeRole;
++  const payload = `${congId}:${pub.id}:${safeRole}:${rolesList}:${expiresAt}`;
+   const key = await crypto.subtle.importKey('raw', enc.encode(pepper), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+   const sig = await crypto.subtle.sign('HMAC', key, enc.encode(`server_role_token_v1|${payload}`));
+   return `kgr_srt1.${payload}.${toHex(sig)}`;
+@@ -358,6 +364,14 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
+     if (rot !== undefined) {
+       const rt = parseTokens(rot);
+       if (!rt) return json(req, env, 400, { ok: false, error: 'bad_tokens' });
++      // Cero conocimiento: el servidor no puede re-cifrar. Si cambia un verificador sin recibir el payload
++      // correspondiente ya cifrado con la clave nueva, esos datos quedarían ilegibles para siempre.
++      if (rt.master && (typeof payload !== 'string' || body.preserve_master)) {
++        return json(req, env, 400, { ok: false, error: 'rotation_requires_master_payload' });
++      }
++      if (rt.public && typeof payloadPublic !== 'string') {
++        return json(req, env, 400, { ok: false, error: 'rotation_requires_public_payload' });
++      }
+       if (rt.master) patch.master_verifier = await verifierOf(env.pepper, 'master', id, rt.master);
+       if (rt.public) patch.public_verifier = await verifierOf(env.pepper, 'public', id, rt.public);
+     }
+@@ -442,6 +456,19 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
+     if (!verification.valid || verification.congId !== id) {
+       return json(req, env, 401, { ok: false, error: 'invalid_or_expired_token' });
+     }
++    // Revalidar contra el estado ACTUAL: si el publicador fue eliminado o le cambiaron el rol,
++    // el token (vigente hasta 30 días) deja de valer y el cliente debe volver a verificar su PIN.
++    const current = (row.personal_verifiers || []).find((v) => v.id === verification.publisherId);
++    if (!current) {
++      return json(req, env, 401, { ok: false, error: 'invalid_or_expired_token' });
++    }
++    const curRole = tokenSafe(current.role || 'publico');
++    const curRoles = (current.theocraticRoles && current.theocraticRoles.length > 0)
++      ? current.theocraticRoles.map((r) => tokenSafe(r.trim())).filter(Boolean)
++      : [curRole];
++    if (verification.role !== curRole || (verification.roles || []).join(',') !== curRoles.join(',')) {
++      return json(req, env, 401, { ok: false, error: 'role_changed' });
++    }
+     await db.clearFailures(kCongIp);
+     return json(req, env, 200, {
+       ok: true,
+diff --git a/test/atRestVault.test.ts b/test/atRestVault.test.ts
+index a2bfce6..b70575c 100644
+--- a/test/atRestVault.test.ts
++++ b/test/atRestVault.test.ts
+@@ -62,29 +62,42 @@ function setupMockIndexedDB() {
+           }
+           return {};
+         },
+-        transaction: (storeNames: string | string[], mode: string) => {
++        transaction: (storeNames: string | string[], _mode: string) => {
+           const storeName = Array.isArray(storeNames) ? storeNames[0] : storeNames;
+           const storeData = dbStores.get(storeName) || new Map();
+-          return {
+-            objectStore: () => ({
+-              get: (key: any) => {
+-                const req: any = {};
+-                queueMicrotask(() => {
+-                  req.result = storeData.get(key);
+-                  if (req.onsuccess) req.onsuccess({ target: req });
+-                });
+-                return req;
+-              },
+-              put: (val: any, key: any) => {
+-                const req: any = {};
+-                queueMicrotask(() => {
+-                  storeData.set(key, val);
+-                  if (req.onsuccess) req.onsuccess({ target: req });
+-                });
+-                return req;
+-              },
+-            }),
++          let pending = 0;
++          const tx: any = {};
++          const done = () => {
++            pending--;
++            if (pending === 0) {
++              setTimeout(() => {
++                if (pending === 0 && tx.oncomplete) tx.oncomplete({ target: tx });
++              }, 0);
++            }
+           };
++          tx.objectStore = () => ({
++            get: (key: any) => {
++              const req: any = {};
++              pending++;
++              queueMicrotask(() => {
++                req.result = storeData.get(key);
++                if (req.onsuccess) req.onsuccess({ target: req });
++                done();
++              });
++              return req;
++            },
++            put: (val: any, key: any) => {
++              const req: any = {};
++              pending++;
++              queueMicrotask(() => {
++                storeData.set(key, val);
++                if (req.onsuccess) req.onsuccess({ target: req });
++                done();
++              });
++              return req;
++            },
++          });
++          return tx;
+         },
+         close: () => {},
+       };
+@@ -147,7 +160,7 @@ test('bóveda: generación y no-extraibilidad de la CryptoKey (extractable: fals
+     async () => {
+       await globalThis.crypto.subtle.exportKey('raw', testKey);
+     },
+-    { name: 'InvalidAccessError' },
++    (err: any) => /^InvalidAccess/.test(String(err?.name)), // Node 22: InvalidAccessException; navegadores: InvalidAccessError
+     'Intentar exportar la clave debe fallar con InvalidAccessError'
+   );
+ });
+@@ -364,3 +377,64 @@ test('hash lento: verifySecureLocalPin valida y limpia hashes residuales', () =>
+   assert.equal(verifySecureLocalPin(key, '000000'), false, 'verifySecureLocalPin rechaza PIN incorrecto');
+   assert.equal(mockLocal.getItem(`${key}_hash`), null, 'Cualquier hash residual queda eliminado');
+ });
++
++
++// ============================================================================
++// REGRESIONES: orden de escrituras, borrado en vuelo, cancelación por tiempo límite
++// ============================================================================
++
++const flush = () => new Promise((r) => setTimeout(r, 40));
++const KEY = 'kongre_coordinator_pin';
++
++test('bóveda: dos escrituras seguidas conservan la más reciente tras recargar', async () => {
++  assert.equal(await initAtRestVault(), true);
++  setVaultValue(KEY, '111111111111');
++  setVaultValue(KEY, '222222222222');
++  await flush();
++  resetVaultForTesting(); // recarga: memoria vacía, localStorage e IndexedDB intactos
++  assert.equal(await initAtRestVault(), true);
++  assert.equal(getVaultValue(KEY), '222222222222');
++});
++
++test('bóveda: borrar mientras hay una escritura en vuelo no resucita el valor', async () => {
++  assert.equal(await initAtRestVault(), true);
++  setVaultValue(KEY, '333333333333');
++  setVaultValue(KEY, null);
++  await flush();
++  assert.equal(mockLocal.getItem(KEY), null);
++  assert.equal(getVaultValue(KEY), null);
++});
++
++test('bóveda: dos inicializaciones consecutivas comparten la misma clave', async () => {
++  assert.equal(await initAtRestVault(), true);
++  setVaultValue(KEY, '444444444444');
++  await flush();
++  resetVaultForTesting();
++  assert.equal(await initAtRestVault(), true);
++  assert.equal(getVaultValue(KEY), '444444444444', 'si la clave hubiera cambiado no se podría descifrar');
++});
++
++test('bóveda: si el tiempo límite vence, la inicialización se cancela por completo (no se activa tarde)', async () => {
++  // IndexedDB lento: responde a los 200 ms; el tiempo límite es 50 ms
++  const base = setupMockIndexedDB();
++  (globalThis as any).indexedDB = {
++    open: (...a: any[]) => {
++      const real = (base.open as any)(...a);
++      const proxy: any = {};
++      Object.defineProperty(proxy, 'result', { get: () => real.result });
++      Object.defineProperty(proxy, 'onsuccess', { set: (fn: any) => { real.onsuccess = () => setTimeout(() => fn({ target: proxy }), 200); } });
++      Object.defineProperty(proxy, 'onupgradeneeded', { set: (fn: any) => { real.onupgradeneeded = fn; } });
++      Object.defineProperty(proxy, 'onerror', { set: () => {} });
++      Object.defineProperty(proxy, 'onblocked', { set: () => {} });
++      return proxy;
++    },
++  };
++  const legacy = encryptPinAtRest('482915063771');
++  mockLocal.setItem(KEY, legacy);
++
++  assert.equal(await initAtRestVault(50), false);
++  await new Promise((r) => setTimeout(r, 500)); // deja que la IndexedDB lenta termine "tarde"
++
++  assert.equal(isVaultReady(), false, 'no debe activarse a mitad de sesión');
++  assert.equal(mockLocal.getItem(KEY), legacy, 'localStorage no debe haberse tocado (sin migración a medias)');
++});
+diff --git a/test/core.test.ts b/test/core.test.ts
+index 2269dcf..e27eabf 100644
+--- a/test/core.test.ts
++++ b/test/core.test.ts
+@@ -97,6 +97,62 @@ test('rotación de credenciales: las viejas dejan de funcionar', async () => {
+   assert.equal((await call({ action: 'meta', id: 'CONG1', tokens: { public: T.publicNew } })).body.tier, 'public');
+ });
+ 
++test('rotación: rotar el verificador maestro sin enviar payload (o con preserve_master) se rechaza y no cambia nada', async () => {
++  const { call, rows } = setup();
++  await create(call);
++  const a = await call({ action: 'push', id: 'CONG1', tokens: { master: T.masterA, public: T.publicA },
++    payload_public: 'PUBX', rotate_to: { master: T.masterNew } });
++  assert.equal(a.status, 400); assert.equal(a.body.error, 'rotation_requires_master_payload');
++  const b = await call({ action: 'push', id: 'CONG1', tokens: { master: T.masterA, public: T.publicA },
++    payload: 'X', payload_public: 'PUBX', preserve_master: true, rotate_to: { master: T.masterNew } });
++  assert.equal(b.status, 400); assert.equal(b.body.error, 'rotation_requires_master_payload');
++  assert.equal(rows.get('CONG1')!.payload, 'ADMIN1', 'datos intactos');
++  assert.equal((await call({ action: 'meta', id: 'CONG1', tokens: { master: T.masterA } }, '6.6.6.6')).body.tier, 'master', 'PIN maestro viejo sigue válido');
++});
++
++test('rotación: rotar el verificador público sin payload_public se rechaza', async () => {
++  const { call, rows } = setup();
++  await create(call);
++  const r = await call({ action: 'push', id: 'CONG1', tokens: { master: T.masterA, public: T.publicA },
++    payload: 'A', rotate_to: { public: T.publicNew } });
++  assert.equal(r.status, 400); assert.equal(r.body.error, 'rotation_requires_public_payload');
++  assert.equal(rows.get('CONG1')!.payload, 'ADMIN1');
++  assert.equal((await call({ action: 'meta', id: 'CONG1', tokens: { public: T.publicA } }, '7.7.7.7')).body.tier, 'public');
++});
++
++async function tokenSetup(role = 'publicador', roles: string[] = ['publicador', 'lector_atalaya']) {
++  const ctx = setup();
++  await ctx.call({ action: 'push', id: 'CONGTOKEN', tokens: { master: T.masterA, public: T.publicA }, payload: 'ADMIN', payload_public: 'PUB',
++    personal_pins: [{ id: 'pub1', token: hex('1'), name: 'Hno Juan', role, privilege: 'publicador', theocraticRoles: roles }] });
++  const login = await ctx.call({ action: 'verify_personal_pin', id: 'CONGTOKEN', tokens: { public: T.publicA }, publisher_id: 'pub1', pin_token: hex('1') });
++  assert.equal(login.status, 200);
++  const check = (tok: string) => ctx.call({ action: 'verify_role_token', id: 'CONGTOKEN', tokens: { public: T.publicA }, token: tok });
++  return { ...ctx, token: login.body.session_token as string, check };
++}
++
++test('token de rol: si el publicador cambia de rol, el token anterior deja de valer', async () => {
++  const { call, token, check } = await tokenSetup();
++  assert.equal((await check(token)).status, 200);
++  await call({ action: 'push', id: 'CONGTOKEN', tokens: { master: T.masterA, public: T.publicA }, payload: 'ADMIN', payload_public: 'PUB',
++    personal_pins: [{ id: 'pub1', token: hex('1'), name: 'Hno Juan', role: 'publico', privilege: 'publicador', theocraticRoles: ['publicador'] }] });
++  const r = await check(token);
++  assert.equal(r.status, 401); assert.equal(r.body.error, 'role_changed');
++});
++
++test('token de rol: si el publicador es eliminado, el token deja de valer', async () => {
++  const { call, token, check } = await tokenSetup();
++  await call({ action: 'push', id: 'CONGTOKEN', tokens: { master: T.masterA, public: T.publicA }, payload: 'ADMIN', payload_public: 'PUB', personal_pins: [] });
++  assert.equal((await check(token)).status, 401);
++});
++
++test('token de rol: roles con separadores (: , .) no rompen ni falsean el token', async () => {
++  const { token, check } = await tokenSetup('rol:raro.v2', ['a,b', 'c:d', 'e.f']);
++  const r = await check(token);
++  assert.equal(r.status, 200);
++  assert.equal(r.body.publisher_id, 'pub1');
++  assert.equal(token.split('.').length, 3, 'el token sigue teniendo exactamente 3 partes');
++});
++
+ test('borrar: público 403, maestro ok', async () => {
+   const { call, rows } = setup();
+   await create(call);
+ 

@@ -37,9 +37,10 @@ interface RotateCredentialsModalProps {
   onClose: () => void;
   onRotate: (params: {
     currentMasterPin: string;
+    currentCongregationPin?: string;
     newCongregationPin?: string;
     newMasterPin?: string;
-  }) => Promise<{ success: boolean; message: string }>;
+  }) => Promise<{ success: boolean; message: string; code?: 'needs_current_congregation_pin' }>;
   congregationId?: string;
   congregationName?: string;
 }
@@ -54,6 +55,8 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
   // Estado del formulario
   const [currentMasterPin, setCurrentMasterPin] = useState('');
   const [showCurrentMaster, setShowCurrentMaster] = useState(false);
+  const [needsCurrentCong, setNeedsCurrentCong] = useState(false);
+  const [currentCongPin, setCurrentCongPin] = useState('');
 
   // Opciones de rotación
   const [rotateCongPin, setRotateCongPin] = useState(true);
@@ -99,6 +102,14 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
       await navigator.clipboard.writeText(text);
       setCopiedKey(label);
       setTimeout(() => setCopiedKey(null), 2500);
+      // Vaciar el portapapeles pasados 30s si sigue conteniendo el PIN copiado
+      setTimeout(async () => {
+        try {
+          let still = true;
+          try { still = (await navigator.clipboard.readText()) === text; } catch { /* sin permiso de lectura: se vacía igualmente */ }
+          if (still) await navigator.clipboard.writeText('');
+        } catch { /* ignorar */ }
+      }, 30000);
     } catch {
       // Fallback
     }
@@ -106,6 +117,8 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
 
   const resetForm = () => {
     setCurrentMasterPin('');
+    setCurrentCongPin('');
+    setNeedsCurrentCong(false);
     setNewCongPin('');
     setConfirmCongPin('');
     setNewMasterPin('');
@@ -145,8 +158,8 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
         setErrorMsg('Ingresa o genera el nuevo PIN de la congregación.');
         return;
       }
-      if (cleanNewCong.length < 4) {
-        setErrorMsg('El PIN de congregación debe tener al menos 4 caracteres.');
+      if (cleanNewCong.length < 8) {
+        setErrorMsg('El PIN de congregación debe tener al menos 8 caracteres.');
         return;
       }
       if (cleanNewCong !== cleanConfirmCong) {
@@ -163,8 +176,8 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
         setErrorMsg('Ingresa o genera el nuevo PIN Maestro del coordinador.');
         return;
       }
-      if (cleanNewMaster.length < 8) {
-        setErrorMsg('El PIN Maestro debe tener un mínimo de 8 caracteres (se recomiendan 12 dígitos).');
+      if (cleanNewMaster.length < 12) {
+        setErrorMsg('El PIN Maestro debe tener un mínimo de 12 caracteres (se recomiendan 12 dígitos).');
         return;
       }
       if (cleanNewMaster !== cleanConfirmMaster) {
@@ -177,11 +190,15 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
     try {
       const res = await onRotate({
         currentMasterPin: cleanCurrentMaster,
+        currentCongregationPin: needsCurrentCong && currentCongPin.trim() ? currentCongPin.trim() : undefined,
         newCongregationPin: rotateCongPin ? cleanNewCong : undefined,
         newMasterPin: rotateMasterPin ? cleanNewMaster : undefined,
       });
 
       if (!res.success) {
+        if (res.code === 'needs_current_congregation_pin') {
+          setNeedsCurrentCong(true);
+        }
         setErrorMsg(res.message);
         return;
       }
@@ -377,6 +394,25 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
                   </button>
                 </div>
               </div>
+
+              {needsCurrentCong && (
+                <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 space-y-2">
+                  <label className="text-xs font-bold text-amber-900 dark:text-amber-200 flex items-center justify-between">
+                    <span>PIN de Congregación actual:</span>
+                    <span className="text-[10px] text-amber-700 dark:text-amber-400 font-normal">
+                      No está guardado en este dispositivo
+                    </span>
+                  </label>
+                  <input
+                    type="password"
+                    value={currentCongPin}
+                    onChange={(e) => setCurrentCongPin(e.target.value)}
+                    placeholder="Ingresa el PIN de congregación vigente..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-mono tracking-wider"
+                    required
+                  />
+                </div>
+              )}
 
               {/* Selector de qué rotar */}
               <div className="space-y-4">

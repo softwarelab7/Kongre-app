@@ -193,8 +193,9 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
         if (rawTimer) {
           const parsedTimer = JSON.parse(rawTimer);
           let sec = Number(parsedTimer?.accumulatedSeconds || 0);
-          if (parsedTimer?.isRunning && parsedTimer?.startedAtMs) {
-            sec += Math.max(0, Math.floor((Date.now() - Number(parsedTimer.startedAtMs)) / 1000));
+          const startedTimestamp = parsedTimer?.startedAt || parsedTimer?.startedAtMs;
+          if (parsedTimer?.isRunning && startedTimestamp) {
+            sec += Math.max(0, Math.floor((Date.now() - Number(startedTimestamp)) / 1000));
           }
           activeTimerMinutes = Math.floor(sec / 60);
         }

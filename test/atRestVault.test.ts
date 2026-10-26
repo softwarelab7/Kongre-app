@@ -62,10 +62,13 @@ function setupMockIndexedDB() {
           }
           return {};
         },
-        transaction: (storeNames: string | string[], mode: string) => {
+        transaction: (storeNames: string | string[], _mode: string) => {
           const storeName = Array.isArray(storeNames) ? storeNames[0] : storeNames;
-          const storeData = dbStores.get(storeName) || new Map();
-          return {
+          if (!dbStores.has(storeName)) dbStores.set(storeName, new Map());
+          const storeData = dbStores.get(storeName)!;
+          const tx: any = {
+            oncomplete: null,
+            onerror: null,
             objectStore: () => ({
               get: (key: any) => {
                 const req: any = {};
@@ -80,11 +83,15 @@ function setupMockIndexedDB() {
                 queueMicrotask(() => {
                   storeData.set(key, val);
                   if (req.onsuccess) req.onsuccess({ target: req });
+                  queueMicrotask(() => {
+                    if (tx.oncomplete) tx.oncomplete({ target: tx });
+                  });
                 });
                 return req;
               },
             }),
           };
+          return tx;
         },
         close: () => {},
       };
@@ -147,7 +154,7 @@ test('bóveda: generación y no-extraibilidad de la CryptoKey (extractable: fals
     async () => {
       await globalThis.crypto.subtle.exportKey('raw', testKey);
     },
-    { name: 'InvalidAccessError' },
+    (err: any) => /^InvalidAccess/.test(String(err?.name)),
     'Intentar exportar la clave debe fallar con InvalidAccessError'
   );
 });
@@ -364,3 +371,122 @@ test('hash lento: verifySecureLocalPin valida y limpia hashes residuales', () =>
   assert.equal(verifySecureLocalPin(key, '000000'), false, 'verifySecureLocalPin rechaza PIN incorrecto');
   assert.equal(mockLocal.getItem(`${key}_hash`), null, 'Cualquier hash residual queda eliminado');
 });
+
+// ============================================================================
+// REGRESIONES DE CONCURRENCIA Y TIMEOUT EN LA BÓVEDA
+// ============================================================================
+
+test('bóveda: dos escrituras seguidas no dejan el primer valor en localStorage aunque su cifrado termine más tarde', async () => {
+  await initAtRestVault();
+  const key = 'kongre_coordinator_pin';
+
+  // Interceptar el primer subtle.encrypt para que se resuelva DESPUÉS del segundo
+  const subtle = globalThis.crypto.subtle as any;
+  const realEncrypt = subtle.encrypt.bind(subtle);
+  let callCount = 0;
+  let releaseFirst!: () => void;
+  const firstGate = new Promise<void>((r) => { releaseFirst = r; });
+
+  subtle.encrypt = async (...args: any[]) => {
+    callCount++;
+    if (callCount === 1) {
+      await firstGate;
+    }
+    return realEncrypt(...args);
+  };
+
+  try {
+    setVaultValue(key, 'PIN_VIEJO_111111');
+    setVaultValue(key, 'PIN_NUEVO_222222');
+
+    // Esperar a que termine la segunda escritura
+    await new Promise((r) => setTimeout(r, 15));
+    // Ahora se completa tardíamente la primera
+    releaseFirst();
+    await new Promise((r) => setTimeout(r, 15));
+
+    assert.equal(getVaultValue(key), 'PIN_NUEVO_222222');
+    const persisted = mockLocal.getItem(key)!;
+    const decrypted = await decryptWithVaultKey(key, persisted);
+    assert.equal(decrypted, 'PIN_NUEVO_222222', 'El cifrado tardío de la primera escritura no debe pisar la segunda');
+  } finally {
+    subtle.encrypt = realEncrypt;
+  }
+});
+
+test('bóveda: borrar una clave mientras hay una escritura en vuelo no la resucita en localStorage', async () => {
+  await initAtRestVault();
+  const key = 'kongre_session_pin_v2';
+
+  const subtle = globalThis.crypto.subtle as any;
+  const realEncrypt = subtle.encrypt.bind(subtle);
+  let release!: () => void;
+  const gate = new Promise<void>((r) => { release = r; });
+  subtle.encrypt = async (...args: any[]) => {
+    await gate;
+    return realEncrypt(...args);
+  };
+
+  try {
+    setVaultValue(key, 'SECRETO_TEMPORAL');
+    setVaultValue(key, ''); // logout / limpieza inmediata
+    assert.equal(getVaultValue(key), null);
+    assert.equal(mockLocal.getItem(key), null);
+
+    release();
+    await new Promise((r) => setTimeout(r, 15));
+
+    assert.equal(mockLocal.getItem(key), null, 'El cifrado en vuelo no debe volver a escribir una clave ya borrada');
+  } finally {
+    subtle.encrypt = realEncrypt;
+  }
+});
+
+test('bóveda: dos inicializaciones sobre el mismo IndexedDB conservan la primera clave sin sobrescribirla', async () => {
+  await initAtRestVault();
+  setSecureLocalPin('kongre_coordinator_pin', 'PIN_PESTANA_1');
+  await new Promise((r) => setTimeout(r, 15));
+  const cipherFromTab1 = mockLocal.getItem('kongre_coordinator_pin')!;
+
+  // Simular segunda pestaña: memoria limpia pero mismo IndexedDB
+  resetVaultForTesting();
+  await initAtRestVault();
+
+  const plainInTab2 = await decryptWithVaultKey('kongre_coordinator_pin', cipherFromTab1);
+  assert.equal(plainInTab2, 'PIN_PESTANA_1', 'La segunda pestaña debe reutilizar la clave existente en la misma transacción');
+});
+
+test('bóveda: si el tiempo límite vence, la inicialización aborta y no muta el estado después', async () => {
+  const key = 'kongre_coordinator_pin';
+  const legacyCipher = encryptPinAtRest('PIN_ANTES_TIMEOUT');
+  mockLocal.setItem(key, legacyCipher);
+
+  // IndexedDB lento: tarda 60ms en abrir, pero el timeout es de 5ms
+  const fastOpen = mockIDB.open;
+  mockIDB.open = (dbName: string, version?: number) => {
+    const req: any = {};
+    setTimeout(() => {
+      const inner = fastOpen(dbName, version);
+      queueMicrotask(() => {
+        req.result = inner.result;
+        if (req.onsuccess) req.onsuccess({ target: req });
+      });
+    }, 60);
+    return req;
+  };
+
+  try {
+    const ok = await initAtRestVault(5);
+    assert.equal(ok, false, 'Debe devolver false al vencer el timeout');
+    assert.equal(isVaultReady(), false);
+
+    // Esperar a que termine la apertura lenta de IndexedDB
+    await new Promise((r) => setTimeout(r, 90));
+
+    assert.equal(isVaultReady(), false, 'La tarea cancelada no debe activar la bóveda más tarde');
+    assert.equal(mockLocal.getItem(key), legacyCipher, 'No debe haber reescrito localStorage a kgr_v3 tras el timeout');
+  } finally {
+    mockIDB.open = fastOpen;
+  }
+});
+

@@ -25,18 +25,45 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.24';
-export const CURRENT_BUILD_CODE = '2026.10.25.7500';
-export const BUILD_DATE = '25 de Octubre, 2026';
+export const CURRENT_APP_VERSION = '2.12.25';
+export const CURRENT_BUILD_CODE = '2026.10.26.7600';
+export const BUILD_DATE = '26 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '2.12.25',
+    buildCode: '2026.10.26.7600',
+    date: '26 de Octubre, 2026',
+    title: 'Blindaje de Concurrencia en Bóveda Local, Rotación Segura de Credenciales, Revalidación de Tokens y Cronómetro iOS',
+    isCurrent: true,
+    highlight: 'Secuenciador monótono e hidratación en 2 fases en atRestVault, validación estricta de payloads re-cifrados en rotate_to, revocación inmediata en verify_role_token y cronómetro nativo estilo iOS sincronizado entre Móvil y PC',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'security',
+        text: 'Concurrencia y Atomicidad en atRestVault: Se incorporó un secuenciador monótono por clave (writeSeq) para evitar que cifrados asíncronos previos pisen escrituras nuevas o resuciten claves borradas, transacción única readwrite en getOrCreateVaultKey y arquitectura de hidratación en 2 fases (planVaultHydration / commitVaultHydration) con cancelación limpia por timeout.',
+      },
+      {
+        category: 'security',
+        text: 'Endurecimiento de Rotación de Credenciales (rotate_to): La Edge Function kongre-sync exige el envío simultáneo del payload re-cifrado correspondiente (rotation_requires_master_payload / rotation_requires_public_payload), solicita explícitamente el PIN de congregación vigente cuando no reside en el dispositivo (needs_current_congregation_pin), sincroniza settings.congregationPinHash, preserva kongre_security_master_key_hash y limpia automáticamente el portapapeles a los 30 segundos.',
+      },
+      {
+        category: 'security',
+        text: 'Revalidación en Tiempo Real de Tokens de Rol (verify_role_token y tokenSafe): El servidor sanitiza delimitadores internos con tokenSafe y contrasta cada token contra personal_verifiers en la base de datos para revocar de inmediato sesiones de publicadores dados de baja o cuyos privilegios hayan cambiado (401 role_changed).',
+      },
+      {
+        category: 'feature',
+        text: 'Cronómetro de Predicación Estilo iOS Sincronizado entre Móvil y PC: Rediseño integral con carátula negra OLED estilo Reloj de iOS (escala de 60 segundos, sub-esfera superior de 30 minutos, manecilla naranja #FF9F0A, botones circulares de doble anillo Iniciar/Detener/Vuelta y vista Analógica/Digital), atajo global Ctrl+Shift+T y sincronización en la nube del cronómetro en curso.',
+      },
+    ],
+  },
   {
     version: '2.12.24',
     buildCode: '2026.10.25.7500',
     date: '25 de Octubre, 2026',
     title: 'Token de Rol Firmado por Servidor y Fase 2 de Bóveda Local para Salud (DPA) y Notas Confidenciales',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Sesión protegida contra manipulación en DevTools mediante tokens HMAC firmados en la Edge Function y migración de datos médicos DPA y notas de ancianos a la Bóveda Local atRestVault respaldada por CryptoKey no extraíble en IndexedDB',
     environment: 'Producción Cloud (Kongre)',
     changes: [

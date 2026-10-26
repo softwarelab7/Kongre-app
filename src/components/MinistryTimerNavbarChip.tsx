@@ -1,5 +1,6 @@
 // src/components/MinistryTimerNavbarChip.tsx
 import React, { useState, useEffect, useMemo } from 'react';
+import { Clock } from 'lucide-react';
 import { AutoLockRing } from './AutoLockRing';
 
 interface ActiveTimerState {
@@ -90,16 +91,28 @@ export const MinistryTimerNavbarChip: React.FC<MinistryTimerNavbarChipProps> = (
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }, [displaySeconds]);
 
-  // Si el cronómetro no está corriendo y está en cero, no mostrar chip
+  // Si el cronómetro está en reposo (0s), mostrar acceso rápido discreto en móvil y escritorio (Ctrl+Shift+T en PC)
   if (displaySeconds === 0 && !timerState.isRunning) {
-    return null;
+    return (
+      <button
+        type="button"
+        onClick={onNavigateToMinistry}
+        className="inline-flex items-center gap-1.5 h-8 px-2 sm:px-2.5 rounded-xl border border-slate-200/80 dark:border-slate-700/70 bg-slate-100/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all cursor-pointer text-xs font-semibold"
+        title="Abrir Cronómetro de Predicación (Ctrl+Shift+T)"
+        aria-label="Abrir Cronómetro de Predicación (Ctrl+Shift+T)"
+      >
+        <Clock className="w-3.5 h-3.5 text-emerald-500" />
+        <span className="hidden lg:inline text-[11px] font-bold">Cronómetro</span>
+      </button>
+    );
   }
 
   const isRunning = timerState.isRunning;
-  // Fracción circular de 60 segundos
   const sec = displaySeconds % 60;
   const fraction = isRunning
-    ? (sec === 0 && displaySeconds > 0 ? 1 : sec / 60)
+    ? sec === 0 && displaySeconds > 0
+      ? 1
+      : sec / 60
     : sec / 60;
 
   return (
@@ -113,8 +126,8 @@ export const MinistryTimerNavbarChip: React.FC<MinistryTimerNavbarChipProps> = (
       }`}
       title={
         isRunning
-          ? `Predicación activa: ${formattedTime}. Clic para ir al cronómetro.`
-          : `Predicación en pausa: ${formattedTime}. Clic para reanudar.`
+          ? `Predicación activa: ${formattedTime}. Clic o Ctrl+Shift+T para abrir el cronómetro.`
+          : `Predicación en pausa: ${formattedTime}. Clic o Ctrl+Shift+T para reanudar.`
       }
       aria-label={`Cronómetro de predicación: ${formattedTime}`}
     >
@@ -122,9 +135,13 @@ export const MinistryTimerNavbarChip: React.FC<MinistryTimerNavbarChipProps> = (
         size={22}
         stroke={2.5}
         fraction={fraction}
-        colorClass={isRunning ? 'text-emerald-500 dark:text-emerald-400' : 'text-amber-500 dark:text-amber-400'}
+        colorClass={
+          isRunning
+            ? 'text-emerald-500 dark:text-emerald-400'
+            : 'text-amber-500 dark:text-amber-400'
+        }
       />
-      <b className="tabular-nums font-bold text-xs">{formattedTime}</b>
+      <b className="tabular-nums font-mono font-bold text-xs">{formattedTime}</b>
     </button>
   );
 };

@@ -6,6 +6,23 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.25] — 26 de Octubre, 2026
+**Blindaje de Concurrencia en Bóveda Local, Rotación Segura de Credenciales, Revalidación de Tokens y Cronómetro Estilo iOS**
+
+- 🔐 **Concurrencia y Atomicidad en Bóveda Criptográfica (`atRestVault.ts`):**
+  - **Secuenciador Monótono (`writeSeq`):** Evita que cifrados asíncronos en vuelo sobrescriban escrituras posteriores o vuelvan a escribir claves eliminadas tras un cierre de sesión.
+  - **Hidratación en 2 Fases y Transacción Única:** `getOrCreateVaultKey` opera en una única transacción `readwrite` sobre `IndexedDB` para impedir colisiones entre pestañas, mientras que `initAtRestVault` separa la lectura (`planVaultHydration`) del compromiso (`commitVaultHydration`) para abortar limpiamente si vence el tiempo límite sin mutar el almacenamiento.
+- 🛡️ **Endurecimiento de Rotación de Credenciales y Revalidación de Rol (`kongre-sync`):**
+  - **Validación de Payloads en `rotate_to`:** El servidor rechaza rotar verificadores si no se incluye en la misma petición el payload re-cifrado correspondiente (`400 rotation_requires_master_payload` / `rotation_requires_public_payload`).
+  - **Solicitud Explícita de PIN de Congregación y Portapapeles Seguro:** Si el dispositivo del coordinador no tiene almacenado el PIN de congregación actual al rotar únicamente el PIN Maestro, solicita ingresarlo (`needs_current_congregation_pin`) en lugar de usar el PIN Maestro como fallback; además, actualiza `settings.congregationPinHash`, preserva intacto `kongre_security_master_key_hash`, unifica longitudes mínimas (12 caracteres para PIN Maestro, 8 para Congregación) y vacía el portapapeles pasados 30 segundos.
+  - **Revocación Inmediata en `verify_role_token` y `tokenSafe`:** Revalida contra `personal_verifiers` que el publicador siga activo y conserve el mismo rol/privilegios (`401 role_changed`), sanitizando delimitadores internos con `tokenSafe`.
+- ⏱️ **Cronómetro de Predicación Estilo Reloj de iOS Sincronizado entre Móvil y PC:**
+  - **Diseño Nativo iOS OLED (`#000000`):** Carátula analógica de 60 segundos con sub-esfera de 30 minutos, manecilla naranja `#FF9F0A`, botones circulares de doble anillo (*Iniciar* / *Detener* / *Vuelta* / *Reiniciar*), selector *Analógico / Digital*, atajo global `Ctrl+Shift+T` y sincronización en tiempo real del estado del cronómetro entre móvil y PC.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.24] — 25 de Octubre, 2026
 **Token de Rol Firmado por el Servidor y Fase 2 de la Bóveda Local para Salud (DPA) y Notas Confidenciales**
 

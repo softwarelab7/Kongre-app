@@ -886,21 +886,30 @@ const AppContent: React.FC = () => {
     );
   }, [digitalTerritoryNumber, territories]);
 
-  // Listen to Cmd+K / Ctrl+K and Cmd+B / Ctrl+B shortcuts globally
+  // Listen to Cmd+K / Ctrl+K, Cmd+B / Ctrl+B, and Ctrl+Shift+T / Cmd+Shift+T shortcuts globally
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === 't') {
+        e.preventDefault();
+        setShowWelcomeLanding(false);
+        setIsSearchModalOpen(false);
+        setActiveTab('cronometro_ministerio');
+        window.dispatchEvent(new CustomEvent('kongre_open_preaching_timer'));
+        showToast('⏱️ Cronómetro de predicación abierto (Ctrl+Shift+T)', 'info');
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setIsSearchModalOpen((prev) => !prev);
       }
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b') {
+      if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'b') {
         e.preventDefault();
         handleToggleSidebar();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [setActiveTab, showToast]);
 
   const handleNavigateToWeek = (weekId: string) => {
     setCurrentWeekId(weekId);

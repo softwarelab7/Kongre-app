@@ -704,6 +704,12 @@ export interface MonthlyServiceReport {
   isAuxiliaryPioneer?: boolean;
   creditHours?: number;
   activeTimerSeconds?: number; // Segundos acumulados en el cronómetro pendientes de cerrar
+  activeTimerRunning?: boolean; // Si el cronómetro está corriendo en tiempo real
+  activeTimerStartedAt?: number | null; // Timestamp (ms) de inicio de la sesión en curso
+  activeTimerModality?: 'casa_en_casa' | 'carritos' | 'revisitas' | 'estudio' | 'informal';
+  activeTimerReturnVisits?: number;
+  activeTimerPlacements?: number;
+  activeTimerNotes?: string;
   timeLogs?: Array<{
     id: string;
     date: string;

@@ -1299,7 +1299,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                   : 'flex items-center'
               }
             >
-              <MinistryTimerNavbarChip onNavigateToMinistry={() => setActiveTab('inicio')} />
+              <MinistryTimerNavbarChip
+                onNavigateToMinistry={() => {
+                  setActiveTab('cronometro_ministerio');
+                  window.dispatchEvent(new CustomEvent('kongre_open_preaching_timer'));
+                }}
+              />
             </div>
 
             {/* Reloj de Bloqueo por Inactividad (Chip con anillo SVG - oculto en móvil para despejar cabecera) */}

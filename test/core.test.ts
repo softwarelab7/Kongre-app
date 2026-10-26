@@ -97,6 +97,49 @@ test('rotación de credenciales: las viejas dejan de funcionar', async () => {
   assert.equal((await call({ action: 'meta', id: 'CONG1', tokens: { public: T.publicNew } })).body.tier, 'public');
 });
 
+test('rotación: rechaza rotar verificador sin enviar el payload re-cifrado correspondiente', async () => {
+  const { call, rows } = setup();
+  await create(call);
+
+  // 1. Intentar rotar master con preserve_master=true o sin payload maestro -> 400
+  const r1 = await call({
+    action: 'push',
+    id: 'CONG1',
+    tokens: { master: T.masterA },
+    payload: 'A',
+    preserve_master: true,
+    rotate_to: { master: T.masterNew },
+  });
+  assert.equal(r1.status, 400);
+  assert.equal(r1.body.error, 'rotation_requires_master_payload');
+
+  const r2 = await call({
+    action: 'push',
+    id: 'CONG1',
+    tokens: { master: T.masterA },
+    payload_public: 'PUB2',
+    rotate_to: { master: T.masterNew },
+  });
+  assert.equal(r2.status, 400);
+  assert.equal(r2.body.error, 'rotation_requires_master_payload');
+
+  // 2. Intentar rotar public sin payload_public -> 400
+  const r3 = await call({
+    action: 'push',
+    id: 'CONG1',
+    tokens: { master: T.masterA },
+    payload: 'ADMIN2',
+    rotate_to: { public: T.publicNew },
+  });
+  assert.equal(r3.status, 400);
+  assert.equal(r3.body.error, 'rotation_requires_public_payload');
+
+  // Los verificadores originales siguen intactos tras los rechazos
+  assert.equal((await call({ action: 'meta', id: 'CONG1', tokens: { master: T.masterA } })).status, 200);
+  assert.equal((await call({ action: 'meta', id: 'CONG1', tokens: { public: T.publicA } })).status, 200);
+  assert.equal(rows.get('CONG1')!.payload, 'ADMIN1');
+});
+
 test('borrar: público 403, maestro ok', async () => {
   const { call, rows } = setup();
   await create(call);
@@ -405,5 +448,114 @@ test('PIN personal: verify_personal_pin devuelve session_token firmado por el se
   assert.equal(r5.body.error, 'invalid_or_expired_token');
 });
 
+test('verify_role_token: revoca el token si el publicador es eliminado o cambia de rol en un push posterior', async () => {
+  const { call } = setup();
+  await call({
+    action: 'push',
+    id: 'CONGREVOKE',
+    tokens: { master: T.masterA, public: T.publicA },
+    payload: 'ADMIN',
+    payload_public: 'PUB',
+    personal_pins: [{
+      id: 'pubAnciano',
+      token: hex('1'),
+      name: 'Hno Pedro',
+      role: 'anciano',
+      privilege: 'anciano',
+      theocraticRoles: ['anciano', 'superintendente_servicio'],
+    }],
+  });
 
+  const login = await call({
+    action: 'verify_personal_pin',
+    id: 'CONGREVOKE',
+    tokens: { public: T.publicA },
+    pin_token: hex('1'),
+    publisher_id: 'pubAnciano',
+  });
+  assert.equal(login.status, 200);
+  const oldToken = login.body.session_token;
 
+  // 1. El coordinador cambia el rol del hermano a 'publicador' y le quita el privilegio de servicio
+  await call({
+    action: 'push',
+    id: 'CONGREVOKE',
+    tokens: { master: T.masterA, public: T.publicA },
+    payload: 'ADMIN2',
+    payload_public: 'PUB2',
+    personal_pins: [{
+      id: 'pubAnciano',
+      token: hex('1'),
+      name: 'Hno Pedro',
+      role: 'publicador',
+      privilege: 'publicador',
+      theocraticRoles: ['publicador'],
+    }],
+  });
+
+  const afterDemote = await call({
+    action: 'verify_role_token',
+    id: 'CONGREVOKE',
+    tokens: { public: T.publicA },
+    token: oldToken,
+  });
+  assert.equal(afterDemote.status, 401);
+  assert.equal(afterDemote.body.error, 'role_changed');
+
+  // 2. El coordinador da de baja al publicador (ya no está en personal_pins)
+  await call({
+    action: 'push',
+    id: 'CONGREVOKE',
+    tokens: { master: T.masterA, public: T.publicA },
+    payload: 'ADMIN3',
+    payload_public: 'PUB3',
+    personal_pins: [],
+  });
+
+  const afterRemove = await call({
+    action: 'verify_role_token',
+    id: 'CONGREVOKE',
+    tokens: { public: T.publicA },
+    token: oldToken,
+  });
+  assert.equal(afterRemove.status, 401);
+  assert.equal(afterRemove.body.error, 'invalid_or_expired_token');
+});
+
+test('signServerRoleToken: caracteres separadores en role o theocraticRoles no rompen el token', async () => {
+  const { call } = setup();
+  await call({
+    action: 'push',
+    id: 'CONGSEP',
+    tokens: { master: T.masterA, public: T.publicA },
+    payload: 'ADMIN',
+    payload_public: 'PUB',
+    personal_pins: [{
+      id: 'pub.con.punto',
+      token: hex('1'),
+      name: 'Hno',
+      role: 'anciano:coord',
+      privilege: 'anciano',
+      theocraticRoles: ['rol.con.punto', 'rol:dos:puntos'],
+    }],
+  });
+
+  const login = await call({
+    action: 'verify_personal_pin',
+    id: 'CONGSEP',
+    tokens: { public: T.publicA },
+    pin_token: hex('1'),
+    publisher_id: 'pub.con.punto',
+  });
+  assert.equal(login.status, 200);
+
+  const check = await call({
+    action: 'verify_role_token',
+    id: 'CONGSEP',
+    tokens: { public: T.publicA },
+    token: login.body.session_token,
+  });
+  assert.equal(check.status, 200);
+  assert.equal(check.body.valid, true);
+  assert.equal(check.body.publisher_id, 'pub.con.punto');
+});

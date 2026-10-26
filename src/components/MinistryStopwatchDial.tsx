@@ -33,6 +33,12 @@ interface MinistryStopwatchDialProps {
   onUpdateReturnVisits: (val: number | ((prev: number) => number)) => void;
   sessionPlacements: number;
   onUpdatePlacements: (val: number | ((prev: number) => number)) => void;
+  startedAt?: number | null;
+  sessionNotes?: string;
+  onUpdateSessionNotes?: (notes: string) => void;
+  loggedMinutesThisMonth?: number;
+  monthlyHours?: number;
+  hourGoal?: number;
   onUpdateModality?: (mod: MinistryTimeLog['modality']) => void;
   onChangeModality?: (mod: MinistryTimeLog['modality']) => void;
   onOpenManualLog?: () => void;

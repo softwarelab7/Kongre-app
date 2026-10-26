@@ -58,7 +58,7 @@ type Tier = 'master' | 'public';
 
 const TOKEN_RE = /^[a-f0-9]{64}$/;
 const ID_RE = /^[A-Z0-9]{4,64}$/;
-const PUB_ID_RE = /^[a-zA-Z0-9_-]{1,80}$/;
+const PUB_ID_RE = /^[a-zA-Z0-9_.-]{1,80}$/;
 const MAX_BODY_CHARS = 8_000_000;
 const MAX_PAYLOAD_CHARS = 4_000_000;
 const MAX_PERSONAL_PINS = 500;
@@ -115,16 +115,24 @@ async function buildPersonalVerifiers(pepper: string, congId: string, list: any[
   return out;
 }
 
+// Reemplaza los delimitadores internos del token (`.`, `:`, `,`) para que ningún campo pueda romper el formato.
+export function tokenSafe(value: string): string {
+  return String(value ?? '').replace(/[.:,\s]/g, '_');
+}
+
 export async function signServerRoleToken(
   pepper: string,
   congId: string,
   pub: { id: string; role: string; theocraticRoles?: string[] },
   expiresAt: number
 ): Promise<string> {
+  const safeCong = tokenSafe(congId);
+  const safePub = tokenSafe(pub.id);
+  const safeRole = tokenSafe(pub.role || 'publico');
   const rolesList = (pub.theocraticRoles && pub.theocraticRoles.length > 0)
-    ? pub.theocraticRoles.map((r) => r.trim()).filter(Boolean).join(',')
-    : (pub.role || 'publico');
-  const payload = `${congId}:${pub.id}:${pub.role || 'publico'}:${rolesList}:${expiresAt}`;
+    ? pub.theocraticRoles.map((r) => tokenSafe(r.trim())).filter(Boolean).join(',')
+    : safeRole;
+  const payload = `${safeCong}:${safePub}:${safeRole}:${rolesList}:${expiresAt}`;
   const key = await crypto.subtle.importKey('raw', enc.encode(pepper), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   const sig = await crypto.subtle.sign('HMAC', key, enc.encode(`server_role_token_v1|${payload}`));
   return `kgr_srt1.${payload}.${toHex(sig)}`;
@@ -358,6 +366,14 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     if (rot !== undefined) {
       const rt = parseTokens(rot);
       if (!rt) return json(req, env, 400, { ok: false, error: 'bad_tokens' });
+      // No se permite rotar un verificador sin re-cifrar y enviar el payload correspondiente:
+      // de lo contrario el verificador nuevo quedaría activo mientras el ciphertext seguiría cifrado con el PIN viejo.
+      if (rt.master && (typeof payload !== 'string' || body.preserve_master)) {
+        return json(req, env, 400, { ok: false, error: 'rotation_requires_master_payload' });
+      }
+      if (rt.public && typeof payloadPublic !== 'string') {
+        return json(req, env, 400, { ok: false, error: 'rotation_requires_public_payload' });
+      }
       if (rt.master) patch.master_verifier = await verifierOf(env.pepper, 'master', id, rt.master);
       if (rt.public) patch.public_verifier = await verifierOf(env.pepper, 'public', id, rt.public);
     }
@@ -442,13 +458,31 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     if (!verification.valid || verification.congId !== id) {
       return json(req, env, 401, { ok: false, error: 'invalid_or_expired_token' });
     }
+    // Revalidar contra el estado actual de la congregación: si el publicador fue dado de baja
+    // o su rol/privilegios cambiaron en un push posterior, el token emitido antes deja de ser válido.
+    const verifiers = Array.isArray(row.personal_verifiers) ? row.personal_verifiers : [];
+    const current = verifiers.find((v) => v && (v.id === verification.publisherId || tokenSafe(v.id) === verification.publisherId));
+    if (!current) {
+      return json(req, env, 401, { ok: false, error: 'invalid_or_expired_token' });
+    }
+    const currentRole = tokenSafe(current.role || 'publico');
+    const currentRoles = (current.theocraticRoles && current.theocraticRoles.length > 0)
+      ? current.theocraticRoles.map((r) => tokenSafe(r.trim())).filter(Boolean)
+      : [currentRole];
+    const sameRole = currentRole === verification.role;
+    const sameRolesList =
+      currentRoles.length === (verification.roles?.length ?? 0) &&
+      currentRoles.every((r, i) => r === verification.roles![i]);
+    if (!sameRole || !sameRolesList) {
+      return json(req, env, 401, { ok: false, error: 'role_changed' });
+    }
     await db.clearFailures(kCongIp);
     return json(req, env, 200, {
       ok: true,
       valid: true,
-      publisher_id: verification.publisherId,
-      role: verification.role,
-      roles: verification.roles,
+      publisher_id: current.id,
+      role: current.role,
+      roles: current.theocraticRoles && current.theocraticRoles.length > 0 ? current.theocraticRoles : [current.role],
       expires_at: verification.expiresAt,
     });
   }

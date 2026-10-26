@@ -12,7 +12,7 @@ Mantiene el cero conocimiento: el servidor nunca ve PINs ni claves de cifrado.
 | "Verificación de propiedad" en el navegador | Verificación en el servidor (token derivado del PIN + pepper) |
 | Anti-fuerza-bruta en `localStorage` | Límite en base de datos: 8 fallos/15 min por congregación+IP, 40 por IP, 300/h por congregación |
 | El PIN de congregación descargaba también el payload maestro | Solo recibe `payload_public`; el maestro únicamente con el PIN maestro |
-| El PIN de congregación podía sobrescribir el payload maestro | Solo puede escribir `payload_public` |
+| El PIN de congregación podía sobrescribir el payload maestro | **No puede escribir nada** (`403 push_requires_master_tier`); solo el PIN maestro hace `push` |
 | Realtime sobre la tabla | Sondeo cada 30 s a la función |
 
 ## Archivos
@@ -77,9 +77,9 @@ prueba de humo del paso 4 y un ciclo completo (alta → login → sync) en una c
   tiene un tope de ~300 intentos/hora por congregación. Exige PIN maestro de 8+ caracteres.
 - El límite por IP depende de `cf-connecting-ip` (es el mejor esfuerzo); el tope por congregación es la red de seguridad.
   Contrapartida: un atacante con muchas IPs puede bloquear 5 min a todos los usuarios de una congregación.
-- **Cifrado en reposo y Vault (Resuelto en v2.12.23)**: Se reemplazó el XOR por AES-256-GCM con clave no extraíble (`extractable: false`) en IndexedDB (`src/utils/atRestVault.ts`), con eliminación de hashes rápidos `${key}_hash`, purga de `sessionStorage` y migración a PBKDF2 (200.000 iteraciones).
-- **Rotación de Credenciales (Resuelto en v2.12.23)**: Implementado el flujo completo de rotación en cliente y servidor con `RotateCredentialsModal.tsx`, integrado en `SettingsTab.tsx` (pestañas de Seguridad y Nube) y orquestado mediante `rotateCredentials` en `CongregationContext.tsx` con revocación inmediata en Supabase.
-- **Fuera de alcance que sigue pendiente**: los hashes de PIN personal dentro del payload público y la firma de rol en el servidor (`verify_personal_pin`).
+- **Cifrado en reposo y Vault (parcial)**: Las claves criptográficas locales (`kongre_v3`) están respaldadas por una `CryptoKey` no extraíble en `IndexedDB` (`extractable: false`) y protegen los PINs locales y campos sensibles puntuales (`address`, `emergencyContact`) con AES-GCM + AAD; los hashes de respaldo de credenciales se generan con PBKDF2 (`200.000` iteraciones). El resto del `localStorage` (`teocratic_app_data_v1`, historial de auditoría, colas offline) sigue en texto claro local.
+- **Rotación de Credenciales**: Flujo integrado en el panel de Configuración del Coordinador para rotar el PIN de Congregación y/o el PIN Maestro re-cifrando los payloads y rotando los verificadores en el servidor (`rotate_to` exige que el payload correspondiente venga re-cifrado en la misma petición; si el dispositivo no conoce el PIN de congregación actual se lo pide explícitamente antes de re-cifrar `payload_public`; `settings.congregationPinHash` se actualiza dentro del propio push; longitudes mínimas unificadas en 12 caracteres para el PIN Maestro y 8 para el de congregación).
+- **Token de rol firmado por el servidor**: Tras `verify_personal_pin`, la Edge Function emite un token HMAC-SHA256 (`kgr_srt1`, vigencia 30 días) usando `KONGRE_VERIFIER_PEPPER`; `verify_role_token` comprueba la firma **y** revalida contra `personal_verifiers` que el publicador siga activo y conserve el mismo rol/privilegios (revocación y degradación inmediatas en cuanto haya red).
 
 ## Dos bugs preexistentes que corregí de paso
 

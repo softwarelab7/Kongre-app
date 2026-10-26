@@ -102,6 +102,20 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   // System navigation modules index
   const navigationModules: SearchResultItem[] = useMemo(() => [
     {
+      id: 'mod-cronometro-ministerio',
+      category: 'modulos',
+      categoryLabel: 'Predicación',
+      title: 'Cronómetro de la Predicación (Ministerio)',
+      subtitle: 'Esfera horológica en vivo, modalidades, revisitas, bitácora y meta mensual S-4',
+      icon: Timer,
+      badge: 'Ctrl+Shift+T',
+      badgeColor: 'bg-emerald-100 text-emerald-800',
+      action: () =>
+        onNavigate('cronometro_ministerio', () => {
+          window.dispatchEvent(new CustomEvent('kongre_open_preaching_timer'));
+        }),
+    },
+    {
       id: 'mod-panorama-general',
       category: 'modulos',
       categoryLabel: 'Mi Congregación',

@@ -307,6 +307,12 @@ export function describeSyncError(r: { status: number; error: string; retryAfter
   }
   if (r.status === 401) return 'El ID de congregación o el PIN no son correctos.';
   if (r.status === 403) return 'Tu nivel de acceso no permite esta operación.';
+  if (r.error === 'rotation_requires_master_payload') {
+    return 'No se puede rotar el PIN Maestro porque este dispositivo no tiene la lista completa de publicadores sincronizada. Sincroniza primero y vuelve a intentarlo.';
+  }
+  if (r.error === 'rotation_requires_public_payload') {
+    return 'No se puede rotar el PIN de congregación sin los datos públicos. Sincroniza primero y vuelve a intentarlo.';
+  }
   if (r.status === 413) return 'Los datos son demasiado grandes para sincronizar.';
   return 'El servidor de sincronización no pudo procesar la solicitud. Inténtalo de nuevo.';
 }

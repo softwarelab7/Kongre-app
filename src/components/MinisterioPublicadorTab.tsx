@@ -175,6 +175,17 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     }
   }, [initialSubTab]);
 
+  useEffect(() => {
+    const handleOpenTimerEvent = () => {
+      setActiveSubTab('cronometro');
+      try {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch {}
+    };
+    window.addEventListener('kongre_open_preaching_timer', handleOpenTimerEvent);
+    return () => window.removeEventListener('kongre_open_preaching_timer', handleOpenTimerEvent);
+  }, []);
+
   // Identify current publisher profile consistently across desktop and mobile
   const activePublisherId = useMemo(() => {
     if (currentPublisherId && publishersMap.has(currentPublisherId)) {
@@ -287,6 +298,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   }, [timerState.isRunning, timerState.startedAt, timerState.accumulatedSeconds]);
 
   const handleStartPauseTimer = () => {
+    markLocalMinistryEdit();
     setTimerState((prev) => {
       if (prev.isRunning) {
         const delta = prev.startedAt
@@ -1061,13 +1073,36 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     }
 
     if (
-      typeof existingS4Report.activeTimerSeconds === 'number' &&
-      !timerState.isRunning &&
-      existingS4Report.activeTimerSeconds !== timerState.accumulatedSeconds
+      typeof existingS4Report.activeTimerSeconds === 'number' ||
+      typeof existingS4Report.activeTimerRunning === 'boolean'
     ) {
       setTimerState((prev) => ({
         ...prev,
-        accumulatedSeconds: existingS4Report.activeTimerSeconds || 0,
+        accumulatedSeconds:
+          typeof existingS4Report.activeTimerSeconds === 'number'
+            ? existingS4Report.activeTimerSeconds
+            : prev.accumulatedSeconds,
+        isRunning:
+          typeof existingS4Report.activeTimerRunning === 'boolean'
+            ? existingS4Report.activeTimerRunning
+            : prev.isRunning,
+        startedAt:
+          existingS4Report.activeTimerStartedAt !== undefined
+            ? existingS4Report.activeTimerStartedAt
+            : prev.startedAt,
+        modality: existingS4Report.activeTimerModality || prev.modality,
+        sessionReturnVisits:
+          typeof existingS4Report.activeTimerReturnVisits === 'number'
+            ? existingS4Report.activeTimerReturnVisits
+            : prev.sessionReturnVisits,
+        sessionPlacements:
+          typeof existingS4Report.activeTimerPlacements === 'number'
+            ? existingS4Report.activeTimerPlacements
+            : prev.sessionPlacements,
+        sessionNotes:
+          typeof existingS4Report.activeTimerNotes === 'string'
+            ? existingS4Report.activeTimerNotes
+            : prev.sessionNotes,
       }));
     }
 
@@ -1188,6 +1223,12 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
       placements: monthSummary.totalPlacementsLogged,
       bibleStudies: monthSummary.totalStudiesCount,
       activeTimerSeconds: timerState.accumulatedSeconds,
+      activeTimerRunning: timerState.isRunning,
+      activeTimerStartedAt: timerState.startedAt,
+      activeTimerModality: timerState.modality,
+      activeTimerReturnVisits: timerState.sessionReturnVisits,
+      activeTimerPlacements: timerState.sessionPlacements,
+      activeTimerNotes: timerState.sessionNotes,
       timeLogs: monthSummary.logsThisMonth,
       returnVisitRecords: returnVisits,
       bibleStudyRecords: bibleStudies,
@@ -1214,6 +1255,12 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
       hourGoal,
       logsLen: monthSummary.logsThisMonth.length,
       accSecs: timerState.accumulatedSeconds,
+      isRunning: timerState.isRunning,
+      startedAt: timerState.startedAt,
+      modality: timerState.modality,
+      sessRv: timerState.sessionReturnVisits,
+      sessPl: timerState.sessionPlacements,
+      sessNotes: timerState.sessionNotes,
       rvLen: returnVisits.length,
       studiesLen: bibleStudies.length,
       studiesCount: monthSummary.totalStudiesCount,
@@ -1238,6 +1285,12 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
     monthSummary.totalStudiesCount,
     hourGoal,
     timerState.accumulatedSeconds,
+    timerState.isRunning,
+    timerState.startedAt,
+    timerState.modality,
+    timerState.sessionReturnVisits,
+    timerState.sessionPlacements,
+    timerState.sessionNotes,
     returnVisits,
     bibleStudies,
     s4Notes,
@@ -1489,35 +1542,49 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
             <MinistryStopwatchDial
               displaySeconds={displaySeconds}
               isRunning={timerState.isRunning}
+              startedAt={timerState.startedAt}
               modality={timerState.modality}
               onStartPause={handleStartPauseTimer}
               onFinish={handleFinishAndSaveSession}
               onReset={handleResetTimer}
               onAdjustMinutes={handleAdjustTimerMinutes}
               sessionReturnVisits={timerState.sessionReturnVisits}
-              onUpdateReturnVisits={(updater) =>
+              onUpdateReturnVisits={(updater) => {
+                markLocalMinistryEdit();
                 setTimerState((prev) => ({
                   ...prev,
                   sessionReturnVisits:
                     typeof updater === 'function' ? updater(prev.sessionReturnVisits) : updater,
-                }))
-              }
+                }));
+              }}
               sessionPlacements={timerState.sessionPlacements}
-              onUpdatePlacements={(updater) =>
+              onUpdatePlacements={(updater) => {
+                markLocalMinistryEdit();
                 setTimerState((prev) => ({
                   ...prev,
                   sessionPlacements:
                     typeof updater === 'function' ? updater(prev.sessionPlacements) : updater,
-                }))
-              }
-              onUpdateModality={(newModality) =>
+                }));
+              }}
+              sessionNotes={timerState.sessionNotes}
+              onUpdateSessionNotes={(notes) => {
+                markLocalMinistryEdit();
+                setTimerState((prev) => ({
+                  ...prev,
+                  sessionNotes: notes,
+                }));
+              }}
+              onUpdateModality={(newModality) => {
+                markLocalMinistryEdit();
                 setTimerState((prev) => ({
                   ...prev,
                   modality: newModality,
-                }))
-              }
+                }));
+              }}
               onOpenManualLog={() => setIsManualLogOpen(true)}
               modalityLabels={MODALITY_LABELS}
+              loggedMinutesThisMonth={monthSummary.loggedMinutes}
+              hourGoal={hourGoal}
             />
           </div>
 

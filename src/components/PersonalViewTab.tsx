@@ -1610,6 +1610,36 @@ export const PersonalViewTab: React.FC = () => {
               )}
             </div>
 
+            {/* Acceso directo al Cronómetro Horológico Unificado (Móvil y PC) */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/50">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                  <Clock size={16} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-extrabold text-slate-900 dark:text-white leading-tight">
+                    Cronómetro de Predicación Unificado (Móvil y PC)
+                  </p>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-tight mt-0.5">
+                    Usa la esfera horológica en vivo con sincronización automática de minutos, revisitas y notas.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.hash = 'cronometro_ministerio';
+                  setTimeout(() => {
+                    window.dispatchEvent(new CustomEvent('kongre_open_preaching_timer'));
+                  }, 40);
+                }}
+                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+              >
+                <Clock size={14} />
+                <span>Abrir Cronómetro</span>
+              </button>
+            </div>
+
             {/* Campos del Formulario S-4 */}
             <div className="space-y-5">
               {/* 1. Casilla de Participación */}

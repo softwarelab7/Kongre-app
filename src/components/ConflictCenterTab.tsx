@@ -57,55 +57,57 @@ export const ConflictCenterTab: React.FC<ConflictCenterTabProps> = ({ onNavigate
 
   return (
     <div className="space-y-6">
-      {/* Barra de Acciones del Centro de Conflictos (Opción 1: arranque directo sin banner redundante) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
-            Detección en Tiempo Real
-          </span>
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
-            Supervisión integral de asignaciones duplicadas, ausencias y descansos
-          </span>
-        </div>
-
-        {/* Counters */}
-        <div className="flex items-center gap-2">
-          <div className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-300 flex items-center gap-2 shadow-2xs">
-            <span className="text-[10px] uppercase font-bold text-rose-600 dark:text-rose-400">Cruces Críticos:</span>
-            <span className="text-sm font-black">{criticalErrors.length}</span>
+      {/* Barra de Acciones y Filtros del Centro de Conflictos (Unified Container) */}
+      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+              Detección en Tiempo Real
+            </span>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
+              Supervisión integral de asignaciones duplicadas, ausencias y descansos
+            </span>
           </div>
 
-          <div className="px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-amber-800 dark:text-amber-300 flex items-center gap-2 shadow-2xs">
-            <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400">Advertencias:</span>
-            <span className="text-sm font-black">{warnings.length}</span>
+          {/* Counters */}
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2">
+            <div className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 text-rose-800 dark:text-rose-300 flex items-center justify-between sm:justify-start gap-2 shadow-2xs">
+              <span className="text-[10px] uppercase font-bold text-rose-600 dark:text-rose-400">Cruces Críticos:</span>
+              <span className="text-sm font-black">{criticalErrors.length}</span>
+            </div>
+
+            <div className="px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-amber-800 dark:text-amber-300 flex items-center justify-between sm:justify-start gap-2 shadow-2xs">
+              <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400">Advertencias:</span>
+              <span className="text-sm font-black">{warnings.length}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Filter and search */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Buscar por hermano o descripción..."
-            className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
-          />
-        </div>
+        {/* Filter and search */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1 border-t border-slate-100 dark:border-slate-800">
+          <div className="relative w-full sm:w-80">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              placeholder="Buscar por hermano o descripción..."
+              className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+            />
+          </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <span className="text-xs text-slate-500 font-semibold">Severidad:</span>
-          <select
-            value={filterSeverity}
-            onChange={e => setFilterSeverity(e.target.value as any)}
-            className="text-xs py-1.5 px-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-700"
-          >
-            <option value="all">Todos ({allWeeksConflicts.length})</option>
-            <option value="error">Solo Cruces Críticos ({criticalErrors.length})</option>
-            <option value="warning">Solo Advertencias ({warnings.length})</option>
-          </select>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Severidad:</span>
+            <select
+              value={filterSeverity}
+              onChange={e => setFilterSeverity(e.target.value as any)}
+              className="text-xs py-1.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
+            >
+              <option value="all">Todos ({allWeeksConflicts.length})</option>
+              <option value="error">Solo Cruces Críticos ({criticalErrors.length})</option>
+              <option value="warning">Solo Advertencias ({warnings.length})</option>
+            </select>
+          </div>
         </div>
       </div>
 

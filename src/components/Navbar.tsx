@@ -9,7 +9,6 @@ import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
 import ThemeToggle from './ThemeToggle';
 import { AutoLockTimerChip } from './AutoLockTimerChip';
-import { MinistryTimerNavbarChip } from './MinistryTimerNavbarChip';
 import { getFriendlyCongregationName, isGenericIdentityName, setSecureLocalPin } from '../utils/theocraticSecurity';
 import { isTabAllowedForRole } from '../utils/rbac';
 import { CURRENT_APP_VERSION } from '../utils/versionLog';
@@ -836,11 +835,33 @@ export const Navbar: React.FC<NavbarProps> = ({
       case 'grupos_servicio':
         return 'Grupos de Servicio';
       case 'carritos':
-        return 'Carritos';
+        return 'Predicación Pública (Carritos)';
       case 'limpieza_deberes':
         return 'Servicios de la Congregación';
+      case 'panel_electrico':
+        return 'Panel Eléctrico y Seguridad';
+      case 'mantenimiento':
+        return 'Mantenimiento del Salón';
       case 'visita_sc':
-        return 'Visita del SC';
+        return 'Visita del Superintendente';
+      case 'memorial_asambleas':
+        return 'Memorial y Asambleas';
+      case 'hospitalidad':
+        return 'Hospitalidad de Oradores';
+      case 'precursores_auxiliares':
+        return 'Precursores Auxiliares';
+      case 'informes_servicio':
+        return 'Informes S-4';
+      case 'conflictos':
+        return 'Centro de Conflictos';
+      case 'equidad':
+        return 'Panel de Equidad';
+      case 'exportar_pdf':
+        return 'Formatos Oficiales y PDF';
+      case 'mi_vista':
+        return 'Mis Asignaciones y Portal';
+      case 'clm_vmc':
+        return 'Vida y Ministerio Cristianos';
       case 'perfil':
         return 'Mi Perfil';
       case 'ajustes':
@@ -1115,10 +1136,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* =========================================================================
           2. TOP HEADER BAR (EXACT REFERENCE DESIGN)
          ========================================================================= */}
-      <header className={`sticky top-0 z-30 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-all duration-200`}>
-        <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 lg:px-8 2xl:px-12 gap-2">
-          {/* Left: Sidebar Toggle & Congregation Breadcrumb (sin menú lateral en móvil) */}
-          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
+      <header className={`sticky top-0 z-30 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 transition-all duration-200`}>
+        <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-6 lg:px-8 2xl:px-12 gap-3">
+          {/* 1. LEFT: Sidebar Toggle & Structured Breadcrumb Context */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             {/* Móvil (< md): Botón Volver cuando está en Menú, o Logo directo al Inicio */}
             <button
               type="button"
@@ -1164,19 +1185,37 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
-            {/* Congregation title & breadcrumb navigation */}
-            <div className="min-w-0 flex-1 flex items-center gap-1.5 sm:gap-3">
+            {/* Congregation title & active module breadcrumb */}
+            <div className="min-w-0 flex items-center gap-1.5 sm:gap-2.5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 min-w-0">
-                <h1 className="text-[10px] sm:text-sm font-medium sm:font-bold text-slate-500 sm:text-slate-900 dark:text-slate-400 sm:dark:text-white leading-tight truncate">
-                  {displayCongregationName}
-                </h1>
-                <span className="hidden sm:inline text-slate-300 dark:text-slate-600 font-normal">/</span>
-                <span className="text-indigo-600 dark:text-indigo-400 font-bold sm:font-semibold truncate text-xs leading-tight">
-                  {getCurrentTabSubtitle(activeTab)}
-                </span>
+                <button
+                  type="button"
+                  onClick={() => handleSelectTab('panorama_general')}
+                  className="inline-flex items-center gap-1.5 text-[10px] sm:text-sm font-medium sm:font-bold text-slate-500 sm:text-slate-800 dark:text-slate-400 sm:dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 leading-tight truncate transition-colors cursor-pointer text-left"
+                  title="Ir a Mi Congregación"
+                >
+                  <Building2 className="hidden lg:inline-block w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" />
+                  <span className="truncate">{displayCongregationName}</span>
+                </button>
+
+                <ChevronRight className="hidden sm:inline-block w-3.5 h-3.5 text-slate-300 dark:text-slate-600 shrink-0" />
+
+                <div className="inline-flex items-center gap-1.5 min-w-0">
+                  {(() => {
+                    const ActiveModIcon = NAV_ICONS[activeTab] || Compass;
+                    return (
+                      <span className="hidden md:inline-flex items-center justify-center w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 shrink-0">
+                        <ActiveModIcon className="w-3.5 h-3.5 stroke-[2]" />
+                      </span>
+                    );
+                  })()}
+                  <span className="text-indigo-600 dark:text-indigo-400 font-bold text-xs sm:text-[13px] leading-tight truncate">
+                    {getCurrentTabSubtitle(activeTab)}
+                  </span>
+                </div>
               </div>
 
-              {/* Demo Mode Badge placed gracefully after the breadcrumb */}
+              {/* Demo Mode Badge placed cleanly after the breadcrumb */}
               {isDemoMode && (
                 <div className="shrink-0 inline-flex">
                   <DemoBanner
@@ -1190,138 +1229,150 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Right: Clean, Organized Utility Icons & User Menu */}
-          <div className="flex items-center gap-0.5 sm:gap-1.5 shrink-0">
-            {/* Search Icon */}
+          {/* 2. CENTER: Desktop Command Search Bar (md+) */}
+          <div className="hidden md:flex items-center justify-center shrink-0">
+            <button
+              type="button"
+              onClick={onOpenSearchModal}
+              aria-label="Buscar en la congregación (Ctrl+K)"
+              title="Buscar publicador, semana o módulo (Ctrl+K / ⌘K)"
+              className="h-9 px-3 rounded-xl bg-slate-100/80 dark:bg-slate-800/70 hover:bg-white dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 hover:border-indigo-300 dark:hover:border-indigo-500/50 text-slate-500 dark:text-slate-400 flex items-center justify-between gap-3 w-48 lg:w-64 xl:w-72 transition-all cursor-pointer group shadow-2xs"
+            >
+              <span className="flex items-center gap-2 min-w-0">
+                <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-500 transition-colors shrink-0" />
+                <span className="text-xs font-medium truncate group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
+                  Buscar en congregación...
+                </span>
+              </span>
+              <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-400 bg-white dark:bg-slate-900 rounded-md border border-slate-200/80 dark:border-slate-700 shrink-0">
+                Ctrl K
+              </kbd>
+            </button>
+          </div>
+
+          {/* 3. RIGHT: Harmonized Quick Actions, Unified Utility Dock & User Profile */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Mobile-only Search Button (< md) */}
             <button
               type="button"
               onClick={onOpenSearchModal}
               aria-label="Buscar en la congregación"
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-200 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-              title="Buscar en la congregación (Ctrl+K)"
+              className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 dark:text-slate-200 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+              title="Buscar en la congregación"
             >
               <Search className="w-4 h-4" />
             </button>
 
-            {/* Publicadores Quick Access (desktop / tablet) */}
-            {isTabAllowedForRole(effectiveRoleInfo.id, 'publicadores') && (
-              <button
-                type="button"
-                onClick={() => handleSelectTab('publicadores')}
-                aria-label="Catálogo y Directorio de Publicadores"
-                aria-current={activeTab === 'publicadores' ? 'page' : undefined}
-                className={`w-9 h-9 rounded-xl hidden sm:flex items-center justify-center transition-all cursor-pointer ${
-                  activeTab === 'publicadores'
-                    ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 shadow-2xs font-bold'
-                    : 'text-slate-400 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
-                title="Catálogo y Directorio de Publicadores"
-              >
-                <Users className="w-4 h-4" />
-              </button>
-            )}
-
-            {/* Calendario Fijo en Barra Superior (PC / Desktop) */}
-            <button
-              type="button"
-              onClick={() => handleSelectTab('calendario')}
-              aria-label="Calendario de la Congregación"
-              aria-current={activeTab === 'calendario' ? 'page' : undefined}
-              className={`h-9 px-2.5 rounded-xl hidden md:flex items-center gap-1.5 transition-all cursor-pointer text-xs font-semibold ${
-                activeTab === 'calendario'
-                  ? 'bg-indigo-600 text-white shadow-xs font-bold'
-                  : 'text-slate-600 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 border border-slate-200/60 dark:border-slate-700/60'
-              }`}
-              title="Calendario de la Congregación (Fijo)"
-            >
-              <Calendar className="w-4 h-4" />
-              <span>Calendario</span>
-            </button>
-
-            {/* App Móvil / QR Icon (desktop / tablet) */}
-            {onOpenQrModal ? (
-              <button
-                type="button"
-                onClick={onOpenQrModal}
-                aria-label="App Móvil y Código QR"
-                className="w-9 h-9 rounded-xl hidden sm:flex items-center justify-center text-slate-400 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-                title="App Móvil y Código QR"
-              >
-                <Smartphone className="w-4 h-4" />
-              </button>
-            ) : (
-              <div className="flex items-center">
-                <PWAInstallButton />
-              </div>
-            )}
-
-            {/* PINs Directory Quick Access (desktop / tablet) */}
-            {onOpenPinsModal && (
-              <button
-                type="button"
-                onClick={onOpenPinsModal}
-                aria-label="Directorio de PINs de los Publicadores y la Congregación"
-                className="w-9 h-9 rounded-xl hidden sm:flex items-center justify-center text-slate-400 dark:text-slate-200 hover:text-amber-500 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer"
-                title="Directorio de PINs de los Publicadores y la Congregación"
-              >
-                <KeyRound className="w-4 h-4" />
-              </button>
-            )}
-
-            {/* Bell Notifications with amber dot (visible on sm+, available in mobile menu & dropdown on < sm) */}
-            <button
-              type="button"
-              onClick={onOpenConflictsModal}
-              aria-label={`Notificaciones y cruces de horario${conflicts.length > 0 ? ` (${conflicts.length} alertas)` : ''}`}
-              className="relative w-9 h-9 rounded-xl hidden sm:flex items-center justify-center text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 hover:bg-amber-50/60 dark:hover:bg-amber-950/30 transition cursor-pointer"
-              title="Notificaciones & Cruces"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-500 ring-2 ring-white dark:ring-slate-900 animate-pulse" />
-            </button>
-
-            {/* Real-time Cloud & Offline Sync Queue Indicator (Supabase & IndexedDB) */}
-            {!isDemoMode && onOpenQueueModal && (
-              <OfflineSyncBadge
-                isOnline={isOnline}
-                onOpenQueueModal={onOpenQueueModal}
-              />
-            )}
-
-            {/* Divider */}
-            <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 hidden sm:block" />
-
-            {/* Cronómetro de Ministerio en Vivo (Chip con anillo SVG - en móvil se oculta si ya estamos viendo el cronómetro en Inicio) */}
-            <div
-              className={
-                activeTab === 'inicio' || activeTab === 'cronometro_ministerio'
-                  ? 'hidden sm:flex items-center'
-                  : 'flex items-center'
-              }
-            >
-              <MinistryTimerNavbarChip
-                onNavigateToMinistry={() => {
-                  setActiveTab('cronometro_ministerio');
-                  window.dispatchEvent(new CustomEvent('kongre_open_preaching_timer'));
-                }}
-              />
-            </div>
-
-            {/* Reloj de Bloqueo por Inactividad (Chip con anillo SVG - oculto en móvil para despejar cabecera) */}
-            <div className="hidden sm:flex items-center">
+            {/* Status indicators (AutoLock & Offline Sync Queue) */}
+            <div className="hidden sm:flex items-center gap-1.5">
               <AutoLockTimerChip />
+              {!isDemoMode && onOpenQueueModal && (
+                <OfflineSyncBadge
+                  isOnline={isOnline}
+                  onOpenQueueModal={onOpenQueueModal}
+                />
+              )}
             </div>
 
-            {/* Dark Mode Moon / Sun Toggle (direct 1-tap toggle without pop-up) */}
-            <div className="flex items-center">
-              <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={32} />
+            {/* Unified System Utility Dock (sm+): Todos solo icono (Calendario, Publicadores, QR, PINs, Alertas, Tema) */}
+            <div className="hidden sm:flex items-center gap-0.5 p-1 h-9 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/70 shadow-2xs">
+              {/* Calendario Quick Access (Solo icono) */}
+              <button
+                type="button"
+                onClick={() => handleSelectTab('calendario')}
+                aria-label="Calendario de la Congregación"
+                aria-current={activeTab === 'calendario' ? 'page' : undefined}
+                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                  activeTab === 'calendario'
+                    ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+                    : 'text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs'
+                }`}
+                title="Calendario de la Congregación"
+              >
+                <Calendar className="w-3.5 h-3.5" />
+              </button>
+
+              {/* Publicadores Quick Access */}
+              {isTabAllowedForRole(effectiveRoleInfo.id, 'publicadores') && (
+                <button
+                  type="button"
+                  onClick={() => handleSelectTab('publicadores')}
+                  aria-label="Catálogo y Directorio de Publicadores"
+                  aria-current={activeTab === 'publicadores' ? 'page' : undefined}
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                    activeTab === 'publicadores'
+                      ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-2xs font-bold'
+                      : 'text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs'
+                  }`}
+                  title="Directorio de Publicadores"
+                >
+                  <Users className="w-3.5 h-3.5" />
+                </button>
+              )}
+
+              {/* App Móvil / QR Icon */}
+              {onOpenQrModal ? (
+                <button
+                  type="button"
+                  onClick={onOpenQrModal}
+                  aria-label="App Móvil y Código QR"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs transition-all cursor-pointer"
+                  title="App Móvil y Código QR"
+                >
+                  <Smartphone className="w-3.5 h-3.5" />
+                </button>
+              ) : (
+                <div className="flex items-center">
+                  <PWAInstallButton />
+                </div>
+              )}
+
+              {/* PINs Directory Quick Access */}
+              {onOpenPinsModal && (
+                <button
+                  type="button"
+                  onClick={onOpenPinsModal}
+                  aria-label="Directorio de PINs de los Publicadores y la Congregación"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-500 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs transition-all cursor-pointer"
+                  title="Directorio de PINs y Accesos"
+                >
+                  <KeyRound className="w-3.5 h-3.5" />
+                </button>
+              )}
+
+              {/* Bell Notifications / Conflicts */}
+              <button
+                type="button"
+                onClick={onOpenConflictsModal}
+                aria-label={`Notificaciones y cruces de horario${conflicts.length > 0 ? ` (${conflicts.length} alertas)` : ''}`}
+                className={`relative w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                  activeTab === 'conflictos'
+                    ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-2xs'
+                    : conflicts.length > 0
+                    ? 'text-amber-600 dark:text-amber-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs'
+                    : 'text-slate-500 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs'
+                }`}
+                title={conflicts.length > 0 ? `Notificaciones y Cruces (${conflicts.length} alertas)` : 'Notificaciones y Cruces'}
+              >
+                <Bell className="w-3.5 h-3.5" />
+                {conflicts.length > 0 && (
+                  <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-amber-500 ring-1 ring-white dark:ring-slate-800 animate-pulse" />
+                )}
+              </button>
+
+              {/* Dark Mode Moon / Sun Toggle Integrated in Dock */}
+              <div className="flex items-center justify-center w-7 h-7 rounded-lg hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs transition-all">
+                <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={26} />
+              </div>
             </div>
 
-            {/* Divider */}
-            <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 hidden sm:block" />
+            {/* Mobile-only Theme Toggle (< sm) */}
+            <div className="flex sm:hidden items-center">
+              <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={30} />
+            </div>
 
-            {/* User Profile Capsule & Dropdown Menu (on mobile navigates directly to Mi Perfil page without pop-up) */}
-            <div className="relative ml-0.5" ref={dropdownRef}>
+            {/* Cluster C: User Profile Capsule & Dropdown Menu */}
+            <div className="relative" ref={dropdownRef}>
               <button
                 type="button"
                 onClick={() => {
@@ -1334,10 +1385,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }}
                 aria-label="Menú de cuenta y perfil de usuario"
                 aria-expanded={openDropdown === 'user'}
-                className="flex items-center gap-2 p-1 pl-1 pr-1.5 sm:pr-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700/60 transition cursor-pointer"
+                className="flex items-center gap-2 h-8 sm:h-9 pl-1 pr-1.5 sm:pl-1.5 sm:pr-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-all cursor-pointer shadow-2xs"
                 title="Mi Perfil y Cuenta"
               >
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold flex items-center justify-center text-xs shadow-xs overflow-hidden ring-2 ring-indigo-500/20">
+                <div className="w-6 h-6 sm:w-6 sm:h-6 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold flex items-center justify-center text-[11px] shadow-2xs overflow-hidden shrink-0">
                   {(() => {
                     const effectiveAvatar = isDemoMode
                       ? userProfile?.photoURL || null
@@ -1370,35 +1421,117 @@ export const Navbar: React.FC<NavbarProps> = ({
                     );
                   })()}
                 </div>
-                <span className="hidden xl:inline-block max-w-[100px] truncate text-xs font-semibold text-slate-700 dark:text-slate-200 text-left">
+                <span className="hidden md:inline-block max-w-[110px] truncate text-xs font-semibold text-slate-700 dark:text-slate-200 text-left">
                   {effectiveDisplayName?.split(' ')[0] || 'Mi Cuenta'}
                 </span>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-slate-300 hidden sm:inline-block" />
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-slate-300 hidden sm:inline-block shrink-0" />
               </button>
 
-              {/* Dropdown Menu Modal */}
+              {/* Redesigned User Profile Panel Popover */}
               {openDropdown === 'user' && (
-                <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                      {effectiveDisplayName || 'Usuario'}
-                    </p>
-                    <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                      {user?.email || (settings?.coordinatorName ? 'Coordinador' : 'Usuario')}
-                    </p>
+                <div className="absolute right-0 top-full mt-2 w-76 sm:w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  {/* Identity Header Card */}
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold flex items-center justify-center text-sm shadow-xs overflow-hidden shrink-0">
+                      {(() => {
+                        const effectiveAvatar = isDemoMode
+                          ? userProfile?.photoURL || null
+                          : userProfile?.photoURL ||
+                            user?.photoURL ||
+                            settings?.coordinatorPhotoURL ||
+                            (typeof window !== 'undefined'
+                              ? localStorage.getItem('kongre_user_photo') ||
+                                localStorage.getItem('kongre_google_photo') ||
+                                localStorage.getItem('kongre_coordinator_photo')
+                              : null);
+
+                        if (effectiveAvatar) {
+                          return (
+                            <img
+                              src={effectiveAvatar}
+                              alt="Usuario"
+                              className="w-full h-full object-cover"
+                            />
+                          );
+                        }
+
+                        return (
+                          <span>
+                            {(effectiveDisplayName || user?.email || 'H').charAt(0).toUpperCase()}
+                          </span>
+                        );
+                      })()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-extrabold text-slate-900 dark:text-white truncate">
+                        {effectiveDisplayName || 'Usuario'}
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                        {user?.email || displayCongregationName}
+                      </p>
+                      <div className="mt-1 flex items-center gap-1.5 text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
+                        <ShieldCheck className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{effectiveRoleInfo?.name || 'Publicador'}</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="p-1 space-y-0.5">
+                  {/* 2-Column Quick Access Cards */}
+                  <div className="grid grid-cols-2 gap-1.5 mb-2">
                     <button
                       type="button"
                       onClick={() => {
                         setOpenDropdown(null);
                         handleSelectTab('perfil');
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
+                      className={`flex flex-col items-start gap-1 p-2.5 rounded-xl border transition-all cursor-pointer text-left ${
+                        activeTab === 'perfil'
+                          ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300'
+                          : 'bg-slate-50/70 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200/60 dark:border-slate-800 text-slate-700 dark:text-slate-200'
+                      }`}
                     >
-                      <User className="w-4 h-4 text-indigo-500" />
-                      <span>Mi Perfil</span>
+                      <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      <div>
+                        <span className="block text-xs font-bold leading-tight">Mi Perfil</span>
+                        <span className="block text-[10px] text-slate-400 mt-0.5">Cuenta y avisos</span>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenDropdown(null);
+                        handleSelectTab('mi_vista');
+                      }}
+                      className={`flex flex-col items-start gap-1 p-2.5 rounded-xl border transition-all cursor-pointer text-left ${
+                        activeTab === 'mi_vista'
+                          ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300'
+                          : 'bg-slate-50/70 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200/60 dark:border-slate-800 text-slate-700 dark:text-slate-200'
+                      }`}
+                    >
+                      <UserCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <div>
+                        <span className="block text-xs font-bold leading-tight">Mi Portal</span>
+                        <span className="block text-[10px] text-slate-400 mt-0.5">Partes e informe</span>
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Management & Security Links */}
+                  <div className="space-y-0.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenDropdown(null);
+                        handleSelectTab('roles');
+                      }}
+                      className="w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
+                    >
+                      <span className="flex items-center gap-2.5 min-w-0">
+                        <Shield className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                        <span className="truncate">{canManageRoles ? 'Roles y Permisos' : 'Cambiar Rol / PIN'}</span>
+                      </span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     </button>
 
                     {isTabAllowedForRole(effectiveRoleInfo.id, 'ajustes') && (
@@ -1408,28 +1541,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setOpenDropdown(null);
                           handleSelectTab('ajustes');
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
+                        className="w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
                       >
-                        <Settings className="w-4 h-4 text-indigo-500" />
-                        <span>Ajustes de la Congregación</span>
+                        <span className="flex items-center gap-2.5 min-w-0">
+                          <Settings className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" />
+                          <span className="truncate">Ajustes de la Congregación</span>
+                        </span>
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       </button>
                     )}
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenDropdown(null);
-                        handleSelectTab('roles');
-                      }}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold rounded-xl transition cursor-pointer text-left ${
-                        activeRole === 'publico'
-                          ? 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100'
-                          : 'text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/50'
-                      }`}
-                    >
-                      <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                      <span>{canManageRoles ? 'Roles Teocráticos y PINs' : '🔑 Activar Rol / Ingresar PIN'}</span>
-                    </button>
 
                     {permissions.canViewAuditLog && onOpenAuditLog && (
                       <button
@@ -1438,10 +1558,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setOpenDropdown(null);
                           onOpenAuditLog();
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-xl transition cursor-pointer text-left"
+                        className="w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
                       >
-                        <ClipboardList className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                        <span>Registro de Auditoría</span>
+                        <span className="flex items-center gap-2.5 min-w-0">
+                          <ClipboardList className="w-4 h-4 text-slate-500 dark:text-slate-400 shrink-0" />
+                          <span className="truncate">Registro de Auditoría</span>
+                        </span>
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       </button>
                     )}
 
@@ -1452,65 +1575,84 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setOpenDropdown(null);
                           lockSession();
                         }}
-                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
+                        className="w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
                       >
-                        <Lock className="w-4 h-4 text-emerald-500" />
-                        <span>Bloquear Sesión con PIN</span>
+                        <span className="flex items-center gap-2.5 min-w-0">
+                          <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                          <span className="truncate">Bloquear Sesión con PIN</span>
+                        </span>
                       </button>
                     )}
 
-                    {/* Quick mobile-only utilities moved from top bar */}
-                    <div className="sm:hidden pt-1 mt-1 border-t border-slate-100 dark:border-slate-800 space-y-0.5">
+                    {/* Theme Selector Row */}
+                    <div className="flex items-center justify-between px-3 py-1.5">
+                      <span className="text-xs font-medium text-slate-600 dark:text-slate-300 flex items-center gap-2.5">
+                        {isDark ? (
+                          <Moon className="w-4 h-4 text-indigo-400" />
+                        ) : (
+                          <Sun className="w-4 h-4 text-amber-500" />
+                        )}
+                        <span>Tema</span>
+                      </span>
+                      <div className="inline-flex items-center p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (isDark) toggleTheme();
+                          }}
+                          className={`px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                            !isDark
+                              ? 'bg-white text-slate-900 shadow-2xs'
+                              : 'text-slate-500 hover:text-slate-200'
+                          }`}
+                        >
+                          Claro
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!isDark) toggleTheme();
+                          }}
+                          className={`px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                            isDark
+                              ? 'bg-slate-700 text-white shadow-2xs'
+                              : 'text-slate-500 hover:text-slate-800'
+                          }`}
+                        >
+                          Oscuro
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Footer with Version & Sign Out */}
+                  <div className="border-t border-slate-100 dark:border-slate-800 mt-2 pt-2 flex items-center justify-between gap-2">
+                    {onOpenVersionModal ? (
                       <button
                         type="button"
                         onClick={() => {
                           setOpenDropdown(null);
-                          onOpenConflictsModal();
+                          onOpenVersionModal();
                         }}
-                        className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
+                        className="px-2 py-1 rounded-lg text-[10px] font-mono font-semibold text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                       >
-                        <span className="flex items-center gap-2.5">
-                          <Bell className="w-4 h-4 text-amber-500" />
-                          <span>Notificaciones y Cruces</span>
-                        </span>
-                        {conflicts.length > 0 && (
-                          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
-                            {conflicts.length}
-                          </span>
-                        )}
+                        Kongre v{CURRENT_APP_VERSION}
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          toggleTheme();
-                        }}
-                        className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer text-left"
-                      >
-                        <span className="flex items-center gap-2.5">
-                          {isDark ? (
-                            <Sun className="w-4 h-4 text-amber-400" />
-                          ) : (
-                            <Moon className="w-4 h-4 text-indigo-500" />
-                          )}
-                          <span>Tema de Pantalla</span>
-                        </span>
-                        <span className="text-[10px] font-semibold text-slate-400">
-                          {isDark ? 'Oscuro' : 'Claro'}
-                        </span>
-                      </button>
-                    </div>
-                  </div>
+                    ) : (
+                      <span className="px-2 text-[10px] font-mono text-slate-400">
+                        v{CURRENT_APP_VERSION}
+                      </span>
+                    )}
 
-                  <div className="border-t border-slate-100 dark:border-slate-800 my-1 p-1">
                     <button
                       type="button"
                       onClick={() => {
                         setOpenDropdown(null);
                         handleLogout();
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition cursor-pointer text-left"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition cursor-pointer"
                     >
-                      <LogOut className="w-4 h-4 text-rose-500" />
+                      <LogOut className="w-3.5 h-3.5" />
                       <span>Cerrar Sesión</span>
                     </button>
                   </div>

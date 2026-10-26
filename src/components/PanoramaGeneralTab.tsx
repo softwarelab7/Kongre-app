@@ -1058,7 +1058,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
     effectiveRoleInfo.id === 'superintendente_servicio';
 
   return (
-    <div className="max-w-4xl mx-auto space-y-4 sm:space-y-5 animate-fade-in select-none">
+    <div className="w-full space-y-4 sm:space-y-5 animate-fade-in select-none">
       {/* =========================================================================
           1. FILA SUPERIOR: INFORME & PRÓXIMOS (2 TARJETAS LADO A LADO)
          ========================================================================= */}
@@ -1269,9 +1269,10 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
       </div>
 
       {/* =========================================================================
-          2. SECCIÓN MEDIA: TABLERO DE ANUNCIOS
+          2 & 3. SECCIÓN MEDIA: TABLERO DE ANUNCIOS & EVENTOS (2 COLUMNAS EN PC)
          ========================================================================= */}
-      <div className="bg-gradient-to-br from-rose-50/40 via-white to-rose-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-rose-950/15 rounded-2xl border border-rose-200/60 dark:border-slate-800 p-4 sm:p-5 shadow-xs">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 sm:gap-5 items-stretch">
+      <div className="bg-gradient-to-br from-rose-50/40 via-white to-rose-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-rose-950/15 rounded-2xl border border-rose-200/60 dark:border-slate-800 p-4 sm:p-5 shadow-xs flex flex-col justify-between">
         <div className="flex items-center justify-between gap-2 mb-2">
           <div>
             <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -1452,6 +1453,7 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
             </div>
           </div>
         )}
+      </div>
       </div>
 
       {/* =========================================================================

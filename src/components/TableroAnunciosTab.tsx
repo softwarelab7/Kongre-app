@@ -378,34 +378,36 @@ export const TableroAnunciosTab: React.FC = () => {
       )}
 
       {/* Barra Principal de Navegación del Tablero Digital */}
-      <div className="bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div className="grid grid-cols-3 gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl w-full lg:w-auto">
           <button
             type="button"
             onClick={() => setActiveSubTab('cartelera_khs')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'cartelera_khs'
                 ? 'bg-indigo-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-700/60'
             }`}
           >
-            <Building2 className="w-4 h-4" />
-            <span>Cartelera del Salón Todo-en-Uno</span>
+            <Building2 className="w-4 h-4 shrink-0" />
+            <span className="truncate hidden sm:inline">Cartelera del Salón</span>
+            <span className="truncate sm:hidden">Cartelera</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveSubTab('despacho_mensual_khs')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'despacho_mensual_khs'
                 ? 'bg-indigo-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-700/60'
             }`}
           >
-            <Layers className="w-4 h-4" />
-            <span>Hojas Mensuales por Hermano (.ics + WhatsApp)</span>
+            <Layers className="w-4 h-4 shrink-0" />
+            <span className="truncate hidden sm:inline">Hojas por Hermano</span>
+            <span className="truncate sm:hidden">Hojas (.ics)</span>
             <span
-              className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+              className={`px-1.5 py-0.2 rounded-full text-[10px] shrink-0 ${
                 activeSubTab === 'despacho_mensual_khs'
                   ? 'bg-white/20 text-white'
                   : 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300'
@@ -418,17 +420,18 @@ export const TableroAnunciosTab: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveSubTab('anuncios_cartas')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeSubTab === 'anuncios_cartas'
                 ? 'bg-indigo-600 text-white shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-700/60'
             }`}
           >
-            <Bell className="w-4 h-4" />
-            <span>Comunicados y Cartas Oficiales</span>
+            <Bell className="w-4 h-4 shrink-0" />
+            <span className="truncate hidden sm:inline">Comunicados y Cartas</span>
+            <span className="truncate sm:hidden">Comunicados</span>
             {notices.length > 0 && (
               <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                className={`px-1.5 py-0.2 rounded-full text-[10px] shrink-0 ${
                   activeSubTab === 'anuncios_cartas'
                     ? 'bg-white/20 text-white'
                     : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
@@ -440,18 +443,18 @@ export const TableroAnunciosTab: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          {canManageNotices && (
+        {canManageNotices && (
+          <div className="flex items-center justify-end w-full lg:w-auto">
             <button
               type="button"
               onClick={handleOpenNew}
-              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer active:scale-95"
+              className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer active:scale-95"
             >
               <Plus className="w-4 h-4" />
               <span>Publicar Anuncio</span>
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* =====================================================================

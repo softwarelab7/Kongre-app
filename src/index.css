@@ -623,9 +623,9 @@
   }
 
   /* Expand inner dialog card to fill 100% of the mobile viewport as a native page */
-  div.fixed.inset-0:not(:empty) > div:not(.absolute),
-  div.fixed.inset-0:not(:empty) > form:not(.absolute),
-  div.fixed.inset-0:not(:empty) > section:not(.absolute) {
+  div.fixed.inset-0.flex:not(:empty) > div:not(.absolute):not([data-mobile-back-btn="true"]),
+  div.fixed.inset-0.flex:not(:empty) > form:not(.absolute),
+  div.fixed.inset-0.flex:not(:empty) > section:not(.absolute) {
     width: 100% !important;
     max-width: 100% !important;
     min-height: 100dvh !important;

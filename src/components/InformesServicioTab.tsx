@@ -241,68 +241,61 @@ export const InformesServicioTab: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Barra de Acciones de Informes de Predicación (Opción 1: arranque directo sin banner redundante) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
-            Registro S-4 / S-21
-          </span>
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
-            Actividad mensual en el ministerio y horas de precursores
-          </span>
-        </div>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Barra Unificada de Mes de Servicio, Progreso y Acción S-4 */}
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col gap-3.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center justify-between sm:justify-start gap-2">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Mes de Servicio:</span>
+            </div>
+            <input
+              type="month"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800 focus:bg-white"
+            />
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 hidden md:inline">
+              ({formatMonthName(selectedMonth)})
+            </span>
+          </div>
 
-        {/* Action button */}
-        <button
-          onClick={handleCopyCongregationSummary}
-          className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer active:scale-95"
-        >
-          {copiedSummary ? (
-            <>
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>¡Resumen S-4 Copiado!</span>
-            </>
-          ) : (
-            <>
-              <Share2 className="w-4 h-4" />
-              <span>Copiar Resumen Sucursal (S-4)</span>
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Month Selector Bar & KPI Summary */}
-      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-emerald-600" />
-          <span className="text-xs font-bold text-slate-700">Mes de Servicio:</span>
-          <input
-            type="month"
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 bg-slate-50 focus:bg-white"
-          />
-          <span className="text-xs font-semibold text-slate-500 hidden sm:inline">
-            ({formatMonthName(selectedMonth)})
-          </span>
+          {/* Action button */}
+          <button
+            onClick={handleCopyCongregationSummary}
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer active:scale-95"
+          >
+            {copiedSummary ? (
+              <>
+                <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+                <span>¡Resumen S-4 Copiado!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-4 h-4" />
+                <span>Copiar Resumen Sucursal (S-4)</span>
+              </>
+            )}
+          </button>
         </div>
 
         {/* Progress Bar */}
-        <div className="flex items-center gap-3 w-full sm:w-72">
-          <div className="flex-1 bg-slate-100 rounded-full h-2.5 overflow-hidden">
+        <div className="flex items-center gap-3 w-full pt-2 border-t border-slate-100 dark:border-slate-800">
+          <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 shrink-0">Recepción:</span>
+          <div className="flex-1 bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 summary.completionPercent >= 90
                   ? 'bg-emerald-500'
                   : summary.completionPercent >= 60
-                  ? 'bg-blue-500'
+                  ? 'bg-indigo-500'
                   : 'bg-amber-500'
               }`}
               style={{ width: `${summary.completionPercent}%` }}
             />
           </div>
-          <span className="text-xs font-extrabold text-slate-800 shrink-0">
+          <span className="text-xs font-extrabold text-slate-800 dark:text-slate-200 shrink-0">
             {summary.completionPercent}% ({summary.reportedCount}/{summary.totalPublishers})
           </span>
         </div>
@@ -310,40 +303,40 @@ export const InformesServicioTab: React.FC = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold text-slate-400 block uppercase">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 block uppercase">
             Publicadores Activos
           </span>
-          <span className="text-xl sm:text-2xl font-black text-slate-900">
+          <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
             {summary.totalPublishers}
           </span>
         </div>
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold text-emerald-600 block uppercase">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 block uppercase">
             Informaron
           </span>
-          <div className="flex items-baseline gap-1">
-            <span className="text-xl sm:text-2xl font-black text-emerald-600">
+          <div className="flex items-baseline gap-1 flex-wrap">
+            <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
               {summary.reportedCount}
             </span>
-            <span className="text-xs text-slate-400 font-semibold">
-              ({summary.pendingCount} pendientes)
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-semibold">
+              ({summary.pendingCount} pend.)
             </span>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold text-blue-600 block uppercase">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 block uppercase">
             Cursos Bíblicos
           </span>
-          <span className="text-xl sm:text-2xl font-black text-blue-600">
+          <span className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400">
             {summary.totalStudies}
           </span>
         </div>
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold text-amber-600 block uppercase">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-amber-600 dark:text-amber-400 block uppercase">
             Promedio Precursores
           </span>
-          <span className="text-xl sm:text-2xl font-black text-amber-600">
+          <span className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400">
             {summary.avgPioneerHours} hrs
           </span>
         </div>

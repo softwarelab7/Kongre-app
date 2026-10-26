@@ -13,10 +13,12 @@ const STORAGE_KEY_TIMER = 'kongre_ministry_active_timer_v1';
 
 interface MinistryTimerNavbarChipProps {
   onNavigateToMinistry?: () => void;
+  isActive?: boolean;
 }
 
 export const MinistryTimerNavbarChip: React.FC<MinistryTimerNavbarChipProps> = ({
   onNavigateToMinistry,
+  isActive = false,
 }) => {
   const [timerState, setTimerState] = useState<ActiveTimerState>(() => {
     try {
@@ -97,12 +99,17 @@ export const MinistryTimerNavbarChip: React.FC<MinistryTimerNavbarChipProps> = (
       <button
         type="button"
         onClick={onNavigateToMinistry}
-        className="inline-flex items-center gap-1.5 h-8 px-2 sm:px-2.5 rounded-xl border border-slate-200/80 dark:border-slate-700/70 bg-slate-100/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all cursor-pointer text-xs font-semibold"
+        aria-current={isActive ? 'page' : undefined}
+        className={`inline-flex items-center gap-1.5 h-8 sm:h-9 px-2.5 sm:px-3 rounded-xl border transition-all cursor-pointer text-xs font-semibold shadow-2xs ${
+          isActive
+            ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-xs'
+            : 'border-slate-200/80 dark:border-slate-700/70 bg-slate-100/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-300 dark:hover:border-emerald-700'
+        }`}
         title="Abrir Cronómetro de Predicación (Ctrl+Shift+T)"
         aria-label="Abrir Cronómetro de Predicación (Ctrl+Shift+T)"
       >
-        <Clock className="w-3.5 h-3.5 text-emerald-500" />
-        <span className="hidden lg:inline text-[11px] font-bold">Cronómetro</span>
+        <Clock className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-emerald-500'}`} />
+        <span className="hidden md:inline text-xs">Cronómetro</span>
       </button>
     );
   }

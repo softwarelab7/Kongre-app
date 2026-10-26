@@ -25,18 +25,125 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.30';
-export const CURRENT_BUILD_CODE = '2026.10.26.7667';
+export const CURRENT_APP_VERSION = '2.12.35';
+export const CURRENT_BUILD_CODE = '2026.10.26.7690';
 export const BUILD_DATE = '26 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.35',
+    buildCode: '2026.10.26.7690',
+    date: '26 de Octubre, 2026',
+    title: 'Diseño Fluido de Ancho Completo y Corrección de Tarjeta Push en Columnas',
+    isCurrent: true,
+    highlight: 'Aprovechamiento integral del ancho de pantalla en monitores de escritorio y portátiles eliminando márgenes restrictivos y corrigiendo el desbordamiento de botones en la tarjeta Push',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Aprovechamiento Completo del Ancho de Pantalla (App.tsx, UserProfileSettingsView.tsx, PanoramaGeneralTab.tsx, RolesManagerTab.tsx, MantenimientoTab.tsx, PanelElectricoTab.tsx, PersonalViewTab.tsx, MinisterioPublicadorTab.tsx): Se eliminaron los topes de ancho fijo (max-w-4xl, max-w-2xl, max-w-7xl) para que los paneles se expandan de forma responsiva ocupando el espacio disponible del monitor.',
+      },
+      {
+        category: 'fix',
+        text: 'Corrección de Desbordamiento en Tarjeta de Suscripción Push (PushNotificationQuickGuideCard.tsx): Se ajustó la disposición de la cabecera y los botones de acción en modo compacto para evitar que el botón "Suscribirme a Notificaciones Push" y "Guía Visual" sobresalgan del contenedor en vistas de dos columnas.',
+      },
+    ],
+  },
+  {
+    version: '2.12.34',
+    buildCode: '2026.10.26.7680',
+    date: '26 de Octubre, 2026',
+    title: 'Rediseño Integral del Panel y Vista de Perfil de Usuario',
+    isCurrent: false,
+    highlight: 'Renovación completa del menú desplegable de cuenta en la barra superior y de la vista de Mi Perfil con diseño en dos columnas, tarjeta de identidad unificada y selectores con iconos vectoriales',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Panel Desplegable de Cuenta Rediseñado (Navbar.tsx): Nueva cabecera de identidad con estado en línea, rol y congregación, cuadrícula rápida de 2 columnas (Mi Perfil y Mi Portal), accesos administrativos con indicadores laterales, selector integrado de tema (Claro / Oscuro) y pie de sesión con versión.',
+      },
+      {
+        category: 'improvement',
+        text: 'Vista Completa de Perfil en 2 Columnas (UserProfileSettingsView.tsx): Reestructuración del módulo Mi Perfil en una tarjeta superior de identidad y foto con barra compacta de avatares predeterminados, columna izquierda para canales de contacto y preferencias de horario con iconos Lucide, y columna derecha con ficha resumen en vivo y avisos Push.',
+      },
+    ],
+  },
+  {
+    version: '2.12.33',
+    buildCode: '2026.10.26.7670',
+    date: '26 de Octubre, 2026',
+    title: 'Rediseño de Barra Superior en PC: Buscador Central y Dock Minimalista de Solo Iconos',
+    isCurrent: false,
+    highlight: 'Reestructuración de la cabecera de escritorio: eliminación del botón de Cronómetro superior, conversión de Calendario a botón de solo icono e integración de todas las utilidades dentro de un único dock uniforme',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Miga de Pan Estructurada con Icono de Módulo (Navbar.tsx, DemoBanner.tsx): Se integró el icono de congregación, separador chevron, insignia visual del módulo activo e indicador de Modo Prueba con proporciones alineadas.',
+      },
+      {
+        category: 'feature',
+        text: 'Barra de Búsqueda Rápida Central en PC (Navbar.tsx): Se reemplazó la lupa suelta por una barra de búsqueda interactiva central con indicador de teclado (Ctrl K).',
+      },
+      {
+        category: 'improvement',
+        text: 'Dock Unificado de Solo Iconos sin Cronómetro (Navbar.tsx): Se retiró el chip de Cronómetro de la barra superior y se convirtió Calendario en botón de solo icono integrado dentro del dock uniforme (Calendario, Publicadores, QR Móvil, PINs, Alertas y Tema) junto a la tarjeta de perfil.',
+      },
+    ],
+  },
+  {
+    version: '2.12.32',
+    buildCode: '2026.10.26.7669',
+    date: '26 de Octubre, 2026',
+    title: 'Unificación Integral de Cabecera Móvil y Contenedores Cohesivos de Control',
+    isCurrent: false,
+    highlight: 'Eliminación de la barra flotante aislada de retroceso mediante barra fija adhesiva superior y empaquetado de todos los controles desparramados en tarjetas contenedoras estructuradas con cuadrículas adaptativas sin recortes de texto',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'fix',
+        text: 'Barra de Retroceso Móvil Adhesiva Unificada (App.tsx): Se reemplazó la burbuja flotante aislada por una barra superior fija de borde a borde (sticky top-0 con backdrop blur) que actúa como cabecera nativa limpia de la aplicación.',
+      },
+      {
+        category: 'improvement',
+        text: 'Contenedores Cohesivos para Controles de Módulo (MantenimientoTab.tsx, PublishersTab.tsx, GruposServicioTab.tsx, MemorialAsambleasTab.tsx, VisitaSuperintendenteTab.tsx, PanelElectricoTab.tsx, TableroAnunciosTab.tsx, EquidadDashboardTab.tsx, ExportPdfTab.tsx, ConflictCenterTab.tsx, PersonalViewTab.tsx, RolesManagerTab.tsx): Todos los botones, filtros y sub-pestañas que quedaban dispersos sobre el fondo se integraron dentro de tarjetas unificadas con fondo blanco/slate-900 y bordes sutiles.',
+      },
+      {
+        category: 'improvement',
+        text: 'Eliminación Definitiva de Textos Cortados y Tiras Desbordadas: Reemplazo de franjas con scroll horizontal estrecho por cuadrículas adaptativas simétricas (2 y 3 columnas) con etiquetas claras y concisas en todos los módulos de gestión.',
+      },
+    ],
+  },
+  {
+    version: '2.12.31',
+    buildCode: '2026.10.26.7668',
+    date: '26 de Octubre, 2026',
+    title: 'Unificación Visual Móvil: Colores Consistentes, Cuadrículas sin Cortes y Tablas Adaptativas',
+    isCurrent: false,
+    highlight: 'Corrección integral de inconsistencias de diseño en móvil: eliminación de secciones con modo oscuro forzado, botones y pestañas alineados en cuadrícula sin recortes y tarjetas móviles para literatura y territorios',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'fix',
+        text: 'Eliminación de Hueco en Blanco en Herramientas del Programa (index.css, ScheduleTab.tsx): Se corrigió la regla CSS global que forzaba min-height: 100dvh sobre la cabecera móvil, integrando el listado de herramientas inmediatamente debajo del título.',
+      },
+      {
+        category: 'improvement',
+        text: 'Consistencia de Tema Claro/Oscuro (InformeSucursalS1Tab.tsx, AttendanceTrendsDashboard.tsx): Se corrigieron las secciones con fondo oscuro fijo en modo claro para que todos los módulos mantengan una paleta uniforme blanca/slate en modo claro y slate-900 en modo oscuro.',
+      },
+      {
+        category: 'improvement',
+        text: 'Pestañas, Botones y Tablas sin Información Cortada (CleaningDutiesTab.tsx, S89SlipsTab.tsx, DiscursosPublicosTab.tsx, HospitalidadTab.tsx, TarjetasS21Tab.tsx, InformesServicioTab.tsx, PrecursoresAuxiliaresTab.tsx, CuentasTab.tsx, TerritoriosTab.tsx, CarritosTab.tsx, LiteraturaTab.tsx): Reorganización de sub-pestañas y botones en cuadrículas móviles de 2 y 3 columnas con colores unificados y vista de tarjetas móviles para el inventario de literatura.',
+      },
+    ],
+  },
+  {
     version: '2.12.30',
     buildCode: '2026.10.26.7667',
     date: '26 de Octubre, 2026',
     title: 'Botones Atrás Móviles Minimalistas (Solo Icono sin Texto)',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Diseño limpio de los botones de retorno en páginas móviles mostrando únicamente el icono de flecha sin etiqueta de texto',
     environment: 'Producción Cloud (Kongre)',
     changes: [

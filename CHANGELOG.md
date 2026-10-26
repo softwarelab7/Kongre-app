@@ -6,15 +6,82 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.35] — 26 de Octubre, 2026
+**Diseño Fluido de Ancho Completo y Corrección de Tarjeta Push en Columnas**
+
+- 🖥️ **Aprovechamiento Integral del Ancho de Pantalla (`App.tsx`, `UserProfileSettingsView.tsx`, `PanoramaGeneralTab.tsx`, `RolesManagerTab.tsx`, `MantenimientoTab.tsx`, `PanelElectricoTab.tsx`, `PersonalViewTab.tsx`, `MinisterioPublicadorTab.tsx`):**
+  - Se eliminaron las restricciones de ancho fijo (`max-w-7xl`, `max-w-4xl`, `max-w-2xl`) en los contenedores principales para que todas las vistas aprovechen de forma responsiva el ancho completo de la pantalla en monitores y portátiles.
+  - En **Panorama General**, las secciones de *Tablero de anuncios* y *Eventos* ahora se distribuyen en una cuadrícula de 2 columnas en escritorio.
+  - En **Mi Perfil**, la barra de avatares predefinidos se distribuye uniformemente a lo largo de toda la tarjeta superior.
+- 🔔 **Alineación Perfecta de Botones en Tarjeta Push (`PushNotificationQuickGuideCard.tsx`):**
+  - Se corrigió el desbordamiento horizontal de los botones **Suscribirme a Notificaciones Push** y **Guía Visual** cuando la tarjeta se muestra dentro de una columna lateral, manteniendo todo el contenido y los pasos perfectamente contenidos dentro del borde de la tarjeta.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
+### [v2.12.34] — 26 de Octubre, 2026
+**Rediseño Integral del Panel y Vista de Perfil de Usuario**
+
+- 👤 **Panel Desplegable de Cuenta en Barra Superior (`Navbar.tsx`):**
+  - Se rediseñó por completo el menú de usuario al hacer clic en el avatar superior en PC: incluye una cabecera de identidad con avatar, indicador en línea, correo, rol y congregación; una cuadrícula de acceso rápido de 2 columnas (**Mi Perfil** y **Mi Portal**); filas limpias para administración y seguridad (*Roles y Permisos*, *Ajustes de la Congregación*, *Registro de Auditoría*, *Bloquear Sesión con PIN*); selector rápido de apariencia (**Claro / Oscuro**); y pie de panel con versión y cierre de sesión.
+- 🪪 **Vista Completa de Mi Perfil en 2 Columnas (`UserProfileSettingsView.tsx`):**
+  - Se reemplazó el diseño vertical de bloques grandes por una arquitectura moderna de **2 columnas en escritorio** y tarjetas compactas en móvil:
+    - **Tarjeta Superior de Identidad y Foto:** Avatar `rounded-2xl` con botón de cámara integrado, metadatos limpios en línea (*Rol · Congregación · Sincronización*), controles rápidos de imagen (*Subir Foto*, *Foto Google*, *Enlace URL*, *Quitar*) y selector compacto de 8 avatares predeterminados.
+    - **Columna Izquierda (Contacto y Preferencias):** Formulario de identidad, teléfono/WhatsApp con enlace de prueba directa y selectores de canal preferido y horario de contacto con iconos vectoriales Lucide (eliminando los emojis gigantes).
+    - **Columna Derecha (Ficha Resumen y Notificaciones Push):** Tabla de vista previa en vivo de la ficha personal y panel integrado de avisos Push y recordatorios en este dispositivo.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
+### [v2.12.33] — 26 de Octubre, 2026
+**Rediseño de Barra Superior en PC: Buscador Central y Dock Minimalista de Solo Iconos**
+
+- 🧭 **Miga de Pan Estructurada con Icono de Módulo (`Navbar.tsx`, `DemoBanner.tsx`):**
+  - La zona izquierda muestra el icono de congregación, un separador chevron limpio (`›`), el icono representativo del módulo activo dentro de una insignia sutil y la etiqueta de **Modo Prueba** alineada en proporción y bordes (`rounded-lg`).
+- 🔍 **Buscador Rápido Central en PC (`Navbar.tsx`):**
+  - En lugar de una lupa suelta a la derecha, la barra superior en escritorio incorpora un buscador interactivo central (`Buscar en congregación...`) con indicador de atajo `Ctrl K`.
+- 🎛️ **Sin Cronómetro Superior y Calendario como Solo Icono en el Dock (`Navbar.tsx`):**
+  - Se retiró el botón de **Cronómetro** de la barra superior y se convirtió **Calendario** en un botón de solo icono integrado dentro del **Dock Unificado de Utilidades** (*Calendario*, *Publicadores*, *QR Móvil*, *PINs*, *Notificaciones* y *Tema*) junto a la tarjeta de perfil de usuario.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
+### [v2.12.32] — 26 de Octubre, 2026
+**Unificación Integral de Cabecera Móvil y Contenedores Cohesivos de Control**
+
+- ⬅️ **Barra Superior Adhesiva de Borde a Borde (`App.tsx`):**
+  - Se eliminó la cápsula/burbuja flotante aislada de retroceso en móvil. Ahora opera como una cabecera nativa fija en la parte superior (`sticky top-0`) con efecto de difuminado (`backdrop-blur`), manteniendo el botón de retorno y el título integrados de forma limpia con la pantalla.
+- 📦 **Contenedores Cohesivos para Controles y Acciones (`MantenimientoTab.tsx`, `PublishersTab.tsx`, `GruposServicioTab.tsx`, `MemorialAsambleasTab.tsx`, `VisitaSuperintendenteTab.tsx`, `PanelElectricoTab.tsx`, `TableroAnunciosTab.tsx`, `EquidadDashboardTab.tsx`, `ExportPdfTab.tsx`, `ConflictCenterTab.tsx`, `PersonalViewTab.tsx`, `RolesManagerTab.tsx`):**
+  - Se agruparon todos los controles que antes flotaban sueltos sobre el fondo (botones desparramados en múltiples filas) dentro de tarjetas estructuradas (`rounded-2xl border bg-white dark:bg-slate-900 shadow-2xs`).
+- 📐 **Cuadrículas Adaptativas sin Textos Cortados:**
+  - Se reemplazaron las tiras horizontales estrechas con scroll que truncaban textos (como "Calendario Anu...") por cuadrículas de 2 y 3 columnas con etiquetas claras, directas y sin recortes en pantallas de teléfonos.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
+### [v2.12.31] — 26 de Octubre, 2026
+**Unificación Visual Móvil: Colores Consistentes, Cuadrículas sin Cortes y Tablas Adaptativas**
+
+- 🎨 **Consistencia de Color en Todos los Módulos (`InformeSucursalS1Tab.tsx`, `AttendanceTrendsDashboard.tsx`, `AsistenciaTab.tsx`):**
+  - Se eliminaron las secciones con modo oscuro forzado cuando la app está en modo claro, unificando todas las tarjetas, tablas y cabeceras bajo el mismo sistema visual.
+- 📐 **Sub-pestañas y Botones Alineados sin Recortes (`CleaningDutiesTab.tsx`, `S89SlipsTab.tsx`, `DiscursosPublicosTab.tsx`, `HospitalidadTab.tsx`, `TarjetasS21Tab.tsx`, `InformesServicioTab.tsx`, `PrecursoresAuxiliaresTab.tsx`, `CuentasTab.tsx`, `TerritoriosTab.tsx`, `CarritosTab.tsx`, `LiteraturaTab.tsx`):**
+  - Todas las barras de sub-navegación y botones de acción usan cuadrículas adaptativas de 2 o 3 columnas en móvil con paleta unificada (`indigo-600` primario y `slate-100` secundario), evitando botones desalineados o texto cortado en los bordes.
+- 📱 **Corrección de Herramientas del Programa y Tablas Móviles (`index.css`, `ScheduleTab.tsx`, `LiteraturaTab.tsx`, `TerritoriosTab.tsx`):**
+  - Se corrigió el espacio en blanco en **Herramientas del Programa** y se añadieron tarjetas adaptativas en móvil para el catálogo de **Literatura** y los indicadores de **Territorios**.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.30] — 26 de Octubre, 2026
 **Botones Atrás Móviles Minimalistas (Solo Icono sin Texto)**
 
 - ⬅️ **Diseño Minimalista de Retorno (`App.tsx`, `ScheduleTab.tsx`, `AssignmentSelectorModal.tsx`, `CongregationCalendar.tsx`, `ConflictsModal.tsx`, `QrCodeModal.tsx`):**
   - Todos los botones de retroceso en páginas móviles muestran únicamente el icono de flecha izquierda (`←`) sin etiqueta de texto.
-
----
-
-## 📅 Historial de Actualizaciones Anteriores
 
 ### [v2.12.29] — 26 de Octubre, 2026
 **Botón Atrás en Todas las Nuevas Páginas Móviles (Antiguos Pop-ups)**

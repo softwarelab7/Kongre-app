@@ -1253,21 +1253,23 @@ const AppContent: React.FC = () => {
       />
 
       <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200 flex flex-col justify-between overflow-x-hidden`}>
-        <div className="relative flex-1 w-full mx-auto px-2.5 sm:px-6 lg:px-8 2xl:px-12 py-2.5 sm:py-6 pb-6">
+        <div className="relative flex-1 w-full px-2.5 sm:px-4 md:px-6 lg:px-7 xl:px-8 py-2.5 sm:py-5 pb-6">
           {!['inicio', 'programacion', 'calendario', 'panorama_general', 'menu'].includes(activeTab) && (
-            <div className="md:hidden mb-3 flex items-center gap-2.5 px-3 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
-              <button
-                type="button"
-                data-mobile-back-btn="true"
-                aria-label="Atrás"
-                onClick={() => setActiveTab(previousTab || 'menu')}
-                className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition-all active:scale-95 cursor-pointer shrink-0"
-              >
-                <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-              </button>
-              <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 truncate">
-                {mobileTabTitles[activeTab] || ''}
-              </span>
+            <div className="md:hidden sticky top-0 z-30 -mx-2.5 -mt-2.5 px-3 py-2.5 mb-3.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-3 min-w-0">
+                <button
+                  type="button"
+                  data-mobile-back-btn="true"
+                  aria-label="Atrás"
+                  onClick={() => setActiveTab(previousTab || 'menu')}
+                  className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition-all active:scale-95 cursor-pointer shrink-0"
+                >
+                  <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                </button>
+                <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 truncate">
+                  {mobileTabTitles[activeTab] || ''}
+                </span>
+              </div>
             </div>
           )}
           <LoadingSpinner

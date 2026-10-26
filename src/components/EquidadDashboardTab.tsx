@@ -537,27 +537,27 @@ export const EquidadDashboardTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Barra Superior de Control y Acciones */}
-      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="px-2.5 py-1 rounded-md text-[10px] font-extrabold tracking-wider uppercase bg-indigo-600 text-white">
               Ponderación de Carga
             </span>
-            <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
+            <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
               Tablero de Equidad y Peso de Carga por Publicador
             </h2>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Pondera el esfuerzo real de cada parte (Discursos 4–5 pts, Lecturas 2.5–3 pts, Salidas al Campo 2.5 pts, Audio/Acomodadores 2 pts, Oraciones 1 pt) en toda la congregación.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full lg:w-auto">
           {/* Selector de Período */}
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value as KhsTimeRangeFilter)}
-            className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             {TIME_RANGE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -570,9 +570,9 @@ export const EquidadDashboardTab: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowWeightsModal(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors"
           >
-            <Sliders className="w-3.5 h-3.5 text-indigo-600" />
+            <Sliders className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
             <span>Configurar Pesos</span>
           </button>
 
@@ -580,7 +580,7 @@ export const EquidadDashboardTab: React.FC = () => {
           <button
             type="button"
             onClick={handleShareWhatsApp}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-xs font-bold text-emerald-800 transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-xs font-bold text-emerald-800 dark:text-emerald-300 transition-colors"
           >
             {copiedWhatsApp ? (
               <>
@@ -599,7 +599,7 @@ export const EquidadDashboardTab: React.FC = () => {
           <button
             type="button"
             onClick={() => printKhsEquityAuditReport(audit, settings, timeRangeLabel)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-bold text-white transition-colors"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold text-white transition-colors"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Imprimir Auditoría</span>

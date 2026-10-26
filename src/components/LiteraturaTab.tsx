@@ -355,38 +355,46 @@ export const LiteraturaTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Barra de Acciones y Navegación de Literatura (Opción 1: arranque directo sin banner redundante) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        {/* Sub-tab Navigation Pills */}
-        <div className="flex rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/90 dark:bg-slate-900/60 p-1 shadow-2xs overflow-x-auto no-scrollbar gap-1">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Barra Unificada de Sub-pestañas y Acciones de Literatura */}
+      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+        {/* Sub-tab Navigation - 2-column grid on mobile so nothing clips */}
+        <div className="grid grid-cols-2 sm:flex rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-slate-100 dark:bg-slate-800/90 p-1.5 gap-1">
           <button
             onClick={() => setActiveSubTab('inventario')}
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               activeSubTab === 'inventario'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-2xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Catálogo S-14</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 font-bold">
+            <BookOpen className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Catálogo S-14</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold shrink-0 ${
+              activeSubTab === 'inventario'
+                ? 'bg-white/20 text-white'
+                : 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200'
+            }`}>
               {stats.totalItems}
             </span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('pedidos')}
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               activeSubTab === 'pedidos'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-2xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Truck className="w-3.5 h-3.5" />
-            <span>Pedidos</span>
+            <Truck className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Pedidos</span>
             {stats.pendingOrdersCount > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 font-bold">
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold shrink-0 ${
+                activeSubTab === 'pedidos'
+                  ? 'bg-white text-indigo-700'
+                  : 'bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200'
+              }`}>
                 {stats.pendingOrdersCount}
               </span>
             )}
@@ -394,50 +402,50 @@ export const LiteraturaTab: React.FC = () => {
 
           <button
             onClick={() => setActiveSubTab('grupos')}
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               activeSubTab === 'grupos'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-2xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Users className="w-3.5 h-3.5" />
-            <span>Grupos</span>
+            <Users className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Grupos</span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('recuento_s14')}
-            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               activeSubTab === 'recuento_s14'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-2xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Recuento Físico</span>
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Recuento Físico</span>
           </button>
         </div>
 
         {/* Action quick buttons */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid grid-cols-2 sm:flex items-center gap-2">
           <button
             onClick={() => {
               const msg = buildLowStockReportWhatsApp(literatureItems);
               handleOpenWhatsApp(msg);
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-300 font-semibold text-xs rounded-xl border border-amber-200 dark:border-amber-800 transition-all shadow-2xs active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl border border-slate-200/80 dark:border-slate-700 transition-all active:scale-95 cursor-pointer"
             title="Enviar solicitud sugerida de stock bajo por WhatsApp"
           >
-            <Share2 className="w-3.5 h-3.5" />
-            <span>Pedido Sugerido S-14</span>
+            <Share2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <span className="truncate">Pedido Sugerido</span>
           </button>
 
           <button
             onClick={handleDownloadOfficialS28}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-all shadow-2xs active:scale-95 cursor-pointer"
             title="Cargar el PDF oficial S-28 de JW Hub para que la app lo rellene y descargue"
           >
-            <Upload className="w-3.5 h-3.5" />
-            <span>Cargar / Rellenar S-28 Oficial (PDF)</span>
+            <Upload className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">PDF S-28 Oficial</span>
           </button>
         </div>
       </div>
@@ -452,47 +460,47 @@ export const LiteraturaTab: React.FC = () => {
       )}
 
       {/* KPI Cards Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
             Títulos en Catálogo
           </span>
-          <div className="text-2xl font-black text-slate-900 mt-1">{stats.totalItems}</div>
-          <span className="text-xs text-slate-400 mt-0.5 block">Biblias, libros y revistas</span>
+          <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1">{stats.totalItems}</div>
+          <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 block">Biblias, libros y revistas</span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
             Unidades en Existencia
           </span>
-          <div className="text-2xl font-black text-indigo-700 mt-1">{stats.totalUnits}</div>
-          <span className="text-xs text-slate-400 mt-0.5 block">En mostrador y almacén</span>
+          <div className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">{stats.totalUnits}</div>
+          <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 block">En mostrador y almacén</span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
             Stock Bajo / Agotado
           </span>
           <div
-            className={`text-2xl font-black mt-1 ${
-              stats.lowStockCount > 0 ? 'text-amber-600' : 'text-emerald-600'
+            className={`text-xl sm:text-2xl font-black mt-1 ${
+              stats.lowStockCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'
             }`}
           >
             {stats.lowStockCount}
           </div>
-          <span className="text-xs text-slate-400 mt-0.5 block">
+          <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 block">
             {stats.lowStockCount > 0 ? 'Requiere pedido a Betel' : 'Existencias saludables'}
           </span>
         </div>
 
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
             Pedidos Pendientes
           </span>
-          <div className="text-2xl font-black text-blue-700 mt-1">
+          <div className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
             {stats.pendingOrdersCount}
           </div>
-          <span className="text-xs text-slate-400 mt-0.5 block">Solicitudes de publicadores</span>
+          <span className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 block">Solicitudes de publicadores</span>
         </div>
       </div>
 
@@ -502,63 +510,156 @@ export const LiteraturaTab: React.FC = () => {
       {activeSubTab === 'inventario' && (
         <div className="space-y-4">
           {/* Controls Bar: Search, Category Filter, and Add Button */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-3 flex-1">
+          <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 flex-1">
               {/* Search input */}
-              <div className="relative min-w-[220px] flex-1 sm:flex-initial">
+              <div className="relative flex-1 min-w-[200px]">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Buscar por código, título o estante..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
-              {/* Category dropdown */}
-              <select
-                value={categoryFilter}
-                onChange={e => setCategoryFilter(e.target.value)}
-                className="text-xs px-3 py-2 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="todos">Todas las Categorías</option>
-                <option value="biblia">Biblias</option>
-                <option value="libro">Libros de Estudio</option>
-                <option value="folleto">Folletos</option>
-                <option value="tratado">Tratados</option>
-                <option value="revista">Revistas</option>
-                <option value="campana_especial">Campaña Especial</option>
-                <option value="otro">Otros Artículos</option>
-              </select>
+              <div className="flex items-center justify-between sm:justify-start gap-2.5">
+                {/* Category dropdown */}
+                <select
+                  value={categoryFilter}
+                  onChange={e => setCategoryFilter(e.target.value)}
+                  className="text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="todos">Todas las Categorías</option>
+                  <option value="biblia">Biblias</option>
+                  <option value="libro">Libros de Estudio</option>
+                  <option value="folleto">Folletos</option>
+                  <option value="tratado">Tratados</option>
+                  <option value="revista">Revistas</option>
+                  <option value="campana_especial">Campaña Especial</option>
+                  <option value="otro">Otros Artículos</option>
+                </select>
 
-              {/* Low stock toggle */}
-              <SplashCheckbox
-                size="sm"
-                checked={onlyLowStock}
-                onChange={e => setOnlyLowStock(e.target.checked)}
-                label={
-                  <span className={onlyLowStock ? 'text-amber-800 dark:text-amber-400 font-bold' : ''}>
-                    Solo Stock Bajo / Agotado
-                  </span>
-                }
-              />
+                {/* Low stock toggle */}
+                <SplashCheckbox
+                  size="sm"
+                  checked={onlyLowStock}
+                  onChange={e => setOnlyLowStock(e.target.checked)}
+                  label={
+                    <span className={onlyLowStock ? 'text-amber-800 dark:text-amber-400 font-bold text-xs' : 'text-xs'}>
+                      Stock Bajo
+                    </span>
+                  }
+                />
+              </div>
             </div>
 
             <button
               onClick={() => setIsAddItemModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-2xs transition-all active:scale-95 cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 shrink-0" />
               <span>Nueva Publicación</span>
             </button>
           </div>
 
-          {/* Literature Table */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-            <div className="overflow-x-auto">
+          {/* Literature Inventory: Mobile Card List + Desktop Table */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs overflow-hidden">
+            {/* Mobile Card List (No horizontal clipping on phones) */}
+            <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800">
+              {filteredItems.map(item => {
+                const isOut = item.currentStock === 0;
+                const isLow = item.currentStock <= item.minimumStock && !isOut;
+                const catInfo = LITERATURE_CATEGORY_LABELS[item.category] || {
+                  label: item.category,
+                  color: 'bg-slate-100 text-slate-700',
+                };
+
+                return (
+                  <div key={item.id} className="p-3.5 space-y-2.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                          <span className="px-2 py-0.5 rounded-md font-mono font-bold text-[11px] bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/70 dark:border-slate-700">
+                            {item.code}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${catInfo.color}`}>
+                            {catInfo.label}
+                          </span>
+                          {isOut ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                              Agotado
+                            </span>
+                          ) : isLow ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                              Stock Bajo
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                              Óptimo
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-snug">
+                          {item.title}
+                        </p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                          Ubicación: <strong className="text-slate-700 dark:text-slate-300">{item.locationBox || 'Mostrador'}</strong> • Mínimo: {item.minimumStock}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => setEditingItem(item)}
+                          className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                          title="Editar publicación"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => deleteLiteratureItem(item.id)}
+                          className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-slate-800 transition-colors"
+                          title="Eliminar del catálogo"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                        Existencias en stock:
+                      </span>
+                      <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-xl">
+                        <button
+                          onClick={() => handleAdjustStock(item, -1)}
+                          className="w-6 h-6 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-white hover:bg-slate-200 font-bold flex items-center justify-center shadow-2xs"
+                          title="Restar 1"
+                        >
+                          -
+                        </button>
+                        <span className="w-8 font-black text-slate-900 dark:text-white text-sm text-center">
+                          {item.currentStock}
+                        </span>
+                        <button
+                          onClick={() => handleAdjustStock(item, 1)}
+                          className="w-6 h-6 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-white hover:bg-slate-200 font-bold flex items-center justify-center shadow-2xs"
+                          title="Sumar 1"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider">
+                <thead className="bg-slate-50 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold uppercase tracking-wider">
                   <tr>
                     <th className="py-3 px-4">Código</th>
                     <th className="py-3 px-4">Título de la Publicación</th>
@@ -570,7 +671,7 @@ export const LiteraturaTab: React.FC = () => {
                     <th className="py-3 px-4 text-right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredItems.map(item => {
                     const isOut = item.currentStock === 0;
                     const isLow = item.currentStock <= item.minimumStock && !isOut;
@@ -580,12 +681,12 @@ export const LiteraturaTab: React.FC = () => {
                     };
 
                     return (
-                      <tr key={item.id} className="hover:bg-slate-50/70 transition-colors">
-                        <td className="py-3 px-4 font-mono font-bold text-slate-800">
+                      <tr key={item.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="py-3 px-4 font-mono font-bold text-slate-800 dark:text-slate-200">
                           {item.code}
                         </td>
                         <td className="py-3 px-4">
-                          <span className="font-bold text-slate-900 block">{item.title}</span>
+                          <span className="font-bold text-slate-900 dark:text-white block">{item.title}</span>
                           <span className="text-[11px] text-slate-400">
                             Idioma: {item.language} {item.notes && `• ${item.notes}`}
                           </span>
@@ -597,31 +698,31 @@ export const LiteraturaTab: React.FC = () => {
                             {catInfo.label}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-600 font-medium">
+                        <td className="py-3 px-4 text-slate-600 dark:text-slate-300 font-medium">
                           {item.locationBox || 'Mostrador'}
                         </td>
                         <td className="py-3 px-4 text-center">
-                          <div className="inline-flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-lg">
+                          <div className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
                             <button
                               onClick={() => handleAdjustStock(item, -1)}
-                              className="w-5 h-5 rounded bg-white text-slate-700 hover:bg-slate-200 font-bold flex items-center justify-center shadow-2xs"
+                              className="w-5 h-5 rounded bg-white dark:bg-slate-700 text-slate-700 dark:text-white hover:bg-slate-200 font-bold flex items-center justify-center shadow-2xs"
                               title="Restar 1"
                             >
                               -
                             </button>
-                            <span className="w-8 font-black text-slate-900 text-sm text-center">
+                            <span className="w-8 font-black text-slate-900 dark:text-white text-sm text-center">
                               {item.currentStock}
                             </span>
                             <button
                               onClick={() => handleAdjustStock(item, 1)}
-                              className="w-5 h-5 rounded bg-white text-slate-700 hover:bg-slate-200 font-bold flex items-center justify-center shadow-2xs"
+                              className="w-5 h-5 rounded bg-white dark:bg-slate-700 text-slate-700 dark:text-white hover:bg-slate-200 font-bold flex items-center justify-center shadow-2xs"
                               title="Sumar 1"
                             >
                               +
                             </button>
                           </div>
                         </td>
-                        <td className="py-3 px-4 text-center text-slate-500 font-semibold">
+                        <td className="py-3 px-4 text-center text-slate-500 dark:text-slate-400 font-semibold">
                           {item.minimumStock}
                         </td>
                         <td className="py-3 px-4 text-center">
@@ -643,14 +744,14 @@ export const LiteraturaTab: React.FC = () => {
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => setEditingItem(item)}
-                              className="p-1.5 text-slate-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                              className="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
                               title="Editar publicación"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={() => deleteLiteratureItem(item.id)}
-                              className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                              className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-slate-800 transition-colors"
                               title="Eliminar del catálogo"
                             >
                               <Trash2 className="w-3.5 h-3.5" />

@@ -658,134 +658,136 @@ export const CleaningDutiesTab: React.FC = () => {
       )}
 
       {/* Barra Unificada de Pestañas y Acciones */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        {/* Subtab Navigation Pills */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 dark:bg-slate-900/60 rounded-2xl border border-slate-200/80 dark:border-white/10 w-fit overflow-x-auto max-w-full shadow-2xs">
-          <button
-            onClick={() => setActiveSection('turnos')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-              activeSection === 'turnos'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            <span>Deberes y Turnos Semanales</span>
-            {activeWeekDutyConflicts.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-rose-600 text-white text-[10px] font-extrabold">
-                {activeWeekDutyConflicts.length}
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveSection('matriz_khs')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-              activeSection === 'matriz_khs'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            <span>Matriz Mensual (Tablero)</span>
-          </button>
-
-          <button
-            onClick={() => setActiveSection('limpieza')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-              activeSection === 'limpieza'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Brush className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-            <span>Programa de Aseo S-28 ({weeks.length} sem.)</span>
-          </button>
-
-          <button
-            onClick={() => setActiveSection('catalogo')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-              activeSection === 'catalogo'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Briefcase className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>Configurar Deberes ({customDuties.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveSection('grupos')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-              activeSection === 'grupos'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Users className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-            <span>Grupos ({preachingGroups.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveSection('salidas')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-              activeSection === 'salidas'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Compass className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            <span>Salidas ({fieldServiceMeetings.length})</span>
-          </button>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 shrink-0 justify-end">
-          {!isReadOnly && (
+      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] shadow-2xs space-y-3">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+          {/* Subtab Navigation Pills (Grid on mobile so nothing clips) */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 p-1 bg-slate-100/90 dark:bg-slate-800/70 rounded-xl border border-slate-200/80 dark:border-white/10 w-full xl:w-auto">
             <button
-              type="button"
-              onClick={() => handleAutoAssignSelectedWeekDuties('both')}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-2xs"
-              title="Auto-asignar turnos de esta semana evitando choques de plataforma y agrupando familias"
+              onClick={() => setActiveSection('turnos')}
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer truncate ${
+                activeSection === 'turnos'
+                  ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
             >
-              <Wand2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <span>Auto-Asignar Deberes (1-Clic)</span>
+              <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="truncate">Turnos Semanales</span>
+              {activeWeekDutyConflicts.length > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full bg-rose-600 text-white text-[10px] font-extrabold shrink-0">
+                  {activeWeekDutyConflicts.length}
+                </span>
+              )}
             </button>
-          )}
 
-          <button
-            onClick={handleCopyWeeklyDutiesSummary}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-2xs"
-            title="Copiar lista de turnos de la semana para WhatsApp"
-          >
-            {copiedDutiesSuccess ? (
-              <>
-                <Check className="w-4 h-4 text-emerald-600" />
-                <span>¡Copiado!</span>
-              </>
-            ) : (
-              <>
-                <MessageCircle className="w-4 h-4 text-emerald-600" />
-                <span>Copiar Turnos WhatsApp</span>
-              </>
+            <button
+              onClick={() => setActiveSection('matriz_khs')}
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer truncate ${
+                activeSection === 'matriz_khs'
+                  ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="truncate">Matriz Mensual</span>
+            </button>
+
+            <button
+              onClick={() => setActiveSection('limpieza')}
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer truncate ${
+                activeSection === 'limpieza'
+                  ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Brush className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="truncate">Aseo S-28 ({weeks.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveSection('catalogo')}
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer truncate ${
+                activeSection === 'catalogo'
+                  ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Briefcase className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span className="truncate">Deberes ({customDuties.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveSection('grupos')}
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer truncate ${
+                activeSection === 'grupos'
+                  ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Users className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
+              <span className="truncate">Grupos ({preachingGroups.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveSection('salidas')}
+              className={`flex items-center justify-center sm:justify-start gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer truncate ${
+                activeSection === 'salidas'
+                  ? 'bg-white dark:bg-indigo-600 text-indigo-600 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Compass className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+              <span className="truncate">Salidas ({fieldServiceMeetings.length})</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full xl:w-auto shrink-0">
+            {!isReadOnly && (
+              <button
+                type="button"
+                onClick={() => handleAutoAssignSelectedWeekDuties('both')}
+                className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-95 truncate"
+                title="Auto-asignar turnos de esta semana evitando choques de plataforma y agrupando familias"
+              >
+                <Wand2 className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">Auto-Asignar (1-Clic)</span>
+              </button>
             )}
-          </button>
 
-          <button
-            onClick={handleAutoRotateCleaning}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-white/80 border border-slate-200/80 dark:border-white/[0.08] text-xs sm:text-sm font-semibold transition-all cursor-pointer shadow-2xs"
-            title="Rotar automáticamente los grupos de aseo semana a semana"
-          >
-            <Brush className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            <span>Rotar Limpieza</span>
-          </button>
+            <button
+              onClick={handleCopyWeeklyDutiesSummary}
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold transition-all cursor-pointer active:scale-95 truncate"
+              title="Copiar lista de turnos de la semana para WhatsApp"
+            >
+              {copiedDutiesSuccess ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span className="truncate">¡Copiado!</span>
+                </>
+              ) : (
+                <>
+                  <MessageCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span className="truncate">Turnos WhatsApp</span>
+                </>
+              )}
+            </button>
 
-          <button
-            onClick={openNewDutyModal}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>+ Nuevo Privilegio</span>
-          </button>
+            <button
+              onClick={handleAutoRotateCleaning}
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold transition-all cursor-pointer active:scale-95 truncate"
+              title="Rotar automáticamente los grupos de aseo semana a semana"
+            >
+              <Brush className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="truncate">Rotar Limpieza</span>
+            </button>
+
+            <button
+              onClick={openNewDutyModal}
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold transition-all active:scale-95 cursor-pointer truncate"
+            >
+              <Plus className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="truncate">Nuevo Privilegio</span>
+            </button>
+          </div>
         </div>
       </div>
 

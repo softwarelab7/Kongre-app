@@ -1110,20 +1110,20 @@ export const PersonalViewTab: React.FC = () => {
       )}
 
       {/* 2.2 PESTAÑAS PRINCIPALES DEL PORTAL */}
-      <div className="flex items-center gap-1.5 sm:gap-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 overflow-x-auto scrollbar-none border border-slate-200/80 dark:border-slate-700/80">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80">
         <button
           type="button"
           onClick={() => setActiveModule('asignaciones')}
-          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeModule === 'asignaciones'
               ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <Calendar size={16} />
-          <span>Mis Asignaciones</span>
+          <Calendar size={14} className="shrink-0" />
+          <span className="truncate">Asignaciones</span>
           {myAssignments.length > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300">
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300 shrink-0">
               {myAssignments.length}
             </span>
           )}
@@ -1132,32 +1132,32 @@ export const PersonalViewTab: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveModule('informe')}
-          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeModule === 'informe'
               ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <FileText size={16} />
-          <span>Mi Informe (S-4)</span>
+          <FileText size={14} className="shrink-0" />
+          <span className="truncate">Informe S-4</span>
           {existingReport && (
-            <span className="w-2 h-2 rounded-full bg-emerald-500" title="Informe del mes registrado" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Informe del mes registrado" />
           )}
         </button>
 
         <button
           type="button"
           onClick={() => setActiveModule('ausencias')}
-          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeModule === 'ausencias'
               ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <Plane size={16} />
-          <span>Mis Ausencias</span>
+          <Plane size={14} className="shrink-0" />
+          <span className="truncate">Ausencias</span>
           {(selectedPublisher?.ausencias || []).length > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300">
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 shrink-0">
               {(selectedPublisher?.ausencias || []).length}
             </span>
           )}
@@ -1166,29 +1166,29 @@ export const PersonalViewTab: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveModule('grupo')}
-          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeModule === 'grupo'
               ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <Users size={16} />
-          <span>Mi Grupo de Servicio</span>
+          <Users size={14} className="shrink-0" />
+          <span className="truncate">Mi Grupo</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveModule('avisos')}
-          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeModule === 'avisos'
               ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <Bell size={16} />
-          <span>Avisos & Literatura</span>
+          <Bell size={14} className="shrink-0" />
+          <span className="truncate">Avisos</span>
           {notices.length > 0 && (
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-300">
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-300 shrink-0">
               {notices.length}
             </span>
           )}
@@ -1197,18 +1197,18 @@ export const PersonalViewTab: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveModule('seguridad_2fa')}
-          className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
             activeModule === 'seguridad_2fa'
               ? 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-400 shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <ShieldCheck size={16} />
-          <span>Seguridad 2FA</span>
+          <ShieldCheck size={14} className="shrink-0" />
+          <span className="truncate">Seguridad 2FA</span>
           {isCurrentPublisher2FAEnabled ? (
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="2FA Activado" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" title="2FA Activado" />
           ) : (
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold">
+            <span className="px-1.5 py-0.2 rounded-full text-[9px] bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold shrink-0">
               Opcional
             </span>
           )}
@@ -1551,7 +1551,7 @@ export const PersonalViewTab: React.FC = () => {
 
       {/* MÓDULO 2: MI INFORME MENSUAL (S-4) */}
       {activeModule === 'informe' && (
-        <div className="max-w-2xl mx-auto space-y-4">
+        <div className="w-full space-y-4">
           <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
             {/* Header del informe */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
@@ -1801,7 +1801,7 @@ export const PersonalViewTab: React.FC = () => {
 
       {/* MÓDULO 3: MIS AUSENCIAS PLANIFICADAS */}
       {activeModule === 'ausencias' && (
-        <div className="max-w-2xl mx-auto space-y-4">
+        <div className="w-full space-y-4">
           <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
               <div>
@@ -1874,7 +1874,7 @@ export const PersonalViewTab: React.FC = () => {
 
       {/* MÓDULO 4: MI GRUPO DE SERVICIO */}
       {activeModule === 'grupo' && (
-        <div className="max-w-2xl mx-auto space-y-4">
+        <div className="w-full space-y-4">
           <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-5">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full">

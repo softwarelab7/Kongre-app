@@ -197,7 +197,7 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-[#0b1329] text-zinc-900 dark:text-zinc-100 transition-colors">
+    <div className="flex flex-col text-slate-900 dark:text-slate-100 transition-colors">
       {/* Toast Feedback */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-[300] bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-3 duration-200">
@@ -210,27 +210,27 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
       )}
 
       {/* Main Container */}
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
-        {/* Barra de Acciones de Precursores Auxiliares (Opción 1: arranque directo sin banner redundante) */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+      <div className="w-full space-y-4 sm:space-y-6">
+        {/* Barra de Acciones de Precursores Auxiliares */}
+        <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="px-2.5 py-1 rounded-lg text-[11px] font-bold tracking-wider uppercase bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
               Formulario S-205
             </span>
-            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 hidden sm:inline">
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
               Gestión y aprobación de solicitudes del comité de servicio
             </span>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
             {/* Print Register */}
             <button
               onClick={() => window.print()}
               title="Imprimir el registro de solicitudes aprobadas para el comité"
-              className="p-2 sm:px-3 sm:py-2 rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-slate-900/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-2 text-xs font-semibold shadow-2xs cursor-pointer active:scale-95"
+              className="px-3 py-2.5 rounded-xl border border-slate-200/80 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-1.5 text-xs font-bold cursor-pointer active:scale-95"
             >
-              <Printer size={16} />
-              <span className="hidden sm:inline">Imprimir Registro</span>
+              <Printer size={15} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="truncate">Imprimir Registro</span>
             </button>
 
             {/* New Request Button */}
@@ -239,10 +239,10 @@ export const PrecursoresAuxiliaresTab: React.FC = () => {
                 setEditingRequest(null);
                 setIsModalOpen(true);
               }}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-indigo-500/25 transition-all cursor-pointer active:scale-95"
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-2xs transition-all cursor-pointer active:scale-95"
             >
-              <Plus size={16} />
-              <span>Nueva Solicitud (S-205)</span>
+              <Plus size={15} className="shrink-0" />
+              <span className="truncate">Nueva Solicitud</span>
             </button>
           </div>
         </div>

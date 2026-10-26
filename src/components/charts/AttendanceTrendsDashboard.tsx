@@ -685,70 +685,60 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Top Banner & Filter Controls */}
-      <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 text-white shadow-xl border border-indigo-500/20 relative overflow-hidden">
-        {/* Glow decoration */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-60 h-60 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
+      {/* Top Card & Filter Controls (Light/Dark Theme Consistent) */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-2xs border border-slate-200 dark:border-slate-800">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
-            <div className="flex flex-wrap items-center gap-2 mb-1.5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-indigo-500/30 text-indigo-300 border border-indigo-400/30">
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800">
                 <BarChart3 className="w-3.5 h-3.5" />
-                Dashboard Recharts
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
                 Año Teocrático (1 Sep - 31 Ago)
               </span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
               Tendencia Histórica de Asistencia
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl leading-relaxed">
-              Análisis dinámico de asistencia a las reuniones entre semana y fin de semana para la congregación{' '}
-              <strong className="text-white underline decoration-indigo-400">{settings.congregationName}</strong>.
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Análisis de asistencia entre semana y fin de semana •{' '}
+              <strong className="text-slate-800 dark:text-slate-200">{settings.congregationName}</strong>
             </p>
           </div>
 
           {/* Right Selector & Action Pills */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="grid grid-cols-2 sm:flex items-center gap-2">
             {/* Service Year Selector */}
-            <div className="flex items-center gap-2 bg-white/10 hover:bg-white/15 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-white/20 transition-all">
-              <Calendar className="w-4 h-4 text-indigo-300 shrink-0" />
-              <div className="flex flex-col">
-                <span className="text-[10px] text-slate-300 font-medium">Año de Servicio</span>
-                <select
-                  value={selectedServiceYear}
-                  onChange={(e) => setSelectedServiceYear(e.target.value)}
-                  className="bg-transparent text-white font-bold text-xs sm:text-sm outline-hidden cursor-pointer"
-                >
-                  {availableYears.map((y) => (
-                    <option key={y} value={y} className="text-slate-900 bg-white">
-                      Año {y} {y === getCurrentServiceYear() ? '(Actual)' : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="flex items-center justify-center gap-2 bg-slate-50 dark:bg-slate-800 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700">
+              <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <select
+                value={selectedServiceYear}
+                onChange={(e) => setSelectedServiceYear(e.target.value)}
+                className="bg-transparent text-slate-900 dark:text-white font-bold text-xs outline-hidden cursor-pointer"
+              >
+                {availableYears.map((y) => (
+                  <option key={y} value={y} className="text-slate-900 bg-white dark:bg-slate-900 dark:text-white">
+                    Año {y}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Copy Report Button */}
             <button
               type="button"
               onClick={handleCopyAnnualSummary}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs border border-white/20 transition-all cursor-pointer active:scale-95 shadow-sm"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200/80 dark:border-slate-700 transition-all cursor-pointer active:scale-95"
               title="Copiar resumen del año de servicio al portapapeles"
             >
               {copiedSummary ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span className="text-emerald-300">¡Copiado!</span>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span className="text-emerald-600 dark:text-emerald-400 truncate">¡Copiado!</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-4 h-4 text-indigo-300" />
-                  <span>Copiar Resumen</span>
+                  <Copy className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  <span className="truncate">Copiar Resumen</span>
                 </>
               )}
             </button>
@@ -756,81 +746,81 @@ export const AttendanceTrendsDashboard: React.FC<AttendanceTrendsDashboardProps>
         </div>
 
         {/* Quick Annual KPI Ribbon */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mt-5 pt-5 border-t border-white/10">
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-            <span className="text-[10px] uppercase font-bold text-slate-300 tracking-wider">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+            <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block">
               Promedio Anual
             </span>
-            <div className="text-xl sm:text-2xl font-black text-white mt-0.5">
+            <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-0.5">
               {annualMetrics.annualAvgOverall}
             </div>
-            <span className="text-[10px] text-indigo-300">Congregación total</span>
+            <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium">Congregación total</span>
           </div>
 
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-            <span className="text-[10px] uppercase font-bold text-indigo-300 tracking-wider">
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+            <span className="text-[10px] uppercase font-bold text-indigo-600 dark:text-indigo-400 tracking-wider block">
               Entre Semana
             </span>
-            <div className="text-xl sm:text-2xl font-black text-white mt-0.5">
+            <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-0.5">
               {annualMetrics.annualAvgMidweek}
             </div>
-            <span className="text-[10px] text-slate-300 truncate block">
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
               {settings.midweekMeetingDay || 'Miércoles'}
             </span>
           </div>
 
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-            <span className="text-[10px] uppercase font-bold text-sky-300 tracking-wider">
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+            <span className="text-[10px] uppercase font-bold text-sky-600 dark:text-sky-400 tracking-wider block">
               Fin de Semana
             </span>
-            <div className="text-xl sm:text-2xl font-black text-white mt-0.5">
+            <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-0.5">
               {annualMetrics.annualAvgWeekend}
             </div>
-            <span className="text-[10px] text-slate-300 truncate block">
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
               {settings.weekendMeetingDay || 'Domingo'}
             </span>
           </div>
 
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-            <span className="text-[10px] uppercase font-bold text-amber-300 tracking-wider">
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+            <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400 tracking-wider block">
               Pico Máximo
             </span>
-            <div className="text-xl sm:text-2xl font-black text-amber-300 mt-0.5">
+            <div className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 mt-0.5">
               {annualMetrics.absolutePeak}
             </div>
-            <span className="text-[10px] text-slate-300 truncate block">
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
               {annualMetrics.peakMonth || '—'}
             </span>
           </div>
 
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-            <span className="text-[10px] uppercase font-bold text-emerald-300 tracking-wider">
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+            <span className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 tracking-wider block">
               Presencial / Zoom
             </span>
-            <div className="text-base sm:text-lg font-black text-white mt-0.5">
+            <div className="text-base sm:text-lg font-black text-slate-900 dark:text-white mt-0.5">
               {annualMetrics.annualInPersonPct}% / {annualMetrics.annualZoomPct}%
             </div>
-            <span className="text-[10px] text-emerald-300">Distribución anual</span>
+            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Distribución anual</span>
           </div>
 
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-            <span className="text-[10px] uppercase font-bold text-slate-300 tracking-wider">
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70">
+            <span className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider block">
               Tendencia Anual
             </span>
-            <div className="flex items-center gap-1 text-base sm:text-lg font-black text-white mt-0.5">
+            <div className="flex items-center gap-1 text-base sm:text-lg font-black text-slate-900 dark:text-white mt-0.5">
               {annualMetrics.trendDelta >= 0 ? (
                 <>
-                  <ArrowUpRight className="w-4 h-4 text-emerald-400" />
-                  <span className="text-emerald-400">+{annualMetrics.trendDelta}</span>
+                  <ArrowUpRight className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-emerald-600 dark:text-emerald-400">+{annualMetrics.trendDelta}</span>
                 </>
               ) : (
                 <>
-                  <ArrowDownRight className="w-4 h-4 text-rose-400" />
-                  <span className="text-rose-400">{annualMetrics.trendDelta}</span>
+                  <ArrowDownRight className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+                  <span className="text-rose-600 dark:text-rose-400">{annualMetrics.trendDelta}</span>
                 </>
               )}
             </div>
-            <span className="text-[10px] text-slate-300 truncate block">
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
               {annualMetrics.monthsWithData} de 12 meses
             </span>
           </div>

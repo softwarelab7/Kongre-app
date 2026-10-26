@@ -908,146 +908,149 @@ export const ScheduleTab: React.FC = () => {
                     className="hidden sm:block fixed inset-0 z-40"
                     onClick={() => setIsMoreMenuOpen(false)}
                   />
-                  <div className="fixed inset-0 sm:inset-auto sm:absolute sm:right-0 sm:top-full sm:mt-1.5 sm:w-64 sm:max-h-[calc(100vh-140px)] overflow-y-auto bg-white dark:bg-slate-900 sm:dark:bg-slate-800 border-0 sm:border border-slate-200 dark:border-white/10 rounded-none sm:rounded-2xl shadow-none sm:shadow-xl z-50 p-4 sm:py-1.5 sm:px-0 animate-in fade-in duration-100">
-                    <div className="flex sm:hidden items-center gap-2.5 pb-3 mb-2 border-b border-slate-100 dark:border-white/10">
+                  <div className="fixed inset-0 sm:inset-auto sm:absolute sm:right-0 sm:top-full sm:mt-1.5 sm:w-64 sm:max-h-[calc(100vh-140px)] overflow-y-auto bg-slate-50 dark:bg-slate-950 sm:bg-white sm:dark:bg-slate-800 border-0 sm:border border-slate-200 dark:border-white/10 rounded-none sm:rounded-2xl shadow-none sm:shadow-xl z-50 p-3 sm:py-1.5 sm:px-0 animate-in fade-in duration-100 flex flex-col justify-start">
+                    <div className="flex sm:hidden items-center gap-3 px-3 py-2.5 mb-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs shrink-0">
                       <button
                         type="button"
                         data-mobile-back-btn="true"
                         onClick={() => setIsMoreMenuOpen(false)}
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
-                        aria-label="Volver al programa"
+                        className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+                        aria-label="Atrás"
                       >
-                        <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                        <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                       </button>
-                      <span className="text-sm font-bold text-slate-900 dark:text-white">
+                      <span className="text-sm font-extrabold text-slate-800 dark:text-white truncate">
                         Herramientas del Programa
                       </span>
                     </div>
-                    {/* Mobile quick access to S-89 and S-38 */}
-                    <div className="sm:hidden pb-1 mb-1 border-b border-slate-100 dark:border-white/5">
+
+                    <div className="bg-white dark:bg-slate-900 sm:bg-transparent sm:dark:bg-transparent rounded-2xl sm:rounded-none border border-slate-200/80 dark:border-slate-800 sm:border-0 divide-y divide-slate-100 dark:divide-slate-800/80 sm:divide-y-0 overflow-hidden shadow-2xs sm:shadow-none">
+                      {/* Mobile quick access to S-89 and S-38 */}
+                      <div className="sm:hidden divide-y divide-slate-100 dark:divide-slate-800/80">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsMoreMenuOpen(false);
+                            handlePrintS89();
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-semibold text-slate-800 dark:text-zinc-100 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer text-left"
+                        >
+                          <FileText className="w-4 h-4 text-rose-500 shrink-0" />
+                          <span>Descargar Hojas S-89 (PDF)</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsMoreMenuOpen(false);
+                            handleOpenS38();
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-semibold text-slate-800 dark:text-zinc-100 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer text-left"
+                        >
+                          <Award className="w-4 h-4 text-indigo-500 shrink-0" />
+                          <span>Registro de Estudiantes (S-38)</span>
+                        </button>
+                      </div>
+
                       <button
                         type="button"
                         onClick={() => {
                           setIsMoreMenuOpen(false);
-                          handlePrintS89();
+                          setIsMwbModalOpen(true);
                         }}
-                        className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-slate-800 sm:text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
                       >
-                        <FileText className="w-4 h-4 text-rose-500 shrink-0" />
-                        <span>Descargar Hojas S-89 (PDF)</span>
+                        <BookOpen className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span>Importar Guía de Actividades (MWB)</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => {
                           setIsMoreMenuOpen(false);
-                          handleOpenS38();
+                          setOrganizedModalTab('catalogo');
+                          setIsOrganizedModalOpen(true);
                         }}
-                        className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs font-semibold text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-slate-800 sm:text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
                       >
-                        <Award className="w-4 h-4 text-indigo-500 shrink-0" />
-                        <span>Registro de Estudiantes (S-38)</span>
+                        <Layers className="w-4 h-4 text-indigo-600 shrink-0" />
+                        <span>Catálogo de Semanas Organized</span>
                       </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsMoreMenuOpen(false);
+                          setIsMonthlyBillboardModalOpen(true);
+                        }}
+                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-slate-800 sm:text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                      >
+                        <CalendarDays className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        <span>Cartelera Mensual del Salón</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsMoreMenuOpen(false);
+                          setIsTimerModalOpen(true);
+                        }}
+                        className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-slate-800 sm:text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                      >
+                        <Timer className="w-4 h-4 text-amber-500 shrink-0" />
+                        <span>Modo Atril / Cronómetro</span>
+                      </button>
+
+                      {!isReadOnly && (
+                        <>
+                          <div className="hidden sm:block my-1 border-t border-slate-100 dark:border-white/5" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsMoreMenuOpen(false);
+                              setEventTitle(currentWeek.specialEvent?.title || '');
+                              setEventType(currentWeek.specialEvent?.type || 'visita_superintendente');
+                              setNoMidweek(Boolean(currentWeek.specialEvent?.noMeetingMidweek));
+                              setNoWeekend(Boolean(currentWeek.specialEvent?.noMeetingWeekend));
+                              setEventNotes(currentWeek.specialEvent?.notes || '');
+                              setIsSpecialEventModalOpen(true);
+                            }}
+                            className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-slate-800 sm:text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                          >
+                            <Sparkle className="w-4 h-4 text-amber-600 shrink-0" />
+                            <span>
+                              {currentWeek.specialEvent?.isSpecial ? 'Evento Especial (Activo)' : 'Configurar Evento Especial'}
+                            </span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsMoreMenuOpen(false);
+                              setSourceWeekId(sortedWeeks[0]?.id || '');
+                              setIsCopyModalOpen(true);
+                            }}
+                            className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-slate-800 sm:text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
+                          >
+                            <Copy className="w-4 h-4 text-slate-500 shrink-0" />
+                            <span>Copiar Estructura de Semana</span>
+                          </button>
+
+                          <div className="hidden sm:block my-1 border-t border-slate-100 dark:border-white/5" />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsMoreMenuOpen(false);
+                              setIsClearWeekAssignmentsModalOpen(true);
+                            }}
+                            className="w-full flex items-center gap-3 sm:gap-2.5 px-4 sm:px-3.5 py-3.5 sm:py-2 text-xs font-semibold sm:font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer text-left"
+                          >
+                            <UserMinus className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+                            <span>Quitar Asignados de la Semana</span>
+                          </button>
+                        </>
+                      )}
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMoreMenuOpen(false);
-                        setIsMwbModalOpen(true);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
-                    >
-                      <BookOpen className="w-4 h-4 text-amber-600 shrink-0" />
-                      <span>Importar Guía de Actividades (MWB)</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMoreMenuOpen(false);
-                        setOrganizedModalTab('catalogo');
-                        setIsOrganizedModalOpen(true);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
-                    >
-                      <Layers className="w-4 h-4 text-indigo-600 shrink-0" />
-                      <span>Catálogo de Semanas Organized</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMoreMenuOpen(false);
-                        setIsMonthlyBillboardModalOpen(true);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
-                    >
-                      <CalendarDays className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                      <span>Cartelera Mensual del Salón</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsMoreMenuOpen(false);
-                        setIsTimerModalOpen(true);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
-                    >
-                      <Timer className="w-4 h-4 text-amber-500 shrink-0" />
-                      <span>Modo Atril / Cronómetro</span>
-                    </button>
-
-                    {!isReadOnly && (
-                      <>
-                        <div className="my-1 border-t border-slate-100 dark:border-white/5" />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsMoreMenuOpen(false);
-                            setEventTitle(currentWeek.specialEvent?.title || '');
-                            setEventType(currentWeek.specialEvent?.type || 'visita_superintendente');
-                            setNoMidweek(Boolean(currentWeek.specialEvent?.noMeetingMidweek));
-                            setNoWeekend(Boolean(currentWeek.specialEvent?.noMeetingWeekend));
-                            setEventNotes(currentWeek.specialEvent?.notes || '');
-                            setIsSpecialEventModalOpen(true);
-                          }}
-                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
-                        >
-                          <Sparkle className="w-4 h-4 text-amber-600 shrink-0" />
-                          <span>
-                            {currentWeek.specialEvent?.isSpecial ? 'Evento Especial (Activo)' : 'Configurar Evento Especial'}
-                          </span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsMoreMenuOpen(false);
-                            setSourceWeekId(sortedWeeks[0]?.id || '');
-                            setIsCopyModalOpen(true);
-                          }}
-                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-slate-700/60 cursor-pointer text-left"
-                        >
-                          <Copy className="w-4 h-4 text-slate-500 shrink-0" />
-                          <span>Copiar Estructura de Semana</span>
-                        </button>
-
-                        <div className="my-1 border-t border-slate-100 dark:border-white/5" />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsMoreMenuOpen(false);
-                            setIsClearWeekAssignmentsModalOpen(true);
-                          }}
-                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 cursor-pointer text-left"
-                        >
-                          <UserMinus className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
-                          <span>Quitar Asignados de la Semana</span>
-                        </button>
-                      </>
-                    )}
                   </div>
                 </>
               )}

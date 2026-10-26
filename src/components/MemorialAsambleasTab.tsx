@@ -452,48 +452,48 @@ export const MemorialAsambleasTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Barra de Acciones y Navegación de Memorial & Asambleas (Opción 1: arranque directo sin banner redundante) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        {/* Sub-tab Navigation Pills */}
-        <div className="flex rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/90 dark:bg-slate-900/60 p-1 shadow-2xs overflow-x-auto no-scrollbar gap-1">
+      {/* Barra de Acciones y Navegación de Memorial & Asambleas (Unified Container) */}
+      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
+        {/* Sub-tab Navigation Pills in responsive grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80">
           <button
             onClick={() => setActiveSubTab('memorial')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
               activeSubTab === 'memorial'
                 ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Wine className="w-3.5 h-3.5 text-red-500" />
-            <span>Memorial (14 Nisán)</span>
+            <Wine className="w-3.5 h-3.5 text-red-500 shrink-0" />
+            <span className="truncate">Memorial (14 Nisán)</span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('asambleas')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
               activeSubTab === 'asambleas'
                 ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Building className="w-3.5 h-3.5" />
-            <span>Asambleas</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 font-bold">
+            <Building className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Asambleas</span>
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 font-bold shrink-0">
               {theocraticAssemblies.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('checklist')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
               activeSubTab === 'checklist'
                 ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Checklist</span>
-            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+            <span className="truncate">Checklist</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold shrink-0 ${
               checklistReadyCount === checklist.length
                 ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200'
                 : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200'
@@ -504,24 +504,24 @@ export const MemorialAsambleasTab: React.FC = () => {
 
           <button
             onClick={() => setActiveSubTab('informe_sucursal')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
               activeSubTab === 'informe_sucursal'
                 ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <FileText className="w-3.5 h-3.5" />
-            <span>Informe Sucursal</span>
+            <FileText className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Informe Sucursal</span>
             {currentPlan?.report.reportedToBranch && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 font-bold">
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 font-bold shrink-0">
                 ✓
               </span>
             )}
           </button>
         </div>
 
-        {/* Action quick buttons */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Action quick buttons in responsive grid */}
+        <div className="grid grid-cols-2 sm:flex sm:items-center sm:justify-end gap-2">
           <button
             onClick={() => {
               if (currentPlan) {
@@ -529,7 +529,7 @@ export const MemorialAsambleasTab: React.FC = () => {
                 handleOpenWhatsApp(msg);
               }
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl transition-all shadow-md shadow-emerald-900/30 active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-xl transition-all shadow-md shadow-emerald-900/30 active:scale-95 cursor-pointer"
           >
             <Share2 className="w-3.5 h-3.5" />
             <span>Programa WhatsApp</span>
@@ -537,7 +537,7 @@ export const MemorialAsambleasTab: React.FC = () => {
 
           <button
             onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 font-semibold text-xs rounded-xl border border-slate-200/80 dark:border-white/[0.08] transition-all shadow-2xs active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-zinc-200 font-semibold text-xs rounded-xl border border-slate-200/80 dark:border-white/[0.08] transition-all shadow-2xs active:scale-95 cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>Imprimir Cuadro</span>

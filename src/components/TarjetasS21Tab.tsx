@@ -336,207 +336,193 @@ export const TarjetasS21Tab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Barra de Acciones de Tarjetas S-21 */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider uppercase bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
-            Formulario S-21
-          </span>
-          <span className="text-xs font-medium text-slate-500 dark:text-slate-400 hidden sm:inline">
-            Carga tu PDF oficial S-21 de JW Hub para que la app lo rellene y descargue
-          </span>
-        </div>
-
-        {/* Global Action Buttons */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Service Year Selector */}
-          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900/60 border border-slate-200/80 dark:border-white/[0.08] rounded-xl px-3 py-1.5 shadow-2xs">
-            <Calendar className="w-4 h-4 text-slate-500" />
-            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Año:</span>
-            <select
-              value={selectedServiceYear}
-              onChange={(e) => setSelectedServiceYear(e.target.value)}
-              className="bg-transparent text-xs font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer"
+    <div className="space-y-4 sm:space-y-6">
+      {/* Barra de Acciones y Selector de Vista de Tarjetas S-21 */}
+      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col gap-3 no-print">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
+          {/* Main View Mode Selector - 2-column grid on mobile so nothing clips */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 bg-slate-100 dark:bg-slate-800/90 p-1.5 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
+            <button
+              onClick={() => setActiveView('fichero')}
+              className={`px-3 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                activeView === 'fichero'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/50'
+              }`}
             >
-              {availableYears.map((yr) => (
-                <option key={yr} value={yr}>
-                  {yr} {yr === '2025-2026' ? '(Año analizado)' : ''}
-                </option>
-              ))}
-            </select>
+              <Users className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Fichero ({filteredPublishers.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveView('tarjeta')}
+              className={`px-3 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                activeView === 'tarjeta'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/50'
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Tarjeta S-21</span>
+            </button>
+
+            <button
+              onClick={() => setActiveView('auditoria_precursores')}
+              className={`px-3 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                activeView === 'auditoria_precursores'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/50'
+              }`}
+            >
+              <Award className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Precursores ({pioneerAudit.summary.totalRegularPioneers})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveView('pastoral')}
+              className={`px-3 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${
+                activeView === 'pastoral'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-700/50'
+              }`}
+            >
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Pastoreo ({metrics.irregularCount + metrics.inactiveCount})</span>
+            </button>
           </div>
 
-          <button
-            onClick={() => setActiveView('formato_local')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer active:scale-95"
-          >
-            <Upload className="w-4 h-4" />
-            <span>Cargar y Rellenar PDF Oficial S-21</span>
-          </button>
+          {/* Global Action Buttons */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
+            {/* Service Year Selector */}
+            <div className="flex items-center justify-center gap-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2">
+              <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Año:</span>
+              <select
+                value={selectedServiceYear}
+                onChange={(e) => setSelectedServiceYear(e.target.value)}
+                className="bg-transparent text-xs font-bold text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer"
+              >
+                {availableYears.map((yr) => (
+                  <option key={yr} value={yr}>
+                    {yr}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <button
-            onClick={() => handleDownloadOfficialS21ForPublisher(currentPublisher)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer active:scale-95"
-          >
-            <Download className="w-4 h-4" />
-            <span>Descargar S-21 Oficial Rellenado</span>
-          </button>
+            <button
+              onClick={() => setActiveView('formato_local')}
+              className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer active:scale-95 ${
+                activeView === 'formato_local'
+                  ? 'bg-indigo-600 text-white shadow-2xs'
+                  : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700'
+              }`}
+            >
+              <Upload className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="truncate">Cargar S-21</span>
+            </button>
 
-          <button
-            onClick={() => printCircuitOverseerExecutiveDossierA4(executiveReport, settings, circuitVisit)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition cursor-pointer active:scale-95"
-            title="Imprimir Resumen Analítico Interno para la Visita"
-          >
-            <Printer className="w-4 h-4" />
-            <span>Resumen Estadístico Visita</span>
-          </button>
-        </div>
-      </div>
+            <button
+              onClick={() => handleDownloadOfficialS21ForPublisher(currentPublisher)}
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 rounded-xl text-xs font-bold transition cursor-pointer active:scale-95"
+            >
+              <Download className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="truncate">Descargar S-21</span>
+            </button>
 
-      {/* KPI Cards (Secretary Dashboard) */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 no-print">
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold text-slate-400 block uppercase">
-            Total Publicadores
-          </span>
-          <span className="text-xl sm:text-2xl font-black text-slate-900">{metrics.totalPublishers}</span>
-          <span className="text-[11px] text-slate-500 block mt-0.5">Fichero activo</span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[10px] sm:text-xs font-bold text-emerald-600 block uppercase">
-            Al Día (Activos)
-          </span>
-          <span className="text-xl sm:text-2xl font-black text-emerald-600">{metrics.activeCount}</span>
-          <span className="text-[11px] text-emerald-700 block mt-0.5">
-            {metrics.totalPublishers > 0 ? Math.round((metrics.activeCount / metrics.totalPublishers) * 100) : 0}% de la congregación
-          </span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs cursor-pointer hover:border-amber-400 transition" onClick={() => setActiveView('pastoral')}>
-          <span className="text-[10px] sm:text-xs font-bold text-amber-600 block uppercase flex items-center justify-between">
-            <span>Irregulares</span>
-            <AlertTriangle className="w-3.5 h-3.5" />
-          </span>
-          <span className="text-xl sm:text-2xl font-black text-amber-600">{metrics.irregularCount}</span>
-          <span className="text-[11px] text-amber-700 block mt-0.5">1 a 5 meses pendientes</span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs cursor-pointer hover:border-rose-400 transition" onClick={() => setActiveView('pastoral')}>
-          <span className="text-[10px] sm:text-xs font-bold text-rose-600 block uppercase flex items-center justify-between">
-            <span>Inactivos (6+ m)</span>
-            <HelpCircle className="w-3.5 h-3.5" />
-          </span>
-          <span className="text-xl sm:text-2xl font-black text-rose-600">{metrics.inactiveCount}</span>
-          <span className="text-[11px] text-rose-700 block mt-0.5">Visitas de pastoreo</span>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs col-span-2 sm:col-span-1">
-          <span className="text-[10px] sm:text-xs font-bold text-indigo-600 block uppercase">
-            Horas Año Servicio
-          </span>
-          <span className="text-xl sm:text-2xl font-black text-indigo-600">{metrics.totalServiceYearHours}</span>
-          <span className="text-[11px] text-indigo-700 block mt-0.5">
-            {metrics.regularPioneersCount} precursores regulares
-          </span>
-        </div>
-      </div>
-
-      {/* Main View Mode Selector */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-3 gap-2 no-print overflow-x-auto">
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={() => setActiveView('fichero')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap ${
-              activeView === 'fichero'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            <Users className="w-3.5 h-3.5" />
-            <span>Fichero de Tarjetas ({filteredPublishers.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveView('tarjeta')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap ${
-              activeView === 'tarjeta'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span>Tarjeta Oficial S-21 Individual</span>
-          </button>
-
-          <button
-            onClick={() => setActiveView('auditoria_precursores')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-              activeView === 'auditoria_precursores'
-                ? 'bg-indigo-600 text-white shadow-xs'
-                : 'bg-indigo-50 text-indigo-800 hover:bg-indigo-100 border border-indigo-200'
-            }`}
-          >
-            <Award className="w-3.5 h-3.5" />
-            <span>Auditoría de Precursores 600h ({pioneerAudit.summary.totalRegularPioneers})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveView('pastoral')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-              activeView === 'pastoral'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            <AlertTriangle className="w-3.5 h-3.5" />
-            <span>Pastoreo: Irregulares e Inactivos ({metrics.irregularCount + metrics.inactiveCount})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveView('formato_local')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-              activeView === 'formato_local'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Cargar y Rellenar PDF Oficial (Local)</span>
-          </button>
+            <button
+              onClick={() => printCircuitOverseerExecutiveDossierA4(executiveReport, settings, circuitVisit)}
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-2xs transition cursor-pointer active:scale-95"
+              title="Imprimir Resumen Analítico Interno para la Visita"
+            >
+              <Printer className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Resumen Visita</span>
+            </button>
+          </div>
         </div>
 
         {/* Quick select publisher dropdown when in tarjeta view */}
         {activeView === 'tarjeta' && (
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={handlePrevPublisher}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600"
-              title="Publicador anterior"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <select
-              value={selectedPublisherId}
-              onChange={(e) => setSelectedPublisherId(e.target.value)}
-              className="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
-            >
-              {publishers.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} {p.privilege ? `(${p.privilege.replace('_', ' ')})` : ''}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={handleNextPublisher}
-              className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600"
-              title="Publicador siguiente"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Publicador seleccionado:</span>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={handlePrevPublisher}
+                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 text-slate-600 dark:text-slate-300"
+                title="Publicador anterior"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <select
+                value={selectedPublisherId}
+                onChange={(e) => setSelectedPublisherId(e.target.value)}
+                className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 max-w-[200px] sm:max-w-xs"
+              >
+                {publishers.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleNextPublisher}
+                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 text-slate-600 dark:text-slate-300"
+                title="Siguiente publicador"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         )}
+      </div>
+
+      {/* KPI Cards (Secretary Dashboard) */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 no-print">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 block uppercase">
+            Total Publicadores
+          </span>
+          <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{metrics.totalPublishers}</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">Fichero activo</span>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+          <span className="text-[10px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 block uppercase">
+            Al Día (Activos)
+          </span>
+          <span className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">{metrics.activeCount}</span>
+          <span className="text-[11px] text-emerald-700 dark:text-emerald-500 block mt-0.5">
+            {metrics.totalPublishers > 0 ? Math.round((metrics.activeCount / metrics.totalPublishers) * 100) : 0}% de la congregación
+          </span>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs cursor-pointer hover:border-amber-400 transition" onClick={() => setActiveView('pastoral')}>
+          <span className="text-[10px] sm:text-xs font-bold text-amber-600 dark:text-amber-400 block uppercase flex items-center justify-between">
+            <span>Irregulares</span>
+            <AlertTriangle className="w-3.5 h-3.5" />
+          </span>
+          <span className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400">{metrics.irregularCount}</span>
+          <span className="text-[11px] text-amber-700 dark:text-amber-500 block mt-0.5">1 a 5 meses pendientes</span>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs cursor-pointer hover:border-rose-400 transition" onClick={() => setActiveView('pastoral')}>
+          <span className="text-[10px] sm:text-xs font-bold text-rose-600 dark:text-rose-400 block uppercase flex items-center justify-between">
+            <span>Inactivos (6+ m)</span>
+            <HelpCircle className="w-3.5 h-3.5" />
+          </span>
+          <span className="text-xl sm:text-2xl font-black text-rose-600 dark:text-rose-400">{metrics.inactiveCount}</span>
+          <span className="text-[11px] text-rose-700 dark:text-rose-500 block mt-0.5">Visitas de pastoreo</span>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs col-span-2 sm:col-span-1">
+          <span className="text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 block uppercase">
+            Horas Año Servicio
+          </span>
+          <span className="text-xl sm:text-2xl font-black text-indigo-600 dark:text-indigo-400">{metrics.totalServiceYearHours}</span>
+          <span className="text-[11px] text-indigo-700 dark:text-indigo-500 block mt-0.5">
+            {metrics.regularPioneersCount} precursores regulares
+          </span>
+        </div>
       </div>
 
       {/* ============================================================== */}

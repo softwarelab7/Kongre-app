@@ -37,7 +37,7 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
             setIsOpen((prev) => !prev);
           }
         }}
-        className="group inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80 font-bold text-[10px] sm:text-[10.5px] tracking-wide transition-all cursor-pointer select-none active:scale-95 shadow-2xs"
+        className="group inline-flex items-center gap-1 sm:gap-1.5 h-6 px-2 rounded-lg bg-indigo-50/90 dark:bg-indigo-950/60 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80 font-bold text-[10px] sm:text-[10.5px] tracking-wide transition-all cursor-pointer select-none active:scale-95 shadow-2xs"
         title="Modo de prueba activo - Clic para cambiar rol"
       >
         <Sparkles className="w-3 h-3 text-indigo-500 dark:text-indigo-400 group-hover:rotate-12 transition-transform shrink-0" />

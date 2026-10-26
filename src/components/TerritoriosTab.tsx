@@ -545,148 +545,148 @@ ${mapLink}${noVisitsText}
         </div>
       )}
 
-      {/* Barra de Navegación de Vistas y Acciones de Territorio (Opción 1: arranque directo sin banner redundante) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        {/* View Mode Toggle Pill */}
-        <div className="flex rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/90 dark:bg-slate-900/60 p-1 shadow-2xs overflow-x-auto no-scrollbar">
+      {/* Barra Unificada de Vistas y Acciones de Territorio */}
+      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        {/* View Mode Toggle - 2-column grid on mobile so nothing clips */}
+        <div className="grid grid-cols-2 sm:flex rounded-xl border border-slate-200/70 dark:border-slate-700/70 bg-slate-100 dark:bg-slate-800/90 p-1.5 gap-1">
           <button
             onClick={() => setViewMode('cards')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
               viewMode === 'cards'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-2xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            Tarjetas
+            <span className="truncate">Tarjetas</span>
           </button>
           <button
             onClick={() => setViewMode('table')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
               viewMode === 'table'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-2xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            Tabla
+            <span className="truncate">Tabla</span>
           </button>
           <button
             onClick={() => setViewMode('map')}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               viewMode === 'map'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-2xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <Map className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-300" />
-            <span>Mapa Interactivo</span>
+            <Map className={`w-3.5 h-3.5 shrink-0 ${viewMode === 'map' ? 'text-white' : 'text-indigo-500 dark:text-indigo-400'}`} />
+            <span className="truncate">Mapa</span>
           </button>
           <button
             onClick={() => setViewMode('s13')}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center cursor-pointer ${
               viewMode === 's13'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-2xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            Fichero S-13
+            <span className="truncate">Fichero S-13</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="grid grid-cols-2 sm:flex items-center gap-2 shrink-0">
           <button
             onClick={handleDownloadOfficialS13}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 rounded-xl transition cursor-pointer shadow-2xs"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 rounded-xl transition cursor-pointer active:scale-95"
             title="Cargar el PDF oficial S-13 de JW Hub para que la app lo rellene y descargue"
           >
-            <Upload className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            <span>PDF S-13 Oficial</span>
+            <Upload className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <span className="truncate">PDF S-13 Oficial</span>
           </button>
 
           <button
             onClick={openCreateModal}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-md dark:shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-2xs transition-all active:scale-95 cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
-            <span>Nuevo Territorio</span>
+            <Plus className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Nuevo Territorio</span>
           </button>
         </div>
       </div>
 
-      {/* KPI Stats Ribbon (Horizontal Swipeable Interactive Filter Ribbon on Mobile) */}
-      <div className="flex sm:grid sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-1 sm:pb-0 touch-pan-x">
+      {/* KPI Stats Ribbon (2-column non-clipping grid on mobile) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
         <button
           type="button"
           onClick={() => setStatusFilter('todos')}
-          className={`bg-white dark:bg-[#131d2e] p-3 sm:p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 sm:gap-3 shrink-0 min-w-[138px] sm:min-w-0 text-left transition-all cursor-pointer active:scale-95 ${
+          className={`bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border shadow-2xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
             statusFilter === 'todos'
               ? 'border-indigo-500 ring-2 ring-indigo-500/15 dark:border-indigo-400'
-              : 'border-slate-200/80 dark:border-white/[0.06] hover:border-indigo-300'
+              : 'border-slate-200 dark:border-slate-800 hover:border-indigo-300'
           }`}
         >
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
             <Map className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">{stats.total}</div>
-            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">Total Territorios</div>
+            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Total Territorios</div>
           </div>
         </button>
 
         <button
           type="button"
           onClick={() => setStatusFilter('disponible')}
-          className={`bg-white dark:bg-[#131d2e] p-3 sm:p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 sm:gap-3 shrink-0 min-w-[132px] sm:min-w-0 text-left transition-all cursor-pointer active:scale-95 ${
+          className={`bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border shadow-2xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
             statusFilter === 'disponible'
               ? 'border-emerald-500 ring-2 ring-emerald-500/15 dark:border-emerald-400'
-              : 'border-slate-200/80 dark:border-white/[0.06] hover:border-emerald-300'
+              : 'border-slate-200 dark:border-slate-800 hover:border-emerald-300'
           }`}
         >
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
             <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="text-lg sm:text-xl font-bold text-emerald-600 dark:text-emerald-400 leading-tight">{stats.disponibles}</div>
-            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">Disponibles</div>
+            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Disponibles</div>
           </div>
         </button>
 
         <button
           type="button"
           onClick={() => setStatusFilter('asignado')}
-          className={`bg-white dark:bg-[#131d2e] p-3 sm:p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 sm:gap-3 shrink-0 min-w-[132px] sm:min-w-0 text-left transition-all cursor-pointer active:scale-95 ${
+          className={`bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border shadow-2xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
             statusFilter === 'asignado'
-              ? 'border-blue-500 ring-2 ring-blue-500/15 dark:border-blue-400'
-              : 'border-slate-200/80 dark:border-white/[0.06] hover:border-blue-300'
+              ? 'border-indigo-500 ring-2 ring-indigo-500/15 dark:border-indigo-400'
+              : 'border-slate-200 dark:border-slate-800 hover:border-indigo-300'
           }`}
         >
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
             <User className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
-            <div className="text-lg sm:text-xl font-bold text-blue-600 dark:text-blue-400 leading-tight">{stats.asignados}</div>
-            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">En Trabajo</div>
+          <div className="min-w-0">
+            <div className="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 leading-tight">{stats.asignados}</div>
+            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate">En Trabajo</div>
           </div>
         </button>
 
         <button
           type="button"
           onClick={() => setStatusFilter('vencido')}
-          className={`bg-white dark:bg-[#131d2e] p-3 sm:p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 sm:gap-3 shrink-0 min-w-[136px] sm:min-w-0 text-left transition-all cursor-pointer active:scale-95 ${
+          className={`bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border shadow-2xs flex items-center gap-2.5 sm:gap-3 text-left transition-all cursor-pointer active:scale-95 ${
             statusFilter === 'vencido'
               ? 'border-rose-500 ring-2 ring-rose-500/15 dark:border-rose-400'
-              : 'border-slate-200/80 dark:border-white/[0.06] hover:border-rose-300'
+              : 'border-slate-200 dark:border-slate-800 hover:border-rose-300'
           }`}
         >
           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
             <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="text-lg sm:text-xl font-bold text-rose-600 dark:text-rose-400 leading-tight">{stats.vencidos}</div>
-            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">Vencidos (&gt;4m)</div>
+            <div className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium truncate">Vencidos (&gt;4m)</div>
           </div>
         </button>
 
-        <div className="bg-white dark:bg-[#131d2e] p-3 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.06] shadow-xs shrink-0 min-w-[175px] sm:min-w-0">
+        <div className="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
           <div className="flex items-center justify-between text-indigo-600 dark:text-indigo-400 text-[11px] font-semibold uppercase tracking-wider mb-0.5">
             <span>Cobertura Anual</span>
             <Compass className="w-3.5 h-3.5" />

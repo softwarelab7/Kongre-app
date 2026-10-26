@@ -338,69 +338,71 @@ export const HospitalidadTab: React.FC = () => {
       )}
 
       {/* Top Navigation & Actions Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/90 dark:bg-slate-900/60 p-1 shadow-2xs gap-1">
-          <button
-            onClick={() => setActiveSubView('cuadrante')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-              activeSubView === 'cuadrante'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Calendar className="w-3.5 h-3.5" />
-            <span>Cuadrante Fin de Semana (1-Clic)</span>
-          </button>
-
-          <button
-            onClick={() => setActiveSubView('anfitriones')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
-              activeSubView === 'anfitriones'
-                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            <Users className="w-3.5 h-3.5" />
-            <span>Familias Anfitrionas ({hospitalityHosts.length})</span>
-          </button>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {activeSubView === 'cuadrante' && (
+      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] shadow-2xs space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="grid grid-cols-2 sm:inline-flex rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-100/90 dark:bg-slate-800/70 p-1 gap-1 w-full sm:w-auto">
             <button
-              onClick={handleAutoAssignAllPendingWeeks}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
-              title="Asignar automáticamente familias anfitrionas a todas las semanas pendientes según rotación y capacidad"
+              onClick={() => setActiveSubView('cuadrante')}
+              className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer truncate ${
+                activeSubView === 'cuadrante'
+                  ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
             >
-              <Sparkles className="w-4 h-4" />
-              <span>Auto-Asignar Rotación (1-Clic)</span>
+              <Calendar className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Cuadrante Semanal</span>
             </button>
-          )}
 
-          <button
-            onClick={handleCopyWhatsAppList}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-zinc-200 border border-slate-200/80 dark:border-white/[0.08] text-xs font-semibold transition-all cursor-pointer shadow-2xs"
-          >
-            {copiedSuccess ? (
-              <>
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span className="text-emerald-600 dark:text-emerald-400 font-bold">¡Copiado!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                <span>Copiar Programa WhatsApp</span>
-              </>
+            <button
+              onClick={() => setActiveSubView('anfitriones')}
+              className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer truncate ${
+                activeSubView === 'anfitriones'
+                  ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Anfitriones ({hospitalityHosts.length})</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto">
+            {activeSubView === 'cuadrante' && (
+              <button
+                onClick={handleAutoAssignAllPendingWeeks}
+                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-bold transition-all cursor-pointer truncate"
+                title="Asignar automáticamente familias anfitrionas a todas las semanas pendientes según rotación y capacidad"
+              >
+                <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">Auto-Asignar (1-Clic)</span>
+              </button>
             )}
-          </button>
 
-          <button
-            onClick={openNewModal}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md transition-all cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Nuevo Anfitrión</span>
-          </button>
+            <button
+              onClick={handleCopyWhatsAppList}
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-semibold transition-all cursor-pointer truncate"
+            >
+              {copiedSuccess ? (
+                <>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold truncate">¡Copiado!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
+                  <span className="truncate">Copiar WhatsApp</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={openNewModal}
+              className={`${activeSubView === 'cuadrante' ? 'col-span-2 sm:col-span-1' : ''} flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-95 truncate`}
+            >
+              <Plus className="w-4 h-4 shrink-0" />
+              <span className="truncate">Nuevo Anfitrión</span>
+            </button>
+          </div>
         </div>
       </div>
 

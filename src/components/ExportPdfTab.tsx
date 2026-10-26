@@ -407,73 +407,74 @@ export const ExportPdfTab: React.FC = () => {
         {`@media print { @page { size: ${pageSize} ${pageOrientation}; margin: 10mm; } }`}
       </style>
 
-      {/* Barra de Navegación de Exportación y Plantillas (Opción 1: arranque directo sin banner redundante) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 no-print">
+      {/* Barra de Navegación de Exportación y Plantillas (Unified Container) */}
+      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3 no-print">
         {/* Tab switch between Monthly Program, S-89 Slips, Local Official Forms, and WhatsApp Center */}
-        <div className="flex items-center gap-1 bg-slate-100/90 dark:bg-slate-900/60 border border-slate-200/80 dark:border-white/[0.08] p-1 rounded-2xl text-xs font-semibold overflow-x-auto no-scrollbar shadow-2xs w-full sm:w-auto">
+        <div className="grid grid-cols-3 sm:grid-cols-5 lg:flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 p-1 rounded-xl text-xs font-semibold w-full lg:w-auto">
           <button
             type="button"
             onClick={() => setActiveTab('programa')}
-            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer whitespace-nowrap ${
+            className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 'programa'
                 ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <FileText className="w-4 h-4 shrink-0" />
-            <span>Programa</span>
+            <span className="truncate">Programa</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('s89')}
-            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer whitespace-nowrap ${
+            className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 's89'
                 ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <FileCheck className="w-4 h-4 shrink-0" />
-            <span>Hojas S-89</span>
+            <span className="truncate">Hojas S-89</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('s21')}
-            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer whitespace-nowrap ${
+            className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 's21'
                 ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <User className="w-4 h-4 shrink-0" />
-            <span>Tarjetas S-21</span>
+            <span className="truncate">Tarjetas S-21</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('formatos_oficiales')}
-            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer whitespace-nowrap ${
+            className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 'formatos_oficiales'
                 ? 'bg-emerald-600 text-white shadow-xs font-bold'
                 : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
             }`}
           >
             <ShieldCheck className="w-4 h-4 shrink-0" />
-            <span>Formatos Oficiales (Local)</span>
+            <span className="truncate hidden sm:inline">Formatos Oficiales</span>
+            <span className="truncate sm:hidden">Oficiales</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('whatsapp')}
-            className={`px-2.5 sm:px-3.5 py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer whitespace-nowrap ${
+            className={`px-2 py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 text-center cursor-pointer ${
               activeTab === 'whatsapp'
                 ? 'bg-emerald-600 text-white shadow-xs font-bold'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <MessageCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span>WhatsApp</span>
+            <span className="truncate">WhatsApp</span>
           </button>
         </div>
 

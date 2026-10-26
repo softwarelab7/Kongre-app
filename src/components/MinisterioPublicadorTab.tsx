@@ -2424,7 +2424,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
           7. CONTENIDO COMPLETO: INFORME MENSUAL S-4 (`informe`)
          ========================================================================= */}
       {activeSubTab === 'informe' && (
-        <div className="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
+        <div className="w-full bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
             <div>
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">

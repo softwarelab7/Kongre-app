@@ -351,51 +351,51 @@ export const CarritosTab: React.FC = () => {
       )}
 
       {/* Barra de Acciones de Carritos */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
         <div>
-          <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+          <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
             Testimonio Público S-148 • Emparejamiento Inteligente
           </span>
           <div className="text-xs text-slate-600 dark:text-slate-300 font-semibold mt-0.5">
             {cartLocations.length} puntos autorizados • {cartShifts.length} turnos semanales •{' '}
             <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-              {stats.familyPairs} parejas familiares/fijas
+              {stats.familyPairs} parejas fijas
             </span>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => handleAutoAssignCarts('fill_vacant')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-95"
+            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer active:scale-95"
             title="Completa automáticamente lugares vacantes emparejando matrimonios/familiares o hermanos del mismo género"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Auto-Emparejar Vacantes</span>
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <span className="truncate">Auto-Emparejar</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleAutoAssignCarts('reassign_all')}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer active:scale-95"
             title="Rota equitativamente todos los turnos entre los publicadores aprobados"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Rotar Turnos</span>
+            <RotateCcw className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <span className="truncate">Rotar Turnos</span>
           </button>
 
           <button
             type="button"
             onClick={() => setShowEquityPanel(!showEquityPanel)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer active:scale-95 ${
               showEquityPanel
-                ? 'bg-amber-600 text-white border-amber-600'
-                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50'
+                ? 'bg-indigo-600 text-white border-indigo-600'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-slate-700 hover:bg-slate-200'
             }`}
           >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>Equidad</span>
+            <BarChart3 className={`w-3.5 h-3.5 shrink-0 ${showEquityPanel ? 'text-white' : 'text-indigo-600 dark:text-indigo-400'}`} />
+            <span className="truncate">Equidad</span>
           </button>
 
           <button
@@ -403,27 +403,27 @@ export const CarritosTab: React.FC = () => {
             onClick={() =>
               printCartScheduleA4KHS(cartLocations, cartShifts, publishersMap, settings)
             }
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer active:scale-95"
             title="Imprimir Cuadrante A4 para el Tablero del Salón"
           >
-            <Printer className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Imprimir A4</span>
+            <Printer className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <span className="truncate">Imprimir A4</span>
           </button>
 
           <button
             type="button"
             onClick={handleCopyScheduleWhatsApp}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer active:scale-95"
           >
             {copiedSchedule ? (
               <>
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="text-emerald-600 font-bold">¡Copiado!</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span className="text-emerald-600 font-bold truncate">¡Copiado!</span>
               </>
             ) : (
               <>
-                <Share2 className="w-3.5 h-3.5 text-slate-500" />
-                <span>WhatsApp</span>
+                <Share2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <span className="truncate">WhatsApp</span>
               </>
             )}
           </button>
@@ -431,19 +431,19 @@ export const CarritosTab: React.FC = () => {
           <button
             type="button"
             onClick={handleOpenNewLoc}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 text-xs font-bold transition-all cursor-pointer active:scale-95"
           >
-            <MapPin className="w-3.5 h-3.5 text-amber-600" />
-            <span>Puntos ({cartLocations.length})</span>
+            <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <span className="truncate">Puntos ({cartLocations.length})</span>
           </button>
 
           <button
             type="button"
             onClick={handleOpenNewShift}
-            className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer"
+            className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-2xs transition-all active:scale-95 cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
-            <span>Nuevo Turno</span>
+            <Plus className="w-4 h-4 shrink-0" />
+            <span className="truncate">Nuevo Turno</span>
           </button>
         </div>
       </div>

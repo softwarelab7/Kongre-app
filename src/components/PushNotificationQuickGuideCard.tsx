@@ -184,7 +184,7 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
       } ${compact ? 'p-3.5 sm:p-4' : 'p-4 sm:p-5'} space-y-3.5`}
     >
       {/* CABECERA PRINCIPAL Y BOTÓN DE ACCIÓN */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
+      <div className={`flex flex-col ${compact ? '' : 'xl:flex-row xl:items-center'} justify-between gap-3.5`}>
         <div className="flex items-start gap-3">
           <div
             className={`w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-xs ${
@@ -244,13 +244,13 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
         </div>
 
         {/* BOTONES DE ACCIÓN */}
-        <div className="flex items-center gap-2 flex-wrap shrink-0">
+        <div className="flex items-center gap-2 flex-wrap w-full xl:w-auto">
           {!isSubscribed ? (
             <button
               type="button"
               onClick={handleQuickSubscribe}
               disabled={isSubscribing || !isNotificationSupported()}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-extrabold shadow-md shadow-violet-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+              className={`${compact ? 'flex-1 sm:flex-initial' : 'w-full sm:w-auto'} px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-extrabold shadow-md shadow-violet-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 disabled:opacity-50`}
             >
               <BellRing className="w-4 h-4 shrink-0" />
               <span>
@@ -325,7 +325,7 @@ export const PushNotificationQuickGuideCard: React.FC<PushNotificationQuickGuide
       {(!isSubscribed || showVisualGuide) && (
         <div className="pt-2 border-t border-violet-200/60 dark:border-slate-800 space-y-3 animate-in fade-in duration-200">
           {/* 3 PASOS DE ACTIVACIÓN */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div className={`grid grid-cols-1 ${compact ? 'xl:grid-cols-3' : 'sm:grid-cols-3'} gap-2.5`}>
             {/* Paso 1 */}
             <div
               className={`p-3 rounded-xl border flex items-start gap-2.5 ${

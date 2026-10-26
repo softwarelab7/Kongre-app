@@ -25,6 +25,10 @@ import {
   Check,
   Info,
   Send,
+  Sun,
+  Sunset,
+  Moon,
+  Building2,
 } from 'lucide-react';
 import {
   isNotificationSupported,
@@ -387,120 +391,35 @@ export const UserProfileSettingsView: React.FC = () => {
     return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
   };
 
+  const activeIsDemo =
+    isDemoMode ||
+    isSafeDemoMode(settings?.congregationNumber || settings?.congregationId, settings?.isRegistered);
+
+  const contactMethodLabels: Record<PreferredContactMethod, string> = {
+    whatsapp: 'WhatsApp',
+    email: 'Correo Electrónico',
+    phone: 'Llamada Telefónica',
+    sms: 'Mensaje SMS',
+  };
+
+  const contactTimeLabels: Record<ContactTimePreference, string> = {
+    morning: 'Mañanas (8:00 - 12:00)',
+    afternoon: 'Tardes (12:00 - 18:00)',
+    evening: 'Noches (18:00 - 21:30)',
+    anytime: 'Cualquier horario',
+  };
+
   return (
-    <div className="space-y-6">
-      {/* 1. Header with Firestore Cloud Sync Banner */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-              <User className="w-4 h-4" />
-            </span>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-              Mi Perfil y Preferencias de Contacto
-            </h2>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Gestiona tu foto, nombre visible y canales de comunicación teocrática. Se sincronizan en tu documento personal en Firestore.
-          </p>
-        </div>
-
-        {/* Cloud Sync Status Badge */}
-        <div className="flex items-center gap-2.5 self-start md:self-auto">
-          {user ? (
-            <div className="px-3 py-1.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 flex items-center gap-2 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
-              <CloudCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <div className="text-[11px] leading-tight">
-                <span className="block font-bold">Firestore Sincronizado</span>
-                <span className="text-[10px] opacity-75 font-mono">/users/{user.uid.slice(0, 8)}...</span>
-              </div>
-            </div>
-          ) : (
-            <div className="px-3 py-1.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 flex items-center gap-2 text-xs font-semibold text-amber-800 dark:text-amber-300">
-              <Cloud className="w-4 h-4 text-amber-600 shrink-0" />
-              <div className="text-[11px] leading-tight">
-                <span className="block font-bold">Almacenamiento Local</span>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      await signInWithGoogle();
-                    } catch (err: any) {
-                      alert(err?.message || 'Error al conectar con Google');
-                    }
-                  }}
-                  className="underline hover:text-amber-900 dark:hover:text-amber-100 cursor-pointer"
-                >
-                  Conectar Google para Nube
-                </button>
-              </div>
-            </div>
-          )}
-
-          {userProfile?.updatedAt && (
-            <span className="hidden lg:inline text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-              Act: {new Date(userProfile.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Success Notification */}
-      {saveSuccess && (
-        <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between text-xs font-semibold text-emerald-900 dark:text-emerald-200 animate-fade-in shadow-xs">
-          <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <div>
-              <p className="font-bold">¡Datos guardados exitosamente en Firestore!</p>
-              <p className="text-[11px] opacity-80">
-                Tu foto, nombre visible y preferencias de contacto han sido actualizados en tu documento de usuario.
-              </p>
-            </div>
-          </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-emerald-200/60 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-100">
-            OK
-          </span>
-        </div>
-      )}
-
-      {/* Error Notification */}
-      {saveError && (
-        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 flex items-center gap-3 text-xs font-semibold text-rose-900 dark:text-rose-200">
-          <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
-          <span>{saveError}</span>
-        </div>
-      )}
-
-      <form onSubmit={handleSave} className="space-y-6">
-        {/* ========================================================================= */}
-        {/* CARD 1: FOTO DE PERFIL & AVATAR TEOCRÁTICO                                 */}
-        {/* ========================================================================= */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-          <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <Camera className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Foto de Perfil y Avatar
-              </h3>
-            </div>
-            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-              Personalización
-            </span>
-          </div>
-
-          {(isDemoMode || isSafeDemoMode(settings?.congregationNumber || settings?.congregationId, settings?.isRegistered)) && (
-            <div className="flex items-center gap-2.5 p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-900 dark:text-amber-200 text-xs">
-              <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-              <span>
-                <strong>Modo Prueba:</strong> El perfil y el avatar se mantienen aislados localmente para la simulación sin acceder a cuentas personales ni fotos externas.
-              </span>
-            </div>
-          )}
-
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-            {/* Live Avatar Preview */}
+    <form onSubmit={handleSave} className="w-full space-y-5">
+      {/* ========================================================================= */}
+      {/* 1. TOP IDENTITY & CONTROL CARD                                            */}
+      {/* ========================================================================= */}
+      <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-5">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+          {/* Avatar + Identity Info */}
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 text-center sm:text-left">
             <div className="relative group shrink-0">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full ring-4 ring-indigo-500/20 overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-md">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl border-2 border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-sm">
                 {photoURL ? (
                   <img
                     src={photoURL}
@@ -512,36 +431,69 @@ export const UserProfileSettingsView: React.FC = () => {
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center text-3xl font-extrabold tracking-wider select-none">
+                  <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center text-2xl sm:text-3xl font-extrabold tracking-wider select-none">
                     {getInitials(displayName || user?.displayName || user?.email || '')}
                   </div>
                 )}
               </div>
 
-              {/* Quick camera trigger button on avatar */}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 p-2 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-transform active:scale-95 cursor-pointer"
-                title="Subir foto desde tu dispositivo"
+                className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-md flex items-center justify-center transition-transform active:scale-95 cursor-pointer border-2 border-white dark:border-slate-900"
+                title="Cambiar foto de perfil"
               >
                 <Camera className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            {/* Avatar Actions & Presets */}
-            <div className="flex-1 space-y-4 text-center sm:text-left w-full">
-              <div>
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                  {displayName || 'Tu Nombre'}
-                </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Esta foto se mostrará en la barra superior, en tu portal de inicio y en tus asignaciones.
-                </p>
+            <div className="space-y-1.5 min-w-0">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate">
+                  {displayName || 'Tu Nombre Visible'}
+                </h2>
               </div>
 
-              {/* Upload buttons row */}
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+              {/* Clean unboxed metadata row */}
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                <span className="inline-flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400">
+                  <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                  <span>{effectiveRoleInfo.name}</span>
+                </span>
+                <span aria-hidden="true">·</span>
+                <span className="inline-flex items-center gap-1">
+                  <Building2 className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                  <span>{settings?.congregationName || 'Congregación Local'}</span>
+                </span>
+                <span aria-hidden="true">·</span>
+                {user ? (
+                  <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                    <CloudCheck className="w-3.5 h-3.5 shrink-0" />
+                    <span>Sincronizado en Nube</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
+                    <Cloud className="w-3.5 h-3.5 shrink-0" />
+                    <span>Modo Local</span>
+                    {!activeIsDemo && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          try {
+                            await signInWithGoogle();
+                          } catch {}
+                        }}
+                        className="ml-1 underline hover:text-amber-700 dark:hover:text-amber-300 cursor-pointer"
+                      >
+                        (Conectar Google)
+                      </button>
+                    )}
+                  </span>
+                )}
+              </div>
+
+              {/* Photo Actions Row */}
+              <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2">
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -553,13 +505,13 @@ export const UserProfileSettingsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-200/80 dark:border-slate-700"
                 >
-                  <Camera className="w-3.5 h-3.5" />
+                  <Camera className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   <span>Subir Foto</span>
                 </button>
 
-                {!(isDemoMode || isSafeDemoMode(settings?.congregationNumber || settings?.congregationId, settings?.isRegistered)) && (() => {
+                {!activeIsDemo && (() => {
                   const googlePhoto =
                     user?.photoURL ||
                     (typeof window !== 'undefined'
@@ -572,9 +524,9 @@ export const UserProfileSettingsView: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleRestoreGooglePhoto}
-                        className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-slate-200 dark:border-slate-700"
+                        className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-200/80 dark:border-slate-700"
                       >
-                        <span>Usar foto de Google</span>
+                        <span>Foto Google</span>
                       </button>
                     );
                   }
@@ -584,9 +536,9 @@ export const UserProfileSettingsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowUrlInput((prev) => !prev)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-slate-200 dark:border-slate-700"
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-200/80 dark:border-slate-700"
                 >
-                  <ImageIcon className="w-3.5 h-3.5" />
+                  <ImageIcon className="w-3.5 h-3.5 text-slate-500" />
                   <span>Enlace URL</span>
                 </button>
 
@@ -594,312 +546,378 @@ export const UserProfileSettingsView: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleRemovePhoto}
-                    className="px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border border-rose-200 dark:border-rose-800"
-                    title="Quitar foto y usar iniciales"
+                    className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-rose-200 dark:border-rose-800/60"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Quitar</span>
                   </button>
                 )}
               </div>
+            </div>
+          </div>
 
-              {/* URL Input collapse */}
-              {showUrlInput && (
-                <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
-                  <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-300">
-                    Pegar enlace directo de imagen (HTTPS):
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="url"
-                      value={customUrlTemp}
-                      onChange={(e) => setCustomUrlTemp(e.target.value)}
-                      placeholder="https://ejemplo.com/mi-foto.jpg"
-                      className="flex-1 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleApplyCustomUrl}
-                      className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer"
-                    >
-                      Aplicar
-                    </button>
-                  </div>
-                </div>
+          {/* Primary Save Action */}
+          <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end justify-between gap-2 shrink-0 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-100 dark:border-slate-800">
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {isSaving ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>Guardando...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span>Guardar Cambios</span>
+                </>
               )}
+            </button>
+            {userProfile?.updatedAt && (
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 text-center sm:text-right">
+                Última actualización: {new Date(userProfile.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
+            )}
+          </div>
+        </div>
 
-              {/* Presets Gallery */}
-              <div className="pt-2">
-                <span className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-2">
-                  O elige un avatar temático teocrático:
-                </span>
-                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
-                  {AVATAR_PRESETS.map((preset) => {
-                    const isSelected = selectedPresetId === preset.id || photoURL === preset.dataUrl;
-                    return (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        onClick={() => handleSelectPreset(preset)}
-                        className={`p-2 rounded-2xl border text-center flex flex-col items-center justify-center transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 ring-2 ring-indigo-500/20 shadow-xs'
-                            : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 hover:border-slate-300'
-                        }`}
-                        title={preset.name}
-                      >
-                        <span className="text-xl mb-1">{preset.icon}</span>
-                        <span className="text-[9px] font-semibold text-slate-700 dark:text-slate-300 truncate w-full">
-                          {preset.name.split(' ')[0]}
-                        </span>
-                      </button>
-                    );
-                  })}
+        {/* URL Input collapse */}
+        {showUrlInput && (
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <input
+              type="url"
+              value={customUrlTemp}
+              onChange={(e) => setCustomUrlTemp(e.target.value)}
+              placeholder="Pegar enlace directo de imagen (https://ejemplo.com/mi-foto.jpg)"
+              className="flex-1 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-white"
+            />
+            <button
+              type="button"
+              onClick={handleApplyCustomUrl}
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer shrink-0"
+            >
+              Aplicar URL
+            </button>
+          </div>
+        )}
+
+        {/* Compact Avatar Presets Bar */}
+        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0">
+            Avatares predefinidos:
+          </span>
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 w-full flex-1">
+            {AVATAR_PRESETS.map((preset) => {
+              const isSelected = selectedPresetId === preset.id || photoURL === preset.dataUrl;
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => handleSelectPreset(preset)}
+                  className={`px-2.5 py-1.5 rounded-xl border text-center flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-2xs font-bold'
+                      : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
+                  }`}
+                  title={preset.name}
+                >
+                  <span className="text-sm">{preset.icon}</span>
+                  <span className="text-[10px] truncate">{preset.name.split(' ')[0]}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Feedback Notifications */}
+      {saveSuccess && (
+        <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between text-xs font-semibold text-emerald-900 dark:text-emerald-200 shadow-2xs">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>Perfil y preferencias actualizados correctamente.</span>
+          </div>
+        </div>
+      )}
+
+      {saveError && (
+        <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 flex items-center gap-2.5 text-xs font-semibold text-rose-900 dark:text-rose-200">
+          <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+          <span>{saveError}</span>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 2. TWO-COLUMN DESKTOP WORKSPACE GRID                                      */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* LEFT COLUMN (7 cols): Identity, Contact Channels & Schedule Preferences */}
+        <div className="lg:col-span-7 space-y-5">
+          {/* Card A: Datos Personales y Canales de Contacto */}
+          <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-5">
+            <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span>Identidad y Canales de Contacto</span>
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Información visible en los tableros de asignaciones y directorio de la congregación.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Nombre Visible */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Nombre Visible *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="Ej. Carlos Mendoza"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                />
+              </div>
+
+              {/* Correo de Cuenta (Solo lectura) */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Cuenta Vinculada
+                </label>
+                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 text-xs">
+                  <span className="font-mono truncate">
+                    {user?.email || (activeIsDemo ? 'modo.prueba@kongre.org' : 'Sesión local activa')}
+                  </span>
+                  <span className="text-[10px] font-semibold text-slate-400 shrink-0 ml-2">
+                    {user ? 'Verificada' : 'Local'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Teléfono / WhatsApp */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Teléfono / WhatsApp
+                  </label>
+                  {cleanPhoneForWa && (
+                    <a
+                      href={`https://wa.me/${cleanPhoneForWa}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1 font-semibold"
+                    >
+                      <span>Probar chat</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+                <div className="relative">
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+52 55 1234 5678"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden font-mono"
+                  />
+                  <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                </div>
+              </div>
+
+              {/* Correo Alternativo */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Correo Alternativo (Opcional)
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={secondaryEmail}
+                    onChange={(e) => setSecondaryEmail(e.target.value)}
+                    placeholder="correo.alternativo@ejemplo.com"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  />
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* ========================================================================= */}
-        {/* CARD 2: NOMBRE VISIBLE E IDENTIDAD TEOCRÁTICA                              */}
-        {/* ========================================================================= */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-          <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Nombre Visible e Identidad
+          {/* Card B: Preferencias de Comunicación y Disponibilidad */}
+          <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-5">
+            <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <Sliders className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span>Preferencias de Comunicación y Horario</span>
               </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Elige cómo y cuándo prefieres recibir confirmaciones de partes y avisos de la congregación.
+              </p>
             </div>
-            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-              {effectiveRoleInfo.name}
-            </span>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Nombre Visible */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Nombre Visible en la Aplicación: *
+            {/* Método de Contacto Preferido */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Canal de Contacto Preferido
               </label>
-              <input
-                type="text"
-                required
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Ej. Hno. Carlos Mendoza"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {[
+                  {
+                    id: 'whatsapp' as PreferredContactMethod,
+                    title: 'WhatsApp',
+                    desc: 'Mensajes directos',
+                    icon: MessageSquare,
+                  },
+                  {
+                    id: 'email' as PreferredContactMethod,
+                    title: 'Correo',
+                    desc: 'Hojas S-89 y PDF',
+                    icon: Mail,
+                  },
+                  {
+                    id: 'phone' as PreferredContactMethod,
+                    title: 'Llamada',
+                    desc: 'Avisos urgentes',
+                    icon: Phone,
+                  },
+                  {
+                    id: 'sms' as PreferredContactMethod,
+                    title: 'SMS',
+                    desc: 'Sin datos móviles',
+                    icon: Send,
+                  },
+                ].map((method) => {
+                  const Icon = method.icon;
+                  const isSelected = preferredContactMethod === method.id;
+                  return (
+                    <button
+                      key={method.id}
+                      type="button"
+                      onClick={() => setPreferredContactMethod(method.id)}
+                      className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
+                        isSelected
+                          ? 'bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 text-indigo-900 dark:text-indigo-200 ring-2 ring-indigo-500/15 shadow-2xs'
+                          : 'bg-slate-50/70 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <Icon className={`w-4 h-4 ${isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'}`} />
+                        {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />}
+                      </div>
+                      <div>
+                        <span className="block text-xs font-bold leading-tight">{method.title}</span>
+                        <span className="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{method.desc}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Franja Horaria Preferida */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Franja Horaria Preferida
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {[
+                  { id: 'morning' as ContactTimePreference, label: 'Mañanas', sub: '8:00 – 12:00', icon: Sun },
+                  { id: 'afternoon' as ContactTimePreference, label: 'Tardes', sub: '12:00 – 18:00', icon: Sunset },
+                  { id: 'evening' as ContactTimePreference, label: 'Noches', sub: '18:00 – 21:30', icon: Moon },
+                  { id: 'anytime' as ContactTimePreference, label: 'Cualquier hora', sub: 'Disponible', icon: Clock },
+                ].map((time) => {
+                  const TimeIcon = time.icon;
+                  const isSelected = contactTimePreference === time.id;
+                  return (
+                    <button
+                      key={time.id}
+                      type="button"
+                      onClick={() => setContactTimePreference(time.id)}
+                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                        isSelected
+                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                          : 'bg-slate-50/70 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <TimeIcon className={`w-4 h-4 mb-1.5 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
+                      <div>
+                        <span className="block text-xs font-bold leading-tight">{time.label}</span>
+                        <span className={`block text-[10px] mt-0.5 ${isSelected ? 'text-indigo-100' : 'text-slate-400'}`}>
+                          {time.sub}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Notas de Disponibilidad */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Notas de Disponibilidad o Circunstancias (Opcional)
+              </label>
+              <textarea
+                rows={2}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Ej. Disponible fines de semana sin restricción. Jueves en turno laboral vespertino."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
               />
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
-                Este es el nombre con el que aparecerás identificado en la barra superior, asignaciones y programas.
-              </span>
-            </div>
-
-            {/* Correo Electrónico Principal (Google Auth) */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Correo Electrónico de la Cuenta (Google):
-              </label>
-              <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 text-sm">
-                <span className="font-mono text-xs truncate">
-                  {user?.email || 'Sin sesión activa de Google'}
-                </span>
-                {user ? (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">
-                    Verificado
-                  </span>
-                ) : (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700 text-slate-600">
-                    Local
-                  </span>
-                )}
-              </div>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
-                El correo está vinculado a tu autenticación y no puede modificarse desde aquí.
-              </span>
             </div>
           </div>
         </div>
 
-        {/* ========================================================================= */}
-        {/* CARD 3: CANALES Y PREFERENCIAS DE CONTACTO                                 */}
-        {/* ========================================================================= */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-          <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <Phone className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Canales y Preferencias de Contacto
+        {/* RIGHT COLUMN (5 cols): Account Summary & Web Push Notifications */}
+        <div className="lg:col-span-5 space-y-5">
+          {/* Card C: Ficha Resumen de Cuenta */}
+          <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
+            <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                <span>Resumen de Ficha Personal</span>
               </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Así se muestra tu perfil en las asignaciones y listas de contacto.
+              </p>
             </div>
-            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-              Notificaciones
-            </span>
-          </div>
 
-          {/* Teléfono & Correo Secundario */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Teléfono Principal / WhatsApp */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center justify-between">
-                <span>Teléfono Principal / WhatsApp:</span>
-                {cleanPhoneForWa && (
-                  <a
-                    href={`https://wa.me/${cleanPhoneForWa}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 font-semibold"
-                  >
-                    <span>Probar enlace WhatsApp</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                )}
-              </label>
-              <div className="relative">
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+34 600 000 000 o 55 1234 5678"
-                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-hidden font-mono"
-                />
-                <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+            <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+              <div className="py-2.5 flex items-center justify-between gap-2">
+                <span className="text-slate-500 dark:text-slate-400">Rol activo</span>
+                <span className="font-bold text-slate-900 dark:text-white">{effectiveRoleInfo.name}</span>
               </div>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
-                Incluye el prefijo internacional para facilitar el envío de asignaciones por WhatsApp.
-              </span>
-            </div>
-
-            {/* Correo Alternativo / Ministerial */}
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Correo Alternativo o Ministerial (Opcional):
-              </label>
-              <div className="relative">
-                <input
-                  type="email"
-                  value={secondaryEmail}
-                  onChange={(e) => setSecondaryEmail(e.target.value)}
-                  placeholder="ejemplo.ministerio@gmail.com"
-                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
-                />
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <div className="py-2.5 flex items-center justify-between gap-2">
+                <span className="text-slate-500 dark:text-slate-400">Canal preferido</span>
+                <span className="font-bold text-slate-900 dark:text-white">{contactMethodLabels[preferredContactMethod]}</span>
               </div>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
-                Útil si prefieres recibir avisos y copias de hojas S-89 en una cuenta secundaria.
-              </span>
+              <div className="py-2.5 flex items-center justify-between gap-2">
+                <span className="text-slate-500 dark:text-slate-400">Horario de contacto</span>
+                <span className="font-bold text-slate-900 dark:text-white">{contactTimeLabels[contactTimePreference]}</span>
+              </div>
+              <div className="py-2.5 flex items-center justify-between gap-2">
+                <span className="text-slate-500 dark:text-slate-400">Teléfono registrado</span>
+                <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
+                  {phone || 'No especificado'}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Método de Contacto Preferido */}
-          <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-              Método de Contacto Preferido:
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {[
-                {
-                  id: 'whatsapp' as PreferredContactMethod,
-                  title: 'WhatsApp',
-                  subtitle: 'Avisos directos y confirmaciones de asignación',
-                  icon: MessageSquare,
-                  activeColor: 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300',
-                },
-                {
-                  id: 'email' as PreferredContactMethod,
-                  title: 'Correo Electrónico',
-                  subtitle: 'Hojas S-89 en PDF y programas mensuales',
-                  icon: Mail,
-                  activeColor: 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/30 text-indigo-800 dark:text-indigo-300',
-                },
-                {
-                  id: 'phone' as PreferredContactMethod,
-                  title: 'Llamada Telefónica',
-                  subtitle: 'Para asuntos urgentes o cambios de última hora',
-                  icon: Phone,
-                  activeColor: 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/30 text-blue-800 dark:text-blue-300',
-                },
-                {
-                  id: 'sms' as PreferredContactMethod,
-                  title: 'Mensaje de Texto (SMS)',
-                  subtitle: 'Recordatorios breves sin conexión de datos',
-                  icon: Bell,
-                  activeColor: 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300',
-                },
-              ].map((method) => {
-                const Icon = method.icon;
-                const isSelected = preferredContactMethod === method.id;
-                return (
-                  <button
-                    key={method.id}
-                    type="button"
-                    onClick={() => setPreferredContactMethod(method.id)}
-                    className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
-                      isSelected
-                        ? `${method.activeColor} ring-2 ring-indigo-500/20 shadow-xs font-semibold`
-                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <Icon className="w-4 h-4" />
-                      {isSelected && <Check className="w-4 h-4" />}
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">
-                        {method.title}
-                      </h4>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
-                        {method.subtitle}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Horario de Contacto Preferido */}
-          <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-              Franja Horaria Preferida para Recibir Comunicaciones:
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              {[
-                { id: 'morning' as ContactTimePreference, label: '🌅 Mañanas (8:00 - 12:00)' },
-                { id: 'afternoon' as ContactTimePreference, label: '☀️ Tardes (12:00 - 18:00)' },
-                { id: 'evening' as ContactTimePreference, label: '🌙 Noches (18:00 - 21:30)' },
-                { id: 'anytime' as ContactTimePreference, label: '🕒 Cualquier hora' },
-              ].map((time) => {
-                const isSelected = contactTimePreference === time.id;
-                return (
-                  <button
-                    key={time.id}
-                    type="button"
-                    onClick={() => setContactTimePreference(time.id)}
-                    className={`p-2.5 rounded-xl border text-center text-xs font-semibold transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
-                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300'
-                    }`}
-                  >
-                    {time.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Notificaciones y Avisos Web Push */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-4">
-            <div className="flex items-center justify-between gap-4">
+          {/* Card D: Notificaciones Web Push y Recordatorios */}
+          <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
+            <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                  <Bell className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                  <span>Notificaciones Web Push y Recordatorios Automáticos</span>
-                </p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  Recibe avisos nativos en tu navegador o móvil antes de tus asignaciones (partes estudiantiles, discursos, audio, micro y aseo).
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  <span>Avisos Push y Recordatorios</span>
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Alertas automáticas en tu dispositivo antes de tus asignaciones.
                 </p>
               </div>
 
@@ -918,7 +936,6 @@ export const UserProfileSettingsView: React.FC = () => {
               </label>
             </div>
 
-            {/* Guía Visual y Botón de Suscripción Push en 1 clic */}
             <PushNotificationQuickGuideCard
               publisherId={currentPublisherId || user?.uid || 'usuario'}
               publisherName={displayName || currentBrotherName || user?.displayName || 'Hermano'}
@@ -938,10 +955,9 @@ export const UserProfileSettingsView: React.FC = () => {
               compact
             />
 
-            {/* Ajustes avanzados de anticipación */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-slate-200 dark:border-slate-700/60 text-xs">
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-slate-600 dark:text-slate-400">Anticipación de aviso:</span>
+                <span className="text-slate-600 dark:text-slate-400 font-medium">Anticipación de aviso:</span>
                 <select
                   value={notifPrefs.notifyDaysBefore}
                   onChange={(e) => {
@@ -949,7 +965,7 @@ export const UserProfileSettingsView: React.FC = () => {
                     saveNotificationPreferences({ notifyDaysBefore: days });
                     setNotifPrefs((prev) => ({ ...prev, notifyDaysBefore: days }));
                   }}
-                  className="py-1 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-semibold text-slate-800 dark:text-slate-200"
+                  className="py-1.5 px-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-semibold text-slate-800 dark:text-slate-200"
                 >
                   <option value={1}>1 día antes (24h)</option>
                   <option value={2}>2 días antes (48h)</option>
@@ -958,7 +974,7 @@ export const UserProfileSettingsView: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between gap-2">
-                <span className="text-slate-600 dark:text-slate-400">Incluir turnos y aseo:</span>
+                <span className="text-slate-600 dark:text-slate-400 font-medium">Incluir turnos de audio, micro y aseo:</span>
                 <input
                   type="checkbox"
                   checked={notifPrefs.notifyDuties}
@@ -969,54 +985,29 @@ export const UserProfileSettingsView: React.FC = () => {
                   className="w-4 h-4 rounded text-indigo-600 cursor-pointer"
                 />
               </div>
+
+              {isNotificationSupported() && browserPermission === 'granted' && (
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    disabled={isSendingTestNotif}
+                    onClick={handleSendTestNotification}
+                    className="w-full py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <Bell className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>{isSendingTestNotif ? 'Enviando prueba...' : 'Enviar Notificación de Prueba'}</span>
+                  </button>
+                  {testNotifResult && (
+                    <p className={`mt-1.5 text-[11px] font-medium ${testNotifResult.success ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                      {testNotifResult.msg}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
-
-          {/* Notas de Disponibilidad */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-              Notas Adicionales de Disponibilidad o Circunstancias (Opcional):
-            </label>
-            <textarea
-              rows={2}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Ej. 'Fines de semana disponibles sin restricción. Los jueves trabajo en horario nocturno.'"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
-            />
-          </div>
         </div>
-
-        {/* ========================================================================= */}
-        {/* SUBMIT BUTTON BAR                                                         */}
-        {/* ========================================================================= */}
-        <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-4 z-20">
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-            <Info className="w-4 h-4 text-indigo-500 shrink-0" />
-            <span>Los cambios se guardan de forma instantánea y persistente en Firestore.</span>
-          </div>
-
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              {isSaving ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Guardando en Firestore...</span>
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  <span>Guardar Mi Perfil</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </form>
+      </div>
 
       <PushSubscriptionModal
         isOpen={isPushModalOpen}
@@ -1040,6 +1031,6 @@ export const UserProfileSettingsView: React.FC = () => {
           setNotifPrefs(getNotificationPreferences());
         }}
       />
-    </div>
+    </form>
   );
 };

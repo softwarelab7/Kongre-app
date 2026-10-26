@@ -199,7 +199,7 @@ export const MantenimientoTab: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-[#0b1329] text-zinc-900 dark:text-zinc-100 transition-colors">
+    <div className="space-y-6 w-full">
       {/* Toast Feedback */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-[300] bg-indigo-600 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-in slide-in-from-bottom-3 duration-200">
@@ -211,98 +211,95 @@ export const MantenimientoTab: React.FC = () => {
         </div>
       )}
 
-      {/* Main Container */}
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
-        {/* Top Sub-Navigation & Action Bar */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          <div className="flex rounded-xl border border-zinc-200/80 dark:border-white/[0.08] bg-zinc-100/90 dark:bg-slate-900/60 p-1 shadow-2xs overflow-x-auto no-scrollbar gap-1">
-            <button
-              onClick={() => setActiveSubView('fichas')}
-              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                activeSubView === 'fichas'
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-              }`}
-            >
-              <Wrench className="w-3.5 h-3.5" />
-              <span>Fichas Operativas</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 font-bold">
-                {stats.total}
-              </span>
-            </button>
+      {/* Top Sub-Navigation & Action Bar (Unified Container) */}
+      <div className="bg-white dark:bg-slate-900 p-3.5 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-3">
+        {/* Subtabs in a 3-column non-clipping mobile grid */}
+        <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80">
+          <button
+            onClick={() => setActiveSubView('fichas')}
+            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+              activeSubView === 'fichas'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+            }`}
+          >
+            <Wrench className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Fichas</span>
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 font-bold shrink-0">
+              {stats.total}
+            </span>
+          </button>
 
-            <button
-              onClick={() => setActiveSubView('calendario_anual')}
-              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                activeSubView === 'calendario_anual'
-                  ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-              }`}
-            >
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Calendario Anual (12 Meses)</span>
-            </button>
+          <button
+            onClick={() => setActiveSubView('calendario_anual')}
+            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+              activeSubView === 'calendario_anual'
+                ? 'bg-white dark:bg-indigo-600 text-indigo-700 dark:text-white shadow-xs font-bold'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+            }`}
+          >
+            <Calendar className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Anual (12M)</span>
+          </button>
 
-            <button
-              onClick={() => setActiveSubView('emergencias')}
-              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                activeSubView === 'emergencias'
-                  ? 'bg-white dark:bg-rose-600 text-rose-700 dark:text-white shadow-xs font-bold'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
-              }`}
-            >
-              <Shield className="w-3.5 h-3.5" />
-              <span>Plan de Emergencias y Seguridad</span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* Print Annual Register A4 */}
-            <button
-              onClick={() =>
-                printAnnualMaintenanceProgramA4({
-                  settings,
-                  sheets: maintenanceSheets,
-                  publishersMap,
-                })
-              }
-              title="Imprimir el Programa Anual de Mantenimiento Preventivo en formato A4"
-              className="px-3 py-2 rounded-xl border border-zinc-200 dark:border-white/[0.08] bg-white dark:bg-slate-900/60 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-slate-800 transition-colors flex items-center gap-2 text-xs font-semibold shadow-2xs cursor-pointer active:scale-95"
-            >
-              <Printer size={15} />
-              <span>Programa Anual A4</span>
-            </button>
-
-            {/* Print Emergency Plan A4 */}
-            <button
-              onClick={() =>
-                printEmergencyPreparednessPlanA4({
-                  settings,
-                  publishers,
-                  preachingGroups,
-                  breakers,
-                })
-              }
-              title="Imprimir Plan de Emergencias y Árbol de Contacto por Grupos en formato A4"
-              className="px-3 py-2 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 transition-colors flex items-center gap-2 text-xs font-semibold shadow-2xs cursor-pointer active:scale-95"
-            >
-              <Printer size={15} />
-              <span>Plan Emergencias A4</span>
-            </button>
-
-            {/* New Sheet Button */}
-            <button
-              onClick={() => {
-                setEditingSheet(null);
-                setIsModalOpen(true);
-              }}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-indigo-500/25 transition-all cursor-pointer active:scale-95"
-            >
-              <Plus size={15} />
-              <span>Nueva Ficha</span>
-            </button>
-          </div>
+          <button
+            onClick={() => setActiveSubView('emergencias')}
+            className={`flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+              activeSubView === 'emergencias'
+                ? 'bg-white dark:bg-rose-600 text-rose-700 dark:text-white shadow-xs font-bold'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
+            }`}
+          >
+            <Shield className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Emergencias</span>
+          </button>
         </div>
+
+        {/* Action buttons in responsive grid */}
+        <div className="grid grid-cols-2 sm:flex sm:items-center sm:justify-end gap-2">
+          <button
+            onClick={() =>
+              printAnnualMaintenanceProgramA4({
+                settings,
+                sheets: maintenanceSheets,
+                publishersMap,
+              })
+            }
+            title="Imprimir el Programa Anual de Mantenimiento Preventivo en formato A4"
+            className="px-3 py-2 rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-zinc-700 dark:text-zinc-300 transition-colors flex items-center justify-center gap-2 text-xs font-semibold shadow-2xs cursor-pointer active:scale-95"
+          >
+            <Printer size={15} />
+            <span>Programa A4</span>
+          </button>
+
+          <button
+            onClick={() =>
+              printEmergencyPreparednessPlanA4({
+                settings,
+                publishers,
+                preachingGroups,
+                breakers,
+              })
+            }
+            title="Imprimir Plan de Emergencias y Árbol de Contacto por Grupos en formato A4"
+            className="px-3 py-2 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors flex items-center justify-center gap-2 text-xs font-semibold shadow-2xs cursor-pointer active:scale-95"
+          >
+            <Printer size={15} />
+            <span>Emergencias A4</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setEditingSheet(null);
+              setIsModalOpen(true);
+            }}
+            className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase tracking-wider shadow-md shadow-indigo-500/25 transition-all cursor-pointer active:scale-95"
+          >
+            <Plus size={15} />
+            <span>Nueva Ficha</span>
+          </button>
+        </div>
+      </div>
 
         {/* ========================================================= */}
         {/* SUBVIEW 1: FICHAS OPERATIVAS DE MANTENIMIENTO             */}
@@ -937,7 +934,6 @@ export const MantenimientoTab: React.FC = () => {
             </p>
           </div>
         </div>
-      </div>
 
       {/* Sheet Add / Edit Modal */}
       <MaintenanceSheetModal

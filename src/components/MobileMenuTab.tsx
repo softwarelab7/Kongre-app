@@ -457,165 +457,10 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
 
   return (
     <div className="pb-24 pt-1 max-w-3xl mx-auto px-1 sm:px-3 space-y-3 select-none animate-in fade-in duration-150">
-      
       {/* =========================================================================
-          1. COMPACT IDENTITY & QUICK CONTROLS BAR (Single clean card, zero overflow)
+          1. QUICK TOOLS STRIP (Compact single-row scrollable / 6-col bar)
          ========================================================================= */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl p-3 border border-slate-200/80 dark:border-slate-800 shadow-2xs flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <button
-            type="button"
-            onClick={() => handleNavigate('perfil')}
-            className="w-10 h-10 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center text-sm shrink-0 overflow-hidden shadow-2xs cursor-pointer active:scale-95"
-          >
-            {(() => {
-              const effectiveAvatar = isDemoMode
-                ? userProfile?.photoURL || null
-                : userProfile?.photoURL ||
-                  user?.photoURL ||
-                  settings?.coordinatorPhotoURL ||
-                  (typeof window !== 'undefined'
-                    ? localStorage.getItem('kongre_user_photo') ||
-                      localStorage.getItem('kongre_google_photo') ||
-                      localStorage.getItem('kongre_coordinator_photo')
-                    : null);
-
-              if (effectiveAvatar) {
-                return (
-                  <img
-                    src={effectiveAvatar}
-                    alt="Usuario"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLElement).style.display = 'none';
-                    }}
-                  />
-                );
-              }
-              return <span>{effectiveDisplayName.charAt(0).toUpperCase()}</span>;
-            })()}
-          </button>
-
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                {effectiveDisplayName}
-              </p>
-            </div>
-            <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
-              <button
-                type="button"
-                onClick={() => handleNavigate('roles')}
-                className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline truncate max-w-full cursor-pointer"
-              >
-                <Shield className="w-3 h-3 shrink-0" />
-                <span className="truncate">{shortRoleLabel}</span>
-              </button>
-              <span className="text-slate-300 dark:text-slate-700">•</span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                {displayCongregationName}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Compact right utility buttons */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            aria-label={isDark ? 'Modo Claro' : 'Modo Oscuro'}
-            title={isDark ? 'Modo Claro' : 'Modo Oscuro'}
-            className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center cursor-pointer active:scale-95"
-          >
-            {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
-          </button>
-
-          {!isDemoMode && (
-            <button
-              type="button"
-              onClick={lockSession}
-              aria-label="Bloquear con PIN"
-              title="Bloquear con PIN"
-              className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center cursor-pointer active:scale-95"
-            >
-              <Lock className="w-3.5 h-3.5" />
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={handleLogout}
-            aria-label="Cerrar sesión"
-            title="Cerrar sesión"
-            className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center cursor-pointer active:scale-95"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-
-      {/* =========================================================================
-          2. SEARCH + CATEGORY FILTER BAR
-         ========================================================================= */}
-      <div className="space-y-2">
-        <div className="relative">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            placeholder="Buscar sección (ej. S-21, S-89, Cuentas, Territorios)..."
-            aria-label="Buscar sección en el menú"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-10 pl-9 pr-9 rounded-xl border border-slate-200 dark:border-slate-800 text-xs bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white placeholder:text-slate-400"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery('')}
-              aria-label="Limpiar búsqueda"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-
-        {/* Category Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
-          {[
-            { id: 'all', label: 'Todos' },
-            { id: 'ministerio', label: 'Ministerio' },
-            { id: 'reuniones', label: 'Reuniones' },
-            { id: 'secretaria', label: 'Secretaría' },
-            { id: 'predicacion', label: 'Predicación' },
-            { id: 'salon', label: 'Salón' },
-            { id: 'supervision', label: 'Control' },
-          ].map((cat) => {
-            const isSelected = selectedCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`h-8 px-3 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer active:scale-95 ${
-                  isSelected
-                    ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800'
-                }`}
-              >
-                {cat.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* =========================================================================
-          3. QUICK TOOLS STRIP (Compact single-row scrollable / 6-col bar)
-         ========================================================================= */}
-      {!searchQuery && selectedCategory === 'all' && (
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
           {onOpenPinsModal && (
             <button
               type="button"
@@ -693,11 +538,10 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
               </span>
             </button>
           )}
-        </div>
-      )}
+      </div>
 
       {/* =========================================================================
-          4. DEPARTMENTS & MODULES (Clean 2-Column Tactile Grid immediately visible!)
+          2. DEPARTMENTS & MODULES (Clean 2-Column Tactile Grid immediately visible!)
          ========================================================================= */}
       {filteredDepartments.length === 0 ? (
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 text-center border border-slate-200/80 dark:border-slate-800 space-y-2.5">

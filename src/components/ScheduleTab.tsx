@@ -796,27 +796,27 @@ export const ScheduleTab: React.FC = () => {
         </div>
 
         {/* ── BARRA DE HERRAMIENTAS DE ACCIONES ── */}
-        <div className="flex items-center justify-between gap-1.5 sm:gap-2 pt-2.5 border-t border-slate-200/60 dark:border-white/[0.06] w-full text-xs flex-wrap">
+        <div className="flex items-center justify-between gap-1 sm:gap-2 pt-2.5 border-t border-slate-200/60 dark:border-white/[0.06] w-full text-xs">
           {/* Lado izquierdo: Acciones clave con diseño limpio */}
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
             {!isReadOnly ? (
               <button
                 onClick={autoAssignCurrentWeek}
-                className="min-h-[36px] sm:min-h-0 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-2xs cursor-pointer active:scale-95"
+                className="min-h-[34px] sm:min-h-0 flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shadow-2xs cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
                 title="Autoasignar toda esta semana respetando rotación y sin cruces"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0" />
                 <span>Autoasignar</span>
               </button>
             ) : (
-              <span className="text-slate-500 text-xs font-medium px-2 py-1 bg-slate-100 dark:bg-white/5 rounded-lg">
+              <span className="text-slate-500 text-[11px] sm:text-xs font-medium px-2 py-1 bg-slate-100 dark:bg-white/5 rounded-lg truncate">
                 Solo lectura ({effectiveRoleInfo.shortName})
               </span>
             )}
 
             <button
               onClick={() => setIsBatchWhatsAppOpen(true)}
-              className="min-h-[36px] sm:min-h-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 font-medium transition-all cursor-pointer active:scale-95"
+              className="min-h-[34px] sm:min-h-0 flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 rounded-xl text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 font-medium transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0"
               title="Enviar recordatorios de la semana por WhatsApp"
             >
               <MessageCircle className="w-3.5 h-3.5 shrink-0" />
@@ -825,7 +825,7 @@ export const ScheduleTab: React.FC = () => {
           </div>
 
           {/* Lado derecho: Documentos, Cruces y Menú Más */}
-          <div className="flex items-center gap-1.5 flex-wrap ml-auto sm:ml-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 ml-auto">
             {/* S-89 oficial (en escritorio visible directo, en móvil dentro de Más Opciones) */}
             <button
               type="button"
@@ -863,7 +863,7 @@ export const ScheduleTab: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsConflictsModalOpen(true)}
-              className={`min-h-[36px] sm:min-h-0 flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-semibold transition-all cursor-pointer border active:scale-95 ${
+              className={`min-h-[34px] sm:min-h-0 flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl font-semibold transition-all cursor-pointer border active:scale-95 whitespace-nowrap shrink-0 ${
                 weekConflictsCount > 0
                   ? 'bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
                   : 'text-slate-600 dark:text-zinc-300 border-slate-200/80 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5'
@@ -879,11 +879,11 @@ export const ScheduleTab: React.FC = () => {
             </button>
 
             {/* Menú Desplegable "Más Opciones" */}
-            <div className="relative">
+            <div className="relative shrink-0">
               <button
                 type="button"
                 onClick={() => setIsMoreMenuOpen((prev) => !prev)}
-                className="min-h-[36px] min-w-[36px] sm:min-h-0 sm:min-w-0 flex items-center justify-center gap-1 p-1.5 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer active:scale-95"
+                className="min-h-[34px] min-w-[34px] sm:min-h-0 sm:min-w-0 flex items-center justify-center gap-1 p-1.5 rounded-xl text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/80 dark:border-white/10 transition-all cursor-pointer active:scale-95"
                 title="Más herramientas, S-89, S-38 y opciones"
                 aria-label="Más herramientas y opciones"
               >

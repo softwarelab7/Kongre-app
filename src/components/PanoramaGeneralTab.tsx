@@ -1059,47 +1059,6 @@ export const PanoramaGeneralTab: React.FC<PanoramaGeneralTabProps> = ({ setActiv
 
   return (
     <div className="max-w-4xl mx-auto space-y-4 sm:space-y-5 animate-fade-in select-none">
-      {/* Cabecera contextual de Mi Congregación */}
-      <div className="flex items-center justify-between gap-3 flex-wrap bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-2xl px-4 py-3 shadow-2xs">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-            <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
-              {settings.congregationName || 'Mi Congregación'}
-            </span>
-            {settings.circuitNumber && (
-              <>
-                <span aria-hidden="true">·</span>
-                <span>Circuito {settings.circuitNumber}</span>
-              </>
-            )}
-            {isDemoMode && (
-              <>
-                <span aria-hidden="true">·</span>
-                <span className="text-amber-600 dark:text-amber-400 font-semibold">
-                  Modo Demostración Interactivo
-                </span>
-              </>
-            )}
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Resumen personal de informe, privilegios próximos, cartelera y eventos
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          {canViewSecretariaStats && (
-            <button
-              type="button"
-              onClick={() => setActiveTab('estadisticas_secretaria')}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200/80 dark:border-slate-700/80 text-xs font-semibold transition-all cursor-pointer"
-            >
-              <BarChart3 className="w-3.5 h-3.5 text-indigo-500" />
-              <span>Estadísticas S-1 / S-21</span>
-            </button>
-          )}
-        </div>
-      </div>
-
       {/* =========================================================================
           1. FILA SUPERIOR: INFORME & PRÓXIMOS (2 TARJETAS LADO A LADO)
          ========================================================================= */}

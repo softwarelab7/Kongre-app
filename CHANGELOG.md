@@ -6,6 +6,25 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.27] — 26 de Octubre, 2026
+**Optimización de Interfaz Móvil: Menú Limpio, Calendario Integrado, Mi Ministerio y Programa de Reuniones**
+
+- 📱 **Menú Móvil sin Banners Redundantes (`MobileMenuTab.tsx`):**
+  - Se eliminaron el banner superior de perfil y la barra de búsqueda y píldoras de categorías, permitiendo ver de inmediato las herramientas rápidas (`PINs`, `Atril`, `Kiosko`, `QR`, `Cruces`, `Sincronía`) y las tarjetas de departamentos.
+- 📅 **Calendario con Botón `+` Integrado (`CongregationCalendar.tsx`):**
+  - Se retiró el banner superior con el campo de búsqueda y se integró el botón `+` (`Crear Evento`) directamente dentro de la barra de navegación superior del contenedor del calendario junto a `Hoy`, `< >` y el mes activo.
+- ⏱️ **Ajustes de Diseño Móvil en Mi Ministerio (`MinisterioPublicadorTab.tsx`, `MinistryStopwatchDial.tsx`):**
+  - **Meta y Registro Mensual:** El selector de meta de horas (`Meta: 15 h (Prec. Auxiliar)`) y el título `Resumen de Octubre 2026` se apilan limpiamente en móvil sin desbordarse fuera de la tarjeta.
+  - **Tarjetas de Revisitas y Estudios Bíblicos:** Los botones `+ Nueva` / `Ver todas` y `+ Nuevo` / `Ver` mantienen su texto en una sola línea horizontal sin comprimir los títulos.
+  - **Cronómetro de Predicación:** Cabecera compacta y selector de modalidades en una sola tira horizontal deslizable sin ocupar múltiples filas.
+- 🏛️ **Simplificación en Mi Congregación y Programa (`PanoramaGeneralTab.tsx`, `ScheduleTab.tsx`, `ClmScheduleView.tsx`):**
+  - Se eliminó el banner superior redundante en `Mi Congregación`.
+  - En `Programa`, la barra de acciones (`Autoasignar`, `WhatsApp`, `Cruces`, `...`) se mantiene alineada en una sola fila compacta en móvil y el control de `Sala Auxiliar` se integra directamente en la cabecera de la `Reunión Entre Semana (VMC)`.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.26] — 26 de Octubre, 2026
 **Estabilidad en Reposo de Pestaña, Prevención de Pantalla en Blanco y Optimización de Sincronización en Segundo Plano**
 
@@ -17,10 +36,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - **Suspensión de Temporizadores en Segundo Plano:** Los intervalos de sincronización en la nube, suscripción remota y lectura de cola `IndexedDB` se pausan automáticamente mientras `document.visibilityState === 'hidden'` y cuentan con candado de concurrencia para no acumular tareas al despertar.
 - 🔒 **Ajuste de Auto-Bloqueo y Capa Modal (`SecurityContext.tsx`, `SessionLockModal.tsx`):**
   - **Temporizador Eficiente:** El contador de bloqueo por inactividad solo se activa cuando existe un PIN de bloqueo personal configurado, pausa sus ticks mientras la pestaña está oculta y utiliza `z-[100]` en el modal de bloqueo.
-
----
-
-## 📅 Historial de Actualizaciones Anteriores
 
 ### [v2.12.25] — 26 de Octubre, 2026
 **Blindaje de Concurrencia en Bóveda Local, Rotación Segura de Credenciales, Revalidación de Tokens y Cronómetro Estilo iOS**

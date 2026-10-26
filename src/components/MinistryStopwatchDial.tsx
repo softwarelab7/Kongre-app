@@ -126,8 +126,8 @@ export const MinistryStopwatchDial: React.FC<MinistryStopwatchDialProps> = ({
       {/* =========================================================================
           1. CABECERA COMPACTA: ESTADO + BOTÓN MANUAL
          ========================================================================= */}
-      <div className="relative z-10 flex items-center justify-between gap-2 pb-2.5 border-b border-slate-100 dark:border-slate-800/80">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="relative z-10 flex items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-slate-800/80">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <div
             className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 transition-all ${
               isRunning
@@ -140,27 +140,25 @@ export const MinistryStopwatchDial: React.FC<MinistryStopwatchDialProps> = ({
             <Timer className={`w-3.5 h-3.5 ${isRunning ? 'animate-spin' : ''}`} style={{ animationDuration: '6s' }} />
           </div>
 
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[11px] font-black tracking-wider uppercase text-slate-800 dark:text-slate-200 truncate">
-                Cronómetro de Predicación
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-[11px] font-black tracking-wide uppercase text-slate-800 dark:text-slate-200 truncate">
+              Cronómetro
+            </span>
+            {isRunning ? (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-800/60 shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                EN VIVO
               </span>
-              {isRunning ? (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-full text-[9px] font-black bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-800/60 shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                  EN VIVO
-                </span>
-              ) : displaySeconds > 0 ? (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-full text-[9px] font-black bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300/60 dark:border-amber-800/60 shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                  PAUSADO
-                </span>
-              ) : (
-                <span className="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200/80 dark:border-slate-700/80 shrink-0">
-                  LISTO
-                </span>
-              )}
-            </div>
+            ) : displaySeconds > 0 ? (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-black bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300/60 dark:border-amber-800/60 shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                PAUSADO
+              </span>
+            ) : (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200/80 dark:border-slate-700/80 shrink-0">
+                LISTO
+              </span>
+            )}
           </div>
         </div>
 
@@ -168,38 +166,37 @@ export const MinistryStopwatchDial: React.FC<MinistryStopwatchDialProps> = ({
           <button
             type="button"
             onClick={handleOpenManual}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[11px] transition-all cursor-pointer active:scale-95 shadow-2xs border border-slate-200/60 dark:border-slate-700/60 shrink-0"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[11px] transition-all cursor-pointer active:scale-95 shadow-2xs border border-slate-200/60 dark:border-slate-700/60 shrink-0 whitespace-nowrap"
             title="Añadir horas de predicación de forma manual"
           >
-            <CalendarPlus className="w-3 h-3 text-indigo-500" />
-            <span>Manual</span>
+            <CalendarPlus className="w-3 h-3 text-indigo-500 shrink-0" />
+            <span>+ Manual</span>
           </button>
         )}
       </div>
 
       {/* =========================================================================
-          2. SELECTOR DE MODALIDAD EN PÍLDORAS COMPACTAS
+          2. SELECTOR DE MODALIDAD EN TIRA HORIZONTAL COMPACTA (SIN SALTOS DE LÍNEA)
          ========================================================================= */}
       <div className="relative z-10">
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5 -mx-0.5 px-0.5">
           {MODALITY_OPTIONS.map((item) => {
             const isSelected = modality === item.key;
             const Icon = item.icon;
-            const displayLabel = modalityLabels?.[item.key] || item.label;
 
             return (
               <button
                 key={item.key}
                 type="button"
                 onClick={() => handleModalityChange(item.key)}
-                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer active:scale-95 ${
+                className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer active:scale-95 whitespace-nowrap shrink-0 ${
                   isSelected
                     ? 'bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-xs shadow-indigo-600/25 ring-1 ring-indigo-500/30'
                     : 'bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800/70 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60'
                 }`}
               >
-                <Icon className={`w-3 h-3 ${isSelected ? 'text-white' : 'text-slate-400 dark:text-slate-500'}`} />
-                <span>{displayLabel}</span>
+                <Icon className={`w-3 h-3 shrink-0 ${isSelected ? 'text-white' : 'text-slate-400 dark:text-slate-500'}`} />
+                <span>{item.label}</span>
               </button>
             );
           })}

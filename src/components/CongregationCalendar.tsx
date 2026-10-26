@@ -91,8 +91,21 @@ const CustomToolbar = (toolbar: any) => {
               <ChevronRight size={16} />
             </button>
           </div>
+          {label()}
         </div>
-        {label()}
+
+        {toolbar.onAddEvent && (
+          <button
+            type="button"
+            onClick={toolbar.onAddEvent}
+            title="Crear Evento"
+            aria-label="Crear Evento"
+            className="inline-flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs h-8 px-2.5 sm:px-3.5 rounded-xl shadow-xs transition-all cursor-pointer active:scale-95 shrink-0"
+          >
+            <Plus size={16} className="stroke-[2.5]" />
+            <span className="hidden sm:inline">Crear Evento</span>
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-4 sm:flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-2xs">
@@ -1070,60 +1083,7 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
   };
 
   return (
-    <div className="space-y-5 animate-fade-in select-none">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-2xs">
-            <CalendarIcon className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <span>Calendario de la</span>
-              <span className="text-indigo-600 dark:text-indigo-400">Congregación</span>
-            </h2>
-            <p className="text-xs text-slate-400">
-              Agenda sincronizada con las reuniones, visitas del SC, asambleas y actividades especiales
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
-            <input
-              type="text"
-              placeholder="Buscar evento o reunión..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-2 pl-9 pr-9 text-xs font-medium text-slate-800 dark:text-slate-200 outline-none focus:ring-2 focus:ring-indigo-500/20"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              setEventToEdit(null);
-              setSelectedSlotDate(undefined);
-              setShowAddModal(true);
-            }}
-            className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-xs transition-all cursor-pointer"
-          >
-            <Plus size={16} />
-            <span>Crear Evento</span>
-          </button>
-        </div>
-      </div>
-
+    <div className="space-y-4 animate-fade-in select-none">
       {/* Main Layout: Sidebar & Calendar (Calendar first on mobile for immediate access) */}
       <div className="flex flex-col lg:flex-row gap-4 sm:gap-5 items-start">
         {/* Left Sidebar (Rendered below main calendar on mobile, left on desktop) */}
@@ -1305,7 +1265,16 @@ export const CongregationCalendar: React.FC<CongregationCalendarProps> = ({ onNa
             onView={(newView: View) => setCurrentView(newView)}
             culture="es"
             components={{
-              toolbar: CustomToolbar,
+              toolbar: (toolbarProps: any) => (
+                <CustomToolbar
+                  {...toolbarProps}
+                  onAddEvent={() => {
+                    setEventToEdit(null);
+                    setSelectedSlotDate(undefined);
+                    setShowAddModal(true);
+                  }}
+                />
+              ),
               month: {
                 dateHeader: CustomDateHeader,
               },

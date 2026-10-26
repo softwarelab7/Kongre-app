@@ -1979,105 +1979,100 @@ export default function ClmScheduleView({
         </>
       ) : (
         /* ── ENCABEZADO VMC SUPER MINIMALISTA (MODO EMBEBIDO / UNIFICADO) ── */
-        <div className="px-3.5 sm:px-5 py-3 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200/70 dark:border-white/[0.06] flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-3 text-xs">
-          {/* Lectura bíblica y fecha de la reunión */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-bold text-slate-900 dark:text-zinc-100 text-xs sm:text-sm">
-                Reunión Entre Semana (VMC)
-              </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60 font-bold text-[11px] uppercase tracking-wide">
-                {effectivePrograma?.lectura_semana || 'JEREMÍAS 40, 41'}
-              </span>
-            </div>
-            {currentWeek?.midweek?.date && (
-              <div className="flex items-center gap-1.5 text-[11px] sm:text-xs">
-                <span className="hidden sm:inline text-slate-300 dark:text-slate-600">•</span>
-                <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                  {formatTheocraticMeetingDate(currentWeek.midweek.date, settings?.midweekMeetingDay)}
-                  {settings?.midweekMeetingTime ? ` (${settings.midweekMeetingTime})` : ''}
+        <div className="px-3.5 sm:px-5 py-2.5 sm:py-3 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-200/70 dark:border-white/[0.06] flex flex-col gap-2 text-xs">
+          {/* Fila principal: Título + Lectura a la izquierda, Checkbox Sala Auxiliar + Cronómetro a la derecha */}
+          <div className="flex items-start sm:items-center justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <span className="font-bold text-slate-900 dark:text-zinc-100 text-xs sm:text-sm whitespace-nowrap">
+                  Reunión Entre Semana (VMC)
+                </span>
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60 font-bold text-[10px] sm:text-[11px] uppercase tracking-wide whitespace-nowrap">
+                  {effectivePrograma?.lectura_semana || 'JEREMÍAS 40, 41'}
                 </span>
               </div>
-            )}
-          </div>
-
-          {/* Selector de salas y configuración auxiliar compacta */}
-          <div className="flex items-center justify-between sm:justify-start lg:justify-end gap-2 flex-wrap pt-2 lg:pt-0 border-t lg:border-t-0 border-slate-200/60 dark:border-white/[0.05]">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {/* Píldora de sala Auditorio / Sala Auxiliar (solo visible cuando Sala Auxiliar está activa) */}
-              {showAuxRoom && (
-                <div className="inline-flex items-center gap-0.5 bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-semibold shadow-2xs">
-                  <button
-                    type="button"
-                    onClick={() => setActiveRoom('principal')}
-                    className={`min-h-[30px] px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                      activeRoom === 'principal'
-                        ? 'bg-indigo-600 text-white font-bold shadow-xs'
-                        : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    <span>Auditorio</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setActiveRoom('auxiliar')}
-                    className={`min-h-[30px] px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                      activeRoom === 'auxiliar'
-                        ? 'bg-amber-500 text-white font-bold shadow-xs'
-                        : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    <span>Sala Auxiliar</span>
-                  </button>
-                </div>
+              {currentWeek?.midweek?.date && (
+                <p className="font-semibold text-indigo-600 dark:text-indigo-400 text-[11px] sm:text-xs mt-0.5 truncate">
+                  {formatTheocraticMeetingDate(currentWeek.midweek.date, settings?.midweekMeetingDay)}
+                  {settings?.midweekMeetingTime ? ` (${settings.midweekMeetingTime})` : ''}
+                </p>
               )}
+            </div>
 
-              {/* Checkbox estilizado para activar o desactivar Sala Auxiliar */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* Checkbox compacto integrado en la esquina superior derecha */}
               <div
-                className="inline-flex items-center min-h-[34px] px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 shadow-2xs select-none"
+                className="inline-flex items-center px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-zinc-300 shadow-2xs select-none"
                 title="Activar o desactivar Sala Auxiliar para esta semana"
               >
                 <SplashCheckbox
                   size="sm"
                   checked={showAuxRoom}
                   onChange={(e) => handleToggleAuxRoom(e.target.checked)}
-                  label={showAuxRoom ? 'Aux. Activa' : 'Sala Auxiliar'}
+                  label={showAuxRoom ? 'Aux.' : 'Sala Auxiliar'}
                 />
               </div>
 
-              {/* Acceso a Consejero si la sala auxiliar está activa */}
-              {showAuxRoom && (
+              {/* Acceso directo a Modo Atril / Cronómetro (solo escritorio) */}
+              <button
+                type="button"
+                onClick={() => {
+                  setTimerInitialPartId(undefined);
+                  setIsTimerModalOpen(true);
+                }}
+                className="hidden sm:flex min-h-[32px] items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 transition-all cursor-pointer shadow-2xs shrink-0"
+                title="Iniciar Modo Atril y Cronómetro de Presidencia para esta sala"
+              >
+                <Clock size={12} className="shrink-0 text-amber-400 dark:text-white" />
+                <span>Cronómetro / Atril</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Sub-barra compacta SOLO cuando Sala Auxiliar está activa */}
+          {showAuxRoom && (
+            <div className="flex items-center justify-between gap-2 pt-1.5 border-t border-slate-200/60 dark:border-white/[0.05]">
+              <div className="inline-flex items-center gap-0.5 bg-white dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-semibold shadow-2xs">
                 <button
                   type="button"
-                  onClick={() => setIsAuxCounselorModalOpen(true)}
-                  className="min-h-[34px] flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/40 transition-all cursor-pointer shadow-2xs"
-                  title="Consejero de la Sala Auxiliar"
+                  onClick={() => setActiveRoom('principal')}
+                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    activeRoom === 'principal'
+                      ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
                 >
-                  <UserCheck size={12} className="shrink-0" />
-                  <span>
-                    {auxCounselorPart?.asignado_nombre
-                      ? auxCounselorPart.asignado_nombre.split(' ')[0]
-                      : 'Consejero'}
-                  </span>
+                  <span>Auditorio</span>
                 </button>
-              )}
-            </div>
 
-            {/* Acceso directo a Modo Atril / Cronómetro (oculto en móvil donde ya está en el menú de la barra superior del programa) */}
-            <button
-              type="button"
-              onClick={() => {
-                setTimerInitialPartId(undefined);
-                setIsTimerModalOpen(true);
-              }}
-              className="hidden sm:flex min-h-[34px] items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500 transition-all cursor-pointer shadow-2xs shrink-0"
-              title="Iniciar Modo Atril y Cronómetro de Presidencia para esta sala"
-            >
-              <Clock size={12} className="shrink-0 text-amber-400 dark:text-white" />
-              <span>Cronómetro / Atril</span>
-            </button>
-          </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveRoom('auxiliar')}
+                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                    activeRoom === 'auxiliar'
+                      ? 'bg-amber-500 text-white font-bold shadow-xs'
+                      : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <span>Sala Auxiliar</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsAuxCounselorModalOpen(true)}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900/40 transition-all cursor-pointer shadow-2xs"
+                title="Consejero de la Sala Auxiliar"
+              >
+                <UserCheck size={12} className="shrink-0" />
+                <span>
+                  {auxCounselorPart?.asignado_nombre
+                    ? auxCounselorPart.asignado_nombre.split(' ')[0]
+                    : 'Consejero'}
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 

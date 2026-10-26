@@ -25,18 +25,45 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.26';
-export const CURRENT_BUILD_CODE = '2026.10.26.7650';
+export const CURRENT_APP_VERSION = '2.12.27';
+export const CURRENT_BUILD_CODE = '2026.10.26.7660';
 export const BUILD_DATE = '26 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.27',
+    buildCode: '2026.10.26.7660',
+    date: '26 de Octubre, 2026',
+    title: 'Optimización de Interfaz Móvil: Menú Limpio, Calendario Integrado, Mi Ministerio y Programa de Reuniones',
+    isCurrent: true,
+    highlight: 'Eliminación de banners y buscadores redundantes en Menú, Calendario y Mi Congregación; integración del botón + dentro del calendario; y alineación compacta de cabeceras y controles en móvil',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Menú Móvil Limpio y Directo (MobileMenuTab.tsx): Se eliminaron el banner superior de perfil y la barra de búsqueda/filtros por categorías para mostrar de inmediato los accesos rápidos y tarjetas de departamentos.',
+      },
+      {
+        category: 'improvement',
+        text: 'Calendario con Botón + Integrado (CongregationCalendar.tsx): Se eliminó el banner superior con el buscador y se integró el botón "+ Crear Evento" directamente dentro de la barra de herramientas del contenedor del calendario.',
+      },
+      {
+        category: 'fix',
+        text: 'Alineación Móvil en Mi Ministerio (MinisterioPublicadorTab.tsx, MinistryStopwatchDial.tsx): Se corrigió el desbordamiento del selector de meta mensual, la envoltura vertical de los botones en Mis Revisitas y Mis Estudios Bíblicos, y se dispuso el selector de modalidades del cronómetro en una tira horizontal compacta.',
+      },
+      {
+        category: 'improvement',
+        text: 'Simplificación en Mi Congregación y Programa de Reuniones (PanoramaGeneralTab.tsx, ScheduleTab.tsx, ClmScheduleView.tsx): Se eliminó el banner superior redundante en Mi Congregación, se unificó en una sola fila la barra de acciones del programa y se integró el selector de Sala Auxiliar en la cabecera VMC.',
+      },
+    ],
+  },
+  {
     version: '2.12.26',
     buildCode: '2026.10.26.7650',
     date: '26 de Octubre, 2026',
     title: 'Estabilidad en Reposo de Pestaña, Prevención de Pantalla en Blanco y Optimización de Sincronización en Segundo Plano',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Eliminación del bucle de re-renderizado en reposo, pausa inteligente de sondeos en pestañas ocultas, pre-chequeo ligero de metadatos sin PBKDF2 redundante y recuperación automática BFCache/visibilitychange',
     environment: 'Producción Cloud (Kongre)',
     changes: [

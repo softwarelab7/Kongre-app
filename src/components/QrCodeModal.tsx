@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
 import { useCongregation } from '../context/CongregationContext';
-import { X, QrCode, Download, Printer, Copy, Check, ExternalLink } from 'lucide-react';
+import { X, QrCode, Download, Printer, Copy, Check, ExternalLink, ArrowLeft } from 'lucide-react';
 
 interface QrCodeModalProps {
   isOpen: boolean;
@@ -69,13 +69,22 @@ export const QrCodeModal: React.FC<QrCodeModalProps> = ({ isOpen, onClose }) => 
     >
       <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 text-center">
         {/* Header */}
-        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div className="flex items-center justify-between pb-2 border-b border-slate-100 gap-2">
           <div className="flex items-center gap-2 text-left">
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center">
+            <button
+              type="button"
+              data-mobile-back-btn="true"
+              onClick={onClose}
+              aria-label="Volver"
+              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 text-slate-800 shrink-0 cursor-pointer active:scale-95"
+            >
+              <ArrowLeft className="w-4 h-4 text-indigo-600" />
+            </button>
+            <div className="hidden sm:flex w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700 items-center justify-center">
               <QrCode className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">Código QR para el Tablero</h3>
+              <h3 className="text-sm sm:text-base font-bold text-slate-900">Código QR para el Tablero</h3>
               <p className="text-xs text-slate-500">Acceso móvil para publicadores</p>
             </div>
           </div>
@@ -83,7 +92,7 @@ export const QrCodeModal: React.FC<QrCodeModalProps> = ({ isOpen, onClose }) => 
             type="button"
             onClick={onClose}
             aria-label="Cerrar código QR"
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+            className="hidden sm:flex p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
           >
             <X className="w-5 h-5" />
           </button>

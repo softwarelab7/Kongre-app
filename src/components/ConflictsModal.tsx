@@ -9,6 +9,7 @@ import {
   Calendar,
   X,
   ArrowRight,
+  ArrowLeft,
   ShieldCheck,
   UserCheck,
 } from 'lucide-react';
@@ -41,14 +42,19 @@ export const ConflictsModal: React.FC<ConflictsModalProps> = ({
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
     >
       <div className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-2xl w-full max-h-[90dvh] sm:max-h-[85vh] flex flex-col shadow-2xl border border-slate-100 dark:border-slate-800 pb-[env(safe-area-inset-bottom,0px)] sm:pb-0 animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
-        {/* Mobile Bottom Sheet Handle */}
-        <div onClick={onClose} className="sm:hidden w-full pt-2.5 pb-0.5 flex justify-center items-center cursor-pointer shrink-0">
-          <div className="w-10 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
-        </div>
         {/* Header */}
-        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <button
+              type="button"
+              data-mobile-back-btn="true"
+              onClick={onClose}
+              aria-label="Volver"
+              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 shrink-0 cursor-pointer active:scale-95"
+            >
+              <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            </button>
+            <div className={`hidden sm:flex w-10 h-10 rounded-xl items-center justify-center ${
               currentList.length > 0
                 ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
                 : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300'
@@ -60,7 +66,7 @@ export const ConflictsModal: React.FC<ConflictsModalProps> = ({
               )}
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+              <h3 className="text-sm sm:text-lg font-bold text-slate-900 dark:text-white">
                 Panel de Detección de Conflictos
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -72,7 +78,7 @@ export const ConflictsModal: React.FC<ConflictsModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Cerrar panel de conflictos"
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0 cursor-pointer"
+            className="hidden sm:flex p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 min-h-[44px] min-w-[44px] items-center justify-center shrink-0 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

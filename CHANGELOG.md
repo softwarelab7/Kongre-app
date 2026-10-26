@@ -6,6 +6,37 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.30] — 26 de Octubre, 2026
+**Botones Atrás Móviles Minimalistas (Solo Icono sin Texto)**
+
+- ⬅️ **Diseño Minimalista de Retorno (`App.tsx`, `ScheduleTab.tsx`, `AssignmentSelectorModal.tsx`, `CongregationCalendar.tsx`, `ConflictsModal.tsx`, `QrCodeModal.tsx`):**
+  - Todos los botones de retroceso en páginas móviles muestran únicamente el icono de flecha izquierda (`←`) sin etiqueta de texto.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
+### [v2.12.29] — 26 de Octubre, 2026
+**Botón Atrás en Todas las Nuevas Páginas Móviles (Antiguos Pop-ups)**
+
+- ⬅️ **Barra de Navegación "Atrás" en Vistas Secundarias Móviles (`App.tsx`):**
+  - Al acceder a páginas que antes eran menús o pop-ups en móvil (`Mi Perfil y Cuenta`, `Roles y Permisos`, `Centro de Conflictos`, `Ajustes del Sistema` y cualquier módulo secundario), se muestra una barra superior con el botón de retroceso para regresar con un toque a la pantalla previa.
+- 📱 **Botón de Retroceso en Formularios y Selectores a Pantalla Completa (`ScheduleTab.tsx`, `AssignmentSelectorModal.tsx`, `CongregationCalendar.tsx`, `ConflictsModal.tsx`, `QrCodeModal.tsx`, `App.tsx`):**
+  - Se incorporó el botón de retroceso en la esquina superior izquierda del Selector de Semanas, Herramientas del Programa, Selector de Participantes, creación/edición de Eventos del Calendario, detalle de reuniones y en todas las vistas a pantalla completa en móvil.
+
+### [v2.12.28] — 26 de Octubre, 2026
+**Experiencia Móvil 100% Nativa sin Pop-ups (Vistas a Pantalla Completa)**
+
+- 📱 **Eliminación de Pop-ups Automáticos y Tarjetas Flotantes en Móvil (`App.tsx`, `LoadingSpinner.tsx`, `OfflineSyncBanner.tsx`, `AutoLockToastWarning.tsx`):**
+  - Se desactivaron los modales automáticos (`DemoNoticeModal`, `AppLockPinSuggestionModal`) y los avisos flotantes inferiores en dispositivos móviles.
+  - Durante la sincronización en la nube, la versión móvil muestra únicamente una barra de progreso delgada en la parte superior en lugar de una ventana emergente.
+- 🧭 **Navegación Directa a Vistas de Página Completa (`Navbar.tsx`, `DemoBanner.tsx`, `MobileMenuTab.tsx`):**
+  - Tocar el avatar de usuario en móvil abre directamente la vista completa de **Mi Perfil** sin desplegar menús flotantes.
+  - El botón de tema claro/oscuro se integra directamente en la cabecera móvil para cambiar de apariencia en 1 toque.
+  - Los accesos a **Cruces** y **Roles / Modo Demo** redirigen directamente a sus pestañas de página completa (`ConflictCenterTab` y `RolesManagerTab`).
+- 🖥️ **Formularios y Selectores a Pantalla Completa en Móvil (`index.css`, `ScheduleTab.tsx`):**
+  - Todos los formularios, selectores de semanas, menús de herramientas y diálogos se renderizan como páginas nativas a pantalla completa (`100%` del viewport sin marcos flotantes ni fondos oscurecidos) en pantallas móviles (`< 768px`).
+
 ### [v2.12.27] — 26 de Octubre, 2026
 **Optimización de Interfaz Móvil: Menú Limpio, Calendario Integrado, Mi Ministerio y Programa de Reuniones**
 
@@ -20,11 +51,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 - 🏛️ **Simplificación en Mi Congregación y Programa (`PanoramaGeneralTab.tsx`, `ScheduleTab.tsx`, `ClmScheduleView.tsx`):**
   - Se eliminó el banner superior redundante en `Mi Congregación`.
   - En `Programa`, la barra de acciones (`Autoasignar`, `WhatsApp`, `Cruces`, `...`) se mantiene alineada en una sola fila compacta en móvil y el control de `Sala Auxiliar` se integra directamente en la cabecera de la `Reunión Entre Semana (VMC)`.
-
----
-
-## 📅 Historial de Actualizaciones Anteriores
-
 ### [v2.12.26] — 26 de Octubre, 2026
 **Estabilidad en Reposo de Pestaña, Prevención de Pantalla en Blanco y Optimización de Sincronización en Segundo Plano**
 

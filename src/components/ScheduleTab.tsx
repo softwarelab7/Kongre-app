@@ -76,6 +76,7 @@ import {
   UserMinus,
   MoreHorizontal,
   ChevronDown,
+  ArrowLeft,
   X,
 } from 'lucide-react';
 
@@ -591,35 +592,46 @@ export const ScheduleTab: React.FC = () => {
                 </button>
               )}
 
-              {/* Popover desplegable de semanas y fechas */}
+              {/* Selector de semanas y fechas (Página completa en móvil, popover en desktop) */}
               {isWeekPickerOpen && (
                 <>
                   <div
-                    className="fixed inset-0 z-40"
+                    className="hidden sm:block fixed inset-0 z-40"
                     onClick={() => setIsWeekPickerOpen(false)}
                   />
 
-                  <div className="fixed sm:absolute top-20 sm:top-full left-3 right-3 sm:left-0 sm:right-auto sm:mt-2 z-50 sm:w-[380px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl p-3.5 space-y-3 animate-in fade-in zoom-in-95 duration-150">
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/5">
+                  <div className="fixed inset-0 sm:inset-auto sm:absolute sm:top-full sm:left-0 sm:mt-2 z-50 sm:w-[380px] bg-white dark:bg-slate-900 border-0 sm:border border-slate-200 dark:border-white/10 rounded-none sm:rounded-2xl shadow-none sm:shadow-2xl p-4 sm:p-3.5 space-y-3 overflow-y-auto animate-in fade-in duration-150">
+                    <div className="flex items-center justify-between pb-2.5 sm:pb-2 border-b border-slate-100 dark:border-white/5">
                       <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          data-mobile-back-btn="true"
+                          onClick={() => setIsWeekPickerOpen(false)}
+                          className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+                          aria-label="Volver al programa"
+                        >
+                          <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                        </button>
                         <CalendarDays className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                        <span className="text-xs font-bold text-slate-900 dark:text-white">
+                        <span className="text-sm sm:text-xs font-bold text-slate-900 dark:text-white">
                           Selector de Semanas
                         </span>
                       </div>
-                      <button
-                        type="button"
-                        onClick={goToToday}
-                        className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer shadow-2xs border ${
-                          isCurrentWeekToday
-                            ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                            : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
-                        }`}
-                        title="Ir directamente a la semana en curso de hoy"
-                      >
-                        <CalendarCheck className="w-3.5 h-3.5" />
-                        <span>{isCurrentWeekToday ? 'Semana de Hoy' : 'Ir a Hoy'}</span>
-                      </button>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={goToToday}
+                          className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer shadow-2xs border ${
+                            isCurrentWeekToday
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                              : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
+                          }`}
+                          title="Ir directamente a la semana en curso de hoy"
+                        >
+                          <CalendarCheck className="w-3.5 h-3.5" />
+                          <span>{isCurrentWeekToday ? 'Semana de Hoy' : 'Ir a Hoy'}</span>
+                        </button>
+                      </div>
                     </div>
 
                     {availableMonths.length > 1 && (
@@ -893,10 +905,24 @@ export const ScheduleTab: React.FC = () => {
               {isMoreMenuOpen && (
                 <>
                   <div
-                    className="fixed inset-0 z-40"
+                    className="hidden sm:block fixed inset-0 z-40"
                     onClick={() => setIsMoreMenuOpen(false)}
                   />
-                  <div className="absolute right-0 top-full mt-1.5 w-64 max-h-[calc(100vh-140px)] overflow-y-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl z-50 py-1.5 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="fixed inset-0 sm:inset-auto sm:absolute sm:right-0 sm:top-full sm:mt-1.5 sm:w-64 sm:max-h-[calc(100vh-140px)] overflow-y-auto bg-white dark:bg-slate-900 sm:dark:bg-slate-800 border-0 sm:border border-slate-200 dark:border-white/10 rounded-none sm:rounded-2xl shadow-none sm:shadow-xl z-50 p-4 sm:py-1.5 sm:px-0 animate-in fade-in duration-100">
+                    <div className="flex sm:hidden items-center gap-2.5 pb-3 mb-2 border-b border-slate-100 dark:border-white/10">
+                      <button
+                        type="button"
+                        data-mobile-back-btn="true"
+                        onClick={() => setIsMoreMenuOpen(false)}
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+                        aria-label="Volver al programa"
+                      >
+                        <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      </button>
+                      <span className="text-sm font-bold text-slate-900 dark:text-white">
+                        Herramientas del Programa
+                      </span>
+                    </div>
                     {/* Mobile quick access to S-89 and S-38 */}
                     <div className="sm:hidden pb-1 mb-1 border-b border-slate-100 dark:border-white/5">
                       <button
@@ -2013,10 +2039,21 @@ export const ScheduleTab: React.FC = () => {
       {/* MODAL: COPY WEEK STRUCTURE */}
       {isCopyModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h3 className="text-base font-bold text-slate-900">
-              Copiar estructura de otra semana
-            </h3>
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                data-mobile-back-btn="true"
+                aria-label="Atrás"
+                onClick={() => setIsCopyModalOpen(false)}
+                className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+              >
+                <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              </button>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                Copiar estructura de otra semana
+              </h3>
+            </div>
             <p className="text-xs text-slate-500">
               Esto copiará los títulos y partes del programa de la semana seleccionada hacia la semana actual, dejando las asignaciones listas para asignar.
             </p>
@@ -2060,11 +2097,22 @@ export const ScheduleTab: React.FC = () => {
       {/* MODAL: SPECIAL EVENT */}
       {isSpecialEventModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Sparkle className="w-5 h-5 text-amber-500" />
-              <span>Configurar Evento o Fecha Especial</span>
-            </h3>
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                data-mobile-back-btn="true"
+                aria-label="Atrás"
+                onClick={() => setIsSpecialEventModalOpen(false)}
+                className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+              >
+                <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              </button>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Sparkle className="w-5 h-5 text-amber-500" />
+                <span>Configurar Evento o Fecha Especial</span>
+              </h3>
+            </div>
             <p className="text-xs text-slate-500">
               Registra asambleas, conmemoración o visitas especiales. Si marcas "Sin reunión", esa reunión quedará bloqueada en el programa.
             </p>
@@ -2238,6 +2286,15 @@ export const ScheduleTab: React.FC = () => {
           <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-white/10">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/10 pb-3">
               <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  data-mobile-back-btn="true"
+                  aria-label="Atrás"
+                  onClick={() => setIsClearWeekAssignmentsModalOpen(false)}
+                  className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+                >
+                  <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                </button>
                 <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/50 flex items-center justify-center text-rose-600 dark:text-rose-400">
                   <UserMinus className="w-4 h-4" />
                 </div>
@@ -2248,7 +2305,7 @@ export const ScheduleTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsClearWeekAssignmentsModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                className="hidden sm:flex p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
               >
                 <XCircle className="w-4 h-4" />
               </button>
@@ -2334,13 +2391,22 @@ export const ScheduleTab: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             {/* Header del Modal */}
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-white/[0.08] flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/50">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+            <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-200 dark:border-white/[0.08] flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/50">
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <button
+                  type="button"
+                  data-mobile-back-btn="true"
+                  aria-label="Atrás"
+                  onClick={() => setIsWeekendEditModalOpen(false)}
+                  className="sm:hidden inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-200/80 dark:bg-slate-700 text-slate-800 dark:text-slate-100 cursor-pointer active:scale-95 shrink-0"
+                >
+                  <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                </button>
+                <div className="hidden sm:flex p-2 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
                   <CalendarCheck className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                     Editar Programa del Fin de Semana
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -2352,7 +2418,7 @@ export const ScheduleTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsWeekendEditModalOpen(false)}
-                className="p-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                className="hidden sm:flex p-1.5 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
               >
                 <X size={18} />
               </button>

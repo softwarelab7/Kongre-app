@@ -33,7 +33,7 @@ export const AutoLockToastWarning: React.FC = () => {
       aria-live="assertive"
       onClick={resetInactivityTimer}
       title="Toca para continuar y restablecer el tiempo"
-      className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[9990] flex items-center gap-3.5 w-[min(92%,430px)] p-3.5 sm:p-4 bg-white/95 dark:bg-[#111827]/95 border border-amber-300 dark:border-amber-500/40 rounded-2xl shadow-2xl backdrop-blur-xl cursor-pointer select-none animate-in fade-in slide-in-from-bottom-4 duration-300 hover:scale-[1.01] active:scale-[0.99] transition-all"
+      className="hidden md:flex fixed bottom-6 left-1/2 -translate-x-1/2 z-[9990] items-center gap-3.5 w-[min(92%,430px)] p-3.5 sm:p-4 bg-white/95 dark:bg-[#111827]/95 border border-amber-300 dark:border-amber-500/40 rounded-2xl shadow-2xl backdrop-blur-xl cursor-pointer select-none animate-in fade-in slide-in-from-bottom-4 duration-300 hover:scale-[1.01] active:scale-[0.99] transition-all"
     >
       <AutoLockRing
         size={46}

@@ -25,18 +25,75 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.27';
-export const CURRENT_BUILD_CODE = '2026.10.26.7660';
+export const CURRENT_APP_VERSION = '2.12.30';
+export const CURRENT_BUILD_CODE = '2026.10.26.7667';
 export const BUILD_DATE = '26 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.30',
+    buildCode: '2026.10.26.7667',
+    date: '26 de Octubre, 2026',
+    title: 'Botones Atrás Móviles Minimalistas (Solo Icono sin Texto)',
+    isCurrent: true,
+    highlight: 'Diseño limpio de los botones de retorno en páginas móviles mostrando únicamente el icono de flecha sin etiqueta de texto',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Botón Atrás Solo Icono (App.tsx, ScheduleTab.tsx, AssignmentSelectorModal.tsx, CongregationCalendar.tsx, ConflictsModal.tsx, QrCodeModal.tsx): Se eliminó el texto de los botones de retroceso en todas las páginas móviles para mostrar únicamente el icono de flecha izquierda con estética minimalista.',
+      },
+    ],
+  },
+  {
+    version: '2.12.29',
+    buildCode: '2026.10.26.7666',
+    date: '26 de Octubre, 2026',
+    title: 'Botón Atrás en Todas las Nuevas Páginas Móviles (Antiguos Pop-ups)',
+    isCurrent: false,
+    highlight: 'Incorporación de botón "Atrás" nativo en la esquina superior izquierda de todas las páginas móviles que anteriormente eran pop-ups, selectores o menús flotantes',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Barra Superior "Atrás" en Páginas Secundarias Móviles (App.tsx): Todas las páginas secundarias abiertas en móvil (Mi Perfil, Roles y Permisos, Centro de Conflictos, Ajustes y módulos del menú) cuentan ahora con un botón "← Atrás" que regresa directamente a la vista anterior.',
+      },
+      {
+        category: 'improvement',
+        text: 'Botón "Atrás" en Selectores, Formularios y Herramientas a Pantalla Completa (ScheduleTab.tsx, AssignmentSelectorModal.tsx, CongregationCalendar.tsx, ConflictsModal.tsx, QrCodeModal.tsx): Se integró el botón "← Atrás" en el Selector de Semanas, Herramientas del Programa, Selector de Participantes, Eventos del Calendario y vistas completas en móvil.',
+      },
+    ],
+  },
+  {
+    version: '2.12.28',
+    buildCode: '2026.10.26.7665',
+    date: '26 de Octubre, 2026',
+    title: 'Experiencia Móvil 100% Nativa sin Pop-ups (Vistas a Pantalla Completa)',
+    isCurrent: false,
+    highlight: 'Eliminación de todos los pop-ups flotantes en la versión móvil: navegación directa a vistas de página completa y transformación automática de formularios/diálogos en pantallas nativas en móvil',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'improvement',
+        text: 'Cero Pop-ups Automáticos en Móvil (App.tsx, LoadingSpinner.tsx, OfflineSyncBanner.tsx, AutoLockToastWarning.tsx): Se desactivaron los avisos emergentes automáticos en móvil y se reemplazó la tarjeta flotante de sincronización por una línea de progreso superior no intrusiva.',
+      },
+      {
+        category: 'improvement',
+        text: 'Navegación Directa a Páginas Completas (Navbar.tsx, DemoBanner.tsx, MobileMenuTab.tsx, App.tsx): En móvil, tocar el avatar de usuario abre directamente la página de Mi Perfil, el botón de tema alterna modo claro/oscuro en 1 toque, y los botones de Cruces y Roles llevan directamente a sus páginas dedicadas sin menús ni modales flotantes.',
+      },
+      {
+        category: 'improvement',
+        text: 'Transformación de Diálogos y Selectores en Pantallas Nativas Móviles (index.css, ScheduleTab.tsx): Todos los formularios, selectores de semanas, herramientas y diálogos se presentan como páginas a pantalla completa (100% ancho y alto sin bordes flotantes ni fondos oscurecidos) en dispositivos móviles (< 768px).',
+      },
+    ],
+  },
+  {
     version: '2.12.27',
     buildCode: '2026.10.26.7660',
     date: '26 de Octubre, 2026',
     title: 'Optimización de Interfaz Móvil: Menú Limpio, Calendario Integrado, Mi Ministerio y Programa de Reuniones',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Eliminación de banners y buscadores redundantes en Menú, Calendario y Mi Congregación; integración del botón + dentro del calendario; y alineación compacta de cabeceras y controles en móvil',
     environment: 'Producción Cloud (Kongre)',
     changes: [

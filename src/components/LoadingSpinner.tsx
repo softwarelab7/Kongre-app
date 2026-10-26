@@ -165,16 +165,21 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     );
   }
 
-  // Modo 'overlay' predeterminado: se superpone elegantemente sobre el contenido de la pestaña activa
+  // En móvil (< md) mostramos únicamente una barra superior delgada sin pop-up flotante
   return (
-    <div
-      data-testid="supabase-tab-loading-overlay"
-      className="absolute inset-0 z-30 bg-slate-50/65 dark:bg-slate-950/65 backdrop-blur-[2px] flex items-start justify-center pt-20 sm:pt-28 transition-all duration-300 pointer-events-auto rounded-2xl"
-    >
-      <div className="sticky top-28 sm:top-36 flex justify-center w-full">
-        {spinnerCard}
+    <>
+      <div className="md:hidden fixed top-14 left-0 right-0 z-30 h-1 bg-indigo-100 dark:bg-indigo-950 overflow-hidden pointer-events-none">
+        <div className="h-full w-1/2 bg-gradient-to-r from-indigo-500 via-violet-500 to-emerald-400 animate-pulse" />
       </div>
-    </div>
+      <div
+        data-testid="supabase-tab-loading-overlay"
+        className="hidden md:flex absolute inset-0 z-30 bg-slate-50/65 dark:bg-slate-950/65 backdrop-blur-[2px] items-start justify-center pt-20 sm:pt-28 transition-all duration-300 pointer-events-auto rounded-2xl"
+      >
+        <div className="sticky top-28 sm:top-36 flex justify-center w-full">
+          {spinnerCard}
+        </div>
+      </div>
+    </>
   );
 };
 

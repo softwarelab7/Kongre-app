@@ -15,6 +15,7 @@ import {
   BookOpen,
   Award,
   UserMinus,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface AssignmentSelectorModalProps {
@@ -126,8 +127,17 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
     >
       <div className="bg-white dark:bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-lg w-full max-h-[92dvh] sm:max-h-[85vh] flex flex-col shadow-2xl border border-slate-100 dark:border-slate-800 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] sm:pb-0">
         {/* Header */}
-        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
-          <div className="min-w-0 pr-2">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2.5 shrink-0">
+          <button
+            type="button"
+            data-mobile-back-btn="true"
+            onClick={onClose}
+            aria-label="Volver al programa"
+            className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 shrink-0 cursor-pointer active:scale-95"
+          >
+            <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+          </button>
+          <div className="min-w-0 flex-1 pr-2">
             <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 px-2 py-0.5 rounded-full">
               Asignar Participante
             </span>
@@ -142,7 +152,7 @@ export const AssignmentSelectorModal: React.FC<AssignmentSelectorModalProps> = (
             type="button"
             onClick={onClose}
             aria-label="Cerrar selector de participante"
-            className="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"
+            className="hidden sm:flex w-8 h-8 rounded-xl items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"
           >
             <X className="w-5 h-5" />
           </button>

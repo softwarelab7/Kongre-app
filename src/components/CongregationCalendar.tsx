@@ -23,6 +23,7 @@ import {
   X,
   BookOpen,
   ArrowRight,
+  ArrowLeft,
   User,
   Users,
   MapPin,
@@ -303,13 +304,22 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+        <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <button
+              type="button"
+              data-mobile-back-btn="true"
+              onClick={onClose}
+              aria-label="Volver al calendario"
+              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 shrink-0 cursor-pointer active:scale-95"
+            >
+              <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            </button>
+            <div className="hidden sm:flex w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 items-center justify-center">
               <CalendarIcon className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                 {eventToEdit ? 'Editar Evento' : 'Nuevo Evento'}
               </h3>
               <p className="text-xs text-slate-400">
@@ -320,7 +330,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="hidden sm:flex p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -512,16 +522,25 @@ const MeetingDetailModal: React.FC<MeetingDetailModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-indigo-50/50 dark:bg-indigo-950/30">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-xs">
+        <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 bg-indigo-50/50 dark:bg-indigo-950/30">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <button
+              type="button"
+              data-mobile-back-btn="true"
+              onClick={onClose}
+              aria-label="Volver al calendario"
+              className="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 shrink-0 cursor-pointer active:scale-95"
+            >
+              <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            </button>
+            <div className="hidden sm:flex w-10 h-10 rounded-2xl bg-indigo-600 text-white items-center justify-center shadow-xs">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                 {isMidweek ? 'Reunión Entre Semana' : 'Reunión de Fin de Semana'}
               </span>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
                 {isMidweek ? 'Vida y Ministerio Cristianos' : 'Discurso Público y La Atalaya'}
               </h3>
             </div>
@@ -529,7 +548,7 @@ const MeetingDetailModal: React.FC<MeetingDetailModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+            className="hidden sm:flex p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

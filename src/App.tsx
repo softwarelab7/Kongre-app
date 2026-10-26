@@ -72,7 +72,7 @@ import { OfflineSyncQueueModal } from './components/OfflineSyncQueueModal';
 import { DemoNoticeModal } from './components/DemoNoticeModal';
 import { FirstTimeLegalConsentModal, hasAcceptedLegalTerms } from './components/TermsAndPrivacyModal';
 import { LoadingSpinner } from './components/LoadingSpinner';
-import { Building2 } from 'lucide-react';
+import { Building2, ArrowLeft } from 'lucide-react';
 import { useAuth } from './context/AuthContext';
 import {
   checkUpcomingAssignmentsAndNotify,
@@ -275,12 +275,7 @@ const AppContent: React.FC = () => {
     exitDemoMode,
   } = useCongregation();
 
-  const [isDemoNoticeOpen, setIsDemoNoticeOpen] = useState(() => {
-    return (
-      isSafeDemoMode() &&
-      sessionStorage.getItem('kongre_demo_notice_shown') !== 'true'
-    );
-  });
+  const [isDemoNoticeOpen, setIsDemoNoticeOpen] = useState(false);
 
   const [hasAcceptedTermsState, setHasAcceptedTermsState] = useState<boolean>(() =>
     hasAcceptedLegalTerms()
@@ -291,12 +286,6 @@ const AppContent: React.FC = () => {
     window.addEventListener('kongre_legal_terms_accepted', syncConsent);
     return () => window.removeEventListener('kongre_legal_terms_accepted', syncConsent);
   }, []);
-
-  useEffect(() => {
-    if (isDemoMode && sessionStorage.getItem('kongre_demo_notice_shown') !== 'true') {
-      setIsDemoNoticeOpen(true);
-    }
-  }, [isDemoMode]);
 
   // Limpieza de fotos y perfiles residuales previos para que no contaminen el modo prueba
   useEffect(() => {
@@ -312,6 +301,8 @@ const AppContent: React.FC = () => {
     }
   }, [isDemoMode]);
 
+  const [previousTab, setPreviousTab] = useState<ActiveTab>('menu');
+
   // Navigation with browser History (Back / Forward button support)
   const setActiveTab = useCallback(
     (
@@ -320,6 +311,9 @@ const AppContent: React.FC = () => {
     ) => {
       setRawActiveTab((prevTab) => {
         const nextTab = typeof targetTabOrFn === 'function' ? targetTabOrFn(prevTab) : targetTabOrFn;
+        if (nextTab !== prevTab) {
+          setPreviousTab(prevTab);
+        }
         const currentModal = options?.modal !== undefined ? options.modal : null;
         const currentWeekId = options?.weekId || null;
 
@@ -387,6 +381,14 @@ const AppContent: React.FC = () => {
     },
     [activeTab, showWelcomeLanding]
   );
+
+  const openConflictsView = useCallback(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setActiveTab('conflictos');
+    } else {
+      openModalWithHistory('conflictos', setIsConflictsModalOpen);
+    }
+  }, [setActiveTab, openModalWithHistory]);
 
   // Synchronize browser history events (Back / Forward button in browser)
   useEffect(() => {
@@ -986,10 +988,110 @@ const AppContent: React.FC = () => {
     }
   };
 
-  // Suggest setting up app lock PIN on this device after user enters the session / logs in
+  const mobileTabTitles: Partial<Record<ActiveTab, string>> = {
+    perfil: 'Mi Perfil y Cuenta',
+    roles: 'Roles y Permisos',
+    conflictos: 'Centro de Conflictos',
+    ajustes: 'Ajustes del Sistema',
+    publicadores: 'Directorio de Publicadores',
+    territorios: 'Territorios',
+    carritos: 'Predicación Pública',
+    discursos: 'Discursos Públicos',
+    hospitalidad: 'Hospitalidad',
+    asistencia: 'Asistencia a Reuniones',
+    informes_servicio: 'Informes de Servicio',
+    tarjetas_s21: 'Tarjetas S-21',
+    informe_s1: 'Informe a la Sucursal (S-1)',
+    cuentas: 'Cuentas de la Congregación',
+    literatura: 'Literatura',
+    limpieza_deberes: 'Limpieza y Acomodadores',
+    mantenimiento: 'Mantenimiento',
+    panel_electrico: 'Seguridad del Salón',
+    tablero_anuncios: 'Tablero de Anuncios',
+    visita_sc: 'Visita del Superintendente',
+    memorial_asambleas: 'Conmemoración y Asambleas',
+    grupos_servicio: 'Grupos de Servicio',
+    precursores_auxiliares: 'Precursores Auxiliares',
+    s89: 'Hojas de Asignación S-89',
+    clm_vmc: 'Programa Vida y Ministerio',
+    equidad: 'Equidad de Asignaciones',
+    exportar_pdf: 'Exportar e Imprimir PDF',
+    estadisticas_secretaria: 'Estadísticas de Secretaría',
+    mi_vista: 'Mi Portal Teocrático',
+    cronometro_ministerio: 'Cronómetro de Ministerio',
+    revisitas: 'Revisitas',
+    estudios_biblicos: 'Estudios Bíblicos',
+  };
+
+  // Garantiza que cualquier vista en pantalla completa en móvil que antes era un pop-up tenga botón "Atrás"
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+    const ensureMobileBackButtons = () => {
+      if (window.innerWidth >= 768) return;
+      const overlays = document.querySelectorAll<HTMLElement>('div.fixed.inset-0');
+      overlays.forEach((overlay) => {
+        if (overlay.children.length === 0) return;
+        if (overlay.querySelector('[data-mobile-back-btn="true"]')) return;
+        const ariaLabel = (overlay.getAttribute('aria-label') || '').toLowerCase();
+        if (ariaLabel.includes('bloqueo') || ariaLabel.includes('consentimiento')) return;
+
+        // Buscar el botón de cierre dentro del contenedor
+        const closeBtn = Array.from(overlay.querySelectorAll<HTMLButtonElement>('button')).find((btn) => {
+          const label = (btn.getAttribute('aria-label') || btn.getAttribute('title') || '').toLowerCase();
+          const text = (btn.textContent || '').trim().toLowerCase();
+          if (
+            label.includes('cerrar') ||
+            label.includes('volver') ||
+            label.includes('cancelar') ||
+            text === 'cerrar' ||
+            text === 'cancelar' ||
+            text === 'volver'
+          ) {
+            return true;
+          }
+          return Boolean(btn.querySelector('svg.lucide-x, svg.lucide-x-circle, svg.lucide-arrow-left'));
+        });
+
+        const card = (overlay.firstElementChild as HTMLElement) || overlay;
+        if (!closeBtn || !card) return;
+
+        const bar = document.createElement('div');
+        bar.setAttribute('data-mobile-back-btn', 'true');
+        bar.className =
+          'sm:hidden flex items-center justify-between px-4 py-2.5 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0 sticky top-0 z-30';
+
+        const backButton = document.createElement('button');
+        backButton.type = 'button';
+        backButton.setAttribute('aria-label', 'Atrás');
+        backButton.className =
+          'inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 active:scale-95 cursor-pointer';
+        backButton.innerHTML =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600 dark:text-indigo-400 shrink-0"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>';
+        backButton.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeBtn.click();
+        };
+
+        bar.appendChild(backButton);
+        card.insertBefore(bar, card.firstChild);
+      });
+    };
+
+    ensureMobileBackButtons();
+    const observer = new MutationObserver(() => {
+      ensureMobileBackButtons();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
+  // Suggest setting up app lock PIN on desktop only (no automatic pop-ups on mobile)
   useEffect(() => {
     const isDemo = isDemoMode || isSafeDemoMode();
     if (isDemo) return;
+    if (typeof window !== 'undefined' && window.innerWidth < 768) return;
 
     const isGuest = localStorage.getItem('kongre_is_guest') === 'true' || localStorage.getItem('kongre_identified_brother') === 'Invitado';
     if (!showWelcomeLanding && !isGuest) {
@@ -1007,6 +1109,10 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     const isDemo = isDemoMode || isSafeDemoMode();
     if (isDemo) return;
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      prevUserRef.current = user;
+      return;
+    }
 
     if (user && !prevUserRef.current && !showWelcomeLanding) {
       const hasPersonalPin = localStorage.getItem('kongre_security_pin_hash');
@@ -1125,7 +1231,7 @@ const AppContent: React.FC = () => {
         setActiveTab={setActiveTab}
         isSidebarVisible={isSidebarVisible}
         onToggleSidebar={handleToggleSidebar}
-        onOpenConflictsModal={() => openModalWithHistory('conflictos', setIsConflictsModalOpen)}
+        onOpenConflictsModal={openConflictsView}
         onOpenQrModal={() => openModalWithHistory('qr', setIsQrModalOpen)}
         onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
         onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
@@ -1148,6 +1254,22 @@ const AppContent: React.FC = () => {
 
       <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200 flex flex-col justify-between overflow-x-hidden`}>
         <div className="relative flex-1 w-full mx-auto px-2.5 sm:px-6 lg:px-8 2xl:px-12 py-2.5 sm:py-6 pb-6">
+          {!['inicio', 'programacion', 'calendario', 'panorama_general', 'menu'].includes(activeTab) && (
+            <div className="md:hidden mb-3 flex items-center gap-2.5 px-3 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs">
+              <button
+                type="button"
+                data-mobile-back-btn="true"
+                aria-label="Atrás"
+                onClick={() => setActiveTab(previousTab || 'menu')}
+                className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 transition-all active:scale-95 cursor-pointer shrink-0"
+              >
+                <ArrowLeft className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              </button>
+              <span className="text-xs font-extrabold text-slate-700 dark:text-slate-200 truncate">
+                {mobileTabTitles[activeTab] || ''}
+              </span>
+            </div>
+          )}
           <LoadingSpinner
             isVisible={!isDemoMode && (isSupabaseSyncing || syncStatus === 'saving')}
             activeTab={activeTab}
@@ -1228,7 +1350,7 @@ const AppContent: React.FC = () => {
                 setActiveTab={setActiveTab}
                 onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
                 onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
-                onOpenConflictsModal={() => openModalWithHistory('conflictos', setIsConflictsModalOpen)}
+                onOpenConflictsModal={openConflictsView}
                 onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
               />
             )}
@@ -1282,12 +1404,12 @@ const AppContent: React.FC = () => {
             {activeTab === 'menu' && (
               <MobileMenuTab
                 setActiveTab={setActiveTab}
-                onOpenConflictsModal={() => openModalWithHistory('conflictos', setIsConflictsModalOpen)}
+                onOpenConflictsModal={openConflictsView}
                 onOpenQrModal={() => openModalWithHistory('qr', setIsQrModalOpen)}
                 onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}
                 onOpenKioskModal={() => openModalWithHistory('tablero_salon', setIsKioskModalOpen)}
                 onOpenPinsModal={() => openModalWithHistory('pines', setIsPinsModalOpen)}
-                onOpenRoleModal={() => openModalWithHistory('roles_permisos', setIsRoleModalOpen)}
+                onOpenRoleModal={() => setActiveTab('roles')}
                 onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
                 onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
               />

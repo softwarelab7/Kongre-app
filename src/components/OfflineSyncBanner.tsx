@@ -71,7 +71,7 @@ export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ onOpenQueu
 
   if (!isOnline) {
     return (
-      <div className="fixed bottom-20 md:bottom-4 left-3 right-3 sm:left-6 sm:right-auto z-40 max-w-md animate-in slide-in-from-bottom duration-200">
+      <div className="hidden md:block fixed bottom-4 left-6 z-40 max-w-md animate-in slide-in-from-bottom duration-200">
         <div
           onClick={onOpenQueueModal}
           className={`p-3 sm:p-3.5 rounded-2xl bg-slate-900/95 text-white backdrop-blur-md shadow-xl border border-slate-700/80 flex items-center justify-between gap-3 ${
@@ -120,7 +120,7 @@ export const OfflineSyncBanner: React.FC<OfflineSyncBannerProps> = ({ onOpenQueu
 
   // Just reconnected or syncing
   return (
-    <div className="fixed bottom-20 md:bottom-4 left-3 right-3 sm:left-6 sm:right-auto z-40 max-w-md animate-in slide-in-from-bottom duration-200">
+    <div className="hidden md:block fixed bottom-4 left-6 z-40 max-w-md animate-in slide-in-from-bottom duration-200">
       <div
         onClick={onOpenQueueModal}
         className={`p-3 sm:p-3.5 rounded-2xl bg-emerald-950/95 text-white backdrop-blur-md shadow-xl border border-emerald-700/80 flex items-center justify-between gap-3 ${

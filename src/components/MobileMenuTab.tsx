@@ -507,7 +507,7 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
 
           <button
             type="button"
-            onClick={onOpenConflictsModal}
+            onClick={() => handleNavigate('conflictos')}
             className="h-10 px-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center justify-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition cursor-pointer"
           >
             <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />

@@ -1312,23 +1312,30 @@ export const Navbar: React.FC<NavbarProps> = ({
               <AutoLockTimerChip />
             </div>
 
-            {/* Dark Mode Moon / Sun / Cabina Toggle (oculto en móvil top-bar, disponible en menú de usuario y hoja inferior) */}
-            <div className="hidden sm:flex items-center">
-              <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={34} />
+            {/* Dark Mode Moon / Sun Toggle (direct 1-tap toggle without pop-up) */}
+            <div className="flex items-center">
+              <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={32} />
             </div>
 
             {/* Divider */}
             <div className="h-4 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 hidden sm:block" />
 
-            {/* User Profile Capsule & Dropdown Menu */}
+            {/* User Profile Capsule & Dropdown Menu (on mobile navigates directly to Mi Perfil page without pop-up) */}
             <div className="relative ml-0.5" ref={dropdownRef}>
               <button
                 type="button"
-                onClick={() => setOpenDropdown((prev) => (prev === 'user' ? null : 'user'))}
+                onClick={() => {
+                  if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                    setOpenDropdown(null);
+                    handleSelectTab('perfil');
+                  } else {
+                    setOpenDropdown((prev) => (prev === 'user' ? null : 'user'));
+                  }
+                }}
                 aria-label="Menú de cuenta y perfil de usuario"
                 aria-expanded={openDropdown === 'user'}
                 className="flex items-center gap-2 p-1 pl-1 pr-1.5 sm:pr-2.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700/60 transition cursor-pointer"
-                title="Menú de cuenta y perfil"
+                title="Mi Perfil y Cuenta"
               >
                 <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold flex items-center justify-center text-xs shadow-xs overflow-hidden ring-2 ring-indigo-500/20">
                   {(() => {

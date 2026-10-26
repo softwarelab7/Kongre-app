@@ -43,6 +43,7 @@ import {
   MinusCircle,
 } from 'lucide-react';
 import { MinistryStopwatchDial } from './MinistryStopwatchDial';
+import { getAvailableServiceYears, getServiceYearMonths } from '../utils/s21Helper';
 
 export type MinistrySubTab =
   | 'resumen'
@@ -1199,6 +1200,270 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
   const [s4Notes, setS4Notes] = useState(() => existingS4Report?.notes || '');
   const [s4Participated, setS4Participated] = useState(true);
 
+  const availableServiceYears = useMemo(() => getAvailableServiceYears(), []);
+  const [selectedServiceYear, setSelectedServiceYear] = useState<string>('2025-2026');
+
+  // Cálculo del Historial Mes a Mes (Año de Servicio Sep - Ago) y Meta Anual de Horas
+  const serviceYearSummary = useMemo(() => {
+    const monthsList = getServiceYearMonths(selectedServiceYear);
+    const isRegularPioneer =
+      activePublisher?.privilege === 'precursor_regular' ||
+      activePublisher?.pioneerStatus === 'regular';
+    const isSpecialPioneer =
+      activePublisher?.privilege === 'precursor_especial' ||
+      activePublisher?.pioneerStatus === 'especial';
+
+    const annualGoalHours = isSpecialPioneer
+      ? 1200
+      : isRegularPioneer
+      ? 600
+      : hourGoal * 12;
+
+    let totalHoursYear = 0;
+    let totalMinutesExtraYear = 0;
+    let totalStudiesYear = 0;
+    let monthsParticipated = 0;
+
+    const rows = monthsList.map((m) => {
+      const isCurrentMonth = m.monthKey === currentMonthKey;
+      const rep = monthlyReports.find(
+        (r) =>
+          (r.publisherId === activePublisherId || r.publisherId === 'pub-local') &&
+          r.month === m.monthKey
+      );
+
+      const logsForMonth = timeLogs.filter((l) => l.month === m.monthKey);
+      const localMins = logsForMonth.reduce((acc, l) => acc + (Number(l.minutes) || 0), 0);
+
+      const hoursVal = isCurrentMonth
+        ? Math.max(monthSummary.fullHours, rep?.hours || 0)
+        : rep?.hours !== undefined
+        ? rep.hours
+        : localMins > 0
+        ? Math.floor(localMins / 60)
+        : undefined;
+
+      const minsVal = isCurrentMonth
+        ? monthSummary.remainingMinutes
+        : rep?.minutes || (localMins > 0 ? localMins % 60 : 0);
+
+      const studiesVal = isCurrentMonth
+        ? Math.max(monthSummary.totalStudiesCount, rep?.bibleStudies || 0)
+        : rep?.bibleStudies || 0;
+
+      const participated = isCurrentMonth
+        ? s4Participated || monthSummary.totalMinutes > 0 || Boolean(rep?.participated)
+        : Boolean(rep?.participated) || (hoursVal !== undefined && hoursVal > 0);
+
+      if (participated) {
+        monthsParticipated++;
+        totalHoursYear += hoursVal || 0;
+        totalMinutesExtraYear += minsVal || 0;
+        totalStudiesYear += studiesVal || 0;
+      }
+
+      return {
+        ...m,
+        isCurrentMonth,
+        participated,
+        hasRecord: Boolean(rep) || isCurrentMonth || localMins > 0,
+        hours: hoursVal,
+        minutes: minsVal,
+        bibleStudies: studiesVal,
+        isAuxiliaryPioneer: Boolean(rep?.isAuxiliaryPioneer),
+        notes: isCurrentMonth ? s4Notes || rep?.notes || '' : rep?.notes || '',
+      };
+    });
+
+    totalHoursYear += Math.floor(totalMinutesExtraYear / 60);
+    const remainingYearMinutes = totalMinutesExtraYear % 60;
+    const avgMonthlyHours =
+      monthsParticipated > 0 ? Math.round((totalHoursYear / monthsParticipated) * 10) / 10 : 0;
+    const annualProgressPct =
+      annualGoalHours > 0 ? Math.min(100, Math.round((totalHoursYear / annualGoalHours) * 100)) : 0;
+    const remainingAnnualHours = Math.max(0, annualGoalHours - totalHoursYear);
+
+    return {
+      rows,
+      annualGoalHours,
+      isRegularPioneer,
+      isSpecialPioneer,
+      totalHoursYear,
+      remainingYearMinutes,
+      totalStudiesYear,
+      monthsParticipated,
+      avgMonthlyHours,
+      annualProgressPct,
+      remainingAnnualHours,
+    };
+  }, [
+    selectedServiceYear,
+    activePublisher,
+    hourGoal,
+    currentMonthKey,
+    monthlyReports,
+    activePublisherId,
+    timeLogs,
+    monthSummary,
+    s4Participated,
+    s4Notes,
+  ]);
+
+  // Estado para seleccionar y editar cualquier mes del historial anual (por defecto el mes actual)
+  const [selectedHistoryMonthKey, setSelectedHistoryMonthKey] = useState<string>(currentMonthKey);
+  const selectedHistoryRow = useMemo(() => {
+    return (
+      serviceYearSummary.rows.find((r) => r.monthKey === selectedHistoryMonthKey) ||
+      serviceYearSummary.rows.find((r) => r.isCurrentMonth) ||
+      serviceYearSummary.rows[0]
+    );
+  }, [serviceYearSummary.rows, selectedHistoryMonthKey]);
+
+  const [historyFormParticipated, setHistoryFormParticipated] = useState<boolean>(true);
+  const [historyFormHours, setHistoryFormHours] = useState<number>(monthSummary.fullHours);
+  const [historyFormMinutes, setHistoryFormMinutes] = useState<number>(monthSummary.remainingMinutes);
+  const [historyFormStudies, setHistoryFormStudies] = useState<number>(monthSummary.totalStudiesCount);
+  const [historyFormAuxPioneer, setHistoryFormAuxPioneer] = useState<boolean>(false);
+  const [historyFormNotes, setHistoryFormNotes] = useState<string>(existingS4Report?.notes || '');
+
+  useEffect(() => {
+    if (!selectedHistoryRow) return;
+    if (selectedHistoryRow.isCurrentMonth) {
+      setHistoryFormParticipated(s4Participated || monthSummary.totalMinutes > 0);
+      setHistoryFormHours(monthSummary.fullHours);
+      setHistoryFormMinutes(monthSummary.remainingMinutes);
+      setHistoryFormStudies(monthSummary.totalStudiesCount);
+      setHistoryFormAuxPioneer(Boolean(selectedHistoryRow.isAuxiliaryPioneer));
+      setHistoryFormNotes(s4Notes || selectedHistoryRow.notes || '');
+    } else {
+      setHistoryFormParticipated(Boolean(selectedHistoryRow.participated));
+      setHistoryFormHours(selectedHistoryRow.hours ?? 0);
+      setHistoryFormMinutes(selectedHistoryRow.minutes ?? 0);
+      setHistoryFormStudies(selectedHistoryRow.bibleStudies ?? 0);
+      setHistoryFormAuxPioneer(Boolean(selectedHistoryRow.isAuxiliaryPioneer));
+      setHistoryFormNotes(selectedHistoryRow.notes || '');
+    }
+  }, [
+    selectedHistoryRow?.monthKey,
+    selectedHistoryRow?.isCurrentMonth,
+    monthSummary.fullHours,
+    monthSummary.remainingMinutes,
+    monthSummary.totalStudiesCount,
+    monthSummary.totalMinutes,
+    s4Participated,
+    s4Notes,
+  ]);
+
+  const handleSaveSelectedHistoryMonth = () => {
+    if (!selectedHistoryRow) return;
+    markLocalMinistryEdit();
+
+    if (selectedHistoryRow.isCurrentMonth) {
+      setS4Participated(historyFormParticipated);
+      setS4Notes(historyFormNotes);
+      // Si el usuario ajustó manualmente las horas del mes actual por encima o debajo del cronómetro,
+      // sincronizamos la diferencia como ajuste en el mes actual
+      const targetTotalMins = historyFormHours * 60 + historyFormMinutes;
+      const diffMins = targetTotalMins - monthSummary.totalMinutes;
+      if (diffMins !== 0) {
+        const adjLog: MinistryTimeLog = {
+          id: `log-adj-${Date.now()}`,
+          date: todayIso,
+          month: currentMonthKey,
+          minutes: diffMins,
+          modality: 'casa_en_casa',
+          returnVisitsCount: 0,
+          placementsCount: 0,
+          notes: 'Ajuste manual en Historial Mensual',
+          createdAt: new Date().toISOString(),
+        };
+        setTimeLogs((prev) => [adjLog, ...prev]);
+      }
+
+      const nowIso = new Date().toISOString();
+      const baseReport = buildCurrentMonthlyReport();
+      const updatedCurrentReport: MonthlyServiceReport = {
+        ...baseReport,
+        participated: historyFormParticipated,
+        hours: historyFormHours,
+        minutes: historyFormMinutes,
+        totalMinutes: targetTotalMins,
+        bibleStudies: historyFormStudies,
+        isAuxiliaryPioneer: historyFormAuxPioneer,
+        notes: historyFormNotes.trim() || undefined,
+        updatedAt: nowIso,
+      };
+      updateMonthlyReport(updatedCurrentReport);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('kongre_ministry_data_changed'));
+        window.dispatchEvent(new CustomEvent('kongre_trigger_cloud_sync'));
+      }
+      triggerToast(
+        `¡Mes de ${selectedHistoryRow.monthName} ${selectedHistoryRow.year} guardado (${historyFormHours}h ${historyFormMinutes}m)!`
+      );
+      return;
+    }
+
+    // Guardar cualquier otro mes del año de servicio
+    const existingRepForMonth = monthlyReports.find(
+      (r) =>
+        (r.publisherId === activePublisherId || r.publisherId === 'pub-local') &&
+        r.month === selectedHistoryRow.monthKey
+    );
+    const nowIso = new Date().toISOString();
+    const isPioneer =
+      activePublisher?.privilege === 'precursor_regular' ||
+      activePublisher?.pioneerStatus === 'regular' ||
+      activePublisher?.pioneerStatus === 'especial';
+
+    const savedMonthReport: MonthlyServiceReport = {
+      id: existingRepForMonth?.id || `rep-${activePublisherId}-${selectedHistoryRow.monthKey}`,
+      publisherId: activePublisherId,
+      month: selectedHistoryRow.monthKey,
+      participated: historyFormParticipated,
+      hours: historyFormParticipated ? historyFormHours : 0,
+      minutes: historyFormParticipated ? historyFormMinutes : 0,
+      totalMinutes: historyFormParticipated ? historyFormHours * 60 + historyFormMinutes : 0,
+      hourGoal,
+      bibleStudies: historyFormParticipated ? historyFormStudies : 0,
+      isPioneer: Boolean(isPioneer),
+      isAuxiliaryPioneer: historyFormAuxPioneer,
+      notes: historyFormNotes.trim() || undefined,
+      reportedAt: existingRepForMonth?.reportedAt || nowIso,
+      updatedAt: nowIso,
+    };
+
+    updateMonthlyReport(savedMonthReport);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('kongre_ministry_data_changed'));
+      window.dispatchEvent(new CustomEvent('kongre_trigger_cloud_sync'));
+    }
+    triggerToast(
+      `¡Historial de ${selectedHistoryRow.monthName} ${selectedHistoryRow.year} actualizado correctamente!`
+    );
+  };
+
+  const handleShareSelectedMonthWhatsApp = () => {
+    if (!selectedHistoryRow) return;
+    const pubName = activePublisher?.name || currentBrotherName || 'Publicador';
+    const timeLabel =
+      historyFormMinutes > 0
+        ? `${historyFormHours} h ${historyFormMinutes} min`
+        : `${historyFormHours} h`;
+    const text =
+      `*Resumen Mensual de Ministerio* 📋\n` +
+      `👤 *Hermano(a):* ${pubName}\n` +
+      `📅 *Mes:* ${selectedHistoryRow.monthName} ${selectedHistoryRow.year}\n` +
+      `✅ *Participó en el ministerio:* ${historyFormParticipated ? 'Sí' : 'No'}\n` +
+      (historyFormParticipated ? `⏱️ *Tiempo:* ${timeLabel}\n` : '') +
+      (historyFormParticipated ? `📖 *Cursos bíblicos:* ${historyFormStudies}\n` : '') +
+      (historyFormAuxPioneer ? `🌟 *Modalidad:* Precursor Auxiliar\n` : '') +
+      (historyFormNotes.trim() ? `📝 *Notas:* ${historyFormNotes.trim()}\n` : '') +
+      `\n_Enviado desde Mi Ministerio • Kongre_`;
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
   const buildCurrentMonthlyReport = (): MonthlyServiceReport => {
     const isPioneer =
       activePublisher?.privilege === 'precursor_regular' ||
@@ -1524,11 +1789,11 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <FileText className="w-3.5 h-3.5 shrink-0" />
-          <span className="truncate">Informe S-4</span>
-          {existingS4Report && (
-            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Informe guardado" />
-          )}
+          <History className="w-3.5 h-3.5 shrink-0" />
+          <span className="truncate">Historial Mensual</span>
+          <span className="px-1.5 py-0.2 rounded-full text-[9.5px] font-mono bg-purple-50 dark:bg-purple-950/80 text-purple-600 dark:text-purple-300 shrink-0">
+            {serviceYearSummary.totalHoursYear}h
+          </span>
         </button>
       </div>
 
@@ -1694,6 +1959,22 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
                   </span>
                   <span>{monthSummary.logsThisMonth.length} salidas</span>
                 </p>
+                <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 dark:border-slate-700/60 text-[10px]">
+                  <span className="font-bold text-slate-600 dark:text-slate-300">
+                    Meta Anual ({selectedServiceYear}):{' '}
+                    <strong className="text-indigo-600 dark:text-indigo-400">
+                      {serviceYearSummary.totalHoursYear} / {serviceYearSummary.annualGoalHours} h ({serviceYearSummary.annualProgressPct}%)
+                    </strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setActiveSubTab('informe')}
+                    className="font-extrabold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <span>Ver historial mes a mes</span>
+                    <ChevronRight className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
 
               {/* 3 Mini-Tarjetas: Revisitas, Estudios, Publicaciones (tamaño y espaciado uniforme) */}
@@ -2421,104 +2702,474 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
       )}
 
       {/* =========================================================================
-          7. CONTENIDO COMPLETO: INFORME MENSUAL S-4 (`informe`)
+      {/* =========================================================================
+          7. CONTENIDO COMPLETO REDISEÑADO: HISTORIAL MENSUAL Y META ANUAL (`informe`)
          ========================================================================= */}
       {activeSubTab === 'informe' && (
-        <div className="w-full bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
-            <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-                Formulario Oficial S-4
-              </span>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white mt-0.5">
-                Informe de Servicio del Campo — {currentMonthLabel}
-              </h3>
-              <p className="text-xs text-slate-500">
-                Autocompletado con tu cronómetro de ministerio y tus cursos bíblicos del mes
-              </p>
+        <div className="w-full space-y-4 sm:space-y-5">
+          {/* 1. CABECERA Y TARJETA DE META ANUAL DEL AÑO DE SERVICIO (SEPTIEMBRE - AGOSTO) */}
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200/90 dark:border-slate-800 shadow-xs space-y-4">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3.5 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60">
+                    <Target className="w-3 h-3" /> Año de Servicio (Septiembre – Agosto)
+                  </span>
+                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                    {serviceYearSummary.isRegularPioneer
+                      ? 'Precursor Regular (Meta oficial: 600 h/año)'
+                      : serviceYearSummary.isSpecialPioneer
+                      ? 'Precursor Especial (Meta oficial: 1200 h/año)'
+                      : `Meta personal: ${hourGoal} h al mes (${serviceYearSummary.annualGoalHours} h al año)`}
+                  </span>
+                </div>
+                <h3 className="text-base sm:text-xl font-black text-slate-900 dark:text-white mt-1">
+                  Mi Historial Mensual y Meta Anual de Horas
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Consulta tu avance mes a mes, ajusta tu meta de horas y toca cualquier mes para editarlo o enviarlo por WhatsApp.
+                </p>
+              </div>
+
+              {/* Selectores rápidos: Meta Mensual/Anual y Año de Servicio */}
+              <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto">
+                <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <Target className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">Mi Meta:</span>
+                  <select
+                    value={hourGoal}
+                    onChange={(e) => handleUpdateGoal(Number(e.target.value))}
+                    className="bg-transparent text-xs font-extrabold text-slate-900 dark:text-white focus:outline-none cursor-pointer"
+                  >
+                    <option value={10}>10 h/mes (120 h/año)</option>
+                    <option value={15}>15 h/mes (Auxiliar)</option>
+                    <option value={30}>30 h/mes (Auxiliar)</option>
+                    <option value={50}>50 h/mes (600 h/año)</option>
+                    <option value={100}>100 h/mes (1200 h/año)</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                  <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">Periodo:</span>
+                  <select
+                    value={selectedServiceYear}
+                    onChange={(e) => {
+                      const nextYr = e.target.value;
+                      setSelectedServiceYear(nextYr);
+                      const monthsInNextYr = getServiceYearMonths(nextYr);
+                      const hasCurrent = monthsInNextYr.some((m) => m.monthKey === currentMonthKey);
+                      setSelectedHistoryMonthKey(
+                        hasCurrent ? currentMonthKey : monthsInNextYr[0]?.monthKey || currentMonthKey
+                      );
+                    }}
+                    className="bg-transparent text-xs font-extrabold text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer"
+                  >
+                    {availableServiceYears.map((yr) => (
+                      <option key={yr} value={yr}>
+                        {yr}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 flex items-center justify-center">
-              <FileText className="w-6 h-6" />
+
+            {/* Resumen Visual de la Meta Anual (4 tarjetas limpias + Barra de Progreso) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+              <div className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/70 dark:border-indigo-800/60">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
+                  Horas en el Año
+                </span>
+                <div className="flex items-baseline gap-1.5 mt-1 tabular-nums">
+                  <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                    {serviceYearSummary.totalHoursYear} h
+                  </span>
+                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                    / {serviceYearSummary.annualGoalHours} h
+                  </span>
+                </div>
+                <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5 block">
+                  {serviceYearSummary.annualProgressPct}% de tu meta anual
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                  Promedio por Mes
+                </span>
+                <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">
+                  {serviceYearSummary.avgMonthlyHours} h
+                </div>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                  Meta mensual: {hourGoal} h/mes
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                  Meses Informados
+                </span>
+                <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">
+                  {serviceYearSummary.monthsParticipated}{' '}
+                  <span className="text-xs font-bold text-slate-400">de 12</span>
+                </div>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                  Septiembre a Agosto
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                  Faltan para la Meta
+                </span>
+                <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">
+                  {serviceYearSummary.remainingAnnualHours === 0
+                    ? '¡Lograda! 🎉'
+                    : `${serviceYearSummary.remainingAnnualHours} h`}
+                </div>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                  {serviceYearSummary.totalStudiesYear} estudios en el año
+                </span>
+              </div>
+            </div>
+
+            {/* Barra de progreso anual */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-[11px] font-bold">
+                <span className="text-slate-600 dark:text-slate-300">
+                  Avance acumulado del año de servicio {selectedServiceYear}
+                </span>
+                <span className="text-indigo-600 dark:text-indigo-400 tabular-nums">
+                  {serviceYearSummary.totalHoursYear} h completadas ({serviceYearSummary.annualProgressPct}%)
+                </span>
+              </div>
+              <div className="w-full h-3 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden p-0.5 border border-slate-200/60 dark:border-slate-700/60">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-indigo-600 via-purple-500 to-emerald-500 transition-all duration-500"
+                  style={{ width: `${serviceYearSummary.annualProgressPct}%` }}
+                />
+              </div>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <label className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700 cursor-pointer">
-              <div>
-                <span className="text-sm font-bold text-slate-900 dark:text-white block">
-                  Participé en alguna faceta del ministerio durante el mes
-                </span>
-                <span className="text-xs text-slate-500">
-                  Marca la casilla si predicaste durante {currentMonthLabel}
-                </span>
-              </div>
-              <input
-                type="checkbox"
-                checked={s4Participated}
-                onChange={(e) => setS4Participated(e.target.checked)}
-                className="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500"
-              />
-            </label>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700">
-                <span className="text-xs font-bold text-slate-500 block">
-                  Horas acumuladas (Precursores)
-                </span>
-                <div className="text-3xl font-black text-slate-900 dark:text-white mt-1">
-                  {monthSummary.fullHours} <span className="text-sm font-semibold text-slate-400">horas</span>
+          {/* 2. PANEL DIVIDIDO: MIS 12 MESES DEL AÑO (IZQUIERDA) + DETALLE Y ENVÍO DEL MES SELECCIONADO (DERECHA) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
+            {/* IZQUIERDA (7 cols): LISTA VISUAL INTERACTIVA DE LOS 12 MESES */}
+            <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/90 dark:border-slate-800 shadow-xs space-y-3.5">
+              <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                  <h4 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">
+                    Mis 12 Meses ({selectedServiceYear})
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Toca cualquier mes de la lista para ver o editar tus horas, estudios y notas.
+                  </p>
                 </div>
-                <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">
-                  + {monthSummary.remainingMinutes} min guardados para el próximo mes
-                </span>
+                {selectedHistoryMonthKey !== currentMonthKey && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedServiceYear('2025-2026');
+                      setSelectedHistoryMonthKey(currentMonthKey);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 text-[11px] font-bold hover:bg-indigo-100 transition cursor-pointer shrink-0"
+                  >
+                    Ir al mes actual
+                  </button>
+                )}
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700">
-                <span className="text-xs font-bold text-slate-500 block">
-                  Cursos Bíblicos Diferentes
-                </span>
-                <div className="text-3xl font-black text-slate-900 dark:text-white mt-1">
-                  {monthSummary.totalStudiesCount}{' '}
-                  <span className="text-sm font-semibold text-slate-400">estudios</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {serviceYearSummary.rows.map((row) => {
+                  const isSelected = row.monthKey === selectedHistoryRow?.monthKey;
+                  const rowHours = row.hours ?? 0;
+                  const monthGoalPct =
+                    hourGoal > 0 ? Math.min(100, Math.round((rowHours / hourGoal) * 100)) : 0;
+
+                  return (
+                    <button
+                      key={row.monthKey}
+                      type="button"
+                      onClick={() => setSelectedHistoryMonthKey(row.monthKey)}
+                      className={`text-left p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                        isSelected
+                          ? 'bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 dark:border-indigo-500 ring-2 ring-indigo-500/20 shadow-xs'
+                          : row.isCurrentMonth
+                          ? 'bg-slate-50/90 dark:bg-slate-800/70 border-indigo-200 dark:border-indigo-800/70 hover:border-indigo-400'
+                          : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2 w-full">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+                              {row.monthName}
+                            </span>
+                            <span className="text-[11px] font-semibold text-slate-400">
+                              {row.year}
+                            </span>
+                            {row.isCurrentMonth && (
+                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-indigo-600 text-white">
+                                Actual
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            {row.participated ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                                <CheckCircle2 className="w-3 h-3" /> Participó
+                              </span>
+                            ) : row.hasRecord ? (
+                              <span className="text-[10px] font-bold text-rose-500">
+                                Sin actividad
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-medium text-slate-400">
+                                Sin registro aún
+                              </span>
+                            )}
+                            {row.isAuxiliaryPioneer && (
+                              <span className="px-1.5 py-0.2 rounded bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 text-[9px] font-bold">
+                                Auxiliar
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="text-right tabular-nums shrink-0">
+                          <div className="text-sm sm:text-base font-black text-indigo-600 dark:text-indigo-400">
+                            {row.hours !== undefined ? `${row.hours} h` : '0 h'}
+                            {row.minutes > 0 && (
+                              <span className="text-[10px] font-bold text-slate-400 ml-0.5">
+                                {row.minutes}m
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 block">
+                            {row.bibleStudies > 0 ? `${row.bibleStudies} est.` : '0 est.'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Mini barra de progreso frente a la meta mensual */}
+                      <div className="w-full space-y-1">
+                        <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${
+                              monthGoalPct >= 100
+                                ? 'bg-emerald-500'
+                                : row.participated
+                                ? 'bg-indigo-500'
+                                : 'bg-slate-300 dark:bg-slate-700'
+                            }`}
+                            style={{ width: `${row.participated ? Math.max(6, monthGoalPct) : 0}%` }}
+                          />
+                        </div>
+                        {row.notes && (
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                            {row.notes}
+                          </p>
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* DERECHA (5 cols): EDITOR SIMPLE Y ENVÍO DEL MES SELECCIONADO */}
+            {selectedHistoryRow && (
+              <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200/90 dark:border-slate-800 shadow-xs space-y-4 lg:sticky lg:top-20">
+                <div className="flex items-start justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                        {selectedHistoryRow.isCurrentMonth
+                          ? 'Mes en Curso (Sincronizado con Cronómetro)'
+                          : 'Edición de Mes del Historial'}
+                      </span>
+                    </div>
+                    <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-white mt-0.5">
+                      {selectedHistoryRow.monthName} {selectedHistoryRow.year}
+                    </h4>
+                  </div>
+
+                  <span
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase ${
+                      selectedHistoryRow.participated
+                        ? 'bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    {selectedHistoryRow.participated ? 'Mes Activo' : 'Pendiente'}
+                  </span>
                 </div>
-                <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">
-                  Calculado de tu lista de Estudios Bíblicos
-                </span>
+
+                {/* Paso 1: ¿Participaste en el ministerio este mes? */}
+                <label className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 cursor-pointer">
+                  <div className="pr-3">
+                    <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white block">
+                      Participé en la predicación este mes
+                    </span>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Marca esta casilla si predicaste en {selectedHistoryRow.monthName}
+                    </span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={historyFormParticipated}
+                    onChange={(e) => setHistoryFormParticipated(e.target.checked)}
+                    className="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer shrink-0"
+                  />
+                </label>
+
+                {/* Paso 2: Horas y Estudios del Mes */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Control de Horas */}
+                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                        Horas del Mes
+                      </span>
+                      <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
+                        Meta: {hourGoal}h
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setHistoryFormHours((h) => Math.max(0, h - 1))}
+                        className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-black hover:bg-slate-100 cursor-pointer"
+                      >
+                        -
+                      </button>
+                      <div className="flex items-baseline gap-1 tabular-nums">
+                        <input
+                          type="number"
+                          min={0}
+                          max={300}
+                          value={historyFormHours}
+                          onChange={(e) =>
+                            setHistoryFormHours(Math.max(0, parseInt(e.target.value, 10) || 0))
+                          }
+                          className="w-14 text-center text-lg font-black py-0.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                        />
+                        <span className="text-xs font-bold text-slate-400">h</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setHistoryFormHours((h) => h + 1)}
+                        className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-black hover:bg-slate-100 cursor-pointer"
+                      >
+                        +
+                      </button>
+                    </div>
+                    {historyFormMinutes > 0 && (
+                      <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold block text-center">
+                        + {historyFormMinutes} min acumulados
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Control de Cursos Bíblicos */}
+                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                        Cursos Bíblicos
+                      </span>
+                      <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                        Diferentes
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setHistoryFormStudies((s) => Math.max(0, s - 1))}
+                        className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-black hover:bg-slate-100 cursor-pointer"
+                      >
+                        -
+                      </button>
+                      <div className="flex items-baseline gap-1 tabular-nums">
+                        <input
+                          type="number"
+                          min={0}
+                          max={50}
+                          value={historyFormStudies}
+                          onChange={(e) =>
+                            setHistoryFormStudies(Math.max(0, parseInt(e.target.value, 10) || 0))
+                          }
+                          className="w-14 text-center text-lg font-black py-0.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setHistoryFormStudies((s) => s + 1)}
+                        className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-black hover:bg-slate-100 cursor-pointer"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <span className="text-[10px] text-slate-400 block text-center">
+                      Estudios dirigidos en el mes
+                    </span>
+                  </div>
+                </div>
+
+                {/* Paso 3: Precursor Auxiliar en este mes */}
+                <label className="flex items-center justify-between p-3 rounded-xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200/70 dark:border-purple-800/50 cursor-pointer">
+                  <div>
+                    <span className="text-xs font-bold text-purple-900 dark:text-purple-200 block">
+                      Hice el Precursorado Auxiliar este mes
+                    </span>
+                    <span className="text-[10px] text-purple-700/80 dark:text-purple-300/80">
+                      Marca si serviste como precursor auxiliar (meta de 15 h o 30 h)
+                    </span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={historyFormAuxPioneer}
+                    onChange={(e) => setHistoryFormAuxPioneer(e.target.checked)}
+                    className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 cursor-pointer shrink-0"
+                  />
+                </label>
+
+                {/* Paso 4: Notas del mes */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Notas o comentarios del mes (opcional)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={historyFormNotes}
+                    onChange={(e) => setHistoryFormNotes(e.target.value)}
+                    placeholder="Ej. Precursor auxiliar de 15h, horas en campaña especial..."
+                    className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                {/* Botones de Acción del Mes */}
+                <div className="space-y-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleSaveSelectedHistoryMonth}
+                    className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer transition"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Guardar {selectedHistoryRow.monthName} en mi Historial</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleShareSelectedMonthWhatsApp}
+                    className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs cursor-pointer transition"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Enviar {selectedHistoryRow.monthName} por WhatsApp</span>
+                  </button>
+                </div>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                Comentarios o Notas (ej. Precursorado Auxiliar de 15h o 30h)
-              </label>
-              <textarea
-                rows={2}
-                value={s4Notes}
-                onChange={(e) => setS4Notes(e.target.value)}
-                placeholder="Opcional: Notas para el Superintendente de Grupo o Secretario..."
-                className="w-full p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={handleSyncAndSubmitS4}
-                className="w-full sm:flex-1 py-3.5 px-5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md cursor-pointer"
-              >
-                <Send className="w-4 h-4" />
-                <span>Enviar Informe S-4 a la Congregación</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleShareS4WhatsApp}
-                className="w-full sm:w-auto py-3.5 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md cursor-pointer"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>Enviar por WhatsApp</span>
-              </button>
-            </div>
+            )}
           </div>
         </div>
       )}

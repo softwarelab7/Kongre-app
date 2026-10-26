@@ -14,6 +14,7 @@ import {
 } from '../utils/unifiedMonthlyAssignments';
 import { openWhatsAppLink } from '../utils/whatsapp';
 import { SplashCheckbox } from './SplashCheckbox';
+import { getAvailableServiceYears, buildS21CardForPublisher } from '../utils/s21Helper';
 import {
   UserCheck,
   Calendar,
@@ -485,6 +486,45 @@ export const PersonalViewTab: React.FC = () => {
     setReportSuccessMsg('¡Informe mensual guardado y transmitido con éxito a la secretaría!');
     setTimeout(() => setReportSuccessMsg(null), 4000);
   };
+
+  // Historial Mes a Mes (Año de Servicio Sep - Ago) y Meta Anual de Horas en Mi Vista
+  const availableServiceYears = useMemo(() => getAvailableServiceYears(), []);
+  const [selectedServiceYear, setSelectedServiceYear] = useState<string>('2025-2026');
+
+  const personalS21Summary = useMemo(() => {
+    if (!selectedPublisher) return null;
+    const card = buildS21CardForPublisher(selectedPublisher, selectedServiceYear, monthlyReports);
+    const isRegularPioneer =
+      selectedPublisher.privilege === 'precursor_regular' ||
+      selectedPublisher.pioneerStatus === 'regular';
+    const isSpecialPioneer =
+      selectedPublisher.privilege === 'precursor_especial' ||
+      selectedPublisher.pioneerStatus === 'especial';
+    const isAuxPioneer =
+      selectedPublisher.privilege === 'precursor_auxiliar' ||
+      selectedPublisher.pioneerStatus === 'auxiliar_continuo';
+
+    const annualGoalHours = isSpecialPioneer
+      ? 1200
+      : isRegularPioneer
+      ? 600
+      : isAuxPioneer
+      ? 360
+      : 180;
+
+    const progressPct =
+      annualGoalHours > 0 ? Math.min(100, Math.round((card.totalHours / annualGoalHours) * 100)) : 0;
+    const remainingAnnualHours = Math.max(0, annualGoalHours - card.totalHours);
+
+    return {
+      card,
+      isRegularPioneer,
+      isSpecialPioneer,
+      annualGoalHours,
+      progressPct,
+      remainingAnnualHours,
+    };
+  }, [selectedPublisher, selectedServiceYear, monthlyReports]);
 
   // Share S-4 report by WhatsApp
   const handleShareReportWhatsApp = () => {
@@ -1138,10 +1178,10 @@ export const PersonalViewTab: React.FC = () => {
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
           }`}
         >
-          <FileText size={14} className="shrink-0" />
-          <span className="truncate">Informe S-4</span>
+          <CalendarDays size={14} className="shrink-0" />
+          <span className="truncate">Historial Mensual</span>
           {existingReport && (
-            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Informe del mes registrado" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" title="Mes registrado" />
           )}
         </button>
 
@@ -1549,123 +1589,317 @@ export const PersonalViewTab: React.FC = () => {
         </div>
       )}
 
-      {/* MÓDULO 2: MI INFORME MENSUAL (S-4) */}
+      {/* MÓDULO 2 REDISEÑADO: HISTORIAL MENSUAL Y META ANUAL */}
       {activeModule === 'informe' && (
-        <div className="w-full space-y-4">
-          <div className="bg-white dark:bg-slate-900 p-5 sm:p-7 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-6">
-            {/* Header del informe */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 px-2.5 py-0.5 rounded-full">
-                  FORMULARIO S-4
-                </span>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mt-1">
-                  Informe del Ministerio del Campo
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Envía mensualmente tu informe a la secretaría y superintendente de grupo.
-                </p>
+        <div className="w-full space-y-4 sm:space-y-5">
+          {/* 1. CABECERA Y META ANUAL DEL AÑO DE SERVICIO (SEPTIEMBRE - AGOSTO) */}
+          {personalS21Summary && (
+            <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3.5 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/60">
+                      <Calendar size={11} /> Año de Servicio (Septiembre – Agosto)
+                    </span>
+                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                      {personalS21Summary.isRegularPioneer
+                        ? 'Precursor Regular (Meta oficial: 600 h/año)'
+                        : personalS21Summary.isSpecialPioneer
+                        ? 'Precursor Especial (Meta oficial: 1200 h/año)'
+                        : `Meta anual de horas: ${personalS21Summary.annualGoalHours} h/año`}
+                    </span>
+                  </div>
+                  <h3 className="text-base sm:text-xl font-black text-slate-900 dark:text-white mt-1">
+                    Mi Historial Mensual y Meta Anual de Horas
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Revisa tu progreso mes a mes y toca cualquier mes de la lista para completar o actualizar tu actividad.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 self-start lg:self-auto">
+                  <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <Calendar size={14} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">Periodo:</span>
+                    <select
+                      value={selectedServiceYear}
+                      onChange={(e) => setSelectedServiceYear(e.target.value)}
+                      className="bg-transparent text-xs font-extrabold text-indigo-600 dark:text-indigo-400 focus:outline-none cursor-pointer"
+                    >
+                      {availableServiceYears.map((yr) => (
+                        <option key={yr} value={yr}>
+                          {yr}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
 
-              {/* Selector de Mes */}
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-                  Mes de servicio:
-                </label>
-                <input
-                  type="month"
-                  value={selectedReportMonth}
-                  onChange={(e) => setSelectedReportMonth(e.target.value)}
-                  className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white cursor-pointer"
-                />
+              {/* 4 Indicadores Visuales de la Meta Anual */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+                <div className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/70 dark:border-indigo-800/60">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">
+                    Horas en el Año
+                  </span>
+                  <div className="flex items-baseline gap-1.5 mt-1 tabular-nums">
+                    <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                      {personalS21Summary.card.totalHours} h
+                    </span>
+                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                      / {personalS21Summary.annualGoalHours} h
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 mt-0.5 block">
+                    {personalS21Summary.progressPct}% de tu meta anual
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                    Promedio por Mes
+                  </span>
+                  <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">
+                    {personalS21Summary.card.avgHoursPerMonth} h
+                  </div>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                    Promedio en meses activos
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                    Meses Informados
+                  </span>
+                  <div className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">
+                    {personalS21Summary.card.totalMonthsActive}{' '}
+                    <span className="text-xs font-bold text-slate-400">de 12</span>
+                  </div>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                    Septiembre a Agosto
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                    Faltan para la Meta
+                  </span>
+                  <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-1 tabular-nums">
+                    {personalS21Summary.remainingAnnualHours === 0
+                      ? '¡Lograda! 🎉'
+                      : `${personalS21Summary.remainingAnnualHours} h`}
+                  </div>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                    {personalS21Summary.card.totalBibleStudies} estudios acumulados
+                  </span>
+                </div>
+              </div>
+
+              {/* Barra de Progreso Anual */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-[11px] font-bold">
+                  <span className="text-slate-600 dark:text-slate-300">
+                    Avance acumulado del año de servicio {selectedServiceYear}
+                  </span>
+                  <span className="text-indigo-600 dark:text-indigo-400 tabular-nums">
+                    {personalS21Summary.card.totalHours} h completadas ({personalS21Summary.progressPct}%)
+                  </span>
+                </div>
+                <div className="w-full h-3 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden p-0.5 border border-slate-200/60 dark:border-slate-700/60">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-indigo-600 via-purple-500 to-emerald-500 transition-all duration-500"
+                    style={{ width: `${personalS21Summary.progressPct}%` }}
+                  />
+                </div>
               </div>
             </div>
+          )}
 
-            {/* Mensaje de éxito */}
-            {reportSuccessMsg && (
-              <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
-                <CheckCircle2 size={16} className="shrink-0" />
-                <span>{reportSuccessMsg}</span>
+          {/* 2. PANEL DIVIDIDO: MIS 12 MESES DEL AÑO (IZQUIERDA) + DETALLE Y ENVÍO DEL MES SELECCIONADO (DERECHA) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start">
+            {/* IZQUIERDA (7 cols): LISTA INTERACTIVA DE LOS 12 MESES */}
+            {personalS21Summary && (
+              <div className="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs space-y-3.5">
+                <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                  <div>
+                    <h4 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">
+                      Mis 12 Meses ({selectedServiceYear})
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Toca cualquier mes para ver o editar tus horas, cursos bíblicos y notas.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {personalS21Summary.card.months.map((m) => {
+                    const isSelected = m.monthKey === selectedReportMonth;
+                    const monthlyTarget = Math.max(10, Math.round(personalS21Summary.annualGoalHours / 12));
+                    const mHours = m.hours ?? 0;
+                    const monthPct = Math.min(100, Math.round((mHours / monthlyTarget) * 100));
+
+                    return (
+                      <button
+                        key={m.monthKey}
+                        type="button"
+                        onClick={() => setSelectedReportMonth(m.monthKey)}
+                        className={`text-left p-3 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                          isSelected
+                            ? 'bg-purple-50/80 dark:bg-purple-950/40 border-purple-500 dark:border-purple-500 ring-2 ring-purple-500/20 shadow-xs'
+                            : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2 w-full">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+                                {m.monthName}
+                              </span>
+                              <span className="text-[11px] font-semibold text-slate-400">
+                                {m.monthKey.slice(0, 4)}
+                              </span>
+                              {isSelected && (
+                                <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-purple-600 text-white">
+                                  Editando
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-1.5 mt-1">
+                              {m.participated ? (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                                  <CheckCircle2 size={12} /> Participó
+                                </span>
+                              ) : m.hasReport ? (
+                                <span className="text-[10px] font-bold text-rose-500">
+                                  Sin actividad
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-medium text-slate-400">
+                                  Pendiente
+                                </span>
+                              )}
+                              {m.isAuxiliaryPioneer && (
+                                <span className="px-1.5 py-0.2 rounded bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 text-[9px] font-bold">
+                                  Auxiliar
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="text-right tabular-nums shrink-0">
+                            <div className="text-sm sm:text-base font-black text-indigo-600 dark:text-indigo-400">
+                              {m.hours !== undefined ? `${m.hours} h` : '0 h'}
+                            </div>
+                            <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 block">
+                              {m.bibleStudies ? `${m.bibleStudies} est.` : '0 est.'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="w-full space-y-1">
+                          <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${
+                                monthPct >= 100
+                                  ? 'bg-emerald-500'
+                                  : m.participated
+                                  ? 'bg-indigo-500'
+                                  : 'bg-slate-300 dark:bg-slate-700'
+                              }`}
+                              style={{ width: `${m.participated ? Math.max(6, monthPct) : 0}%` }}
+                            />
+                          </div>
+                          {m.notes && (
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                              {m.notes}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
-            {/* Estado de envío */}
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80">
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-3 h-3 rounded-full ${
-                    existingReport ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'
-                  }`}
-                />
-                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                  {existingReport
-                    ? `Informe de ${selectedReportMonth} Registrado`
-                    : `Informe de ${selectedReportMonth} Pendiente de Envío`}
-                </span>
+            {/* DERECHA (5 cols): REGISTRO Y ENVÍO DEL MES SELECCIONADO */}
+            <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4 lg:sticky lg:top-20">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div>
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+                    Detalle y Cierre del Mes
+                  </span>
+                  <h4 className="text-base sm:text-lg font-black text-slate-900 dark:text-white mt-0.5 capitalize">
+                    {formatSpanishMonthLabel(selectedReportMonth)}
+                  </h4>
+                </div>
+
+                <div>
+                  <input
+                    type="month"
+                    value={selectedReportMonth}
+                    onChange={(e) => setSelectedReportMonth(e.target.value)}
+                    className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white cursor-pointer"
+                  />
+                </div>
               </div>
-              {existingReport?.reportedAt && (
-                <span className="text-[10px] text-slate-400">
-                  Actualizado: {new Date(existingReport.reportedAt).toLocaleDateString()}
-                </span>
+
+              {reportSuccessMsg && (
+                <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
+                  <CheckCircle2 size={15} className="shrink-0" />
+                  <span>{reportSuccessMsg}</span>
+                </div>
               )}
-            </div>
 
-            {/* Acceso directo al Cronómetro Horológico Unificado (Móvil y PC) */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/50">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
-                  <Clock size={16} />
+              {/* Acceso directo al Cronómetro */}
+              <div className="flex items-center justify-between gap-2.5 p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/50">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                    <Clock size={14} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                      Cronómetro de Ministerio
+                    </p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                      Registra tus salidas en vivo
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-extrabold text-slate-900 dark:text-white leading-tight">
-                    Cronómetro de Predicación Unificado (Móvil y PC)
-                  </p>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-tight mt-0.5">
-                    Usa la esfera horológica en vivo con sincronización automática de minutos, revisitas y notas.
-                  </p>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.location.hash = 'cronometro_ministerio';
+                    setTimeout(() => {
+                      window.dispatchEvent(new CustomEvent('kongre_open_preaching_timer'));
+                    }, 40);
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition-all cursor-pointer shrink-0"
+                >
+                  Abrir
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  window.location.hash = 'cronometro_ministerio';
-                  setTimeout(() => {
-                    window.dispatchEvent(new CustomEvent('kongre_open_preaching_timer'));
-                  }, 40);
-                }}
-                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
-              >
-                <Clock size={14} />
-                <span>Abrir Cronómetro</span>
-              </button>
-            </div>
 
-            {/* Campos del Formulario S-4 */}
-            <div className="space-y-5">
-              {/* 1. Casilla de Participación */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+              {/* 1. Participación */}
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
                 <SplashCheckbox
                   checked={reportForm.participated}
                   onChange={(e) =>
                     setReportForm({ ...reportForm, participated: e.target.checked })
                   }
-                  label="He participado en el ministerio durante este mes"
-                  description="Requisito de participación activa en el ministerio para publicadores de congregación."
+                  label="Participé en la predicación este mes"
+                  description="Marca si participaste en alguna faceta del ministerio."
                 />
               </div>
 
-              {/* 2. Horas */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white block">
-                      Horas dedicadas al ministerio
-                    </label>
-                    <span className="text-[11px] text-slate-500">
-                      Obligatorio para precursores auxiliares (15/30 hrs) y regulares (50 hrs).
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
+              {/* 2. Horas y Cursos Bíblicos en cuadrícula de 2 columnas */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
+                    Horas del Mes
+                  </span>
+                  <div className="flex items-center justify-between gap-1.5">
                     <button
                       type="button"
                       onClick={() =>
@@ -1674,14 +1908,14 @@ export const PersonalViewTab: React.FC = () => {
                           hours: Math.max(0, reportForm.hours - 1),
                         })
                       }
-                      className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-base hover:bg-slate-300 transition-colors"
+                      className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-black hover:bg-slate-100 cursor-pointer"
                     >
                       -
                     </button>
                     <input
                       type="number"
                       min={0}
-                      max={200}
+                      max={250}
                       value={reportForm.hours}
                       onChange={(e) =>
                         setReportForm({
@@ -1689,7 +1923,7 @@ export const PersonalViewTab: React.FC = () => {
                           hours: parseInt(e.target.value, 10) || 0,
                         })
                       }
-                      className="w-16 text-center text-lg font-bold py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
+                      className="w-14 text-center text-lg font-black py-0.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white tabular-nums"
                     />
                     <button
                       type="button"
@@ -1699,26 +1933,18 @@ export const PersonalViewTab: React.FC = () => {
                           hours: reportForm.hours + 1,
                         })
                       }
-                      className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-base hover:bg-slate-300 transition-colors"
+                      className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-black hover:bg-slate-100 cursor-pointer"
                     >
                       +
                     </button>
                   </div>
                 </div>
-              </div>
 
-              {/* 3. Cursos Bíblicos */}
-              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white block">
-                      Cursos bíblicos diferentes dirigidos
-                    </label>
-                    <span className="text-[11px] text-slate-500">
-                      Número de personas diferentes con las que estudiaste la Biblia este mes.
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-2">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
+                    Cursos Bíblicos
+                  </span>
+                  <div className="flex items-center justify-between gap-1.5">
                     <button
                       type="button"
                       onClick={() =>
@@ -1727,7 +1953,7 @@ export const PersonalViewTab: React.FC = () => {
                           bibleStudies: Math.max(0, reportForm.bibleStudies - 1),
                         })
                       }
-                      className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-base hover:bg-slate-300 transition-colors"
+                      className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-black hover:bg-slate-100 cursor-pointer"
                     >
                       -
                     </button>
@@ -1742,7 +1968,7 @@ export const PersonalViewTab: React.FC = () => {
                           bibleStudies: parseInt(e.target.value, 10) || 0,
                         })
                       }
-                      className="w-16 text-center text-lg font-bold py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white"
+                      className="w-14 text-center text-lg font-black py-0.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white tabular-nums"
                     />
                     <button
                       type="button"
@@ -1752,7 +1978,7 @@ export const PersonalViewTab: React.FC = () => {
                           bibleStudies: reportForm.bibleStudies + 1,
                         })
                       }
-                      className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-base hover:bg-slate-300 transition-colors"
+                      className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-black hover:bg-slate-100 cursor-pointer"
                     >
                       +
                     </button>
@@ -1760,40 +1986,40 @@ export const PersonalViewTab: React.FC = () => {
                 </div>
               </div>
 
-              {/* 4. Notas / Observaciones */}
-              <div className="space-y-1.5">
+              {/* 3. Notas */}
+              <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
-                  Notas u Observaciones (Opcional)
+                  Notas o comentarios del mes (opcional)
                 </label>
                 <textarea
                   rows={2}
                   value={reportForm.notes}
                   onChange={(e) => setReportForm({ ...reportForm, notes: e.target.value })}
-                  placeholder="Ej. Precursor auxiliar este mes con meta de 15 horas, crédito LDC..."
-                  className="w-full text-xs p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 focus:outline-hidden text-slate-900 dark:text-white placeholder:text-slate-400"
+                  placeholder="Ej. Precursor auxiliar este mes (15h o 30h)..."
+                  className="w-full text-xs p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 focus:outline-hidden text-slate-900 dark:text-white placeholder:text-slate-400"
                 />
               </div>
-            </div>
 
-            {/* Acciones de envío */}
-            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 flex-wrap">
-              <button
-                type="button"
-                onClick={handleShareReportWhatsApp}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all cursor-pointer shadow-xs"
-              >
-                <Share2 size={14} />
-                <span>Enviar copia por WhatsApp</span>
-              </button>
+              {/* 4. Botones de Acción */}
+              <div className="space-y-2 pt-1">
+                <button
+                  type="button"
+                  onClick={handleSaveMonthlyReport}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs sm:text-sm transition-all cursor-pointer shadow-sm"
+                >
+                  <CheckCircle2 size={16} />
+                  <span>Guardar Mes en mi Historial</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={handleSaveMonthlyReport}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all cursor-pointer shadow-sm shadow-purple-600/30"
-              >
-                <Send size={14} />
-                <span>Guardar y Transmitir Informe</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={handleShareReportWhatsApp}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all cursor-pointer shadow-xs"
+                >
+                  <Share2 size={14} />
+                  <span>Enviar copia por WhatsApp</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

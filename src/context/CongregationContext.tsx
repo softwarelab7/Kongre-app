@@ -2129,6 +2129,8 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return await syncNowWithSupabase(false);
   };
 
+  const isCloudSyncInFlightRef = useRef<boolean>(false);
+
   // Función explícita para sincronización bidireccional continua con Supabase (Cero Conocimiento)
   const syncNowWithSupabase = async (
     forceUpload: boolean = false
@@ -2138,6 +2140,16 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       isDemoModeActive()
     ) {
       return { success: true, message: 'El modo de demostración opera de manera 100% local sin conexión a Supabase.' };
+    }
+
+    // Evitar ejecuciones concurrentes de PBKDF2 / descifrado al despertar la pestaña
+    if (isCloudSyncInFlightRef.current && !forceUpload) {
+      return { success: true, action: 'up_to_date', message: 'Sincronización en curso.' };
+    }
+
+    // No ejecutar sincronizaciones de fondo pesadas si la pestaña está oculta en reposo
+    if (!forceUpload && typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+      return { success: true, action: 'up_to_date', message: 'Pestaña en reposo; sincronización pospuesta.' };
     }
 
     const congDocId = resolveCongregationDocId();
@@ -2166,8 +2178,28 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return { success: false, message: 'Se requiere el PIN de la congregación para cifrar los datos en Supabase.' };
     }
 
-    setIsSupabaseSyncing(true);
+    isCloudSyncInFlightRef.current = true;
     try {
+      const hasPendingLocalUpload =
+        typeof localStorage !== 'undefined' && localStorage.getItem('kongre_needs_cloud_upload') === 'true';
+
+      // Si es un sondeo periódico y no hay cambios locales pendientes de subir,
+      // verificar primero metadatos remotos sin bloquear el hilo principal ni re-renderizar toda la app
+      if (!forceUpload && !hasPendingLocalUpload && typeof navigator !== 'undefined' && navigator.onLine) {
+        const metaCheck = await supabaseSyncService.checkRemoteUpdates(
+          congDocId,
+          pinMaestro || pinCongregacion
+        );
+        if (!metaCheck.hasUpdate) {
+          return {
+            success: true,
+            action: 'up_to_date',
+            message: 'Tus datos ya están sincronizados y al día con Supabase.',
+          };
+        }
+      }
+
+      setIsSupabaseSyncing(true);
       const fresh = getFreshLocalCongregationData();
       const res = await supabaseSyncService.syncBidirectional({
         congregationId: congDocId,
@@ -2204,7 +2236,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         },
         pinMaestro,
         pinCongregacion,
-        forceUpload,
+        forceUpload: forceUpload || hasPendingLocalUpload,
         onDataUpdated: (merged) => {
           hydrateAllFromData(merged);
         },
@@ -2227,6 +2259,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       if (res.action === 'downloaded' || res.action === 'merged') {
         msg = 'Se descargaron y combinaron las últimas novedades teocráticas desde Supabase.';
       } else if (res.action === 'uploaded') {
+        localStorage.removeItem('kongre_needs_cloud_upload');
         msg = 'Tus datos locales cifrados con AES-256 se sincronizaron con éxito en Supabase.';
       } else if (res.action === 'offline_queued') {
         msg = 'Sin conexión. Los cambios quedaron en cola local para subirse al reconectar.';
@@ -2239,6 +2272,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       console.warn('Error en syncNowWithSupabase:', err);
       return { success: false, message: err?.message || 'Error en sincronización con Supabase.' };
     } finally {
+      isCloudSyncInFlightRef.current = false;
       setIsSupabaseSyncing(false);
     }
   };
@@ -2462,13 +2496,22 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       syncNowWithSupabase(true).catch(() => {});
     };
 
+    const handleTabWakeUp = () => {
+      refreshQueueStats();
+      syncNowWithSupabase(false).catch(() => {});
+    };
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     window.addEventListener('kongre_indexeddb_queue_changed', handleQueueChanged);
     window.addEventListener('kongre_offline_sync_queued', handleQueueChanged);
     window.addEventListener('kongre_trigger_cloud_sync', handleTriggerCloudSync);
+    window.addEventListener('kongre_tab_wakeup', handleTabWakeUp);
 
     const intervalId = window.setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+        return;
+      }
       if (typeof navigator !== 'undefined' && navigator.onLine) {
         if (
           isDemoMode ||
@@ -2495,6 +2538,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       window.removeEventListener('kongre_indexeddb_queue_changed', handleQueueChanged);
       window.removeEventListener('kongre_offline_sync_queued', handleQueueChanged);
       window.removeEventListener('kongre_trigger_cloud_sync', handleTriggerCloudSync);
+      window.removeEventListener('kongre_tab_wakeup', handleTabWakeUp);
       window.clearInterval(intervalId);
     };
   }, []);

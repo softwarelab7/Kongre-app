@@ -68,13 +68,23 @@ export const OfflineSyncBadge: React.FC<OfflineSyncBadgeProps> = ({
       loadStats();
     };
 
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        loadStats();
+      }
+    };
+
     window.addEventListener('kongre_indexeddb_queue_changed', handleUpdate);
     window.addEventListener('kongre_offline_sync_queued', handleUpdate);
     window.addEventListener('storage', handleUpdate);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+    document.addEventListener('visibilitychange', handleVisibility);
 
-    const pollInterval = window.setInterval(loadStats, 4000);
+    const pollInterval = window.setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+      loadStats();
+    }, 4000);
 
     return () => {
       window.removeEventListener('kongre_indexeddb_queue_changed', handleUpdate);
@@ -82,6 +92,7 @@ export const OfflineSyncBadge: React.FC<OfflineSyncBadgeProps> = ({
       window.removeEventListener('storage', handleUpdate);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      document.removeEventListener('visibilitychange', handleVisibility);
       window.clearInterval(pollInterval);
     };
   }, []);

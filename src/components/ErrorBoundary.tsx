@@ -23,6 +23,24 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error, errorInfo: null };
   }
 
+  public componentDidMount() {
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', this.handleVisibilityRecovery);
+    }
+  }
+
+  public componentWillUnmount() {
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.handleVisibilityRecovery);
+    }
+  }
+
+  private handleVisibilityRecovery = () => {
+    if (typeof document !== 'undefined' && document.visibilityState === 'visible' && this.state.hasError) {
+      this.setState({ hasError: false, error: null, errorInfo: null });
+    }
+  };
+
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error in React ErrorBoundary:', error, errorInfo);
     this.setState({ error, errorInfo });

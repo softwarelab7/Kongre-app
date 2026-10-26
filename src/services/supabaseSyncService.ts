@@ -807,7 +807,14 @@ export const supabaseSyncService = {
         }
       }
 
-      // 4. Si la nube no tiene novedades o forzamos subida, subir snapshot actual
+      // 4. Solo subir snapshot actual si se solicitó subida explícita o hay cambios locales pendientes
+      const hasPendingLocalUpload =
+        typeof localStorage !== 'undefined' && localStorage.getItem('kongre_needs_cloud_upload') === 'true';
+
+      if (!params.forceUpload && !hasPendingLocalUpload) {
+        return { success: true, action: 'up_to_date' };
+      }
+
       const uploadRes = await this.uploadCongregation({
         congregationId: cleanId,
         data: params.currentData,
@@ -1038,6 +1045,7 @@ export const supabaseSyncService = {
     if (!cleanId || !rawPin || isDemoModeActive(cleanId)) return null;
 
     const timer = setInterval(async () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
       if (typeof navigator !== 'undefined' && !navigator.onLine) return;
       const check = await this.checkRemoteUpdates(cleanId, rawPin);
       if (check.hasUpdate && check.remoteCreatedAt) {

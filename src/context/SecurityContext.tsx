@@ -600,7 +600,7 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const deadlineRef = useRef<number>(Date.now() + (autoLockMinutes > 0 ? autoLockMinutes * 60 * 1000 : 0));
   const lastResetRef = useRef<number>(Date.now());
 
-  const isAutoLockActive = !isDemoSession() && (!!pinHash || !!congregationPinHash) && autoLockMinutes > 0 && !isLocked;
+  const isAutoLockActive = !isDemoSession() && !!pinHash && autoLockMinutes > 0 && !isLocked;
   const totalSeconds = autoLockMinutes > 0 ? autoLockMinutes * 60 : 0;
   const autoLockFraction = totalSeconds > 0 ? Math.min(1, Math.max(0, remainingSeconds / totalSeconds)) : 0;
 
@@ -616,31 +616,38 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const now = Date.now();
     deadlineRef.current = now + autoLockMinutes * 60 * 1000;
     lastResetRef.current = now;
-    setRemainingSeconds(autoLockMinutes * 60);
+    const fullSecs = autoLockMinutes * 60;
+    setRemainingSeconds((prev) => (prev === fullSecs ? prev : fullSecs));
     setIsRefilling(true);
     setTimeout(() => setIsRefilling(false), 600);
   }, [isLocked, autoLockMinutes]);
 
   useEffect(() => {
     if (!isAutoLockActive) {
-      setRemainingSeconds(0);
+      setRemainingSeconds((prev) => (prev === 0 ? prev : 0));
       return;
     }
 
-    deadlineRef.current = Date.now() + autoLockMinutes * 60 * 1000;
-    setRemainingSeconds(autoLockMinutes * 60);
+    const fullSecs = autoLockMinutes * 60;
+    deadlineRef.current = Date.now() + fullSecs * 1000;
+    setRemainingSeconds((prev) => (prev === fullSecs ? prev : fullSecs));
 
     const updateCountdown = () => {
       const now = Date.now();
       const diffMs = deadlineRef.current - now;
       const secs = Math.max(0, Math.ceil(diffMs / 1000));
-      setRemainingSeconds(secs);
+      setRemainingSeconds((prev) => (prev === secs ? prev : secs));
       if (secs <= 0) {
         lockSession();
       }
     };
 
-    const interval = setInterval(updateCountdown, 250);
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+        return;
+      }
+      updateCountdown();
+    }, 1000);
 
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
@@ -653,10 +660,10 @@ export const SecurityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     const handleActivity = () => {
       const now = Date.now();
-      if (now - lastResetRef.current > 500) {
+      if (now - lastResetRef.current > 1000) {
         lastResetRef.current = now;
-        deadlineRef.current = now + autoLockMinutes * 60 * 1000;
-        setRemainingSeconds(autoLockMinutes * 60);
+        deadlineRef.current = now + fullSecs * 1000;
+        setRemainingSeconds((prev) => (prev === fullSecs ? prev : fullSecs));
       }
     };
 

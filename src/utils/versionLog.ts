@@ -25,18 +25,41 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.25';
-export const CURRENT_BUILD_CODE = '2026.10.26.7600';
+export const CURRENT_APP_VERSION = '2.12.26';
+export const CURRENT_BUILD_CODE = '2026.10.26.7650';
 export const BUILD_DATE = '26 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '2.12.26',
+    buildCode: '2026.10.26.7650',
+    date: '26 de Octubre, 2026',
+    title: 'Estabilidad en Reposo de Pestaña, Prevención de Pantalla en Blanco y Optimización de Sincronización en Segundo Plano',
+    isCurrent: true,
+    highlight: 'Eliminación del bucle de re-renderizado en reposo, pausa inteligente de sondeos en pestañas ocultas, pre-chequeo ligero de metadatos sin PBKDF2 redundante y recuperación automática BFCache/visibilitychange',
+    environment: 'Producción Cloud (Kongre)',
+    changes: [
+      {
+        category: 'fix',
+        text: 'Corrección de Pantalla en Blanco tras Reposo en el Navegador: Se eliminó el bucle infinito de verificación en la nube en App.tsx y se protegió la sesión local para que nunca se borre ante errores transitorios de red, límites 429 o suspensión de la pestaña.',
+      },
+      {
+        category: 'improvement',
+        text: 'Sincronización Inteligente sin Bloqueo de CPU (PBKDF2): syncNowWithSupabase y syncBidirectional ahora comprueban primero metadatos ligeros y omiten la lectura/cifrado de todo el almacenamiento local si no hay cambios pendientes, pausando todos los temporizadores cuando la pestaña está oculta (visibilityState === hidden).',
+      },
+      {
+        category: 'fix',
+        text: 'Recuperación Automática al Despertar (visibilitychange / pageshow) y Auto-Bloqueo: Rehidratación automática de la bóveda IndexedDB tras hibernación del navegador, ajuste del temporizador de bloqueo por inactividad y corrección de capa z-[100] en SessionLockModal.',
+      },
+    ],
+  },
+  {
     version: '2.12.25',
     buildCode: '2026.10.26.7600',
     date: '26 de Octubre, 2026',
     title: 'Blindaje de Concurrencia en Bóveda Local, Rotación Segura de Credenciales, Revalidación de Tokens y Cronómetro iOS',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Secuenciador monótono e hidratación en 2 fases en atRestVault, validación estricta de payloads re-cifrados en rotate_to, revocación inmediata en verify_role_token y cronómetro nativo estilo iOS sincronizado entre Móvil y PC',
     environment: 'Producción Cloud (Kongre)',
     changes: [

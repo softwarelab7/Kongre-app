@@ -706,32 +706,94 @@ const AppContent: React.FC = () => {
     }
   }, [publishers, loadCongregationFromCloud]);
 
-  // Verificación de existencia real de la congregación en la nube (Supabase):
-  // Si la congregación activa fue eliminada de la nube o no existe, restablecer el acceso a la pantalla de bienvenida
+  // Verificación inicial única de sincronización en la nube por ID de congregación:
+  // Se protege con ref para evitar bucles infinitos de re-renderizado y NUNCA borra la sesión local
+  // ante errores transitorios de red, límites de tasa (429) o al volver de suspensión del navegador.
+  const verifiedCloudCongRef = useRef<string | null>(null);
+  const loadCongregationFromCloudRef = useRef(loadCongregationFromCloud);
+  loadCongregationFromCloudRef.current = loadCongregationFromCloud;
+
   useEffect(() => {
     if (isDemoMode || isSafeDemoMode()) {
       return;
     }
-    const activeCongId = settings.congregationNumber || settings.congregationId || localStorage.getItem('kongre_congregation_number');
-    if (activeCongId && activeCongId.length >= 3 && !['1001', 'CENTRAL', 'MAIN', 'ID', 'DEMO-001'].includes(activeCongId.toUpperCase())) {
-      (async () => {
-        try {
-          const res = await loadCongregationFromCloud(activeCongId, { skipHydrate: true });
-          if (!res?.success || !res.data) {
-            // La congregación ya no existe en la nube
-            localStorage.removeItem('kongre_has_entered_app');
-            localStorage.removeItem('kongre_is_registered_congregation');
-            localStorage.removeItem('kongre_congregation_number');
-            localStorage.removeItem('kongre_congregation_id');
-            localStorage.removeItem('kongre_congregation_name');
-            setShowWelcomeLanding(true);
-          }
-        } catch (e) {
-          console.warn('Verificando estado de congregación en la nube:', e);
-        }
-      })();
+    const activeCongId = (
+      settings.congregationNumber ||
+      settings.congregationId ||
+      localStorage.getItem('kongre_congregation_number') ||
+      ''
+    )
+      .trim()
+      .toUpperCase();
+
+    if (
+      !activeCongId ||
+      activeCongId.length < 3 ||
+      ['1001', 'CENTRAL', 'MAIN', 'ID', 'DEMO-001', 'DEMO001'].includes(activeCongId) ||
+      activeCongId.startsWith('DEMO')
+    ) {
+      return;
     }
-  }, [settings.congregationNumber, settings.congregationId, loadCongregationFromCloud, isDemoMode]);
+
+    if (verifiedCloudCongRef.current === activeCongId) {
+      return;
+    }
+    verifiedCloudCongRef.current = activeCongId;
+
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+      return;
+    }
+
+    (async () => {
+      try {
+        await loadCongregationFromCloudRef.current(activeCongId, { skipHydrate: true });
+      } catch (e) {
+        console.warn('Verificando estado de congregación en la nube:', e);
+      }
+    })();
+  }, [settings.congregationNumber, settings.congregationId, isDemoMode]);
+
+  // Recuperación automática al volver del reposo/hibernación de pestaña (visibilitychange / pageshow BFCache)
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    let hiddenSince = document.visibilityState === 'hidden' ? Date.now() : 0;
+
+    const handleWakeUp = () => {
+      const idleDurationMs = hiddenSince > 0 ? Date.now() - hiddenSince : 0;
+      hiddenSince = 0;
+
+      // Rehidratar bóveda criptográfica en memoria si el navegador cerró conexiones IndexedDB en reposo
+      import('./utils/atRestVault')
+        .then(({ initAtRestVault }) => initAtRestVault(1500))
+        .catch(() => {});
+
+      // Si estuvo en reposo más de 30s, disparar sincronización ligera no bloqueante
+      if (idleDurationMs > 30000 && navigator.onLine && !isDemoMode && !isSafeDemoMode()) {
+        window.dispatchEvent(new CustomEvent('kongre_tab_wakeup', { detail: { idleDurationMs } }));
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        hiddenSince = Date.now();
+      } else if (document.visibilityState === 'visible') {
+        handleWakeUp();
+      }
+    };
+
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        handleWakeUp();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pageshow', handlePageShow);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, [isDemoMode]);
 
   // Guardián de Sesión de Publicador: Revocación o cambio de PIN en tiempo real (p.ej. teléfono perdido o robo)
   useEffect(() => {

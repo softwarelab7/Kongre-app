@@ -113,7 +113,7 @@ export const SessionLockModal: React.FC = () => {
 
   return (
     <div
-      className="fixed inset-0 z-100 flex items-center justify-center bg-slate-950/95 backdrop-blur-md p-4 animate-fade-in select-none"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/95 backdrop-blur-md p-4 animate-fade-in select-none"
       role="dialog"
       aria-modal="true"
       aria-label="Pantalla de bloqueo de seguridad"

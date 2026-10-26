@@ -6,6 +6,22 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v2.12.26] — 26 de Octubre, 2026
+**Estabilidad en Reposo de Pestaña, Prevención de Pantalla en Blanco y Optimización de Sincronización en Segundo Plano**
+
+- 🛠️ **Solución Definitiva a la Pantalla en Blanco tras Reposo en el Navegador (`App.tsx`, `ErrorBoundary.tsx`):**
+  - **Eliminación de Bucle de Verificación en la Nube:** Se corrigió el efecto de verificación de congregación en `App.tsx` que se re-ejecutaba en bucle en cada ciclo de sincronización y podía congelar la pestaña o limpiar la sesión activa ante límites de tasa (`429`) o cortes de red durante el reposo.
+  - **Recuperación Automática al Despertar (`visibilitychange` / `pageshow`):** Cuando el usuario regresa a la pestaña tras haber estado inactiva o hibernada por el navegador, la aplicación rehidrata de forma transparente la bóveda criptográfica (`atRestVault`), restablece cualquier error transitorio de renderizado y sincroniza novedades sin necesidad de pulsar `F5`.
+- ⚡ **Sincronización Ligera y Pausa en Pestañas Ocultas (`CongregationContext.tsx`, `supabaseSyncService.ts`, `OfflineSyncBadge.tsx`):**
+  - **Pre-chequeo de Metadatos sin PBKDF2 Redundante:** El sondeo periódico ya no re-cifra ni sube toda la base de datos local cada 45 segundos si no existen cambios locales pendientes (`kongre_needs_cloud_upload`), evitando bloqueos del hilo principal.
+  - **Suspensión de Temporizadores en Segundo Plano:** Los intervalos de sincronización en la nube, suscripción remota y lectura de cola `IndexedDB` se pausan automáticamente mientras `document.visibilityState === 'hidden'` y cuentan con candado de concurrencia para no acumular tareas al despertar.
+- 🔒 **Ajuste de Auto-Bloqueo y Capa Modal (`SecurityContext.tsx`, `SessionLockModal.tsx`):**
+  - **Temporizador Eficiente:** El contador de bloqueo por inactividad solo se activa cuando existe un PIN de bloqueo personal configurado, pausa sus ticks mientras la pestaña está oculta y utiliza `z-[100]` en el modal de bloqueo.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.25] — 26 de Octubre, 2026
 **Blindaje de Concurrencia en Bóveda Local, Rotación Segura de Credenciales, Revalidación de Tokens y Cronómetro Estilo iOS**
 
@@ -20,8 +36,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - **Diseño Nativo iOS OLED (`#000000`):** Carátula analógica de 60 segundos con sub-esfera de 30 minutos, manecilla naranja `#FF9F0A`, botones circulares de doble anillo (*Iniciar* / *Detener* / *Vuelta* / *Reiniciar*), selector *Analógico / Digital*, atajo global `Ctrl+Shift+T` y sincronización en tiempo real del estado del cronómetro entre móvil y PC.
 
 ---
-
-## 📅 Historial de Actualizaciones Anteriores
 
 ### [v2.12.24] — 25 de Octubre, 2026
 **Token de Rol Firmado por el Servidor y Fase 2 de la Bóveda Local para Salud (DPA) y Notas Confidenciales**

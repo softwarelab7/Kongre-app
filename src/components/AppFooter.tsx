@@ -175,6 +175,19 @@ export const AppFooter: React.FC<AppFooterProps> = ({
             <div className="w-full md:w-auto flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11.5px] sm:text-xs border-t md:border-t-0 border-slate-100 dark:border-slate-800/80 pt-2 md:pt-0">
               <button
                 type="button"
+                onClick={() => {
+                  window.location.hash = '#presentacion';
+                }}
+                className="inline-flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors cursor-pointer"
+              >
+                <ScrollText className="w-3.5 h-3.5 text-indigo-500" />
+                <span>Presentación y Docs</span>
+              </button>
+
+              <span className="text-slate-300 dark:text-slate-700">•</span>
+
+              <button
+                type="button"
                 onClick={() => handleOpenLegal('terms')}
                 className="inline-flex items-center gap-1 font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
               >

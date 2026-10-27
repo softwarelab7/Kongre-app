@@ -632,6 +632,8 @@
     min-height: 100dvh !important;
     max-height: none !important;
     height: auto !important;
+    flex-shrink: 0 !important;
+    overflow: visible !important;
     margin: 0 !important;
     border-radius: 0 !important;
     border: none !important;

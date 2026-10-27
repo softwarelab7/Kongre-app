@@ -60,6 +60,7 @@ import { AutoLockToastWarning } from './components/AutoLockToastWarning';
 import { JoinCongregationModal } from './components/JoinCongregationModal';
 import { InvitationManagerModal } from './components/InvitationManagerModal';
 import { CongregationWelcomeLanding } from './components/CongregationWelcomeLanding';
+import { KongreOfficialWebsite } from './components/KongreOfficialWebsite';
 import { RegisterCongregationWizard } from './components/RegisterCongregationWizard';
 import { AppLockPinSuggestionModal } from './components/AppLockPinSuggestionModal';
 import { AccountLinkRequestsModal } from './components/AccountLinkRequestsModal';
@@ -144,7 +145,9 @@ export const VALID_TABS_MAP: Record<string, ActiveTab> = {
 
 export function parseAppHash(hashString: string) {
   const clean = (hashString || '').replace(/^#\/?/, '').trim();
-  if (!clean) return null;
+  if (!clean) {
+    return { tab: null, modal: null, semana: null, isLanding: false, isLegal: false, isWebsite: true };
+  }
   const [routePart, queryPart] = clean.split('?');
   const normalizedRoute = routePart.toLowerCase().trim();
   const searchParams = new URLSearchParams(queryPart || '');
@@ -152,9 +155,18 @@ export function parseAppHash(hashString: string) {
   const modal = searchParams.get('modal') || null;
   const semana = searchParams.get('semana') || null;
   const isLanding = normalizedRoute === 'portal' || normalizedRoute === 'bienvenida';
-  const isLegal = normalizedRoute === 'privacy' || normalizedRoute === 'terms' ||
-                  normalizedRoute === 'privacidad' || normalizedRoute === 'terminos';
-  return { tab, modal, semana, isLanding, isLegal };
+  const isWebsite =
+    normalizedRoute === 'web' ||
+    normalizedRoute === 'sitio' ||
+    normalizedRoute === 'presentacion' ||
+    normalizedRoute === 'docs' ||
+    normalizedRoute === 'documentacion';
+  const isLegal =
+    normalizedRoute === 'privacy' ||
+    normalizedRoute === 'terms' ||
+    normalizedRoute === 'privacidad' ||
+    normalizedRoute === 'terminos';
+  return { tab, modal, semana, isLanding, isLegal, isWebsite };
 }
 
 const AppContent: React.FC = () => {
@@ -240,6 +252,38 @@ const AppContent: React.FC = () => {
   const [isQueueModalOpen, setIsQueueModalOpen] = useState(false);
   const [desktopUpdate, setDesktopUpdate] = useState<DesktopUpdateInfo | null>(null);
   const [isDesktopUpdateOpen, setIsDesktopUpdateOpen] = useState(false);
+
+  const [showOfficialWebsite, setShowOfficialWebsite] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    if (isDesktopApp()) return false;
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasPortalOrAuthParams =
+      urlParams.get('portal') === '1' ||
+      urlParams.get('inicio') === '1' ||
+      urlParams.get('bienvenida') === '1' ||
+      urlParams.has('code') ||
+      urlParams.has('invite') ||
+      urlParams.has('tk') ||
+      urlParams.has('pub') ||
+      urlParams.has('confirmar') ||
+      urlParams.has('territorio') ||
+      urlParams.has('t') ||
+      urlParams.get('modo') === 'tablero' ||
+      window.location.hash.includes('access_token') ||
+      sessionStorage.getItem('kongre_show_landing') === 'true';
+
+    if (hasPortalOrAuthParams) {
+      return false;
+    }
+
+    const hashInfo = parseAppHash(window.location.hash);
+    // En www.kongre-app.com (raíz sin hash) o #presentacion / #docs mostrar el sitio de presentación y documentación
+    if (hashInfo?.isWebsite) {
+      return true;
+    }
+    return false;
+  });
+
   const [showWelcomeLanding, setShowWelcomeLanding] = useState<boolean>(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const hashInfo = typeof window !== 'undefined' ? parseAppHash(window.location.hash) : null;
@@ -254,7 +298,10 @@ const AppContent: React.FC = () => {
     ) {
       return true;
     }
-    // Show welcome screen if the user has not entered yet in this browser
+    if (hashInfo?.isWebsite && !isDesktopApp()) {
+      return false;
+    }
+    // Show welcome portal if the user has not entered yet in this browser
     if (!localStorage.getItem('kongre_has_entered_app')) {
       return true;
     }
@@ -374,16 +421,17 @@ const AppContent: React.FC = () => {
   const openModalWithHistory = useCallback(
     (modalName: string, setter: React.Dispatch<React.SetStateAction<boolean>>) => {
       setter(true);
-      const baseRoute = showWelcomeLanding ? 'portal' : activeTab;
+      const baseRoute = showOfficialWebsite ? 'presentacion' : showWelcomeLanding ? 'portal' : activeTab;
       const nextHash = `#${baseRoute}?modal=${modalName}`;
       const nextState = {
         tab: activeTab,
         modal: modalName,
         landing: showWelcomeLanding,
+        website: showOfficialWebsite,
       };
       window.history.pushState(nextState, '', nextHash);
     },
-    [activeTab, showWelcomeLanding]
+    [activeTab, showWelcomeLanding, showOfficialWebsite]
   );
 
   const closeModalWithHistory = useCallback(
@@ -394,12 +442,20 @@ const AppContent: React.FC = () => {
       } else {
         const parsed = parseAppHash(window.location.hash);
         if (parsed?.modal === modalName) {
-          const fallbackHash = showWelcomeLanding ? '#portal' : `#${activeTab}`;
-          window.history.replaceState({ tab: activeTab, modal: null, landing: showWelcomeLanding }, '', fallbackHash);
+          const fallbackUrl = showOfficialWebsite
+            ? window.location.pathname
+            : showWelcomeLanding
+            ? '#portal'
+            : `#${activeTab}`;
+          window.history.replaceState(
+            { tab: activeTab, modal: null, landing: showWelcomeLanding, website: showOfficialWebsite },
+            '',
+            fallbackUrl
+          );
         }
       }
     },
-    [activeTab, showWelcomeLanding]
+    [activeTab, showWelcomeLanding, showOfficialWebsite]
   );
 
   const openConflictsView = useCallback(() => {
@@ -410,12 +466,38 @@ const AppContent: React.FC = () => {
     }
   }, [setActiveTab, openModalWithHistory]);
 
-  // Synchronize browser history events (Back / Forward button in browser)
+  // Synchronize browser history events (Back / Forward button in browser & hash changes)
   useEffect(() => {
-    const onPopState = (event: PopStateEvent) => {
-      const state = event.state;
+    const syncFromLocation = (state?: any) => {
       const hashInfo = parseAppHash(window.location.hash);
       const targetModal = state?.modal ?? hashInfo?.modal ?? null;
+
+      const isWebsite =
+        !isDesktopApp() &&
+        (state?.website ?? (hashInfo?.isWebsite && !state?.landing && !hashInfo?.isLanding));
+
+      if (isWebsite) {
+        setShowOfficialWebsite(true);
+        setShowWelcomeLanding(false);
+        setIsConflictsModalOpen(false);
+        setIsQrModalOpen(false);
+        setIsTimerModalOpen(false);
+        setIsKioskModalOpen(false);
+        setIsSearchModalOpen(false);
+        setIsRoleModalOpen(false);
+        setIsThemeModalOpen(false);
+        setIsJoinModalOpen(false);
+        setIsInviteManagerOpen(false);
+        setIsLinkRequestsModalOpen(false);
+        setIsPinsModalOpen(false);
+        setIsAuditLogOpen(false);
+        setIsRegisterWizardOpen(false);
+        setIsVersionModalOpen(targetModal === 'versiones');
+        setIsQueueModalOpen(false);
+        return;
+      }
+
+      setShowOfficialWebsite(false);
 
       const isLanding = state?.landing ?? hashInfo?.isLanding ?? hashInfo?.isLegal ?? false;
       if (isLanding) {
@@ -474,8 +556,20 @@ const AppContent: React.FC = () => {
       setIsQueueModalOpen(targetModal === 'cola_offline' || targetModal === 'cola');
     };
 
+    const onPopState = (event: PopStateEvent) => {
+      syncFromLocation(event.state);
+    };
+
+    const onHashChange = () => {
+      syncFromLocation(window.history.state);
+    };
+
     window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
+    window.addEventListener('hashchange', onHashChange);
+    return () => {
+      window.removeEventListener('popstate', onPopState);
+      window.removeEventListener('hashchange', onHashChange);
+    };
   }, [setCurrentWeekId, canManageRoles, isDemoMode, permissions.canViewAuditLog, permissions.canSuperviseConflicts]);
 
   // Initial history state synchronization on app mount
@@ -483,6 +577,20 @@ const AppContent: React.FC = () => {
     const hashInfo = parseAppHash(window.location.hash);
     const isLanding = showWelcomeLanding || (hashInfo?.isLanding ?? false);
     const initialModal = hashInfo?.modal || null;
+
+    if (showOfficialWebsite) {
+      const cleanRootUrl =
+        window.location.pathname + window.location.search + (window.location.hash || '');
+      window.history.replaceState(
+        { tab: activeTab, modal: initialModal, landing: false, website: true },
+        '',
+        cleanRootUrl
+      );
+      if (initialModal === 'versiones') {
+        setIsVersionModalOpen(true);
+      }
+      return;
+    }
 
     if (isLanding) {
       const hasAuthTokens = typeof window !== 'undefined' && (
@@ -504,7 +612,7 @@ const AppContent: React.FC = () => {
       const landingHash = (currentHash.startsWith('#portal') || currentHash.startsWith('#bienvenida'))
         ? currentHash
         : '#portal';
-      window.history.replaceState({ tab: activeTab, modal: null, landing: true }, '', landingHash);
+      window.history.replaceState({ tab: activeTab, modal: null, landing: true, website: false }, '', landingHash);
     } else {
       let initialHash = `#${activeTab}`;
       const params = new URLSearchParams();
@@ -519,6 +627,7 @@ const AppContent: React.FC = () => {
           modal: initialModal,
           weekId: hashInfo?.semana || null,
           landing: false,
+          website: false,
         },
         '',
         initialHash
@@ -1053,6 +1162,11 @@ const AppContent: React.FC = () => {
       overlays.forEach((overlay) => {
         if (overlay.children.length === 0) return;
         if (overlay.querySelector('[data-mobile-back-btn="true"]')) return;
+        const existingBackArrowBtn = overlay.querySelector('button svg.lucide-arrow-left')?.closest('button');
+        if (existingBackArrowBtn) {
+          existingBackArrowBtn.setAttribute('data-mobile-back-btn', 'true');
+          return;
+        }
         const ariaLabel = (overlay.getAttribute('aria-label') || '').toLowerCase();
         if (ariaLabel.includes('bloqueo') || ariaLabel.includes('consentimiento')) return;
 
@@ -1070,7 +1184,7 @@ const AppContent: React.FC = () => {
           ) {
             return true;
           }
-          return Boolean(btn.querySelector('svg.lucide-x, svg.lucide-x-circle, svg.lucide-arrow-left'));
+          return Boolean(btn.querySelector('svg.lucide-x, svg.lucide-x-circle'));
         });
 
         const card = (overlay.firstElementChild as HTMLElement) || overlay;
@@ -1166,6 +1280,55 @@ const AppContent: React.FC = () => {
       <VersionHistoryModal
         isOpen={true}
         onClose={() => closeModalWithHistory('versiones', setIsVersionModalOpen)}
+      />
+    );
+  }
+
+  // Official Product Presentation & Documentation Website (www.kongre-app.com / root URL)
+  if (showOfficialWebsite) {
+    return (
+      <KongreOfficialWebsite
+        onGoToPortal={(initialPortalTab) => {
+          setShowOfficialWebsite(false);
+          if (initialPortalTab === 'register') {
+            setIsRegisterWizardOpen(true);
+            window.history.pushState(
+              { tab: activeTab, modal: 'registro_congregacion', landing: false, website: false },
+              '',
+              '#portal?modal=registro_congregacion'
+            );
+            return;
+          }
+          setShowWelcomeLanding(true);
+          window.history.pushState(
+            { tab: activeTab, modal: null, landing: true, website: false },
+            '',
+            '#portal'
+          );
+        }}
+        onStartDemoMode={() => {
+          loadDemoData();
+          setShowOfficialWebsite(false);
+          setShowWelcomeLanding(false);
+          sessionStorage.removeItem('kongre_show_landing');
+          localStorage.setItem('kongre_has_entered_app', 'true');
+          localStorage.setItem('kongre_is_guest', 'true');
+          setActiveTab('inicio');
+        }}
+        onOpenVersionModal={() => {
+          openModalWithHistory('versiones', setIsVersionModalOpen);
+        }}
+        isSignedInOrRegistered={isCongregationRegistered}
+        onEnterAppDirectly={() => {
+          setShowOfficialWebsite(false);
+          setShowWelcomeLanding(false);
+          setActiveTab('inicio');
+          window.history.pushState(
+            { tab: 'inicio', modal: null, landing: false, website: false },
+            '',
+            '#inicio'
+          );
+        }}
       />
     );
   }

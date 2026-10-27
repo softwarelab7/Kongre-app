@@ -425,24 +425,25 @@ export const TermsAndPrivacyModal: React.FC<TermsAndPrivacyModalProps> = ({
 
   const pageContent = (
     <div
-      className="fixed inset-0 z-[100] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-y-auto flex flex-col py-3 sm:py-6 px-3 sm:px-6 lg:px-8 transition-colors duration-200 animate-fade-in"
+      className="fixed inset-0 z-[100] bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-y-auto overflow-x-hidden overscroll-y-contain [-webkit-overflow-scrolling:touch] block sm:py-6 sm:px-6 lg:px-8 transition-colors duration-200 animate-fade-in"
       role="region"
       aria-label="Términos de uso y política de privacidad"
     >
-      <div className="w-full max-w-4xl xl:max-w-5xl mx-auto flex-1 flex flex-col">
+      <div className="w-full max-w-4xl xl:max-w-5xl mx-auto pb-10">
         {/* Full-Page Main Card */}
-        <div className="w-full rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col overflow-hidden">
+        <div className="w-full sm:rounded-3xl bg-white dark:bg-slate-900 sm:border border-slate-200 dark:border-slate-800 sm:shadow-xl">
           {/* Page Header */}
-          <div className="px-5 py-4 sm:px-7 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-slate-50/70 dark:bg-slate-900/80 shrink-0">
+          <div className="sticky top-0 z-20 px-4 py-3.5 sm:px-7 sm:py-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md sm:rounded-t-3xl">
             <div className="flex items-center gap-3 min-w-0">
               <button
                 type="button"
+                data-mobile-back-btn="true"
                 onClick={onClose}
-                className="p-2 -ml-1 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
+                className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer shrink-0 active:scale-95"
                 title="Volver"
                 aria-label="Volver"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               </button>
               <div className="w-10 h-10 rounded-2xl bg-indigo-600/10 dark:bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
                 {activeTab === 'terms' ? (

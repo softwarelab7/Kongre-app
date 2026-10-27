@@ -223,14 +223,6 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
           <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
             Elige el sistema operativo de tu PC:
           </span>
-          <button
-            type="button"
-            onClick={onOpenAllDownloads}
-            className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 inline-flex items-center gap-1 transition cursor-pointer"
-          >
-            <span>Todos los instaladores</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -294,7 +286,7 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
             href={activeConfig.primaryFile.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition-all active:scale-95 cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition-all active:scale-95 cursor-pointer"
           >
             <Download className="w-4 h-4 shrink-0" />
             <span>Descargar {activeConfig.primaryFile.ext}</span>
@@ -302,15 +294,6 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
               ({activeConfig.primaryFile.size})
             </span>
           </a>
-
-          <button
-            type="button"
-            onClick={onOpenAllDownloads}
-            className="px-3 py-2.5 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-100/80 hover:bg-indigo-200/70 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/80 border border-indigo-200/80 dark:border-indigo-800/80 transition cursor-pointer shrink-0"
-            title="Ver catálogo completo de instaladores de PC"
-          >
-            Más opciones
-          </button>
         </div>
       </div>
     </div>

@@ -1383,17 +1383,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                    setOpenDropdown(null);
-                    handleSelectTab('perfil');
-                  } else {
-                    setOpenDropdown((prev) => (prev === 'user' ? null : 'user'));
-                  }
+                  setOpenDropdown((prev) => (prev === 'user' ? null : 'user'));
                 }}
-                aria-label="Menú de cuenta y perfil de usuario"
+                aria-label="Menú de cuenta, perfil y cerrar sesión"
                 aria-expanded={openDropdown === 'user'}
-                className="flex items-center gap-2 h-8 sm:h-9 pl-1 pr-1.5 sm:pl-1.5 sm:pr-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-all cursor-pointer shadow-2xs"
-                title="Mi Perfil y Cuenta"
+                className="flex items-center gap-1.5 sm:gap-2 h-8 sm:h-9 pl-1 pr-1.5 sm:pl-1.5 sm:pr-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-all cursor-pointer shadow-2xs"
+                title="Mi Perfil, Cuenta y Cerrar Sesión"
               >
                 <div className="w-6 h-6 sm:w-6 sm:h-6 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold flex items-center justify-center text-[11px] shadow-2xs overflow-hidden shrink-0">
                   {(() => {
@@ -1431,12 +1426,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="hidden md:inline-block max-w-[110px] truncate text-xs font-semibold text-slate-700 dark:text-slate-200 text-left">
                   {effectiveDisplayName?.split(' ')[0] || 'Mi Cuenta'}
                 </span>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-slate-300 hidden sm:inline-block shrink-0" />
+                <ChevronDown
+                  className={`w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400 dark:text-slate-300 shrink-0 transition-transform duration-150 ${
+                    openDropdown === 'user' ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''
+                  }`}
+                />
               </button>
 
-              {/* Redesigned User Profile Panel Popover */}
+              {/* Redesigned User Profile Panel Popover (Mobile & Desktop) */}
               {openDropdown === 'user' && (
-                <div className="absolute right-0 top-full mt-2 w-76 sm:w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute right-0 top-full mt-2 w-[calc(100vw-24px)] max-w-[320px] sm:w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 p-2.5 z-50 animate-in fade-in zoom-in-95 duration-150">
                   {/* Identity Header Card */}
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800 flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white font-bold flex items-center justify-center text-sm shadow-xs overflow-hidden shrink-0">

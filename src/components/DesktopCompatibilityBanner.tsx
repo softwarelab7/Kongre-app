@@ -174,108 +174,69 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
   const activeConfig = PLATFORMS_DATA[selectedPlatformId];
   const detectedConfig = PLATFORMS_DATA[detectedPlatformId];
   const ActiveIcon = activeConfig.icon;
+  const isMobileVariant = variant === 'mobile-banner';
 
-  // COMPACT / MOBILE BANNER
-  if (variant === 'mobile-banner') {
-    return (
-      <div className="rounded-2xl p-4 bg-linear-to-br from-slate-900 via-indigo-950 to-slate-900 text-white border border-indigo-500/30 shadow-lg shadow-indigo-950/40 relative overflow-hidden">
-        <div className="absolute -right-10 -bottom-10 w-36 h-36 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-        
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-500/30">
-            <Monitor className="w-5 h-5" />
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[13px] font-extrabold text-white tracking-tight">
-                Kongre App para Escritorio
-              </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
-                Rust v{CURRENT_APP_VERSION}
-              </span>
-            </div>
-
-            <p className="text-[11.5px] text-slate-300 mt-1 leading-snug">
-              Disponible nativamente para <strong>Windows, macOS y Linux</strong>. Ideal para la computadora del Salón del Reino con operación 100% offline.
-            </p>
-
-            <div className="mt-3 flex items-center gap-2">
-              <button
-                type="button"
-                onClick={onOpenAllDownloads}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow-xs active:scale-95 cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Ver instaladores de PC</span>
-                <ChevronRight className="w-3.5 h-3.5 opacity-80" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // HERO CARD (Desktop view)
   return (
-    <div className="mt-4 rounded-3xl p-4 sm:p-5 bg-linear-to-br from-slate-900 via-indigo-950/95 to-slate-900 text-white border border-indigo-500/30 shadow-xl shadow-indigo-950/30 relative overflow-hidden group">
-      {/* Subtle background glow effect */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-radial from-indigo-500/15 via-transparent to-transparent pointer-events-none" />
+    <div
+      className={`${
+        isMobileVariant ? 'rounded-2xl p-4 sm:p-5' : 'mt-4 rounded-3xl p-4 sm:p-5'
+      } bg-linear-to-br from-indigo-50/95 via-white to-violet-50/80 dark:from-slate-900 dark:via-indigo-950/85 dark:to-slate-900 text-slate-900 dark:text-white border border-indigo-200/90 dark:border-indigo-800/70 shadow-md shadow-indigo-500/5 dark:shadow-indigo-950/30 relative overflow-hidden transition-all`}
+    >
+      {/* Top subtle accent line */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-indigo-600 via-violet-500 to-sky-500" />
 
       {/* Header bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-white/10">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-9 h-9 rounded-xl bg-linear-to-tr from-indigo-500 to-violet-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-500/30">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5 border-b border-indigo-100/90 dark:border-slate-800">
+        <div className="flex items-start sm:items-center gap-3 min-w-0">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-linear-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-600/25 ring-2 ring-indigo-500/15">
             <Monitor className="w-5 h-5" />
           </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm sm:text-[15px] font-black text-white tracking-tight truncate">
-                Kongre App Nativa para PC
-              </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-500/25 text-indigo-300 border border-indigo-400/30">
-                Rust Core • v{CURRENT_APP_VERSION}
-              </span>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10.5px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <span>Versión para PC</span>
+              <span aria-hidden="true">·</span>
+              <span className="font-mono">Rust v{CURRENT_APP_VERSION}</span>
             </div>
-            <p className="text-[11px] text-slate-300 truncate">
-              Arranque instantáneo (~15 MB), 100% offline y cifrado local en reposo
+            <h3 className="text-[15px] sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug mt-0.5">
+              Kongre App para Escritorio
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mt-0.5">
+              Ideal para la computadora del Salón del Reino y estudio personal con operación 100% offline.
             </p>
           </div>
         </div>
 
-        {/* Operating System Detection pill */}
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-[11px] font-bold self-start sm:self-auto shrink-0">
-          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+        {/* Status / Platform Detection */}
+        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 shrink-0 sm:self-start">
+          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span>
             {isMobileDevice
-              ? 'Multiplataforma PC lista'
-              : `Detectado: ${detectedConfig.name}`}
+              ? 'Windows · macOS · Linux'
+              : `Recomendado: ${detectedConfig.name}`}
           </span>
         </div>
       </div>
 
-      {/* Quick Platform Switcher Tabs */}
-      <div className="pt-3 pb-2.5">
-        <div className="flex items-center justify-between gap-1 mb-2">
-          <span className="text-[10.5px] font-bold uppercase tracking-wider text-slate-400">
-            Selecciona tu sistema operativo:
+      {/* Interactive OS Selector Grid */}
+      <div className="py-3">
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+            Elige el sistema operativo de tu PC:
           </span>
           <button
             type="button"
             onClick={onOpenAllDownloads}
-            className="text-[11px] font-bold text-indigo-300 hover:text-white flex items-center gap-1 transition cursor-pointer"
+            className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 inline-flex items-center gap-1 transition cursor-pointer"
           >
-            <span>Ver todos los formatos</span>
-            <ExternalLink className="w-3 h-3" />
+            <span>Todos los instaladores</span>
+            <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {(Object.keys(PLATFORMS_DATA) as PlatformId[]).map((pid) => {
             const p = PLATFORMS_DATA[pid];
             const isSelected = selectedPlatformId === pid;
-            const isDetected = detectedPlatformId === pid && !isMobileDevice;
             const PIcon = p.icon;
 
             return (
@@ -283,48 +244,49 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
                 key={pid}
                 type="button"
                 onClick={() => setSelectedPlatformId(pid)}
-                className={`relative px-2.5 py-2 rounded-xl text-left transition-all cursor-pointer border flex items-center gap-2 ${
+                className={`px-3 py-2.5 rounded-xl text-left transition-all cursor-pointer border flex items-center gap-2.5 ${
                   isSelected
-                    ? 'bg-white/15 border-indigo-400 text-white shadow-xs'
-                    : 'bg-white/5 border-white/5 text-slate-300 hover:bg-white/10 hover:border-white/20'
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-600/20'
+                    : 'bg-white/90 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 hover:border-indigo-300 dark:hover:border-indigo-600'
                 }`}
               >
-                <PIcon className="w-4 h-4 shrink-0 text-indigo-300" />
+                <PIcon
+                  className={`w-4 h-4 shrink-0 ${
+                    isSelected ? 'text-white' : 'text-indigo-600 dark:text-indigo-400'
+                  }`}
+                />
                 <div className="min-w-0 flex-1">
-                  <div className="text-[12px] font-bold leading-tight truncate">
+                  <div className="text-xs font-bold leading-tight truncate">
                     {p.name}
                   </div>
-                  <div className="text-[10px] text-slate-400 truncate">
-                    {p.primaryFile.ext}
+                  <div
+                    className={`text-[10px] font-mono truncate mt-0.5 ${
+                      isSelected ? 'text-indigo-100' : 'text-slate-400 dark:text-slate-400'
+                    }`}
+                  >
+                    {p.primaryFile.ext} · {p.primaryFile.size}
                   </div>
                 </div>
-
-                {isDetected && (
-                  <span
-                    className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-slate-900"
-                    title="Tu sistema actual"
-                  />
-                )}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Download Action Area */}
-      <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-black/20 -mx-4 -mb-4 sm:-mx-5 sm:-mb-5 p-4 sm:p-4 rounded-b-3xl border-t border-white/10">
+      {/* Selected Platform Details & Action Bar */}
+      <div className="pt-3 border-t border-indigo-100/90 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="min-w-0">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-white">
-            <ActiveIcon className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+          <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-100">
+            <ActiveIcon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
             <span className="truncate">{activeConfig.architecture}</span>
-            <span className="text-white/40">•</span>
-            <span className="text-indigo-300 font-semibold text-[11px] shrink-0">
+            <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">·</span>
+            <span className="text-indigo-600 dark:text-indigo-400 font-semibold text-[11px]">
               {activeConfig.badge}
             </span>
           </div>
-          <div className="text-[11px] text-slate-400 truncate mt-0.5">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
             {activeConfig.compatibilityNote}
-          </div>
+          </p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
@@ -332,26 +294,23 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
             href={activeConfig.primaryFile.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-indigo-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 text-white text-xs font-black shadow-md shadow-indigo-600/30 transition-all active:scale-95 cursor-pointer"
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition-all active:scale-95 cursor-pointer"
           >
-            <Download className="w-4 h-4" />
+            <Download className="w-4 h-4 shrink-0" />
             <span>Descargar {activeConfig.primaryFile.ext}</span>
-            <span className="text-[10.5px] font-normal opacity-80">
+            <span className="text-[10.5px] font-mono opacity-85">
               ({activeConfig.primaryFile.size})
             </span>
           </a>
 
-          {activeConfig.secondaryFile && (
-            <a
-              href={activeConfig.secondaryFile.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-2.5 py-2 rounded-xl text-[11px] font-semibold text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition text-center"
-              title={`Alternativa: ${activeConfig.secondaryFile.name}`}
-            >
-              {activeConfig.secondaryFile.ext}
-            </a>
-          )}
+          <button
+            type="button"
+            onClick={onOpenAllDownloads}
+            className="px-3 py-2.5 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-100/80 hover:bg-indigo-200/70 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/80 border border-indigo-200/80 dark:border-indigo-800/80 transition cursor-pointer shrink-0"
+            title="Ver catálogo completo de instaladores de PC"
+          >
+            Más opciones
+          </button>
         </div>
       </div>
     </div>

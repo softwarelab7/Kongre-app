@@ -154,7 +154,7 @@ interface DesktopOptionProps {
   icon: any;
   title: string;
   description: string;
-  pill?: { label: string; tone: 'of' | 'ok' };
+  meta?: string;
   isFeatured?: boolean;
   onClick: () => void;
   iconCustom?: React.ReactNode;
@@ -164,7 +164,7 @@ function DesktopOption({
   icon: Icon,
   title,
   description,
-  pill,
+  meta,
   isFeatured = false,
   onClick,
   iconCustom,
@@ -173,39 +173,52 @@ function DesktopOption({
     <button
       type="button"
       onClick={onClick}
-      className={`opt hov group mb-1.5 flex w-full cursor-pointer items-start gap-3 rounded-2xl border-[1.5px] p-2.5 sm:p-3 text-left transition-all ${
+      className={`group flex w-full cursor-pointer items-center gap-3.5 rounded-2xl border p-3 sm:p-3.5 text-left transition-all duration-200 ${
         isFeatured
-          ? 'border-bline bg-brand-soft hover:border-brand shadow-xs'
-          : 'border-transparent hover:bg-hover'
+          ? 'border-indigo-200/90 dark:border-indigo-800/80 bg-linear-to-r from-indigo-50/90 via-indigo-50/40 to-white dark:from-indigo-950/60 dark:via-indigo-950/25 dark:to-slate-900/90 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-xs hover:shadow-md hover:shadow-indigo-500/10'
+          : 'border-slate-200/75 dark:border-slate-800/90 bg-white/80 dark:bg-slate-900/50 hover:bg-slate-50/90 dark:hover:bg-slate-800/70 hover:border-indigo-300/80 dark:hover:border-indigo-700/70'
       }`}
     >
-      <span className="mt-0.5 shrink-0 text-brand">
-        {iconCustom ? iconCustom : <Icon size={24} strokeWidth={2} aria-hidden />}
+      <span
+        className={`flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl transition-all duration-200 group-hover:scale-105 ${
+          isFeatured
+            ? 'bg-linear-to-br from-indigo-600 to-violet-600 text-white shadow-sm shadow-indigo-600/25'
+            : 'bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/80 border border-slate-200/60 dark:border-slate-700/60'
+        }`}
+      >
+        {iconCustom ? iconCustom : <Icon size={20} strokeWidth={2.1} aria-hidden />}
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-1.5">
-          <b className="text-[13.5px] sm:text-[14px] lg:text-[14.5px] font-bold text-ink group-hover:text-brand transition-colors leading-snug">
+          <b className="text-[13.5px] sm:text-[14px] font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors leading-snug">
             {title}
           </b>
-          {pill && (
-            <span
-              className={`rounded-full px-2 py-0.5 text-[10.5px] font-semibold whitespace-nowrap ${
-                pill.tone === 'of' ? 'bg-ofb text-off' : 'bg-okb text-okf'
-              }`}
-            >
-              {pill.label}
-            </span>
+          {meta && (
+            <>
+              <span className="text-slate-300 dark:text-slate-600 text-xs" aria-hidden="true">·</span>
+              <span className="text-[11px] font-medium text-indigo-600/90 dark:text-indigo-400/90 whitespace-nowrap">
+                {meta}
+              </span>
+            </>
           )}
         </span>
-        <span className="mt-0.5 block text-[11.5px] sm:text-[12px] leading-snug text-muted">
+        <span className="mt-0.5 block text-[11.5px] sm:text-[12px] leading-snug text-slate-500 dark:text-slate-400">
           {description}
         </span>
       </span>
-      <ArrowRight
-        size={18}
-        className="mt-1 text-muted transition-all group-hover:translate-x-1 group-hover:text-brand shrink-0"
-        aria-hidden
-      />
+      <span
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-all duration-200 ${
+          isFeatured
+            ? 'bg-indigo-100/80 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-600 group-hover:text-white'
+            : 'text-slate-400 dark:text-slate-500 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/60 group-hover:text-indigo-600 dark:group-hover:text-indigo-300'
+        }`}
+      >
+        <ArrowRight
+          size={15}
+          className="transition-transform duration-200 group-hover:translate-x-0.5"
+          aria-hidden
+        />
+      </span>
     </button>
   );
 }
@@ -1295,7 +1308,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     }
   };
 
-  const isFullWidthView = activeTab !== 'home';
+  const isFullWidthView = activeTab === 'register';
+  const isSessionSubView = activeTab === 'email_login' || activeTab === 'code_login' || activeTab === 'invite_code_login';
 
   return (
     <div className="min-h-screen bg-page text-ink flex flex-col justify-between font-sans selection:bg-brand selection:text-white transition-colors duration-200">
@@ -1620,30 +1634,36 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           )}
 
           {/* ========================================================= */}
-          {/* RIGHT COLUMN: INTERACTIVE ACCESS CARD                    */}
+          {/* RIGHT COLUMN: REDESIGNED PC SESSION PANEL                */}
           {/* ========================================================= */}
           <div className="w-full mx-auto transition-all duration-300">
             <section
               key={isFullWidthView ? `portal-wide-${activeTab}` : `portal-${activeTab}`}
               aria-label="Portal de acceso"
-              className={`card rounded-3xl border border-line bg-card relative ${
+              className={`card rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-card relative ${
                 isFullWidthView
                   ? 'p-4 sm:p-6 lg:p-7 kg-register-box-enter shadow-2xl overflow-visible'
-                  : 'p-4 sm:p-5 lg:p-6 kg-home-box-enter shadow-xl overflow-hidden'
+                  : 'p-5 sm:p-6 lg:p-6.5 kg-home-box-enter shadow-xl overflow-hidden'
               } transition-all`}
               style={{ boxShadow: 'var(--card-shadow)' }}
             >
-              {/* Vibrant glowing gradient line at top for full-width view */}
-              {isFullWidthView && (
-                <div className="absolute top-0 left-0 right-0 h-1 kg-shimmer-bar z-10 rounded-t-3xl" />
-              )}
+              {/* Subtle top accent line */}
+              <div
+                className={`absolute top-0 left-0 right-0 h-1 z-10 rounded-t-3xl ${
+                  isFullWidthView
+                    ? 'kg-shimmer-bar'
+                    : 'bg-linear-to-r from-indigo-600 via-violet-500 to-indigo-600'
+                }`}
+              />
 
-              {/* UNIFIED CARD HEADER ACROSS ALL VIEWS */}
-              <div className={`eye flex items-center justify-between text-[11px] font-bold tracking-[0.06em] text-brand ${
-                isFullWidthView ? 'kg-header-enter' : ''
-              }`}>
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  {activeTab !== 'home' && (
+              {/* UNIFIED SESSION PANEL HEADER */}
+              <div
+                className={`flex items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800/80 ${
+                  isFullWidthView ? 'kg-header-enter' : ''
+                }`}
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  {activeTab !== 'home' ? (
                     <button
                       type="button"
                       onClick={() => {
@@ -1653,121 +1673,266 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                         setEmailError(null);
                         setInviteCodeError(null);
                       }}
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-full text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer group -ml-1.5"
-                      title="Volver"
-                      aria-label="Volver"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-950/60 dark:hover:text-indigo-300 transition-colors cursor-pointer group shrink-0"
+                      title="Volver al inicio del panel"
+                      aria-label="Volver al inicio del panel"
                     >
-                      <ArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
+                      <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
                     </button>
+                  ) : (
+                    <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 shrink-0">
+                      <ShieldCheck className="w-4 h-4" />
+                    </span>
                   )}
-                  <span className="uppercase">
-                    KONGRE • {
-                      activeTab === 'home'
-                        ? 'PORTAL DE ACCESO'
+                  <div className="min-w-0">
+                    <span className="block text-[11px] font-bold tracking-[0.06em] text-indigo-600 dark:text-indigo-400 uppercase truncate">
+                      {activeTab === 'home'
+                        ? 'Kongre · Panel de Sesión'
                         : activeTab === 'email_login'
-                        ? 'ACCESO CON GOOGLE'
+                        ? 'Sesión · Cuenta de Google'
                         : activeTab === 'code_login'
-                        ? 'CONECTAR CON ID Y PIN'
+                        ? 'Sesión · ID y PIN'
                         : activeTab === 'invite_code_login'
-                        ? 'CÓDIGO DE INVITACIÓN'
+                        ? 'Sesión · Código o QR'
                         : activeTab === 'unauthorized'
-                        ? 'ACCESO RESTRINGIDO'
-                        : 'REGISTRO DE CONGREGACIÓN'
-                    }
-                  </span>
+                        ? 'Sesión · Acceso Restringido'
+                        : 'Registro de Congregación'}
+                    </span>
+                  </div>
                 </div>
 
-                <span className="rounded-full bg-hover px-2.5 py-0.5 font-semibold tracking-normal text-muted text-[10.5px]">
-                  Gestor Teocrático
-                </span>
+                <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-medium text-slate-400 dark:text-slate-500 shrink-0">
+                  <Lock className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                  <span>Cifrado</span>
+                  <span aria-hidden="true">·</span>
+                  <span>Offline</span>
+                </div>
               </div>
 
               {/* Main Title & Subtitle */}
-              <div className={isFullWidthView ? 'kg-title-enter' : ''}>
-                <h2 className={`font-extrabold tracking-tight text-ink ${
-                  isFullWidthView
-                    ? 'mb-0.5 mt-1 sm:mt-1.5 text-lg sm:text-xl lg:text-2xl'
-                    : 'mb-0.5 mt-2 text-[20px] sm:text-[22px] lg:text-[24px]'
-                }`}>
+              <div className={`${isFullWidthView ? 'kg-title-enter' : ''} pt-3.5`}>
+                <h2
+                  className={`font-extrabold tracking-tight text-slate-900 dark:text-white ${
+                    isFullWidthView
+                      ? 'mb-0.5 text-lg sm:text-xl lg:text-2xl'
+                      : 'mb-1 text-[20px] sm:text-[22px] lg:text-[23px]'
+                  }`}
+                >
                   {activeTab === 'home'
-                    ? '¡Bienvenido a Kongre!'
+                    ? 'Accede a tu Congregación'
                     : activeTab === 'email_login'
-                    ? 'Acceso con Google'
+                    ? 'Iniciar sesión con Google'
                     : activeTab === 'code_login'
                     ? 'Conectar con ID y PIN'
                     : activeTab === 'invite_code_login'
-                    ? 'Conéctate a tu congregación'
+                    ? 'Código de invitación o QR'
                     : activeTab === 'unauthorized'
                     ? 'Acceso Restringido'
                     : 'Registrar mi Congregación'}
                 </h2>
-                <p className={`text-muted ${
-                  isFullWidthView
-                    ? 'mb-2 sm:mb-2.5 text-[11px] sm:text-xs'
-                    : 'mb-3 sm:mb-3.5 text-xs sm:text-[13px]'
-                } leading-normal`}>
+                <p
+                  className={`text-slate-500 dark:text-slate-400 ${
+                    isFullWidthView
+                      ? 'mb-2 sm:mb-2.5 text-[11.5px] sm:text-xs'
+                      : 'mb-3.5 text-xs sm:text-[13px]'
+                  } leading-relaxed`}
+                >
                   {activeTab === 'home'
-                    ? 'Una herramienta teocrática que facilita la gestión integral de la congregación'
+                    ? 'Selecciona tu método de autenticación o configura una congregación nueva en este equipo.'
                     : activeTab === 'email_login'
-                    ? 'Inicia sesión con tu cuenta de Google para acceder a tus asignaciones y perfil'
+                    ? 'Sincroniza tus asignaciones, perfil y privilegios con tu cuenta autorizada.'
                     : activeTab === 'code_login'
-                    ? 'Introduce el ID de congregación y tu PIN para acceder'
+                    ? 'Ingresa el identificador oficial KGR-XXXX-XXXX y el PIN de seguridad de tu congregación.'
                     : activeTab === 'invite_code_login'
-                    ? 'Para activar la aplicación Kongre en este dispositivo, ingresa el código de invitación que recibiste de los ancianos de tu congregación.'
+                    ? 'Introduce el código temporal o enlace de activación proporcionado por el Cuerpo de Ancianos.'
                     : activeTab === 'unauthorized'
                     ? 'Esta cuenta requiere autorización previa del Cuerpo de Ancianos'
                     : 'Configura los datos oficiales de tu congregación paso a paso'}
                 </p>
               </div>
 
-              {/* VIEW: MAIN HOME OPTIONS */}
-              {activeTab === 'home' && (
-                <div className="space-y-0.5 pt-0.5">
-                  <DesktopOption
-                    isFeatured
-                    icon={Building2}
-                    pill={{ label: 'Oficial', tone: 'of' }}
-                    title="Registrar mi Congregación"
-                    description="Configura tu congregación desde cero: ID, PINs, circuito y horarios."
-                    onClick={() => setActiveTab('register')}
-                  />
-
-                  <DesktopOption
-                    icon={CircleUserRound}
-                    title="Iniciar sesión con Google"
-                    description="Accede con tu cuenta verificada para sincronizar asignaciones y perfil."
-                    onClick={() => setActiveTab('email_login')}
-                  />
-
-                  <DesktopOption
-                    icon={KeyRound}
-                    title="Conectar con ID y PIN de Congregación"
-                    description="Accede a una congregación existente con su ID y PIN."
+              {/* QUICK SESSION METHOD SWITCHER (Visible inside login subviews) */}
+              {isSessionSubView && (
+                <div
+                  role="tablist"
+                  aria-label="Cambiar método de inicio de sesión"
+                  className="mb-4 grid grid-cols-3 gap-1 rounded-xl bg-slate-100/90 dark:bg-slate-800/80 p-1 border border-slate-200/60 dark:border-slate-700/60"
+                >
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'email_login'}
                     onClick={() => {
-                      setActiveTab('code_login');
+                      setEmailError(null);
+                      setActiveTab('email_login');
+                    }}
+                    className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 px-2 text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'email_login'
+                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-300 shadow-2xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <CircleUserRound className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">Google</span>
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'code_login'}
+                    onClick={() => {
                       setCodeError(null);
                       setCodeSuccess(null);
+                      setActiveTab('code_login');
                     }}
-                  />
-
-                  <DesktopOption
-                    icon={Eye}
-                    title="Iniciar sesión con código de invitación"
-                    description="Accede con un código temporal de un solo uso en este dispositivo."
+                    className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 px-2 text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'code_login'
+                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-300 shadow-2xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <KeyRound className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">ID y PIN</span>
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'invite_code_login'}
                     onClick={() => {
                       setInviteCodeError(null);
                       setInviteCodeSuccess(null);
                       setActiveTab('invite_code_login');
                     }}
-                  />
+                    className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 px-2 text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'invite_code_login'
+                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-300 shadow-2xs'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <QrCode className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">Invitación</span>
+                  </button>
+                </div>
+              )}
 
-                  <DesktopOption
-                    icon={Monitor}
-                    pill={{ label: 'Rust Nativo', tone: 'ok' }}
-                    title="Descargar Kongre para PC (Windows, Mac, Linux)"
-                    description="Instaladores oficiales ultraligeros de ~15 MB con 100% de soporte offline."
-                    onClick={() => setDesktopModalOpen(true)}
-                  />
+              {/* VIEW: MAIN HOME OPTIONS */}
+              {activeTab === 'home' && (
+                <div className="space-y-3">
+                  {/* 1. Primary Highlight: Register New Congregation */}
+                  <div>
+                    <DesktopOption
+                      isFeatured
+                      icon={Building2}
+                      meta="Configuración oficial"
+                      title="Registrar mi Congregación"
+                      description="Crea el espacio de tu congregación desde cero: ID, PINs, circuito y horarios."
+                      onClick={() => setActiveTab('register')}
+                    />
+                  </div>
+
+                  {/* 2. Section Divider for Sign-in Methods */}
+                  <div className="relative flex items-center py-0.5">
+                    <div className="grow border-t border-slate-200/80 dark:border-slate-800" />
+                    <span className="mx-3 shrink-0 text-[10.5px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
+                      Iniciar sesión en congregación existente
+                    </span>
+                    <div className="grow border-t border-slate-200/80 dark:border-slate-800" />
+                  </div>
+
+                  {/* 3. Sign-in Options Stack */}
+                  <div className="space-y-2">
+                    <DesktopOption
+                      icon={CircleUserRound}
+                      meta="Cuenta verificada"
+                      iconCustom={
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+                          <path
+                            fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                          />
+                        </svg>
+                      }
+                      title="Iniciar sesión con Google"
+                      description="Accede con tu correo autorizado para sincronizar asignaciones y perfil."
+                      onClick={() => setActiveTab('email_login')}
+                    />
+
+                    <DesktopOption
+                      icon={KeyRound}
+                      meta="Acceso directo"
+                      title="Conectar con ID y PIN de Congregación"
+                      description="Ingresa con el identificador KGR-XXXX-XXXX, PIN general y tu PIN personal."
+                      onClick={() => {
+                        setActiveTab('code_login');
+                        setCodeError(null);
+                        setCodeSuccess(null);
+                      }}
+                    />
+
+                    <DesktopOption
+                      icon={QrCode}
+                      meta="Un solo uso"
+                      title="Código de invitación o QR"
+                      description="Activa tu acceso rápidamente con un código temporal de los ancianos."
+                      onClick={() => {
+                        setInviteCodeError(null);
+                        setInviteCodeSuccess(null);
+                        setActiveTab('invite_code_login');
+                      }}
+                    />
+                  </div>
+
+                  {/* 4. Compact Bottom Utility Bar (Desktop App + Demo Mode) */}
+                  <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setDesktopModalOpen(true)}
+                      className="group flex items-center gap-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 px-3 py-2.5 text-left transition-all cursor-pointer"
+                    >
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 border border-slate-200/70 dark:border-slate-700/70 shadow-2xs">
+                        <Monitor className="w-4 h-4" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 truncate">
+                          Kongre para PC
+                        </span>
+                        <span className="block text-[10.5px] text-slate-500 dark:text-slate-400 truncate">
+                          Windows · macOS · Linux
+                        </span>
+                      </span>
+                      <Download className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 shrink-0 transition-colors" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleEnterDemoMode}
+                      className="group flex items-center gap-2.5 rounded-xl border border-indigo-200/70 dark:border-indigo-800/60 bg-indigo-50/50 dark:bg-indigo-950/30 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:border-indigo-300 dark:hover:border-indigo-700 px-3 py-2.5 text-left transition-all cursor-pointer"
+                    >
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-2xs">
+                        <Sparkles className="w-4 h-4 text-amber-300" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-bold text-indigo-950 dark:text-indigo-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 truncate">
+                          Explorar Modo Demo
+                        </span>
+                        <span className="block text-[10.5px] text-indigo-700/80 dark:text-indigo-300/80 truncate">
+                          Probar sin registrarse
+                        </span>
+                      </span>
+                      <ArrowRight className="w-3.5 h-3.5 text-indigo-500 group-hover:translate-x-0.5 shrink-0 transition-transform" />
+                    </button>
+                  </div>
                 </div>
               )}
 

@@ -29,6 +29,7 @@ import {
   Sunset,
   Moon,
   Building2,
+  LogOut,
 } from 'lucide-react';
 import {
   isNotificationSupported,
@@ -42,7 +43,7 @@ import {
 } from '../services/notificationService';
 import { PushSubscriptionModal } from './PushSubscriptionModal';
 import { PushNotificationQuickGuideCard } from './PushNotificationQuickGuideCard';
-import { isSafeDemoMode } from '../utils/theocraticSecurity';
+import { isSafeDemoMode, setSecureLocalPin } from '../utils/theocraticSecurity';
 
 // Preset avatar styles with clean SVG iconography and theocratic themes
 const AVATAR_PRESETS = [
@@ -105,8 +106,33 @@ const AVATAR_PRESETS = [
 ];
 
 export const UserProfileSettingsView: React.FC = () => {
-  const { user, userProfile, updateUserProfile, effectiveRoleInfo, signInWithGoogle, currentPublisherId, currentBrotherName } = useAuth();
-  const { settings, updateSettings, isDemoMode, weeks, cartShifts, cartLocations, publishersMap } = useCongregation();
+  const { user, userProfile, updateUserProfile, effectiveRoleInfo, signInWithGoogle, signOutUser, currentPublisherId, currentBrotherName } = useAuth();
+  const { settings, updateSettings, isDemoMode, exitDemoMode, weeks, cartShifts, cartLocations, publishersMap } = useCongregation();
+
+  const handleProfileLogout = async () => {
+    try {
+      await signOutUser();
+    } catch {}
+    try {
+      if (isDemoMode && exitDemoMode) exitDemoMode();
+      localStorage.removeItem('kongre_has_entered_app');
+      localStorage.removeItem('kongre_is_registered_congregation');
+      localStorage.removeItem('kongre_is_guest');
+      localStorage.removeItem('kongre_demo_mode');
+      localStorage.removeItem('kongre_user_profile_guest');
+      localStorage.removeItem('kongre_user_profile_active');
+      localStorage.removeItem('kongre_identified_brother');
+      localStorage.removeItem('kongre_current_publisher_id_v2');
+      setSecureLocalPin('kongre_session_pin_v2', null);
+      localStorage.removeItem('kongre_active_role_v1');
+      localStorage.removeItem('kongre_active_roles_v1');
+      localStorage.removeItem('kongre_role_session_sig_v1');
+      sessionStorage.removeItem('kongre_session_locked');
+      sessionStorage.setItem('kongre_show_landing', 'true');
+    } catch {}
+    window.location.hash = '#portal';
+    window.location.reload();
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -905,6 +931,17 @@ export const UserProfileSettingsView: React.FC = () => {
                   {phone || 'No especificado'}
                 </span>
               </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={handleProfileLogout}
+                className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800/70 text-rose-600 dark:text-rose-400 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <LogOut className="w-4 h-4 shrink-0" />
+                <span>Cerrar Sesión en este Dispositivo</span>
+              </button>
             </div>
           </div>
 

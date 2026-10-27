@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollText, ShieldCheck, Scale, CloudOff } from 'lucide-react';
+import { ScrollText, ShieldCheck, Scale, CloudOff, Monitor } from 'lucide-react';
 import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
 import Logo from '../Logo';
 import { OfflineSyncBadge } from './OfflineSyncBadge';
 import { TermsAndPrivacyModal, LegalModalTab, detectLegalRoute } from './TermsAndPrivacyModal';
+import { DesktopDownloadModal } from './DesktopDownloadModal';
 
 interface AppFooterProps {
   onOpenVersionModal?: () => void;
@@ -26,6 +27,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
   const [legalModalTab, setLegalModalTab] = useState<LegalModalTab>(() => {
     return detectLegalRoute() || 'terms';
   });
+  const [desktopModalOpen, setDesktopModalOpen] = useState(false);
 
   useEffect(() => {
     const handleRouteCheck = () => {
@@ -188,6 +190,17 @@ export const AppFooter: React.FC<AppFooterProps> = ({
                 <span>Política de Privacidad</span>
               </button>
 
+              <span className="text-slate-300 dark:text-slate-700">•</span>
+
+              <button
+                type="button"
+                onClick={() => setDesktopModalOpen(true)}
+                className="inline-flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors cursor-pointer"
+              >
+                <Monitor className="w-3.5 h-3.5 text-indigo-500" />
+                <span>App Escritorio (PC / Mac)</span>
+              </button>
+
               <span className="text-slate-300 dark:text-slate-700 hidden lg:inline">•</span>
 
               <span className="hidden lg:inline-flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500">
@@ -232,6 +245,11 @@ export const AppFooter: React.FC<AppFooterProps> = ({
         isOpen={legalModalOpen}
         onClose={handleCloseLegal}
         initialTab={legalModalTab}
+      />
+
+      <DesktopDownloadModal
+        isOpen={desktopModalOpen}
+        onClose={() => setDesktopModalOpen(false)}
       />
     </>
   );

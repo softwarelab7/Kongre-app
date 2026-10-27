@@ -16,6 +16,7 @@ import { OfflineSyncBadge } from './OfflineSyncBadge';
 import { DemoBanner } from './DemoBanner';
 import { insertAuditLog } from '../services/auditLogService';
 import { NAV_ICONS } from '../NavIcons';
+import { DesktopDownloadModal } from './DesktopDownloadModal';
 import {
   Calendar,
   Users,
@@ -74,6 +75,8 @@ import {
   Wrench,
   Target,
   FileBarChart,
+  Download,
+  Monitor,
 } from 'lucide-react';
 
 export type ActiveTab =
@@ -260,6 +263,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { isPinEnabled, lockSession } = useSecurity();
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [desktopDownloadOpen, setDesktopDownloadOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -1584,6 +1588,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </button>
                     )}
 
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenDropdown(null);
+                        setDesktopDownloadOpen(true);
+                      }}
+                      className="w-full flex items-center justify-between gap-2 px-3 py-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50/80 dark:hover:bg-indigo-950/40 rounded-xl transition cursor-pointer text-left"
+                    >
+                      <span className="flex items-center gap-2.5 min-w-0">
+                        <Monitor className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                        <span className="truncate">Descargar App de Escritorio</span>
+                      </span>
+                      <Download className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                    </button>
+
                     {/* Theme Selector Row */}
                     <div className="flex items-center justify-between px-3 py-1.5">
                       <span className="text-xs font-medium text-slate-600 dark:text-slate-300 flex items-center gap-2.5">
@@ -1772,6 +1791,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
       </nav>
+
+      <DesktopDownloadModal
+        isOpen={desktopDownloadOpen}
+        onClose={() => setDesktopDownloadOpen(false)}
+      />
     </>
   );
 };

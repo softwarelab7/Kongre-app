@@ -18,16 +18,19 @@ import type { Plugin, ResolvedConfig } from 'vite';
 
 export function buildCsp(supabaseOrigin: string, scriptHashes: string[], opts: { forMeta?: boolean } = {}): string {
   const d: Record<string, string[]> = {
-    'default-src': ["'self'"],
+    'default-src': ["'self'", 'tauri:'],
     'script-src': ["'self'", 'https://va.vercel-scripts.com', ...scriptHashes],
     // 'unsafe-inline' en estilos: React (style=...) y Leaflet lo necesitan. Es el riesgo menor.
     'style-src': ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
     'font-src': ["'self'", 'data:', 'https://fonts.gstatic.com'],
-    'img-src': ["'self'", 'data:', 'blob:', 'https:'], // teselas de mapa y fotos de perfil de Google
+    'img-src': ["'self'", 'data:', 'blob:', 'https:', 'asset:', 'tauri:'], // teselas de mapa y fotos de perfil de Google
     'media-src': ["'self'", 'data:', 'blob:'],
     // connect-src también rige los fetch() del service worker (teselas en caché, fuentes).
     'connect-src': [
       "'self'",
+      'ipc:',
+      'http://ipc.localhost',
+      'tauri:',
       supabaseOrigin,
       'https://va.vercel-scripts.com',
       'https://nominatim.openstreetmap.org',

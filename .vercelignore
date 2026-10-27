@@ -1,0 +1,6 @@
+# Ignorar archivos del núcleo de escritorio (Rust / Tauri)
+src-tauri
+.github
+DESKTOP_RUST.md
+test
+scripts

@@ -8,6 +8,7 @@ dist/
 dist-ssr/
 build/
 dev-dist/
+src-tauri/target/
 *.local
 client_secret*.json
 

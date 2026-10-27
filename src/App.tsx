@@ -257,7 +257,7 @@ const AppContent: React.FC = () => {
     if (typeof window === 'undefined') return false;
     if (isDesktopApp()) return false;
     const urlParams = new URLSearchParams(window.location.search);
-    const hasPortalOrAuthParams =
+    const hasAuthOrActionParams =
       urlParams.get('portal') === '1' ||
       urlParams.get('inicio') === '1' ||
       urlParams.get('bienvenida') === '1' ||
@@ -269,33 +269,52 @@ const AppContent: React.FC = () => {
       urlParams.has('territorio') ||
       urlParams.has('t') ||
       urlParams.get('modo') === 'tablero' ||
-      window.location.hash.includes('access_token') ||
-      sessionStorage.getItem('kongre_show_landing') === 'true';
+      window.location.hash.includes('access_token');
 
-    if (hasPortalOrAuthParams) {
+    if (hasAuthOrActionParams) {
       return false;
     }
 
     const hashInfo = parseAppHash(window.location.hash);
-    // En www.kongre-app.com (raíz sin hash) o #presentacion / #docs mostrar el sitio de presentación y documentación
     if (hashInfo?.isWebsite) {
       return true;
     }
+
+    // Si el hash quedó en #portal por una recarga previa pero el usuario no abrió explícitamente el portal en esta sesión
+    const explicitPortal = sessionStorage.getItem('kongre_portal_explicit_v2') === 'true';
+    const isProductionDirectPortal =
+      window.location.hostname.includes('kongre-app.com') && Boolean(hashInfo?.isLanding);
+
+    if (hashInfo?.isLanding && !explicitPortal && !isProductionDirectPortal) {
+      return true;
+    }
+
+    if (!hashInfo?.tab && !hashInfo?.isLegal && !explicitPortal && !isProductionDirectPortal) {
+      return true;
+    }
+
     return false;
   });
 
   const [showWelcomeLanding, setShowWelcomeLanding] = useState<boolean>(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const hashInfo = typeof window !== 'undefined' ? parseAppHash(window.location.hash) : null;
-    if (hashInfo?.isLanding) {
-      return true;
-    }
     if (
       urlParams.get('portal') === '1' ||
       urlParams.get('inicio') === '1' ||
-      urlParams.get('bienvenida') === '1' ||
-      sessionStorage.getItem('kongre_show_landing') === 'true'
+      urlParams.get('bienvenida') === '1'
     ) {
+      return true;
+    }
+    const explicitPortal =
+      typeof window !== 'undefined' &&
+      sessionStorage.getItem('kongre_portal_explicit_v2') === 'true';
+    const isProductionDirectPortal =
+      typeof window !== 'undefined' &&
+      window.location.hostname.includes('kongre-app.com') &&
+      Boolean(hashInfo?.isLanding);
+
+    if (hashInfo?.isLanding && (explicitPortal || isProductionDirectPortal)) {
       return true;
     }
     if (hashInfo?.isWebsite && !isDesktopApp()) {
@@ -1289,6 +1308,9 @@ const AppContent: React.FC = () => {
     return (
       <KongreOfficialWebsite
         onGoToPortal={(initialPortalTab) => {
+          try {
+            sessionStorage.setItem('kongre_portal_explicit_v2', 'true');
+          } catch {}
           setShowOfficialWebsite(false);
           if (initialPortalTab === 'register') {
             setIsRegisterWizardOpen(true);
@@ -1336,6 +1358,33 @@ const AppContent: React.FC = () => {
   if (showWelcomeLanding || !isCongregationRegistered) {
     return (
       <>
+        {!isDesktopApp() && (
+          <div className="w-full bg-slate-900 text-white px-4 py-2 flex items-center justify-between gap-3 text-xs border-b border-slate-800 z-50">
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  sessionStorage.removeItem('kongre_portal_explicit_v2');
+                  sessionStorage.removeItem('kongre_show_landing');
+                } catch {}
+                setShowOfficialWebsite(true);
+                setShowWelcomeLanding(false);
+                window.history.pushState(
+                  { tab: activeTab, modal: null, landing: false, website: true },
+                  '',
+                  window.location.pathname
+                );
+              }}
+              className="inline-flex items-center gap-1.5 font-bold text-indigo-300 hover:text-white transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Ir a Presentación y Documentación (www.kongre-app.com)</span>
+            </button>
+            <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">
+              kongre-app.com/#portal
+            </span>
+          </div>
+        )}
         <CongregationWelcomeLanding
           onEnterApp={() => {
             setShowWelcomeLanding(false);

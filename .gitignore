@@ -9,6 +9,12 @@ dist-ssr/
 build/
 dev-dist/
 src-tauri/target/
+*.rpm
+*.deb
+*.AppImage
+*.exe
+*.msi
+*.dmg
 *.local
 client_secret*.json
 

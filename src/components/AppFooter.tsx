@@ -73,10 +73,8 @@ export const AppFooter: React.FC<AppFooterProps> = ({
         }`}
       >
         <div
-          className={`w-full mx-auto px-4 sm:px-5 md:px-6 lg:px-7 xl:px-8 ${
+          className={`w-full px-4 sm:px-6 md:px-8 lg:px-10 ${
             variant === 'app' ? 'py-2 md:py-3.5' : 'py-3 sm:py-3.5'
-          } ${
-            variant === 'landing' ? 'max-w-[1240px] 2xl:max-w-[1360px]' : ''
           }`}
         >
           {/* Ultra-compact single-line bar on mobile for in-app view */}

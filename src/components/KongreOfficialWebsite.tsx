@@ -9,7 +9,6 @@ import {
   ChevronDown,
   CloudOff,
   Download,
-  FileText,
   HelpCircle,
   KeyRound,
   Layers,
@@ -18,7 +17,6 @@ import {
   Monitor,
   Moon,
   QrCode,
-  ScrollText,
   Search,
   Shield,
   ShieldCheck,
@@ -29,9 +27,14 @@ import {
   Building2,
   Clock,
   AlertCircle,
-  Tv,
   RefreshCw,
-  FileSpreadsheet,
+  Home,
+  Compass,
+  FileCheck2,
+  Timer,
+  Laptop,
+  Check,
+  Info,
 } from 'lucide-react';
 import Logo from '../Logo';
 import { useTheme } from '../context/ThemeContext';
@@ -48,54 +51,203 @@ interface KongreOfficialWebsiteProps {
   onEnterAppDirectly?: () => void;
 }
 
-type WebsiteSection = 'overview' | 'modules' | 'docs' | 'downloads';
+type WebsiteSection = 'about' | 'guide' | 'downloads';
 
-type DocCategory =
-  | 'all'
-  | 'inicio'
-  | 'reuniones'
-  | 'predicacion'
-  | 'secretaria'
-  | 'publicadores'
-  | 'seguridad';
+type RolePersonaId = 'elders' | 'servants' | 'pioneers' | 'publishers';
+
+type GuideSectionCategory =
+  | 'welcome'
+  | 'install'
+  | 'onboarding'
+  | 'how-to'
+  | 'security-faq';
 
 type DocArticleId =
-  | 'arquitectura'
-  | 'primeros-pasos'
-  | 'acceso-publicadores'
-  | 'roles-rbac'
-  | 'vmc-s89'
-  | 'discursos-fin-semana'
-  | 'territorios-carritos'
-  | 'secretaria-s21'
-  | 'salon-tablero-cuentas'
-  | 'portal-publicador-movil'
-  | 'sincronizacion-respaldos'
-  | 'seguridad-2fa';
+  | 'app-overview'
+  | 'elder-first-approach'
+  | 'install-android'
+  | 'install-ios'
+  | 'install-desktop'
+  | 'create-congregation'
+  | 'join-congregation'
+  | 'navigation-overview'
+  | 'roles-permissions'
+  | 'ministry-timer-studies'
+  | 'monthly-delegated-reports'
+  | 'meetings-jwor-s89'
+  | 'weekend-public-talks'
+  | 'attendance-counter-s88'
+  | 'persons-groups-s21'
+  | 'territories-carts-hall'
+  | 'sync-offline-backups'
+  | 'security-2fa-troubleshooting';
+
+interface DocStep {
+  id: string;
+  title: string;
+  detail: string;
+  badge?: string;
+}
 
 interface DocArticle {
   id: DocArticleId;
-  categoryKey: Exclude<DocCategory, 'all'>;
-  category: string;
+  categoryKey: GuideSectionCategory;
+  categoryLabel: string;
   audience: string;
   title: string;
   summary: string;
   readTime: string;
   menuPath: string;
-  steps: { title: string; detail: string; badge?: string }[];
-  keyTakeaways?: string[];
+  steps: DocStep[];
+  note?: string;
   tip?: string;
   warning?: string;
 }
 
-const DOC_CATEGORIES: { id: DocCategory; label: string }[] = [
-  { id: 'all', label: 'Todos los capítulos (12)' },
-  { id: 'inicio', label: 'Primeros Pasos' },
-  { id: 'reuniones', label: 'Reuniones (VMC y Fin de Semana)' },
-  { id: 'predicacion', label: 'Territorios y Carritos' },
-  { id: 'secretaria', label: 'Secretaría y Salón' },
-  { id: 'publicadores', label: 'App para Publicadores' },
-  { id: 'seguridad', label: 'Seguridad, Nube y Respaldos' },
+const GUIDE_SIDEBAR_SECTIONS: {
+  id: GuideSectionCategory;
+  title: string;
+}[] = [
+  { id: 'welcome', title: 'Bienvenida y Resumen' },
+  { id: 'install', title: 'Abrir e Instalar la App' },
+  { id: 'onboarding', title: 'Primeros Pasos y Acceso' },
+  { id: 'how-to', title: 'Cómo Usar Kongre' },
+  { id: 'security-faq', title: 'Seguridad y Solución de Problemas' },
+];
+
+const ROLE_PERSONAS: {
+  id: RolePersonaId;
+  label: string;
+  badge: string;
+  headline: string;
+  description: string;
+  features: { title: string; detail: string }[];
+  guideTarget: DocArticleId;
+}[] = [
+  {
+    id: 'elders',
+    label: 'Para Ancianos',
+    badge: 'ENFOQUE ELDER-FIRST · PASTOREO Y SUPERVISIÓN',
+    headline: 'Menos tiempo en trámites administrativos, más tiempo para pastorear el rebaño.',
+    description:
+      'Diseñada bajo un enfoque «Elder-First», la congregación es configurada y supervisada por el cuerpo de ancianos. Automatiza los programas semanales, consolida los informes para la sucursal y facilita el cuidado espiritual de cada grupo.',
+    features: [
+      {
+        title: 'Importación automática de programas (JW.ORG / EPUB)',
+        detail:
+          'Carga las partes de la Reunión Vida y Ministerio y La Atalaya sin copiar ni pegar textos ni calcular duraciones manualmente.',
+      },
+      {
+        title: 'Tarjetas S-21 digitales e Informe a la Sucursal (S-1)',
+        detail:
+          'Recopila los informes de los grupos de servicio, detecta publicadores irregulares o inactivos y consolida los totales mensuales y anuales.',
+      },
+      {
+        title: 'Grupos de Servicio y Visita del Superintendente de Circuito',
+        detail:
+          'Organiza a los publicadores por grupo, revisa solicitudes de precursor auxiliar y genera la carpeta digital de auditoría para la visita del SC.',
+      },
+      {
+        title: 'Control de Roles (RBAC) y Seguridad Cero Conocimiento',
+        detail:
+          'Asigna privilegios específicos a cada hermano nombrado con códigos de invitación personales y revocación instantánea en caso de extravío.',
+      },
+    ],
+    guideTarget: 'create-congregation',
+  },
+  {
+    id: 'servants',
+    label: 'Para Siervos Ministeriales',
+    badge: 'DEPARTAMENTOS · TERRITORIOS, SALÓN Y ASISTENCIA',
+    headline: 'Herramientas precisas para cada departamento del Salón del Reino.',
+    description:
+      'Simplifica el trabajo de los siervos de territorios, cuentas, literatura, acomodadores y audio/video con plantillas oficiales listas para imprimir o compartir.',
+    features: [
+      {
+        title: 'Contador de Asistencia en Vivo (Presencial + Zoom / S-88)',
+        detail:
+          'Botones táctiles para acomodadores que suman en tiempo real la asistencia en el auditorio y por videoconferencia, calculando el promedio S-88.',
+      },
+      {
+        title: 'Mapas de Territorios GPS y Registro S-13',
+        detail:
+          'Polígonos interactivos, tarjetas digitales con código QR para conductores, direcciones «No visitar» y control de fechas de asignación.',
+      },
+      {
+        title: 'Acomodadores, Micrófonos, Audio/Video y Limpieza',
+        detail:
+          'Programa los turnos semanales sin choques de horario con las partes estudiantiles o discursos.',
+      },
+      {
+        title: 'Cuentas, Literatura y Mantenimiento del Salón',
+        detail:
+          'Lleva el control mensual de ingresos/egresos, inventario de publicaciones y esquema de seguridad del panel eléctrico.',
+      },
+    ],
+    guideTarget: 'attendance-counter-s88',
+  },
+  {
+    id: 'pioneers',
+    label: 'Para Precursores',
+    badge: 'PRECURSORES REGULARES, AUXILIARES Y ESPECIALES',
+    headline: 'Lleva el control de tu ministerio, horas y cursos bíblicos incluso sin internet.',
+    description:
+      'Todo lo que un precursor necesita en su teléfono para organizar su horario de servicio, registrar sus horas con precisión y atender a las personas interesadas.',
+    features: [
+      {
+        title: 'Cronómetro de Ministerio Integrado',
+        detail:
+          'Inicia, pausa y reanuda tu tiempo de predicación desde el celular. Acumula sesiones automáticamente y redondea los minutos a fin de mes.',
+      },
+      {
+        title: 'Seguimiento de Metas Mensuales y Anuales',
+        detail:
+          'Visualiza tu progreso de horas para precursores auxiliares (15 o 30 horas) y precursores regulares a lo largo del año de servicio.',
+      },
+      {
+        title: 'Registro Privado de Revisitas y Estudios Bíblicos',
+        detail:
+          'Anota tus estudiantes, publicación de estudio, lección actual y recordatorios de próxima visita cifrados localmente en tu dispositivo.',
+      },
+      {
+        title: 'Solicitud Digital de Precursor Auxiliar',
+        detail:
+          'Envía tu solicitud para servir como precursor auxiliar en un mes especial o de forma continua directamente al Comité de Servicio.',
+      },
+    ],
+    guideTarget: 'ministry-timer-studies',
+  },
+  {
+    id: 'publishers',
+    label: 'Para Publicadores y Estudiantes',
+    badge: 'VISTA PERSONAL · ASIGNACIONES S-89 E INFORMES',
+    headline: 'Tus asignaciones, programas de reunión e informes siempre a la mano.',
+    description:
+      'Una interfaz clara y amigable para que todos los hermanos de la congregación —jóvenes y mayores— consulten el programa semanal y cumplan sus asignaciones.',
+    features: [
+      {
+        title: 'Hojas de Asignación S-89 y Confirmación en 1 Clic',
+        detail:
+          'Consulta tu próxima lectura bíblica o demostración con la fecha, ayudante, sala asignada y botón para agregarla al calendario de tu teléfono.',
+      },
+      {
+        title: 'Entrega del Informe Mensual en Segundos',
+        detail:
+          'Marca tu casilla de participación en el ministerio, indica tus cursos bíblicos y envíalo directamente a tu Superintendente de Grupo.',
+      },
+      {
+        title: 'Informes Delegados para la Familia',
+        detail:
+          'Los cabezas de familia pueden enviar fácilmente el informe mensual de sus hijos o de hermanos mayores que no utilizan teléfono inteligente.',
+      },
+      {
+        title: 'Tablero de Anuncios, Carritos y Territorios en Bolsillo',
+        detail:
+          'Revisa el programa completo S-140, tus turnos de limpieza o exhibidores móviles y abre el mapa GPS del territorio con tu código QR.',
+      },
+    ],
+    guideTarget: 'monthly-delegated-reports',
+  },
 ];
 
 const RBAC_DOCUMENTATION_MATRIX = [
@@ -149,543 +301,633 @@ const RBAC_DOCUMENTATION_MATRIX = [
   },
 ];
 
-const FAQ_ITEMS = [
-  {
-    question: '¿Cómo funciona Kongre si en el Salón del Reino no hay conexión a internet?',
-    answer:
-      'Kongre utiliza una arquitectura Offline-First con base de datos local cifrada (IndexedDB). Puedes abrir la app en la computadora del Salón o en tu teléfono sin internet, consultar programas, registrar asistencia S-88 o marcar territorios. Los cambios se guardan en la "Cola Offline" y se sincronizan automáticamente en cuanto el dispositivo vuelve a conectarse.',
-  },
-  {
-    question: '¿Qué hago si un publicador o anciano cambia de teléfono o extravía su celular?',
-    answer:
-      'El Coordinador o un Anciano autorizado puede ir al menú superior → "PINes de Acceso", buscar al hermano y pulsar "Regenerar PIN" o "Revocar". El Guardián de Sesión cerrará automáticamente la sesión en el teléfono extraviado en tiempo real y el hermano podrá ingresar en su teléfono nuevo con el nuevo PIN o código QR.',
-  },
-  {
-    question: '¿Pueden varios ancianos programar partes desde sus casas al mismo tiempo?',
-    answer:
-      'Sí. Al estar conectada la congregación mediante su ID canónico (KGR-XXXX-XXXX), el Superintendente de Vida y Ministerio puede programar entre semana mientras el Siervo de Discursos actualiza el fin de semana y el Secretario revisa los informes S-21. Kongre sincroniza y fusiona los cambios automáticamente.',
-  },
-  {
-    question: '¿Necesitan los publicadores tener cuenta de Google o correo electrónico para ver sus partes?',
-    answer:
-      'No. A diferencia de otros sistemas que obligan a crear cuentas de correo, en Kongre los publicadores pueden entrar directamente escaneando su código QR de invitación o escribiendo su PIN personal de 4 a 6 dígitos en kongre-app.com/#portal.',
-  },
-  {
-    question: '¿Cómo se proyecta el Tablero de Anuncios en el monitor o TV del Salón del Reino?',
-    answer:
-      'Desde la barra superior de la aplicación (o en la pestaña "Tablero de Anuncios"), haz clic en el botón "Modo Tablero del Salón" (Quiosco). La pantalla mostrará en formato de alto contraste el programa semanal S-140, asignaciones de limpieza, acomodadores, discurso público y anuncios oficiales.',
-  },
-  {
-    question: '¿Qué nivel de privacidad tienen los datos sensibles de los publicadores en la nube?',
-    answer:
-      'Todos los datos se cifran en tu propio dispositivo antes de enviarse a la nube mediante AES-256-GCM con derivación PBKDF2 de 600,000 iteraciones (arquitectura Zero-Knowledge). Ni siquiera el servidor de base de datos puede leer los nombres, teléfonos o tarjetas S-21 sin el PIN de tu congregación.',
-  },
-];
-
 const DOC_ARTICLES: DocArticle[] = [
   {
-    id: 'arquitectura',
-    categoryKey: 'inicio',
-    category: '1. Introducción',
-    audience: 'Cuerpo de Ancianos y Toda la Congregación',
-    title: '1. ¿Qué es Kongre y cómo se organiza el ecosistema?',
+    id: 'app-overview',
+    categoryKey: 'welcome',
+    categoryLabel: 'Bienvenida y Resumen',
+    audience: 'Toda la Congregación',
+    title: 'Descripción general de Kongre',
     summary:
-      'Comprende cómo interactúan la aplicación de escritorio del Salón del Reino, el panel administrativo web para ancianos y el portal móvil para publicadores.',
+      'Conoce qué es Kongre, cómo simplifica las tareas de la congregación y cómo combina aplicación web progresiva (PWA) y aplicación nativa de escritorio.',
     readTime: '3 min',
-    menuPath: 'www.kongre-app.com → #portal',
+    menuPath: 'www.kongre-app.com',
     steps: [
       {
-        title: 'Aplicación de Escritorio (Windows, macOS y Linux en Rust)',
-        badge: 'Salón del Reino y PC',
+        id: 'que-es-kongre',
+        title: 'Una herramienta todo en uno para la vida congregacional',
+        badge: 'Propósito',
         detail:
-          'Diseñada para instalarse en la computadora del Salón del Reino y en las computadoras personales del Cuerpo de Ancianos. Arranca en menos de un segundo, consume solo ~15 MB y opera 100% sin conexión.',
+          'Kongre es una aplicación gratuita y moderna diseñada para ayudar a las congregaciones de los Testigos de Jehová a organizar programas de reuniones, asignaciones estudiantiles, territorios, informes de servicio y deberes del Salón del Reino.',
       },
       {
-        title: 'Portal Web de Administración (kongre-app.com/#portal)',
-        badge: 'Ancianos y Siervos',
+        id: 'arquitectura-hibrida',
+        title: 'Web PWA + Escritorio Nativo (Rust)',
+        badge: 'Multiplataforma',
         detail:
-          'Permite a los hermanos nombrados programar reuniones, imprimir plantillas oficiales en PDF (S-140, S-89, S-21, S-13, S-88) y coordinar departamentos desde cualquier navegador moderno sin instalar nada.',
+          'Puede abrirse directamente desde cualquier navegador o instalarse en teléfonos (iOS y Android), tabletas y computadoras (Windows, macOS y Linux). Todos los dispositivos de la congregación se sincronizan de forma segura.',
       },
       {
-        title: 'App Móvil PWA "Mi Vista" para Publicadores (iOS y Android)',
-        badge: 'Publicadores',
+        id: 'local-first-offline',
+        title: 'Funcionamiento Local-First (100% sin conexión)',
+        badge: 'Offline',
         detail:
-          'Cada hermano instala el acceso directo en su celular para recibir sus hojas de asignación S-89, confirmar partes con un toque, ver el mapa GPS de su territorio, consultar la cartelera y entregar su informe mensual.',
+          'Los datos se guardan primero en la memoria segura de tu dispositivo. Puedes consultar programas, usar el cronómetro de predicación o registrar la asistencia en el Salón aunque no haya internet.',
       },
     ],
-    keyTakeaways: [
-      'Una sola base de datos cifrada sincroniza PC, Mac, teléfonos Android y iPhone.',
-      'Compatible con modo Claro, modo Oscuro y modo Cabina de Audio/Video.',
-      'Incluye entorno Demo interactivo para capacitar a hermanos sin alterar datos reales.',
-    ],
-    tip: 'Comparte www.kongre-app.com con el cuerpo de ancianos para que revisen esta guía antes de realizar la configuración inicial.',
+    note: 'Kongre es una herramienta independiente desarrollada para apoyar las labores organizativas y no reemplaza las plataformas oficiales de jw.org.',
+    tip: 'Usa las pestañas de la barra lateral izquierda para navegar entre las guías de instalación, configuración inicial y uso diario.',
   },
   {
-    id: 'primeros-pasos',
-    categoryKey: 'inicio',
-    category: '2. Configuración Inicial',
-    audience: 'Coordinador o Secretario',
-    title: '2. Primeros pasos: Registro oficial de la congregación',
+    id: 'elder-first-approach',
+    categoryKey: 'welcome',
+    categoryLabel: 'Bienvenida y Resumen',
+    audience: 'Cuerpo de Ancianos',
+    title: 'Enfoque «Elder-First» y Privacidad de Datos',
     summary:
-      'Guía paso a paso para dar de alta tu congregación, generar el ID único (KGR-XXXX-XXXX) y configurar horarios y credenciales.',
+      'Por qué Kongre requiere la aprobación inicial del cuerpo de ancianos y cómo protege la confidencialidad de los registros de la congregación.',
+    readTime: '4 min',
+    menuPath: 'Seguridad y Gobernanza Teocrática',
+    steps: [
+      {
+        id: 'aprobacion-ancianos',
+        title: 'Configuración iniciada por el Cuerpo de Ancianos',
+        badge: 'Elder-First',
+        detail:
+          'Para mantener el buen orden teocrático, una congregación en Kongre solo debe ser registrada tras contar con el acuerdo del cuerpo de ancianos local. El Coordinador o el Secretario crean el espacio de la congregación y administran los accesos.',
+      },
+      {
+        id: 'cifrado-extremo-a-extremo',
+        title: 'Cifrado de Extremo a Extremo (AES-256 Zero-Knowledge)',
+        badge: 'Cifrado',
+        detail:
+          'Toda la información sensible (nombres, teléfonos, tarjetas S-21 e informes) se cifra en el dispositivo mediante AES-256-GCM antes de sincronizarse. Nadie externo a tu congregación puede leer los datos.',
+      },
+      {
+        id: 'acceso-por-invitacion',
+        title: 'Acceso controlado por Códigos de Invitación y Roles',
+        badge: 'Privacidad',
+        detail:
+          'No existen perfiles públicos ni búsquedas abiertas de congregaciones. Cada publicador o siervo ingresa únicamente mediante su código de invitación o PIN asignado por los ancianos.',
+      },
+    ],
+    warning:
+      'Antes de cargar datos reales de los publicadores, asegúrate de que el cuerpo de ancianos haya aprobado el uso de la aplicación y designado a los hermanos administradores.',
+  },
+  {
+    id: 'install-android',
+    categoryKey: 'install',
+    categoryLabel: 'Abrir e Instalar la App',
+    audience: 'Usuarios de Teléfonos y Tabletas Android',
+    title: 'Instalar Kongre en Android',
+    summary:
+      'Cómo instalar la aplicación web progresiva (PWA) en cualquier teléfono o tableta Android para abrirla desde tu pantalla de inicio sin usar la tienda.',
+    readTime: '2 min',
+    menuPath: 'Google Chrome → Instalar aplicación',
+    steps: [
+      {
+        id: 'android-paso-1',
+        title: 'Paso 1: Abre el portal en Google Chrome',
+        badge: 'Paso 1',
+        detail:
+          'En tu teléfono o tableta Android, abre el navegador Google Chrome (o Brave / Samsung Internet) y entra en kongre-app.com/#portal.',
+      },
+      {
+        id: 'android-paso-2',
+        title: 'Paso 2: Toca «Instalar aplicación» en el menú',
+        badge: 'Paso 2',
+        detail:
+          'Toca el botón de menú de tres puntos (⋮) en la esquina superior derecha del navegador y selecciona la opción "Instalar aplicación" o "Añadir a la pantalla de inicio".',
+      },
+      {
+        id: 'android-paso-3',
+        title: 'Paso 3: Abre Kongre desde tu cajón de aplicaciones',
+        badge: 'Paso 3',
+        detail:
+          'Confirma pulsando "Instalar". En unos segundos aparecerá el ícono oficial de Kongre junto a tus demás aplicaciones y se abrirá a pantalla completa sin barras del navegador.',
+      },
+    ],
+    tip: 'Una vez instalada en Android, la aplicación se actualiza sola automáticamente cada vez que se publica una mejora.',
+  },
+  {
+    id: 'install-ios',
+    categoryKey: 'install',
+    categoryLabel: 'Abrir e Instalar la App',
+    audience: 'Usuarios de iPhone y iPad (iOS / iPadOS)',
+    title: 'Instalar Kongre en iOS / iPadOS (iPhone y iPad)',
+    summary:
+      'Pasos exactos para añadir Kongre a la pantalla de inicio en iPhone o iPad usando Safari y disfrutar de pantalla completa y modo sin conexión.',
+    readTime: '2 min',
+    menuPath: 'Safari → Compartir → Añadir a pantalla de inicio',
+    steps: [
+      {
+        id: 'ios-paso-1',
+        title: 'Paso 1: Abre kongre-app.com/#portal en Safari',
+        badge: 'Safari',
+        detail:
+          'En tu iPhone o iPad, abre el navegador oficial Safari y dirígete a kongre-app.com/#portal.',
+      },
+      {
+        id: 'ios-paso-2',
+        title: 'Paso 2: Pulsa el botón «Compartir»',
+        badge: 'Compartir',
+        detail:
+          'En la barra inferior de Safari (o superior en iPad), toca el ícono de Compartir (el cuadrado con una flecha apuntando hacia arriba).',
+      },
+      {
+        id: 'ios-paso-3',
+        title: 'Paso 3: Selecciona «Añadir a pantalla de inicio»',
+        badge: 'Pantalla de Inicio',
+        detail:
+          'Desliza la lista de opciones hacia arriba hasta encontrar "Añadir a pantalla de inicio" (con el símbolo +) y pulsa "Añadir" en la esquina superior derecha.',
+      },
+    ],
+    note: 'En dispositivos Apple es importante realizar este paso desde Safari para que iOS habilite las notificaciones y el modo de aplicación independiente.',
+  },
+  {
+    id: 'install-desktop',
+    categoryKey: 'install',
+    categoryLabel: 'Abrir e Instalar la App',
+    audience: 'Ancianos, Siervos y Computadora del Salón del Reino',
+    title: 'Instalar en Windows, macOS y Linux (Escritorio)',
+    summary:
+      'Elige entre instalar el ejecutable nativo ultraligero en Rust (Tauri) para la PC del Salón del Reino o instalar la aplicación desde Chrome/Edge.',
+    readTime: '3 min',
+    menuPath: 'Descargas PC / Navegador de Escritorio',
+    steps: [
+      {
+        id: 'desktop-opcion-1',
+        title: 'Opción A: Instalador Nativo de Escritorio en Rust (Recomendado para el Salón)',
+        badge: 'App Nativa PC/Mac',
+        detail:
+          'Ve a la pestaña "Descargas PC / Móvil" de este sitio y descarga el instalador correspondiente a tu sistema: Windows (.exe / .msi), macOS (.dmg para Apple Silicon o Intel) o Linux (.deb / .AppImage). Pesa menos de 15 MB y arranca al instante.',
+      },
+      {
+        id: 'desktop-opcion-2',
+        title: 'Opción B: Instalación rápida como PWA desde Chrome o Microsoft Edge',
+        badge: 'Desde Navegador',
+        detail:
+          'Si estás en Windows, Mac o Chromebook, abre kongre-app.com/#portal en Chrome o Edge. Haz clic en el ícono de computadora con una flecha situado en el extremo derecho de la barra de direcciones y pulsa "Instalar".',
+      },
+    ],
+    tip: 'En la computadora del Salón del Reino puedes anclar Kongre a la barra de tareas para abrir rápidamente el «Modo Tablero del Salón» antes de cada reunión.',
+  },
+  {
+    id: 'create-congregation',
+    categoryKey: 'onboarding',
+    categoryLabel: 'Primeros Pasos y Acceso',
+    audience: 'Coordinador o Secretario',
+    title: 'Crear y configurar una Congregación',
+    summary:
+      'Cómo registrar por primera vez tu congregación, obtener el código único KGR y configurar los días de reunión.',
     readTime: '4 min',
     menuPath: '#portal → Registrar Nueva Congregación',
     steps: [
       {
-        title: 'Paso 1: Inicia el asistente de registro en #portal',
-        badge: 'Paso 1',
+        id: 'registro-paso-1',
+        title: 'Paso 1: Completa los datos básicos de la congregación',
+        badge: 'Identidad',
         detail:
-          'Entra en kongre-app.com/#portal y selecciona "Registrar Nueva Congregación". Solo una persona (generalmente el Coordinador o el Secretario) debe realizar este registro inicial.',
+          'Abre kongre-app.com/#portal, elige "Registrar Nueva Congregación" e ingresa el nombre oficial, número de congregación, circuito y los horarios de la reunión de entre semana y de fin de semana.',
       },
       {
-        title: 'Paso 2: Identificación y horarios de reunión',
-        badge: 'Paso 2',
+        id: 'registro-paso-2',
+        title: 'Paso 2: Define el PIN de Congregación y el PIN Maestro del Coordinador',
+        badge: 'Credenciales',
         detail:
-          'Introduce el nombre de la congregación, número oficial, circuito, ciudad y los días y horas exactos de la Reunión de Entre Semana y la Reunión del Fin de Semana.',
+          'Establece el PIN general de la congregación y el PIN Maestro de administración. Al finalizar, el sistema generará el identificador único de tu congregación (ejemplo: KGR-4829-1042).',
       },
       {
-        title: 'Paso 3: Configura los dos niveles de PIN de la congregación',
-        badge: 'Seguridad',
-        detail:
-          'El asistente te pedirá crear: (1) el PIN de Congregación (para acceso general de miembros) y (2) el PIN Maestro del Coordinador (para administración de roles y seguridad). Al finalizar recibirás tu ID canónico, por ejemplo: KGR-4829-1042.',
-      },
-      {
-        title: 'Paso 4: Carga o importa la lista de publicadores',
+        id: 'registro-paso-3',
+        title: 'Paso 3: Crea los Grupos de Servicio y agrega a los Publicadores',
         badge: 'Directorio',
         detail:
-          'Dirígete a la pestaña "Publicadores". Puedes registrar a cada hermano indicando su grupo de servicio, privilegios (Anciano, Siervo Ministerial, Precursor Regular/Auxiliar) y asignaciones habilitadas (lector, acomodador, micrófonos, audio/video, discursos).',
+          'En la sección "Grupos de Servicio" y "Publicadores", registra a los hermanos indicando su grupo, nombramiento (Anciano, Siervo Ministerial), precursorado y privilegios aprobados (lectura, demostraciones, acomodador, audio/video, discursos).',
       },
     ],
     warning:
-      'Guarda en un lugar seguro el ID de la congregación (KGR-XXXX-XXXX) y el PIN Maestro del Coordinador. Por seguridad de conocimiento cero, el PIN Maestro cifra las llaves de administración.',
-    tip: 'Si ya tienes una lista de publicadores en otro programa (como KHS, NW Scheduler u Organized), puedes usar el importador en la pestaña Publicadores o Ajustes.',
+      'Anota y resguarda el ID de la congregación (KGR-XXXX-XXXX) y el PIN Maestro del Coordinador. Se utilizan para derivar la llave de cifrado de la congregación.',
   },
   {
-    id: 'acceso-publicadores',
-    categoryKey: 'inicio',
-    category: '3. Conexión de Hermanos',
-    audience: 'Ancianos y Publicadores',
-    title: '3. Cómo conectar a ancianos, siervos y publicadores',
+    id: 'join-congregation',
+    categoryKey: 'onboarding',
+    categoryLabel: 'Primeros Pasos y Acceso',
+    audience: 'Ancianos, Siervos y Publicadores',
+    title: 'Unirse a una Congregación existente',
     summary:
-      'Aprende los 3 métodos de ingreso para vincular los dispositivos de los ancianos y dar acceso rápido a cada publicador.',
-    readTime: '4 min',
+      'Cómo invitar y conectar a otros ancianos, siervos ministeriales y publicadores mediante códigos de invitación QR, PIN personal o cuenta de Google.',
+    readTime: '3 min',
     menuPath: 'Barra Superior → PINes de Acceso / Invitaciones',
     steps: [
       {
-        title: 'Opción A: Enlace Directo o Código QR de Invitación (La más rápida)',
-        badge: 'Recomendado',
+        id: 'unirse-codigo-qr',
+        title: 'Método 1: Enlace o Código QR de Invitación (Recomendado)',
+        badge: '1 Clic',
         detail:
-          'Desde la barra superior, abre el botón de Invitaciones o "PINes de Acceso". Selecciona al hermano y pulsa "Compartir por WhatsApp" o muestra el código QR. Al abrir el enlace, su teléfono queda configurado automáticamente con su nombre y rol.',
+          'El administrador abre "PINes de Acceso" en la barra superior, selecciona al hermano y pulsa "Enviar invitación por WhatsApp" o muestra el código QR en pantalla. Al abrirlo, el hermano entra directamente a su perfil.',
       },
       {
-        title: 'Opción B: Ingreso con ID de Congregación + PIN Personal',
-        badge: 'Sin correo',
+        id: 'unirse-pin',
+        title: 'Método 2: Ingreso con ID de Congregación + PIN Personal',
+        badge: 'Sin Correo',
         detail:
-          'En el directorio de "PINes de Acceso", cada hermano tiene un PIN personal de 4 a 6 dígitos. En kongre-app.com/#portal (pestaña ID y PIN), el hermano escribe el ID de congregación, el PIN de congregación y su PIN personal.',
+          'El hermano entra en kongre-app.com/#portal, selecciona la pestaña "ID y PIN" e introduce el ID de su congregación, el PIN de congregación y su PIN personal de 4 a 6 dígitos.',
       },
       {
-        title: 'Opción C: Inicio de sesión con cuenta de Google',
-        badge: 'OAuth Verificado',
+        id: 'unirse-google',
+        title: 'Método 3: Acceso con Cuenta de Google autorizada',
+        badge: 'Google OAuth',
         detail:
-          'Si registras el correo Gmail de un anciano o siervo en su ficha o en "Roles y Permisos", ese hermano podrá entrar con un clic usando el botón "Continuar con Google". Si su correo aún no está autorizado, podrá enviar una "Solicitud de Aprobación" al Coordinador.',
+          'Los ancianos y siervos cuyo correo haya sido vinculado en "Roles y Permisos" pueden iniciar sesión pulsando "Continuar con Google". Si un hermano nuevo intenta entrar con Google, su solicitud quedará pendiente hasta que el Coordinador la apruebe.',
       },
-    ],
-    keyTakeaways: [
-      'Un mismo hermano puede entrar desde su PC y desde su celular simultáneamente.',
-      'No es obligatorio tener cuenta de Google para usar Kongre.',
-      'Las solicitudes de vinculación nuevas aparecen como notificación para el Coordinador.',
     ],
   },
   {
-    id: 'roles-rbac',
-    categoryKey: 'seguridad',
-    category: '4. Roles y Permisos',
-    audience: 'Cuerpo de Ancianos',
-    title: '4. Matriz de Roles Teocráticos y Permisos (RBAC)',
+    id: 'navigation-overview',
+    categoryKey: 'onboarding',
+    categoryLabel: 'Primeros Pasos y Acceso',
+    audience: 'Todos los Usuarios',
+    title: 'Navegación por la App y «Mi Vista»',
     summary:
-      'Cómo asignar responsabilidades por departamento asegurando que cada hermano solo acceda a la información que le corresponde.',
-    readTime: '5 min',
+      'Recorrido por la barra superior, el selector de semanas, el buscador global y el panel personal para móviles.',
+    readTime: '3 min',
+    menuPath: 'Barra de Navegación Principal',
+    steps: [
+      {
+        id: 'nav-mi-vista',
+        title: 'Panel «Mi Vista» (Inicio para Publicadores)',
+        badge: 'Móvil y PC',
+        detail:
+          'Muestra de un vistazo tus próximas asignaciones estudiantiles o de fin de semana, turnos de limpieza o acomodador, el cronómetro de predicación y la tarjeta para enviar tu informe mensual.',
+      },
+      {
+        id: 'nav-departamentos',
+        title: 'Menú por Departamentos Teocráticos',
+        badge: 'Organización',
+        detail:
+          'Los hermanos nombrados ven pestañas organizadas por área: Reuniones (Vida y Ministerio, Hojas S-89, Discursos), Predicación (Territorios, Carritos), Secretaría (Informes, Tarjetas S-21, Asistencia S-88) y Salón del Reino.',
+      },
+      {
+        id: 'nav-buscador-y-temas',
+        title: 'Buscador Global (Ctrl+K) y Modos Visuales',
+        badge: 'Productividad',
+        detail:
+          'Usa la lupa superior para buscar cualquier publicador, bosquejo o territorio al instante. También puedes alternar entre Modo Claro, Modo Oscuro y Modo Cabina de Audio/Video.',
+      },
+    ],
+  },
+  {
+    id: 'roles-permissions',
+    categoryKey: 'onboarding',
+    categoryLabel: 'Primeros Pasos y Acceso',
+    audience: 'Cuerpo de Ancianos',
+    title: 'Roles y Permisos Teocráticos (RBAC)',
+    summary:
+      'Consulta qué secciones puede ver y editar cada hermano según sus responsabilidades asignadas en la congregación.',
+    readTime: '4 min',
     menuPath: 'Menú → Roles y Permisos (#roles)',
     steps: [
       {
-        title: 'Principio de privilegio mínimo y confidencialidad',
-        badge: 'Gobernanza',
+        id: 'rbac-separacion',
+        title: 'Visibilidad adaptada a cada nombramiento',
+        badge: 'Confidencialidad',
         detail:
-          'Kongre filtra automáticamente las pestañas visibles según el rol activo del usuario. Por ejemplo, un Siervo de Territorios ve el mapa y el registro S-13, pero no tiene acceso a las tarjetas S-21 de secretaría ni a la contabilidad.',
+          'Cada usuario ve únicamente las herramientas de su asignación. Un hermano puede tener múltiples roles simultáneos (por ejemplo, Anciano + Superintendente VMC + Superintendente de Grupo).',
       },
       {
-        title: 'Asignación de múltiples roles a un hermano',
-        badge: 'Multirrol',
-        detail:
-          'En la vista "Roles y Permisos", el Coordinador puede asignar uno o varios roles a un hermano (ej. Anciano + Superintendente de Vida y Ministerio + Superintendente de Grupo). El hermano verá todas las herramientas combinadas de sus privilegios.',
-      },
-      {
-        title: 'Alcance protegido en Tarjetas S-21 por Grupo de Servicio',
+        id: 'rbac-grupos-s21',
+        title: 'Protección de Tarjetas S-21 por Grupo de Servicio',
         badge: 'Privacidad S-21',
         detail:
-          'El Coordinador, el Secretario y el Superintendente de Servicio pueden consultar todas las tarjetas S-21. En cambio, cada Superintendente de Grupo (y su auxiliar) solo puede visualizar las tarjetas S-21 de los publicadores pertenecientes a su propio grupo.',
+          'El Coordinador, el Secretario y el Superintendente de Servicio tienen vista global de las tarjetas S-21. Los Superintendentes de Grupo solo acceden a las tarjetas S-21 de los miembros de su propio grupo.',
       },
     ],
-    tip: 'Revisa la tabla inferior en este mismo capítulo para consultar el detalle exacto de permisos de cada nombramiento.',
+    tip: 'Consulta la Matriz Oficial de Roles debajo de estos pasos para ver el detalle completo de permisos.',
   },
   {
-    id: 'vmc-s89',
-    categoryKey: 'reuniones',
-    category: '5. Vida y Ministerio (VMC)',
-    audience: 'Superintendente VMC y Consejeros',
-    title: '5. Programación Vida y Ministerio (S-140) y Hojas S-89',
+    id: 'ministry-timer-studies',
+    categoryKey: 'how-to',
+    categoryLabel: 'Cómo Usar Kongre',
+    audience: 'Publicadores y Precursores',
+    title: 'Ministerio: Cronómetro, Estudios Bíblicos y Solicitud de Precursor',
     summary:
-      'Cómo importar el cuaderno de actividades, asignar partes sin conflictos, llevar el historial S-38 y enviar hojas S-89 por WhatsApp.',
-    readTime: '6 min',
+      'Cómo registrar tus horas de servicio con el cronómetro integrado, anotar revisitas y enviar una solicitud de precursor auxiliar.',
+    readTime: '4 min',
+    menuPath: 'Mi Vista → Ministerio Personal',
+    steps: [
+      {
+        id: 'min-cronometro',
+        title: 'Usar el Cronómetro de Predicación',
+        badge: 'Cronómetro',
+        detail:
+          'Pulsa "Iniciar" al comenzar tu predicación. Puedes pausarlo o cerrar la pantalla; el temporizador seguirá calculando el tiempo con exactitud y lo sumará a tu registro mensual.',
+      },
+      {
+        id: 'min-revisitas',
+        title: 'Gestionar Revisitas y Cursos Bíblicos',
+        badge: 'Estudios',
+        detail:
+          'Agrega tus estudiantes bíblicos indicando la publicación de estudio y la próxima fecha de visita. A fin de mes, el total de cursos activos se sugiere automáticamente en tu informe.',
+      },
+      {
+        id: 'min-precursor-auxiliar',
+        title: 'Enviar Solicitud de Precursor Auxiliar (15 o 30 horas)',
+        badge: 'Precursorado',
+        detail:
+          'Abre la tarjeta "Precursorado Auxiliar", elige el mes (o marca "De continuo"), selecciona el requisito de 15 o 30 horas y envíala para revisión del Comité de Servicio.',
+      },
+    ],
+  },
+  {
+    id: 'monthly-delegated-reports',
+    categoryKey: 'how-to',
+    categoryLabel: 'Cómo Usar Kongre',
+    audience: 'Publicadores, Cabezas de Familia y Sup. de Grupo',
+    title: 'Informes Mensuales (S-4) e Informes Delegados de Familia',
+    summary:
+      'Cómo entregar tu informe de servicio mensual y cómo enviar el informe en nombre de familiares o hermanos mayores.',
+    readTime: '4 min',
+    menuPath: 'Mi Vista → Informe Mensual / Informes de Servicio',
+    steps: [
+      {
+        id: 'inf-personal',
+        title: 'Paso 1: Enviar tu informe mensual personal',
+        badge: 'Publicadores',
+        detail:
+          'Al concluir el mes, marca la casilla "Participé en alguna faceta del ministerio", anota tus estudios bíblicos (y tus horas si eres precursor) y pulsa "Enviar Informe".',
+      },
+      {
+        id: 'inf-delegado',
+        title: 'Paso 2: Enviar Informes Delegados (Familiares o Adultos Mayores)',
+        badge: 'Delegación',
+        detail:
+          'Si eres cabeza de familia o tienes asignado apoyar a un hermano mayor sin smartphone, selecciona su nombre en la sección "Informes de mi familia / Delegados" y envía su actividad mensual desde tu propio dispositivo.',
+      },
+      {
+        id: 'inf-grupo',
+        title: 'Paso 3: Revisión por el Superintendente de Grupo',
+        badge: 'Grupos',
+        detail:
+          'El Superintendente de Grupo verifica en la pestaña "Informes de Servicio" quiénes ya informaron entre los días 1 y 6 del mes y puede registrar manualmente el informe de cualquier hermano que se lo entregue por escrito o teléfono.',
+      },
+    ],
+  },
+  {
+    id: 'meetings-jwor-s89',
+    categoryKey: 'how-to',
+    categoryLabel: 'Cómo Usar Kongre',
+    audience: 'Superintendente de Vida y Ministerio y Presidente',
+    title: 'Reunión Entre Semana: Importación JW.ORG, S-140 y Hojas S-89',
+    summary:
+      'Cómo importar automáticamente la Guía de Actividades, asignar estudiantes sin conflictos y enviar hojas S-89 por WhatsApp.',
+    readTime: '5 min',
     menuPath: 'Menú → Vida y Ministerio (CLM) / Hojas S-89',
     steps: [
       {
-        title: 'Paso 1: Importar semanas de la Guía de Actividades (MWB)',
-        badge: 'Importador',
+        id: 'vmc-importar',
+        title: 'Paso 1: Importar el programa semanal desde el Catálogo o archivo EPUB',
+        badge: 'Automatización',
         detail:
-          'En la sección "Vida y Ministerio (CLM)", usa el botón "Importar Guía de Actividades" para cargar automáticamente las canciones, lecturas bíblicas, Perlas Escondidas, partes estudiantiles y Nuestra Vida Cristiana del mes.',
+          'Haz clic en "Importar Guía de Actividades" o "Sincronizar Semana". Kongre carga canciones, capítulos de lectura bíblica, Perlas Escondidas, partes estudiantiles y temas de Nuestra Vida Cristiana con sus tiempos exactos.',
       },
       {
-        title: 'Paso 2: Selector inteligente con Motor de Equidad e Historial S-38',
-        badge: 'Sin Conflictos',
+        id: 'vmc-asignar',
+        title: 'Paso 2: Asignar partes con el Motor de Equidad e Historial S-38',
+        badge: 'Sin Choques',
         detail:
-          'Al hacer clic en cualquier asignación (presidente, oración, discurso, lectura de la Biblia, demostración o conductor del Estudio Bíblico), el selector ordena a los hermanos habilitados mostrando quién lleva más semanas sin participar y bloquea choques si ya tiene otra responsabilidad esa noche.',
+          'Al hacer clic en cada parte, el selector muestra a los hermanos calificados ordenados según el tiempo transcurrido desde su última asignación y avisa si el hermano ya tiene otra tarea o turno de acomodador esa misma noche.',
       },
       {
-        title: 'Paso 3: Generación de Hojas S-89 en PDF y envío por WhatsApp',
-        badge: 'Formato S-89',
+        id: 'vmc-s89',
+        title: 'Paso 3: Imprimir Hojas S-89 (4 por página) o enviar por WhatsApp',
+        badge: 'Hojas S-89',
         detail:
-          'Abre la pestaña "Hojas S-89". Puedes descargar el PDF oficial con 4 hojas S-89 por página listo para cortar, o pulsar "Enviar por WhatsApp". El mensaje incluye la fecha, tema, ayudante, sala y un enlace seguro de confirmación.',
+          'En la pestaña "Hojas S-89", descarga el PDF con el formato oficial listo para imprimir o envía cada asignación por WhatsApp con un enlace para que el estudiante confirme su participación en 1 clic.',
       },
       {
-        title: 'Paso 4: Confirmación en 1 clic y reemplazos rápidos',
-        badge: 'Seguimiento',
+        id: 'vmc-s140',
+        title: 'Paso 4: Exportar el Programa Mensual S-140 para la Cartelera',
+        badge: 'Programa S-140',
         detail:
-          'Cuando el estudiante pulsa "Confirmar asignación" desde su WhatsApp o desde "Mi Vista", la parte aparece marcada en verde como Confirmada. Si un hermano avisa que no podrá asistir, usa el botón "Sustitución Rápida" para reasignar la parte al instante.',
+          'Genera el PDF limpio del programa S-140 para fijarlo en el tablero de anuncios del Salón del Reino o publicarlo en el tablero digital.',
       },
-    ],
-    keyTakeaways: [
-      'Impresión del programa mensual S-140 con diseño oficial para la cartelera.',
-      'Soporte completo para Sala Principal y Sala Auxiliar 1 / 2.',
-      'Registro automático en el historial estudiantil S-38.',
     ],
   },
   {
-    id: 'discursos-fin-semana',
-    categoryKey: 'reuniones',
-    category: '6. Reunión de Fin de Semana',
-    audience: 'Siervo de Discursos y Coordinador',
-    title: '6. Discursos Públicos, Oradores Visitantes y Hospitalidad',
+    id: 'weekend-public-talks',
+    categoryKey: 'how-to',
+    categoryLabel: 'Cómo Usar Kongre',
+    audience: 'Coordinador y Siervo de Discursos',
+    title: 'Reunión de Fin de Semana: Discursos Públicos y Hospitalidad',
     summary:
-      'Organiza el programa del fin de semana, catálogo de 194 bosquejos, intercambio de conferenciantes y turnos de hospitalidad.',
+      'Coordina los bosquejos de discursos públicos, oradores locales y visitantes, presidente, lector de La Atalaya y hospitalidad.',
     readTime: '4 min',
     menuPath: 'Menú → Discursos Públicos / Hospitalidad',
     steps: [
       {
-        title: 'Catálogo de bosquejos y control de repetición',
-        badge: 'Bosquejos',
+        id: 'disc-bosquejos',
+        title: 'Selección de bosquejos con historial de fechas',
+        badge: '194 Bosquejos',
         detail:
-          'Al programar el discurso público de la semana, selecciona el número de bosquejo oficial. Kongre te indica cuándo fue la última vez que se presentó ese tema en la congregación para evitar repetir discursos recientes.',
+          'Elige el bosquejo del discurso público entre el catálogo oficial. Kongre muestra cuándo se presentó por última vez cada tema en tu congregación para mantener variedad.',
       },
       {
-        title: 'Directorio de oradores locales y visitantes',
-        badge: 'Conferenciantes',
+        id: 'disc-oradores',
+        title: 'Control de oradores visitantes y conferenciantes salientes',
+        badge: 'Intercambio',
         detail:
-          'Registra los oradores de tu congregación que salen a visitar otras congregaciones y los oradores visitantes que recibes, incluyendo su congregación de origen, teléfono y temas preparados.',
+          'Registra los discursantes que visitan tu congregación y lleva el calendario de los ancianos y siervos locales que salen a dar discursos a otras congregaciones.',
       },
       {
-        title: 'Coordinación de Hospitalidad y Presidente / Lector',
+        id: 'disc-hospitalidad',
+        title: 'Turnos de Hospitalidad por Grupo de Servicio',
         badge: 'Hospitalidad',
         detail:
-          'En la pestaña "Hospitalidad", asigna qué grupo de servicio o familia atenderá al orador visitante cada domingo, registrando arreglos de comida o alojamiento y enviando el recordatorio por WhatsApp.',
+          'Asigna la familia o grupo encargado de brindar hospitalidad al orador visitante y envía los detalles de contacto y recordatorio por WhatsApp.',
       },
     ],
   },
   {
-    id: 'territorios-carritos',
-    categoryKey: 'predicacion',
-    category: '7. Territorios y Carritos',
-    audience: 'Siervo de Territorios y Superintendente de Servicio',
-    title: '7. Mapas de Territorios GPS (S-13) y Predicación Pública',
+    id: 'attendance-counter-s88',
+    categoryKey: 'how-to',
+    categoryLabel: 'Cómo Usar Kongre',
+    audience: 'Acomodadores y Secretario',
+    title: 'Contador de Asistencia a las Reuniones y Registro S-88',
     summary:
-      'Cartografía interactiva OpenStreetMap/Leaflet, tarjetas digitales con QR para conductores y turnos de exhibidores móviles.',
-    readTime: '5 min',
-    menuPath: 'Menú → Territorios / Carritos',
+      'Usa el contador táctil integrado durante la reunión y obtén automáticamente los totales y promedios mensuales del formulario S-88.',
+    readTime: '3 min',
+    menuPath: 'Menú → Asistencia a Reuniones (S-88)',
     steps: [
       {
-        title: 'Creación y edición de polígonos en el mapa interactivo',
-        badge: 'Cartografía GPS',
+        id: 'asist-contador',
+        title: 'Paso 1: Contar asistentes con el Contador Táctil en Vivo',
+        badge: 'En Vivo',
         detail:
-          'En la pestaña "Territorios", dibuja los límites de cada territorio sobre el mapa callejero o vista satelital. Puedes agregar manzanas, notas de "No visitar" y clasificar el territorio por estado (Disponible, En curso o Atrasado).',
+          'Durante la reunión, el acomodador abre "Contador en Vivo". Puede incrementar o disminuir con botones grandes la asistencia presencial en el Salón y los conectados por videoconferencia (Zoom).',
       },
       {
-        title: 'Tarjeta Digital con Código QR y GPS en vivo',
-        badge: 'Modo Bolsillo',
+        id: 'asist-promedios',
+        title: 'Paso 2: Cálculo automático del Registro S-88',
+        badge: 'Promedios S-88',
         detail:
-          'Al asignar un territorio a un conductor o publicador, envíale su enlace o tarjeta QR. El hermano abrirá el mapa en su celular sin necesidad de permisos administrativos, verá su punto azul GPS en tiempo real dentro del territorio y marcará las manzanas predicadas.',
-      },
-      {
-        title: 'Exportación del Registro Oficial S-13',
-        badge: 'Formato S-13',
-        detail:
-          'Cada vez que asignas y marcas como completado un territorio, Kongre guarda el nombre del hermano, la fecha de asignación y la fecha de conclusión en el formulario S-13 exportable en PDF.',
-      },
-      {
-        title: 'Turnos de Predicación Pública (Carritos)',
-        badge: 'Exhibidores',
-        detail:
-          'En la pestaña "Carritos", configura las ubicaciones autorizadas de exhibidores móviles, horarios y asigna las parejas de publicadores para cada turno semanal.',
+          'Kongre guarda la asistencia de cada semana, calcula el promedio mensual de las reuniones de entre semana y fin de semana, y genera las tablas comparativas del año de servicio.',
       },
     ],
   },
   {
-    id: 'secretaria-s21',
-    categoryKey: 'secretaria',
-    category: '8. Secretaría e Informes',
+    id: 'persons-groups-s21',
+    categoryKey: 'how-to',
+    categoryLabel: 'Cómo Usar Kongre',
     audience: 'Secretario, Sup. de Servicio y Sup. de Grupo',
-    title: '8. Informes Mensuales (S-1), Tarjetas S-21 y Asistencia (S-88)',
+    title: 'Personas, Grupos de Servicio, Tarjetas S-21 e Informe S-1',
     summary:
-      'Flujo mensual para recopilar informes de predicación por grupo, consolidar totales para la sucursal y llevar el registro S-88.',
+      'Administra el directorio de publicadores, organiza los grupos de predicación, genera las tarjetas S-21 y prepara el informe mensual a la sucursal.',
     readTime: '5 min',
-    menuPath: 'Menú → Informes de Servicio / Tarjetas S-21 / Asistencia',
+    menuPath: 'Menú → Publicadores / Tarjetas S-21 / Informe S-1',
     steps: [
       {
-        title: 'Paso 1: Recopilación de informes por Grupo de Servicio',
-        badge: 'Días 1 al 6',
+        id: 'pers-directorio',
+        title: 'Directorio de Publicadores y Familias',
+        badge: 'Personas',
         detail:
-          'Al finalizar el mes, los publicadores envían su informe desde "Mi Vista" (indicando si participaron en el ministerio, cursos bíblicos y horas si son precursores). Los Superintendentes de Grupo ven en tiempo real quién falta por entregar y pueden ingresarlo manualmente.',
+          'Mantén actualizados los datos teocráticos de cada publicador (fecha de bautismo, grupo de servicio, privilegios, contacto de emergencia y períodos de ausencia).',
       },
       {
-        title: 'Paso 2: Resumen S-1 para la Sucursal',
-        badge: 'Informe S-1',
-        detail:
-          'En la pestaña "Informe S-1", el Secretario obtiene el desglose exacto listo para transcribir a jw.org: total de publicadores activos, informes recibidos, precursores auxiliares y precursores regulares.',
-      },
-      {
-        title: 'Paso 3: Archivo Digital de Tarjetas S-21',
+        id: 'pers-s21',
+        title: 'Tarjetas de Registro del Publicador (S-21) y Año de Servicio',
         badge: 'Tarjetas S-21',
         detail:
-          'Todos los informes mensuales se vuelcan automáticamente en la Tarjeta de Registro del Publicador (S-21) del año de servicio en curso, con opción de exportar en PDF individual o por grupo de servicio.',
+          'Consulta o exporta en PDF las tarjetas S-21 individuales o por grupo de servicio (de septiembre a agosto), con alertas automáticas de publicadores irregulares o inactivos.',
       },
       {
-        title: 'Paso 4: Registro S-88 de Asistencia a las Reuniones',
-        badge: 'Asistencia S-88',
+        id: 'pers-s1',
+        title: 'Resumen Mensual S-1 para jw.org',
+        badge: 'Sucursal S-1',
         detail:
-          'Los acomodadores o el Secretario registran la asistencia de cada semana (presencial y conectada). Kongre calcula automáticamente los promedios mensuales, anuales y gráficos comparativos.',
+          'Una vez cerrados los informes del mes, la vista "Informe S-1" presenta los casilleros exactos de publicadores, precursores auxiliares y precursores regulares listos para enviarse a la sucursal.',
       },
     ],
   },
   {
-    id: 'salon-tablero-cuentas',
-    categoryKey: 'secretaria',
-    category: '9. Salón del Reino',
-    audience: 'Encargados de Acomodadores, Audio/Video, Limpieza y Cuentas',
-    title: '9. Tablero Digital, Limpieza, Acomodadores, Cuentas y Mantenimiento',
+    id: 'territories-carts-hall',
+    categoryKey: 'how-to',
+    categoryLabel: 'Cómo Usar Kongre',
+    audience: 'Siervo de Territorios y Encargados del Salón',
+    title: 'Territorios GPS (S-13), Carritos y Tablero Digital del Salón',
     summary:
-      'Administra los deberes semanales de las reuniones, la pantalla de anuncios del Salón, contabilidad y seguridad eléctrica.',
+      'Gestiona los mapas de territorios con códigos QR, turnos de predicación pública y la pantalla de anuncios del Salón del Reino.',
     readTime: '4 min',
-    menuPath: 'Menú → Limpieza y Deberes / Tablero / Cuentas',
+    menuPath: 'Menú → Territorios / Carritos / Tablero del Salón',
     steps: [
       {
-        title: 'Asignación de Acomodadores, Micrófonos, Plataforma y Audio/Video',
-        badge: 'Deberes',
+        id: 'terr-gps',
+        title: 'Mapas GPS Interactivos y Tarjeta Digital con QR',
+        badge: 'Territorios S-13',
         detail:
-          'En "Limpieza y Deberes", asigna por semana quiénes atenderán la entrada, el auditorio, los micrófonos, la consola de sonido/video y qué grupo de servicio tiene a su cargo el aseo semanal del Salón.',
+          'Traza los polígonos de tus territorios, marca direcciones "No visitar" y comparte el código QR con el conductor. Todos los movimientos quedan asentados en el registro oficial S-13.',
       },
       {
-        title: 'Modo Tablero del Salón (Cartelera Digital Quiosco)',
-        badge: 'Monitor TV',
+        id: 'terr-carritos',
+        title: 'Turnos de Predicación Pública (Exhibidores / Carritos)',
+        badge: 'Carritos PPE',
         detail:
-          'Abre "Tablero del Salón" en la computadora conectada a la pantalla de anuncios del Salón del Reino. Muestra de forma rotativa o fija el programa Vida y Ministerio, discursos, deberes de limpieza y comunicados oficiales.',
+          'Configura los puntos de exhibidores móviles y asigna a los hermanos por horario, enviando recordatorios automáticos.',
       },
       {
-        title: 'Cuentas, Literatura, Mantenimiento y Panel Eléctrico',
-        badge: 'Operación',
+        id: 'terr-tablero',
+        title: 'Modo Tablero Digital (Quiosco TV para el Salón del Reino)',
+        badge: 'Pantalla TV',
         detail:
-          'Incluye módulos dedicados para el libro mensual de cuentas, inventario de publicaciones, calendario de mantenimiento preventivo del edificio e identificación visual de pastillas/disyuntores del panel eléctrico.',
+          'Proyecta en el monitor del Salón del Reino el programa semanal S-140, asignaciones de limpieza, acomodadores, discurso público y anuncios en diseño de alta legibilidad.',
       },
     ],
   },
   {
-    id: 'portal-publicador-movil',
-    categoryKey: 'publicadores',
-    category: '10. App del Publicador',
-    audience: 'Todos los Publicadores y Precursores',
-    title: '10. Guía del Publicador: Cómo usar "Mi Vista" en el celular',
-    summary:
-      'Todo lo que un publicador o precursor puede hacer desde su teléfono: ver partes, usar el cronómetro, anotar revisitas y enviar su informe.',
-    readTime: '4 min',
-    menuPath: 'Menú Inferior → Inicio / Mi Vista',
-    steps: [
-      {
-        title: 'Consulta y confirmación de próximas asignaciones',
-        badge: 'Mis Partes',
-        detail:
-          'Al abrir Kongre en el celular, el hermano ve una tarjeta clara con su próxima asignación estudiantil S-89, lectura, discurso o turno de micrófonos/acomodador, con botón para confirmar asistencia o agregarla a su calendario.',
-      },
-      {
-        title: 'Cronómetro de Ministerio, Revisitas y Estudios Bíblicos',
-        badge: 'Ministerio',
-        detail:
-          'Para los precursores y publicadores, la pestaña "Inicio / Ministerio" incluye un cronómetro integrado de predicación, libreta privada de revisitas y control de progreso de estudios bíblicos.',
-      },
-      {
-        title: 'Entrega del informe mensual en 10 segundos',
-        badge: 'Informe S-4',
-        detail:
-          'Al final de cada mes aparece la tarjeta de entrega de informe. El hermano marca su casilla de participación (o sus horas si es precursor), añade sus cursos bíblicos y pulsa "Enviar al Superintendente de Grupo".',
-      },
-    ],
-    tip: 'Instala Kongre en la pantalla de inicio de tu teléfono (Safari → Compartir → Agregar a inicio en iPhone, o Chrome → Instalar aplicación en Android) para recibir recordatorios de tus partes.',
-  },
-  {
-    id: 'sincronizacion-respaldos',
-    categoryKey: 'seguridad',
-    category: '11. Sincronización y Respaldos',
+    id: 'sync-offline-backups',
+    categoryKey: 'security-faq',
+    categoryLabel: 'Seguridad y Solución de Problemas',
     audience: 'Coordinador y Secretario',
-    title: '11. Sincronización en la Nube, Modo Offline y Copias de Seguridad',
+    title: 'Sincronización, Modo Offline y Copias de Seguridad (.json)',
     summary:
-      'Cómo funciona la sincronización automática entre dispositivos, la cola offline y cómo exportar copias de seguridad locales.',
-    readTime: '4 min',
-    menuPath: 'Menú → Ajustes / Indicador de Sincronización',
+      'Cómo funciona la cola de sincronización cuando no hay internet y cómo guardar respaldos locales de la congregación.',
+    readTime: '3 min',
+    menuPath: 'Menú → Ajustes → Respaldos y Sincronización',
     steps: [
       {
-        title: 'Sincronización automática en tiempo real',
-        badge: 'Nube Cifrada',
-        detail:
-          'Cada vez que un anciano guarda un cambio en la programación o un publicador confirma su parte, Kongre cifra el paquete de datos y lo sincroniza automáticamente con la nube de la congregación.',
-      },
-      {
-        title: 'Cola de Sincronización Offline (Trabajo sin internet)',
+        id: 'sync-cola',
+        title: 'Sincronización automática y Cola Offline',
         badge: 'Offline-First',
         detail:
-          'Si trabajas sin conexión en el Salón del Reino, el indicador inferior mostrará "Modo Offline". Al recuperar la conexión, todas las operaciones pendientes se envían en orden sin perder ningún dato.',
+          'Si realizas cambios en el Salón del Reino sin internet, Kongre los almacena en la cola local y los sincroniza cifrados tan pronto como el dispositivo detecta conexión.',
       },
       {
-        title: 'Exportación e importación de Copias de Seguridad (.json)',
+        id: 'sync-backup',
+        title: 'Exportar e Importar Copias de Seguridad (.json)',
         badge: 'Respaldo Local',
         detail:
-          'Desde la pestaña "Ajustes", el Coordinador o Secretario puede descargar en cualquier momento un archivo de respaldo completo de la congregación para guardarlo en una memoria USB o restaurarlo en otro equipo.',
+          'En "Ajustes", pulsa "Descargar Copia de Seguridad" para guardar un archivo .json completo en tu computadora o memoria USB, o para restaurar la información en un equipo nuevo.',
       },
     ],
   },
   {
-    id: 'seguridad-2fa',
-    categoryKey: 'seguridad',
-    category: '12. Criptografía y 2FA',
-    audience: 'Cuerpo de Ancianos y Todos los Usuarios',
-    title: '12. Seguridad Cero Conocimiento (AES-256) y Autenticación 2FA',
+    id: 'security-2fa-troubleshooting',
+    categoryKey: 'security-faq',
+    categoryLabel: 'Seguridad y Solución de Problemas',
+    audience: 'Todos los Usuarios',
+    title: 'Autenticación 2FA, Bloqueo por PIN y Solución de Problemas',
     summary:
-      'Configura la verificación en dos pasos con Microsoft/Google Authenticator, bloqueo automático por PIN y rotación de claves.',
+      'Cómo proteger tu cuenta con verificación en dos pasos, bloquear la pantalla por inactividad y resolver dudas frecuentes.',
     readTime: '4 min',
-    menuPath: 'Menú → Mi Perfil / Roles y Permisos',
+    menuPath: 'Mi Perfil → Seguridad y 2FA',
     steps: [
       {
-        title: 'Arquitectura Cero Conocimiento (Zero-Knowledge AES-256-GCM)',
-        badge: 'Cifrado Militar',
+        id: 'sec-2fa',
+        title: 'Activar Autenticación en Dos Pasos (2FA TOTP)',
+        badge: '2FA',
         detail:
-          'Kongre deriva una llave criptográfica única a partir de las credenciales de tu congregación mediante PBKDF2 (600,000 iteraciones SHA-256). Los datos viajan y se almacenan cifrados de extremo a extremo.',
+          'En "Mi Perfil", vincula Google Authenticator o Microsoft Authenticator escaneando el código QR y guarda tus 8 códigos de recuperación.',
       },
       {
-        title: 'Activar Verificación en Dos Pasos (2FA TOTP)',
-        badge: 'Authenticator',
+        id: 'sec-pin-lock',
+        title: 'Auto-bloqueo por inactividad y Revocación de dispositivos',
+        badge: 'Protección',
         detail:
-          'Ve a "Mi Perfil" → "Autenticación en Dos Pasos (2FA)". Escanea el código QR con Microsoft Authenticator o Google Authenticator, ingresa el código de 6 dígitos y descarga tus 8 códigos de recuperación de emergencia.',
-      },
-      {
-        title: 'Bloqueo de pantalla por inactividad y Rotación de Credenciales',
-        badge: 'Protección Local',
-        detail:
-          'Activa el temporizador de auto-bloqueo para que la sesión pida tu PIN si te alejas de la computadora. Además, si cambia el Coordinador o deseas renovar los accesos, usa la herramienta "Rotar Credenciales de Congregación".',
+          'Activa el bloqueo automático por PIN si compartes la computadora. Si un hermano pierde su teléfono, el Coordinador puede regenerar su PIN en "PINes de Acceso" para cerrar la sesión remota de inmediato.',
       },
     ],
   },
 ];
 
-const MODULE_SHOWCASE = [
+const FAQ_ITEMS = [
   {
-    id: 'vmc',
-    kicker: 'VIDA Y MINISTERIO · S-140 & S-89',
-    title: 'Programación Semanal y Hojas S-89',
-    description:
-      'Programa las reuniones de entre semana con detección instantánea de conflictos, historial estudiantil S-38, sala auxiliar y envío de hojas S-89 por WhatsApp con confirmación en 1 clic.',
-    iconPath: '/assets/icons/svg-indigo/clm_vmc.svg',
-    docTarget: 'vmc-s89' as DocArticleId,
-    highlights: [
-      'Plantillas oficiales S-140 y S-89 (4 por hoja) en PDF',
-      'Confirmación de asignación por WhatsApp sin iniciar sesión',
-      'Motor de equidad y rotación equilibrada de participantes',
-    ],
+    question: '¿Es Kongre una aplicación gratuita para toda la congregación?',
+    answer:
+      'Sí. Kongre es 100% gratuita para ancianos, siervos ministeriales, precursores y publicadores. No incluye anuncios ni suscripciones comerciales.',
   },
   {
-    id: 'discursos',
-    kicker: 'FIN DE SEMANA · ORADORES Y HOSPITALIDAD',
-    title: 'Discursos Públicos y Arreglos de Oradores',
-    description:
-      'Coordina oradores locales y visitantes, catálogo de bosquejos oficiales, asignación de presidente, lector de La Atalaya y turnos de hospitalidad por grupo de servicio.',
-    iconPath: '/assets/icons/svg-indigo/discursos.svg',
-    docTarget: 'discursos-fin-semana' as DocArticleId,
-    highlights: [
-      'Control de bosquejos presentados recientemente en la congregación',
-      'Calendario de oradores que salen a otras congregaciones',
-      'Programación de hospitalidad y recordatorios para anfitriones',
-    ],
+    question: '¿Quién debe registrar inicialmente a la congregación?',
+    answer:
+      'Siguiendo el orden teocrático, la congregación debe ser registrada por un anciano autorizado (como el Coordinador del Cuerpo de Ancianos o el Secretario) tras el acuerdo del cuerpo de ancianos.',
   },
   {
-    id: 'territorios',
-    kicker: 'PREDICACIÓN · MAPAS GPS Y S-13',
-    title: 'Territorios Interactivos y Exhibidores (Carritos)',
-    description:
-      'Mapas callejeros y satelitales con polígonos editables, tarjetas digitales con código QR para trabajar desde el móvil, control de manzanas y registro oficial S-13.',
-    iconPath: '/assets/icons/svg-indigo/predicacion.svg',
-    docTarget: 'territorios-carritos' as DocArticleId,
-    highlights: [
-      'Geolocalización GPS en vivo para publicadores en el territorio',
-      'Alertas automáticas de territorios sin trabajar por más de 4 meses',
-      'Gestión de turnos de predicación pública en carritos',
-    ],
+    question: '¿Funciona si en el Salón del Reino no tenemos conexión a internet?',
+    answer:
+      'Sí. Kongre tiene arquitectura Local-First. Todos los programas, tarjetas y herramientas funcionan sin conexión. Los cambios realizados sin internet se sincronizan automáticamente al recuperar la señal.',
   },
   {
-    id: 'secretaria',
-    kicker: 'SECRETARÍA · S-21, S-88 Y S-1',
-    title: 'Informes de Servicio, Tarjetas S-21 y Asistencia',
-    description:
-      'Recibe los informes mensuales de los grupos de servicio, consolida el informe S-1 para la sucursal, genera tarjetas S-21 en PDF y analiza las estadísticas de asistencia S-88.',
-    iconPath: '/assets/icons/svg-indigo/secretaria.svg',
-    docTarget: 'secretaria-s21' as DocArticleId,
-    highlights: [
-      'Entrega de informe mensual desde el portal del publicador',
-      'Control de precursores regulares, auxiliares y metas de horas',
-      'Registro S-88 presencial/Zoom con promedios del año de servicio',
-    ],
+    question: '¿Pueden los publicadores usar Kongre sin tener correo electrónico ni cuenta de Google?',
+    answer:
+      'Por supuesto. Los publicadores pueden entrar con su enlace/código QR de invitación o con su PIN personal de 4 a 6 dígitos directamente desde el navegador de su celular.',
   },
   {
-    id: 'salon',
-    kicker: 'SALÓN DEL REINO · OPERACIÓN Y TABLERO',
-    title: 'Tablero Digital, Limpieza, Cuentas y Mantenimiento',
-    description:
-      'Todo lo necesario para el cuidado del Salón del Reino: cartelera digital en pantalla completa, programa de limpieza y acomodadores, contabilidad mensual e inventario.',
-    iconPath: '/assets/icons/svg-indigo/salon.svg',
-    docTarget: 'salon-tablero-cuentas' as DocArticleId,
-    highlights: [
-      'Modo Quiosco / Tablero de Anuncios para TV o monitor del Salón',
-      'Asignación automática de acomodadores, micrófonos y audio/video',
-      'Hojas de cuentas, literatura y esquema del panel eléctrico',
-    ],
+    question: '¿Cómo se protegen los datos personales de los hermanos?',
+    answer:
+      'Los datos se almacenan localmente en tu dispositivo y, cuando se sincronizan entre los miembros de la congregación, se cifran de extremo a extremo con AES-256-GCM (arquitectura de conocimiento cero) cumpliendo con los estándares internacionales de privacidad (RGPD).',
   },
   {
-    id: 'portal-publicador',
-    kicker: 'APP MÓVIL · MI VISTA TEOCRÁTICA',
-    title: 'Portal Personal del Publicador (iOS, Android y Web)',
-    description:
-      'Al igual que las plataformas teocráticas modernas, cada hermano cuenta con su vista personal para consultar sus próximas partes, anuncios, territorios y cronómetro de ministerio.',
-    iconPath: '/assets/icons/svg-indigo/mi_vista.svg',
-    docTarget: 'portal-publicador-movil' as DocArticleId,
-    highlights: [
-      'Ingreso instantáneo con PIN personal o código QR de invitación',
-      'Funciona sin conexión a internet (PWA Offline-First)',
-      'Notificaciones y recordatorios de próximas asignaciones',
-    ],
+    question: '¿Cómo se realizan copias de seguridad locales de la congregación?',
+    answer:
+      'Desde la pestaña Ajustes, el Coordinador o el Secretario pueden descargar en cualquier momento un archivo de respaldo cifrado (.json) para resguardarlo en una memoria USB o restaurarlo en otra computadora.',
   },
 ];
 
@@ -697,31 +939,39 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
   onEnterAppDirectly,
 }) => {
   const { theme, setTheme } = useTheme();
-  const [activeSection, setActiveSection] = useState<WebsiteSection>('overview');
-  const [selectedDocCategory, setSelectedDocCategory] = useState<DocCategory>('all');
-  const [selectedDocId, setSelectedDocId] = useState<DocArticleId>('arquitectura');
+  const [activeSection, setActiveSection] = useState<WebsiteSection>('about');
+  const [selectedRolePersona, setSelectedRolePersona] = useState<RolePersonaId>('elders');
+  const [selectedDocId, setSelectedDocId] = useState<DocArticleId>('app-overview');
+  const [expandedCategories, setExpandedCategories] = useState<Record<GuideSectionCategory, boolean>>({
+    welcome: true,
+    install: true,
+    onboarding: true,
+    'how-to': true,
+    'security-faq': true,
+  });
   const [docSearchQuery, setDocSearchQuery] = useState('');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [desktopModalOpen, setDesktopModalOpen] = useState(false);
 
+  const activePersona = useMemo(
+    () => ROLE_PERSONAS.find((p) => p.id === selectedRolePersona) || ROLE_PERSONAS[0],
+    [selectedRolePersona]
+  );
+
   const filteredDocs = useMemo(() => {
     const q = docSearchQuery.trim().toLowerCase();
-    return DOC_ARTICLES.filter((doc) => {
-      if (selectedDocCategory !== 'all' && doc.categoryKey !== selectedDocCategory) {
-        return false;
-      }
-      if (!q) return true;
-      return (
+    if (!q) return DOC_ARTICLES;
+    return DOC_ARTICLES.filter(
+      (doc) =>
         doc.title.toLowerCase().includes(q) ||
         doc.summary.toLowerCase().includes(q) ||
-        doc.category.toLowerCase().includes(q) ||
+        doc.categoryLabel.toLowerCase().includes(q) ||
         doc.audience.toLowerCase().includes(q) ||
         doc.steps.some(
           (s) => s.title.toLowerCase().includes(q) || s.detail.toLowerCase().includes(q)
         )
-      );
-    });
-  }, [docSearchQuery, selectedDocCategory]);
+    );
+  }, [docSearchQuery]);
 
   const activeDoc = useMemo(() => {
     return (
@@ -731,9 +981,10 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
     );
   }, [filteredDocs, selectedDocId]);
 
-  const currentDocIndex = useMemo(() => {
-    return DOC_ARTICLES.findIndex((d) => d.id === activeDoc.id);
-  }, [activeDoc.id]);
+  const currentDocIndex = useMemo(
+    () => DOC_ARTICLES.findIndex((d) => d.id === activeDoc.id),
+    [activeDoc.id]
+  );
 
   const prevDoc = currentDocIndex > 0 ? DOC_ARTICLES[currentDocIndex - 1] : null;
   const nextDoc =
@@ -741,11 +992,17 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
       ? DOC_ARTICLES[currentDocIndex + 1]
       : null;
 
-  const handleOpenSpecificDoc = (docId: DocArticleId) => {
-    setSelectedDocCategory('all');
+  const handleOpenGuideArticle = (docId: DocArticleId) => {
     setSelectedDocId(docId);
-    setActiveSection('docs');
+    setActiveSection('guide');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const toggleCategoryAccordion = (catId: GuideSectionCategory) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [catId]: !prev[catId],
+    }));
   };
 
   const handleToggleTheme = () => {
@@ -754,15 +1011,17 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
 
   return (
     <div className="min-h-dvh w-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans selection:bg-indigo-600 selection:text-white transition-colors duration-200">
-      {/* Top Official Website Header */}
-      <header className="sticky top-0 z-40 w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-          {/* Brand Identity */}
+      {/* =====================================================================
+          TOP NAVIGATION BAR (Inspired by about.organized-app.com & guide.organized-app.com)
+          ===================================================================== */}
+      <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80">
+        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center justify-between gap-3">
+          {/* Left: Brand Identity */}
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
               onClick={() => {
-                setActiveSection('overview');
+                setActiveSection('about');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               className="flex items-center gap-2.5 text-left group cursor-pointer"
@@ -776,23 +1035,24 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     Kongre
                   </span>
                   <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-indigo-50 dark:bg-indigo-950/90 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/80">
-                    v{CURRENT_APP_VERSION}
+                    {activeSection === 'guide' ? 'Guía de Usuario' : `v${CURRENT_APP_VERSION}`}
                   </span>
                 </div>
                 <span className="block text-[10.5px] font-medium text-slate-500 dark:text-slate-400 leading-none">
-                  Gestor Teocrático Integral
+                  {activeSection === 'guide'
+                    ? 'Documentación Oficial Paso a Paso'
+                    : 'Todo en uno para Congregaciones'}
                 </span>
               </div>
             </button>
           </div>
 
-          {/* Center Navigation Links (Desktop) */}
-          <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 dark:bg-slate-800/70 p-1 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
+          {/* Center: Switch between About (about.organized-app.com style) & Guide (guide.organized-app.com style) */}
+          <nav className="hidden md:flex items-center gap-1 bg-slate-100/90 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/70 dark:border-slate-700/70">
             {[
-              { id: 'overview' as WebsiteSection, label: 'Presentación', icon: Sparkles },
-              { id: 'modules' as WebsiteSection, label: 'Módulos', icon: Layers },
-              { id: 'docs' as WebsiteSection, label: 'Guía y Documentación', icon: BookOpen },
-              { id: 'downloads' as WebsiteSection, label: 'Descargas PC / Móvil', icon: Download },
+              { id: 'about' as WebsiteSection, label: 'Acerca de Kongre', icon: Compass },
+              { id: 'guide' as WebsiteSection, label: 'Guía de Usuario (Docs)', icon: BookOpen },
+              { id: 'downloads' as WebsiteSection, label: 'Instalar en PC / Móvil', icon: Download },
             ].map((item) => {
               const Icon = item.icon;
               const isActive = activeSection === item.id;
@@ -817,7 +1077,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
             })}
           </nav>
 
-          {/* Right Actions: Theme, Demo & Go to Portal */}
+          {/* Right Actions: Theme, Demo & "Usar Kongre" (Open App Portal) */}
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
@@ -829,14 +1089,14 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               {theme === 'dark' ? (
                 <Sun className="w-4 h-4 text-amber-400" />
               ) : (
-                <Moon className="w-4 h-4 text-indigo-600" />
+                <Moon className="w-4 h-4 text-slate-700" />
               )}
             </button>
 
             <button
               type="button"
               onClick={onStartDemoMode}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-violet-50 dark:bg-violet-950/60 hover:bg-violet-100 dark:hover:bg-violet-900/70 text-violet-700 dark:text-violet-300 border border-violet-200/80 dark:border-violet-800/80 text-xs font-bold transition cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/60 dark:hover:bg-violet-900/70 text-violet-700 dark:text-violet-300 border border-violet-200/80 dark:border-violet-800/70 text-xs font-bold transition cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Modo Demo</span>
@@ -846,32 +1106,31 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               <button
                 type="button"
                 onClick={onEnterAppDirectly}
-                className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-sm transition-all active:scale-95 cursor-pointer"
               >
-                <span>Entrar a mi Congregación</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Volver a mi Congregación</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
-            ) : null}
-
-            <button
-              type="button"
-              onClick={() => onGoToPortal()}
-              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/25 transition active:scale-95 cursor-pointer"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>Ir al Portal</span>
-              <ArrowRight className="w-3.5 h-3.5 hidden sm:inline" />
-            </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onGoToPortal()}
+                className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm shadow-indigo-500/20 transition-all active:scale-95 cursor-pointer"
+              >
+                <KeyRound className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span>Usar Kongre</span>
+                <ArrowRight className="w-3.5 h-3.5 hidden sm:inline" />
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Mobile Section Switcher Bar */}
-        <div className="md:hidden flex items-center gap-1 px-3 py-2 bg-slate-50/90 dark:bg-slate-900/90 border-t border-slate-200/70 dark:border-slate-800/80 overflow-x-auto scrollbar-none">
+        {/* Mobile Secondary Tab Bar */}
+        <div className="md:hidden border-t border-slate-200/70 dark:border-slate-800/70 px-3 py-1.5 flex items-center gap-1 overflow-x-auto scrollbar-none bg-slate-50/80 dark:bg-slate-900/80">
           {[
-            { id: 'overview' as WebsiteSection, label: 'Presentación', icon: Sparkles },
-            { id: 'modules' as WebsiteSection, label: 'Módulos', icon: Layers },
-            { id: 'docs' as WebsiteSection, label: 'Guía y Docs', icon: BookOpen },
-            { id: 'downloads' as WebsiteSection, label: 'Descargas PC', icon: Download },
+            { id: 'about' as WebsiteSection, label: 'Acerca de Kongre', icon: Compass },
+            { id: 'guide' as WebsiteSection, label: 'Guía de Usuario', icon: BookOpen },
+            { id: 'downloads' as WebsiteSection, label: 'Instalar App', icon: Download },
           ].map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
@@ -883,10 +1142,10 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   setActiveSection(item.id);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 whitespace-nowrap transition cursor-pointer shrink-0 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1.5 whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                   isActive
                     ? 'bg-indigo-600 text-white shadow-2xs'
-                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/80'
+                    : 'text-slate-600 dark:text-slate-300'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -897,39 +1156,33 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
         </div>
       </header>
 
-      {/* Main Content Container */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-12">
-        {/* =================================================================
-            SECTION 1: OVERVIEW (HERO + QUICK ARCHITECTURE + MODULES PREVIEW)
-            ================================================================= */}
-        {activeSection === 'overview' && (
-          <>
-            {/* Hero Banner */}
-            <section className="relative rounded-3xl bg-linear-to-br from-indigo-50/90 via-white to-violet-50/70 dark:from-slate-900 dark:via-indigo-950/50 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-800/70 p-6 sm:p-10 lg:p-12 shadow-lg shadow-indigo-500/5 overflow-hidden">
+      {/* =====================================================================
+          MAIN CONTENT CONTAINER
+          ===================================================================== */}
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8">
+        {/* ===================================================================
+            VIEW 1: ABOUT KONGRE (Modeled after https://about.organized-app.com/)
+            =================================================================== */}
+        {activeSection === 'about' && (
+          <div className="space-y-12 animate-fade-in w-full">
+            {/* 1. HERO SECTION */}
+            <section className="relative w-full rounded-3xl bg-linear-to-br from-indigo-50/90 via-white to-violet-50/70 dark:from-slate-900 dark:via-indigo-950/50 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-800/70 p-6 sm:p-10 lg:p-12 shadow-lg shadow-indigo-500/5 overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-                {/* Left Column: Value Proposition & CTAs */}
-                <div className="lg:col-span-7 space-y-5">
-                  <div className="inline-flex flex-wrap items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                    <span>Plataforma Teocrática para Congregaciones</span>
-                    <span aria-hidden="true">·</span>
-                    <span className="font-mono text-slate-600 dark:text-slate-300">
-                      Web, Móvil y Escritorio (Rust)
-                    </span>
+                <div className="lg:col-span-7 xl:col-span-8 space-y-5">
+                  <div className="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-full bg-indigo-100/90 dark:bg-indigo-950/90 border border-indigo-200 dark:border-indigo-800 text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Aplicación Todo en Uno para Congregaciones</span>
                   </div>
 
                   <h1 className="text-2xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-slate-900 dark:text-white leading-[1.12]">
-                    Organización ordenada, segura y 100% offline para tu congregación.
+                    Simplifica y organiza toda la vida de tu congregación en un solo lugar.
                   </h1>
 
-                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
-                    <strong>Kongre</strong> reúne en una sola herramienta la programación de la{' '}
-                    <strong>Reunión Vida y Ministerio (S-140 y S-89)</strong>,{' '}
-                    <strong>Discursos Públicos</strong>, <strong>Territorios GPS (S-13)</strong>,{' '}
-                    <strong>Secretaría (S-21, S-88 y S-1)</strong>, <strong>Tablero del Salón</strong> y el{' '}
-                    <strong>Portal Móvil del Publicador</strong> con cifrado de conocimiento cero.
+                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-4xl">
+                    <strong>Kongre</strong> une a ancianos, siervos ministeriales, precursores y publicadores en una plataforma moderna, gratuita y 100% funcional sin internet. Automatiza la programación de reuniones, el seguimiento del ministerio, la asistencia, las tarjetas S-21 y los mapas de territorios bajo cifrado de extremo a extremo.
                   </p>
 
-                  {/* Primary Action Buttons */}
+                  {/* Primary Action Buttons (Like Organized: "Use App" + "User Guide") */}
                   <div className="flex flex-wrap items-center gap-3 pt-2">
                     <button
                       type="button"
@@ -937,17 +1190,17 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md shadow-indigo-600/25 transition-all active:scale-95 cursor-pointer"
                     >
                       <KeyRound className="w-4 h-4" />
-                      <span>Abrir Portal de Congregación</span>
+                      <span>Usar Kongre en el Navegador</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
 
                     <button
                       type="button"
-                      onClick={() => setActiveSection('docs')}
+                      onClick={() => setActiveSection('guide')}
                       className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-bold text-sm shadow-2xs transition-all cursor-pointer"
                     >
                       <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                      <span>Leer Guía de Documentación</span>
+                      <span>Explorar Guía de Usuario</span>
                     </button>
 
                     <button
@@ -956,37 +1209,37 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-violet-100/80 dark:bg-violet-950/60 hover:bg-violet-200/70 dark:hover:bg-violet-900/70 text-violet-800 dark:text-violet-200 border border-violet-200 dark:border-violet-800 font-bold text-sm transition-all cursor-pointer"
                     >
                       <Sparkles className="w-4 h-4 text-violet-600 dark:text-violet-400" />
-                      <span>Probar Demo en Vivo</span>
+                      <span>Probar Demo Interactiva</span>
                     </button>
                   </div>
 
-                  {/* Unboxed Key Trust Metadata */}
+                  {/* Key Trust Highlights */}
                   <div className="pt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-slate-600 dark:text-slate-300 border-t border-indigo-100/90 dark:border-slate-800">
                     <span className="inline-flex items-center gap-1.5">
                       <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      Cifrado AES-256-GCM Zero-Knowledge
+                      Enfoque «Elder-First» y Cifrado E2EE
                     </span>
                     <span className="inline-flex items-center gap-1.5">
                       <CloudOff className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                      100% Funcional sin Internet
+                      Local-First (Funciona sin Internet)
                     </span>
                     <span className="inline-flex items-center gap-1.5">
                       <Smartphone className="w-4 h-4 text-violet-600 dark:text-violet-400" />
-                      Sincronización PC ↔ Móvil
+                      PWA Móvil + Escritorio Nativo
                     </span>
                   </div>
                 </div>
 
-                {/* Right Column: Interactive Quick Access & Architecture Preview Card */}
-                <div className="lg:col-span-5">
+                {/* Right Column: Quick Portal & Guide Hub Card */}
+                <div className="lg:col-span-5 xl:col-span-4">
                   <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xl p-5 sm:p-6 space-y-4">
                     <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3.5">
                       <div>
                         <span className="text-[10.5px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                          Acceso Rápido
+                          Centro de Acceso Rápido
                         </span>
                         <h2 className="text-base font-extrabold text-slate-900 dark:text-white">
-                          ¿Cómo deseas ingresar hoy?
+                          Comienza en menos de 1 minuto
                         </h2>
                       </div>
                       <Logo variant="isotipo" className="w-7 h-7 object-contain" />
@@ -1004,10 +1257,10 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           </div>
                           <div className="min-w-0">
                             <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300">
-                              Portal de Acceso de Congregación
+                              Unirse a mi Congregación
                             </div>
                             <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                              Ingresar con Google, ID + PIN o Código de Invitación
+                              Entrar con Código de Invitación, PIN o Google
                             </div>
                           </div>
                         </div>
@@ -1025,10 +1278,10 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           </div>
                           <div className="min-w-0">
                             <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-300">
-                              Registrar Nueva Congregación
+                              Configurar Nueva Congregación
                             </div>
                             <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                              Configuración inicial para el Cuerpo de Ancianos
+                              Enfoque «Elder-First» para el Cuerpo de Ancianos
                             </div>
                           </div>
                         </div>
@@ -1037,644 +1290,293 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
 
                       <button
                         type="button"
-                        onClick={() => setActiveSection('docs')}
+                        onClick={() => handleOpenGuideArticle('install-android')}
                         className="w-full p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 flex items-center justify-between gap-3 text-left transition cursor-pointer group"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                            <BookOpen className="w-5 h-5" />
+                            <Smartphone className="w-5 h-5" />
                           </div>
                           <div className="min-w-0">
                             <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-300">
-                              Manual y Documentación Oficial (12 Guías)
+                              Cómo instalar en Android, iOS y PC
                             </div>
                             <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                              Paso a paso para ancianos, siervos y publicadores
+                              Guía paso a paso para añadir a la pantalla de inicio
                             </div>
                           </div>
                         </div>
                         <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 group-hover:translate-x-0.5 transition-transform" />
                       </button>
                     </div>
+                  </div>
+                </div>
+              </div>
+            </section>
 
-                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                      <span>Ruta directa del portal:</span>
+            {/* 2. WHO IS IT FOR? INTERACTIVE ROLE SWITCHER (Like about.organized-app.com) */}
+            <section className="space-y-6">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                    Herramientas para Cada Hermano
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
+                    ¿Para quién está diseñada Kongre?
+                  </h2>
+                </div>
+
+                {/* Role Tabs */}
+                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none bg-slate-200/70 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-300/60 dark:border-slate-800">
+                  {ROLE_PERSONAS.map((role) => {
+                    const isSelected = role.id === selectedRolePersona;
+                    return (
+                      <button
+                        key={role.id}
+                        type="button"
+                        onClick={() => setSelectedRolePersona(role.id)}
+                        className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                          isSelected
+                            ? 'bg-indigo-600 text-white shadow-xs'
+                            : 'text-slate-700 dark:text-slate-300 hover:bg-white/60 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        {role.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Active Persona Showcase Card */}
+              <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 p-6 sm:p-8 lg:p-10 shadow-sm">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                  <div className="lg:col-span-5 space-y-4">
+                    <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                      {activePersona.badge}
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-snug">
+                      {activePersona.headline}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                      {activePersona.description}
+                    </p>
+
+                    <div className="pt-2 flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenGuideArticle(activePersona.guideTarget)}
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 font-bold text-xs transition cursor-pointer"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        <span>Ver guía para este rol</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
                       <button
                         type="button"
                         onClick={() => onGoToPortal()}
-                        className="font-mono font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs transition cursor-pointer"
                       >
-                        kongre-app.com/#portal
+                        <span>Ingresar ahora</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
+
+                  <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {activePersona.features.map((feat, idx) => (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-2xl bg-slate-50/90 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60 space-y-1.5"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-lg bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                            <Check className="w-3.5 h-3.5" />
+                          </div>
+                          <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-snug">
+                            {feat.title}
+                          </h4>
+                        </div>
+                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pl-8">
+                          {feat.detail}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </section>
 
-            {/* How Kongre Connects the Congregation (3 Pillars like NW Scheduler / KHS) */}
-            <section className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-                <div>
-                  <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                    Ecosistema Unificado
-                  </span>
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-                    Diseñado para Ancianos, Siervos Ministeriales y Publicadores
-                  </h2>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveSection('docs')}
-                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
-                >
-                  <span>Ir al Centro de Documentación</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
-                  <div className="w-11 h-11 rounded-xl bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                    <Monitor className="w-5 h-5" />
-                  </div>
-                  <div className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                    1. Administración en PC y Web
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                    Programación de Reuniones y Secretaría
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                    El Cuerpo de Ancianos y los siervos designados preparan el programa Vida y Ministerio, discursos públicos, acomodadores, limpieza, territorios y tarjetas S-21 desde la aplicación de escritorio o navegador.
-                  </p>
-                </div>
-
-                <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
-                  <div className="w-11 h-11 rounded-xl bg-emerald-600/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                    <Smartphone className="w-5 h-5" />
-                  </div>
-                  <div className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                    2. App para Publicadores ("Mi Vista")
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                    Asignaciones S-89, Turnos e Informes en el Bolsillo
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                    Los hermanos consultan desde su celular sus próximas asignaciones estudiantiles, turnos de micrófonos o acomodadores, mapas de territorios, cartelera de anuncios y entregan su informe de predicación.
-                  </p>
-                </div>
-
-                <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
-                  <div className="w-11 h-11 rounded-xl bg-violet-600/10 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400 flex items-center justify-center">
-                    <Shield className="w-5 h-5" />
-                  </div>
-                  <div className="text-[11px] font-extrabold uppercase tracking-wider text-violet-600 dark:text-indigo-400">
-                    3. Tablero del Salón & Seguridad
-                  </div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                    Cartelera Digital + Cifrado Cero Conocimiento
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                    Incluye modo Quiosco para la pantalla de anuncios del Salón del Reino y tema especial para la Cabina de Audio/Video, respaldado por cifrado local AES-256-GCM y autenticación 2FA opcional.
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* Modules Grid Preview */}
+            {/* 3. CORE FEATURES BENTO GRID (Like about.organized-app.com) */}
             <section className="space-y-6">
               <div>
                 <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                  Módulos Integrados
+                  Módulos de la Aplicación
                 </span>
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-                  Todos los departamentos de la congregación en un mismo lugar
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
+                  Funciones diseñadas para ahorrar horas de trabajo semanal
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {MODULE_SHOWCASE.map((mod) => (
+                {[
+                  {
+                    icon: '/assets/icons/svg-indigo/clm_vmc.svg',
+                    kicker: 'REUNIONES Y AUTOMATIZACIÓN',
+                    title: 'Programación Semanal y Hojas S-89',
+                    desc: 'Importa los datos de las reuniones desde jw.org o archivos EPUB sin copiar y pegar. Asigna partes estudiantiles con historial S-38 y envía hojas S-89 por WhatsApp.',
+                    docId: 'meetings-jwor-s89' as DocArticleId,
+                  },
+                  {
+                    icon: '/assets/icons/svg-indigo/informes_servicio.svg',
+                    kicker: 'MINISTERIO Y PRECURSORES',
+                    title: 'Cronómetro, Informes y Delegados',
+                    desc: 'Cronómetro de predicación integrado, registro de estudios bíblicos, solicitud de precursor auxiliar y entrega de informes mensuales (incluyendo informes delegados de familia).',
+                    docId: 'ministry-timer-studies' as DocArticleId,
+                  },
+                  {
+                    icon: '/assets/icons/svg-indigo/secretaria.svg',
+                    kicker: 'SECRETARÍA Y REGISTROS',
+                    title: 'Grupos de Servicio, Tarjetas S-21 y S-1',
+                    desc: 'Organiza a los publicadores por grupo de servicio, genera automáticamente las tarjetas S-21 del año de servicio y consolida el informe mensual para la sucursal.',
+                    docId: 'persons-groups-s21' as DocArticleId,
+                  },
+                  {
+                    icon: '/assets/icons/svg-indigo/supervision.svg',
+                    kicker: 'CONTADOR DE ASISTENCIA S-88',
+                    title: 'Contador de Asistencia en Tiempo Real',
+                    desc: 'Herramienta táctil para acomodadores que suma los asistentes en el auditorio y por Zoom, calculando los promedios mensuales y anuales del formulario S-88.',
+                    docId: 'attendance-counter-s88' as DocArticleId,
+                  },
+                  {
+                    icon: '/assets/icons/svg-indigo/predicacion.svg',
+                    kicker: 'TERRITORIOS GPS Y CARRITOS',
+                    title: 'Mapas Interactivos (S-13) y Exhibidores',
+                    desc: 'Traza polígonos de territorios, comparte tarjetas digitales con código QR para trabajar desde el móvil y organiza los turnos de predicación pública.',
+                    docId: 'territories-carts-hall' as DocArticleId,
+                  },
+                  {
+                    icon: '/assets/icons/svg-indigo/discursos.svg',
+                    kicker: 'FIN DE SEMANA Y SALÓN',
+                    title: 'Discursos Públicos, Hospitalidad y Tablero TV',
+                    desc: 'Coordina oradores locales y visitantes, turnos de hospitalidad, limpieza, acomodadores y proyecta el Tablero Digital en el monitor del Salón del Reino.',
+                    docId: 'weekend-public-talks' as DocArticleId,
+                  },
+                ].map((card) => (
                   <div
-                    key={mod.id}
-                    className="p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all shadow-xs flex flex-col justify-between gap-4"
+                    key={card.title}
+                    className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all shadow-xs flex flex-col justify-between gap-4"
                   >
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
                         <div className="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200/60 dark:border-indigo-800/60 flex items-center justify-center shrink-0">
-                          <img
-                            src={mod.iconPath}
-                            alt={mod.title}
-                            className="w-6 h-6 object-contain"
-                          />
+                          <img src={card.icon} alt={card.title} className="w-6 h-6 object-contain" />
                         </div>
                         <span className="text-[10.5px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                          {mod.kicker}
+                          {card.kicker}
                         </span>
                       </div>
-
                       <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                        {mod.title}
+                        {card.title}
                       </h3>
                       <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                        {mod.description}
+                        {card.desc}
                       </p>
                     </div>
 
-                    <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-                      <ul className="space-y-1.5">
-                        {mod.highlights.map((item, idx) => (
-                          <li
-                            key={idx}
-                            className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300"
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      <button
-                        type="button"
-                        onClick={() => handleOpenSpecificDoc(mod.docTarget)}
-                        className="w-full py-2 px-3 rounded-xl bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800/70 dark:hover:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 text-xs font-bold inline-flex items-center justify-between transition cursor-pointer"
-                      >
-                        <span>Ver guía paso a paso</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenGuideArticle(card.docId)}
+                      className="w-full py-2.5 px-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800/70 dark:hover:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 text-xs font-bold inline-flex items-center justify-between transition cursor-pointer"
+                    >
+                      <span>Cómo usar esta función</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 ))}
               </div>
             </section>
 
-            {/* Desktop Version Download Banner */}
+            {/* 4. SECURITY & PRIVACY BY DESIGN SECTION (Like about.organized-app.com) */}
+            <section className="rounded-3xl bg-slate-900 text-white p-6 sm:p-10 border border-slate-800 shadow-xl space-y-6">
+              <div className="max-w-3xl space-y-2">
+                <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-emerald-400">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Seguridad, Privacidad y Confidencialidad</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
+                  Tus datos pertenecen únicamente a tu congregación
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                  Sabemos lo importante que es proteger la información personal de los hermanos. Por eso Kongre ha sido construida desde cero con estándares de seguridad criptográfica y almacenamiento local prioritario.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                  <Lock className="w-5 h-5 text-emerald-400" />
+                  <h3 className="text-sm font-bold text-white">Cifrado de Extremo a Extremo</h3>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Los registros se cifran en tu dispositivo con AES-256-GCM antes de sincronizarse. Nadie externo puede leerlos.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                  <CloudOff className="w-5 h-5 text-indigo-400" />
+                  <h3 className="text-sm font-bold text-white">Arquitectura Local-First</h3>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    La base de datos vive directamente en tu dispositivo para que trabajes con rapidez y sin depender de internet.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                  <Users className="w-5 h-5 text-amber-400" />
+                  <h3 className="text-sm font-bold text-white">Enfoque «Elder-First»</h3>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    El acceso requiere un código de invitación personal y roles asignados por los ancianos de la congregación.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                  <Shield className="w-5 h-5 text-violet-400" />
+                  <h3 className="text-sm font-bold text-white">Protección 2FA y PIN Local</h3>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Soporta verificación en dos pasos (Authenticator), auto-bloqueo por inactividad y revocación remota.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* 5. USE ON ANY DEVICE BANNER */}
             <section className="space-y-3">
               <DesktopCompatibilityBanner
                 variant="hero-card"
                 onOpenAllDownloads={() => setDesktopModalOpen(true)}
               />
             </section>
-          </>
-        )}
 
-        {/* =================================================================
-            SECTION 2: DETAILED MODULES BREAKDOWN
-            ================================================================= */}
-        {activeSection === 'modules' && (
-          <section className="space-y-8 animate-fade-in">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
-              <div>
-                <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                  Catálogo de Funciones Teocráticas
-                </span>
-                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-                  Módulos y Formatos Soportados por Kongre
-                </h1>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
-                  Cada departamento cuenta con herramientas especializadas y plantillas listas para exportar en PDF o compartir digitalmente con los hermanos.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => onGoToPortal()}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition cursor-pointer shrink-0"
-              >
-                <KeyRound className="w-4 h-4" />
-                <span>Abrir Portal Web</span>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {MODULE_SHOWCASE.map((mod) => (
-                <div
-                  key={mod.id}
-                  className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between gap-4"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200/60 dark:border-indigo-800/60 flex items-center justify-center shrink-0">
-                        <img
-                          src={mod.iconPath}
-                          alt={mod.title}
-                          className="w-6 h-6 object-contain"
-                        />
-                      </div>
-                      <span className="text-[10.5px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                        {mod.kicker}
-                      </span>
-                    </div>
-
-                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                      {mod.title}
-                    </h3>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                      {mod.description}
-                    </p>
-                  </div>
-
-                  <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-                    <ul className="space-y-2">
-                      {mod.highlights.map((item, idx) => (
-                        <li
-                          key={idx}
-                          className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <button
-                      type="button"
-                      onClick={() => handleOpenSpecificDoc(mod.docTarget)}
-                      className="w-full py-2 px-3 rounded-xl bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800/70 dark:hover:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 text-xs font-bold inline-flex items-center justify-between transition cursor-pointer"
-                    >
-                      <span>Leer documentación de este módulo</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Official Forms Compatibility Table */}
-            <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 space-y-4">
-              <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
-                Compatibilidad de Plantillas e Informes Teocráticos
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-                {[
-                  { code: 'Programa S-140', desc: 'Programa semanal de la Reunión Vida y Ministerio Cristiano para cartelera.' },
-                  { code: 'Hojas S-89', desc: 'Asignaciones estudiantiles en PDF (4 por página o individuales) y envío por WhatsApp.' },
-                  { code: 'Historial S-38', desc: 'Registro histórico de partes estudiantiles, ayudantes y salas por publicador.' },
-                  { code: 'Tarjetas S-21', desc: 'Registro individual de publicador por año de servicio con totales automáticos.' },
-                  { code: 'Asistencia S-88', desc: 'Control mensual y promedios de asistencia a las reuniones de congregación.' },
-                  { code: 'Registro S-13', desc: 'Control de asignación y fechas de finalización de territorios de la congregación.' },
-                ].map((f) => (
-                  <div
-                    key={f.code}
-                    className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70 space-y-1"
-                  >
-                    <div className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
-                      {f.code}
-                    </div>
-                    <p className="text-slate-600 dark:text-slate-300 leading-snug">{f.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* =================================================================
-            SECTION 3: ENHANCED INTERACTIVE DOCUMENTATION & USER GUIDE
-            ================================================================= */}
-        {activeSection === 'docs' && (
-          <section className="space-y-8 animate-fade-in">
-            {/* Documentation Header Banner */}
-            <div className="rounded-3xl bg-linear-to-br from-indigo-50/90 via-white to-violet-50/60 dark:from-slate-900 dark:via-indigo-950/40 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-800/70 p-5 sm:p-8 space-y-5">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="space-y-1.5">
-                  <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                    <BookOpen className="w-3.5 h-3.5" />
-                    <span>Centro Oficial de Documentación · Kongre v{CURRENT_APP_VERSION}</span>
-                  </div>
-                  <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                    Guía Completa de Uso, Administración y Seguridad
-                  </h1>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-                    Manual estructurado en 12 capítulos prácticos para el Cuerpo de Ancianos, Siervos Ministeriales y Publicadores. Selecciona un departamento o busca cualquier procedimiento.
-                  </p>
-                </div>
-
-                {/* Search Input */}
-                <div className="relative w-full lg:w-80 shrink-0">
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={docSearchQuery}
-                    onChange={(e) => setDocSearchQuery(e.target.value)}
-                    placeholder="Buscar tema (ej. S-89, PIN, S-21, QR, 2FA)..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-2xs"
-                  />
-                </div>
-              </div>
-
-              {/* Category Filter Bar */}
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pt-1">
-                {DOC_CATEGORIES.map((cat) => {
-                  const isActive = selectedDocCategory === cat.id;
-                  return (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedDocCategory(cat.id);
-                        const firstInCat = DOC_ARTICLES.find(
-                          (a) => cat.id === 'all' || a.categoryKey === cat.id
-                        );
-                        if (firstInCat) setSelectedDocId(firstInCat.id);
-                      }}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer shrink-0 border ${
-                        isActive
-                          ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
-                          : 'bg-white/90 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border-slate-200/80 dark:border-slate-700/80 hover:border-indigo-300'
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Mobile Quick Chapter Selector Dropdown */}
-            <div className="lg:hidden bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-1.5">
-              <label
-                htmlFor="mobile-doc-selector"
-                className="block text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400"
-              >
-                Capítulo seleccionado ({filteredDocs.length} disponibles):
-              </label>
-              <select
-                id="mobile-doc-selector"
-                value={activeDoc.id}
-                onChange={(e) => setSelectedDocId(e.target.value as DocArticleId)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                {filteredDocs.map((doc) => (
-                  <option key={doc.id} value={doc.id}>
-                    {doc.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Left Sidebar: Documentation Topics (Desktop) */}
-              <aside className="hidden lg:block lg:col-span-4 space-y-1.5 bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
-                <div className="px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-                  <span>Índice del Manual</span>
-                  <span className="font-mono">{filteredDocs.length} guías</span>
-                </div>
-                {filteredDocs.map((doc) => {
-                  const isSelected = activeDoc.id === doc.id;
-                  return (
-                    <button
-                      key={doc.id}
-                      type="button"
-                      onClick={() => setSelectedDocId(doc.id)}
-                      className={`w-full text-left px-3.5 py-3 rounded-xl transition-all cursor-pointer flex items-start justify-between gap-2 ${
-                        isSelected
-                          ? 'bg-indigo-600 text-white shadow-xs'
-                          : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
-                      }`}
-                    >
-                      <div className="min-w-0">
-                        <span
-                          className={`block text-[10px] font-bold uppercase tracking-wider ${
-                            isSelected ? 'text-indigo-200' : 'text-indigo-600 dark:text-indigo-400'
-                          }`}
-                        >
-                          {doc.category}
-                        </span>
-                        <span className="block text-xs font-bold leading-snug mt-0.5">
-                          {doc.title}
-                        </span>
-                      </div>
-                      <ChevronRight
-                        className={`w-4 h-4 shrink-0 mt-1 ${
-                          isSelected ? 'text-white' : 'text-slate-400'
-                        }`}
-                      />
-                    </button>
-                  );
-                })}
-              </aside>
-
-              {/* Right Content: Selected Documentation Article */}
-              <article className="lg:col-span-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-8 space-y-6 shadow-xs">
-                {/* Article Header & Metadata */}
-                <div className="border-b border-slate-100 dark:border-slate-800 pb-5 space-y-3">
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-bold">
-                    <span className="text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                      {activeDoc.category}
-                    </span>
-                    <span className="text-slate-300 dark:text-slate-600">·</span>
-                    <span className="inline-flex items-center gap-1 text-slate-600 dark:text-slate-300">
-                      <Users className="w-3.5 h-3.5 text-indigo-500" />
-                      Para: {activeDoc.audience}
-                    </span>
-                    <span className="text-slate-300 dark:text-slate-600">·</span>
-                    <span className="inline-flex items-center gap-1 text-slate-500 dark:text-slate-400 font-medium">
-                      <Clock className="w-3.5 h-3.5" />
-                      {activeDoc.readTime}
-                    </span>
-                  </div>
-
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                    {activeDoc.title}
-                  </h2>
-
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                    {activeDoc.summary}
-                  </p>
-
-                  <div className="pt-1 flex items-center gap-2 text-[11.5px] font-mono text-slate-500 dark:text-slate-400">
-                    <span className="font-sans font-bold text-slate-700 dark:text-slate-200">
-                      Ubicación en la app:
-                    </span>
-                    <code className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-bold">
-                      {activeDoc.menuPath}
-                    </code>
-                  </div>
-                </div>
-
-                {/* Step-by-Step Procedure */}
-                <div className="space-y-4">
-                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400">
-                    Procedimiento Paso a Paso
-                  </h3>
-
-                  {activeDoc.steps.map((step, index) => (
-                    <div
-                      key={index}
-                      className="p-4 sm:p-5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/70 flex items-start gap-3.5"
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
-                        {index + 1}
-                      </div>
-                      <div className="space-y-1.5 flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <h4 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                            {step.title}
-                          </h4>
-                          {step.badge && (
-                            <span className="text-[10.5px] font-bold text-indigo-600 dark:text-indigo-400">
-                              {step.badge}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                          {step.detail}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Embedded RBAC Role Matrix when viewing 'roles-rbac' */}
-                {activeDoc.id === 'roles-rbac' && (
-                  <div className="space-y-3 pt-2">
-                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                      Tabla Oficial de Roles y Alcance de Acceso
-                    </h3>
-                    <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
-                      <table className="w-full text-left border-collapse text-xs">
-                        <thead>
-                          <tr className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200">
-                            <th className="py-3 px-4 font-extrabold">Nombramiento / Rol</th>
-                            <th className="py-3 px-4 font-extrabold">Alcance</th>
-                            <th className="py-3 px-4 font-extrabold">Módulos y Permisos Habilitados</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                          {RBAC_DOCUMENTATION_MATRIX.map((row) => (
-                            <tr
-                              key={row.role}
-                              className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40"
-                            >
-                              <td className="py-3 px-4 font-bold text-slate-900 dark:text-white whitespace-nowrap">
-                                {row.role}
-                              </td>
-                              <td className="py-3 px-4 font-semibold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
-                                {row.scope}
-                              </td>
-                              <td className="py-3 px-4 text-slate-600 dark:text-slate-300 leading-relaxed">
-                                {row.permissions}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-
-                {/* Key Takeaways */}
-                {activeDoc.keyTakeaways && activeDoc.keyTakeaways.length > 0 && (
-                  <div className="p-4 sm:p-5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/25 border border-indigo-200/70 dark:border-indigo-800/60 space-y-2.5">
-                    <div className="text-xs font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
-                      Puntos clave para recordar
-                    </div>
-                    <ul className="space-y-1.5">
-                      {activeDoc.keyTakeaways.map((item, idx) => (
-                        <li
-                          key={idx}
-                          className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-300"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Warning Box */}
-                {activeDoc.warning && (
-                  <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 flex items-start gap-3 text-xs text-amber-900 dark:text-amber-200">
-                    <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                    <div className="leading-relaxed">
-                      <strong className="font-bold">Importante: </strong>
-                      {activeDoc.warning}
-                    </div>
-                  </div>
-                )}
-
-                {/* Practical Tip */}
-                {activeDoc.tip && (
-                  <div className="p-4 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 flex items-start gap-3 text-xs text-emerald-900 dark:text-emerald-200">
-                    <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                    <div className="leading-relaxed">
-                      <strong className="font-bold">Sugerencia práctica: </strong>
-                      {activeDoc.tip}
-                    </div>
-                  </div>
-                )}
-
-                {/* Previous / Next Chapter Pagination */}
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {prevDoc ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedDocId(prevDoc.id);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 text-left transition cursor-pointer flex items-center gap-3 group"
-                    >
-                      <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 shrink-0" />
-                      <div className="min-w-0">
-                        <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Capítulo anterior
-                        </span>
-                        <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                          {prevDoc.title}
-                        </span>
-                      </div>
-                    </button>
-                  ) : (
-                    <div />
-                  )}
-
-                  {nextDoc ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedDocId(nextDoc.id);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 text-right transition cursor-pointer flex items-center justify-end gap-3 group"
-                    >
-                      <div className="min-w-0">
-                        <span className="block text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                          Siguiente capítulo
-                        </span>
-                        <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                          {nextDoc.title}
-                        </span>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                    </button>
-                  ) : null}
-                </div>
-              </article>
-            </div>
-
-            {/* Frequently Asked Questions (FAQ) Accordion Section */}
-            <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 space-y-5 shadow-xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+            {/* 6. FREQUENTLY ASKED QUESTIONS (FAQ) */}
+            <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                    Preguntas Frecuentes y Solución de Dudas
+                    Respuestas Rápidas
                   </span>
-                  <h2 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white mt-0.5">
-                    Respuestas rápidas para el Cuerpo de Ancianos y Publicadores
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                    Preguntas Frecuentes (FAQ)
                   </h2>
                 </div>
                 <button
                   type="button"
-                  onClick={onOpenVersionModal}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer shrink-0"
+                  onClick={() => setActiveSection('guide')}
+                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
                 >
-                  <ScrollText className="w-4 h-4 text-amber-500" />
-                  <span>Historial de Versiones (v{CURRENT_APP_VERSION})</span>
+                  <span>Abrir Guía Completa de Usuario</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              <div className="divide-y divide-slate-200/70 dark:divide-slate-800">
+              <div className="divide-y divide-slate-200/80 dark:divide-slate-800">
                 {FAQ_ITEMS.map((faq, idx) => {
                   const isOpen = openFaqIndex === idx;
                   return (
@@ -1694,7 +1596,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                         />
                       </button>
                       {isOpen && (
-                        <p className="mt-2 text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed pr-6">
+                        <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pr-6">
                           {faq.answer}
                         </p>
                       )}
@@ -1702,24 +1604,381 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   );
                 })}
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
         )}
 
-        {/* =================================================================
-            SECTION 4: DOWNLOADS (PC / MAC / LINUX + MOBILE PWA GUIDE)
-            ================================================================= */}
+        {/* ===================================================================
+            VIEW 2: USER GUIDE (Modeled after https://guide.organized-app.com/ - Docusaurus 3-Column Layout)
+            =================================================================== */}
+        {activeSection === 'guide' && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Top Search & Mobile Navigation Bar for Guide */}
+            <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-2xs">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                      Guía Oficial de Usuario de Kongre
+                    </h1>
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800">
+                      {DOC_ARTICLES.length} artículos
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Documentación paso a paso sobre instalación, configuración de congregación y uso diario.
+                  </p>
+                </div>
+              </div>
+
+              {/* Search Input + Mobile Article Selector */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto">
+                <div className="relative w-full sm:w-72">
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={docSearchQuery}
+                    onChange={(e) => setDocSearchQuery(e.target.value)}
+                    placeholder="Buscar en la guía (ej. iOS, S-89, PIN)..."
+                    className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                {/* Mobile Quick Jump Dropdown */}
+                <div className="lg:hidden">
+                  <select
+                    aria-label="Seleccionar artículo de la guía"
+                    value={activeDoc.id}
+                    onChange={(e) => setSelectedDocId(e.target.value as DocArticleId)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 text-xs font-bold text-indigo-950 dark:text-indigo-200"
+                  >
+                    {GUIDE_SIDEBAR_SECTIONS.map((sec) => (
+                      <optgroup key={sec.id} label={sec.title}>
+                        {filteredDocs
+                          .filter((d) => d.categoryKey === sec.id)
+                          .map((doc) => (
+                            <option key={doc.id} value={doc.id}>
+                              {doc.title}
+                            </option>
+                          ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* 3-Column Docusaurus Layout (Left Sidebar + Center Article + Right TOC) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
+              {/* LEFT SIDEBAR: Collapsible Categories like guide.organized-app.com */}
+              <aside className="hidden lg:block lg:col-span-3 xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-3.5 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto space-y-2">
+                {GUIDE_SIDEBAR_SECTIONS.map((section) => {
+                  const sectionArticles = filteredDocs.filter((d) => d.categoryKey === section.id);
+                  if (sectionArticles.length === 0) return null;
+                  const isExpanded = expandedCategories[section.id];
+
+                  return (
+                    <div key={section.id} className="space-y-1">
+                      <button
+                        type="button"
+                        onClick={() => toggleCategoryAccordion(section.id)}
+                        className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition cursor-pointer"
+                      >
+                        <span>{section.title}</span>
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 text-slate-400 transition-transform ${
+                            isExpanded ? 'rotate-0' : '-rotate-90'
+                          }`}
+                        />
+                      </button>
+
+                      {isExpanded && (
+                        <div className="space-y-0.5 pl-2 border-l-2 border-slate-100 dark:border-slate-800 ml-2">
+                          {sectionArticles.map((doc) => {
+                            const isSelected = activeDoc.id === doc.id;
+                            return (
+                              <button
+                                key={doc.id}
+                                type="button"
+                                onClick={() => setSelectedDocId(doc.id)}
+                                className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all cursor-pointer block ${
+                                  isSelected
+                                    ? 'bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 font-extrabold border-l-2 border-indigo-600 -ml-[2px]'
+                                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50 font-medium'
+                                }`}
+                              >
+                                {doc.title}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </aside>
+
+              {/* CENTER ARTICLE CONTENT */}
+              <article className="lg:col-span-6 xl:col-span-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-8 shadow-xs space-y-6">
+                {/* Breadcrumbs (Docusaurus style: 🏠 > Category > Article) */}
+                <nav
+                  aria-label="Breadcrumb"
+                  className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDocId('app-overview')}
+                    className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-indigo-600 transition cursor-pointer"
+                    title="Inicio de la Guía"
+                  >
+                    <Home className="w-3.5 h-3.5" />
+                  </button>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="font-semibold text-slate-600 dark:text-slate-300">
+                    {activeDoc.categoryLabel}
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="font-bold text-indigo-600 dark:text-indigo-400 truncate max-w-[220px] sm:max-w-none">
+                    {activeDoc.title}
+                  </span>
+                </nav>
+
+                {/* Article Title & Metadata */}
+                <div className="space-y-3 border-b border-slate-100 dark:border-slate-800 pb-5">
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                    {activeDoc.title}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    {activeDoc.summary}
+                  </p>
+
+                  <div className="pt-1 flex flex-wrap items-center gap-2 text-[11px]">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold">
+                      <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                      <span>Para: {activeDoc.audience}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">
+                      <span>Ubicación: {activeDoc.menuPath}</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                      <Clock className="w-3 h-3" />
+                      <span>{activeDoc.readTime}</span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Docusaurus Admonition: Note */}
+                {activeDoc.note && (
+                  <div className="p-4 rounded-xl bg-blue-50/80 dark:bg-blue-950/30 border-l-4 border-blue-500 text-xs text-blue-950 dark:text-blue-200 space-y-1">
+                    <div className="font-extrabold uppercase tracking-wider flex items-center gap-1.5 text-blue-700 dark:text-blue-300">
+                      <Info className="w-4 h-4" />
+                      <span>Nota</span>
+                    </div>
+                    <p className="leading-relaxed">{activeDoc.note}</p>
+                  </div>
+                )}
+
+                {/* Step-by-Step Sections */}
+                <div className="space-y-4">
+                  {activeDoc.steps.map((step, index) => (
+                    <div
+                      key={step.id}
+                      id={step.id}
+                      className="p-4 sm:p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60 space-y-2 scroll-mt-24"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5">
+                          <span className="w-6 h-6 rounded-lg bg-indigo-600 text-white font-mono text-xs font-bold flex items-center justify-center shrink-0">
+                            {index + 1}
+                          </span>
+                          <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                            {step.title}
+                          </h3>
+                        </div>
+                        {step.badge && (
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100/80 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 shrink-0">
+                            {step.badge}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pl-8">
+                        {step.detail}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Embedded RBAC Matrix Table when on roles-permissions */}
+                {activeDoc.id === 'roles-permissions' && (
+                  <div className="space-y-2 pt-2">
+                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Tabla de Permisos por Nombramiento
+                    </h3>
+                    <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                      <table className="w-full text-left border-collapse text-xs">
+                        <thead>
+                          <tr className="bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700">
+                            <th className="py-2.5 px-3 font-extrabold">Rol</th>
+                            <th className="py-2.5 px-3 font-extrabold">Alcance</th>
+                            <th className="py-2.5 px-3 font-extrabold">Permisos en Kongre</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-200/70 dark:divide-slate-800">
+                          {RBAC_DOCUMENTATION_MATRIX.map((row) => (
+                            <tr key={row.role}>
+                              <td className="py-2.5 px-3 font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
+                                {row.role}
+                              </td>
+                              <td className="py-2.5 px-3 font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                {row.scope}
+                              </td>
+                              <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 leading-relaxed">
+                                {row.permissions}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Docusaurus Admonition: Tip */}
+                {activeDoc.tip && (
+                  <div className="p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border-l-4 border-emerald-500 text-xs text-emerald-950 dark:text-emerald-200 space-y-1">
+                    <div className="font-extrabold uppercase tracking-wider flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300">
+                      <Sparkles className="w-4 h-4" />
+                      <span>Consejo Práctico</span>
+                    </div>
+                    <p className="leading-relaxed">{activeDoc.tip}</p>
+                  </div>
+                )}
+
+                {/* Docusaurus Admonition: Warning */}
+                {activeDoc.warning && (
+                  <div className="p-4 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border-l-4 border-amber-500 text-xs text-amber-950 dark:text-amber-200 space-y-1">
+                    <div className="font-extrabold uppercase tracking-wider flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
+                      <AlertCircle className="w-4 h-4" />
+                      <span>Importante</span>
+                    </div>
+                    <p className="leading-relaxed">{activeDoc.warning}</p>
+                  </div>
+                )}
+
+                {/* Previous / Next Article Pagination (Like Docusaurus) */}
+                <div className="pt-5 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {prevDoc ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedDocId(prevDoc.id);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 text-left transition cursor-pointer flex items-center gap-3 group"
+                    >
+                      <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 shrink-0" />
+                      <div className="min-w-0">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          Anterior
+                        </span>
+                        <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                          {prevDoc.title}
+                        </span>
+                      </div>
+                    </button>
+                  ) : (
+                    <div />
+                  )}
+
+                  {nextDoc ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedDocId(nextDoc.id);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 text-right transition cursor-pointer flex items-center justify-end gap-3 group"
+                    >
+                      <div className="min-w-0">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                          Siguiente
+                        </span>
+                        <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                          {nextDoc.title}
+                        </span>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                    </button>
+                  ) : (
+                    <div />
+                  )}
+                </div>
+              </article>
+
+              {/* RIGHT SIDEBAR: "En esta página" Table of Contents (Like guide.organized-app.com) */}
+              <aside className="hidden lg:block lg:col-span-3 xl:col-span-2 space-y-4 sticky top-20">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 space-y-3">
+                  <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+                    En esta página
+                  </div>
+                  <ul className="space-y-2 text-xs border-l-2 border-slate-100 dark:border-slate-800 pl-3">
+                    {activeDoc.steps.map((step, i) => (
+                      <li key={step.id}>
+                        <a
+                          href={`#${step.id}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const el = document.getElementById(step.id);
+                            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }}
+                          className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium block leading-snug transition"
+                        >
+                          {i + 1}. {step.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Quick Action Box in Sidebar */}
+                <div className="rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/70 dark:border-indigo-800/70 p-4 space-y-2.5">
+                  <div className="text-xs font-extrabold text-indigo-950 dark:text-indigo-200">
+                    ¿Listo para abrir la aplicación?
+                  </div>
+                  <p className="text-[11px] text-indigo-900/80 dark:text-indigo-300/80 leading-relaxed">
+                    Accede al portal de tu congregación o explora el entorno de demostración con datos de prueba.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => onGoToPortal()}
+                    className="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 transition cursor-pointer"
+                  >
+                    <KeyRound className="w-3.5 h-3.5" />
+                    <span>Ir al Portal (#portal)</span>
+                  </button>
+                </div>
+              </aside>
+            </div>
+          </div>
+        )}
+
+        {/* ===================================================================
+            VIEW 3: DOWNLOADS & PWA INSTALLATION
+            =================================================================== */}
         {activeSection === 'downloads' && (
           <section className="space-y-8 animate-fade-in">
             <div className="border-b border-slate-200 dark:border-slate-800 pb-5">
               <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                Instaladores Oficiales
+                Multiplataforma
               </span>
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">
-                Descarga Kongre para Escritorio y Dispositivos Móviles
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
+                Instala Kongre en cualquier dispositivo
               </h1>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1">
-                Instala la aplicación nativa compilada en Rust para la computadora del Salón del Reino o instala la Web App en tu teléfono iOS o Android.
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
+                Úsala en el navegador, instálala como aplicación web progresiva (PWA) en tu celular o descarga el ejecutable nativo para la computadora del Salón del Reino.
               </p>
             </div>
 
@@ -1728,60 +1987,71 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               onOpenAllDownloads={() => setDesktopModalOpen(true)}
             />
 
-            {/* Mobile Installation Guide (iOS & Android) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                    <Smartphone className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-[10.5px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                      iPhone y iPad (iOS / iPadOS)
-                    </span>
-                    <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-                      Cómo instalar Kongre en iOS
-                    </h3>
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    Android (Chrome)
+                  </span>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                    Teléfonos y Tabletas Android
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Abre <strong>kongre-app.com/#portal</strong> en Chrome, toca el menú de tres puntos (⋮) y selecciona <strong>«Instalar aplicación»</strong>.
+                  </p>
                 </div>
-                <ol className="list-decimal list-inside space-y-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  <li>
-                    Abre <strong>kongre-app.com/#portal</strong> desde el navegador <strong>Safari</strong>.
-                  </li>
-                  <li>
-                    Toca el botón <strong>Compartir</strong> en la barra inferior de Safari.
-                  </li>
-                  <li>
-                    Selecciona <strong>«Agregar a la pantalla de inicio»</strong> para usar Kongre en pantalla completa y con soporte offline.
-                  </li>
-                </ol>
+                <button
+                  type="button"
+                  onClick={() => handleOpenGuideArticle('install-android')}
+                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Ver guía para Android</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
 
-              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-600/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                    <Smartphone className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-[10.5px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                      Teléfonos y Tabletas Android
-                    </span>
-                    <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
-                      Cómo instalar Kongre en Android
-                    </h3>
-                  </div>
+              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                    iOS / iPadOS (Safari)
+                  </span>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                    iPhone y iPad
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Abre <strong>kongre-app.com/#portal</strong> en Safari, toca el botón <strong>Compartir</strong> y elige <strong>«Añadir a pantalla de inicio»</strong>.
+                  </p>
                 </div>
-                <ol className="list-decimal list-inside space-y-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                  <li>
-                    Abre <strong>kongre-app.com/#portal</strong> en Google Chrome, Brave o Edge.
-                  </li>
-                  <li>
-                    Toca el menú del navegador (tres puntos) y selecciona <strong>«Instalar aplicación»</strong>.
-                  </li>
-                  <li>
-                    El ícono oficial de Kongre aparecerá en tus aplicaciones con acceso sin conexión y notificaciones de asignaciones.
-                  </li>
-                </ol>
+                <button
+                  type="button"
+                  onClick={() => handleOpenGuideArticle('install-ios')}
+                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Ver guía para iPhone / iPad</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-violet-600 dark:text-violet-400">
+                    Windows, macOS y Linux
+                  </span>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                    Computadora del Salón y PC Personal
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Descarga el instalador nativo en Rust (.exe, .dmg, .deb) o instálala desde la barra de direcciones de Chrome o Edge.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDesktopModalOpen(true)}
+                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Abrir instaladores de escritorio</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
           </section>
@@ -1790,10 +2060,11 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
 
       {/* Official Footer */}
       <AppFooter
-        variant="landing"
         onOpenVersionModal={onOpenVersionModal}
+        onOpenDesktopModal={() => setDesktopModalOpen(true)}
       />
 
+      {/* Desktop Installer Modal */}
       <DesktopDownloadModal
         isOpen={desktopModalOpen}
         onClose={() => setDesktopModalOpen(false)}

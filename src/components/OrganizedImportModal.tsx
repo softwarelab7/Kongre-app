@@ -94,7 +94,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
 
   const handleApplyToAllWeeks = () => {
     syncAllWeeksWithOrganized();
-    setFeedbackSuccess('¡Todas las semanas de la congregación han sido sincronizadas con Organized!');
+    setFeedbackSuccess('¡Todas las semanas de la congregación han sido sincronizadas con el catálogo oficial!');
     setTimeout(() => {
       setFeedbackSuccess(null);
       onClose();
@@ -468,7 +468,7 @@ export const OrganizedImportModal: React.FC<OrganizedImportModalProps> = ({
                     type="button"
                     onClick={handleApplyToAllWeeks}
                     className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 border border-slate-700"
-                    title="Aplica automáticamente los programas oficiales de Organized a todas las semanas de la congregación"
+                    title="Aplica automáticamente los programas oficiales del catálogo a todas las semanas de la congregación"
                   >
                     <Sparkles className="w-4 h-4 text-amber-300" />
                     <span>Sincronizar Todas las Semanas</span>

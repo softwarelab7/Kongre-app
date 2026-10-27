@@ -1564,10 +1564,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         {/* 2. MAIN WORKSPACE / RESPONSIVE HERO & ACTIONS            */}
         {/* ========================================================= */}
         <main
-          className={`mx-auto grid w-full flex-1 gap-6 lg:gap-10 xl:gap-14 px-4 sm:px-6 md:px-8 ${
+          className={`w-full grid flex-1 gap-6 lg:gap-10 xl:gap-14 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 ${
             isFullWidthView
-              ? 'max-w-4xl xl:max-w-5xl grid-cols-1 py-2 sm:py-3.5 my-auto items-center'
-              : 'max-w-[1240px] 2xl:max-w-[1360px] lg:grid-cols-[1.12fr_.88fr] py-4 sm:py-6 lg:py-6 xl:py-8 items-center'
+              ? 'grid-cols-1 py-2 sm:py-3.5 my-auto items-center'
+              : 'lg:grid-cols-[1.18fr_.82fr] py-4 sm:py-6 lg:py-6 xl:py-8 items-center'
           }`}
         >
           {/* ========================================================= */}

@@ -1,21 +1,21 @@
-# 🏛️ Kongre Desktop
+# 🏛️ Kongre App
 
 > Gestor Teocrático Integral para Congregaciones (Windows, macOS, Linux).
 
-Kongre es una aplicación de escritorio de alto rendimiento diseñada con **Rust**, segura, privada y con soporte 100% offline para la gestión de asignaciones, reuniones, asistencia S-88 y territorios.
+**Kongre App** es una aplicación de escritorio de alto rendimiento diseñada con **Rust**, segura, privada y con soporte 100% offline para la gestión de asignaciones, reuniones, asistencia S-88 y territorios.
 
 ---
 
-## 📥 Descargas Oficiales (Versión v2.12.35)
+## 📥 Descargas Oficiales de Kongre App (Versión v2.12.35)
 
 | Sistema Operativo | Tipo de Instalador | Enlace de Descarga Directa |
 | :--- | :--- | :--- |
-| 🪟 **Windows 10 / 11** | Instalador ejecutable (.exe) | [Descargar Kongre Setup (.exe)](https://github.com/softwarelab7/Kongre-Desktop/releases/download/v2.12.35/Kongre_2.12.35_x64-setup.exe) |
-| 🪟 **Windows (Empresarial)** | Paquete MSI (.msi) | [Descargar Kongre MSI (.msi)](https://github.com/softwarelab7/Kongre-Desktop/releases/download/v2.12.35/Kongre_2.12.35_x64_en-US.msi) |
-| 🍎 **macOS (Apple Silicon & Intel)** | Imagen de disco (.dmg) | [Descargar Kongre para Mac (.dmg)](https://github.com/softwarelab7/Kongre-Desktop/releases/download/v2.12.35/Kongre_2.12.35_universal.dmg) |
-| 🔵 **Fedora / Red Hat** | Paquete RPM (.rpm) | [Descargar para Fedora (.rpm)](https://github.com/softwarelab7/Kongre-Desktop/releases/download/v2.12.35/Kongre-2.12.35-1.x86_64.rpm) |
-| 🟠 **Ubuntu / Debian** | Paquete Debian (.deb) | [Descargar para Ubuntu (.deb)](https://github.com/softwarelab7/Kongre-Desktop/releases/download/v2.12.35/Kongre_2.12.35_amd64.deb) |
-| 🐧 **Linux (Universal)** | Portable (.AppImage) | [Descargar AppImage (.AppImage)](https://github.com/softwarelab7/Kongre-Desktop/releases/download/v2.12.35/Kongre_2.12.35_amd64.AppImage) |
+| 🪟 **Windows 10 / 11** | Instalador ejecutable (.exe) | [Descargar Kongre App Setup (.exe)](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_x64-setup.exe) |
+| 🪟 **Windows (Empresarial)** | Paquete MSI (.msi) | [Descargar Kongre App MSI (.msi)](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_x64_en-US.msi) |
+| 🍎 **macOS (Apple Silicon & Intel)** | Imagen de disco (.dmg) | [Descargar Kongre App para Mac (.dmg)](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_universal.dmg) |
+| 🔵 **Fedora / Red Hat** | Paquete RPM (.rpm) | [Descargar Kongre App para Fedora (.rpm)](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre-2.12.35-1.x86_64.rpm) |
+| 🟠 **Ubuntu / Debian** | Paquete Debian (.deb) | [Descargar Kongre App para Ubuntu (.deb)](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_amd64.deb) |
+| 🐧 **Linux (Universal)** | Portable (.AppImage) | [Descargar Kongre App Portable (.AppImage)](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_amd64.AppImage) |
 
 ---
 

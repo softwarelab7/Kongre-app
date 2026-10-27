@@ -5,7 +5,7 @@
 
 # 🏛️ Kongre App
 
-### Gestor Teocrático Integral para Congregaciones
+### Gestor Teocrático Integral para las Congregaciones de los Testigos de Jehová
 
 **Aplicación nativa de alto rendimiento desarrollada con Rust, React y Tauri v2 para Windows, macOS y Linux.**
 
@@ -30,21 +30,13 @@
 
 ## 📖 Acerca de Kongre App
 
-**Kongre App** es una plataforma integral diseñada para simplificar y optimizar la administración de congregaciones. Proporciona a ancianos, siervos ministeriales y publicadores herramientas teocráticas modernas, organizadas y seguras.
-
-A diferencia de las herramientas convencionales, **Kongre App** funciona con una arquitectura **Offline-First**, lo que permite utilizar todas las funciones en el Salón del Reino o en predicación sin necesidad de conexión a Internet, sincronizando automáticamente los cambios en cuanto se restablece la red.
-
----
-
-## ❤️ Un Proyecto Hecho con Amor y 100% Gratuito
-
 > *"Recibieron gratis; den gratis."* Mateo 10:8
 
-**Kongre App** nace del deseo sincero de poner nuestras habilidades técnicas al servicio de los hermanos, ofreciendo una herramienta moderna, accesible y pensada para apoyar las labores de todas las congregaciones:
+**Kongre App** es una plataforma integral desarrollada **con amor y de forma 100% gratuita** para simplificar y optimizar la organización en las **congregaciones de los testigos de Jehová**. Proporciona a ancianos, siervos ministeriales y publicadores herramientas teocráticas modernas, organizadas y seguras.
 
-* 🎁 **100% Gratuito para siempre:** Este proyecto se entrega con amor como un aporte voluntario para el beneficio de las congregaciones. No tiene fines comerciales, suscripciones, licencias de pago ni funciones bloqueadas.
+* 🎁 **100% Gratuito para siempre:** Este proyecto se entrega con cariño como un aporte voluntario para el beneficio de todas las congregaciones. No tiene fines comerciales, suscripciones, licencias de pago ni funciones bloqueadas.
 * 💻 **Verdaderamente Multiplataforma (Windows, macOS y Linux):** Desarrollada de forma nativa con **Rust, React y Tauri v2**, garantiza instaladores ultraligeros y veloces tanto para PC con Windows 10/11, como para Mac (Apple Silicon M1-M4 e Intel) y distribuciones Linux.
-* 🔒 **Privacidad local y 100% Offline:** Gracias a su arquitectura **Offline-First** y su bóveda **AES-256-GCM**, toda la información permanece segura y exclusivamente en manos de cada congregación.
+* 🔒 **100% Offline y Privada:** Su arquitectura **Offline-First** con cifrado local **AES-256-GCM** permite utilizar todas las funciones en el Salón del Reino o en predicación sin necesidad de conexión a Internet, sincronizando los cambios cuando se restablece la red y manteniendo la información siempre bajo el control de los hermanos.
 
 ---
 
@@ -76,6 +68,8 @@ Descarga el instalador correspondiente a tu sistema operativo con un solo clic:
 2. Abre la imagen de disco descargada con doble clic.
 3. Arrastra el icono de **Kongre App** a la carpeta **Aplicaciones**.
 4. ¡Listo! Compatible de forma nativa con procesadores M1, M2, M3, M4 e Intel.
+> 💡 **Nota para usuarios de Mac:** Al ser un proyecto 100% gratuito, el instalador no incluye una firma comercial de pago de Apple. Si al abrir la aplicación por primera vez macOS muestra un aviso indicando que *"no se puede verificar"* o que *"está dañada"*, abre la aplicación **Terminal** y ejecuta este comando una sola vez para autorizarla:
+> <pre><code>xattr -cr "/Applications/Kongre App.app"</code></pre>
 
 ### 🔵 Fedora Linux / Red Hat / openSUSE
 Abre tu terminal en la carpeta de descargas y ejecuta:
@@ -134,6 +128,6 @@ Kongre App incorpora una arquitectura de seguridad diseñada bajo los más rigur
 ### 🌐 Conoce más y accede a la versión en la nube:
 ### 👉 [https://kongre-app.com](https://kongre-app.com)
 
-*Kongre App es una herramienta desarrollada con ❤️, 100% gratuita, por y para el beneficio de todas las congregaciones.*
+*Kongre App es una herramienta desarrollada con ❤️, 100% gratuita, para el beneficio de las congregaciones de los testigos de Jehová.*
 
 </div>

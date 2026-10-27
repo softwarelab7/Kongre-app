@@ -68,6 +68,9 @@ import { PublisherPinsModal } from './components/PublisherPinsModal';
 import { AuditLogModal } from './components/AuditLogModal';
 import { AppFooter } from './components/AppFooter';
 import { VersionHistoryModal } from './components/VersionHistoryModal';
+import { DesktopUpdateModal } from './components/DesktopUpdateModal';
+import { checkForDesktopUpdate, DesktopUpdateInfo } from './services/desktopUpdateService';
+import { isDesktopApp } from './utils/platform';
 import { OfflineSyncQueueModal } from './components/OfflineSyncQueueModal';
 import { DemoNoticeModal } from './components/DemoNoticeModal';
 import { FirstTimeLegalConsentModal, hasAcceptedLegalTerms } from './components/TermsAndPrivacyModal';
@@ -235,6 +238,8 @@ const AppContent: React.FC = () => {
   const [isLinkRequestsModalOpen, setIsLinkRequestsModalOpen] = useState(false);
   const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
   const [isQueueModalOpen, setIsQueueModalOpen] = useState(false);
+  const [desktopUpdate, setDesktopUpdate] = useState<DesktopUpdateInfo | null>(null);
+  const [isDesktopUpdateOpen, setIsDesktopUpdateOpen] = useState(false);
   const [showWelcomeLanding, setShowWelcomeLanding] = useState<boolean>(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const hashInfo = typeof window !== 'undefined' ? parseAppHash(window.location.hash) : null;
@@ -300,6 +305,21 @@ const AppContent: React.FC = () => {
       } catch {}
     }
   }, [isDemoMode]);
+
+  // Comprobación automática de actualización en PC (Desktop App)
+  useEffect(() => {
+    // Si la app está en PC o en modo online, busca actualizaciones tras el arranque inicial
+    const timer = setTimeout(async () => {
+      try {
+        const update = await checkForDesktopUpdate();
+        if (update && update.hasUpdate) {
+          setDesktopUpdate(update);
+          setIsDesktopUpdateOpen(true);
+        }
+      } catch {}
+    }, 3500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const [previousTab, setPreviousTab] = useState<ActiveTab>('menu');
 
@@ -1558,6 +1578,13 @@ const AppContent: React.FC = () => {
       <VersionHistoryModal
         isOpen={isVersionModalOpen}
         onClose={() => closeModalWithHistory('versiones', setIsVersionModalOpen)}
+      />
+
+      {/* Notificación y Modal de Actualización para PC */}
+      <DesktopUpdateModal
+        isOpen={isDesktopUpdateOpen}
+        updateInfo={desktopUpdate}
+        onClose={() => setIsDesktopUpdateOpen(false)}
       />
 
       {/* Modal de Cola de Sincronización Offline (IndexedDB / Supabase) */}

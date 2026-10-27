@@ -155,9 +155,12 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
               <span className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
                 v{CURRENT_APP_VERSION}
               </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                Alfa (Pruebas)
+              </span>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Aplicación nativa ultraligera construida en <strong>Rust</strong>. Instálala en tu computadora para acceso offline sin depender del navegador.
+              Aplicación nativa en <strong>Rust</strong> en fase <strong>Alfa preliminar</strong>. Funciones teocráticas y de seguridad 100% operativas para pruebas de escritorio.
             </p>
           </div>
         </div>

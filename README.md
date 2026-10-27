@@ -9,7 +9,7 @@
 **Aplicación nativa de alto rendimiento desarrollada con Rust para Windows, macOS y Linux.**
 
 [![Fase](https://img.shields.io/badge/Estado-Versi%C3%B3n%20Alfa%20Preliminar-EA580C?style=for-the-badge&logo=speedtest)](https://github.com/softwarelab7/Kongre-app/releases)
-[![Build](https://img.shields.io/badge/Build-v0.1.0%20(Alfa)-4F46E5?style=for-the-badge&logo=rocket)](https://github.com/softwarelab7/Kongre-app/releases/tag/v0.1.0)
+[![Build](https://img.shields.io/badge/Build-v0.1.0--alpha.35%20(Alfa)-4F46E5?style=for-the-badge&logo=rocket)](https://github.com/softwarelab7/Kongre-app/releases/tag/v0.1.0-alpha.35)
 [![Plataformas](https://img.shields.io/badge/Plataformas-Windows%20%7C%20macOS%20%7C%20Linux-0EA5E9?style=for-the-badge&logo=linux)](https://github.com/softwarelab7/Kongre-app/releases)
 [![Seguridad](https://img.shields.io/badge/Cifrado-AES--256--GCM-10B981?style=for-the-badge&logo=shield)](https://kongre-app.com)
 [![Modo](https://img.shields.io/badge/Operaci%C3%B3n-100%25%20Offline-F59E0B?style=for-the-badge&logo=offline)](https://kongre-app.com)
@@ -21,7 +21,7 @@
 </div>
 
 > ⚠️ **Nota de Versión Alfa (Acceso Anticipado / Pruebas Activas):**  
-> Kongre App se encuentra actualmente en fase de **desarrollo Alfa preliminar (Build v0.1.0)**. Aunque los módulos clave (reuniones, S-89, S-21, territorios y la bóveda criptográfica) están totalmente operativos y listos para uso, la aplicación continúa en constante perfeccionamiento y corrección de detalles visuales y de rendimiento.  
+> Kongre App se encuentra actualmente en fase de **desarrollo Alfa preliminar (Build v0.1.0-alpha.35)**. Aunque los módulos clave (reuniones, S-89, S-21, territorios y la bóveda criptográfica) están totalmente operativos y listos para uso, la aplicación continúa en constante perfeccionamiento y corrección de detalles visuales y de rendimiento.  
 > Apreciamos profundamente tu paciencia y tus reportes de mejora mientras avanzamos hacia la versión Beta y el lanzamiento estable final.
 
 ---
@@ -34,31 +34,31 @@ A diferencia de las herramientas convencionales, **Kongre App** funciona con una
 
 ---
 
-## 📥 Descargas Oficiales (Build Alfa v0.1.0)
+## 📥 Descargas Oficiales (Build Alfa v0.1.0-alpha.35)
 
 Descarga el instalador correspondiente a tu sistema operativo con un solo clic:
 
 | Sistema Operativo | Formato de Paquete | Arquitectura | Enlace de Descarga Directa | Tamaño |
 | :--- | :--- | :--- | :--- | :--- |
-| 🪟 **Windows 10 / 11** | Instalador ejecutable (`.exe`) | x64 (64 bits) | [⬇️ **Descargar Setup (.exe)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0/Kongre_0.1.0_x64-setup.exe) | 15.3 MB |
-| 🪟 **Windows (Empresarial)** | Paquete de sistema (`.msi`) | x64 (64 bits) | [⬇️ **Descargar MSI (.msi)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0/Kongre_0.1.0_x64_en-US.msi) | 16.1 MB |
-| 🍎 **macOS (Apple)** | Imagen de disco (`.dmg`) | Universal (Apple Silicon M1-M4 & Intel) | [⬇️ **Descargar para Mac (.dmg)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0/Kongre_0.1.0_universal.dmg) | 32.2 MB |
-| 🔵 **Fedora / Red Hat** | Paquete RPM (`.rpm`) | x86_64 | [⬇️ **Descargar para Fedora (.rpm)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0/Kongre-0.1.0-1.x86_64.rpm) | 16.1 MB |
-| 🟠 **Ubuntu / Debian** | Paquete Debian (`.deb`) | amd64 | [⬇️ **Descargar para Ubuntu (.deb)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0/Kongre_0.1.0_amd64.deb) | 16.1 MB |
-| 🐧 **Linux (Universal)** | Binario Portable (`.AppImage`) | x86_64 | [⬇️ **Descargar Portable (.AppImage)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0/Kongre_0.1.0_amd64.AppImage) | 90.9 MB |
+| 🪟 **Windows 10 / 11** | Instalador ejecutable (`.exe`) | x64 (64 bits) | [⬇️ **Descargar Setup (.exe)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.35/Kongre_0.1.0-alpha.35_x64-setup.exe) | 15.3 MB |
+| 🪟 **Windows (Empresarial)** | Paquete de sistema (`.msi`) | x64 (64 bits) | [⬇️ **Descargar MSI (.msi)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.35/Kongre_0.1.0-alpha.35_x64_en-US.msi) | 16.1 MB |
+| 🍎 **macOS (Apple)** | Imagen de disco (`.dmg`) | Universal (Apple Silicon M1-M4 & Intel) | [⬇️ **Descargar para Mac (.dmg)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.35/Kongre_0.1.0-alpha.35_universal.dmg) | 32.2 MB |
+| 🔵 **Fedora / Red Hat** | Paquete RPM (`.rpm`) | x86_64 | [⬇️ **Descargar para Fedora (.rpm)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.35/Kongre-0.1.0-alpha.35-1.x86_64.rpm) | 16.1 MB |
+| 🟠 **Ubuntu / Debian** | Paquete Debian (`.deb`) | amd64 | [⬇️ **Descargar para Ubuntu (.deb)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.35/Kongre_0.1.0-alpha.35_amd64.deb) | 16.1 MB |
+| 🐧 **Linux (Universal)** | Binario Portable (`.AppImage`) | x86_64 | [⬇️ **Descargar Portable (.AppImage)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.35/Kongre_0.1.0-alpha.35_amd64.AppImage) | 90.9 MB |
 
 ---
 
 ## 🚀 Guía de Instalación Rápida
 
 ### 🪟 Windows
-1. Descarga el archivo [Kongre_0.1.0_x64-setup.exe](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0/Kongre_0.1.0_x64-setup.exe).
+1. Descarga el archivo [Kongre_0.1.0-alpha.35_x64-setup.exe](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.35/Kongre_0.1.0-alpha.35_x64-setup.exe).
 2. Haz doble clic sobre el archivo descargado.
 3. Sigue los pasos del asistente de instalación (*Siguiente → Instalar*).
 4. El acceso directo se creará automáticamente en tu Escritorio y Menú Inicio.
 
 ### 🍎 macOS
-1. Descarga el archivo [Kongre_0.1.0_universal.dmg](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0/Kongre_0.1.0_universal.dmg).
+1. Descarga el archivo [Kongre_0.1.0-alpha.35_universal.dmg](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.35/Kongre_0.1.0-alpha.35_universal.dmg).
 2. Abre la imagen de disco descargada con doble clic.
 3. Arrastra el icono de **Kongre App** a la carpeta **Aplicaciones**.
 4. ¡Listo! Compatible de forma nativa con procesadores M1, M2, M3, M4 e Intel.
@@ -66,23 +66,23 @@ Descarga el instalador correspondiente a tu sistema operativo con un solo clic:
 ### 🔵 Fedora Linux / Red Hat / openSUSE
 Abre tu terminal en la carpeta de descargas y ejecuta:
 ```bash
-sudo dnf install ./Kongre-0.1.0-1.x86_64.rpm
+sudo dnf install ./Kongre-0.1.0-alpha.35-1.x86_64.rpm
 ```
 *O haz doble clic sobre el archivo `.rpm` para instalarlo a través del centro de software de KDE Discover / GNOME Software.*
 
 ### 🟠 Ubuntu / Debian / Linux Mint
 Abre tu terminal en la carpeta de descargas y ejecuta:
 ```bash
-sudo apt install ./Kongre_0.1.0_amd64.deb
+sudo apt install ./Kongre_0.1.0-alpha.35_amd64.deb
 ```
 
 ### 🐧 Linux Universal (Cualquier distribución sin instalar)
 1. Descarga el archivo `.AppImage`.
 2. Dale permisos de ejecución:
    ```bash
-   chmod +x Kongre_0.1.0_amd64.AppImage
+   chmod +x Kongre_0.1.0-alpha.35_amd64.AppImage
    ```
-3. Ejecútalo con `./Kongre_0.1.0_amd64.AppImage` o con doble clic desde tu explorador de archivos.
+3. Ejecútalo con `./Kongre_0.1.0-alpha.35_amd64.AppImage` o con doble clic desde tu explorador de archivos.
 
 ---
 

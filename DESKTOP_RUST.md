@@ -31,19 +31,27 @@ Dado que compilar binarios de macOS y Windows requiere sus respectivos sistemas 
 `.github/workflows/desktop-release.yml`
 
 ### ¿Cómo generar los instaladores automáticamente?
-1. Haz un commit y push de tus cambios.
-2. Crea un tag de versión, por ejemplo:
+1. **Automático en cada Push:** Simplemente haz un commit y push a la rama `main`:
+   ```bash
+   git add .
+   git commit -m "feat: mi nuevo cambio"
+   git push origin main
+   ```
+2. **O por Tag de Versión:**
    ```bash
    git tag v0.1.0
    git push origin v0.1.0
    ```
-   *(o activa el workflow manualmente desde la pestaña **Actions** en GitHub con `workflow_dispatch`)*.
-3. GitHub Actions compilará en paralelo:
+   *(o activando el workflow manualmente desde la pestaña **Actions** en GitHub con `workflow_dispatch`)*.
+
+3. **GitHub Actions compilará en paralelo:**
    - **Windows Runner:** Genera `Kongre_0.1.0_x64-setup.exe` y `Kongre_0.1.0_x64_en-US.msi`.
-   - **macOS Runner:** Genera `Kongre_0.1.0_universal.dmg` (compatible con Intel y Mac Silicon).
-   - **Linux Fedora Runner:** Genera `Kongre-0.1.0-1.x86_64.rpm` y `Kongre_0.1.0_amd64.AppImage`.
-   - **Linux Ubuntu Runner:** Genera `Kongre_0.1.0_amd64.deb`.
-4. Los archivos quedarán listos para descarga en **Releases** de tu repositorio GitHub.
+   - **macOS Runner:** Genera `Kongre_0.1.0_universal.dmg` (binario Universal compatible con Intel y Apple Silicon).
+   - **Linux Runner:** Genera `Kongre_0.1.0_amd64.deb`, `Kongre_0.1.0_amd64.AppImage` y `Kongre-0.1.0-1.x86_64.rpm`.
+
+4. **Disponibilidad inmediata:**
+   - En **Releases** de GitHub: Listos para descarga pública directa.
+   - En **Actions > Artifacts**: Descargables de inmediato como archivo zip por plataforma tras cada ejecución.
 
 ---
 

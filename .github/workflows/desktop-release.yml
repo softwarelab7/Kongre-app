@@ -58,6 +58,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          tauriScript: "npm run tauri"
           tagName: ${{ github.event.inputs.release_tag || github.ref_name }}
           releaseName: 'Kongre Desktop ${{ github.event.inputs.release_tag || github.ref_name }}'
           releaseBody: 'Descarga el instalador nativo de Kongre para Windows (.exe / .msi), macOS (.dmg) o Linux (.deb / .AppImage).'

@@ -52,7 +52,7 @@ export function buildCsp(supabaseOrigin: string, scriptHashes: string[], opts: {
 }
 
 export function securityHeadersPlugin(env: Record<string, string>): Plugin {
-  const enforce = process.env.KONGRE_CSP === 'enforce';
+  const enforce = process.env.KONGRE_CSP !== 'report-only';
   const supabaseOrigin = (() => {
     try { return new URL(env.VITE_SUPABASE_URL || 'https://rceyevhwhtjshsthrrtp.supabase.co').origin; }
     catch { return 'https://rceyevhwhtjshsthrrtp.supabase.co'; }

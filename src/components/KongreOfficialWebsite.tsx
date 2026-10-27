@@ -35,13 +35,18 @@ import {
   Laptop,
   Check,
   Info,
+  ChevronsUpDown,
+  FileText,
+  X,
 } from 'lucide-react';
 import Logo from '../Logo';
+import AnimatedLogo from '../AnimatedLogo';
 import { useTheme } from '../context/ThemeContext';
 import { CURRENT_APP_VERSION } from '../utils/versionLog';
 import { DesktopCompatibilityBanner } from './DesktopCompatibilityBanner';
 import { DesktopDownloadModal } from './DesktopDownloadModal';
 import { AppFooter } from './AppFooter';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface KongreOfficialWebsiteProps {
   onGoToPortal: (initialPortalTab?: string) => void;
@@ -107,12 +112,13 @@ interface DocArticle {
 const GUIDE_SIDEBAR_SECTIONS: {
   id: GuideSectionCategory;
   title: string;
+  icon: React.ComponentType<{ className?: string }>;
 }[] = [
-  { id: 'welcome', title: 'Bienvenida y Resumen' },
-  { id: 'install', title: 'Abrir e Instalar la App' },
-  { id: 'onboarding', title: 'Primeros Pasos y Acceso' },
-  { id: 'how-to', title: 'Cómo Usar Kongre' },
-  { id: 'security-faq', title: 'Seguridad y Solución de Problemas' },
+  { id: 'welcome', title: 'Bienvenida y Resumen', icon: Sparkles },
+  { id: 'install', title: 'Abrir e Instalar la App', icon: Smartphone },
+  { id: 'onboarding', title: 'Primeros Pasos y Acceso', icon: KeyRound },
+  { id: 'how-to', title: 'Cómo Usar Kongre', icon: Layers },
+  { id: 'security-faq', title: 'Seguridad y Soporte', icon: ShieldCheck },
 ];
 
 const ROLE_PERSONAS: {
@@ -938,7 +944,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
   isSignedInOrRegistered = false,
   onEnterAppDirectly,
 }) => {
-  const { theme, setTheme } = useTheme();
+  const { themeMode: theme, toggleTheme: handleToggleTheme } = useTheme();
   const [activeSection, setActiveSection] = useState<WebsiteSection>('about');
   const [selectedRolePersona, setSelectedRolePersona] = useState<RolePersonaId>('elders');
   const [selectedDocId, setSelectedDocId] = useState<DocArticleId>('app-overview');
@@ -1005,9 +1011,21 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
     }));
   };
 
-  const handleToggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+  const allCategoriesExpanded = useMemo(() => {
+    return Object.values(expandedCategories).every(Boolean);
+  }, [expandedCategories]);
+
+  const handleToggleAllCategories = () => {
+    const nextState = !allCategoriesExpanded;
+    setExpandedCategories({
+      welcome: nextState,
+      install: nextState,
+      onboarding: nextState,
+      'how-to': nextState,
+      'security-faq': nextState,
+    });
   };
+
 
   return (
     <div className="min-h-dvh w-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans selection:bg-indigo-600 selection:text-white transition-colors duration-200">
@@ -1164,75 +1182,139 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
             VIEW 1: ABOUT KONGRE (Modeled after https://about.organized-app.com/)
             =================================================================== */}
         {activeSection === 'about' && (
-          <div className="space-y-12 animate-fade-in w-full">
-            {/* 1. HERO SECTION */}
-            <section className="relative w-full rounded-3xl bg-linear-to-br from-indigo-50/90 via-white to-violet-50/70 dark:from-slate-900 dark:via-indigo-950/50 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-800/70 p-6 sm:p-10 lg:p-12 shadow-lg shadow-indigo-500/5 overflow-hidden">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+          <div className="space-y-12 w-full">
+            {/* 1. HERO SECTION WITH MOTION ENTRANCE & AMBIENT GLOW */}
+            <motion.section
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full rounded-3xl bg-linear-to-br from-indigo-50/90 via-white to-violet-50/70 dark:from-slate-900 dark:via-indigo-950/50 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-800/70 p-6 sm:p-10 lg:p-12 shadow-lg shadow-indigo-500/5 overflow-hidden"
+            >
+              {/* Floating ambient glow orbs */}
+              <motion.div
+                animate={{
+                  x: [0, 24, 0],
+                  y: [0, -20, 0],
+                  scale: [1, 1.08, 1],
+                }}
+                transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-indigo-500/15 dark:bg-indigo-600/20 blur-3xl pointer-events-none"
+              />
+              <motion.div
+                animate={{
+                  x: [0, -22, 0],
+                  y: [0, 20, 0],
+                  scale: [1, 1.1, 1],
+                }}
+                transition={{ duration: 11, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-violet-500/15 dark:bg-violet-600/20 blur-3xl pointer-events-none"
+              />
+
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
                 <div className="lg:col-span-7 xl:col-span-8 space-y-5">
-                  <div className="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-full bg-indigo-100/90 dark:bg-indigo-950/90 border border-indigo-200 dark:border-indigo-800 text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
-                    <Sparkles className="w-3.5 h-3.5" />
+                  <motion.div
+                    initial={{ opacity: 0, y: -14, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                    className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100/90 dark:bg-indigo-950/90 border border-indigo-200 dark:border-indigo-800 text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 shadow-2xs"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                     <span>Aplicación Todo en Uno para Congregaciones</span>
-                  </div>
+                  </motion.div>
 
-                  <h1 className="text-2xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-slate-900 dark:text-white leading-[1.12]">
+                  <motion.h1
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.55, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+                    className="text-2xl sm:text-4xl lg:text-[42px] font-black tracking-tight text-slate-900 dark:text-white leading-[1.12]"
+                  >
                     Simplifica y organiza toda la vida de tu congregación en un solo lugar.
-                  </h1>
+                  </motion.h1>
 
-                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-4xl">
+                  <motion.p
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                    className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-4xl"
+                  >
                     <strong>Kongre</strong> une a ancianos, siervos ministeriales, precursores y publicadores en una plataforma moderna, gratuita y 100% funcional sin internet. Automatiza la programación de reuniones, el seguimiento del ministerio, la asistencia, las tarjetas S-21 y los mapas de territorios bajo cifrado de extremo a extremo.
-                  </p>
+                  </motion.p>
 
-                  {/* Primary Action Buttons (Like Organized: "Use App" + "User Guide") */}
-                  <div className="flex flex-wrap items-center gap-3 pt-2">
-                    <button
+                  {/* Primary Action Buttons with Motion Physics */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                    className="flex flex-wrap items-center gap-3 pt-2"
+                  >
+                    <motion.button
                       type="button"
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.97 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       onClick={() => onGoToPortal()}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md shadow-indigo-600/25 transition-all active:scale-95 cursor-pointer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-md shadow-indigo-600/25 cursor-pointer group"
                     >
                       <KeyRound className="w-4 h-4" />
                       <span>Usar Kongre en el Navegador</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </motion.button>
 
-                    <button
+                    <motion.button
                       type="button"
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.97 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       onClick={() => setActiveSection('guide')}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-bold text-sm shadow-2xs transition-all cursor-pointer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-bold text-sm shadow-2xs cursor-pointer"
                     >
                       <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                       <span>Explorar Guía de Usuario</span>
-                    </button>
+                    </motion.button>
 
-                    <button
+                    <motion.button
                       type="button"
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.97 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       onClick={onStartDemoMode}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-violet-100/80 dark:bg-violet-950/60 hover:bg-violet-200/70 dark:hover:bg-violet-900/70 text-violet-800 dark:text-violet-200 border border-violet-200 dark:border-violet-800 font-bold text-sm transition-all cursor-pointer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-violet-100/80 dark:bg-violet-950/60 hover:bg-violet-200/70 dark:hover:bg-violet-900/70 text-violet-800 dark:text-violet-200 border border-violet-200 dark:border-violet-800 font-bold text-sm cursor-pointer"
                     >
                       <Sparkles className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                       <span>Probar Demo Interactiva</span>
-                    </button>
-                  </div>
+                    </motion.button>
+                  </motion.div>
 
                   {/* Key Trust Highlights */}
-                  <div className="pt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-slate-600 dark:text-slate-300 border-t border-indigo-100/90 dark:border-slate-800">
-                    <span className="inline-flex items-center gap-1.5">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.35 }}
+                    className="pt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-slate-600 dark:text-slate-300 border-t border-indigo-100/90 dark:border-slate-800"
+                  >
+                    <span className="inline-flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                       <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       Enfoque «Elder-First» y Cifrado E2EE
                     </span>
-                    <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                       <CloudOff className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                       Local-First (Funciona sin Internet)
                     </span>
-                    <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                       <Smartphone className="w-4 h-4 text-violet-600 dark:text-violet-400" />
                       PWA Móvil + Escritorio Nativo
                     </span>
-                  </div>
+                  </motion.div>
                 </div>
 
-                {/* Right Column: Quick Portal & Guide Hub Card */}
-                <div className="lg:col-span-5 xl:col-span-4">
-                  <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xl p-5 sm:p-6 space-y-4">
+                {/* Right Column: Quick Portal Card with Motion & Interactive Animated Logo */}
+                <motion.div
+                  initial={{ opacity: 0, x: 28, scale: 0.96 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  className="lg:col-span-5 xl:col-span-4"
+                >
+                  <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xl p-5 sm:p-6 space-y-4 hover:shadow-2xl transition-shadow duration-300">
                     <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3.5">
                       <div>
                         <span className="text-[10.5px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
@@ -1242,21 +1324,26 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                           Comienza en menos de 1 minuto
                         </h2>
                       </div>
-                      <Logo variant="isotipo" className="w-7 h-7 object-contain" />
+                      <div className="p-1 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-2xs hover:scale-105 active:scale-95 transition-transform" title="Toca para animar el logo de Kongre">
+                        <AnimatedLogo height={28} iconOnly />
+                      </div>
                     </div>
 
                     <div className="space-y-2.5">
-                      <button
+                      <motion.button
                         type="button"
+                        whileHover={{ x: 5, scale: 1.01 }}
+                        whileTap={{ scale: 0.98 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                         onClick={() => onGoToPortal('home')}
-                        className="w-full p-3.5 rounded-xl bg-indigo-50/70 hover:bg-indigo-100/80 dark:bg-indigo-950/40 dark:hover:bg-indigo-950/70 border border-indigo-200/80 dark:border-indigo-800/70 flex items-center justify-between gap-3 text-left transition cursor-pointer group"
+                        className="w-full p-3.5 rounded-xl bg-indigo-50/70 hover:bg-indigo-100/80 dark:bg-indigo-950/40 dark:hover:bg-indigo-950/70 border border-indigo-200/80 dark:border-indigo-800/70 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer group"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 transition-transform">
                             <KeyRound className="w-5 h-5" />
                           </div>
                           <div className="min-w-0">
-                            <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300">
+                            <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">
                               Unirse a mi Congregación
                             </div>
                             <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
@@ -1264,20 +1351,23 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             </div>
                           </div>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-indigo-500 shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
+                        <ChevronRight className="w-4 h-4 text-indigo-500 shrink-0 group-hover:translate-x-1 transition-transform" />
+                      </motion.button>
 
-                      <button
+                      <motion.button
                         type="button"
+                        whileHover={{ x: 5, scale: 1.01 }}
+                        whileTap={{ scale: 0.98 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                         onClick={() => onGoToPortal('register')}
-                        className="w-full p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 flex items-center justify-between gap-3 text-left transition cursor-pointer group"
+                        className="w-full p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer group"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 transition-transform">
                             <Building2 className="w-5 h-5" />
                           </div>
                           <div className="min-w-0">
-                            <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-300">
+                            <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">
                               Configurar Nueva Congregación
                             </div>
                             <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
@@ -1285,20 +1375,23 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             </div>
                           </div>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
+                        <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 group-hover:translate-x-1 transition-transform" />
+                      </motion.button>
 
-                      <button
+                      <motion.button
                         type="button"
+                        whileHover={{ x: 5, scale: 1.01 }}
+                        whileTap={{ scale: 0.98 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                         onClick={() => handleOpenGuideArticle('install-android')}
-                        className="w-full p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 flex items-center justify-between gap-3 text-left transition cursor-pointer group"
+                        className="w-full p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer group"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                          <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 transition-transform">
                             <Smartphone className="w-5 h-5" />
                           </div>
                           <div className="min-w-0">
-                            <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-300">
+                            <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-300 transition-colors">
                               Cómo instalar en Android, iOS y PC
                             </div>
                             <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
@@ -1306,16 +1399,22 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             </div>
                           </div>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
+                        <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 group-hover:translate-x-1 transition-transform" />
+                      </motion.button>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
-            </section>
+            </motion.section>
 
-            {/* 2. WHO IS IT FOR? INTERACTIVE ROLE SWITCHER (Like about.organized-app.com) */}
-            <section className="space-y-6">
+            {/* 2. WHO IS IT FOR? INTERACTIVE ROLE SWITCHER WITH MOTION TABS & ANIMATED CONTENT */}
+            <motion.section
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.55 }}
+              className="space-y-6"
+            >
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
                   <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
@@ -1326,89 +1425,126 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   </h2>
                 </div>
 
-                {/* Role Tabs */}
+                {/* Animated Role Tabs with Sliding Pill */}
                 <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none bg-slate-200/70 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-300/60 dark:border-slate-800">
                   {ROLE_PERSONAS.map((role) => {
                     const isSelected = role.id === selectedRolePersona;
                     return (
-                      <button
+                      <motion.button
                         key={role.id}
                         type="button"
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
                         onClick={() => setSelectedRolePersona(role.id)}
-                        className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                        className={`relative px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-colors cursor-pointer shrink-0 z-10 ${
                           isSelected
-                            ? 'bg-indigo-600 text-white shadow-xs'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-white/60 dark:hover:bg-slate-800'
+                            ? 'text-white'
+                            : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
-                        {role.label}
-                      </button>
+                        {isSelected && (
+                          <motion.div
+                            layoutId="activeRoleTab"
+                            transition={{ type: 'spring', stiffness: 450, damping: 30 }}
+                            className="absolute inset-0 bg-indigo-600 rounded-xl shadow-xs -z-10"
+                          />
+                        )}
+                        <span>{role.label}</span>
+                      </motion.button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Active Persona Showcase Card */}
-              <div className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 p-6 sm:p-8 lg:p-10 shadow-sm">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                  <div className="lg:col-span-5 space-y-4">
-                    <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                      {activePersona.badge}
-                    </span>
-                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-snug">
-                      {activePersona.headline}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                      {activePersona.description}
-                    </p>
+              {/* Active Persona Showcase Card with Motion AnimatePresence & Staggered Features */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedRolePersona}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 p-6 sm:p-8 lg:p-10 shadow-sm"
+                >
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div className="lg:col-span-5 space-y-4">
+                      <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                        {activePersona.badge}
+                      </span>
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-snug">
+                        {activePersona.headline}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {activePersona.description}
+                      </p>
 
-                    <div className="pt-2 flex flex-wrap items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => handleOpenGuideArticle(activePersona.guideTarget)}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 font-bold text-xs transition cursor-pointer"
-                      >
-                        <BookOpen className="w-4 h-4" />
-                        <span>Ver guía para este rol</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onGoToPortal()}
-                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs transition cursor-pointer"
-                      >
-                        <span>Ingresar ahora</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="pt-2 flex flex-wrap items-center gap-3">
+                        <motion.button
+                          type="button"
+                          whileHover={{ scale: 1.04, y: -1 }}
+                          whileTap={{ scale: 0.96 }}
+                          onClick={() => handleOpenGuideArticle(activePersona.guideTarget)}
+                          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 font-bold text-xs transition-colors cursor-pointer group"
+                        >
+                          <BookOpen className="w-4 h-4" />
+                          <span>Ver guía para este rol</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </motion.button>
+                        <motion.button
+                          type="button"
+                          whileHover={{ scale: 1.04, y: -1 }}
+                          whileTap={{ scale: 0.96 }}
+                          onClick={() => onGoToPortal()}
+                          className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs transition-colors cursor-pointer group"
+                        >
+                          <span>Ingresar ahora</span>
+                          <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </motion.button>
+                      </div>
+                    </div>
+
+                    <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {activePersona.features.map((feat, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, y: 14 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.35, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                          whileHover={{ y: -3, scale: 1.015 }}
+                          className="p-4 rounded-2xl bg-slate-50/90 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60 space-y-1.5 transition-shadow hover:shadow-md"
+                        >
+                          <div className="flex items-center gap-2">
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ delay: idx * 0.08 + 0.15, type: 'spring', stiffness: 500, damping: 20 }}
+                              className="w-6 h-6 rounded-lg bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                            </motion.div>
+                            <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-snug">
+                              {feat.title}
+                            </h4>
+                          </div>
+                          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pl-8">
+                            {feat.detail}
+                          </p>
+                        </motion.div>
+                      ))}
                     </div>
                   </div>
+                </motion.div>
+              </AnimatePresence>
+            </motion.section>
 
-                  <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {activePersona.features.map((feat, idx) => (
-                      <div
-                        key={idx}
-                        className="p-4 rounded-2xl bg-slate-50/90 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60 space-y-1.5"
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-lg bg-indigo-600/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-                            <Check className="w-3.5 h-3.5" />
-                          </div>
-                          <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white leading-snug">
-                            {feat.title}
-                          </h4>
-                        </div>
-                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pl-8">
-                          {feat.detail}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* 3. CORE FEATURES BENTO GRID (Like about.organized-app.com) */}
-            <section className="space-y-6">
+            {/* 3. CORE FEATURES BENTO GRID WITH STAGGERED MOTION HOVER */}
+            <motion.section
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.55 }}
+              className="space-y-6"
+            >
               <div>
                 <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                   Módulos de la Aplicación
@@ -1462,21 +1598,30 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     desc: 'Coordina oradores locales y visitantes, turnos de hospitalidad, limpieza, acomodadores y proyecta el Tablero Digital en el monitor del Salón del Reino.',
                     docId: 'weekend-public-talks' as DocArticleId,
                   },
-                ].map((card) => (
-                  <div
+                ].map((card, idx) => (
+                  <motion.div
                     key={card.title}
-                    className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all shadow-xs flex flex-col justify-between gap-4"
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-40px' }}
+                    transition={{ duration: 0.45, delay: (idx % 3) * 0.09, ease: [0.16, 1, 0.3, 1] }}
+                    whileHover={{ y: -6, scale: 1.015, transition: { duration: 0.22 } }}
+                    className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-500/10 transition-colors shadow-xs flex flex-col justify-between gap-4 group cursor-pointer"
                   >
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200/60 dark:border-indigo-800/60 flex items-center justify-center shrink-0">
+                        <motion.div
+                          whileHover={{ scale: 1.15, rotate: 4 }}
+                          transition={{ type: 'spring', stiffness: 350, damping: 20 }}
+                          className="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200/60 dark:border-indigo-800/60 flex items-center justify-center shrink-0"
+                        >
                           <img src={card.icon} alt={card.title} className="w-6 h-6 object-contain" />
-                        </div>
+                        </motion.div>
                         <span className="text-[10.5px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                           {card.kicker}
                         </span>
                       </div>
-                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         {card.title}
                       </h3>
                       <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
@@ -1487,21 +1632,42 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     <button
                       type="button"
                       onClick={() => handleOpenGuideArticle(card.docId)}
-                      className="w-full py-2.5 px-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800/70 dark:hover:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 text-xs font-bold inline-flex items-center justify-between transition cursor-pointer"
+                      className="w-full py-2.5 px-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800/70 dark:hover:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 text-xs font-bold inline-flex items-center justify-between transition-colors cursor-pointer group/btn"
                     >
                       <span>Cómo usar esta función</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
+                      <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1.5 transition-transform" />
                     </button>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-            </section>
+            </motion.section>
 
-            {/* 4. SECURITY & PRIVACY BY DESIGN SECTION (Like about.organized-app.com) */}
-            <section className="rounded-3xl bg-slate-900 text-white p-6 sm:p-10 border border-slate-800 shadow-xl space-y-6">
-              <div className="max-w-3xl space-y-2">
+            {/* 4. SECURITY & PRIVACY BY DESIGN SECTION WITH MOTION GLOW */}
+            <motion.section
+              initial={{ opacity: 0, scale: 0.98, y: 20 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              className="rounded-3xl bg-slate-900 text-white p-6 sm:p-10 border border-slate-800 shadow-xl space-y-6 relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative z-10 max-w-3xl space-y-2">
                 <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-emerald-400">
-                  <ShieldCheck className="w-4 h-4" />
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.1, 1],
+                      boxShadow: [
+                        '0 0 0 0 rgba(16, 185, 129, 0.35)',
+                        '0 0 0 8px rgba(16, 185, 129, 0)',
+                        '0 0 0 0 rgba(16, 185, 129, 0)',
+                      ],
+                    }}
+                    transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+                    className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  </motion.div>
                   <span>Seguridad, Privacidad y Confidencialidad</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
@@ -1512,51 +1678,75 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <Lock className="w-5 h-5 text-emerald-400" />
-                  <h3 className="text-sm font-bold text-white">Cifrado de Extremo a Extremo</h3>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    Los registros se cifran en tu dispositivo con AES-256-GCM antes de sincronizarse. Nadie externo puede leerlos.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <CloudOff className="w-5 h-5 text-indigo-400" />
-                  <h3 className="text-sm font-bold text-white">Arquitectura Local-First</h3>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    La base de datos vive directamente en tu dispositivo para que trabajes con rapidez y sin depender de internet.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <Users className="w-5 h-5 text-amber-400" />
-                  <h3 className="text-sm font-bold text-white">Enfoque «Elder-First»</h3>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    El acceso requiere un código de invitación personal y roles asignados por los ancianos de la congregación.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <Shield className="w-5 h-5 text-violet-400" />
-                  <h3 className="text-sm font-bold text-white">Protección 2FA y PIN Local</h3>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    Soporta verificación en dos pasos (Authenticator), auto-bloqueo por inactividad y revocación remota.
-                  </p>
-                </div>
+              <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                {[
+                  {
+                    icon: Lock,
+                    color: 'text-emerald-400',
+                    title: 'Cifrado de Extremo a Extremo',
+                    desc: 'Los registros se cifran en tu dispositivo con AES-256-GCM antes de sincronizarse. Nadie externo puede leerlos.',
+                  },
+                  {
+                    icon: CloudOff,
+                    color: 'text-indigo-400',
+                    title: 'Arquitectura Local-First',
+                    desc: 'La base de datos vive directamente en tu dispositivo para que trabajes con rapidez y sin depender de internet.',
+                  },
+                  {
+                    icon: Users,
+                    color: 'text-amber-400',
+                    title: 'Enfoque «Elder-First»',
+                    desc: 'El acceso requiere un código de invitación personal y roles asignados por los ancianos de la congregación.',
+                  },
+                  {
+                    icon: Shield,
+                    color: 'text-violet-400',
+                    title: 'Protección 2FA y PIN Local',
+                    desc: 'Soporta verificación en dos pasos (Authenticator), auto-bloqueo por inactividad y revocación remota.',
+                  },
+                ].map((item, idx) => {
+                  const Icon = item.icon;
+                  return (
+                    <motion.div
+                      key={item.title}
+                      initial={{ opacity: 0, y: 16 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: idx * 0.08 }}
+                      whileHover={{ y: -4, scale: 1.02, backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
+                      className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2 transition-colors cursor-pointer"
+                    >
+                      <Icon className={`w-5 h-5 ${item.color}`} />
+                      <h3 className="text-sm font-bold text-white">{item.title}</h3>
+                      <p className="text-xs text-slate-300 leading-relaxed">{item.desc}</p>
+                    </motion.div>
+                  );
+                })}
               </div>
-            </section>
+            </motion.section>
 
             {/* 5. USE ON ANY DEVICE BANNER */}
-            <section className="space-y-3">
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.5 }}
+              className="space-y-3"
+            >
               <DesktopCompatibilityBanner
                 variant="hero-card"
                 onOpenAllDownloads={() => setDesktopModalOpen(true)}
               />
-            </section>
+            </motion.section>
 
-            {/* 6. FREQUENTLY ASKED QUESTIONS (FAQ) */}
-            <section className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 space-y-5">
+            {/* 6. FREQUENTLY ASKED QUESTIONS (FAQ) WITH SMOOTH MOTION ACCORDION */}
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.5 }}
+              className="rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 space-y-5 shadow-xs"
+            >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
@@ -1566,14 +1756,15 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     Preguntas Frecuentes (FAQ)
                   </h2>
                 </div>
-                <button
+                <motion.button
                   type="button"
+                  whileHover={{ x: 3 }}
                   onClick={() => setActiveSection('guide')}
                   className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
                 >
                   <span>Abrir Guía Completa de Usuario</span>
                   <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                </motion.button>
               </div>
 
               <div className="divide-y divide-slate-200/80 dark:divide-slate-800">
@@ -1581,30 +1772,46 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   const isOpen = openFaqIndex === idx;
                   return (
                     <div key={idx} className="py-3.5 first:pt-0 last:pb-0">
-                      <button
+                      <motion.button
                         type="button"
+                        whileHover={{ x: 4 }}
+                        transition={{ duration: 0.15 }}
                         onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
                         className="w-full flex items-center justify-between gap-4 text-left py-1 cursor-pointer group"
                       >
-                        <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                        <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                           {faq.question}
                         </span>
-                        <ChevronDown
-                          className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
-                            isOpen ? 'rotate-180 text-indigo-600' : ''
-                          }`}
-                        />
-                      </button>
-                      {isOpen && (
-                        <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pr-6">
-                          {faq.answer}
-                        </p>
-                      )}
+                        <motion.div
+                          animate={{ rotate: isOpen ? 180 : 0 }}
+                          transition={{ duration: 0.24, ease: 'easeInOut' }}
+                          className="shrink-0"
+                        >
+                          <ChevronDown
+                            className={`w-4 h-4 ${isOpen ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'}`}
+                          />
+                        </motion.div>
+                      </motion.button>
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pr-6">
+                              {faq.answer}
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   );
                 })}
               </div>
-            </section>
+            </motion.section>
           </div>
         )}
 
@@ -1612,39 +1819,58 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
             VIEW 2: USER GUIDE (Modeled after https://guide.organized-app.com/ - Docusaurus 3-Column Layout)
             =================================================================== */}
         {activeSection === 'guide' && (
-          <div className="space-y-6 animate-fade-in">
-            {/* Top Search & Mobile Navigation Bar for Guide */}
-            <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-2xs">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+          <div className="space-y-6">
+            {/* Top Search & Mobile Navigation Bar for Guide with Motion */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="rounded-3xl bg-linear-to-r from-white via-indigo-50/30 to-white dark:from-slate-900 dark:via-indigo-950/20 dark:to-slate-900 border border-slate-200/90 dark:border-slate-800 p-4 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-2xs"
+            >
+              <div className="flex items-center gap-3.5">
+                <motion.div
+                  whileHover={{ scale: 1.08, rotate: 3 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  className="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-600/25"
+                >
                   <BookOpen className="w-5 h-5" />
-                </div>
+                </motion.div>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h1 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
                       Guía Oficial de Usuario de Kongre
                     </h1>
-                    <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-bold bg-indigo-100/90 dark:bg-indigo-950/90 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80">
                       {DOC_ARTICLES.length} artículos
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Documentación paso a paso sobre instalación, configuración de congregación y uso diario.
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Documentación oficial paso a paso sobre instalación, roles teocráticos y uso diario.
                   </p>
                 </div>
               </div>
 
-              {/* Search Input + Mobile Article Selector */}
+              {/* Search Input + Clear button + Mobile Quick Jump */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto">
-                <div className="relative w-full sm:w-72">
+                <div className="relative w-full sm:w-80">
                   <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     value={docSearchQuery}
                     onChange={(e) => setDocSearchQuery(e.target.value)}
-                    placeholder="Buscar en la guía (ej. iOS, S-89, PIN)..."
-                    className="w-full pl-9 pr-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Buscar en la guía (ej. iOS, S-89, PIN, roles)..."
+                    className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-2xs"
                   />
+                  {docSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setDocSearchQuery('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-md text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition cursor-pointer"
+                      title="Limpiar búsqueda"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
 
                 {/* Mobile Quick Jump Dropdown */}
@@ -1652,8 +1878,11 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   <select
                     aria-label="Seleccionar artículo de la guía"
                     value={activeDoc.id}
-                    onChange={(e) => setSelectedDocId(e.target.value as DocArticleId)}
-                    className="w-full px-3.5 py-2 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 text-xs font-bold text-indigo-950 dark:text-indigo-200"
+                    onChange={(e) => {
+                      setSelectedDocId(e.target.value as DocArticleId);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-xs font-bold text-indigo-950 dark:text-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     {GUIDE_SIDEBAR_SECTIONS.map((sec) => (
                       <optgroup key={sec.id} label={sec.title}>
@@ -1669,260 +1898,401 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   </select>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            {/* 3-Column Docusaurus Layout (Left Sidebar + Center Article + Right TOC) */}
+            {/* 3-Column Balanced Docusaurus Layout (Left Sidebar + Center Article + Right TOC) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
-              {/* LEFT SIDEBAR: Collapsible Categories like guide.organized-app.com */}
-              <aside className="hidden lg:block lg:col-span-3 xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-3.5 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto space-y-2">
-                {GUIDE_SIDEBAR_SECTIONS.map((section) => {
-                  const sectionArticles = filteredDocs.filter((d) => d.categoryKey === section.id);
-                  if (sectionArticles.length === 0) return null;
-                  const isExpanded = expandedCategories[section.id];
-
-                  return (
-                    <div key={section.id} className="space-y-1">
-                      <button
-                        type="button"
-                        onClick={() => toggleCategoryAccordion(section.id)}
-                        className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition cursor-pointer"
-                      >
-                        <span>{section.title}</span>
-                        <ChevronDown
-                          className={`w-3.5 h-3.5 text-slate-400 transition-transform ${
-                            isExpanded ? 'rotate-0' : '-rotate-90'
-                          }`}
-                        />
-                      </button>
-
-                      {isExpanded && (
-                        <div className="space-y-0.5 pl-2 border-l-2 border-slate-100 dark:border-slate-800 ml-2">
-                          {sectionArticles.map((doc) => {
-                            const isSelected = activeDoc.id === doc.id;
-                            return (
-                              <button
-                                key={doc.id}
-                                type="button"
-                                onClick={() => setSelectedDocId(doc.id)}
-                                className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all cursor-pointer block ${
-                                  isSelected
-                                    ? 'bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 font-extrabold border-l-2 border-indigo-600 -ml-[2px]'
-                                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50 font-medium'
-                                }`}
-                              >
-                                {doc.title}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
+              {/* LEFT SIDEBAR: Redesigned and Animated Navigation Menu */}
+              <aside className="hidden lg:block lg:col-span-3 xl:col-span-3 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 p-4 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto space-y-3.5 shadow-xs">
+                {/* Sidebar Header & Controls */}
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                      <FileText className="w-3.5 h-3.5" />
                     </div>
-                  );
-                })}
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                      Contenido
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                      {filteredDocs.length}
+                    </span>
+                  </div>
+
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleToggleAllCategories}
+                    className="px-2 py-1 rounded-lg text-[10.5px] font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 inline-flex items-center gap-1 transition cursor-pointer"
+                    title={allCategoriesExpanded ? 'Colapsar todas las carpetas' : 'Expandir todas las carpetas'}
+                  >
+                    <ChevronsUpDown className="w-3 h-3" />
+                    <span>{allCategoriesExpanded ? 'Colapsar' : 'Expandir'}</span>
+                  </motion.button>
+                </div>
+
+                {/* Search Filter feedback bar if searching */}
+                {docSearchQuery && (
+                  <div className="p-2.5 rounded-xl bg-indigo-50/80 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/80 flex items-center justify-between text-[11px] text-indigo-950 dark:text-indigo-200">
+                    <span className="truncate">
+                      Filtro: <strong>"{docSearchQuery}"</strong> ({filteredDocs.length})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setDocSearchQuery('')}
+                      className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0 ml-1.5 cursor-pointer"
+                    >
+                      Limpiar
+                    </button>
+                  </div>
+                )}
+
+                {/* Sidebar Categories List */}
+                <div className="space-y-1.5">
+                  {GUIDE_SIDEBAR_SECTIONS.map((section) => {
+                    const sectionArticles = filteredDocs.filter((d) => d.categoryKey === section.id);
+                    if (sectionArticles.length === 0) return null;
+                    const isExpanded = expandedCategories[section.id];
+                    const SectionIcon = section.icon;
+                    const hasActiveDoc = sectionArticles.some((d) => d.id === activeDoc.id);
+
+                    return (
+                      <div key={section.id} className="space-y-1">
+                        <motion.button
+                          type="button"
+                          whileHover={{ x: 2 }}
+                          transition={{ duration: 0.15 }}
+                          onClick={() => toggleCategoryAccordion(section.id)}
+                          className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs font-bold transition-all cursor-pointer group ${
+                            hasActiveDoc
+                              ? 'bg-slate-100/80 dark:bg-slate-800/80 text-slate-900 dark:text-white'
+                              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100/60 dark:hover:bg-slate-800/50'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div
+                              className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
+                                hasActiveDoc
+                                  ? 'bg-indigo-600 text-white'
+                                  : 'bg-slate-200/70 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+                              }`}
+                            >
+                              <SectionIcon className="w-3 h-3" />
+                            </div>
+                            <span className="truncate text-xs font-bold">{section.title}</span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                            <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-slate-200/60 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                              {sectionArticles.length}
+                            </span>
+                            <motion.div
+                              animate={{ rotate: isExpanded ? 0 : -90 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200" />
+                            </motion.div>
+                          </div>
+                        </motion.button>
+
+                        {/* Animated Collapsible Articles Container */}
+                        <AnimatePresence initial={false}>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                              className="overflow-hidden space-y-0.5 pl-2.5 border-l-2 border-indigo-100 dark:border-slate-800 ml-4 py-0.5"
+                            >
+                              {sectionArticles.map((doc) => {
+                                const isSelected = activeDoc.id === doc.id;
+                                return (
+                                  <motion.button
+                                    key={doc.id}
+                                    type="button"
+                                    whileHover={{ x: 3 }}
+                                    transition={{ duration: 0.15 }}
+                                    onClick={() => {
+                                      setSelectedDocId(doc.id);
+                                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }}
+                                    className={`w-full text-left px-2.5 py-2 rounded-xl text-xs transition-all cursor-pointer flex items-center justify-between gap-2 ${
+                                      isSelected
+                                        ? 'bg-indigo-600 text-white font-extrabold shadow-xs shadow-indigo-600/30'
+                                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-slate-800/50 font-medium'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <span
+                                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                          isSelected ? 'bg-white' : 'bg-slate-300 dark:bg-slate-600'
+                                        }`}
+                                      />
+                                      <span className="truncate leading-tight">{doc.title}</span>
+                                    </div>
+                                    <span
+                                      className={`text-[10px] font-mono shrink-0 ${
+                                        isSelected ? 'text-indigo-100' : 'text-slate-400 dark:text-slate-500'
+                                      }`}
+                                    >
+                                      {doc.readTime}
+                                    </span>
+                                  </motion.button>
+                                );
+                              })}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                </div>
               </aside>
 
-              {/* CENTER ARTICLE CONTENT */}
-              <article className="lg:col-span-6 xl:col-span-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-5 sm:p-8 shadow-xs space-y-6">
-                {/* Breadcrumbs (Docusaurus style: 🏠 > Category > Article) */}
-                <nav
-                  aria-label="Breadcrumb"
-                  className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400"
-                >
-                  <button
-                    type="button"
-                    onClick={() => setSelectedDocId('app-overview')}
-                    className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-indigo-600 transition cursor-pointer"
-                    title="Inicio de la Guía"
+              {/* CENTER ARTICLE CONTENT WITH ANIMATEPRESENCE */}
+              <div className="lg:col-span-6 xl:col-span-6">
+                <AnimatePresence mode="wait">
+                  <motion.article
+                    key={activeDoc.id}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                    className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 p-6 sm:p-9 shadow-xs space-y-6"
                   >
-                    <Home className="w-3.5 h-3.5" />
-                  </button>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="font-semibold text-slate-600 dark:text-slate-300">
-                    {activeDoc.categoryLabel}
-                  </span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="font-bold text-indigo-600 dark:text-indigo-400 truncate max-w-[220px] sm:max-w-none">
-                    {activeDoc.title}
-                  </span>
-                </nav>
-
-                {/* Article Title & Metadata */}
-                <div className="space-y-3 border-b border-slate-100 dark:border-slate-800 pb-5">
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                    {activeDoc.title}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                    {activeDoc.summary}
-                  </p>
-
-                  <div className="pt-1 flex flex-wrap items-center gap-2 text-[11px]">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold">
-                      <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                      <span>Para: {activeDoc.audience}</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">
-                      <span>Ubicación: {activeDoc.menuPath}</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                      <Clock className="w-3 h-3" />
-                      <span>{activeDoc.readTime}</span>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Docusaurus Admonition: Note */}
-                {activeDoc.note && (
-                  <div className="p-4 rounded-xl bg-blue-50/80 dark:bg-blue-950/30 border-l-4 border-blue-500 text-xs text-blue-950 dark:text-blue-200 space-y-1">
-                    <div className="font-extrabold uppercase tracking-wider flex items-center gap-1.5 text-blue-700 dark:text-blue-300">
-                      <Info className="w-4 h-4" />
-                      <span>Nota</span>
-                    </div>
-                    <p className="leading-relaxed">{activeDoc.note}</p>
-                  </div>
-                )}
-
-                {/* Step-by-Step Sections */}
-                <div className="space-y-4">
-                  {activeDoc.steps.map((step, index) => (
-                    <div
-                      key={step.id}
-                      id={step.id}
-                      className="p-4 sm:p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60 space-y-2 scroll-mt-24"
+                    {/* Breadcrumbs (Docusaurus style: 🏠 > Category > Article) */}
+                    <nav
+                      aria-label="Breadcrumb"
+                      className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400"
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2.5">
-                          <span className="w-6 h-6 rounded-lg bg-indigo-600 text-white font-mono text-xs font-bold flex items-center justify-center shrink-0">
-                            {index + 1}
-                          </span>
-                          <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
-                            {step.title}
-                          </h3>
-                        </div>
-                        {step.badge && (
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100/80 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 shrink-0">
-                            {step.badge}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pl-8">
-                        {step.detail}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDocId('app-overview')}
+                        className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-indigo-600 transition cursor-pointer"
+                        title="Inicio de la Guía"
+                      >
+                        <Home className="w-3.5 h-3.5" />
+                      </button>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="font-semibold text-slate-600 dark:text-slate-300">
+                        {activeDoc.categoryLabel}
+                      </span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="font-bold text-indigo-600 dark:text-indigo-400 truncate max-w-[220px] sm:max-w-none">
+                        {activeDoc.title}
+                      </span>
+                    </nav>
+
+                    {/* Article Title & Metadata */}
+                    <div className="space-y-3 border-b border-slate-100 dark:border-slate-800 pb-5">
+                      <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                        {activeDoc.title}
+                      </h2>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {activeDoc.summary}
                       </p>
-                    </div>
-                  ))}
-                </div>
 
-                {/* Embedded RBAC Matrix Table when on roles-permissions */}
-                {activeDoc.id === 'roles-permissions' && (
-                  <div className="space-y-2 pt-2">
-                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                      Tabla de Permisos por Nombramiento
-                    </h3>
-                    <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-                      <table className="w-full text-left border-collapse text-xs">
-                        <thead>
-                          <tr className="bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700">
-                            <th className="py-2.5 px-3 font-extrabold">Rol</th>
-                            <th className="py-2.5 px-3 font-extrabold">Alcance</th>
-                            <th className="py-2.5 px-3 font-extrabold">Permisos en Kongre</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-200/70 dark:divide-slate-800">
-                          {RBAC_DOCUMENTATION_MATRIX.map((row) => (
-                            <tr key={row.role}>
-                              <td className="py-2.5 px-3 font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
-                                {row.role}
-                              </td>
-                              <td className="py-2.5 px-3 font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
-                                {row.scope}
-                              </td>
-                              <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 leading-relaxed">
-                                {row.permissions}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-
-                {/* Docusaurus Admonition: Tip */}
-                {activeDoc.tip && (
-                  <div className="p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border-l-4 border-emerald-500 text-xs text-emerald-950 dark:text-emerald-200 space-y-1">
-                    <div className="font-extrabold uppercase tracking-wider flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300">
-                      <Sparkles className="w-4 h-4" />
-                      <span>Consejo Práctico</span>
-                    </div>
-                    <p className="leading-relaxed">{activeDoc.tip}</p>
-                  </div>
-                )}
-
-                {/* Docusaurus Admonition: Warning */}
-                {activeDoc.warning && (
-                  <div className="p-4 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border-l-4 border-amber-500 text-xs text-amber-950 dark:text-amber-200 space-y-1">
-                    <div className="font-extrabold uppercase tracking-wider flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
-                      <AlertCircle className="w-4 h-4" />
-                      <span>Importante</span>
-                    </div>
-                    <p className="leading-relaxed">{activeDoc.warning}</p>
-                  </div>
-                )}
-
-                {/* Previous / Next Article Pagination (Like Docusaurus) */}
-                <div className="pt-5 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {prevDoc ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedDocId(prevDoc.id);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 text-left transition cursor-pointer flex items-center gap-3 group"
-                    >
-                      <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 shrink-0" />
-                      <div className="min-w-0">
-                        <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Anterior
+                      <div className="pt-1 flex flex-wrap items-center gap-2 text-[11px]">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold">
+                          <Users className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span>Para: {activeDoc.audience}</span>
                         </span>
-                        <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                          {prevDoc.title}
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">
+                          <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span>{activeDoc.menuPath}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>{activeDoc.readTime}</span>
                         </span>
                       </div>
-                    </button>
-                  ) : (
-                    <div />
-                  )}
+                    </div>
 
-                  {nextDoc ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedDocId(nextDoc.id);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 text-right transition cursor-pointer flex items-center justify-end gap-3 group"
-                    >
-                      <div className="min-w-0">
-                        <span className="block text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                          Siguiente
-                        </span>
-                        <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                          {nextDoc.title}
-                        </span>
+                    {/* Docusaurus Admonition: Note */}
+                    {activeDoc.note && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="p-4 rounded-2xl bg-blue-50/80 dark:bg-blue-950/30 border-l-4 border-blue-500 text-xs text-blue-950 dark:text-blue-200 space-y-1 shadow-2xs"
+                      >
+                        <div className="font-extrabold uppercase tracking-wider flex items-center gap-1.5 text-blue-700 dark:text-blue-300">
+                          <Info className="w-4 h-4" />
+                          <span>Nota</span>
+                        </div>
+                        <p className="leading-relaxed">{activeDoc.note}</p>
+                      </motion.div>
+                    )}
+
+                    {/* Step-by-Step Sections with Motion Hover Lift */}
+                    <div className="space-y-4">
+                      {activeDoc.steps.map((step, index) => (
+                        <motion.div
+                          key={step.id}
+                          id={step.id}
+                          whileHover={{ y: -2, scale: 1.006 }}
+                          transition={{ duration: 0.2 }}
+                          className="p-4 sm:p-5 rounded-2xl bg-slate-50/90 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-700/60 space-y-2 scroll-mt-24 transition-shadow hover:shadow-md"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2.5">
+                              <span className="w-6 h-6 rounded-lg bg-indigo-600 text-white font-mono text-xs font-bold flex items-center justify-center shrink-0 shadow-2xs">
+                                {index + 1}
+                              </span>
+                              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">
+                                {step.title}
+                              </h3>
+                            </div>
+                            {step.badge && (
+                              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100/80 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 shrink-0">
+                                {step.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed pl-8">
+                            {step.detail}
+                          </p>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Embedded RBAC Matrix Table when on roles-permissions */}
+                    {activeDoc.id === 'roles-permissions' && (
+                      <div className="space-y-2 pt-2">
+                        <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                          Tabla de Permisos por Nombramiento
+                        </h3>
+                        <div className="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
+                          <table className="w-full text-left border-collapse text-xs">
+                            <thead>
+                              <tr className="bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-700">
+                                <th className="py-2.5 px-3 font-extrabold">Rol</th>
+                                <th className="py-2.5 px-3 font-extrabold">Alcance</th>
+                                <th className="py-2.5 px-3 font-extrabold">Permisos en Kongre</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-200/70 dark:divide-slate-800">
+                              {RBAC_DOCUMENTATION_MATRIX.map((row) => (
+                                <tr
+                                  key={row.role}
+                                  className="hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 transition-colors"
+                                >
+                                  <td className="py-2.5 px-3 font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
+                                    {row.role}
+                                  </td>
+                                  <td className="py-2.5 px-3 font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                    {row.scope}
+                                  </td>
+                                  <td className="py-2.5 px-3 text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    {row.permissions}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                    </button>
-                  ) : (
-                    <div />
-                  )}
-                </div>
-              </article>
+                    )}
 
-              {/* RIGHT SIDEBAR: "En esta página" Table of Contents (Like guide.organized-app.com) */}
-              <aside className="hidden lg:block lg:col-span-3 xl:col-span-2 space-y-4 sticky top-20">
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-4 space-y-3">
-                  <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
-                    En esta página
+                    {/* Docusaurus Admonition: Tip */}
+                    {activeDoc.tip && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="p-4 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border-l-4 border-emerald-500 text-xs text-emerald-950 dark:text-emerald-200 space-y-1 shadow-2xs"
+                      >
+                        <div className="font-extrabold uppercase tracking-wider flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300">
+                          <Sparkles className="w-4 h-4" />
+                          <span>Consejo Práctico</span>
+                        </div>
+                        <p className="leading-relaxed">{activeDoc.tip}</p>
+                      </motion.div>
+                    )}
+
+                    {/* Docusaurus Admonition: Warning */}
+                    {activeDoc.warning && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/30 border-l-4 border-amber-500 text-xs text-amber-950 dark:text-amber-200 space-y-1 shadow-2xs"
+                      >
+                        <div className="font-extrabold uppercase tracking-wider flex items-center gap-1.5 text-amber-700 dark:text-amber-300">
+                          <AlertCircle className="w-4 h-4" />
+                          <span>Importante</span>
+                        </div>
+                        <p className="leading-relaxed">{activeDoc.warning}</p>
+                      </motion.div>
+                    )}
+
+                    {/* Previous / Next Article Pagination with Motion Spring Physics */}
+                    <div className="pt-5 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {prevDoc ? (
+                        <motion.button
+                          type="button"
+                          whileHover={{ x: -4, scale: 1.01 }}
+                          whileTap={{ scale: 0.98 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                          onClick={() => {
+                            setSelectedDocId(prevDoc.id);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 text-left transition cursor-pointer flex items-center gap-3 group bg-white dark:bg-slate-900 shadow-2xs hover:shadow-sm"
+                        >
+                          <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 shrink-0 group-hover:-translate-x-1 transition-transform" />
+                          <div className="min-w-0">
+                            <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                              Anterior
+                            </span>
+                            <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                              {prevDoc.title}
+                            </span>
+                          </div>
+                        </motion.button>
+                      ) : (
+                        <div />
+                      )}
+
+                      {nextDoc ? (
+                        <motion.button
+                          type="button"
+                          whileHover={{ x: 4, scale: 1.01 }}
+                          whileTap={{ scale: 0.98 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                          onClick={() => {
+                            setSelectedDocId(nextDoc.id);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-600 text-right transition cursor-pointer flex items-center justify-end gap-3 group bg-white dark:bg-slate-900 shadow-2xs hover:shadow-sm"
+                        >
+                          <div className="min-w-0">
+                            <span className="block text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                              Siguiente
+                            </span>
+                            <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
+                              {nextDoc.title}
+                            </span>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 group-hover:translate-x-1 transition-transform" />
+                        </motion.button>
+                      ) : (
+                        <div />
+                      )}
+                    </div>
+                  </motion.article>
+                </AnimatePresence>
+              </div>
+
+              {/* RIGHT SIDEBAR: "En esta página" Table of Contents (Docusaurus style) */}
+              <motion.aside
+                initial={{ opacity: 0, x: 16 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.45 }}
+                className="hidden lg:block lg:col-span-3 xl:col-span-3 space-y-4 sticky top-20"
+              >
+                <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 p-4 sm:p-5 space-y-3 shadow-xs">
+                  <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                    <Compass className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>En esta página</span>
                   </div>
                   <ul className="space-y-2 text-xs border-l-2 border-slate-100 dark:border-slate-800 pl-3">
                     {activeDoc.steps.map((step, i) => (
@@ -1934,7 +2304,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             const el = document.getElementById(step.id);
                             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                           }}
-                          className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium block leading-snug transition"
+                          className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium block leading-snug transition hover:translate-x-1"
                         >
                           {i + 1}. {step.title}
                         </a>
@@ -1943,24 +2313,28 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   </ul>
                 </div>
 
-                {/* Quick Action Box in Sidebar */}
-                <div className="rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/70 dark:border-indigo-800/70 p-4 space-y-2.5">
-                  <div className="text-xs font-extrabold text-indigo-950 dark:text-indigo-200">
-                    ¿Listo para abrir la aplicación?
+                {/* Quick Action Box in Sidebar with Motion button */}
+                <div className="rounded-3xl bg-linear-to-br from-indigo-50/90 via-white to-violet-50/80 dark:from-indigo-950/40 dark:via-slate-900 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-800/70 p-4 sm:p-5 space-y-3 shadow-xs">
+                  <div className="text-xs font-extrabold text-indigo-950 dark:text-indigo-200 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>¿Listo para abrir la app?</span>
                   </div>
                   <p className="text-[11px] text-indigo-900/80 dark:text-indigo-300/80 leading-relaxed">
-                    Accede al portal de tu congregación o explora el entorno de demostración con datos de prueba.
+                    Accede al portal de tu congregación con tu código personal o explora la demo interactiva.
                   </p>
-                  <button
+                  <motion.button
                     type="button"
+                    whileHover={{ scale: 1.02, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                     onClick={() => onGoToPortal()}
-                    className="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 transition cursor-pointer"
+                    className="w-full py-2.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold inline-flex items-center justify-center gap-2 shadow-xs shadow-indigo-600/25 transition cursor-pointer"
                   >
                     <KeyRound className="w-3.5 h-3.5" />
                     <span>Ir al Portal (#portal)</span>
-                  </button>
+                  </motion.button>
                 </div>
-              </aside>
+              </motion.aside>
             </div>
           </div>
         )}
@@ -2061,7 +2435,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
       {/* Official Footer */}
       <AppFooter
         onOpenVersionModal={onOpenVersionModal}
-        onOpenDesktopModal={() => setDesktopModalOpen(true)}
+        variant="landing"
       />
 
       {/* Desktop Installer Modal */}

@@ -9,10 +9,12 @@ export default function AnimatedLogo({
   height = 34,
   vertical = false,
   inverted = false,
+  iconOnly = false,
 }: {
   height?: number;
   vertical?: boolean;
   inverted?: boolean;
+  iconOnly?: boolean;
 }) {
   const [run, setRun] = useState(0);
   const sqSize = vertical ? Math.round(height * 0.85) : height;
@@ -50,14 +52,16 @@ export default function AnimatedLogo({
           <path className="kg-k" pathLength={1} d="M31.5 32.5V67.5" style={{ animationDelay: '.45s' }} />
           <path className="kg-k" pathLength={1} d="M70 27L51 50L70 73" style={{ animationDelay: '.8s' }} />
         </svg>
-        <svg
-          className="kg-wm"
-          height={wmHeight}
-          viewBox="-4 8 220.8 70"
-          aria-hidden
-        >
-          <path d={WM} fill={inverted ? "#FFFFFF" : "currentColor"} />
-        </svg>
+        {!iconOnly && (
+          <svg
+            className="kg-wm"
+            height={wmHeight}
+            viewBox="-4 8 220.8 70"
+            aria-hidden
+          >
+            <path d={WM} fill={inverted ? "#FFFFFF" : "currentColor"} />
+          </svg>
+        )}
       </span>
     </button>
   );

@@ -1,0 +1,242 @@
+/* =========================================================
+   ANIMACIONES FLUIDAS PARA LA PÁGINA "ACERCA DE KONGRE"
+   ========================================================= */
+
+@keyframes kg-orb-float-1 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(18px, -22px, 0) scale(1.06);
+    opacity: 0.85;
+  }
+}
+
+@keyframes kg-orb-float-2 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate3d(-16px, 18px, 0) scale(1.08);
+    opacity: 0.75;
+  }
+}
+
+@keyframes kg-slide-fade-up {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes kg-slide-fade-down {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -12px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes kg-scale-reveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes kg-halo-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(76, 58, 237, 0.35);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 10px rgba(76, 58, 237, 0);
+  }
+}
+
+@keyframes kg-badge-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  65% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes kg-check-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes kg-timer-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* Ambient Floating Orbs */
+.kg-orb-1 {
+  animation: kg-orb-float-1 9s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.kg-orb-2 {
+  animation: kg-orb-float-2 11s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Staggered Entrance Animations */
+.kg-anim-hero-badge {
+  animation: kg-slide-fade-down 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.kg-anim-hero-title {
+  animation: kg-slide-fade-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.06s;
+}
+
+.kg-anim-hero-text {
+  animation: kg-slide-fade-up 0.48s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.12s;
+}
+
+.kg-anim-hero-actions {
+  animation: kg-slide-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.18s;
+}
+
+.kg-anim-hero-highlights {
+  animation: kg-slide-fade-up 0.52s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.24s;
+}
+
+.kg-anim-hero-card {
+  animation: kg-scale-reveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.1s;
+}
+
+/* Stagger Helpers */
+.kg-stagger-1 {
+  animation: kg-slide-fade-up 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.04s;
+}
+
+.kg-stagger-2 {
+  animation: kg-slide-fade-up 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.08s;
+}
+
+.kg-stagger-3 {
+  animation: kg-slide-fade-up 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.12s;
+}
+
+.kg-stagger-4 {
+  animation: kg-slide-fade-up 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.16s;
+}
+
+.kg-stagger-5 {
+  animation: kg-slide-fade-up 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.20s;
+}
+
+.kg-stagger-6 {
+  animation: kg-slide-fade-up 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 0.24s;
+}
+
+/* Interactive Card Transitions & Hover Springs */
+.kg-hover-lift {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease;
+  will-change: transform;
+}
+
+.kg-hover-lift:hover {
+  transform: translate3d(0, -4px, 0);
+}
+
+.kg-hover-lift-sm {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease,
+              border-color 0.2s ease;
+}
+
+.kg-hover-lift-sm:hover {
+  transform: translate3d(0, -2px, 0);
+}
+
+/* Live Simulator Controls */
+.kg-timer-colon {
+  animation: kg-timer-pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.kg-check-animated {
+  animation: kg-check-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.kg-halo-active {
+  animation: kg-halo-pulse 2.2s infinite;
+}
+
+/* Reduced Motion Override (WCAG AA Compliance) */
+@media (prefers-reduced-motion: reduce) {
+  .kg-orb-1,
+  .kg-orb-2,
+  .kg-anim-hero-badge,
+  .kg-anim-hero-title,
+  .kg-anim-hero-text,
+  .kg-anim-hero-actions,
+  .kg-anim-hero-highlights,
+  .kg-anim-hero-card,
+  .kg-stagger-1,
+  .kg-stagger-2,
+  .kg-stagger-3,
+  .kg-stagger-4,
+  .kg-stagger-5,
+  .kg-stagger-6,
+  .kg-hover-lift,
+  .kg-hover-lift-sm,
+  .kg-timer-colon,
+  .kg-check-animated,
+  .kg-halo-active {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}

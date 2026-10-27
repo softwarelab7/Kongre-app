@@ -4,6 +4,7 @@
 @import "./kongre-theme-toggle.css";
 @import "./kongre-indigo.css";
 @import "./kongre-welcome.css";
+@import "./kongre-about-animations.css";
 @import "leaflet/dist/leaflet.css";
 
 @layer base {

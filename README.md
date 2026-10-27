@@ -71,10 +71,16 @@ x86_64
 4. ¡Listo! Compatible de forma nativa con procesadores M1, M2, M3, M4 e Intel.
 🔵 Fedora Linux / Red Hat / openSUSE
 Abre tu terminal en la carpeta de descargas y ejecuta:
+sudo dnf install ./Kongre-0.1.0-alpha.35-1.x86_64.rpm
 O haz doble clic sobre el archivo ⁠.rpm⁠ para instalarlo a través del centro de software de KDE Discover / GNOME Software.
 🟠 Ubuntu / Debian / Linux Mint
 Abre tu terminal en la carpeta de descargas y ejecuta:
+sudo apt install ./Kongre_0.1.0-alpha.35_amd64.deb
 🐧 Linux Universal (Cualquier distribución sin instalar)
+1. Descarga el archivo ⁠.AppImage⁠.
+2. Dale permisos de ejecución:
+chmod +x Kongre_0.1.0-alpha.35_amd64.AppImage
+3. Ejecútalo con ⁠./Kongre_0.1.0-alpha.35_amd64.AppImage⁠ o con doble clic desde tu explorador de archivos.
 ✨ Módulos y Funcionalidades Destacadas
 ￼ 📅 Reunión Vida y Ministerio (VMC) y Discursos Públicos: Programa semanal completo, asignaciones estudiantiles, lector de Atalaya, oraciones y presidencia.
 ￼ 📋 Hojas de Asignación S-89: Generación, previsualización e impresión instantánea en formato oficial PDF con respaldo offline.

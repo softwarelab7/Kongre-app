@@ -6,8 +6,8 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
-### [v0.1.0] (Alfa) — 26 de Octubre, 2026
-**Transición a Ciclo SemVer Alfa Preliminar y Lanzamiento Multiplataforma (PC & Web)**
+### [v0.1.0-alpha.35] — 26 de Octubre, 2026
+**Lanzamiento Multiplataforma para PC (Rust + Tauri v2), Reconocimiento de SO y Diseño Fluido**
 
 - 🦀 **Lanzamiento de Kongre App para Escritorio (Rust + Tauri v2):**
   - Aplicación nativa ultraligera compilada con Rust (Tauri v2) que arranca en milisegundos y consume apenas ~15 MB de memoria RAM.
@@ -17,11 +17,14 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
     - **Ubuntu / Debian:** Paquete `.deb`.
     - **Linux Universal:** Paquete portable `.AppImage`.
     - **macOS:** Binario Universal `.dmg` compatible con procesadores Apple Silicon (M1 a M4) e Intel.
-- 📐 **Estandarización de Versionado SemVer (Ciclo Preliminar `v0.x.y`):**
-  - Conforme al estándar internacional de versionado de software (SemVer), se formaliza el ciclo a la serie preliminar `v0.1.0 (Alfa)` para reflejar con total transparencia que el sistema se encuentra en fase de pruebas activas, refinamiento visual y corrección comunitaria rumbo al futuro lanzamiento de la **Versión 1.0.0 Definitiva**.
-  - Indicadores visuales **Alfa** integrados de forma elegante en la versión Web: barra de navegación superior (Navbar), pie de página (AppFooter), menú desplegable de usuario, menú móvil y panel de configuración del sistema.
+- 💻 **Reconocimiento Inteligente de SO en Pantalla de Bienvenida (`DesktopCompatibilityBanner.tsx`):**
+  - Banner interactivo que detecta en tiempo real si el usuario se conecta desde Windows, macOS, Fedora o Ubuntu y ofrece la descarga directa del paquete compatible con un clic y pestañas rápidas de selección.
 - 📥 **Centro de Descargas en la Versión Web (`DesktopDownloadModal.tsx`):**
   - Modal interactivo con detección automática del sistema operativo del visitante, enlaces directos de descarga y acceso a los lanzamientos oficiales en GitHub.
+- 🖥️ **Aprovechamiento Integral del Ancho de Pantalla (`App.tsx`, `UserProfileSettingsView.tsx`, `PanoramaGeneralTab.tsx`, `RolesManagerTab.tsx`, `MantenimientoTab.tsx`, `PanelElectricoTab.tsx`, `PersonalViewTab.tsx`, `MinisterioPublicadorTab.tsx`):**
+  - Se eliminaron las restricciones de ancho fijo (`max-w-7xl`, `max-w-4xl`, `max-w-2xl`) en los contenedores principales para que todas las vistas aprovechen de forma responsiva el ancho completo de la pantalla en monitores y portátiles.
+- 🔔 **Alineación Perfecta de Botones en Tarjeta Push (`PushNotificationQuickGuideCard.tsx`):**
+  - Se corrigió el desbordamiento horizontal de los botones **Suscribirme a Notificaciones Push** y **Guía Visual** cuando la tarjeta se muestra dentro de una columna lateral.
 
 ---
 
@@ -29,16 +32,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 > ℹ️ **Registro de Iteraciones de la Fase Alfa:**  
 > Todas las entregas del historial corresponden a iteraciones de desarrollo activo de la fase Alfa (`v0.1.0-alpha.x` y `v0.0.x-alpha`), organizadas conforme a la norma internacional **SemVer** en su camino hacia la versión 1.0.0 definitiva.
-
-### [v0.1.0-alpha.35] — 26 de Octubre, 2026
-**Diseño Fluido de Ancho Completo y Corrección de Tarjeta Push en Columnas**
-
-- 🖥️ **Aprovechamiento Integral del Ancho de Pantalla (`App.tsx`, `UserProfileSettingsView.tsx`, `PanoramaGeneralTab.tsx`, `RolesManagerTab.tsx`, `MantenimientoTab.tsx`, `PanelElectricoTab.tsx`, `PersonalViewTab.tsx`, `MinisterioPublicadorTab.tsx`):**
-  - Se eliminaron las restricciones de ancho fijo (`max-w-7xl`, `max-w-4xl`, `max-w-2xl`) en los contenedores principales para que todas las vistas aprovechen de forma responsiva el ancho completo de la pantalla en monitores y portátiles.
-  - En **Panorama General**, las secciones de *Tablero de anuncios* y *Eventos* ahora se distribuyen en una cuadrícula de 2 columnas en escritorio.
-  - En **Mi Perfil**, la barra de avatares predefinidos se distribuye uniformemente a lo largo de toda la tarjeta superior.
-- 🔔 **Alineación Perfecta de Botones en Tarjeta Push (`PushNotificationQuickGuideCard.tsx`):**
-  - Se corrigió el desbordamiento horizontal de los botones **Suscribirme a Notificaciones Push** y **Guía Visual** cuando la tarjeta se muestra dentro de una columna lateral, manteniendo todo el contenido y los pasos perfectamente contenidos dentro del borde de la tarjeta.
 
 ---
 

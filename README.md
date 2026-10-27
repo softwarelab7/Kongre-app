@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-2.12.23-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión 2.12.23" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.35-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.35" />
   <img src="https://img.shields.io/badge/Google%20OAuth-Brand%20Verified-4285F4?style=flat-square&logo=google&logoColor=white" alt="Google OAuth Brand Verified" />
   <img src="https://img.shields.io/badge/2FA-Microsoft%20Authenticator-00A4EF?style=flat-square&logo=microsoft&logoColor=white" alt="2FA Microsoft Authenticator" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />

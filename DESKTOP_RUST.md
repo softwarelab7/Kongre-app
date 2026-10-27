@@ -39,15 +39,15 @@ Dado que compilar binarios de macOS y Windows requiere sus respectivos sistemas 
    ```
 2. **O por Tag de Versión:**
    ```bash
-   git tag v0.1.0
-   git push origin v0.1.0
+   git tag v0.1.0-alpha.35
+   git push origin v0.1.0-alpha.35
    ```
    *(o activando el workflow manualmente desde la pestaña **Actions** en GitHub con `workflow_dispatch`)*.
 
 3. **GitHub Actions compilará en paralelo:**
-   - **Windows Runner:** Genera `Kongre_0.1.0_x64-setup.exe` y `Kongre_0.1.0_x64_en-US.msi`.
-   - **macOS Runner:** Genera `Kongre_0.1.0_universal.dmg` (binario Universal compatible con Intel y Apple Silicon).
-   - **Linux Runner:** Genera `Kongre_0.1.0_amd64.deb`, `Kongre_0.1.0_amd64.AppImage` y `Kongre-0.1.0-1.x86_64.rpm`.
+   - **Windows Runner:** Genera `Kongre_0.1.0-alpha.35_x64-setup.exe` y `Kongre_0.1.0-alpha.35_x64_en-US.msi`.
+   - **macOS Runner:** Genera `Kongre_0.1.0-alpha.35_universal.dmg` (binario Universal compatible con Intel y Apple Silicon).
+   - **Linux Runner:** Genera `Kongre_0.1.0-alpha.35_amd64.deb`, `Kongre_0.1.0-alpha.35_amd64.AppImage` y `Kongre-0.1.0-alpha.35-1.x86_64.rpm`.
 
 4. **Disponibilidad inmediata:**
    - En **Releases** de GitHub: Listos para descarga pública directa.

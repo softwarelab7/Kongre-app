@@ -25,20 +25,20 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '0.1.0';
+export const CURRENT_APP_VERSION = '0.1.0-alpha.35';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.10.26.8000';
+export const CURRENT_BUILD_CODE = '2026.10.26.8035';
 export const BUILD_DATE = '26 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
-    version: '0.1.0 (Alfa)',
-    buildCode: '2026.10.26.8000',
+    version: '0.1.0-alpha.35',
+    buildCode: '2026.10.26.8035',
     date: '26 de Octubre, 2026',
-    title: 'Transición a Ciclo SemVer Alfa y Lanzamiento Multiplataforma (PC & Web)',
+    title: 'Lanzamiento Multiplataforma para PC (Rust), Reconocimiento de SO y Diseño Fluido',
     isCurrent: true,
-    highlight: 'Reinicio formal del ciclo de desarrollo a v0.1.0 Alfa preliminar hacia la versión 1.0.0 definitiva, con soporte de escritorio nativo para Windows, Linux y macOS en Rust',
+    highlight: 'Lanzamiento oficial de Kongre App nativa para PC con instaladores para Windows, macOS y Linux en Rust, banner con detección inteligente de SO en la bienvenida y diseño fluido de ancho completo',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [
       {
@@ -46,31 +46,20 @@ export const VERSION_HISTORY: VersionRecord[] = [
         text: 'Lanzamiento de Kongre App para Escritorio: Núcleo nativo ultraligero desarrollado con Rust (Tauri v2) con instaladores oficiales para Windows (.exe / .msi), macOS (.dmg Universal), Fedora (.rpm), Ubuntu (.deb) y Linux Portable (.AppImage).',
       },
       {
-        category: 'improvement',
-        text: 'Estandarización de Versionado SemVer: Adopción del ciclo preliminar v0.x.y para la fase de pruebas y estabilización comunitaria previa a la versión 1.0.0 final.',
+        category: 'feature',
+        text: 'Reconocimiento Inteligente de Sistema Operativo y Descargas Directas: La pantalla de bienvenida detecta automáticamente el SO del usuario (Windows, Mac, Fedora o Ubuntu) y ofrece la descarga directa y pestañas interactivas de compatibilidad.',
       },
       {
         category: 'feature',
-        text: 'Centro de Descargas en la Web: Modal interactivo y enlaces directos para instalar la aplicación de escritorio desde cualquier navegador con detección automática del sistema operativo.',
+        text: 'Centro de Descargas en la Web (DesktopDownloadModal.tsx): Modal interactivo con selector de sistemas operativos y enlaces directos a las Releases oficiales.',
       },
-    ],
-  },
-  {
-    version: '0.1.0-alpha.35',
-    buildCode: '2026.10.26.7690',
-    date: '26 de Octubre, 2026',
-    title: 'Diseño Fluido de Ancho Completo y Corrección de Tarjeta Push en Columnas',
-    isCurrent: false,
-    highlight: 'Aprovechamiento integral del ancho de pantalla en monitores de escritorio y portátiles eliminando márgenes restrictivos y corrigiendo el desbordamiento de botones en la tarjeta Push',
-    environment: 'Producción Cloud (Kongre)',
-    changes: [
       {
         category: 'improvement',
-        text: 'Aprovechamiento Completo del Ancho de Pantalla (App.tsx, UserProfileSettingsView.tsx, PanoramaGeneralTab.tsx, RolesManagerTab.tsx, MantenimientoTab.tsx, PanelElectricoTab.tsx, PersonalViewTab.tsx, MinisterioPublicadorTab.tsx): Se eliminaron los topes de ancho fijo (max-w-4xl, max-w-2xl, max-w-7xl) para que los paneles se expandan de forma responsiva ocupando el espacio disponible del monitor.',
+        text: 'Aprovechamiento Completo del Ancho de Pantalla (App.tsx, UserProfileSettingsView.tsx, PanoramaGeneralTab.tsx, RolesManagerTab.tsx, MantenimientoTab.tsx, PanelElectricoTab.tsx, PersonalViewTab.tsx, MinisterioPublicadorTab.tsx): Se eliminaron los topes de ancho fijo para que los paneles se expandan de forma responsiva ocupando todo el espacio del monitor.',
       },
       {
         category: 'fix',
-        text: 'Corrección de Desbordamiento en Tarjeta de Suscripción Push (PushNotificationQuickGuideCard.tsx): Se ajustó la disposición de la cabecera y los botones de acción en modo compacto para evitar que el botón "Suscribirme a Notificaciones Push" y "Guía Visual" sobresalgan del contenedor en vistas de dos columnas.',
+        text: 'Corrección de Desbordamiento en Tarjeta Push (PushNotificationQuickGuideCard.tsx): Se ajustó la disposición de botones para evitar desbordamientos en vistas de dos columnas.',
       },
     ],
   },

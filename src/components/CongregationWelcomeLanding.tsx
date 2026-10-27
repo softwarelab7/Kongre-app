@@ -39,8 +39,12 @@ import {
   EyeOff,
   Trash2,
   AlertTriangle,
+  Monitor,
+  Download,
 } from 'lucide-react';
 import { DemoStartupModal } from './DemoStartupModal';
+import { DesktopDownloadModal } from './DesktopDownloadModal';
+import { DesktopCompatibilityBanner } from './DesktopCompatibilityBanner';
 import { IconCongregationAccess } from './IconCongregationAccess';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 import { PendingApprovalView } from './PendingApprovalView';
@@ -436,6 +440,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
     congregationName: string;
   } | null>(null);
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
+  const [desktopModalOpen, setDesktopModalOpen] = useState(false);
 
   // Three credentials (PIN Personal es opcional para coordinadores):
   // 1. ID de la Congregación
@@ -1304,17 +1309,28 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             className="relative px-5 pt-4 pb-12 sm:pb-14 flex flex-col items-center select-none text-white shrink-0"
             style={{ background: 'linear-gradient(135deg, #4C3AED, #3728BE)' }}
           >
-            {/* Top Utility Bar (Demo Mode & Theme Toggle) */}
+            {/* Top Utility Bar (Demo Mode, PC Version & Theme Toggle) */}
             <div className="w-full flex items-center justify-between z-10 mb-2">
-              <button
-                type="button"
-                onClick={handleEnterDemoMode}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xs backdrop-blur-xs transition-all cursor-pointer shadow-xs active:scale-95"
-                title="Probar Kongre con datos de demostración"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>Modo Demo</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={handleEnterDemoMode}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xs backdrop-blur-xs transition-all cursor-pointer shadow-xs active:scale-95"
+                  title="Probar Kongre con datos de demostración"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Modo Demo</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDesktopModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white/15 hover:bg-white/25 text-white font-semibold text-xs backdrop-blur-xs transition-all cursor-pointer shadow-xs active:scale-95"
+                  title="Descargar versión nativa para PC"
+                >
+                  <Monitor className="w-3.5 h-3.5" />
+                  <span>PC</span>
+                </button>
+              </div>
 
               <ThemeToggle size={36} variant="onBrand" />
             </div>
@@ -1390,6 +1406,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   setActiveTab('invite_code_login');
                 }}
               />
+
+              <LandingOptionRow
+                icon={Monitor}
+                badge={{ label: 'PC · Rust', tone: 'lectura' }}
+                title="Descargar Kongre para PC"
+                description="Instalador nativo para Windows (.exe), macOS (.dmg) o Linux (.rpm / .deb)."
+                onClick={() => setDesktopModalOpen(true)}
+              />
             </div>
 
             {/* Mobile Features Section: Funciones Principales de la App */}
@@ -1450,6 +1474,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 />
               </div>
 
+              {/* Mobile PC Compatibility & Download Card */}
+              <div className="mt-4">
+                <DesktopCompatibilityBanner
+                  variant="mobile-banner"
+                  onOpenAllDownloads={() => setDesktopModalOpen(true)}
+                />
+              </div>
+
               {/* Interactive Demo Action Banner inside Features Section */}
               <button
                 type="button"
@@ -1487,8 +1519,20 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             <AnimatedLogo height={32} />
           </div>
 
-          {/* Right Actions: Demo Mode Button & Theme Switch */}
+          {/* Right Actions: PC Download, Demo Mode Button & Theme Switch */}
           <div className="flex items-center gap-2 sm:gap-2.5">
+            <button
+              type="button"
+              onClick={() => setDesktopModalOpen(true)}
+              className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-2xs"
+              title="Descargar Kongre App para PC (Windows, macOS, Linux)"
+            >
+              <Monitor className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
+              <span className="hidden xs:inline sm:inline">Versión PC</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                v{CURRENT_APP_VERSION}
+              </span>
+            </button>
             <button
               type="button"
               onClick={handleEnterDemoMode}
@@ -1566,6 +1610,12 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   text="Úsala en el Salón sin conexión a internet; tus datos se sincronizan al volver a tener red."
                 />
               </div>
+
+              {/* Desktop Compatibility & Direct Download Hero Banner */}
+              <DesktopCompatibilityBanner
+                variant="hero-card"
+                onOpenAllDownloads={() => setDesktopModalOpen(true)}
+              />
             </section>
           )}
 
@@ -1709,6 +1759,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                       setInviteCodeSuccess(null);
                       setActiveTab('invite_code_login');
                     }}
+                  />
+
+                  <DesktopOption
+                    icon={Monitor}
+                    pill={{ label: 'Rust Nativo', tone: 'ok' }}
+                    title="Descargar Kongre para PC (Windows, Mac, Linux)"
+                    description="Instaladores oficiales ultraligeros de ~15 MB con 100% de soporte offline."
+                    onClick={() => setDesktopModalOpen(true)}
                   />
                 </div>
               )}
@@ -2401,6 +2459,12 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
       {/* Demo Mode Startup & Data Preparation Modal */}
       <DemoStartupModal isOpen={isStartingDemo} />
+
+      {/* Native Desktop Download Modal */}
+      <DesktopDownloadModal
+        isOpen={desktopModalOpen}
+        onClose={() => setDesktopModalOpen(false)}
+      />
     </div>
   );
 };

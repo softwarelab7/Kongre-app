@@ -25,7 +25,10 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-## 📅 Historial de Actualizaciones Anteriores
+## 📅 Historial de Actualizaciones Anteriores (Compilaciones Previas v2.12.x)
+
+> ℹ️ **Nota de Transición de Versionado:**  
+> Las versiones con numeración `v2.12.x` corresponden a los ciclos internos de desarrollo y compilaciones rápidas previas a la formalización del estándar internacional **SemVer**. Todo ese historial técnico se conserva íntegro a continuación como referencia del trabajo realizado antes del reinicio oficial al ciclo **v0.1.0 (Alfa)** rumbo a la versión 1.0.0 definitiva.
 
 ### [v2.12.35] — 26 de Octubre, 2026
 **Diseño Fluido de Ancho Completo y Corrección de Tarjeta Push en Columnas**
@@ -38,8 +41,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Se corrigió el desbordamiento horizontal de los botones **Suscribirme a Notificaciones Push** y **Guía Visual** cuando la tarjeta se muestra dentro de una columna lateral, manteniendo todo el contenido y los pasos perfectamente contenidos dentro del borde de la tarjeta.
 
 ---
-
-## 📅 Historial de Actualizaciones Anteriores
 
 ### [v2.12.34] — 26 de Octubre, 2026
 **Rediseño Integral del Panel y Vista de Perfil de Usuario**
@@ -54,8 +55,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-## 📅 Historial de Actualizaciones Anteriores
-
 ### [v2.12.33] — 26 de Octubre, 2026
 **Rediseño de Barra Superior en PC: Buscador Central y Dock Minimalista de Solo Iconos**
 
@@ -67,8 +66,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Se retiró el botón de **Cronómetro** de la barra superior y se convirtió **Calendario** en un botón de solo icono integrado dentro del **Dock Unificado de Utilidades** (*Calendario*, *Publicadores*, *QR Móvil*, *PINs*, *Notificaciones* y *Tema*) junto a la tarjeta de perfil de usuario.
 
 ---
-
-## 📅 Historial de Actualizaciones Anteriores
 
 ### [v2.12.32] — 26 de Octubre, 2026
 **Unificación Integral de Cabecera Móvil y Contenedores Cohesivos de Control**
@@ -82,8 +79,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-## 📅 Historial de Actualizaciones Anteriores
-
 ### [v2.12.31] — 26 de Octubre, 2026
 **Unificación Visual Móvil: Colores Consistentes, Cuadrículas sin Cortes y Tablas Adaptativas**
 
@@ -95,8 +90,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Se corrigió el espacio en blanco en **Herramientas del Programa** y se añadieron tarjetas adaptativas en móvil para el catálogo de **Literatura** y los indicadores de **Territorios**.
 
 ---
-
-## 📅 Historial de Actualizaciones Anteriores
 
 ### [v2.12.30] — 26 de Octubre, 2026
 **Botones Atrás Móviles Minimalistas (Solo Icono sin Texto)**
@@ -180,8 +173,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-## 📅 Historial de Actualizaciones Anteriores
-
 ### [v2.12.23] — 25 de Octubre, 2026
 **Rediseño Arquitectónico desde Cero de Estado Espiritual y las 11 Tarjetas del Publicador con Bloques Numerados y Cintas de KPIs**
 
@@ -201,8 +192,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-## 📅 Historial de Actualizaciones Anteriores
-
 ### [v2.12.22] — 25 de Octubre, 2026
 **Rediseño Editorial Completo de las 11 Tarjetas del Publicador, el Hub de Categorías, Registro S-21, Contactos de Emergencia y Credenciales PIN/QR**
 
@@ -220,8 +209,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Espacio de trabajo unificado en dos columnas (*PIN Personal y Fortaleza* + *Nivel de Acceso y Permisos en la Aplicación*), papeleta imprimible con código QR renovada y cabeceras editoriales consistentes en las 11 tarjetas del publicador.
 
 ---
-
-## 📅 Historial de Actualizaciones Anteriores
 
 ### [v2.12.21] — 25 de Octubre, 2026
 **Renovación Integral de las Tarjetas del Publicador: Información Personal, Contacto y Ubicación, Estado Espiritual, DPA, Asignaciones e Historial**
@@ -241,8 +228,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-## 📅 Historial de Actualizaciones Anteriores
-
 ### [v2.12.20] — 25 de Octubre, 2026
 **Analítica Gráfica con Recharts y Selector Multi-Grupo de Servicio en el Tablero de Equidad (`EquidadDashboardTab`)**
 
@@ -254,8 +239,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Sincronización integral entre el selector superior, la barra multi-grupo, la tabla de radiografía por publicador y las tarjetas inferiores de grupos de predicación, incluyendo sufijos identificadores `(G#N)` en los gráficos al comparar múltiples grupos.
 
 ---
-
-## 📅 Historial de Actualizaciones Anteriores
 
 ### [v2.12.19] — 25 de Octubre, 2026
 **Centro Local y Motor Universal de Carga y Relleno Automático de Plantillas PDF Oficiales (`S-21`, `S-89`, `S-140`, `S-88`, `S-13`, `S-26`, `S-30`, `S-25`, `S-28` y `S-1`)**
@@ -375,8 +358,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-## 📅 Historial de Actualizaciones Anteriores
-
 ### [v2.12.11] — 23 de Octubre, 2026
 **Autenticación de Dos Pasos (2FA) con Microsoft Authenticator y Códigos de Respaldo**
 
@@ -397,8 +378,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-## 📅 Historial de Actualizaciones Anteriores
-
 ### [v2.12.10] — 23 de Octubre, 2026
 **Páginas Oficiales de Privacidad y Términos de Uso para Verificación de Google**
 
@@ -410,8 +389,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-## 📅 Historial de Actualizaciones Anteriores
-
 ### [v2.12.9] — 23 de Octubre, 2026
 **Corrección en Cambio de Cuenta con Google**
 
@@ -420,8 +397,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Se corrigió un detalle que hacía que, al volver de Google tras cambiar de cuenta, la pantalla quedara esperando o volviera a mostrar el botón "Continuar con Google". Ahora la sesión se valida al instante y muestra directamente tu tarjeta de cuenta verificada.
 
 ---
-
-## 📅 Historial de Actualizaciones Anteriores
 
 ### [v2.12.8] — 23 de Octubre, 2026
 **Navegación Fluida en el Portal y Corrección en Menú de Google**
@@ -433,8 +408,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Al pulsar "Volver" o usar las flechas del navegador para regresar al portal de bienvenida, las pantallas temporales de inicio de sesión se limpian de inmediato.
 
 ---
-
-## 📅 Historial de Actualizaciones Anteriores
 
 ### [v2.12.7] — 23 de Octubre, 2026
 **Blindaje de Privacidad en Vista Personal, Cierre por Inactividad y Protección del Sistema**
@@ -459,8 +432,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Detección y ocultamiento automático de contraseñas accidentales en las descripciones de eventos (`••••`).
 
 ---
-
-## 📅 Historial de Actualizaciones Anteriores
 
 ### [v2.12.6] — 23 de Octubre, 2026
 **Cifrado de Grado Militar en el Dispositivo, Navegación Protegida y Salto de Seguridad OWASP**

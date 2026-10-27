@@ -25,12 +25,12 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-## 📅 Historial de Actualizaciones Anteriores (Compilaciones Previas v2.12.x)
+## 📅 Historial de Iteraciones Anteriores (Fase Alfa Preliminar)
 
-> ℹ️ **Nota de Transición de Versionado:**  
-> Las versiones con numeración `v2.12.x` corresponden a los ciclos internos de desarrollo y compilaciones rápidas previas a la formalización del estándar internacional **SemVer**. Todo ese historial técnico se conserva íntegro a continuación como referencia del trabajo realizado antes del reinicio oficial al ciclo **v0.1.0 (Alfa)** rumbo a la versión 1.0.0 definitiva.
+> ℹ️ **Registro de Iteraciones de la Fase Alfa:**  
+> Todas las entregas del historial corresponden a iteraciones de desarrollo activo de la fase Alfa (`v0.1.0-alpha.x` y `v0.0.x-alpha`), organizadas conforme a la norma internacional **SemVer** en su camino hacia la versión 1.0.0 definitiva.
 
-### [v2.12.35] — 26 de Octubre, 2026
+### [v0.1.0-alpha.35] — 26 de Octubre, 2026
 **Diseño Fluido de Ancho Completo y Corrección de Tarjeta Push en Columnas**
 
 - 🖥️ **Aprovechamiento Integral del Ancho de Pantalla (`App.tsx`, `UserProfileSettingsView.tsx`, `PanoramaGeneralTab.tsx`, `RolesManagerTab.tsx`, `MantenimientoTab.tsx`, `PanelElectricoTab.tsx`, `PersonalViewTab.tsx`, `MinisterioPublicadorTab.tsx`):**
@@ -42,7 +42,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.34] — 26 de Octubre, 2026
+### [v0.1.0-alpha.34] — 26 de Octubre, 2026
 **Rediseño Integral del Panel y Vista de Perfil de Usuario**
 
 - 👤 **Panel Desplegable de Cuenta en Barra Superior (`Navbar.tsx`):**
@@ -55,7 +55,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.33] — 26 de Octubre, 2026
+### [v0.1.0-alpha.33] — 26 de Octubre, 2026
 **Rediseño de Barra Superior en PC: Buscador Central y Dock Minimalista de Solo Iconos**
 
 - 🧭 **Miga de Pan Estructurada con Icono de Módulo (`Navbar.tsx`, `DemoBanner.tsx`):**
@@ -67,7 +67,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.32] — 26 de Octubre, 2026
+### [v0.1.0-alpha.32] — 26 de Octubre, 2026
 **Unificación Integral de Cabecera Móvil y Contenedores Cohesivos de Control**
 
 - ⬅️ **Barra Superior Adhesiva de Borde a Borde (`App.tsx`):**
@@ -79,7 +79,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.31] — 26 de Octubre, 2026
+### [v0.1.0-alpha.31] — 26 de Octubre, 2026
 **Unificación Visual Móvil: Colores Consistentes, Cuadrículas sin Cortes y Tablas Adaptativas**
 
 - 🎨 **Consistencia de Color en Todos los Módulos (`InformeSucursalS1Tab.tsx`, `AttendanceTrendsDashboard.tsx`, `AsistenciaTab.tsx`):**
@@ -91,13 +91,13 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.30] — 26 de Octubre, 2026
+### [v0.1.0-alpha.30] — 26 de Octubre, 2026
 **Botones Atrás Móviles Minimalistas (Solo Icono sin Texto)**
 
 - ⬅️ **Diseño Minimalista de Retorno (`App.tsx`, `ScheduleTab.tsx`, `AssignmentSelectorModal.tsx`, `CongregationCalendar.tsx`, `ConflictsModal.tsx`, `QrCodeModal.tsx`):**
   - Todos los botones de retroceso en páginas móviles muestran únicamente el icono de flecha izquierda (`←`) sin etiqueta de texto.
 
-### [v2.12.29] — 26 de Octubre, 2026
+### [v0.1.0-alpha.29] — 26 de Octubre, 2026
 **Botón Atrás en Todas las Nuevas Páginas Móviles (Antiguos Pop-ups)**
 
 - ⬅️ **Barra de Navegación "Atrás" en Vistas Secundarias Móviles (`App.tsx`):**
@@ -105,7 +105,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 - 📱 **Botón de Retroceso en Formularios y Selectores a Pantalla Completa (`ScheduleTab.tsx`, `AssignmentSelectorModal.tsx`, `CongregationCalendar.tsx`, `ConflictsModal.tsx`, `QrCodeModal.tsx`, `App.tsx`):**
   - Se incorporó el botón de retroceso en la esquina superior izquierda del Selector de Semanas, Herramientas del Programa, Selector de Participantes, creación/edición de Eventos del Calendario, detalle de reuniones y en todas las vistas a pantalla completa en móvil.
 
-### [v2.12.28] — 26 de Octubre, 2026
+### [v0.1.0-alpha.28] — 26 de Octubre, 2026
 **Experiencia Móvil 100% Nativa sin Pop-ups (Vistas a Pantalla Completa)**
 
 - 📱 **Eliminación de Pop-ups Automáticos y Tarjetas Flotantes en Móvil (`App.tsx`, `LoadingSpinner.tsx`, `OfflineSyncBanner.tsx`, `AutoLockToastWarning.tsx`):**
@@ -118,7 +118,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 - 🖥️ **Formularios y Selectores a Pantalla Completa en Móvil (`index.css`, `ScheduleTab.tsx`):**
   - Todos los formularios, selectores de semanas, menús de herramientas y diálogos se renderizan como páginas nativas a pantalla completa (`100%` del viewport sin marcos flotantes ni fondos oscurecidos) en pantallas móviles (`< 768px`).
 
-### [v2.12.27] — 26 de Octubre, 2026
+### [v0.1.0-alpha.27] — 26 de Octubre, 2026
 **Optimización de Interfaz Móvil: Menú Limpio, Calendario Integrado, Mi Ministerio y Programa de Reuniones**
 
 - 📱 **Menú Móvil sin Banners Redundantes (`MobileMenuTab.tsx`):**
@@ -132,7 +132,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 - 🏛️ **Simplificación en Mi Congregación y Programa (`PanoramaGeneralTab.tsx`, `ScheduleTab.tsx`, `ClmScheduleView.tsx`):**
   - Se eliminó el banner superior redundante en `Mi Congregación`.
   - En `Programa`, la barra de acciones (`Autoasignar`, `WhatsApp`, `Cruces`, `...`) se mantiene alineada en una sola fila compacta en móvil y el control de `Sala Auxiliar` se integra directamente en la cabecera de la `Reunión Entre Semana (VMC)`.
-### [v2.12.26] — 26 de Octubre, 2026
+### [v0.1.0-alpha.26] — 26 de Octubre, 2026
 **Estabilidad en Reposo de Pestaña, Prevención de Pantalla en Blanco y Optimización de Sincronización en Segundo Plano**
 
 - 🛠️ **Solución Definitiva a la Pantalla en Blanco tras Reposo en el Navegador (`App.tsx`, `ErrorBoundary.tsx`):**
@@ -144,7 +144,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 - 🔒 **Ajuste de Auto-Bloqueo y Capa Modal (`SecurityContext.tsx`, `SessionLockModal.tsx`):**
   - **Temporizador Eficiente:** El contador de bloqueo por inactividad solo se activa cuando existe un PIN de bloqueo personal configurado, pausa sus ticks mientras la pestaña está oculta y utiliza `z-[100]` en el modal de bloqueo.
 
-### [v2.12.25] — 26 de Octubre, 2026
+### [v0.1.0-alpha.25] — 26 de Octubre, 2026
 **Blindaje de Concurrencia en Bóveda Local, Rotación Segura de Credenciales, Revalidación de Tokens y Cronómetro Estilo iOS**
 
 - 🔐 **Concurrencia y Atomicidad en Bóveda Criptográfica (`atRestVault.ts`):**
@@ -159,7 +159,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.24] — 25 de Octubre, 2026
+### [v0.1.0-alpha.24] — 25 de Octubre, 2026
 **Token de Rol Firmado por el Servidor y Fase 2 de la Bóveda Local para Salud (DPA) y Notas Confidenciales**
 
 - 🛡️ **Token Firmado por el Servidor para PIN Personal (`kgr_srt1` con HMAC-SHA256):**
@@ -173,7 +173,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.23] — 25 de Octubre, 2026
+### [v0.1.0-alpha.23] — 25 de Octubre, 2026
 **Rediseño Arquitectónico desde Cero de Estado Espiritual y las 11 Tarjetas del Publicador con Bloques Numerados y Cintas de KPIs**
 
 - 🛡️ **Rediseño Total desde Cero de Estado Espiritual (`PrivilegesSection`):**
@@ -192,7 +192,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.22] — 25 de Octubre, 2026
+### [v0.1.0-alpha.22] — 25 de Octubre, 2026
 **Rediseño Editorial Completo de las 11 Tarjetas del Publicador, el Hub de Categorías, Registro S-21, Contactos de Emergencia y Credenciales PIN/QR**
 
 - 🏛️ **Cabecera Ejecutiva, Pestañas Numeradas (`01–11`) y Nuevo Hub de Tarjetas (`PublisherEditor`):**
@@ -210,7 +210,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.21] — 25 de Octubre, 2026
+### [v0.1.0-alpha.21] — 25 de Octubre, 2026
 **Renovación Integral de las Tarjetas del Publicador: Información Personal, Contacto y Ubicación, Estado Espiritual, DPA, Asignaciones e Historial**
 
 - 👤 **Tarjeta de Información Personal (`BasicInfoSection`):**
@@ -228,7 +228,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.20] — 25 de Octubre, 2026
+### [v0.1.0-alpha.20] — 25 de Octubre, 2026
 **Analítica Gráfica con Recharts y Selector Multi-Grupo de Servicio en el Tablero de Equidad (`EquidadDashboardTab`)**
 
 - 📊 **Visualización Comparativa con Recharts y Detección Gráfica de Desequilibrios:**
@@ -240,7 +240,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.19] — 25 de Octubre, 2026
+### [v0.1.0-alpha.19] — 25 de Octubre, 2026
 **Centro Local y Motor Universal de Carga y Relleno Automático de Plantillas PDF Oficiales (`S-21`, `S-89`, `S-140`, `S-88`, `S-13`, `S-26`, `S-30`, `S-25`, `S-28` y `S-1`)**
 
 - 📄 **Carga de Plantillas PDF Oficiales en Blanco (100% Local):**
@@ -256,7 +256,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.18] — 25 de Octubre, 2026
+### [v0.1.0-alpha.18] — 25 de Octubre, 2026
 **Auditoría de Secretaría, Carpeta Ejecutiva de Visita del Sup. de Circuito, Literatura (`S-28`/`S-14`), Mantenimiento/Emergencias y Contabilidad (`S-26`/`S-30`/`S-25`)**
 
 - 📋 **Auditoría de Secretaría y Meta Anual de Precursores (600 h):**
@@ -277,7 +277,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.17] — 25 de Octubre, 2026
+### [v0.1.0-alpha.17] — 25 de Octubre, 2026
 **Suite Integral de Gestión Congregacional: Intercambio de Oradores, Deberes y Aseo, Carritos, Agrupación Familiar, Salidas al Campo, Cartelera Digital y Equidad Ponderada**
 
 - 🎙️ **Motor de Intercambio de Oradores, Congregaciones Vecinas y Hospitalidad Inteligente:**
@@ -301,7 +301,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.16] — 23 de Octubre, 2026
+### [v0.1.0-alpha.16] — 23 de Octubre, 2026
 **Optimización Integral de Experiencia Móvil (Auditoría UI/UX, Gestos Táctiles y Ergonomía)**
 
 - 📱 **Cabecera Superior y Pie de Página Móvil Simplificados:**
@@ -313,7 +313,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.15] — 23 de Octubre, 2026
+### [v0.1.0-alpha.15] — 23 de Octubre, 2026
 **Indicador de Carga Global (`LoadingSpinner`) durante la Sincronización con Supabase**
 
 - ✨ **Componente Global `LoadingSpinner`:**
@@ -323,7 +323,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.14] — 23 de Octubre, 2026
+### [v0.1.0-alpha.14] — 23 de Octubre, 2026
 **Redacción Institucional y Profesional de Términos de Uso y Política de Privacidad**
 
 - ⚖️ **Marco Normativo de Términos de Uso Teocrático:**
@@ -335,7 +335,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.13] — 23 de Octubre, 2026
+### [v0.1.0-alpha.13] — 23 de Octubre, 2026
 **Vistas Dedicadas de Página Completa para Registro de Versiones (Changelog) y Términos y Privacidad**
 
 - 📄 **Registro de Versiones (Changelog) en Página Completa:**
@@ -345,7 +345,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.12] — 23 de Octubre, 2026
+### [v0.1.0-alpha.12] — 23 de Octubre, 2026
 **Aceptación Obligatoria de Términos de Uso y Política de Privacidad en Registro y Primer Ingreso**
 
 - ⚖️ **Aceptación en el Registro de Congregación:**
@@ -358,7 +358,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.11] — 23 de Octubre, 2026
+### [v0.1.0-alpha.11] — 23 de Octubre, 2026
 **Autenticación de Dos Pasos (2FA) con Microsoft Authenticator y Códigos de Respaldo**
 
 - 📱 **Verificación en Dos Factores con Microsoft Authenticator (Opcional):**
@@ -378,7 +378,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.10] — 23 de Octubre, 2026
+### [v0.1.0-alpha.10] — 23 de Octubre, 2026
 **Páginas Oficiales de Privacidad y Términos de Uso para Verificación de Google**
 
 - 📜 **Acceso Directo y Universal a Términos y Privacidad:**
@@ -389,7 +389,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.9] — 23 de Octubre, 2026
+### [v0.1.0-alpha.9] — 23 de Octubre, 2026
 **Corrección en Cambio de Cuenta con Google**
 
 - 🔄 **Cambio y Selección de Cuentas de Google Fluido:**
@@ -398,7 +398,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.8] — 23 de Octubre, 2026
+### [v0.1.0-alpha.8] — 23 de Octubre, 2026
 **Navegación Fluida en el Portal y Corrección en Menú de Google**
 
 - 🧭 **Sincronización Precisa de Pantalla y Enlace:**
@@ -409,7 +409,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.7] — 23 de Octubre, 2026
+### [v0.1.0-alpha.7] — 23 de Octubre, 2026
 **Blindaje de Privacidad en Vista Personal, Cierre por Inactividad y Protección del Sistema**
 
 - 🔒 **Mayor Privacidad en Vista Personal:**
@@ -433,66 +433,66 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.12.6] — 23 de Octubre, 2026
+### [v0.1.0-alpha.6] — 23 de Octubre, 2026
 **Cifrado de Grado Militar en el Dispositivo, Navegación Protegida y Salto de Seguridad OWASP**
 - **Cifrado Fuerte de Datos Sensibles:** Los datos de salud, contactos de emergencia y teléfonos personales en tu dispositivo ahora se protegen con cifrado de flujo por bloques de última generación ligado al hardware del dispositivo.
 - **Protección Web Estricta (CSP Bloqueador):** La aplicación no permite la ejecución de scripts no autorizados ni enlaces externos sospechosos, garantizando un entorno totalmente blindado.
 - **Limpieza de Credenciales en la Barra del Navegador:** Ningún enlace o código QR deja contraseñas visibles en la barra de direcciones; las URLs se limpian al instante al cargar.
 
-### [v2.12.5] — 23 de Octubre, 2026
+### [v0.1.0-alpha.5] — 23 de Octubre, 2026
 **Seguridad Web en Producción y Optimización de Memoria**
 - **Protección contra Secuestro de Clics (Clickjacking):** La app no puede ser incrustada en páginas externas no autorizadas.
 - **Rendimiento Mejorado Fuera de Línea:** Almacenamiento optimizado para que la app instalada en móviles funcione más rápido sin consumir almacenamiento innecesario.
 
-### [v2.12.4] — 23 de Octubre, 2026
+### [v0.1.0-alpha.4] — 23 de Octubre, 2026
 **Invitaciones de Alta Seguridad y Facilidad de Entrada**
 - **Códigos Imposibles de Adivinar:** Los nuevos códigos de invitación para publicadores y ancianos adoptan 10 caracteres aleatorios de alta seguridad (`KONG-[ROL]-XXXXX-XXXXX`).
 - **Escritura Flexible:** Puedes escribir o pegar tu código con o sin guiones, con o sin el prefijo `KONG-`, o en minúsculas. El sistema lo reconoce y valida automáticamente.
 
-### [v2.12.3] — 23 de Octubre, 2026
+### [v0.1.0-alpha.3] — 23 de Octubre, 2026
 **Minimización de Datos en Nube (Ley 1581 de Protección de Datos)**
 - **Mayor Reserva de Informes:** Los informes mensuales de predicación personales y correos electrónicos de los hermanos se retiraron del contenido público general, quedando reservados exclusivamente para el cuerpo de ancianos.
 - **App Más Ligera:** Depuración profunda de componentes internos, reduciendo el peso de la aplicación.
 
-### [v2.12.2] — 23 de Octubre, 2026
+### [v0.1.0-alpha.2] — 23 de Octubre, 2026
 **Protección de Datos Médicos, Dominio Oficial y Enlaces Temporales**
 - **Dominio Oficial:** Lanzamiento en la dirección web oficial `https://kongre-app.com` con conexión cifrada de alta velocidad.
 - **Protección Médica y DPA:** Alergias, directivas médicas anticipadas y notas pastorales se guardan cifradas en el dispositivo del hermano autorizado.
 - **Enlaces con Caducidad:** Los enlaces compartidos y códigos QR expiran automáticamente a los 7 días y no transportan claves de congregación.
 
-### [v2.12.1] — 23 de Octubre, 2026
+### [v0.1.0-alpha.1] — 23 de Octubre, 2026
 **Acceso con Google en 1 Clic y Pantalla Completa**
 - **Acceso Directo con Google:** Ya no es necesario hacer doble clic; la aplicación recuerda tu congregación y te conecta automáticamente al iniciar sesión.
 - **Diseño Amplio de Bienvenida:** Las ventanas de acceso aprovechan todo el ancho de la pantalla, con campos simétricos para el ID y el PIN de la congregación.
 
-### [v2.12.0] — 23 de Octubre, 2026
+### [v0.1.0-alpha.0] — 23 de Octubre, 2026
 **Sincronización en la Nube de Cero Conocimiento**
 - **Arquitectura Privada:** Nueva sincronización donde el servidor en la nube nunca conoce las contraseñas, los PINs ni el contenido íntimo de tu congregación.
 
 ---
 
-### [v2.10.8] — 21 de Octubre, 2026
+### [v0.0.10-alpha.8] — 21 de Octubre, 2026
 **Más Espacio en Pantalla y Arranque Directo con Contenido**
 - **Más Espacio Vertical:** Se eliminaron tarjetas y encabezados que duplicaban el nombre de la sección en 27 módulos. Toda la aplicación arranca de inmediato con sus tablas, filtros y herramientas útiles.
 - **Barra de Navegación Unificada:** La barra superior fija muestra siempre tu congregación y sección actual con un diseño limpio estilo Notion y Linear.
 
-### [v2.10.7] — 21 de Octubre, 2026
+### [v0.0.10-alpha.7] — 21 de Octubre, 2026
 **Reloj Animado de Bloqueo por Inactividad y Alerta Suave**
 - **Contador en Barra Superior:** Chip interactivo con anillo de progreso y cuenta regresiva de minutos restantes de inactividad.
 - **Aviso Flotante en los Últimos 60 Segundos:** Alerta suave en la parte inferior de la pantalla antes del bloqueo; tocar cualquier parte restablece el tiempo al instante.
 - **Selector de Tiempo en Ajustes:** Deslizador para configurar el bloqueo automático entre 5, 10 o 15 minutos según las necesidades del salón.
 
-### [v2.10.5 & v2.10.6] — 21 de Octubre, 2026
+### [v0.0.10-alpha.5 & 6] — 21 de Octubre, 2026
 **Botón de Modo Oscuro Minimalista y Herramientas Agrupadas**
 - **Transición Sol ⇄ Luna:** Nuevo botón con animación fluida y alto contraste en modo oscuro para facilitar la lectura nocturna.
 - **Herramientas de Ajustes en una Sola Fila:** Los botones "Guardar Ajustes" y "Mi Perfil" se integraron en la misma fila que las pestañas para mayor comodidad.
 
-### [v2.10.4] — 21 de Octubre, 2026
+### [v0.0.10-alpha.4] — 21 de Octubre, 2026
 **Sincronización Total de 20 Módulos y Guardado Automático**
 - **Guardado Automático:** Cambios en programas de reunión, territorios, discursos, asistencia, carritos, paneles eléctricos y mantenimiento se sincronizan solos en segundo plano.
 - **Cola sin Conexión Confiable:** Si estás sin internet en el Salón o en el territorio, tus registros se guardan en el teléfono y se suben solos al restablecerse la conexión.
 
-### [v2.10.0 a v2.10.3] — 21 de Octubre, 2026
+### [v0.0.10-alpha.0 a 3] — 21 de Octubre, 2026
 **Suite del Publicador, Gestos Táctiles y Accesos Directos Móviles**
 - **Herramientas para el Ministerio:** Cronómetro de predicación persistente (sigue contando al bloquear el teléfono), meta mensual de horas, agenda de revisitas con enlace a WhatsApp y control de lecciones de cursos bíblicos.
 - **Gestos Móviles (Swipe):** Deslizar el dedo desde el borde abre y cierra el menú lateral con total fluidez.
@@ -501,7 +501,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.9.0 a v2.9.2] — 20 y 21 de Octubre, 2026
+### [v0.0.9-alpha.0 a v0.0.9-alpha.2] — 20 y 21 de Octubre, 2026
 **Formatos Oficiales en Local, Avisos Push y Gestión de Roles**
 - **Llenado Local de Formatos Oficiales (S-21, S-89, S-140, S-88):** Completa papeletas e historiales en PDF directamente desde tu navegador sin subir documentos oficiales a la nube.
 - **Notificaciones Push en Segundo Plano:** Recordatorios de asignaciones y turnos que llegan a tu teléfono móvil incluso si la app o el navegador están cerrados.
@@ -509,7 +509,7 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ---
 
-### [v2.0.0 a v2.8.12] — Resumen de Fundamentos de Kongre
+### [v0.0.1 a v0.0.8 (Alfa Inicial)] — Resumen de Fundamentos de Kongre
 - **Gráficos de Tendencias de Asistencia:** Estadísticas mensuales del año de servicio y comparación presencial vs. Zoom.
 - **Territorios Digitales y Mapas:** Asignación de territorios con enlaces QR y direcciones de no visitar.
 - **Control de Acceso por Roles (RBAC):** Privilegios diferenciados para Coordinador, Ancianos, Siervos Ministeriales, Precursores y Publicadores.

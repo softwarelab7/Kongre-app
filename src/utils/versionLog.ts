@@ -56,7 +56,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.35',
+    version: '0.1.0-alpha.35',
     buildCode: '2026.10.26.7690',
     date: '26 de Octubre, 2026',
     title: 'Diseño Fluido de Ancho Completo y Corrección de Tarjeta Push en Columnas',
@@ -75,7 +75,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.34',
+    version: '0.1.0-alpha.34',
     buildCode: '2026.10.26.7680',
     date: '26 de Octubre, 2026',
     title: 'Rediseño Integral del Panel y Vista de Perfil de Usuario',
@@ -94,7 +94,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.33',
+    version: '0.1.0-alpha.33',
     buildCode: '2026.10.26.7670',
     date: '26 de Octubre, 2026',
     title: 'Rediseño de Barra Superior en PC: Buscador Central y Dock Minimalista de Solo Iconos',
@@ -117,7 +117,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.32',
+    version: '0.1.0-alpha.32',
     buildCode: '2026.10.26.7669',
     date: '26 de Octubre, 2026',
     title: 'Unificación Integral de Cabecera Móvil y Contenedores Cohesivos de Control',
@@ -140,7 +140,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.31',
+    version: '0.1.0-alpha.31',
     buildCode: '2026.10.26.7668',
     date: '26 de Octubre, 2026',
     title: 'Unificación Visual Móvil: Colores Consistentes, Cuadrículas sin Cortes y Tablas Adaptativas',
@@ -163,7 +163,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.30',
+    version: '0.1.0-alpha.30',
     buildCode: '2026.10.26.7667',
     date: '26 de Octubre, 2026',
     title: 'Botones Atrás Móviles Minimalistas (Solo Icono sin Texto)',
@@ -178,7 +178,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.29',
+    version: '0.1.0-alpha.29',
     buildCode: '2026.10.26.7666',
     date: '26 de Octubre, 2026',
     title: 'Botón Atrás en Todas las Nuevas Páginas Móviles (Antiguos Pop-ups)',
@@ -197,7 +197,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.28',
+    version: '0.1.0-alpha.28',
     buildCode: '2026.10.26.7665',
     date: '26 de Octubre, 2026',
     title: 'Experiencia Móvil 100% Nativa sin Pop-ups (Vistas a Pantalla Completa)',
@@ -220,7 +220,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.27',
+    version: '0.1.0-alpha.27',
     buildCode: '2026.10.26.7660',
     date: '26 de Octubre, 2026',
     title: 'Optimización de Interfaz Móvil: Menú Limpio, Calendario Integrado, Mi Ministerio y Programa de Reuniones',
@@ -247,7 +247,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.26',
+    version: '0.1.0-alpha.26',
     buildCode: '2026.10.26.7650',
     date: '26 de Octubre, 2026',
     title: 'Estabilidad en Reposo de Pestaña, Prevención de Pantalla en Blanco y Optimización de Sincronización en Segundo Plano',
@@ -270,7 +270,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.25',
+    version: '0.1.0-alpha.25',
     buildCode: '2026.10.26.7600',
     date: '26 de Octubre, 2026',
     title: 'Blindaje de Concurrencia en Bóveda Local, Rotación Segura de Credenciales, Revalidación de Tokens y Cronómetro iOS',
@@ -297,7 +297,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.24',
+    version: '0.1.0-alpha.24',
     buildCode: '2026.10.25.7500',
     date: '25 de Octubre, 2026',
     title: 'Token de Rol Firmado por Servidor y Fase 2 de Bóveda Local para Salud (DPA) y Notas Confidenciales',
@@ -324,7 +324,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.23',
+    version: '0.1.0-alpha.23',
     buildCode: '2026.10.25.7400',
     date: '25 de Octubre, 2026',
     title: 'Rediseño Arquitectónico desde Cero de Estado Espiritual y las 11 Tarjetas del Publicador con Bloques Numerados y Cintas de KPIs',
@@ -351,7 +351,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.22',
+    version: '0.1.0-alpha.22',
     buildCode: '2026.10.25.7300',
     date: '25 de Octubre, 2026',
     title: 'Rediseño Editorial Completo de las 11 Tarjetas del Publicador, el Hub de Categorías, Registro S-21, Contactos de Emergencia y Credenciales PIN/QR',
@@ -378,7 +378,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.21',
+    version: '0.1.0-alpha.21',
     buildCode: '2026.10.25.7200',
     date: '25 de Octubre, 2026',
     title: 'Renovación Integral de las Tarjetas del Publicador: Información Personal, Contacto y GPS, Estado Espiritual, DPA, Asignaciones e Historial',
@@ -405,7 +405,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.20',
+    version: '0.1.0-alpha.20',
     buildCode: '2026.10.25.7100',
     date: '25 de Octubre, 2026',
     title: 'Analítica Gráfica con Recharts y Selector Multi-Grupo de Servicio en el Tablero de Equidad (EquidadDashboardTab)',
@@ -428,7 +428,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.19',
+    version: '0.1.0-alpha.19',
     buildCode: '2026.10.25.7000',
     date: '25 de Octubre, 2026',
     title: 'Centro Local y Motor Universal de Carga y Relleno Automático de Plantillas PDF Oficiales (S-21, S-89, S-140, S-88, S-13, S-26, S-30, S-25, S-28 y S-1)',
@@ -459,7 +459,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.18',
+    version: '0.1.0-alpha.18',
     buildCode: '2026.10.25.6900',
     date: '25 de Octubre, 2026',
     title: 'Auditoría de Secretaría, Carpeta Ejecutiva de Visita del Sup. de Circuito, Literatura (S-28/S-14), Mantenimiento/Emergencias y Contabilidad (S-26/S-30/S-25)',
@@ -490,7 +490,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.17',
+    version: '0.1.0-alpha.17',
     buildCode: '2026.10.25.6800',
     date: '25 de Octubre, 2026',
     title: 'Suite Integral de Gestión Congregacional: Intercambio de Oradores, Deberes y Aseo, Carritos, Agrupación Familiar, Salidas al Campo, Cartelera Digital y Equidad Ponderada',
@@ -525,7 +525,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.16',
+    version: '0.1.0-alpha.16',
     buildCode: '2026.10.23.6700',
     date: '23 de Octubre, 2026',
     title: 'Optimización Integral de Experiencia Móvil (Auditoría UI/UX, Gestos Táctiles y Ergonomía)',
@@ -548,7 +548,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.15',
+    version: '0.1.0-alpha.15',
     buildCode: '2026.10.23.6600',
     date: '23 de Octubre, 2026',
     title: 'Indicador de Carga Global (LoadingSpinner) durante la Sincronización con Supabase',
@@ -567,7 +567,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.14',
+    version: '0.1.0-alpha.14',
     buildCode: '2026.10.23.6500',
     date: '23 de Octubre, 2026',
     title: 'Redacción Institucional y Profesional de Términos de Uso y Política de Privacidad',
@@ -590,7 +590,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.13',
+    version: '0.1.0-alpha.13',
     buildCode: '2026.10.23.6400',
     date: '23 de Octubre, 2026',
     title: 'Vistas Dedicadas de Página Completa para Registro de Versiones (Changelog) y Términos y Privacidad',
@@ -609,7 +609,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.12',
+    version: '0.1.0-alpha.12',
     buildCode: '2026.10.23.6300',
     date: '23 de Octubre, 2026',
     title: 'Aceptación Obligatoria de Términos de Uso y Política de Privacidad en Registro y Primer Ingreso',
@@ -632,7 +632,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.11',
+    version: '0.1.0-alpha.11',
     buildCode: '2026.10.23.6200',
     date: '23 de Octubre, 2026',
     title: 'Autenticación de Dos Pasos (2FA) con Microsoft Authenticator y Códigos de Respaldo',
@@ -663,7 +663,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.10',
+    version: '0.1.0-alpha.10',
     buildCode: '2026.10.23.6100',
     date: '23 de Octubre, 2026',
     title: 'Páginas Legales Oficiales y Rutas Directas de Privacidad y Términos para Verificación de Google',
@@ -686,7 +686,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.9',
+    version: '0.1.0-alpha.9',
     buildCode: '2026.10.23.6000',
     date: '23 de Octubre, 2026',
     title: 'Corrección de Re-autenticación y Selector de Cuentas con Google',
@@ -709,7 +709,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.8',
+    version: '0.1.0-alpha.8',
     buildCode: '2026.10.23.5900',
     date: '23 de Octubre, 2026',
     title: 'Sincronización Precisa de Historial y Vistas en Portal de Bienvenida',
@@ -732,7 +732,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.7',
+    version: '0.1.0-alpha.7',
     buildCode: '2026.10.23.5800',
     date: '23 de Octubre, 2026',
     title: 'Auditoría Profunda de Seguridad: Mitigación de DoS en Rate Limits, Purga de PIN en Texto Plano y Blindaje Anti-Bypass',
@@ -767,7 +767,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.6',
+    version: '0.1.0-alpha.6',
     buildCode: '2026.10.23.5700',
     date: '23 de Octubre, 2026',
     title: 'Remediación Integral de Seguridad: Cifrado en Reposo CTR con Tag MAC, CSP Estricta sin Unsafe-Inline y Claves Ligadas a Entropía',
@@ -810,7 +810,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.5',
+    version: '0.1.0-alpha.5',
     buildCode: '2026.10.23.5600',
     date: '23 de Octubre, 2026',
     title: 'CSP Activo en Producción, Higiene de PWA Caching y Orígenes Restringidos en Errores 500',
@@ -833,7 +833,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.4',
+    version: '0.1.0-alpha.4',
     buildCode: '2026.10.23.5500',
     date: '23 de Octubre, 2026',
     title: 'Fortalecimiento de Invitaciones: 50 Bits de Entropía Criptográfica y Hash v2 Normalizado',
@@ -852,7 +852,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.3',
+    version: '0.1.0-alpha.3',
     buildCode: '2026.10.23.5400',
     date: '23 de Octubre, 2026',
     title: 'Minimización de Datos en Nube (Ley 1581) e Higiene de Dependencias (0 Vulnerabilidades)',
@@ -871,7 +871,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.2',
+    version: '0.1.0-alpha.2',
     buildCode: '2026.10.23.5300',
     date: '23 de Octubre, 2026',
     title: 'Blindaje de Seguridad Integral: Cifrado en Reposo (Ley 1581), Cabeceras HTTP y Dominio Oficial',
@@ -902,7 +902,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.1',
+    version: '0.1.0-alpha.1',
     buildCode: '2026.10.23.5200',
     date: '23 de Octubre, 2026',
     title: 'Transición Fluida de OAuth con Google y Diseño Full-Width en Portal de Acceso',
@@ -925,7 +925,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.12.0',
+    version: '0.1.0-alpha.0',
     buildCode: '2026.10.23.5100',
     date: '23 de Octubre, 2026',
     title: 'Sincronización Segura vía Supabase Edge Function y Blindaje Criptográfico de PINs y Roles',
@@ -960,7 +960,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.11.8',
+    version: '0.0.11-alpha.8',
     buildCode: '2026.10.22.4501',
     date: '22 de Octubre, 2026',
     title: 'Eliminación del Menú Lateral en Dispositivos Móviles y Navegación Exclusiva Inferior',
@@ -982,7 +982,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.11.7',
+    version: '0.0.11-alpha.7',
     buildCode: '2026.10.22.4401',
     date: '22 de Octubre, 2026',
     title: 'Control de Barra Lateral Oculto Detrás del Icono de Congregación con Revelación al Pasar el Cursor',
@@ -1001,7 +1001,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.11.6',
+    version: '0.0.11-alpha.6',
     buildCode: '2026.10.22.4301',
     date: '22 de Octubre, 2026',
     title: 'Corrección Definitiva de Ubicación del Control de Barra Lateral en Cabecera',
@@ -1024,7 +1024,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.11.5',
+    version: '0.0.11-alpha.5',
     buildCode: '2026.10.22.4201',
     date: '22 de Octubre, 2026',
     title: 'Optimización Ergonómica del Control para Ocultar Barra Lateral y Atajo Global Ctrl+B',
@@ -1047,7 +1047,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.11.4',
+    version: '0.0.11-alpha.4',
     buildCode: '2026.10.22.4101',
     date: '22 de Octubre, 2026',
     title: 'Eliminación de Barra de Cabecera Redundante en Mi Ministerio y Limpieza de Repeticiones en Navegación',
@@ -1070,7 +1070,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.11.3',
+    version: '0.0.11-alpha.3',
     buildCode: '2026.10.22.4001',
     date: '22 de Octubre, 2026',
     title: 'Autoguardado Instantáneo de Tiempo de Ministerio (+15m) y Sincronización Multidispositivo en Tiempo Real',
@@ -1093,7 +1093,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.11.2',
+    version: '0.0.11-alpha.2',
     buildCode: '2026.10.22.3901',
     date: '22 de Octubre, 2026',
     title: 'Estrategia Avanzada de Caché en Service Worker y Persistencia Offline de Formularios S-89 con IndexedDB',
@@ -1120,7 +1120,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.11.1',
+    version: '0.0.11-alpha.1',
     buildCode: '2026.10.22.3801',
     date: '22 de Octubre, 2026',
     title: 'Blindaje de Invitaciones por QR y PIN, Asignación Inmediata de Rol Teocrático y Aislamiento de Modo Demo',
@@ -1146,7 +1146,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.11.0',
+    version: '0.0.11-alpha.0',
     buildCode: '2026.10.22.3701',
     date: '22 de Octubre, 2026',
     title: 'Nuevo Panel "Mi Congregación", Estadísticas de Secretaría y Auditoría de Accesibilidad ARIA',
@@ -1172,7 +1172,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.10.9',
+    version: '0.0.10-alpha.9',
     buildCode: '2026.10.21.3601',
     date: '21 de Octubre, 2026',
     title: 'Nuevo Cronómetro de Predicación Circular de Precisión y Chip Navbar',
@@ -1198,7 +1198,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.10.8',
+    version: '0.0.10-alpha.8',
     buildCode: '2026.10.21.3501',
     date: '21 de Octubre, 2026',
     title: 'Optimización Global de Interfaz: Arranque Directo con Contenido (Opción 1) en Toda la App',
@@ -1224,7 +1224,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.10.7',
+    version: '0.0.10-alpha.7',
     buildCode: '2026.10.21.3412',
     date: '21 de Octubre, 2026',
     title: 'Reloj Animado de Bloqueo por Inactividad, Anillos SVG y Aviso Flotante',
@@ -1250,7 +1250,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.10.6',
+    version: '0.0.10-alpha.6',
     buildCode: '2026.10.21.3411',
     date: '21 de Octubre, 2026',
     title: 'Optimización de Interfaz: Eliminación de Banner Redundante en Ajustes (Opción 1)',
@@ -1271,7 +1271,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.10.5',
+    version: '0.0.10-alpha.5',
     buildCode: '2026.10.21.3410',
     date: '21 de Octubre, 2026',
     title: 'Botón de Modo Oscuro Sin Contenedor, Animación Fluida y Luna Blanca Nítida',
@@ -1292,7 +1292,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.10.4',
+    version: '0.0.10-alpha.4',
     buildCode: '2026.10.21.3400',
     date: '21 de Octubre, 2026',
     title: 'Auditoría Integral y Persistencia Total de Configuraciones y Datos en Supabase',
@@ -1318,7 +1318,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.10.3',
+    version: '0.0.10-alpha.3',
     buildCode: '2026.10.21.3300',
     date: '21 de Octubre, 2026',
     title: 'Eliminación del Diálogo "¿Quién eres?" al Acceder con PIN',
@@ -1332,7 +1332,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.10.2',
+    version: '0.0.10-alpha.2',
     buildCode: '2026.10.21.3200',
     date: '21 de Octubre, 2026',
     title: 'Corrección Definitiva del Icono Oficial de Kongre en Pantalla de Inicio de iPhone (iOS Safari)',
@@ -1354,7 +1354,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.10.1',
+    version: '0.0.10-alpha.1',
     buildCode: '2026.10.21.3100',
     date: '21 de Octubre, 2026',
     title: 'Iconos PWA, Pantallas de Carga iOS y Nuevo Selector de Tema Animado (2 Modos: Claro y Oscuro)',
@@ -1380,7 +1380,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.10.0',
+    version: '0.0.10-alpha.0',
     buildCode: '2026.10.21.3000',
     date: '21 de Octubre, 2026',
     title: 'Suite de Funciones para Publicadores, Gestos Táctiles (Swipe) y Menú Independiente de Panorama General',
@@ -1418,7 +1418,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.9.2',
+    version: '0.0.9-alpha.2',
     buildCode: '2026.10.21.2902',
     date: '21 de Octubre, 2026',
     title: 'Suscripción a Notificaciones Web Push en Segundo Plano (Con App Cerrada)',
@@ -1443,7 +1443,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.9.1',
+    version: '0.0.9-alpha.1',
     buildCode: '2026.10.21.2901',
     date: '21 de Octubre, 2026',
     title: 'Bóveda y Rellenador 100% Local de Formatos Oficiales (S-21, S-89, S-140, S-88) y Conexión Integral de Publicadores',
@@ -1468,7 +1468,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.9.0',
+    version: '0.0.9-alpha.0',
     buildCode: '2026.10.20.2900',
     date: '20 de Octubre, 2026',
     title: 'Gestor Dedicado de Roles Teocráticos a Pantalla Completa y Nuevo Sistema de Íconos',
@@ -1509,7 +1509,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.12',
+    version: '0.0.8-alpha.12',
     buildCode: '2026.10.20.2812',
     date: '20 de Octubre, 2026',
     title: 'Rediseño del Menú Móvil y Optimización Integral de Interfaz para Teléfonos',
@@ -1535,7 +1535,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.11',
+    version: '0.0.8-alpha.11',
     buildCode: '2026.10.20.2811',
     date: '20 de Octubre, 2026',
     title: 'Eliminación Completa de Funciones de IA Externa y Operación 100% Local Determinista',
@@ -1553,7 +1553,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.10',
+    version: '0.0.8-alpha.10',
     buildCode: '2026.10.20.2810',
     date: '20 de Octubre, 2026',
     title: 'Capa 6 de Seguridad: Invitaciones Hasheadas en Nube, Protección Anti-Formula-Injection CSV, Guardia RBAC de Modales y Enlaces Firmados',
@@ -1579,7 +1579,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.9',
+    version: '0.0.8-alpha.9',
     buildCode: '2026.10.20.289',
     date: '20 de Octubre, 2026',
     title: 'Blindaje Integral de Seguridad Criptográfica en 5 Capas (Zero-Knowledge, Anti-Brute-Force, Tokens QR, Auditoría SHA-256 y Respaldos Firmados)',
@@ -1605,7 +1605,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.8',
+    version: '0.0.8-alpha.8',
     buildCode: '2026.10.19.288',
     date: '19 de Octubre, 2026',
     title: 'Optimización de Roles Teocráticos, Ingreso por ID/PIN entre Dispositivos y Códigos de Invitación QR',
@@ -1631,7 +1631,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.7',
+    version: '0.0.8-alpha.7',
     buildCode: '2026.10.19.287',
     date: '19 de Octubre, 2026',
     title: 'Vista Previa de Documentos PDF antes de Descargar y Orientación de Página',
@@ -1658,7 +1658,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.6',
+    version: '0.0.8-alpha.6',
     buildCode: '2026.10.19.286',
     date: '19 de Octubre, 2026',
     title: 'Unificación de Barra Inferior, Términos Legales, Botón de Tema y Mejoras Móviles',
@@ -1684,7 +1684,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.5',
+    version: '0.0.8-alpha.5',
     buildCode: '2026.10.19.285',
     date: '19 de Octubre, 2026',
     title: 'Soporte Completo de Icono PWA en iPhone (iOS Apple Touch Icon)',
@@ -1710,7 +1710,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.4',
+    version: '0.0.8-alpha.4',
     buildCode: '2026.10.18.284',
     date: '18 de Octubre, 2026',
     title: 'Estandarización de Marca Oficial Índigo #4C3AED y Optimización de Activos',
@@ -1741,7 +1741,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.3',
+    version: '0.0.8-alpha.3',
     buildCode: '2026.10.18.283',
     date: '18 de Octubre, 2026',
     title: 'Eliminación Total de Iconos v4 y Estandarización Teocrática',
@@ -1762,7 +1762,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.2',
+    version: '0.0.8-alpha.2',
     buildCode: '2026.10.18.282',
     date: '18 de Octubre, 2026',
     title: 'Optimización de Espaciados en Bienvenida PC y Modo Demo Sin Bloqueos',
@@ -1788,7 +1788,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.1',
+    version: '0.0.8-alpha.1',
     buildCode: '2026.10.18.281',
     date: '18 de Octubre, 2026',
     title: 'Aislamiento Local del Modo Demo (Sin Conexión a Supabase)',
@@ -1809,7 +1809,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.8.0',
+    version: '0.0.8-alpha.0',
     buildCode: '2026.10.18.280',
     date: '18 de Octubre, 2026',
     title: 'Diseño Oficial de Bienvenida para PC / Escritorio (Kongre v3)',
@@ -1835,7 +1835,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.7.0',
+    version: '0.0.7-alpha.0',
     buildCode: '2026.10.18.270',
     date: '18 de Octubre, 2026',
     title: 'Dashboard Visual de Tendencias de Asistencia con Recharts',
@@ -1865,7 +1865,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.6.0',
+    version: '0.0.6-alpha.0',
     buildCode: '2026.10.17.260',
     date: '17 de Octubre, 2026',
     title: 'Sincronización en Cola Offline con IndexedDB y Supabase',
@@ -1896,7 +1896,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.5.0',
+    version: '0.0.5-alpha.0',
     buildCode: '2026.10.17.250',
     date: '17 de Octubre, 2026',
     title: 'Registro de Versión en Pie de Página y Navegación Histórica',
@@ -1930,7 +1930,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.4.0',
+    version: '0.0.4-alpha.0',
     buildCode: '2026.10.16.240',
     date: '16 de Octubre, 2026',
     title: 'Autenticación Simplificada por ID de Congregación y PIN Personal',
@@ -1956,7 +1956,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.3.0',
+    version: '0.0.3-alpha.0',
     buildCode: '2026.10.15.230',
     date: '15 de Octubre, 2026',
     title: 'Pocket Mode Teocrático, Códigos QR y Enlaces Directos',
@@ -1982,7 +1982,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.2.0',
+    version: '0.0.2-alpha.0',
     buildCode: '2026.10.14.220',
     date: '14 de Octubre, 2026',
     title: 'Sincronización en la Nube y Respaldo Híbrido',
@@ -2004,7 +2004,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.1.0',
+    version: '0.0.1-alpha.0',
     buildCode: '2026.10.12.210',
     date: '12 de Octubre, 2026',
     title: 'Formularios Oficiales S-21, S-88, S-89 e Informes S-1',
@@ -2030,7 +2030,7 @@ export const VERSION_HISTORY: VersionRecord[] = [
     ],
   },
   {
-    version: '2.0.0',
+    version: '0.0.0-alpha.0',
     buildCode: '2026.10.10.200',
     date: '10 de Octubre, 2026',
     title: 'Rediseño Integral Kongre, Tema Oscuro y PWA',

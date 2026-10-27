@@ -198,7 +198,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
                 className="inline-flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors cursor-pointer"
               >
                 <Monitor className="w-3.5 h-3.5 text-indigo-500" />
-                <span>App Escritorio (PC / Mac)</span>
+                <span>Kongre App (PC / Mac)</span>
               </button>
 
               <span className="text-slate-300 dark:text-slate-700 hidden lg:inline">•</span>

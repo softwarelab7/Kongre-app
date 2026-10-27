@@ -1598,7 +1598,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     >
                       <span className="flex items-center gap-2.5 min-w-0">
                         <Monitor className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                        <span className="truncate">Descargar App de Escritorio</span>
+                        <span className="truncate">Descargar Kongre App</span>
                       </span>
                       <Download className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                     </button>

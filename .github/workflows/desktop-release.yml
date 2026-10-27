@@ -60,8 +60,8 @@ jobs:
         with:
           tauriScript: "npm run tauri"
           tagName: ${{ github.event.inputs.release_tag || github.ref_name }}
-          releaseName: 'Kongre Desktop ${{ github.event.inputs.release_tag || github.ref_name }}'
-          releaseBody: 'Descarga el instalador nativo de Kongre para Windows (.exe / .msi), macOS (.dmg) o Linux (.deb / .AppImage).'
+          releaseName: 'Kongre App ${{ github.event.inputs.release_tag || github.ref_name }}'
+          releaseBody: 'Descarga el instalador nativo de Kongre App para Windows (.exe / .msi), macOS (.dmg) o Linux (.rpm / .deb / .AppImage).'
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}

@@ -19,7 +19,7 @@ interface DesktopDownloadModalProps {
 
 type OperatingSystem = 'windows' | 'mac' | 'fedora' | 'linux' | 'unknown';
 
-const DOWNLOAD_BASE_URL = 'https://github.com/softwarelab7/Kongre-Desktop/releases/latest/download';
+const DOWNLOAD_BASE_URL = 'https://github.com/softwarelab7/Kongre-app/releases/latest/download';
 
 export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOpen, onClose }) => {
   const [detectedOs, setDetectedOs] = useState<OperatingSystem>('windows');
@@ -150,7 +150,7 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                Kongre para Escritorio
+                Kongre App
               </h2>
               <span className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
                 v{CURRENT_APP_VERSION}
@@ -262,7 +262,7 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
           <span>Descargas seguras y verificadas con suma de verificación SHA-256.</span>
           <a
-            href="https://github.com/softwarelab7/Kongre-Desktop"
+            href="https://github.com/softwarelab7/Kongre-app"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"

@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Kongre",
+  "productName": "Kongre App",
   "version": "2.12.35",
   "identifier": "org.kongre.desktop",
   "build": {
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Kongre - Gestor Teocrático",
+        "title": "Kongre App - Gestor Teocrático",
         "width": 1280,
         "height": 840,
         "minWidth": 960,

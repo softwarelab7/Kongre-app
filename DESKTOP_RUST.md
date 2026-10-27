@@ -1,6 +1,6 @@
-# Kongre Desktop en Rust (Windows, Linux, macOS)
+# Kongre App en Rust (Windows, Linux, macOS)
 
-Kongre ahora cuenta con soporte oficial para compilación nativa en escritorio mediante **Tauri v2 (Rust)**.
+Kongre App ahora cuenta con soporte oficial para compilación nativa en escritorio mediante **Tauri v2 (Rust)**.
 
 Esta arquitectura combina:
 - **Frontend:** React 19 + TypeScript + Vite + TailwindCSS (código existente, 100% reutilizado).

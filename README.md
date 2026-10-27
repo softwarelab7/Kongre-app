@@ -1,11 +1,15 @@
 <div align="center">
 
+<br />
+<img src="assets/logo.png" width="100" height="100" alt="Kongre App Logo" style="border-radius: 22px;" />
+
 # 🏛️ Kongre App
 
 ### Gestor Teocrático Integral para Congregaciones
 **Aplicación nativa de alto rendimiento desarrollada con Rust para Windows, macOS y Linux.**
 
-[![Versión Actual](https://img.shields.io/badge/Versi%C3%B3n-v2.12.35-4F46E5?style=for-the-badge&logo=rocket)](https://github.com/softwarelab7/Kongre-app/releases/tag/v2.12.35)
+[![Fase](https://img.shields.io/badge/Estado-Versi%C3%B3n%20Alfa%20Preliminar-EA580C?style=for-the-badge&logo=speedtest)](https://github.com/softwarelab7/Kongre-app/releases)
+[![Build](https://img.shields.io/badge/Build-v2.12.35%20(Alfa)-4F46E5?style=for-the-badge&logo=rocket)](https://github.com/softwarelab7/Kongre-app/releases/tag/v2.12.35)
 [![Plataformas](https://img.shields.io/badge/Plataformas-Windows%20%7C%20macOS%20%7C%20Linux-0EA5E9?style=for-the-badge&logo=linux)](https://github.com/softwarelab7/Kongre-app/releases)
 [![Seguridad](https://img.shields.io/badge/Cifrado-AES--256--GCM-10B981?style=for-the-badge&logo=shield)](https://kongre-app.com)
 [![Modo](https://img.shields.io/badge/Operaci%C3%B3n-100%25%20Offline-F59E0B?style=for-the-badge&logo=offline)](https://kongre-app.com)
@@ -16,6 +20,12 @@
 
 </div>
 
+> ⚠️ **Nota de Versión Alfa (Acceso Anticipado / Pruebas Activas):**  
+> Kongre App se encuentra actualmente en fase de **desarrollo Alfa preliminar (Build v2.12.35)**. Aunque los módulos clave (reuniones, S-89, S-21, territorios y la bóveda criptográfica) están totalmente operativos y listos para uso, la aplicación continúa en constante perfeccionamiento y corrección de detalles visuales y de rendimiento.  
+> Apreciamos profundamente tu paciencia y tus reportes de mejora mientras avanzamos hacia la versión Beta y el lanzamiento estable final.
+
+---
+
 ## 📖 Acerca de Kongre App
 
 **Kongre App** es una plataforma integral diseñada para simplificar y optimizar la administración de congregaciones. Proporciona a ancianos, siervos ministeriales y publicadores herramientas teocráticas modernas, organizadas y seguras.
@@ -24,7 +34,7 @@ A diferencia de las herramientas convencionales, **Kongre App** funciona con una
 
 ---
 
-## 📥 Descargas Oficiales (Versión v2.12.35)
+## 📥 Descargas Oficiales (Build Alfa v2.12.35)
 
 Descarga el instalador correspondiente a tu sistema operativo con un solo clic:
 

@@ -6,13 +6,15 @@
 # 🏛️ Kongre App
 
 ### Gestor Teocrático Integral para Congregaciones
-**Aplicación nativa de alto rendimiento desarrollada con Rust para Windows, macOS y Linux.**
+
+**Aplicación nativa de alto rendimiento desarrollada con Rust, React y Tauri v2 para Windows, macOS y Linux.**
 
 [![Fase](https://img.shields.io/badge/Estado-Versi%C3%B3n%20Alfa%20Preliminar-EA580C?style=for-the-badge&logo=speedtest)](https://github.com/softwarelab7/Kongre-app/releases)
 [![Build](https://img.shields.io/badge/Build-v0.1.0--alpha.35%20(Alfa)-4F46E5?style=for-the-badge&logo=rocket)](https://github.com/softwarelab7/Kongre-app/releases/tag/v0.1.0-alpha.35)
 [![Plataformas](https://img.shields.io/badge/Plataformas-Windows%20%7C%20macOS%20%7C%20Linux-0EA5E9?style=for-the-badge&logo=linux)](https://github.com/softwarelab7/Kongre-app/releases)
 [![Seguridad](https://img.shields.io/badge/Cifrado-AES--256--GCM-10B981?style=for-the-badge&logo=shield)](https://kongre-app.com)
 [![Modo](https://img.shields.io/badge/Operaci%C3%B3n-100%25%20Offline-F59E0B?style=for-the-badge&logo=offline)](https://kongre-app.com)
+[![Filosofia](https://img.shields.io/badge/Proyecto-100%25%20Gratuito%20y%20con%20Amor%20%E2%9D%A4%EF%B8%8F-EC4899?style=for-the-badge)](https://kongre-app.com)
 
 🌐 **Sitio Web Oficial:** [https://kongre-app.com](https://kongre-app.com)
 
@@ -31,6 +33,26 @@
 **Kongre App** es una plataforma integral diseñada para simplificar y optimizar la administración de congregaciones. Proporciona a ancianos, siervos ministeriales y publicadores herramientas teocráticas modernas, organizadas y seguras.
 
 A diferencia de las herramientas convencionales, **Kongre App** funciona con una arquitectura **Offline-First**, lo que permite utilizar todas las funciones en el Salón del Reino o en predicación sin necesidad de conexión a Internet, sincronizando automáticamente los cambios en cuanto se restablece la red.
+
+---
+
+## ❤️ Hecho con Amor, 100% Gratuito y Verdaderamente Multiplataforma
+
+> *"Recibieron gratis; den gratis."*
+
+**Kongre App** nace del deseo sincero de poner nuestras habilidades técnicas al servicio de los hermanos, eliminando las dos grandes barreras que suelen presentar otros programas de gestión teocrática: **el cobro de licencias** y **la limitación de depender exclusivamente de Windows**.
+
+* 🎁 **100% Gratuito para siempre:** Aunque existen herramientas similares cuyos desarrolladores cobran licencias o suscripciones anuales, nuestra convicción es que el apoyo a las congregaciones no debe tener barreras económicas. Este proyecto se entrega con amor como un aporte voluntario: sin pagos, sin planes "Pro" ni funciones bloqueadas.
+* 💻 **Nativo en Windows, macOS y Linux:** Mientras que otros programas tradicionales están construidos con tecnologías antiguas que solo funcionan en PC con Windows (obligando a usar emuladores o máquinas virtuales en otros sistemas), **Kongre App** está desarrollada con **Rust, React y Tauri v2**. Esto garantiza instaladores nativos, ultraligeros y veloces para Windows 10/11, Mac (Apple Silicon M1-M4 e Intel) y distribuciones Linux.
+* 🔒 **Privacidad local sin costos ocultos:** Gracias a su arquitectura **Offline-First** y su bóveda **AES-256-GCM**, la información sensible permanece protegida directamente en el dispositivo de cada hermano.
+
+| Característica | Otros Programas Tradicionales | 🏛️ Kongre App |
+| :--- | :---: | :---: |
+| **Licencia / Costo** | Licencia de pago / Suscripción | **100% Gratuito y con Amor ❤️** |
+| **Windows 10 / 11** | ✅ | **✅ Nativo (`.exe` / `.msi`)** |
+| **macOS (Apple Silicon & Intel)** | ❌ (O requiere emulación) | **✅ Nativo Universal (`.dmg`)** |
+| **Linux (Fedora, Ubuntu, Debian)** | ❌ | **✅ Nativo (`.rpm` / `.deb` / `.AppImage`)** |
+| **Tecnología Base** | Legacy (Atada a Windows) | **Moderna (Rust + React + Tauri v2)** |
 
 ---
 
@@ -126,6 +148,6 @@ Kongre App incorpora una arquitectura de seguridad diseñada bajo los más rigur
 ### 🌐 Conoce más y accede a la versión en la nube:
 ### 👉 [https://kongre-app.com](https://kongre-app.com)
 
-*Kongre App es una herramienta desarrollada por y para el beneficio de las congregaciones.*
+*Kongre App es una herramienta desarrollada con ❤️, 100% gratuita, por y para el beneficio de todas las congregaciones.*
 
 </div>

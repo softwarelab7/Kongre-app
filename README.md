@@ -1,29 +1,121 @@
+<div align="center">
+
 # 🏛️ Kongre App
 
-> Gestor Teocrático Integral para Congregaciones (Windows, macOS, Linux).
+### Gestor Teocrático Integral para Congregaciones
+**Aplicación nativa de alto rendimiento desarrollada con Rust para Windows, macOS y Linux.**
 
-**Kongre App** es una aplicación de escritorio de alto rendimiento diseñada con **Rust**, segura, privada y con soporte 100% offline para la gestión de asignaciones, reuniones, asistencia S-88 y territorios.
+[![Versión Actual](https://img.shields.io/badge/Versi%C3%B3n-v2.12.35-4F46E5?style=for-the-badge&logo=rocket)](https://github.com/softwarelab7/Kongre-app/releases/tag/v2.12.35)
+[![Plataformas](https://img.shields.io/badge/Plataformas-Windows%20%7C%20macOS%20%7C%20Linux-0EA5E9?style=for-the-badge&logo=linux)](https://github.com/softwarelab7/Kongre-app/releases)
+[![Seguridad](https://img.shields.io/badge/Cifrado-AES--256--GCM-10B981?style=for-the-badge&logo=shield)](https://kongre-app.com)
+[![Modo](https://img.shields.io/badge/Operaci%C3%B3n-100%25%20Offline-F59E0B?style=for-the-badge&logo=offline)](https://kongre-app.com)
 
----
-
-## 📥 Descargas Oficiales de Kongre App (Versión v2.12.35)
-
-| Sistema Operativo | Tipo de Instalador | Enlace de Descarga Directa |
-| :--- | :--- | :--- |
-| 🪟 **Windows 10 / 11** | Instalador ejecutable (.exe) | [Descargar Kongre App Setup (.exe)](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_x64-setup.exe) |
-| 🪟 **Windows (Empresarial)** | Paquete MSI (.msi) | [Descargar Kongre App MSI (.msi)](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_x64_en-US.msi) |
-| 🍎 **macOS (Apple Silicon & Intel)** | Imagen de disco (.dmg) | [Descargar Kongre App para Mac (.dmg)](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_universal.dmg) |
-| 🔵 **Fedora / Red Hat** | Paquete RPM (.rpm) | [Descargar Kongre App para Fedora (.rpm)](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre-2.12.35-1.x86_64.rpm) |
-| 🟠 **Ubuntu / Debian** | Paquete Debian (.deb) | [Descargar Kongre App para Ubuntu (.deb)](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_amd64.deb) |
-| 🐧 **Linux (Universal)** | Portable (.AppImage) | [Descargar Kongre App Portable (.AppImage)](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_amd64.AppImage) |
+🌐 **Sitio Web Oficial:** [https://kongre-app.com](https://kongre-app.com)
 
 ---
 
-## 🔒 Privacidad y Seguridad
-- Cifrado en reposo AES-256-GCM y PBKDF2.
-- Funcionamiento 100% offline sin necesidad de conexión continua a Internet.
-- Sincronización segura cifrada de extremo a extremo.
+</div>
+
+## 📖 Acerca de Kongre App
+
+**Kongre App** es una plataforma integral diseñada para simplificar y optimizar la administración de congregaciones. Proporciona a ancianos, siervos ministeriales y publicadores herramientas teocráticas modernas, organizadas y seguras.
+
+A diferencia de las herramientas convencionales, **Kongre App** funciona con una arquitectura **Offline-First**, lo que permite utilizar todas las funciones en el Salón del Reino o en predicación sin necesidad de conexión a Internet, sincronizando automáticamente los cambios en cuanto se restablece la red.
 
 ---
 
-Para más información, visita la versión en línea en [kongre-seven.vercel.app](https://kongre-seven.vercel.app).
+## 📥 Descargas Oficiales (Versión v2.12.35)
+
+Descarga el instalador correspondiente a tu sistema operativo con un solo clic:
+
+| Sistema Operativo | Formato de Paquete | Arquitectura | Enlace de Descarga Directa | Tamaño |
+| :--- | :--- | :--- | :--- | :--- |
+| 🪟 **Windows 10 / 11** | Instalador ejecutable (`.exe`) | x64 (64 bits) | [⬇️ **Descargar Setup (.exe)**](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_x64-setup.exe) | 15.3 MB |
+| 🪟 **Windows (Empresarial)** | Paquete de sistema (`.msi`) | x64 (64 bits) | [⬇️ **Descargar MSI (.msi)**](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_x64_en-US.msi) | 16.1 MB |
+| 🍎 **macOS (Apple)** | Imagen de disco (`.dmg`) | Universal (Apple Silicon M1-M4 & Intel) | [⬇️ **Descargar para Mac (.dmg)**](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_universal.dmg) | 32.2 MB |
+| 🔵 **Fedora / Red Hat** | Paquete RPM (`.rpm`) | x86_64 | [⬇️ **Descargar para Fedora (.rpm)**](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre-2.12.35-1.x86_64.rpm) | 16.1 MB |
+| 🟠 **Ubuntu / Debian** | Paquete Debian (`.deb`) | amd64 | [⬇️ **Descargar para Ubuntu (.deb)**](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_amd64.deb) | 16.1 MB |
+| 🐧 **Linux (Universal)** | Binario Portable (`.AppImage`) | x86_64 | [⬇️ **Descargar Portable (.AppImage)**](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_amd64.AppImage) | 90.9 MB |
+
+---
+
+## 🚀 Guía de Instalación Rápida
+
+### 🪟 Windows
+1. Descarga el archivo [Kongre_2.12.35_x64-setup.exe](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_x64-setup.exe).
+2. Haz doble clic sobre el archivo descargado.
+3. Sigue los pasos del asistente de instalación (*Siguiente → Instalar*).
+4. El acceso directo se creará automáticamente en tu Escritorio y Menú Inicio.
+
+### 🍎 macOS
+1. Descarga el archivo [Kongre_2.12.35_universal.dmg](https://github.com/softwarelab7/Kongre-app/releases/download/v2.12.35/Kongre_2.12.35_universal.dmg).
+2. Abre la imagen de disco descargada con doble clic.
+3. Arrastra el icono de **Kongre App** a la carpeta **Aplicaciones**.
+4. ¡Listo! Compatible de forma nativa con procesadores M1, M2, M3, M4 e Intel.
+
+### 🔵 Fedora Linux / Red Hat / openSUSE
+Abre tu terminal en la carpeta de descargas y ejecuta:
+```bash
+sudo dnf install ./Kongre-2.12.35-1.x86_64.rpm
+```
+*O haz doble clic sobre el archivo `.rpm` para instalarlo a través del centro de software de KDE Discover / GNOME Software.*
+
+### 🟠 Ubuntu / Debian / Linux Mint
+Abre tu terminal en la carpeta de descargas y ejecuta:
+```bash
+sudo apt install ./Kongre_2.12.35_amd64.deb
+```
+
+### 🐧 Linux Universal (Cualquier distribución sin instalar)
+1. Descarga el archivo `.AppImage`.
+2. Dale permisos de ejecución:
+   ```bash
+   chmod +x Kongre_2.12.35_amd64.AppImage
+   ```
+3. Ejecútalo con `./Kongre_2.12.35_amd64.AppImage` o con doble clic desde tu explorador de archivos.
+
+---
+
+## ✨ Módulos y Funcionalidades Destacadas
+
+* 📅 **Reunión Vida y Ministerio (VMC) y Discursos Públicos:** Programa semanal completo, asignaciones estudiantiles, lector de Atalaya, oraciones y presidencia.
+* 📋 **Hojas de Asignación S-89:** Generación, previsualización e impresión instantánea en formato oficial PDF con respaldo offline.
+* 👥 **Fichas S-21 y Publicadores:** Gestión de tarjetas de registro de publicador S-21, horas anuales, grupos de servicio, precursores auxiliares y regulares.
+* 🗺️ **Territorios y Cartografía:** Control de manzanas, mapas satelitales y de calles en caché offline (OpenStreetMap, CartoDB, Esri Satelital) con alertas de vencimiento.
+* 📊 **Asistencia S-88:** Registro en vivo de asistentes presenciales y por videoconferencia, análisis de promedios mensuales y tendencias históricas.
+* ⏱️ **Cronómetro de Ministerio Personal:** Registro de horas, revisitas, cursos bíblicos e informes mensuales de predicación.
+* 🧹 **Mantenimiento y Cuadrantes:** Aseo del Salón del Reino, cabina de audio y video, panel eléctrico y tareas de conservación.
+* 📢 **Tablero de Anuncios:** Avisos fijados, eventos de congregación y cartas importantes al alcance de todos.
+* 🔔 **Notificaciones Push Teocráticas:** Recordatorios de asignaciones y avisos en tiempo real en tu dispositivo.
+
+---
+
+## 🔒 Privacidad, Seguridad y Bóveda Criptográfica
+
+Kongre App incorpora una arquitectura de seguridad diseñada bajo los más rigurosos estándares de protección de datos:
+
+* 🔐 **Bóveda AES-256-GCM + PBKDF2:** Todos los datos confidenciales almacenados localmente están cifrados en reposo con claves criptográficas no extraíbles respaldadas por IndexedDB.
+* 🔑 **Autenticación en 2 Pasos (2FA TOTP):** Compatible con Microsoft Authenticator y Google Authenticator para accesos de coordinador y ancianos.
+* 🛡️ **Control de Acceso por Roles (RBAC):** Privilegios estrictos según la responsabilidad teocrática (Coordinador, Anciano, Siervo Ministerial, Publicador).
+* 🔒 **Bloqueo Rápido de Sesión:** Bloqueo instantáneo con PIN local para proteger la pantalla si debes ausentarte del equipo.
+
+---
+
+## 💻 Requisitos del Sistema
+
+* **Windows:** Windows 10 o Windows 11 (64 bits).
+* **macOS:** macOS 11 (Big Sur) o superior.
+* **Linux:** Cualquier distribución con glibc 2.31+ (Fedora 34+, Ubuntu 20.04+, Debian 11+, Arch, etc.).
+* **Memoria RAM:** Mínimo 2 GB (Recomendado 4 GB).
+* **Espacio en disco:** Menos de 100 MB libres.
+
+---
+
+<div align="center">
+
+### 🌐 Conoce más y accede a la versión en la nube:
+### 👉 [https://kongre-app.com](https://kongre-app.com)
+
+*Kongre App es una herramienta desarrollada por y para el beneficio de las congregaciones.*
+
+</div>

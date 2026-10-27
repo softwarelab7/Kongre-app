@@ -38,7 +38,7 @@ A diferencia de las herramientas convencionales, **Kongre App** funciona con una
 
 ## ❤️ Un Proyecto Hecho con Amor y 100% Gratuito
 
-> *"Recibieron gratis; den gratis."*
+> *"Recibieron gratis; den gratis."* Mateo 10:8
 
 **Kongre App** nace del deseo sincero de poner nuestras habilidades técnicas al servicio de los hermanos, ofreciendo una herramienta moderna, accesible y pensada para apoyar las labores de todas las congregaciones:
 

@@ -84,7 +84,7 @@ import {
   NotificationPreferences,
   PushSubscriptionRecord,
 } from '../services/notificationService';
-import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
+import { CURRENT_APP_VERSION, CURRENT_APP_STAGE, BUILD_DATE } from '../utils/versionLog';
 
 export type SettingsCategoryTab =
   | 'all'
@@ -1702,10 +1702,15 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
                   <div className="p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
                     <RefreshCw size={22} />
                   </div>
-                  <span className="px-2.5 py-1 rounded-xl text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/40 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    v{CURRENT_APP_VERSION}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-lg text-[9.5px] font-extrabold uppercase bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                      {CURRENT_APP_STAGE}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/40 font-mono">
+                      v{CURRENT_APP_VERSION}
+                    </span>
+                  </div>
                 </div>
                 <h4 className="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                   Registro de Versiones y Changelog
@@ -1716,8 +1721,8 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ onNavigateToProfile, o
 
                 <div className="mt-4 p-3 rounded-2xl bg-zinc-50 dark:bg-white/[0.02] border border-zinc-100 dark:border-white/[0.04] space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
                   <div className="flex justify-between">
-                    <span className="text-zinc-400">Compilación:</span>
-                    <span className="font-semibold text-indigo-600 dark:text-indigo-400 font-mono text-[11px]">v{CURRENT_APP_VERSION}</span>
+                    <span className="text-zinc-400">Compilación activa:</span>
+                    <span className="font-semibold text-indigo-600 dark:text-indigo-400 font-mono text-[11px]">v{CURRENT_APP_VERSION} ({CURRENT_APP_STAGE} Preliminar)</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-zinc-400">Fecha de actualización:</span>

@@ -1126,11 +1126,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={onOpenVersionModal}
-                aria-label={`Versión actual Kongre v${CURRENT_APP_VERSION}, ver historial de versiones`}
-                className="px-1.5 py-0.5 mt-0.5 rounded text-[10px] font-mono font-bold text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-colors cursor-pointer select-none"
-                title={`Kongre v${CURRENT_APP_VERSION} - Clic para ver historial de versiones y cambios`}
+                aria-label={`Versión actual Kongre v${CURRENT_APP_VERSION} (Alfa), ver historial de versiones`}
+                className="flex items-center gap-1 px-1.5 py-0.5 mt-0.5 rounded text-[10px] font-mono font-bold text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/50 transition-colors cursor-pointer select-none"
+                title={`Kongre v${CURRENT_APP_VERSION} (Alfa) - Clic para ver historial de versiones y cambios`}
               >
-                v{CURRENT_APP_VERSION}
+                <span>v{CURRENT_APP_VERSION}</span>
+                <span className="px-1 py-0.2 rounded text-[8px] font-sans font-extrabold uppercase bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60">
+                  Alfa
+                </span>
               </button>
             )}
           </div>
@@ -1653,13 +1656,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                           setOpenDropdown(null);
                           onOpenVersionModal();
                         }}
-                        className="px-2 py-1 rounded-lg text-[10px] font-mono font-semibold text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10.5px] font-mono font-semibold text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                       >
-                        Kongre v{CURRENT_APP_VERSION}
+                        <span>Kongre App v{CURRENT_APP_VERSION}</span>
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-sans font-extrabold uppercase bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60">
+                          Alfa
+                        </span>
                       </button>
                     ) : (
                       <span className="px-2 text-[10px] font-mono text-slate-400">
-                        v{CURRENT_APP_VERSION}
+                        v{CURRENT_APP_VERSION} (Alfa)
                       </span>
                     )}
 

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import {
   CURRENT_APP_VERSION,
+  CURRENT_APP_STAGE,
   CURRENT_BUILD_CODE,
   BUILD_DATE,
   BUILD_ENVIRONMENT,
@@ -142,12 +143,15 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
                       <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300/50 dark:border-emerald-800/50">
                         ● Compilación Activa
                       </span>
+                      <span className="text-xs font-extrabold uppercase px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60">
+                        Fase {CURRENT_APP_STAGE}
+                      </span>
                       <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                         {BUILD_DATE}
                       </span>
                     </div>
                     <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mt-1">
-                      Kongre Gestor Teocrático v{CURRENT_APP_VERSION}
+                      Kongre App v{CURRENT_APP_VERSION} ({CURRENT_APP_STAGE} Preliminar)
                     </h2>
                     <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
                       Entorno: <strong className="text-indigo-600 dark:text-indigo-400">{BUILD_ENVIRONMENT}</strong> • Compilación: #{CURRENT_BUILD_CODE}
@@ -177,10 +181,13 @@ export const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
             </div>
 
             {/* Clarity Notice for User & Developer */}
-            <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 flex items-start gap-2.5 text-xs sm:text-[13px] text-amber-800 dark:text-amber-300">
+            <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 flex items-start gap-3 text-xs sm:text-[13px] text-amber-900 dark:text-amber-300">
               <Info className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
               <div className="leading-relaxed">
-                <strong>Verificación de Actualizaciones:</strong> Cada vez que se compila una actualización, se incrementa el número de versión y se registran las novedades en el historial del sistema. Si el número de versión en el pie de página coincide con este registro, los cambios ya están activos y listos para usar.
+                <strong className="block text-amber-950 dark:text-amber-200 font-bold mb-0.5">
+                  Fase Alfa Preliminar — Camino a la Versión 1.0.0 Definitiva
+                </strong>
+                Kongre se encuentra en ciclo de desarrollo <strong>Alfa (v0.1.0)</strong> en Web y Escritorio. Siguiendo el estándar internacional SemVer (Versionado Semántico), el sistema mantendrá la serie <code>v0.x.y</code> durante las pruebas de compatibilidad, ajustes de rendimiento y corrección de incidencias, hasta consolidar todas las funciones requeridas para el lanzamiento oficial de la <strong>Versión 1.0.0 Definitiva</strong>.
               </div>
             </div>
 

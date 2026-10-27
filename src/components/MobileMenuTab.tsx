@@ -7,7 +7,7 @@ import { useSecurity } from '../context/SecurityContext';
 import { ActiveTab } from './Navbar';
 import { isTabAllowedForRole } from '../utils/rbac';
 import { getFriendlyCongregationName, isGenericIdentityName } from '../utils/theocraticSecurity';
-import { CURRENT_APP_VERSION } from '../utils/versionLog';
+import { CURRENT_APP_VERSION, CURRENT_APP_STAGE } from '../utils/versionLog';
 import { insertAuditLog } from '../services/auditLogService';
 import { NAV_ICONS } from '../NavIcons';
 import {
@@ -644,6 +644,33 @@ export const MobileMenuTab: React.FC<MobileMenuTabProps> = ({
           })}
         </div>
       )}
+
+      {/* Mobile Version & Stage Footer */}
+      <div className="pt-6 pb-8 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-col items-center justify-center text-center gap-2">
+        {onOpenVersionModal ? (
+          <button
+            type="button"
+            onClick={onOpenVersionModal}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 text-xs font-semibold text-slate-700 dark:text-slate-200 active:scale-95 transition-all shadow-2xs"
+          >
+            <span>Kongre App</span>
+            <span className="font-mono text-indigo-600 dark:text-indigo-400 font-bold">v{CURRENT_APP_VERSION}</span>
+            <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold uppercase bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60">
+              {CURRENT_APP_STAGE}
+            </span>
+          </button>
+        ) : (
+          <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 font-mono">
+            <span>v{CURRENT_APP_VERSION}</span>
+            <span className="px-1.5 py-0.2 rounded text-[9px] font-sans font-bold bg-amber-100 text-amber-700">
+              {CURRENT_APP_STAGE}
+            </span>
+          </div>
+        )}
+        <p className="text-[11px] text-slate-400 dark:text-slate-500">
+          Fase Alfa Preliminar • Camino a la v1.0.0 Oficial
+        </p>
+      </div>
     </div>
   );
 };

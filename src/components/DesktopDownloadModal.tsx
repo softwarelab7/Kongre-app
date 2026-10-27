@@ -53,13 +53,13 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
       primaryFile: {
         name: 'Kongre Setup (.exe)',
         size: '15.3 MB',
-        url: `${DOWNLOAD_BASE_URL}/Kongre_2.12.35_x64-setup.exe`,
+        url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_x64-setup.exe`,
         recommended: true,
       },
       secondaryFile: {
         name: 'Paquete MSI (.msi)',
         size: '16.1 MB',
-        url: `${DOWNLOAD_BASE_URL}/Kongre_2.12.35_x64_en-US.msi`,
+        url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_x64_en-US.msi`,
       },
     },
     {
@@ -72,13 +72,13 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
       primaryFile: {
         name: 'Kongre RPM (.rpm)',
         size: '16.1 MB',
-        url: `${DOWNLOAD_BASE_URL}/Kongre-2.12.35-1.x86_64.rpm`,
+        url: `${DOWNLOAD_BASE_URL}/Kongre-${CURRENT_APP_VERSION}-1.x86_64.rpm`,
         recommended: true,
       },
       secondaryFile: {
         name: 'Portable (.AppImage)',
         size: '90.9 MB',
-        url: `${DOWNLOAD_BASE_URL}/Kongre_2.12.35_amd64.AppImage`,
+        url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_amd64.AppImage`,
       },
     },
     {
@@ -91,7 +91,7 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
       primaryFile: {
         name: 'Kongre para Mac (.dmg)',
         size: '32.2 MB',
-        url: `${DOWNLOAD_BASE_URL}/Kongre_2.12.35_universal.dmg`,
+        url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_universal.dmg`,
         recommended: true,
       },
       secondaryFile: {
@@ -110,13 +110,13 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
       primaryFile: {
         name: 'Paquete Debian (.deb)',
         size: '16.1 MB',
-        url: `${DOWNLOAD_BASE_URL}/Kongre_2.12.35_amd64.deb`,
+        url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_amd64.deb`,
         recommended: true,
       },
       secondaryFile: {
         name: 'Portable (.AppImage)',
         size: '90.9 MB',
-        url: `${DOWNLOAD_BASE_URL}/Kongre_2.12.35_amd64.AppImage`,
+        url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_amd64.AppImage`,
       },
     },
   ];

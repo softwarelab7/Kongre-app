@@ -107,14 +107,17 @@ export const AppFooter: React.FC<AppFooterProps> = ({
                 <button
                   type="button"
                   onClick={onOpenVersionModal}
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 font-semibold text-[10.5px] shrink-0 active:scale-95 cursor-pointer"
-                  title="Ver registro de cambios y versiones"
+                  className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 font-semibold text-[10.5px] shrink-0 active:scale-95 cursor-pointer"
+                  title="Ver registro de cambios y versiones (Versión Alfa)"
                 >
-                  <ScrollText className="w-3 h-3 text-indigo-500" />
+                  <ScrollText className="w-3 h-3 text-amber-500" />
                   <span>v{CURRENT_APP_VERSION}</span>
+                  <span className="px-1 py-0.2 rounded text-[8.5px] font-extrabold uppercase bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60">
+                    Alfa
+                  </span>
                 </button>
               ) : (
-                <span className="text-[10.5px] text-slate-400 shrink-0">v{CURRENT_APP_VERSION}</span>
+                <span className="text-[10.5px] text-slate-400 shrink-0">v{CURRENT_APP_VERSION} (Alfa)</span>
               )}
             </div>
           )}
@@ -156,13 +159,13 @@ export const AppFooter: React.FC<AppFooterProps> = ({
                 <button
                   type="button"
                   onClick={onOpenVersionModal}
-                  className="md:hidden group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800/90 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer shadow-2xs active:scale-95 text-[11px] font-semibold shrink-0"
+                  className="md:hidden group inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800/90 hover:bg-amber-50 dark:hover:bg-amber-950/60 border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 hover:text-amber-600 dark:hover:text-amber-400 transition-all cursor-pointer shadow-2xs active:scale-95 text-[11px] font-semibold shrink-0"
                   title="Ver registro de cambios y versiones"
                 >
-                  <ScrollText className="w-3 h-3 text-indigo-500" />
+                  <ScrollText className="w-3 h-3 text-amber-500" />
                   <span>v{CURRENT_APP_VERSION}</span>
-                  <span className="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-indigo-100/90 dark:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300">
-                    Novedades
+                  <span className="px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase bg-amber-100/90 dark:bg-amber-900/70 text-amber-800 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60">
+                    Alfa
                   </span>
                 </button>
               )}
@@ -226,13 +229,13 @@ export const AppFooter: React.FC<AppFooterProps> = ({
                 <button
                   type="button"
                   onClick={onOpenVersionModal}
-                  className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 border border-slate-200/80 dark:border-slate-700/80 hover:border-indigo-300 dark:hover:border-indigo-700/70 text-slate-700 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all cursor-pointer shadow-2xs active:scale-95 text-xs font-semibold"
-                  title="Ver registro de cambios y versiones de la aplicación"
+                  className="group inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 hover:bg-amber-50 dark:hover:bg-amber-950/60 border border-slate-200/80 dark:border-slate-700/80 hover:border-amber-300 dark:hover:border-amber-700/70 text-slate-700 dark:text-slate-200 hover:text-amber-700 dark:hover:text-amber-300 transition-all cursor-pointer shadow-2xs active:scale-95 text-xs font-semibold"
+                  title="Ver registro de cambios y versiones de la aplicación (Fase Alfa)"
                 >
-                  <ScrollText className="w-3.5 h-3.5 text-indigo-500 group-hover:rotate-12 transition-transform" />
+                  <ScrollText className="w-3.5 h-3.5 text-amber-500 group-hover:rotate-12 transition-transform" />
                   <span>v{CURRENT_APP_VERSION}</span>
-                  <span className="px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-indigo-100/80 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                    Novedades
+                  <span className="px-1.5 py-0.5 rounded-md text-[9.5px] font-extrabold uppercase bg-amber-100/80 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-300/60 dark:border-amber-700/60 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                    Alfa
                   </span>
                 </button>
               )}

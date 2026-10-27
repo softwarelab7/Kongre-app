@@ -34,14 +34,15 @@ Dado que compilar binarios de macOS y Windows requiere sus respectivos sistemas 
 1. Haz un commit y push de tus cambios.
 2. Crea un tag de versión, por ejemplo:
    ```bash
-   git tag v2.12.35
-   git push origin v2.12.35
+   git tag v0.1.0
+   git push origin v0.1.0
    ```
    *(o activa el workflow manualmente desde la pestaña **Actions** en GitHub con `workflow_dispatch`)*.
 3. GitHub Actions compilará en paralelo:
-   - **Windows Runner:** Genera `Kongre_2.12.35_x64-setup.exe` y `Kongre_2.12.35_x64_en-US.msi`.
-   - **macOS Runner:** Genera `Kongre_2.12.35_universal.dmg` (compatible con Intel y Mac Silicon).
-   - **Linux Runner:** Genera `kongre_2.12.35_amd64.deb` y `kongre_2.12.35_amd64.AppImage`.
+   - **Windows Runner:** Genera `Kongre_0.1.0_x64-setup.exe` y `Kongre_0.1.0_x64_en-US.msi`.
+   - **macOS Runner:** Genera `Kongre_0.1.0_universal.dmg` (compatible con Intel y Mac Silicon).
+   - **Linux Fedora Runner:** Genera `Kongre-0.1.0-1.x86_64.rpm` y `Kongre_0.1.0_amd64.AppImage`.
+   - **Linux Ubuntu Runner:** Genera `Kongre_0.1.0_amd64.deb`.
 4. Los archivos quedarán listos para descarga en **Releases** de tu repositorio GitHub.
 
 ---

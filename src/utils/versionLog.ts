@@ -25,18 +25,42 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '2.12.35';
-export const CURRENT_BUILD_CODE = '2026.10.26.7690';
+export const CURRENT_APP_VERSION = '0.1.0';
+export const CURRENT_APP_STAGE = 'Alfa';
+export const CURRENT_BUILD_CODE = '2026.10.26.8000';
 export const BUILD_DATE = '26 de Octubre, 2026';
-export const BUILD_ENVIRONMENT = 'Producción Cloud (Kongre)';
+export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '0.1.0 (Alfa)',
+    buildCode: '2026.10.26.8000',
+    date: '26 de Octubre, 2026',
+    title: 'Transición a Ciclo SemVer Alfa y Lanzamiento Multiplataforma (PC & Web)',
+    isCurrent: true,
+    highlight: 'Reinicio formal del ciclo de desarrollo a v0.1.0 Alfa preliminar hacia la versión 1.0.0 definitiva, con soporte de escritorio nativo para Windows, Linux y macOS en Rust',
+    environment: 'Fase Alfa Preliminar (Web & Desktop)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Lanzamiento de Kongre App para Escritorio: Núcleo nativo ultraligero desarrollado con Rust (Tauri v2) con instaladores oficiales para Windows (.exe / .msi), macOS (.dmg Universal), Fedora (.rpm), Ubuntu (.deb) y Linux Portable (.AppImage).',
+      },
+      {
+        category: 'improvement',
+        text: 'Estandarización de Versionado SemVer: Adopción del ciclo preliminar v0.x.y para la fase de pruebas y estabilización comunitaria previa a la versión 1.0.0 final.',
+      },
+      {
+        category: 'feature',
+        text: 'Centro de Descargas en la Web: Modal interactivo y enlaces directos para instalar la aplicación de escritorio desde cualquier navegador con detección automática del sistema operativo.',
+      },
+    ],
+  },
   {
     version: '2.12.35',
     buildCode: '2026.10.26.7690',
     date: '26 de Octubre, 2026',
     title: 'Diseño Fluido de Ancho Completo y Corrección de Tarjeta Push en Columnas',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Aprovechamiento integral del ancho de pantalla en monitores de escritorio y portátiles eliminando márgenes restrictivos y corrigiendo el desbordamiento de botones en la tarjeta Push',
     environment: 'Producción Cloud (Kongre)',
     changes: [
@@ -2034,8 +2058,8 @@ export const VERSION_HISTORY: VersionRecord[] = [
  */
 export function getSystemDiagnosticInfo(): string {
   return [
-    `Aplicación: Kongre`,
-    `Versión: v${CURRENT_APP_VERSION}`,
+    `Aplicación: Kongre App`,
+    `Versión: v${CURRENT_APP_VERSION} (${CURRENT_APP_STAGE} Preliminar)`,
     `Código de Compilación: ${CURRENT_BUILD_CODE}`,
     `Fecha de Publicación: ${BUILD_DATE}`,
     `Plataforma: ${BUILD_ENVIRONMENT}`,

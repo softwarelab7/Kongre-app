@@ -6,6 +6,27 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0] (Alfa) — 26 de Octubre, 2026
+**Transición a Ciclo SemVer Alfa Preliminar y Lanzamiento Multiplataforma (PC & Web)**
+
+- 🦀 **Lanzamiento de Kongre App para Escritorio (Rust + Tauri v2):**
+  - Aplicación nativa ultraligera compilada con Rust (Tauri v2) que arranca en milisegundos y consume apenas ~15 MB de memoria RAM.
+  - Paquetes de instalación oficiales para todas las plataformas de escritorio:
+    - **Windows 10 / 11:** Instalador ejecutable `.exe` y paquete corporativo `.msi`.
+    - **Linux Fedora / Red Hat:** Paquete nativo `.rpm` de 64 bits.
+    - **Ubuntu / Debian:** Paquete `.deb`.
+    - **Linux Universal:** Paquete portable `.AppImage`.
+    - **macOS:** Binario Universal `.dmg` compatible con procesadores Apple Silicon (M1 a M4) e Intel.
+- 📐 **Estandarización de Versionado SemVer (Ciclo Preliminar `v0.x.y`):**
+  - Conforme al estándar internacional de versionado de software (SemVer), se formaliza el ciclo a la serie preliminar `v0.1.0 (Alfa)` para reflejar con total transparencia que el sistema se encuentra en fase de pruebas activas, refinamiento visual y corrección comunitaria rumbo al futuro lanzamiento de la **Versión 1.0.0 Definitiva**.
+  - Indicadores visuales **Alfa** integrados de forma elegante en la versión Web: barra de navegación superior (Navbar), pie de página (AppFooter), menú desplegable de usuario, menú móvil y panel de configuración del sistema.
+- 📥 **Centro de Descargas en la Versión Web (`DesktopDownloadModal.tsx`):**
+  - Modal interactivo con detección automática del sistema operativo del visitante, enlaces directos de descarga y acceso a los lanzamientos oficiales en GitHub.
+
+---
+
+## 📅 Historial de Actualizaciones Anteriores
+
 ### [v2.12.35] — 26 de Octubre, 2026
 **Diseño Fluido de Ancho Completo y Corrección de Tarjeta Push en Columnas**
 

@@ -25,19 +25,62 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '0.1.0-alpha.35';
+export const CURRENT_APP_VERSION = '0.1.0-alpha.36';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.10.26.8035';
-export const BUILD_DATE = '26 de Octubre, 2026';
+export const CURRENT_BUILD_CODE = '2026.10.27.8036';
+export const BUILD_DATE = '27 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '0.1.0-alpha.36',
+    buildCode: '2026.10.27.8036',
+    date: '27 de Octubre, 2026',
+    title: 'Rediseño Acerca de Kongre, Unificación de Modo Demo y Bienvenida Zero-Scroll',
+    isCurrent: true,
+    highlight: 'Rediseño integral de Acerca de Kongre con Bento Grid y Cockpit en vivo, nuevo componente estándar DemoModeButton en tonos neutros sin artificios, y pantalla de bienvenida 100% Zero-Scroll en escritorio',
+    environment: 'Fase Alfa Preliminar (Web & Desktop)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Cockpit Teocrático en Vivo (KongreOfficialWebsite.tsx): Maqueta interactiva con 4 vistas reactivas (Reunión Vida y Ministerio, Asistencia S-88, Territorios S-13 e Informes de Servicio) que simula el entorno real de una congregación.',
+      },
+      {
+        category: 'improvement',
+        text: 'Bento Grid Asimétrico con Iconografía Vectorial Oficial (KongreOfficialWebsite.tsx): Cuadrícula moderna con ritmo visual y los SVGs originales de la aplicación (clm_vmc, predicacion, supervision, discursos, secretaria, informes_servicio) con accesos directos a la Guía de Usuario.',
+      },
+      {
+        category: 'feature',
+        text: 'Flujo Teocrático en 3 Pasos (KongreOfficialWebsite.tsx): Franja secuencial clara que desglosa el proceso de adopción teocrática: 1. Inicialización e Importación local, 2. Asignación y Programación Inteligente, 3. Coordinación y Consulta Segura por portal o PDF/WhatsApp.',
+      },
+      {
+        category: 'improvement',
+        text: 'Componente Unificado DemoModeButton (DemoModeButton.tsx): Nuevo botón estándar y minimalista en tonos neutros slate (bg-slate-100 dark:bg-slate-800, border-slate-200 dark:border-slate-700), idéntico en barra superior, cockpit y portal de bienvenida.',
+      },
+      {
+        category: 'improvement',
+        text: 'Purga Total de Iconos de Estrella (Sparkles): Erradicación completa de destellos/estrellas en botones, insignias teocráticas y cabeceras en favor de iconos sobrios institucionales (Building2, CheckCircle2, Download, BookOpen) o tipografía limpia.',
+      },
+      {
+        category: 'improvement',
+        text: 'Portal de Bienvenida 100% Zero-Scroll en Escritorio (CongregationWelcomeLanding.tsx): Optimización del contenedor a pantalla completa (lg:h-screen lg:max-h-screen lg:overflow-hidden) con centrado automático y eliminación de botones duplicados, permitiendo ver las 4 opciones de acceso simultáneamente sin ningún desplazamiento vertical.',
+      },
+      {
+        category: 'fix',
+        text: 'Corrección de Identidad Institucional (KongreOfficialWebsite.tsx): Corrección del encabezado de previsualización en la maqueta de la web oficial, eliminando el texto erróneo "Kongre Studio" y restableciendo la identidad oficial: "Kongre · Congregación Central".',
+      },
+      {
+        category: 'improvement',
+        text: 'Estandarización de Encabezados y Selector de Tema (AnimatedLogo.tsx, ThemeToggle.tsx): Logotipo unificado AnimatedLogo y botón de apariencia ThemeToggle consistentes en todas las pantallas.',
+      },
+    ],
+  },
   {
     version: '0.1.0-alpha.35',
     buildCode: '2026.10.26.8035',
     date: '26 de Octubre, 2026',
     title: 'Lanzamiento Multiplataforma para PC (Rust), Reconocimiento de SO y Diseño Fluido',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Lanzamiento oficial de Kongre App nativa para PC con instaladores para Windows, macOS y Linux en Rust, banner con detección inteligente de SO en la bienvenida y diseño fluido de ancho completo',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [

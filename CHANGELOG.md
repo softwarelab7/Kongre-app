@@ -6,6 +6,39 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.36] — 27 de Octubre, 2026
+**Rediseño Acerca de Kongre, Unificación de Modo Demo y Bienvenida Zero-Scroll**
+
+- 🏛️ **Cockpit Teocrático en Vivo (`KongreOfficialWebsite.tsx`, `kongre-about-animations.css`):**
+  - Maqueta interactiva con 4 pestañas reactivas (*Reunión Vida y Ministerio*, *Asistencia S-88*, *Territorios S-13* e *Informes de Servicio*) que simula el entorno real y operativo de una congregación en tiempo real.
+- 🍱 **Bento Grid Asimétrico con Iconografía Vectorial Oficial (`KongreOfficialWebsite.tsx`):**
+  - Cuadrícula moderna con ritmo visual diferenciado y los SVGs originales de la aplicación (`clm_vmc.svg`, `predicacion.svg`, `supervision.svg`, `discursos.svg`, `secretaria.svg`, `informes_servicio.svg`) con accesos directos temáticos a la Guía de Usuario.
+- 🔄 **Flujo Teocrático en 3 Pasos (`KongreOfficialWebsite.tsx`):**
+  - Franja secuencial que desglosa el proceso de adopción teocrática: 1. *Inicialización e Importación local*, 2. *Asignación y Programación Inteligente*, 3. *Coordinación y Consulta Segura por portal o PDF/WhatsApp*.
+- 🛡️ **Seguridad Cero Conocimiento y Principio Bíblico (`KongreOfficialWebsite.tsx`):**
+  - Bloque documental enfocado en almacenamiento local cifrado (AES-256 + PBKDF2), cero telemetría y respeto a las directrices de privacidad teocrática (*1 Corintios 14:40*).
+- 🔘 **Componente Estándar y Unificado `DemoModeButton` (`DemoModeButton.tsx`):**
+  - Nuevo botón reutilizable con diseño minimalista y serio en tonos slate neutros (`bg-slate-100 dark:bg-slate-800`, `border-slate-200 dark:border-slate-700`), unificado de forma homogénea en: cabecera y pie del cockpit en Acerca de Kongre, cabecera de PC, barra móvil y pestaña ID/PIN de Bienvenida, y la insignia interna `DemoBanner.tsx`.
+- ✨ **Purga Total de Iconos de Estrella (`Sparkles`):**
+  - Erradicación completa de destellos/estrellas en botones, insignias teocráticas y cabeceras en favor de iconos sobrios e institucionales (`Building2`, `CheckCircle2`, `Download`, `BookOpen`) o tipografía limpia.
+- 🖥️ **Portal de Bienvenida 100% Zero-Scroll en Escritorio (`CongregationWelcomeLanding.tsx`, `AppFooter.tsx`):**
+  - Contenedor de escritorio a pantalla completa (`lg:h-screen lg:max-h-screen lg:overflow-hidden`) con centrado automático `my-auto`, permitiendo visualizar las 4 opciones de acceso simultáneamente sin ningún desplazamiento vertical.
+  - Eliminación de accesos redundantes en la tarjeta de inicio de sesión (*«Kongre para PC»* y *«Modo Demo»* ya presentes en la cabecera superior) y del banner duplicado de compatibilidad en la columna izquierda.
+  - Ajuste de proporciones compactas en `DesktopOption`, `LandingFeatureCard`, barra superior de retorno (`py-1.5`) y `AppFooter` (`py-1.5 sm:py-2`).
+- 🏷️ **Corrección de Identidad Institucional:**
+  - Corrección del encabezado de previsualización en la maqueta de la web oficial, eliminando el texto erróneo *"Kongre Studio"* y restableciendo la denominación oficial: **«Kongre · Congregación Central»**.
+- 🎨 **Estandarización de Encabezados y Selector de Tema (`AnimatedLogo.tsx`, `ThemeToggle.tsx`):**
+  - Logotipo unificado `<AnimatedLogo height={32} />` y botón de alternancia de tema `<ThemeToggle size={36} />` con dimensiones homogéneas en toda la interfaz.
+
+---
+
+## 📅 Historial de Iteraciones Anteriores (Fase Alfa Preliminar)
+
+> ℹ️ **Registro de Iteraciones de la Fase Alfa:**  
+> Todas las entregas del historial corresponden a iteraciones de desarrollo activo de la fase Alfa (`v0.1.0-alpha.x` y `v0.0.x-alpha`), organizadas conforme a la norma internacional **SemVer** en su camino hacia la versión 1.0.0 definitiva.
+
+---
+
 ### [v0.1.0-alpha.35] — 26 de Octubre, 2026
 **Lanzamiento Multiplataforma para PC (Rust + Tauri v2), Reconocimiento de SO y Diseño Fluido**
 
@@ -25,17 +58,6 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
   - Se eliminaron las restricciones de ancho fijo (`max-w-7xl`, `max-w-4xl`, `max-w-2xl`) en los contenedores principales para que todas las vistas aprovechen de forma responsiva el ancho completo de la pantalla en monitores y portátiles.
 - 🔔 **Alineación Perfecta de Botones en Tarjeta Push (`PushNotificationQuickGuideCard.tsx`):**
   - Se corrigió el desbordamiento horizontal de los botones **Suscribirme a Notificaciones Push** y **Guía Visual** cuando la tarjeta se muestra dentro de una columna lateral.
-
----
-
-## 📅 Historial de Iteraciones Anteriores (Fase Alfa Preliminar)
-
-> ℹ️ **Registro de Iteraciones de la Fase Alfa:**  
-> Todas las entregas del historial corresponden a iteraciones de desarrollo activo de la fase Alfa (`v0.1.0-alpha.x` y `v0.0.x-alpha`), organizadas conforme a la norma internacional **SemVer** en su camino hacia la versión 1.0.0 definitiva.
-
----
-
-### [v0.1.0-alpha.34] — 26 de Octubre, 2026
 **Rediseño Integral del Panel y Vista de Perfil de Usuario**
 
 - 👤 **Panel Desplegable de Cuenta en Barra Superior (`Navbar.tsx`):**

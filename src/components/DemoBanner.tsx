@@ -5,7 +5,7 @@
  * que el usuario está explorando un entorno de demostración con datos de prueba.
  */
 import React, { useState } from 'react';
-import { Sparkles, Shield, Building2, RotateCcw, LogOut, ChevronDown, Check } from 'lucide-react';
+import { Shield, Building2, RotateCcw, LogOut, ChevronDown, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCongregation } from '../context/CongregationContext';
 
@@ -40,7 +40,7 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
         className="group inline-flex items-center gap-1 sm:gap-1.5 h-6 px-2 rounded-lg bg-indigo-50/90 dark:bg-indigo-950/60 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80 font-bold text-[10px] sm:text-[10.5px] tracking-wide transition-all cursor-pointer select-none active:scale-95 shadow-2xs"
         title="Modo de prueba activo - Clic para cambiar rol"
       >
-        <Sparkles className="w-3 h-3 text-indigo-500 dark:text-indigo-400 group-hover:rotate-12 transition-transform shrink-0" />
+        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
         <span className="sm:hidden">Demo</span>
         <span className="hidden sm:inline">Modo Prueba</span>
         <ChevronDown className="hidden sm:inline w-3 h-3 text-indigo-400 dark:text-indigo-400 opacity-70 group-hover:opacity-100 shrink-0 transition-opacity" />
@@ -54,8 +54,8 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
           />
           <div className="fixed sm:absolute top-14 sm:top-full left-3 right-3 sm:left-0 sm:right-auto sm:mt-2 sm:w-72 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-3.5 z-50 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start gap-2.5 pb-2.5 mb-2 border-b border-slate-100 dark:border-slate-800">
-              <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-                <Sparkles className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
+                <Shield className="w-4 h-4" />
               </div>
               <div className="min-w-0">
                 <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
@@ -64,7 +64,7 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
                   {settings.congregationName || 'Congregación Central (Demo)'}
                 </p>
-                <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 px-1.5 py-0.5 rounded-md">
+                <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md">
                   <Shield className="w-2.5 h-2.5" />
                   <span>Rol: {effectiveRoleInfo?.name || activeRole}</span>
                 </div>
@@ -79,9 +79,9 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({
                     setIsOpen(false);
                     onOpenRoleModal();
                   }}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-purple-950/50 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition cursor-pointer text-left"
+                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white font-medium transition cursor-pointer text-left"
                 >
-                  <Shield className="w-4 h-4 text-purple-500" />
+                  <Shield className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <span>Cambiar rol de prueba</span>
                 </button>
               )}

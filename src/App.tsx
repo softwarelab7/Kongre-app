@@ -1359,7 +1359,7 @@ const AppContent: React.FC = () => {
     return (
       <>
         {!isDesktopApp() && (
-          <div className="w-full bg-slate-900 text-white px-4 py-2 flex items-center justify-between gap-3 text-xs border-b border-slate-800 z-50">
+          <div className="w-full bg-slate-900 text-white px-4 py-1.5 flex items-center justify-between gap-3 text-xs border-b border-slate-800 z-50 shrink-0">
             <button
               type="button"
               onClick={() => {

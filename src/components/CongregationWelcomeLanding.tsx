@@ -52,6 +52,7 @@ import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
 import AnimatedLogo from '../AnimatedLogo';
 import ThemeToggle from './ThemeToggle';
+import DemoModeButton from './DemoModeButton';
 import { AppFooter } from './AppFooter';
 import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
 import { supabaseSyncService } from '../services/supabaseSyncService';
@@ -124,25 +125,25 @@ function LandingFeatureCard({
   const styles = FEATURE_ACCENT_STYLES[accent];
   return (
     <article
-      className={`group relative rounded-2xl border p-3.5 sm:p-4 transition-all duration-200 hover:-translate-y-0.5 flex items-start gap-3.5 ${styles.card}`}
+      className={`group relative rounded-2xl border p-2.5 sm:p-3 lg:p-2.5 xl:p-3 transition-all duration-200 hover:-translate-y-0.5 flex items-start gap-3 ${styles.card}`}
     >
       <div
-        className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 ${styles.iconBox}`}
+        className={`w-8.5 h-8.5 sm:w-9.5 sm:h-9.5 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 ${styles.iconBox}`}
       >
-        <Icon className="w-5 h-5 text-white" strokeWidth={2.1} aria-hidden />
+        <Icon className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white" strokeWidth={2.1} aria-hidden />
       </div>
       <div className="min-w-0 flex-1">
         {kicker && (
-          <div className={`text-[10.5px] font-bold tracking-wider uppercase mb-0.5 ${styles.kicker}`}>
+          <div className={`text-[10px] font-bold tracking-wider uppercase mb-0.5 ${styles.kicker}`}>
             {kicker}
           </div>
         )}
         <h3
-          className={`text-[14px] sm:text-[14.5px] font-extrabold text-slate-900 dark:text-white leading-snug transition-colors ${styles.titleHover}`}
+          className={`text-[13px] sm:text-[13.5px] font-extrabold text-slate-900 dark:text-white leading-snug transition-colors ${styles.titleHover}`}
         >
           {title}
         </h3>
-        <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+        <p className="mt-0.5 text-[11px] sm:text-[11.5px] leading-snug text-slate-600 dark:text-slate-300 line-clamp-2">
           {text}
         </p>
       </div>
@@ -173,48 +174,48 @@ function DesktopOption({
     <button
       type="button"
       onClick={onClick}
-      className={`group flex w-full cursor-pointer items-center gap-3.5 rounded-2xl border p-3 sm:p-3.5 text-left transition-all duration-200 ${
+      className={`group flex w-full cursor-pointer items-center gap-3 rounded-2xl border p-2.5 sm:p-3 lg:p-2.5 text-left transition-all duration-200 ${
         isFeatured
           ? 'border-indigo-200/90 dark:border-indigo-800/80 bg-linear-to-r from-indigo-50/90 via-indigo-50/40 to-white dark:from-indigo-950/60 dark:via-indigo-950/25 dark:to-slate-900/90 hover:border-indigo-400 dark:hover:border-indigo-500 shadow-xs hover:shadow-md hover:shadow-indigo-500/10'
           : 'border-slate-200/75 dark:border-slate-800/90 bg-white/80 dark:bg-slate-900/50 hover:bg-slate-50/90 dark:hover:bg-slate-800/70 hover:border-indigo-300/80 dark:hover:border-indigo-700/70'
       }`}
     >
       <span
-        className={`flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl transition-all duration-200 group-hover:scale-105 ${
+        className={`flex h-9 w-9 sm:h-9.5 sm:w-9.5 shrink-0 items-center justify-center rounded-xl transition-all duration-200 group-hover:scale-105 ${
           isFeatured
             ? 'bg-linear-to-br from-indigo-600 to-violet-600 text-white shadow-sm shadow-indigo-600/25'
             : 'bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/80 border border-slate-200/60 dark:border-slate-700/60'
         }`}
       >
-        {iconCustom ? iconCustom : <Icon size={20} strokeWidth={2.1} aria-hidden />}
+        {iconCustom ? iconCustom : <Icon size={18} strokeWidth={2.1} aria-hidden />}
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-1.5">
-          <b className="text-[13.5px] sm:text-[14px] font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors leading-snug">
+          <b className="text-[13px] sm:text-[13.5px] font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors leading-snug">
             {title}
           </b>
           {meta && (
             <>
               <span className="text-slate-300 dark:text-slate-600 text-xs" aria-hidden="true">·</span>
-              <span className="text-[11px] font-medium text-indigo-600/90 dark:text-indigo-400/90 whitespace-nowrap">
+              <span className="text-[10.5px] font-medium text-indigo-600/90 dark:text-indigo-400/90 whitespace-nowrap">
                 {meta}
               </span>
             </>
           )}
         </span>
-        <span className="mt-0.5 block text-[11.5px] sm:text-[12px] leading-snug text-slate-500 dark:text-slate-400">
+        <span className="mt-0.5 block text-[11px] sm:text-[11.5px] leading-snug text-slate-500 dark:text-slate-400 line-clamp-1">
           {description}
         </span>
       </span>
       <span
-        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-all duration-200 ${
+        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg transition-all duration-200 ${
           isFeatured
             ? 'bg-indigo-100/80 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 group-hover:bg-indigo-600 group-hover:text-white'
             : 'text-slate-400 dark:text-slate-500 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/60 group-hover:text-indigo-600 dark:group-hover:text-indigo-300'
         }`}
       >
         <ArrowRight
-          size={15}
+          size={14}
           className="transition-transform duration-200 group-hover:translate-x-0.5"
           aria-hidden
         />
@@ -1312,7 +1313,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   const isSessionSubView = activeTab === 'email_login' || activeTab === 'code_login' || activeTab === 'invite_code_login';
 
   return (
-    <div className="min-h-screen bg-page text-ink flex flex-col justify-between font-sans selection:bg-brand selection:text-white transition-colors duration-200">
+    <div className="min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden bg-page text-ink flex flex-col justify-between font-sans selection:bg-brand selection:text-white transition-colors duration-200">
       {/* ========================================================= */}
       {/* 0. MOBILE HERO & SHEET VIEW (< md) - FIEL A BIENVENIDA-HTML*/}
       {/* ========================================================= */}
@@ -1326,19 +1327,15 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             {/* Top Utility Bar (Demo Mode, PC Version & Theme Toggle) */}
             <div className="w-full flex items-center justify-between z-10 mb-2">
               <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
+                <DemoModeButton
+                  variant="onBrand"
+                  size="sm"
                   onClick={handleEnterDemoMode}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-xs backdrop-blur-xs transition-all cursor-pointer shadow-xs active:scale-95"
-                  title="Probar Kongre con datos de demostración"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Modo Demo</span>
-                </button>
+                />
                 <button
                   type="button"
                   onClick={() => setDesktopModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white/15 hover:bg-white/25 text-white font-semibold text-xs backdrop-blur-xs transition-all cursor-pointer shadow-xs active:scale-95"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-xs backdrop-blur-xs transition-all cursor-pointer shadow-xs active:scale-95"
                   title="Descargar versión nativa para PC"
                 >
                   <Monitor className="w-3.5 h-3.5" />
@@ -1523,14 +1520,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       )}
 
       {/* Main Container: Desktop view or Mobile active subviews */}
-      <div className={`${activeTab === 'home' ? 'hidden md:flex' : 'flex'} flex-col justify-between flex-1`}>
+      <div className={`${activeTab === 'home' ? 'hidden md:flex' : 'flex'} flex-col justify-between flex-1 md:overflow-hidden`}>
         {/* ========================================================= */}
         {/* 1. TOP HEADER                                            */}
         {/* ========================================================= */}
-        <header className="w-full bg-card border-b border-line px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 flex items-center justify-between sticky top-0 z-30 transition-colors">
+        <header className="w-full bg-card border-b border-line px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 flex items-center justify-between sticky top-0 z-30 transition-colors">
           {/* Logo and Brand */}
           <div className="flex items-center gap-2.5">
-            <AnimatedLogo height={32} />
+            <AnimatedLogo height={30} />
           </div>
 
           {/* Right Actions: PC Download, Demo Mode Button & Theme Switch */}
@@ -1538,7 +1535,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
             <button
               type="button"
               onClick={() => setDesktopModalOpen(true)}
-              className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-2xs"
+              className="group flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-2xs"
               title="Descargar Kongre App para PC (Windows, macOS, Linux)"
             >
               <Monitor className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
@@ -1547,15 +1544,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 v{CURRENT_APP_VERSION}
               </span>
             </button>
-            <button
-              type="button"
-              onClick={handleEnterDemoMode}
-              className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
-              title="Probar Kongre con datos de demostración"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300 group-hover:rotate-12 transition-transform" />
-              <span>Modo Demo</span>
-            </button>
+            <DemoModeButton onClick={handleEnterDemoMode} />
             <ThemeToggle size={36} />
           </div>
         </header>
@@ -1564,10 +1553,10 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         {/* 2. MAIN WORKSPACE / RESPONSIVE HERO & ACTIONS            */}
         {/* ========================================================= */}
         <main
-          className={`w-full grid flex-1 gap-6 lg:gap-10 xl:gap-14 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 ${
+          className={`w-full grid flex-1 gap-5 lg:gap-8 xl:gap-10 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 items-center ${
             isFullWidthView
-              ? 'grid-cols-1 py-2 sm:py-3.5 my-auto items-center'
-              : 'lg:grid-cols-[1.18fr_.82fr] py-4 sm:py-6 lg:py-6 xl:py-8 items-center'
+              ? 'grid-cols-1 py-2 sm:py-3 my-auto'
+              : 'lg:grid-cols-[1.14fr_.86fr] py-1 sm:py-2 lg:py-2.5 my-auto'
           }`}
         >
           {/* ========================================================= */}
@@ -1576,60 +1565,54 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           {!isFullWidthView && (
             <section className="hidden lg:block space-y-0">
               <div
-                className="inline-flex items-center gap-2 rounded-full border border-bline bg-brand-soft px-3 py-1 text-[11.5px] sm:text-xs font-semibold text-brand mb-2.5 sm:mb-3 select-none"
+                className="inline-flex items-center gap-2 rounded-full border border-bline bg-brand-soft px-2.5 py-0.5 text-[11px] font-semibold text-brand mb-1.5 select-none"
               >
-                <Sparkles size={15} className="text-brand shrink-0" aria-hidden />
+                <ShieldCheck size={13} className="text-brand shrink-0" aria-hidden />
                 <span>Gestor Teocrático Integral • Seguro y Eficiente</span>
               </div>
 
-              <h1 className="mb-2.5 sm:mb-3 text-[clamp(26px,2.9vw,48px)] font-black leading-[1.08] tracking-tight text-ink">
+              <h1 className="mb-1.5 text-[clamp(24px,2.4vw,38px)] font-black leading-[1.08] tracking-tight text-ink">
                 Toda la gestión teocrática de tu congregación,{' '}
                 <em className="bg-linear-to-r from-(--t1) to-(--t2) bg-clip-text not-italic text-transparent">
                   en un solo lugar.
                 </em>
               </h1>
 
-              <p className="max-w-[520px] text-xs sm:text-[13.5px] lg:text-[14.5px] leading-relaxed text-muted mb-5">
+              <p className="max-w-[500px] text-xs sm:text-[13px] leading-relaxed text-muted mb-3">
                 Plataforma digital especializada para coordinadores, secretarios, superintendentes de servicio y publicadores. Organiza programas semanales, hojas S-89, asignaciones de limpieza y territorios con soporte offline PWA.
               </p>
 
               {/* Feature Cards Grid (2x2 on Desktop) */}
-              <div className="grid gap-3.5 sm:grid-cols-2">
+              <div className="grid gap-2.5 sm:grid-cols-2">
                 <LandingFeatureCard
                   icon={CalendarDays}
                   accent="indigo"
                   kicker="Programación · S-89"
                   title="Reuniones & Guía S-89"
-                  text="Programación Vida y Ministerio, Fin de Semana, generación automática e impresión de hojas S-89 oficiales."
+                  text="Programación Vida y Ministerio, Fin de Semana y hojas S-89 oficiales automáticas."
                 />
                 <LandingFeatureCard
                   icon={MapPin}
                   accent="emerald"
                   kicker="Mapas · Código QR"
                   title="Territorios & Carritos"
-                  text="Manzanas georreferenciadas, enlaces digitales por QR para publicadores y control de turnos en carritos."
+                  text="Manzanas georreferenciadas, enlaces digitales por QR y control de turnos en carritos."
                 />
                 <LandingFeatureCard
                   icon={ShieldCheck}
                   accent="amber"
                   kicker="Cifrado · Confidencial"
                   title="Seguridad por Roles & PIN"
-                  text="Autenticación con ID de congregación, PIN de congregación y PIN personal bajo estrictas directrices."
+                  text="Autenticación con ID de congregación, PIN general y PIN personal confidencial."
                 />
                 <LandingFeatureCard
                   icon={Wifi}
                   accent="sky"
                   kicker="Sin Conexión · Nube"
                   title="PWA & Modo Offline"
-                  text="Úsala en el Salón sin conexión a internet; tus datos se sincronizan al volver a tener red."
+                  text="Úsala en el Salón sin conexión a internet; sincronización automática al volver a red."
                 />
               </div>
-
-              {/* Desktop Compatibility & Direct Download Hero Banner */}
-              <DesktopCompatibilityBanner
-                variant="hero-card"
-                onOpenAllDownloads={() => setDesktopModalOpen(true)}
-              />
             </section>
           )}
 
@@ -1643,7 +1626,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               className={`card rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-card relative ${
                 isFullWidthView
                   ? 'p-4 sm:p-6 lg:p-7 kg-register-box-enter shadow-2xl overflow-visible'
-                  : 'p-5 sm:p-6 lg:p-6.5 kg-home-box-enter shadow-xl overflow-hidden'
+                  : 'p-3.5 sm:p-4.5 lg:p-4.5 kg-home-box-enter shadow-xl overflow-hidden'
               } transition-all`}
               style={{ boxShadow: 'var(--card-shadow)' }}
             >
@@ -1658,7 +1641,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
               {/* UNIFIED SESSION PANEL HEADER */}
               <div
-                className={`flex items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800/80 ${
+                className={`flex items-center justify-between gap-2 pb-2 border-b border-slate-100 dark:border-slate-800/80 ${
                   isFullWidthView ? 'kg-header-enter' : ''
                 }`}
               >
@@ -1710,12 +1693,12 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               </div>
 
               {/* Main Title & Subtitle */}
-              <div className={`${isFullWidthView ? 'kg-title-enter' : ''} pt-3.5`}>
+              <div className={`${isFullWidthView ? 'kg-title-enter' : ''} pt-2.5`}>
                 <h2
                   className={`font-extrabold tracking-tight text-slate-900 dark:text-white ${
                     isFullWidthView
                       ? 'mb-0.5 text-lg sm:text-xl lg:text-2xl'
-                      : 'mb-1 text-[20px] sm:text-[22px] lg:text-[23px]'
+                      : 'mb-0.5 text-[18px] sm:text-[19px] lg:text-[20px]'
                   }`}
                 >
                   {activeTab === 'home'
@@ -1734,8 +1717,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   className={`text-slate-500 dark:text-slate-400 ${
                     isFullWidthView
                       ? 'mb-2 sm:mb-2.5 text-[11.5px] sm:text-xs'
-                      : 'mb-3.5 text-xs sm:text-[13px]'
-                  } leading-relaxed`}
+                      : 'mb-2.5 text-[11.5px] sm:text-xs'
+                  } leading-snug`}
                 >
                   {activeTab === 'home'
                     ? 'Selecciona tu método de autenticación o configura una congregación nueva en este equipo.'
@@ -1816,7 +1799,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
               {/* VIEW: MAIN HOME OPTIONS */}
               {activeTab === 'home' && (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {/* 1. Primary Highlight: Register New Congregation */}
                   <div>
                     <DesktopOption
@@ -1832,19 +1815,19 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                   {/* 2. Section Divider for Sign-in Methods */}
                   <div className="relative flex items-center py-0.5">
                     <div className="grow border-t border-slate-200/80 dark:border-slate-800" />
-                    <span className="mx-3 shrink-0 text-[10.5px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
+                    <span className="mx-2.5 shrink-0 text-[10px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
                       Iniciar sesión en congregación existente
                     </span>
                     <div className="grow border-t border-slate-200/80 dark:border-slate-800" />
                   </div>
 
                   {/* 3. Sign-in Options Stack */}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <DesktopOption
                       icon={CircleUserRound}
                       meta="Cuenta verificada"
                       iconCustom={
-                        <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+                        <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" aria-hidden="true">
                           <path
                             fill="#4285F4"
                             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -1891,47 +1874,6 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                         setActiveTab('invite_code_login');
                       }}
                     />
-                  </div>
-
-                  {/* 4. Compact Bottom Utility Bar (Desktop App + Demo Mode) */}
-                  <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setDesktopModalOpen(true)}
-                      className="group flex items-center gap-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-700 px-3 py-2.5 text-left transition-all cursor-pointer"
-                    >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 border border-slate-200/70 dark:border-slate-700/70 shadow-2xs">
-                        <Monitor className="w-4 h-4" />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-xs font-bold text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 truncate">
-                          Kongre para PC
-                        </span>
-                        <span className="block text-[10.5px] text-slate-500 dark:text-slate-400 truncate">
-                          Windows · macOS · Linux
-                        </span>
-                      </span>
-                      <Download className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 shrink-0 transition-colors" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleEnterDemoMode}
-                      className="group flex items-center gap-2.5 rounded-xl border border-indigo-200/70 dark:border-indigo-800/60 bg-indigo-50/50 dark:bg-indigo-950/30 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:border-indigo-300 dark:hover:border-indigo-700 px-3 py-2.5 text-left transition-all cursor-pointer"
-                    >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-2xs">
-                        <Sparkles className="w-4 h-4 text-amber-300" />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-xs font-bold text-indigo-950 dark:text-indigo-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 truncate">
-                          Explorar Modo Demo
-                        </span>
-                        <span className="block text-[10.5px] text-indigo-700/80 dark:text-indigo-300/80 truncate">
-                          Probar sin registrarse
-                        </span>
-                      </span>
-                      <ArrowRight className="w-3.5 h-3.5 text-indigo-500 group-hover:translate-x-0.5 shrink-0 transition-transform" />
-                    </button>
                   </div>
                 </div>
               )}
@@ -2590,9 +2532,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                     <button
                       type="button"
                       onClick={handleEnterDemoMode}
-                      className="w-full py-2.5 px-4 rounded-2xl border border-purple-200 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-950/50 text-purple-700 dark:text-purple-300 font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-200 font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <Sparkles className="w-4 h-4 text-purple-500" />
                       <span>Probar Kongre en Modo Demo</span>
                     </button>
 

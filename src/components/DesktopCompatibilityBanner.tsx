@@ -12,6 +12,7 @@ import {
   ExternalLink,
   Laptop,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { CURRENT_APP_VERSION } from '../utils/versionLog';
 
 export type PlatformId = 'windows' | 'mac' | 'fedora' | 'linux';
@@ -177,7 +178,10 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
   const isMobileVariant = variant === 'mobile-banner';
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       className={`${
         isMobileVariant ? 'rounded-2xl p-4 sm:p-5' : 'mt-4 rounded-3xl p-4 sm:p-5'
       } bg-linear-to-br from-indigo-50/95 via-white to-violet-50/80 dark:from-slate-900 dark:via-indigo-950/85 dark:to-slate-900 text-slate-900 dark:text-white border border-indigo-200/90 dark:border-indigo-800/70 shadow-md shadow-indigo-500/5 dark:shadow-indigo-950/30 relative overflow-hidden transition-all`}
@@ -188,9 +192,13 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5 border-b border-indigo-100/90 dark:border-slate-800">
         <div className="flex items-start sm:items-center gap-3 min-w-0">
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-linear-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-600/25 ring-2 ring-indigo-500/15">
+          <motion.div
+            whileHover={{ scale: 1.08, rotate: 2 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-linear-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shrink-0 shadow-md shadow-indigo-600/25 ring-2 ring-indigo-500/15"
+          >
             <Monitor className="w-5 h-5" />
-          </div>
+          </motion.div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10.5px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
               <span>Versión para PC</span>
@@ -232,9 +240,11 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
             const PIcon = p.icon;
 
             return (
-              <button
+              <motion.button
                 key={pid}
                 type="button"
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setSelectedPlatformId(pid)}
                 className={`px-3 py-2.5 rounded-xl text-left transition-all cursor-pointer border flex items-center gap-2.5 ${
                   isSelected
@@ -259,43 +269,54 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
                     {p.primaryFile.ext} · {p.primaryFile.size}
                   </div>
                 </div>
-              </button>
+              </motion.button>
             );
           })}
         </div>
       </div>
 
-      {/* Selected Platform Details & Action Bar */}
-      <div className="pt-3 border-t border-indigo-100/90 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-100">
-            <ActiveIcon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
-            <span className="truncate">{activeConfig.architecture}</span>
-            <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">·</span>
-            <span className="text-indigo-600 dark:text-indigo-400 font-semibold text-[11px]">
-              {activeConfig.badge}
-            </span>
+      {/* Selected Platform Details & Action Bar with Animated Switch */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={selectedPlatformId}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.2 }}
+          className="pt-3 border-t border-indigo-100/90 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3"
+        >
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-100">
+              <ActiveIcon className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="truncate">{activeConfig.architecture}</span>
+              <span className="text-slate-300 dark:text-slate-600" aria-hidden="true">·</span>
+              <span className="text-indigo-600 dark:text-indigo-400 font-semibold text-[11px]">
+                {activeConfig.badge}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+              {activeConfig.compatibilityNote}
+            </p>
           </div>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
-            {activeConfig.compatibilityNote}
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <a
-            href={activeConfig.primaryFile.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition-all active:scale-95 cursor-pointer"
-          >
-            <Download className="w-4 h-4 shrink-0" />
-            <span>Descargar {activeConfig.primaryFile.ext}</span>
-            <span className="text-[10.5px] font-mono opacity-85">
-              ({activeConfig.primaryFile.size})
-            </span>
-          </a>
-        </div>
-      </div>
-    </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <motion.a
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              href={activeConfig.primaryFile.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-600/20 transition-all cursor-pointer"
+            >
+              <Download className="w-4 h-4 shrink-0 kg-download-bounce" />
+              <span>Descargar {activeConfig.primaryFile.ext}</span>
+              <span className="text-[10.5px] font-mono opacity-85">
+                ({activeConfig.primaryFile.size})
+              </span>
+            </motion.a>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    </motion.div>
   );
 };

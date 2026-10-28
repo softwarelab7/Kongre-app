@@ -213,6 +213,77 @@
   animation: kg-halo-pulse 2.2s infinite;
 }
 
+/* =========================================================
+   ANIMACIONES FLUIDAS PARA INSTALACIÓN EN PC / MÓVIL
+   ========================================================= */
+
+@keyframes kg-float-slow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(0.8deg);
+  }
+}
+
+@keyframes kg-scan-beam {
+  0% {
+    top: 4%;
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  100% {
+    top: 92%;
+    opacity: 0.2;
+  }
+}
+
+@keyframes kg-download-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+@keyframes kg-glow-pulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.kg-float-anim {
+  animation: kg-float-slow 5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.kg-download-bounce {
+  animation: kg-download-bounce 1.8s ease-in-out infinite;
+}
+
+.kg-scan-line {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #6366f1, #a855f7, transparent);
+  box-shadow: 0 0 12px 2px rgba(99, 102, 241, 0.65);
+  pointer-events: none;
+  animation: kg-scan-beam 2.6s ease-in-out infinite alternate;
+}
+
+.kg-glow-pulse {
+  animation: kg-glow-pulse 3s ease-in-out infinite;
+}
+
 /* Reduced Motion Override (WCAG AA Compliance) */
 @media (prefers-reduced-motion: reduce) {
   .kg-orb-1,
@@ -233,10 +304,15 @@
   .kg-hover-lift-sm,
   .kg-timer-colon,
   .kg-check-animated,
-  .kg-halo-active {
+  .kg-halo-active,
+  .kg-float-anim,
+  .kg-download-bounce,
+  .kg-scan-line,
+  .kg-glow-pulse {
     animation: none !important;
     transition: none !important;
     transform: none !important;
     opacity: 1 !important;
   }
 }
+

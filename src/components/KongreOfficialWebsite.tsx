@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import QRCode from 'qrcode';
 import {
   ArrowRight,
   ArrowLeft,
@@ -15,14 +16,11 @@ import {
   Lock,
   MapPin,
   Monitor,
-  Moon,
   QrCode,
   Search,
   Shield,
   ShieldCheck,
   Smartphone,
-  Sparkles,
-  Sun,
   Users,
   Building2,
   Clock,
@@ -38,13 +36,26 @@ import {
   ChevronsUpDown,
   FileText,
   X,
+  Copy,
+  ExternalLink,
+  Share2,
+  Apple,
+  Terminal,
+  HardDrive,
+  Zap,
 } from 'lucide-react';
-import Logo from '../Logo';
 import AnimatedLogo from '../AnimatedLogo';
 import { useTheme } from '../context/ThemeContext';
 import { CURRENT_APP_VERSION } from '../utils/versionLog';
-import { DesktopCompatibilityBanner } from './DesktopCompatibilityBanner';
+import {
+  DesktopCompatibilityBanner,
+  PLATFORMS_DATA,
+  detectUserPlatform,
+  PlatformId,
+} from './DesktopCompatibilityBanner';
 import { DesktopDownloadModal } from './DesktopDownloadModal';
+import ThemeToggle from './ThemeToggle';
+import DemoModeButton from './DemoModeButton';
 import { AppFooter } from './AppFooter';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -114,7 +125,7 @@ const GUIDE_SIDEBAR_SECTIONS: {
   title: string;
   icon: React.ComponentType<{ className?: string }>;
 }[] = [
-  { id: 'welcome', title: 'Bienvenida y Resumen', icon: Sparkles },
+  { id: 'welcome', title: 'Bienvenida y Resumen', icon: BookOpen },
   { id: 'install', title: 'Abrir e Instalar la App', icon: Smartphone },
   { id: 'onboarding', title: 'Primeros Pasos y Acceso', icon: KeyRound },
   { id: 'how-to', title: 'Cómo Usar Kongre', icon: Layers },
@@ -958,6 +969,42 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
   const [docSearchQuery, setDocSearchQuery] = useState('');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [desktopModalOpen, setDesktopModalOpen] = useState(false);
+  const [selectedMobileTab, setSelectedMobileTab] = useState<'android' | 'ios'>('android');
+  const detectedPlatform = useMemo(() => detectUserPlatform(), []);
+  const [selectedPcOs, setSelectedPcOs] = useState<PlatformId>(() => detectedPlatform.id);
+  const [qrCopied, setQrCopied] = useState(false);
+  const [heroPreviewTab, setHeroPreviewTab] = useState<'reuniones' | 'asistencia' | 'territorios' | 'ministerio'>('reuniones');
+  const qrCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const portalUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/#portal`
+    : 'https://kongre-app.com/#portal';
+
+  useEffect(() => {
+    if (activeSection === 'downloads' && qrCanvasRef.current) {
+      QRCode.toCanvas(
+        qrCanvasRef.current,
+        portalUrl,
+        {
+          width: 96,
+          margin: 1,
+          color: {
+            dark: theme === 'dark' ? '#ffffff' : '#312e81',
+            light: theme === 'dark' ? '#0f172a' : '#ffffff',
+          },
+        },
+        (error) => {
+          if (error) console.error('Error generating QR in downloads:', error);
+        }
+      );
+    }
+  }, [activeSection, theme, portalUrl]);
+
+  const handleCopyPortalLink = () => {
+    navigator.clipboard.writeText(portalUrl);
+    setQrCopied(true);
+    setTimeout(() => setQrCopied(false), 2400);
+  };
 
   const activePersona = useMemo(
     () => ROLE_PERSONAS.find((p) => p.id === selectedRolePersona) || ROLE_PERSONAS[0],
@@ -1034,35 +1081,18 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
           ===================================================================== */}
       <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80">
         <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center justify-between gap-3">
-          {/* Left: Brand Identity */}
-          <div className="flex items-center gap-3 min-w-0">
-            <button
-              type="button"
+          {/* Left: Brand Identity (Unified with App Brand & AnimatedLogo) */}
+          <div className="flex items-center gap-2.5 min-w-0">
+            <AnimatedLogo
+              height={32}
               onClick={() => {
                 setActiveSection('about');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="flex items-center gap-2.5 text-left group cursor-pointer"
-            >
-              <div className="w-9 h-9 rounded-xl bg-indigo-600/10 dark:bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center shrink-0">
-                <Logo variant="isotipo" className="w-6 h-6 object-contain" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-base sm:text-lg font-black tracking-tight text-slate-900 dark:text-white">
-                    Kongre
-                  </span>
-                  <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-indigo-50 dark:bg-indigo-950/90 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/80">
-                    {activeSection === 'guide' ? 'Guía de Usuario' : `v${CURRENT_APP_VERSION}`}
-                  </span>
-                </div>
-                <span className="block text-[10.5px] font-medium text-slate-500 dark:text-slate-400 leading-none">
-                  {activeSection === 'guide'
-                    ? 'Documentación Oficial Paso a Paso'
-                    : 'Todo en uno para Congregaciones'}
-                </span>
-              </div>
-            </button>
+            />
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800/80 shrink-0">
+              {activeSection === 'guide' ? 'Guía de Usuario' : `v${CURRENT_APP_VERSION}`}
+            </span>
           </div>
 
           {/* Center: Switch between About (about.organized-app.com style) & Guide (guide.organized-app.com style) */}
@@ -1097,28 +1127,12 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
 
           {/* Right Actions: Theme, Demo & "Usar Kongre" (Open App Portal) */}
           <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={handleToggleTheme}
-              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/80 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer"
-              title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-              aria-label="Cambiar tema"
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-4 h-4 text-amber-400" />
-              ) : (
-                <Moon className="w-4 h-4 text-slate-700" />
-              )}
-            </button>
+            <ThemeToggle size={36} />
 
-            <button
-              type="button"
+            <DemoModeButton
               onClick={onStartDemoMode}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/60 dark:hover:bg-violet-900/70 text-violet-700 dark:text-violet-300 border border-violet-200/80 dark:border-violet-800/70 text-xs font-bold transition cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Modo Demo</span>
-            </button>
+              className="hidden sm:inline-flex"
+            />
 
             {isSignedInOrRegistered && onEnterAppDirectly ? (
               <button
@@ -1177,13 +1191,13 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
       {/* =====================================================================
           MAIN CONTENT CONTAINER
           ===================================================================== */}
-      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 py-6 sm:py-8">
+      <main className={`flex-1 w-full px-4 sm:px-6 lg:px-8 xl:px-10 ${activeSection === 'downloads' ? 'py-2 sm:py-3 flex flex-col justify-center' : 'py-6 sm:py-8'}`}>
         {/* ===================================================================
-            VIEW 1: ABOUT KONGRE (Modeled after https://about.organized-app.com/)
+            VIEW 1: ABOUT KONGRE (Interactive Cockpit, Modern Bento Grid & Zero-Fluff Showcase)
             =================================================================== */}
         {activeSection === 'about' && (
-          <div className="space-y-12 w-full">
-            {/* 1. HERO SECTION WITH MOTION ENTRANCE & AMBIENT GLOW */}
+          <div className="space-y-12 sm:space-y-16 w-full">
+            {/* 1. HERO SECTION WITH MOTION ENTRANCE, AMBIENT GLOW & LIVE COCKPIT DEMO */}
             <motion.section
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1211,15 +1225,16 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               />
 
               <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-                <div className="lg:col-span-7 xl:col-span-8 space-y-5">
+                {/* Left Column: Heading, Value Proposition & Actions */}
+                <div className="lg:col-span-7 xl:col-span-7 space-y-5">
                   <motion.div
                     initial={{ opacity: 0, y: -14, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                     className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100/90 dark:bg-indigo-950/90 border border-indigo-200 dark:border-indigo-800 text-[11px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 shadow-2xs"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                    <span>Aplicación Todo en Uno para Congregaciones</span>
+                    <Building2 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <span>Aplicación Integral para Congregaciones</span>
                   </motion.div>
 
                   <motion.h1
@@ -1235,7 +1250,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     initial={{ opacity: 0, y: 14 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-4xl"
+                    className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl"
                   >
                     <strong>Kongre</strong> une a ancianos, siervos ministeriales, precursores y publicadores en una plataforma moderna, gratuita y 100% funcional sin internet. Automatiza la programación de reuniones, el seguimiento del ministerio, la asistencia, las tarjetas S-21 y los mapas de territorios bajo cifrado de extremo a extremo.
                   </motion.p>
@@ -1265,11 +1280,11 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       whileHover={{ scale: 1.03, y: -2 }}
                       whileTap={{ scale: 0.97 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                      onClick={() => setActiveSection('guide')}
+                      onClick={() => setActiveSection('downloads')}
                       className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-bold text-sm shadow-2xs cursor-pointer"
                     >
-                      <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                      <span>Explorar Guía de Usuario</span>
+                      <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      <span>Instalar en PC / Móvil</span>
                     </motion.button>
 
                     <motion.button
@@ -1277,11 +1292,11 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       whileHover={{ scale: 1.03, y: -2 }}
                       whileTap={{ scale: 0.97 }}
                       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                      onClick={onStartDemoMode}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-violet-100/80 dark:bg-violet-950/60 hover:bg-violet-200/70 dark:hover:bg-violet-900/70 text-violet-800 dark:text-violet-200 border border-violet-200 dark:border-violet-800 font-bold text-sm cursor-pointer"
+                      onClick={() => setActiveSection('guide')}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/80 font-bold text-sm cursor-pointer"
                     >
-                      <Sparkles className="w-4 h-4 text-violet-600 dark:text-violet-400" />
-                      <span>Probar Demo Interactiva</span>
+                      <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                      <span>Guía de Usuario</span>
                     </motion.button>
                   </motion.div>
 
@@ -1307,107 +1322,304 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   </motion.div>
                 </div>
 
-                {/* Right Column: Quick Portal Card with Motion & Interactive Animated Logo */}
+                {/* Right Column: Interactive Live Cockpit Mockup */}
                 <motion.div
                   initial={{ opacity: 0, x: 28, scale: 0.96 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="lg:col-span-5 xl:col-span-4"
+                  className="lg:col-span-5 xl:col-span-5"
                 >
-                  <div className="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xl p-5 sm:p-6 space-y-4 hover:shadow-2xl transition-shadow duration-300">
-                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3.5">
-                      <div>
-                        <span className="text-[10.5px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                          Centro de Acceso Rápido
+                  <div className="rounded-3xl bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-slate-800 shadow-2xl p-4 sm:p-5 space-y-3.5 relative overflow-hidden backdrop-blur-xl group">
+                    {/* Ambient subtle card glow */}
+                    <div className="absolute -top-16 -right-16 w-48 h-48 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-2xl pointer-events-none" />
+
+                    {/* Cockpit Window Header (macOS style window buttons + Congregation Live Badge) */}
+                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
+                        </div>
+                        <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 pl-1.5 flex items-center gap-1.5">
+                          <span>Kongre</span>
+                          <span className="text-slate-400 dark:text-slate-500 font-normal">·</span>
+                          <span className="font-normal text-slate-500 dark:text-slate-400">Congregación Central</span>
                         </span>
-                        <h2 className="text-base font-extrabold text-slate-900 dark:text-white">
-                          Comienza en menos de 1 minuto
-                        </h2>
                       </div>
-                      <div className="p-1 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-2xs hover:scale-105 active:scale-95 transition-transform" title="Toca para animar el logo de Kongre">
-                        <AnimatedLogo height={28} iconOnly />
+
+                      <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200/80 dark:border-emerald-800/80 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span>En Sincronización</span>
                       </div>
                     </div>
 
-                    <div className="space-y-2.5">
-                      <motion.button
-                        type="button"
-                        whileHover={{ x: 5, scale: 1.01 }}
-                        whileTap={{ scale: 0.98 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                        onClick={() => onGoToPortal('home')}
-                        className="w-full p-3.5 rounded-xl bg-indigo-50/70 hover:bg-indigo-100/80 dark:bg-indigo-950/40 dark:hover:bg-indigo-950/70 border border-indigo-200/80 dark:border-indigo-800/70 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer group"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 transition-transform">
-                            <KeyRound className="w-5 h-5" />
-                          </div>
-                          <div className="min-w-0">
-                            <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">
-                              Unirse a mi Congregación
-                            </div>
-                            <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                              Entrar con Código de Invitación, PIN o Google
-                            </div>
-                          </div>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-indigo-500 shrink-0 group-hover:translate-x-1 transition-transform" />
-                      </motion.button>
+                    {/* Interactive Cockpit Tabs */}
+                    <div className="grid grid-cols-4 gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-[11px] font-bold">
+                      {[
+                        { id: 'reuniones' as const, label: 'Reunión' },
+                        { id: 'asistencia' as const, label: 'S-88' },
+                        { id: 'territorios' as const, label: 'S-13' },
+                        { id: 'ministerio' as const, label: 'Informes' },
+                      ].map((tab) => {
+                        const isTabActive = heroPreviewTab === tab.id;
+                        return (
+                          <button
+                            key={tab.id}
+                            type="button"
+                            onClick={() => setHeroPreviewTab(tab.id)}
+                            className={`py-1 rounded-lg text-center transition-all cursor-pointer ${
+                              isTabActive
+                                ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs font-black'
+                                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                            }`}
+                          >
+                            {tab.label}
+                          </button>
+                        );
+                      })}
+                    </div>
 
-                      <motion.button
-                        type="button"
-                        whileHover={{ x: 5, scale: 1.01 }}
-                        whileTap={{ scale: 0.98 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                        onClick={() => onGoToPortal('register')}
-                        className="w-full p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer group"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 transition-transform">
-                            <Building2 className="w-5 h-5" />
+                    {/* Dynamic Preview Card Body (Switches with Framer Motion AnimatePresence) */}
+                    <AnimatePresence mode="wait">
+                      {heroPreviewTab === 'reuniones' && (
+                        <motion.div
+                          key="reuniones"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.22 }}
+                          className="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 space-y-2.5 text-xs"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                              <Calendar className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                              <span>Reunión Vida y Ministerio</span>
+                            </span>
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300">
+                              Miércoles 19:00
+                            </span>
                           </div>
-                          <div className="min-w-0">
-                            <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">
-                              Configurar Nueva Congregación
-                            </div>
-                            <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                              Enfoque «Elder-First» para el Cuerpo de Ancianos
-                            </div>
-                          </div>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 group-hover:translate-x-1 transition-transform" />
-                      </motion.button>
 
-                      <motion.button
-                        type="button"
-                        whileHover={{ x: 5, scale: 1.01 }}
-                        whileTap={{ scale: 0.98 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                        onClick={() => handleOpenGuideArticle('install-android')}
-                        className="w-full p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/70 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer group"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 transition-transform">
-                            <Smartphone className="w-5 h-5" />
-                          </div>
-                          <div className="min-w-0">
-                            <div className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-300 transition-colors">
-                              Cómo instalar en Android, iOS y PC
+                          <div className="space-y-1.5 bg-white dark:bg-slate-850 p-2.5 rounded-xl border border-indigo-100/80 dark:border-indigo-900/40">
+                            <div className="flex items-center justify-between text-[11px]">
+                              <span className="font-bold text-slate-800 dark:text-slate-200 truncate">
+                                Tesoros de la Biblia (10 min)
+                              </span>
+                              <span className="text-slate-500 dark:text-slate-400 font-medium shrink-0 ml-2">
+                                C. Mendoza
+                              </span>
                             </div>
-                            <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                              Guía paso a paso para añadir a la pantalla de inicio
+                            <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-100 dark:border-slate-800">
+                              <span className="text-slate-600 dark:text-slate-300 truncate">
+                                Lectura de la Biblia (S-89)
+                              </span>
+                              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 shrink-0">
+                                <Check className="w-3 h-3" /> Enviada
+                              </span>
                             </div>
                           </div>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-slate-400 shrink-0 group-hover:translate-x-1 transition-transform" />
-                      </motion.button>
+
+                          <div className="flex items-center justify-between text-[10.5px] text-slate-500 dark:text-slate-400 font-medium">
+                            <span>JW.ORG EPUB Importado</span>
+                            <span className="text-indigo-600 dark:text-indigo-400 font-bold">Historial S-38 al día</span>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {heroPreviewTab === 'asistencia' && (
+                        <motion.div
+                          key="asistencia"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.22 }}
+                          className="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/60 space-y-2.5 text-xs"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                              <Users className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                              <span>Contador S-88 en Vivo</span>
+                            </span>
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/80 text-emerald-700 dark:text-emerald-300">
+                              Auditorio + Zoom
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 text-center">
+                            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-850 border border-emerald-100 dark:border-emerald-900/40">
+                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Auditorio</span>
+                              <span className="text-xl font-black text-slate-900 dark:text-white">96</span>
+                            </div>
+                            <div className="p-2.5 rounded-xl bg-white dark:bg-slate-850 border border-emerald-100 dark:border-emerald-900/40">
+                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Zoom</span>
+                              <span className="text-xl font-black text-emerald-600 dark:text-emerald-400">32</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[11px] font-bold text-slate-700 dark:text-slate-300 px-1">
+                            <span>Total Reunión: <strong className="text-slate-900 dark:text-white">128</strong></span>
+                            <span className="text-emerald-600 dark:text-emerald-400 font-mono">Promedio Mensual: 122</span>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {heroPreviewTab === 'territorios' && (
+                        <motion.div
+                          key="territorios"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.22 }}
+                          className="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900/60 space-y-2.5 text-xs"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                              <MapPin className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                              <span>Territorio #14 · Los Álamos</span>
+                            </span>
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/80 text-amber-700 dark:text-amber-300">
+                              Campaña S-13
+                            </span>
+                          </div>
+
+                          <div className="p-2.5 rounded-xl bg-white dark:bg-slate-850 border border-amber-100 dark:border-amber-900/40 space-y-1.5">
+                            <div className="flex items-center justify-between text-[11px]">
+                              <span className="font-bold text-slate-800 dark:text-slate-200">Asignado a: Grupo 2</span>
+                              <span className="text-amber-600 dark:text-amber-400 font-bold">78% Cubierto</span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                              <div className="h-full bg-amber-500 rounded-full w-[78%]" />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[10.5px] text-slate-500 dark:text-slate-400 font-medium">
+                            <span>2 direcciones «No Visitar»</span>
+                            <span className="text-indigo-600 dark:text-indigo-400 font-bold flex items-center gap-1">
+                              <QrCode className="w-3 h-3" /> Tarjeta Digital Activa
+                            </span>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {heroPreviewTab === 'ministerio' && (
+                        <motion.div
+                          key="ministerio"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.22 }}
+                          className="p-3.5 rounded-2xl bg-violet-50/70 dark:bg-violet-950/40 border border-violet-100 dark:border-violet-900/60 space-y-2.5 text-xs"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                              <Clock className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+                              <span>Ministerio & Precursores</span>
+                            </span>
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-violet-100 dark:bg-violet-900/80 text-violet-700 dark:text-violet-300">
+                              Octubre 2026
+                            </span>
+                          </div>
+
+                          <div className="p-2.5 rounded-xl bg-white dark:bg-slate-850 border border-violet-100 dark:border-violet-900/40 space-y-1.5">
+                            <div className="flex items-center justify-between text-[11px]">
+                              <span className="font-bold text-slate-800 dark:text-slate-200">Meta de Horas (Precursor)</span>
+                              <span className="text-violet-600 dark:text-violet-400 font-mono font-bold">42 / 50 hrs</span>
+                            </div>
+                            <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+                              <div className="h-full bg-violet-600 rounded-full w-[84%]" />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[10.5px] text-slate-500 dark:text-slate-400 font-medium">
+                            <span>3 Cursos Bíblicos</span>
+                            <span className="text-emerald-600 dark:text-emerald-400 font-bold">✓ Informe mensual listo</span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* Cockpit Action Launcher: Minimalista, Serio y Unificado */}
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                      <span className="text-xs text-slate-500 dark:text-slate-400 font-medium truncate">
+                        Congregación de muestra interactiva
+                      </span>
+                      <DemoModeButton onClick={onStartDemoMode} size="sm" />
                     </div>
                   </div>
                 </motion.div>
               </div>
             </motion.section>
 
-            {/* 2. WHO IS IT FOR? INTERACTIVE ROLE SWITCHER WITH MOTION TABS & ANIMATED CONTENT */}
+            {/* 2. THREE-STEP CONGREGATIONAL WORKFLOW */}
+            <motion.section
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.55 }}
+              className="space-y-6"
+            >
+              <div className="text-center max-w-2xl mx-auto space-y-1.5">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                  Flujo de Trabajo Sencillo y Seguro
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                  Cómo funciona Kongre en tu congregación
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">
+                  Una transición sin fricción para hermanos de todas las edades y niveles de experiencia tecnológica.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-3 relative overflow-hidden"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 font-black text-base flex items-center justify-center">
+                    1
+                  </div>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                    Configuración en 2 Minutos
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    El Coordinador o Secretario crea la congregación desde cualquier dispositivo. Cero servidores complicados ni configuraciones técnicas.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-3 relative overflow-hidden"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/80 text-violet-600 dark:text-violet-400 font-black text-base flex items-center justify-center">
+                    2
+                  </div>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                    Acceso con PIN y Roles Teocráticos
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Cada hermano recibe un código de invitación y PIN personal. Cada uno ve exactamente lo que le corresponde según sus privilegios.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm space-y-3 relative overflow-hidden"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 font-black text-base flex items-center justify-center">
+                    3
+                  </div>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                    100% Offline con Sincronización P2P
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    Funciona en el Salón del Reino y en la predicación sin señal. Cuando hay conexión, los datos se sincronizan cifrados de extremo a extremo.
+                  </p>
+                </motion.div>
+              </div>
+            </motion.section>
+
+            {/* 3. WHO IS IT FOR? INTERACTIVE ROLE SWITCHER WITH MOTION TABS & SCRIPTURAL THEME */}
             <motion.section
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -1423,12 +1635,24 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
                     ¿Para quién está diseñada Kongre?
                   </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 italic mt-1">
+                    «Que todas las cosas se hagan de forma digna y ordenada» — 1 Corintios 14:40
+                  </p>
                 </div>
 
-                {/* Animated Role Tabs with Sliding Pill */}
+                {/* Animated Role Tabs with Sliding Pill & Emblems */}
                 <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none bg-slate-200/70 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-300/60 dark:border-slate-800">
                   {ROLE_PERSONAS.map((role) => {
                     const isSelected = role.id === selectedRolePersona;
+                    const RoleIcon =
+                      role.id === 'elders'
+                        ? ShieldCheck
+                        : role.id === 'servants'
+                        ? Layers
+                        : role.id === 'pioneers'
+                        ? Compass
+                        : Users;
+
                     return (
                       <motion.button
                         key={role.id}
@@ -1436,7 +1660,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => setSelectedRolePersona(role.id)}
-                        className={`relative px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-colors cursor-pointer shrink-0 z-10 ${
+                        className={`relative px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-colors cursor-pointer shrink-0 z-10 flex items-center gap-1.5 ${
                           isSelected
                             ? 'text-white'
                             : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
@@ -1449,6 +1673,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                             className="absolute inset-0 bg-indigo-600 rounded-xl shadow-xs -z-10"
                           />
                         )}
+                        <RoleIcon className="w-3.5 h-3.5" />
                         <span>{role.label}</span>
                       </motion.button>
                     );
@@ -1537,7 +1762,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               </AnimatePresence>
             </motion.section>
 
-            {/* 3. CORE FEATURES BENTO GRID WITH STAGGERED MOTION HOVER */}
+            {/* 4. CORE FEATURES ASYMMETRICAL BENTO GRID */}
             <motion.section
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -1545,104 +1770,285 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               transition={{ duration: 0.55 }}
               className="space-y-6"
             >
-              <div>
-                <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                  Módulos de la Aplicación
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-                  Funciones diseñadas para ahorrar horas de trabajo semanal
-                </h2>
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+                <div>
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                    Módulos Teocráticos Integrados
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
+                    Funciones que ahorran horas de trabajo cada semana
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveSection('guide')}
+                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Ver los 24 módulos en la guía</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
 
+              {/* Bento Grid with Asymmetrical Rhythm */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {[
-                  {
-                    icon: '/assets/icons/svg-indigo/clm_vmc.svg',
-                    kicker: 'REUNIONES Y AUTOMATIZACIÓN',
-                    title: 'Programación Semanal y Hojas S-89',
-                    desc: 'Importa los datos de las reuniones desde jw.org o archivos EPUB sin copiar y pegar. Asigna partes estudiantiles con historial S-38 y envía hojas S-89 por WhatsApp.',
-                    docId: 'meetings-jwor-s89' as DocArticleId,
-                  },
-                  {
-                    icon: '/assets/icons/svg-indigo/informes_servicio.svg',
-                    kicker: 'MINISTERIO Y PRECURSORES',
-                    title: 'Cronómetro, Informes y Delegados',
-                    desc: 'Cronómetro de predicación integrado, registro de estudios bíblicos, solicitud de precursor auxiliar y entrega de informes mensuales (incluyendo informes delegados de familia).',
-                    docId: 'ministry-timer-studies' as DocArticleId,
-                  },
-                  {
-                    icon: '/assets/icons/svg-indigo/secretaria.svg',
-                    kicker: 'SECRETARÍA Y REGISTROS',
-                    title: 'Grupos de Servicio, Tarjetas S-21 y S-1',
-                    desc: 'Organiza a los publicadores por grupo de servicio, genera automáticamente las tarjetas S-21 del año de servicio y consolida el informe mensual para la sucursal.',
-                    docId: 'persons-groups-s21' as DocArticleId,
-                  },
-                  {
-                    icon: '/assets/icons/svg-indigo/supervision.svg',
-                    kicker: 'CONTADOR DE ASISTENCIA S-88',
-                    title: 'Contador de Asistencia en Tiempo Real',
-                    desc: 'Herramienta táctil para acomodadores que suma los asistentes en el auditorio y por Zoom, calculando los promedios mensuales y anuales del formulario S-88.',
-                    docId: 'attendance-counter-s88' as DocArticleId,
-                  },
-                  {
-                    icon: '/assets/icons/svg-indigo/predicacion.svg',
-                    kicker: 'TERRITORIOS GPS Y CARRITOS',
-                    title: 'Mapas Interactivos (S-13) y Exhibidores',
-                    desc: 'Traza polígonos de territorios, comparte tarjetas digitales con código QR para trabajar desde el móvil y organiza los turnos de predicación pública.',
-                    docId: 'territories-carts-hall' as DocArticleId,
-                  },
-                  {
-                    icon: '/assets/icons/svg-indigo/discursos.svg',
-                    kicker: 'FIN DE SEMANA Y SALÓN',
-                    title: 'Discursos Públicos, Hospitalidad y Tablero TV',
-                    desc: 'Coordina oradores locales y visitantes, turnos de hospitalidad, limpieza, acomodadores y proyecta el Tablero Digital en el monitor del Salón del Reino.',
-                    docId: 'weekend-public-talks' as DocArticleId,
-                  },
-                ].map((card, idx) => (
-                  <motion.div
-                    key={card.title}
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: '-40px' }}
-                    transition={{ duration: 0.45, delay: (idx % 3) * 0.09, ease: [0.16, 1, 0.3, 1] }}
-                    whileHover={{ y: -6, scale: 1.015, transition: { duration: 0.22 } }}
-                    className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-500/10 transition-colors shadow-xs flex flex-col justify-between gap-4 group cursor-pointer"
-                  >
-                    <div className="space-y-3">
+                {/* Bento Card 1 (Span 2 cols on md/lg): Weekly Meetings & S-89 */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl bg-linear-to-br from-indigo-50/80 via-white to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-850 border border-indigo-200/80 dark:border-indigo-800/70 shadow-sm flex flex-col justify-between gap-5 group"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <motion.div
-                          whileHover={{ scale: 1.15, rotate: 4 }}
-                          transition={{ type: 'spring', stiffness: 350, damping: 20 }}
-                          className="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200/60 dark:border-indigo-800/60 flex items-center justify-center shrink-0"
-                        >
-                          <img src={card.icon} alt={card.title} className="w-6 h-6 object-contain" />
-                        </motion.div>
-                        <span className="text-[10.5px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                          {card.kicker}
-                        </span>
+                        <div className="w-11 h-11 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-600/20 shrink-0">
+                          <img src="/assets/icons/svg-indigo/clm_vmc.svg" alt="Reuniones" className="w-6 h-6 object-contain invert brightness-0" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                            Reuniones y Automatización
+                          </span>
+                          <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                            Programación Semanal y Hojas S-89
+                          </h3>
+                        </div>
                       </div>
-                      <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                        {card.title}
-                      </h3>
-                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                        {card.desc}
-                      </p>
+                      <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80">
+                        JW.ORG EPUB Directo
+                      </span>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleOpenGuideArticle(card.docId)}
-                      className="w-full py-2.5 px-3.5 rounded-xl bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800/70 dark:hover:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 text-xs font-bold inline-flex items-center justify-between transition-colors cursor-pointer group/btn"
-                    >
-                      <span>Cómo usar esta función</span>
-                      <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1.5 transition-transform" />
-                    </button>
-                  </motion.div>
-                ))}
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                      Carga los datos de las reuniones desde los programas oficiales de jw.org sin copiar y pegar. Asigna partes estudiantiles respetando el historial S-38 de cada publicador y envía las hojas de asignación S-89 por WhatsApp en un toque.
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Detección de choques</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Exportar PDF oficial</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Historial S-38 automático</span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenGuideArticle('meetings-jwor-s89')}
+                    className="w-full sm:w-auto self-start py-2 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <span>Ver cómo programar reuniones</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </motion.div>
+
+                {/* Bento Card 2: Attendance Counter S-88 */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                  className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col justify-between gap-5 group"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                        <img src="/assets/icons/svg-indigo/supervision.svg" alt="Asistencia" className="w-5 h-5 object-contain" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                          Auditorio & Zoom
+                        </span>
+                        <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                          Contador S-88 Táctil
+                        </h3>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                      Herramienta táctil para acomodadores con botones rápidos (+ / -) que calcula promedios mensuales y anuales oficiales para el formulario S-88.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenGuideArticle('attendance-counter-s88')}
+                    className="w-full py-2 px-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold inline-flex items-center justify-between transition-colors cursor-pointer"
+                  >
+                    <span>Ver guía de asistencia</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </motion.div>
+
+                {/* Bento Card 3: Ministry Timer & Reports */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                  className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col justify-between gap-5 group"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-violet-50 dark:bg-violet-950/80 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+                        <img src="/assets/icons/svg-indigo/informes_servicio.svg" alt="Ministerio" className="w-5 h-5 object-contain" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-violet-600 dark:text-violet-400">
+                          Ministerio y Metas
+                        </span>
+                        <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                          Cronómetro e Informes
+                        </h3>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                      Lleva el tiempo exacto en el celular sin gastar batería. Control de cursos bíblicos, solicitud de precursor auxiliar e informes delegados de familia.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenGuideArticle('ministry-timer-studies')}
+                    className="w-full py-2 px-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold inline-flex items-center justify-between transition-colors cursor-pointer"
+                  >
+                    <span>Cómo reportar ministerio</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </motion.div>
+
+                {/* Bento Card 4 (Span 2 cols on md/lg): GPS Territories & Carts */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl bg-linear-to-br from-amber-50/70 via-white to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-850 border border-amber-200/80 dark:border-amber-800/60 shadow-sm flex flex-col justify-between gap-5 group"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0">
+                          <img src="/assets/icons/svg-indigo/predicacion.svg" alt="Territorios" className="w-6 h-6 object-contain invert brightness-0" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                            Territorios GPS y Carritos
+                          </span>
+                          <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                            Mapas Digitales Interactivos (S-13) y Exhibidores
+                          </h3>
+                        </div>
+                      </div>
+                      <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-amber-200/80">
+                        Código QR Móvil
+                      </span>
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                      Dibuja polígonos interactivos con OpenStreetMap, marca direcciones «No visitar» para proteger la privacidad de los vecinos y comparte la tarjeta digital por QR con el conductor del grupo sin imprimir papel.
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Registro oficial S-13</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Turnos de Carritos PPE</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Direcciones No Visitar</span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenGuideArticle('territories-carts-hall')}
+                    className="w-full sm:w-auto self-start py-2 px-4 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/70 dark:hover:bg-amber-900/70 text-amber-800 dark:text-amber-300 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <span>Ver mapas y carritos</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </motion.div>
+
+                {/* Bento Card 5: Secretary & S-21 Cards */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                  className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col justify-between gap-5 group"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <img src="/assets/icons/svg-indigo/secretaria.svg" alt="Secretaría" className="w-5 h-5 object-contain" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                          Secretaría y Registros
+                        </span>
+                        <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
+                          Fichas S-21 e Informe S-1
+                        </h3>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                      Genera automáticamente las tarjetas de registro de publicador S-21 para el año de servicio y consolida los totales para el informe mensual S-1 a la sucursal.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenGuideArticle('persons-groups-s21')}
+                    className="w-full py-2 px-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold inline-flex items-center justify-between transition-colors cursor-pointer"
+                  >
+                    <span>Ver secretaría y S-21</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </motion.div>
+
+                {/* Bento Card 6 (Span 2 cols on md/lg): Public Talks & TV Board */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                  className="md:col-span-2 p-6 sm:p-7 rounded-3xl bg-linear-to-br from-violet-50/70 via-white to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-850 border border-violet-200/80 dark:border-violet-800/60 shadow-sm flex flex-col justify-between gap-5 group"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-2xl bg-violet-600 text-white flex items-center justify-center shadow-md shadow-violet-600/20 shrink-0">
+                          <img src="/assets/icons/svg-indigo/discursos.svg" alt="Discursos" className="w-6 h-6 object-contain invert brightness-0" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-violet-600 dark:text-violet-400">
+                            Fin de Semana y Salón
+                          </span>
+                          <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                            Discursos Públicos, Hospitalidad y Tablero TV
+                          </h3>
+                        </div>
+                      </div>
+                      <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-violet-100 dark:bg-violet-950 text-violet-800 dark:text-violet-300 border border-violet-200/80">
+                        Modo Quiosco Pantalla Completa
+                      </span>
+                    </div>
+
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                      Coordina oradores locales y visitantes, hospitalidad, turnos de limpieza, acomodadores y proyecta en pantalla completa el Tablero Digital en el monitor del Salón del Reino con diseño de alta visibilidad.
+                    </p>
+
+                    <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Temas de discursos oficiales</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Cronograma de hospitalidad</span>
+                      <span className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">✓ Atajos de cabina de sonido</span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleOpenGuideArticle('weekend-public-talks')}
+                    className="w-full sm:w-auto self-start py-2 px-4 rounded-xl bg-violet-50 hover:bg-violet-100 dark:bg-violet-950/70 dark:hover:bg-violet-900/70 text-violet-800 dark:text-violet-300 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <span>Ver discursos y tablero TV</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </motion.div>
               </div>
             </motion.section>
 
-            {/* 4. SECURITY & PRIVACY BY DESIGN SECTION WITH MOTION GLOW */}
+            {/* 5. SECURITY & PRIVACY BY DESIGN SECTION WITH MOTION GLOW */}
             <motion.section
               initial={{ opacity: 0, scale: 0.98, y: 20 }}
               whileInView={{ opacity: 1, scale: 1, y: 0 }}
@@ -1668,7 +2074,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   >
                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
                   </motion.div>
-                  <span>Seguridad, Privacidad y Confidencialidad</span>
+                  <span>Seguridad, Privacidad y Confidencialidad Teocrática</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
                   Tus datos pertenecen únicamente a tu congregación
@@ -1683,8 +2089,8 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   {
                     icon: Lock,
                     color: 'text-emerald-400',
-                    title: 'Cifrado de Extremo a Extremo',
-                    desc: 'Los registros se cifran en tu dispositivo con AES-256-GCM antes de sincronizarse. Nadie externo puede leerlos.',
+                    title: 'Cifrado E2EE (AES-256-GCM)',
+                    desc: 'Los registros se cifran en tu dispositivo antes de sincronizarse. Nadie externo ni servidores pueden leerlos.',
                   },
                   {
                     icon: CloudOff,
@@ -1725,7 +2131,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               </div>
             </motion.section>
 
-            {/* 5. USE ON ANY DEVICE BANNER */}
+            {/* 6. USE ON ANY DEVICE BANNER */}
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -1739,7 +2145,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               />
             </motion.section>
 
-            {/* 6. FREQUENTLY ASKED QUESTIONS (FAQ) WITH SMOOTH MOTION ACCORDION */}
+            {/* 7. FREQUENTLY ASKED QUESTIONS (FAQ) WITH SMOOTH MOTION ACCORDION */}
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -1810,6 +2216,56 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     </div>
                   );
                 })}
+              </div>
+            </motion.section>
+
+            {/* 8. HIGH IMPACT CLOSING CALL TO ACTION BANNER */}
+            <motion.section
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.55 }}
+              className="rounded-3xl bg-linear-to-br from-indigo-900 via-indigo-950 to-slate-950 text-white p-8 sm:p-12 border border-indigo-800/80 shadow-2xl relative overflow-hidden text-center space-y-6"
+            >
+              <div className="absolute -top-24 -left-24 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-violet-500/20 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative z-10 max-w-2xl mx-auto space-y-3">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] font-extrabold uppercase tracking-wider text-indigo-200">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                  <span>Sin costo ni registro previo requerido</span>
+                </div>
+                <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white">
+                  Lleva el orden y la tranquilidad a tu congregación
+                </h2>
+                <p className="text-xs sm:text-sm text-indigo-200/90 leading-relaxed max-w-xl mx-auto">
+                  Sin costo alguno, sin publicidad y sin recopilar datos personales. Descubre por qué hermanos de todo el mundo eligen Kongre.
+                </p>
+              </div>
+
+              <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 pt-2">
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => onGoToPortal()}
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm shadow-lg transition-all cursor-pointer"
+                >
+                  <KeyRound className="w-4 h-4 text-indigo-600" />
+                  <span>Usar Kongre en el Navegador</span>
+                  <ArrowRight className="w-4 h-4" />
+                </motion.button>
+
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setActiveSection('downloads')}
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-indigo-800/80 hover:bg-indigo-700/80 border border-indigo-700 text-white font-bold text-sm transition-all cursor-pointer"
+                >
+                  <Download className="w-4 h-4 text-indigo-300" />
+                  <span>Instalar en PC / Móvil</span>
+                </motion.button>
               </div>
             </motion.section>
           </div>
@@ -2202,7 +2658,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                         className="p-4 rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border-l-4 border-emerald-500 text-xs text-emerald-950 dark:text-emerald-200 space-y-1 shadow-2xs"
                       >
                         <div className="font-extrabold uppercase tracking-wider flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300">
-                          <Sparkles className="w-4 h-4" />
+                          <CheckCircle2 className="w-4 h-4" />
                           <span>Consejo Práctico</span>
                         </div>
                         <p className="leading-relaxed">{activeDoc.tip}</p>
@@ -2316,7 +2772,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 {/* Quick Action Box in Sidebar with Motion button */}
                 <div className="rounded-3xl bg-linear-to-br from-indigo-50/90 via-white to-violet-50/80 dark:from-indigo-950/40 dark:via-slate-900 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-800/70 p-4 sm:p-5 space-y-3 shadow-xs">
                   <div className="text-xs font-extrabold text-indigo-950 dark:text-indigo-200 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <KeyRound className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                     <span>¿Listo para abrir la app?</span>
                   </div>
                   <p className="text-[11px] text-indigo-900/80 dark:text-indigo-300/80 leading-relaxed">
@@ -2340,95 +2796,316 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
         )}
 
         {/* ===================================================================
-            VIEW 3: DOWNLOADS & PWA INSTALLATION
+            VIEW 3: DOWNLOADS & PWA INSTALLATION (CLEAN, MINIMAL & FLUID)
             =================================================================== */}
         {activeSection === 'downloads' && (
-          <section className="space-y-8 animate-fade-in">
-            <div className="border-b border-slate-200 dark:border-slate-800 pb-5">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                Multiplataforma
-              </span>
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-0.5">
-                Instala Kongre en cualquier dispositivo
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 max-w-2xl">
-                Úsala en el navegador, instálala como aplicación web progresiva (PWA) en tu celular o descarga el ejecutable nativo para la computadora del Salón del Reino.
-              </p>
-            </div>
-
-            <DesktopCompatibilityBanner
-              variant="hero-card"
-              onOpenAllDownloads={() => setDesktopModalOpen(true)}
+          <div className="w-full max-w-5xl mx-auto space-y-3.5 sm:space-y-4 relative py-1">
+            {/* Ambient Floating Glow Orbs */}
+            <motion.div
+              animate={{
+                x: [0, 20, 0],
+                y: [0, -15, 0],
+                scale: [1, 1.08, 1],
+              }}
+              transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute -top-10 -left-10 w-72 h-72 rounded-full bg-indigo-500/10 dark:bg-indigo-600/15 blur-3xl pointer-events-none"
+            />
+            <motion.div
+              animate={{
+                x: [0, -20, 0],
+                y: [0, 15, 0],
+                scale: [1, 1.06, 1],
+              }}
+              transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+              className="absolute -bottom-10 -right-10 w-80 h-80 rounded-full bg-violet-500/10 dark:bg-violet-600/15 blur-3xl pointer-events-none"
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between">
-                <div className="space-y-2">
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                    Android (Chrome)
-                  </span>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                    Teléfonos y Tabletas Android
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                    Abre <strong>kongre-app.com/#portal</strong> en Chrome, toca el menú de tres puntos (⋮) y selecciona <strong>«Instalar aplicación»</strong>.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleOpenGuideArticle('install-android')}
-                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
-                >
-                  <span>Ver guía para Android</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+            {/* Header: Super compact, zero wasted vertical space */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="text-center space-y-1"
+            >
+              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200/80 dark:border-indigo-800/80 text-[10.5px] font-extrabold uppercase tracking-wider text-indigo-700 dark:text-indigo-300 shadow-2xs">
+                <Download className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
+                <span>Instalación Oficial · 100% Offline · v{CURRENT_APP_VERSION}</span>
               </div>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+                Instala Kongre en tu dispositivo
+              </h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
+                Sin intermediarios ni registros en tiendas. Elige tu dispositivo para comenzar de inmediato.
+              </p>
+            </motion.div>
 
-              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between">
-                <div className="space-y-2">
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                    iOS / iPadOS (Safari)
-                  </span>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                    iPhone y iPad
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                    Abre <strong>kongre-app.com/#portal</strong> en Safari, toca el botón <strong>Compartir</strong> y elige <strong>«Añadir a pantalla de inicio»</strong>.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleOpenGuideArticle('install-ios')}
-                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
-                >
-                  <span>Ver guía para iPhone / iPad</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
+            {/* 2 MAIN CARDS: MOBILE vs DESKTOP (EQUAL HEIGHT, ULTRA-COMPACT & BALANCED) */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 sm:gap-5 items-stretch relative z-10">
+              {/* CARD 1: EN TU MÓVIL (PWA) */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -2 }}
+                className="p-4 sm:p-5 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800 shadow-lg shadow-indigo-500/5 hover:border-indigo-500/40 transition-all flex flex-col justify-between space-y-3.5"
+              >
+                <div className="space-y-3">
+                  {/* Top Header */}
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                        PWA Móvil · Android & iOS
+                      </span>
+                      <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                        En Celular o Tableta
+                      </h2>
+                    </div>
+                    <div className="w-9 h-9 rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20 shrink-0">
+                      <Smartphone className="w-5 h-5 stroke-[2]" />
+                    </div>
+                  </div>
 
-              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between">
-                <div className="space-y-2">
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-violet-600 dark:text-violet-400">
-                    Windows, macOS y Linux
-                  </span>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                    Computadora del Salón y PC Personal
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                    Descarga el instalador nativo en Rust (.exe, .dmg, .deb) o instálala desde la barra de direcciones de Chrome o Edge.
-                  </p>
+                  {/* QR Code Presentation Box (Compact) */}
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-750 flex items-center gap-3">
+                    <div className="relative p-1 rounded-lg bg-white shadow-xs shrink-0 border border-slate-200/70">
+                      <canvas ref={qrCanvasRef} className="block w-20 h-20 rounded" />
+                    </div>
+                    <div className="space-y-1 min-w-0 flex-1">
+                      <div className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-white">
+                        <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <span>Apunta tu cámara móvil</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
+                        Escanea el QR para abrir la app sin teclear la dirección.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleCopyPortalLink}
+                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10.5px] font-bold bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 transition cursor-pointer shadow-2xs"
+                      >
+                        {qrCopied ? <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                        <span>{qrCopied ? '¡Enlace copiado!' : 'Copiar enlace'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Android / iPhone Clean Instructions */}
+                  <div className="space-y-1.5">
+                    <div className="flex rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5 text-xs font-bold">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedMobileTab('android')}
+                        className={`flex-1 py-1 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                          selectedMobileTab === 'android'
+                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs font-extrabold'
+                            : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        <Smartphone className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <span>Android (Chrome)</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedMobileTab('ios')}
+                        className={`flex-1 py-1 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                          selectedMobileTab === 'ios'
+                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs font-extrabold'
+                            : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        <Apple className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <span>iPhone / iPad (Safari)</span>
+                      </button>
+                    </div>
+
+                    <div className="p-2 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/70 text-[11px] leading-snug text-slate-600 dark:text-slate-300">
+                      {selectedMobileTab === 'android' ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">Instalación:</span>
+                          <span>Abre en Chrome → menú (<strong>⋮</strong>) → <strong>«Instalar aplicación»</strong>.</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 shrink-0">Instalación:</span>
+                          <span>Abre en Safari → Compartir (<strong>↑</strong>) → <strong>«Añadir a pantalla de inicio»</strong>.</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setDesktopModalOpen(true)}
-                  className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
-                >
-                  <span>Abrir instaladores de escritorio</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
+
+                {/* Primary Mobile Action */}
+                <div className="pt-1">
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => onGoToPortal()}
+                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs shadow-md transition-all cursor-pointer"
+                  >
+                    <span>Abrir Portal Web en este Dispositivo</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </motion.button>
+                </div>
+              </motion.div>
+
+              {/* CARD 2: EN COMPUTADORA / SALÓN (RUST NATIVO) */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -2 }}
+                className="p-4 sm:p-5 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-800 shadow-lg shadow-indigo-500/5 hover:border-indigo-500/40 transition-all flex flex-col justify-between space-y-3.5"
+              >
+                <div className="space-y-3">
+                  {/* Top Header */}
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                        Rust Nativo · PC & Mac & Linux
+                      </span>
+                      <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                        En Computadora / Salón
+                      </h2>
+                    </div>
+                    <div className="w-9 h-9 rounded-xl bg-linear-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-md shadow-indigo-600/25 shrink-0">
+                      <Monitor className="w-5 h-5 stroke-[2]" />
+                    </div>
+                  </div>
+
+                  {/* OS Selector Pills (4 options in a single neat row) */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10.5px]">
+                      <span className="font-bold text-slate-500 dark:text-slate-400">
+                        Sistema operativo:
+                      </span>
+                      {selectedPcOs === detectedPlatform.id && (
+                        <span className="inline-flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400 text-[10px]">
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>Detectado en tu equipo</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                      {[
+                        { id: 'windows' as PlatformId, name: 'Windows', icon: Laptop, ext: '.exe' },
+                        { id: 'mac' as PlatformId, name: 'macOS', icon: Apple, ext: '.dmg' },
+                        { id: 'linux' as PlatformId, name: 'Ubuntu', icon: Terminal, ext: '.deb' },
+                        { id: 'fedora' as PlatformId, name: 'Fedora', icon: Monitor, ext: '.rpm' },
+                      ].map((item) => {
+                        const Icon = item.icon;
+                        const isSelected = selectedPcOs === item.id;
+                        const isDetected = detectedPlatform.id === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => setSelectedPcOs(item.id)}
+                            className={`py-1.5 px-2 rounded-xl text-center border transition-all cursor-pointer relative ${
+                              isSelected
+                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm font-extrabold'
+                                : 'bg-slate-50 dark:bg-slate-800/70 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-indigo-300'
+                            }`}
+                          >
+                            <div className="flex items-center justify-center gap-1 text-xs">
+                              <Icon className="w-3 h-3" />
+                              <span>{item.name}</span>
+                            </div>
+                            <div className={`text-[9.5px] font-mono mt-0.5 ${isSelected ? 'text-indigo-100' : 'text-slate-400'}`}>
+                              {item.ext}
+                            </div>
+                            {isDetected && !isSelected && (
+                              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" title="Detectado" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Active Platform Summary & Highlights (Ultra-compact) */}
+                  <div className="p-2.5 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-extrabold text-slate-900 dark:text-white">
+                          {PLATFORMS_DATA[selectedPcOs]?.name} ({PLATFORMS_DATA[selectedPcOs]?.primaryFile.ext})
+                        </span>
+                        <span className="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80">
+                          {PLATFORMS_DATA[selectedPcOs]?.architecture || '64-bit'}
+                        </span>
+                      </div>
+                      <span className="font-mono text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
+                        {PLATFORMS_DATA[selectedPcOs]?.primaryFile.size}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-1 text-[10.5px] text-slate-600 dark:text-slate-300 font-medium pt-1 border-t border-indigo-100/80 dark:border-indigo-900/60">
+                      <span className="flex items-center gap-1">
+                        <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        <span>Modo Cabina & Salón</span>
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        <span>0 dependencias</span>
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        <span>Atajos de teclado</span>
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Check className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        <span>Arranque &lt; 0.8 seg</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Primary Desktop Action: Download */}
+                <div className="space-y-1 pt-1">
+                  <motion.a
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    href={PLATFORMS_DATA[selectedPcOs]?.primaryFile.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5 kg-download-bounce" />
+                    <span>Descargar para {PLATFORMS_DATA[selectedPcOs]?.name} ({PLATFORMS_DATA[selectedPcOs]?.primaryFile.ext})</span>
+                  </motion.a>
+
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={() => setDesktopModalOpen(true)}
+                      className="text-[10.5px] font-semibold text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
+                    >
+                      Ver sumas SHA-256 e instaladores avanzados (MSI / AppImage / Portátiles)
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
             </div>
-          </section>
+
+            {/* TRUST GUARANTEE: Ultra-slim Single Line Pill Strip */}
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 py-1 px-4 rounded-full bg-slate-100/70 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400 relative z-10">
+              <span className="inline-flex items-center gap-1.5 font-medium">
+                <CloudOff className="w-3.5 h-3.5 text-indigo-500" />
+                <span>100% Offline-First</span>
+              </span>
+              <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+              <span className="inline-flex items-center gap-1.5 font-medium">
+                <ShieldCheck className="w-3.5 h-3.5 text-violet-500" />
+                <span>Cifrado AES-256 Local</span>
+              </span>
+              <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
+              <span className="inline-flex items-center gap-1.5 font-medium">
+                <Zap className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Código Abierto y Gratuito</span>
+              </span>
+            </div>
+          </div>
         )}
       </main>
 

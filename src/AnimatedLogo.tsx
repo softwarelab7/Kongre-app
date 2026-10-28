@@ -10,24 +10,35 @@ export default function AnimatedLogo({
   vertical = false,
   inverted = false,
   iconOnly = false,
+  onClick,
+  className = '',
 }: {
   height?: number;
   vertical?: boolean;
   inverted?: boolean;
   iconOnly?: boolean;
+  onClick?: () => void;
+  className?: string;
 }) {
   const [run, setRun] = useState(0);
   const sqSize = vertical ? Math.round(height * 0.85) : height;
   const wmHeight = vertical ? Math.round(height * 0.42) : height * 0.6;
 
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setRun((r) => r + 1);
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
     <button
       type="button"
-      onClick={() => setRun((r) => r + 1)}
+      onClick={handleClick}
       aria-label="Kongre - Reproducir animación"
       className={`inline-flex cursor-pointer items-center border-0 bg-transparent p-0 transition-transform active:scale-95 ${
         inverted ? 'text-white' : 'text-logo'
-      }`}
+      } ${className}`}
     >
       <span
         key={run}

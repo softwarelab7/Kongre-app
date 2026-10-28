@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useId } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Check, Search, X } from 'lucide-react';
 
 export interface Option {
@@ -56,8 +57,12 @@ const SelectComponent: React.FC<SelectProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openUpward, setOpenUpward] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 640 : false
+  );
   const [searchTerm, setSearchTerm] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const selectId = useId();
 
@@ -66,9 +71,18 @@ const SelectComponent: React.FC<SelectProps> = ({
 
   const selectedOption = options.find((opt) => String(opt.value) === String(value));
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Auto-detect placement: open upward if limited space below
   useEffect(() => {
-    if (isOpen && containerRef.current) {
+    if (isOpen && containerRef.current && !isMobile) {
       if (placement === 'top') {
         setOpenUpward(true);
         return;
@@ -97,11 +111,11 @@ const SelectComponent: React.FC<SelectProps> = ({
       const estimatedMenuHeight = Math.min(options.length * 44 + (isSearchActive ? 52 : 16), 260);
       setOpenUpward(spaceBelow < estimatedMenuHeight && spaceAbove >= 120);
     }
-  }, [isOpen, options.length, isSearchActive, placement]);
+  }, [isOpen, options.length, isSearchActive, placement, isMobile]);
 
   // Focus search input on open (only on desktop >= 640px to avoid jarring virtual keyboard jump on mobile)
   useEffect(() => {
-    if (isOpen && isSearchActive && searchInputRef.current && window.innerWidth >= 640) {
+    if (isOpen && isSearchActive && searchInputRef.current && !isMobile) {
       setTimeout(() => {
         searchInputRef.current?.focus();
       }, 50);
@@ -109,12 +123,17 @@ const SelectComponent: React.FC<SelectProps> = ({
     if (!isOpen) {
       setSearchTerm('');
     }
-  }, [isOpen, isSearchActive]);
+  }, [isOpen, isSearchActive, isMobile]);
 
   // Click outside and escape key listener
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(target) &&
+        (!menuRef.current || !menuRef.current.contains(target))
+      ) {
         setIsOpen(false);
       }
     };
@@ -147,6 +166,95 @@ const SelectComponent: React.FC<SelectProps> = ({
     onChange(String(optionValue));
     setIsOpen(false);
   };
+
+  const menuInnerContent = (
+    <>
+      {/* Mobile Sheet Header */}
+      <div className="flex sm:hidden items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60">
+        <span className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+          {placeholder}
+        </span>
+        <button
+          type="button"
+          onClick={() => setIsOpen(false)}
+          className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+          aria-label="Cerrar selector"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Search Bar (when options > 7 or searchable=true) */}
+      {isSearchActive && (
+        <div className="p-2.5 sm:p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 relative">
+          <Search className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Buscar por nombre..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-8 sm:pl-7 pr-8 py-2 sm:py-1.5 rounded-xl sm:rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs sm:text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm('')}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Options List */}
+      <div className="max-h-[55dvh] sm:max-h-60 overflow-y-auto p-1.5 scrollbar-thin space-y-0.5">
+        {filteredOptions.length > 0 ? (
+          filteredOptions.map((option) => {
+            const isSelected = String(option.value) === String(value);
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => handleSelect(option.value)}
+                className={`group relative flex w-full select-none items-center justify-between min-h-[42px] py-2.5 px-3 cursor-pointer transition-all rounded-xl text-left ${
+                  isSelected
+                    ? 'bg-indigo-600 text-white font-bold shadow-xs'
+                    : 'text-slate-700 dark:text-slate-200 hover:bg-indigo-50/70 dark:hover:bg-slate-800/90 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium'
+                }`}
+              >
+                <div className="flex items-start sm:items-center gap-2 min-w-0 flex-1 pr-2">
+                  {option.icon && (
+                    <span
+                      className={`shrink-0 mt-0.5 sm:mt-0 ${
+                        isSelected ? 'text-white' : 'text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
+                      }`}
+                    >
+                      {option.icon}
+                    </span>
+                  )}
+                  <span className="block whitespace-normal sm:truncate leading-snug">
+                    {option.label}
+                  </span>
+                </div>
+
+                {isSelected && (
+                  <span className="flex items-center shrink-0 ml-1 text-white">
+                    <Check size={16} strokeWidth={2.5} />
+                  </span>
+                )}
+              </button>
+            );
+          })
+        ) : (
+          <div className="py-5 px-4 text-center text-slate-400 text-xs font-medium">
+            No se encontraron opciones
+          </div>
+        )}
+      </div>
+    </>
+  );
 
   return (
     <div className={`relative ${isOpen ? 'z-50' : 'z-auto'} ${className}`} ref={containerRef}>
@@ -194,107 +302,33 @@ const SelectComponent: React.FC<SelectProps> = ({
         />
       </button>
 
-      {/* Modern Floating Menu (Fixed Bottom-Sheet on Mobile <sm, Floating Popover on Desktop >=sm) */}
+      {/* Modern Floating Menu (Portaled Bottom-Sheet on Mobile <sm, Floating Popover on Desktop >=sm) */}
       {isOpen && !disabled && (
-        <>
-          {/* Mobile backdrop to prevent accidental outside taps and highlight sheet */}
+        isMobile && typeof document !== 'undefined' ? (
+          createPortal(
+            <div className="fixed inset-0 z-[100] flex flex-col justify-end bg-slate-950/50 backdrop-blur-[2px] animate-in fade-in duration-150 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+              <div className="flex-1 w-full" onClick={() => setIsOpen(false)} />
+              <div
+                ref={menuRef}
+                className="w-full max-w-lg mx-auto rounded-2xl bg-white dark:bg-slate-900 shadow-2xl shadow-slate-900/40 dark:shadow-black/80 border border-slate-200/90 dark:border-slate-800 overflow-hidden text-xs animate-in slide-in-from-bottom-4 duration-200"
+              >
+                {menuInnerContent}
+              </div>
+            </div>,
+            document.body
+          )
+        ) : (
           <div
-            className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-[1px] sm:hidden animate-in fade-in duration-150"
-            onClick={() => setIsOpen(false)}
-          />
-          <div
-            className={`fixed inset-x-3 bottom-4 z-50 sm:Generate sm:absolute sm:inset-x-0 sm:bottom-auto min-w-full sm:w-full rounded-2xl bg-white dark:bg-slate-900 shadow-2xl shadow-slate-900/30 dark:shadow-black/80 border border-slate-200/90 dark:border-slate-800 overflow-hidden text-xs sm:text-sm animate-in fade-in zoom-in-95 duration-150 ${
+            ref={menuRef}
+            className={`absolute inset-x-0 z-50 min-w-full w-full rounded-2xl bg-white dark:bg-slate-900 shadow-2xl shadow-slate-900/30 dark:shadow-black/80 border border-slate-200/90 dark:border-slate-800 overflow-hidden text-xs sm:text-sm animate-in fade-in zoom-in-95 duration-150 ${
               openUpward
-                ? 'sm:bottom-full sm:mb-1.5 origin-bottom'
-                : 'sm:top-full sm:mt-1.5 origin-top'
+                ? 'bottom-full mb-1.5 origin-bottom'
+                : 'top-full mt-1.5 origin-top'
             }`}
           >
-            {/* Mobile Sheet Header */}
-            <div className="flex sm:hidden items-center justify-between px-3.5 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60">
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 truncate">
-                {placeholder}
-              </span>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
-                aria-label="Cerrar selector"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Search Bar (when options > 7 or searchable=true) */}
-            {isSearchActive && (
-              <div className="p-2.5 sm:p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 relative">
-                <Search className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  placeholder="Buscar por nombre..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-8 sm:pl-7 pr-8 py-2 sm:py-1.5 rounded-xl sm:rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs sm:text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-                {searchTerm && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchTerm('')}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded cursor-pointer"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Options List */}
-            <div className="max-h-[55dvh] sm:max-h-60 overflow-y-auto p-1.5 scrollbar-thin space-y-0.5">
-              {filteredOptions.length > 0 ? (
-                filteredOptions.map((option) => {
-                  const isSelected = String(option.value) === String(value);
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => handleSelect(option.value)}
-                      className={`group relative flex w-full select-none items-center justify-between min-h-[42px] py-2.5 px-3 cursor-pointer transition-all rounded-xl text-left ${
-                        isSelected
-                          ? 'bg-indigo-600 text-white font-bold shadow-xs'
-                          : 'text-slate-700 dark:text-slate-200 hover:bg-indigo-50/70 dark:hover:bg-slate-800/90 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium'
-                      }`}
-                    >
-                      <div className="flex items-start sm:items-center gap-2 min-w-0 flex-1 pr-2">
-                        {option.icon && (
-                          <span
-                            className={`shrink-0 mt-0.5 sm:mt-0 ${
-                              isSelected ? 'text-white' : 'text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
-                            }`}
-                          >
-                            {option.icon}
-                          </span>
-                        )}
-                        <span className="block whitespace-normal sm:truncate leading-snug">
-                          {option.label}
-                        </span>
-                      </div>
-
-                      {isSelected && (
-                        <span className="flex items-center shrink-0 ml-1 text-white">
-                          <Check size={16} strokeWidth={2.5} />
-                        </span>
-                      )}
-                    </button>
-                  );
-                })
-              ) : (
-                <div className="py-5 px-4 text-center text-slate-400 text-xs font-medium">
-                  No se encontraron opciones
-                </div>
-              )}
-            </div>
+            {menuInnerContent}
           </div>
-        </>
+        )
       )}
     </div>
   );

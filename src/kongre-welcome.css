@@ -37,8 +37,8 @@
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0px);
+    transform: none;
+    filter: none;
   }
 }
 
@@ -49,7 +49,7 @@
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: none;
   }
 }
 
@@ -60,7 +60,7 @@
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: none;
   }
 }
 
@@ -71,7 +71,7 @@
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: none;
   }
 }
 
@@ -91,7 +91,7 @@
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: none;
   }
 }
 
@@ -101,12 +101,10 @@
 
 .kg-register-box-enter {
   animation: kg-register-box-enter 0.44s cubic-bezier(0.16, 1, 0.3, 1) both;
-  will-change: transform, opacity, filter;
 }
 
 .kg-home-box-enter {
   animation: kg-home-box-enter 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
-  will-change: transform, opacity;
 }
 
 .kg-header-enter {

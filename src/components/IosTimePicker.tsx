@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useId, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Clock, Check, ChevronDown, X } from 'lucide-react';
 
 export interface IosTimePickerProps {
@@ -66,8 +67,11 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openUpward, setOpenUpward] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 640 : false
+  );
   const containerRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
   const pickerId = useId();
 
   // Estados locales de la rueda iOS
@@ -144,7 +148,12 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
   // Click outside y escape listener
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(target) &&
+        (!sheetRef.current || !sheetRef.current.contains(target))
+      ) {
         setIsOpen(false);
       }
     };
@@ -426,19 +435,26 @@ export const IosTimePicker: React.FC<IosTimePickerProps> = ({
       {isOpen && !disabled && (
         <>
           {/* MODO MÓVIL (<640px): Hoja Inferior Estilo iOS Bottom Sheet con Fondo Oscuro */}
-          {isMobile ? (
-            <div className="fixed inset-0 z-[100] flex flex-col justify-end bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-              {/* Backdrop click to close */}
-              <div className="flex-1 w-full" onClick={() => setIsOpen(false)} />
-              
-              <div className="w-full bg-white dark:bg-slate-900 rounded-t-3xl border-t border-slate-200 dark:border-slate-800 p-2 pb-6 shadow-2xl animate-in slide-in-from-bottom duration-200 max-w-lg mx-auto">
-                <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-1.5 mb-2.5 opacity-60" />
-                {wheelContent}
-              </div>
-            </div>
+          {isMobile && typeof document !== 'undefined' ? (
+            createPortal(
+              <div className="fixed inset-0 z-[100] flex flex-col justify-end bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
+                {/* Backdrop click to close */}
+                <div className="flex-1 w-full" onClick={() => setIsOpen(false)} />
+
+                <div
+                  ref={sheetRef}
+                  className="w-full bg-white dark:bg-slate-900 rounded-t-3xl border-t border-slate-200 dark:border-slate-800 p-2 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl animate-in slide-in-from-bottom duration-200 max-w-lg mx-auto"
+                >
+                  <div className="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-1.5 mb-2.5 opacity-60" />
+                  {wheelContent}
+                </div>
+              </div>,
+              document.body
+            )
           ) : (
             /* MODO DESKTOP (>=640px): Popover Flotante Auto-Posicionado Arriba o Abajo */
             <div
+              ref={sheetRef}
               className={`absolute z-50 right-0 w-76 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl shadow-slate-900/20 dark:shadow-black/70 border border-slate-200/90 dark:border-slate-800 overflow-hidden text-xs sm:text-sm animate-in fade-in zoom-in-95 duration-150 ${
                 openUpward ? 'bottom-full mb-2 origin-bottom' : 'top-full mt-2 origin-top'
               }`}

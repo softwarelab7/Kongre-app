@@ -1524,28 +1524,28 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
         {/* ========================================================= */}
         {/* 1. TOP HEADER                                            */}
         {/* ========================================================= */}
-        <header className="w-full bg-card border-b border-line px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 flex items-center justify-between sticky top-0 z-30 transition-colors">
+        <header className="w-full bg-card border-b border-line px-3.5 sm:px-6 md:px-8 py-2 sm:py-2.5 flex items-center justify-between gap-2 sticky top-0 z-30 transition-colors">
           {/* Logo and Brand */}
-          <div className="flex items-center gap-2.5">
-            <AnimatedLogo height={30} />
+          <div className="flex items-center gap-2 shrink-0">
+            <AnimatedLogo height={28} onClick={() => setActiveTab('home')} />
           </div>
 
           {/* Right Actions: PC Download, Demo Mode Button & Theme Switch */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <button
               type="button"
               onClick={() => setDesktopModalOpen(true)}
-              className="group flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-2xs"
+              className="hidden sm:flex group items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-2xs shrink-0"
               title="Descargar Kongre App para PC (Windows, macOS, Linux)"
             >
               <Monitor className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
-              <span className="hidden xs:inline sm:inline">Versión PC</span>
+              <span>Versión PC</span>
               <span className="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
                 v{CURRENT_APP_VERSION}
               </span>
             </button>
-            <DemoModeButton onClick={handleEnterDemoMode} />
-            <ThemeToggle size={36} />
+            <DemoModeButton onClick={handleEnterDemoMode} size="sm" />
+            <ThemeToggle size={34} />
           </div>
         </header>
 

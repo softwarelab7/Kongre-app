@@ -22,7 +22,8 @@ export default function AnimatedLogo({
 }) {
   const [run, setRun] = useState(0);
   const sqSize = vertical ? Math.round(height * 0.85) : height;
-  const wmHeight = vertical ? Math.round(height * 0.42) : height * 0.6;
+  const wmHeight = vertical ? Math.round(height * 0.42) : Math.round(height * 0.6);
+  const wmWidth = Math.round(wmHeight * (220.8 / 70));
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setRun((r) => r + 1);
@@ -36,21 +37,21 @@ export default function AnimatedLogo({
       type="button"
       onClick={handleClick}
       aria-label="Kongre - Reproducir animación"
-      className={`inline-flex cursor-pointer items-center border-0 bg-transparent p-0 transition-transform active:scale-95 ${
+      className={`inline-flex shrink-0 cursor-pointer items-center border-0 bg-transparent p-0 transition-transform active:scale-95 ${
         inverted ? 'text-white' : 'text-logo'
       } ${className}`}
     >
       <span
         key={run}
-        className={`inline-flex items-center ${
-          vertical ? 'flex-col gap-3 justify-center' : 'gap-2.5'
+        className={`inline-flex shrink-0 items-center ${
+          vertical ? 'flex-col gap-3 justify-center' : 'gap-2 sm:gap-2.5'
         }`}
       >
         <svg
           width={sqSize}
           height={sqSize}
           viewBox="0 0 100 100"
-          className="overflow-visible drop-shadow-md"
+          className="shrink-0 overflow-visible drop-shadow-md"
           aria-hidden
         >
           <defs>
@@ -65,7 +66,8 @@ export default function AnimatedLogo({
         </svg>
         {!iconOnly && (
           <svg
-            className="kg-wm"
+            className="kg-wm shrink-0"
+            width={wmWidth}
             height={wmHeight}
             viewBox="-4 8 220.8 70"
             aria-hidden

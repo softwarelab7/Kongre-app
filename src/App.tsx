@@ -1359,7 +1359,7 @@ const AppContent: React.FC = () => {
     return (
       <>
         {!isDesktopApp() && (
-          <div className="w-full bg-slate-900 text-white px-4 py-1.5 flex items-center justify-between gap-3 text-xs border-b border-slate-800 z-50 shrink-0">
+          <div className="w-full bg-slate-900 text-white px-3.5 sm:px-4 py-1.5 flex items-center justify-between gap-2 text-xs border-b border-slate-800 z-50 shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -1375,12 +1375,13 @@ const AppContent: React.FC = () => {
                   window.location.pathname
                 );
               }}
-              className="inline-flex items-center gap-1.5 font-bold text-indigo-300 hover:text-white transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 font-bold text-indigo-300 hover:text-white transition-colors cursor-pointer min-w-0"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Ir a Presentación y Documentación (www.kongre-app.com)</span>
+              <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
+              <span className="sm:hidden truncate">Volver a Presentación y Guía</span>
+              <span className="hidden sm:inline truncate">Ir a Presentación y Documentación (www.kongre-app.com)</span>
             </button>
-            <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">
+            <span className="text-[11px] font-mono text-slate-400 hidden sm:inline shrink-0">
               kongre-app.com/#portal
             </span>
           </div>
@@ -1484,10 +1485,10 @@ const AppContent: React.FC = () => {
         onOpenRegisterModal={() => openModalWithHistory('registro_congregacion', setIsRegisterWizardOpen)}
       />
 
-      <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200 flex flex-col justify-between overflow-x-hidden`}>
+      <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200 flex flex-col justify-between overflow-x-clip`}>
         <div className="relative flex-1 w-full px-2.5 sm:px-4 md:px-6 lg:px-7 xl:px-8 py-2.5 sm:py-5 pb-6">
           {!['inicio', 'programacion', 'calendario', 'panorama_general', 'menu'].includes(activeTab) && (
-            <div className="md:hidden sticky top-0 z-30 -mx-2.5 -mt-2.5 px-3 py-2.5 mb-3.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 shadow-2xs">
+            <div className="md:hidden sticky top-[calc(env(safe-area-inset-top,0px)+3.5rem)] z-30 -mx-2.5 px-3 pt-[max(0.625rem,env(safe-area-inset-top,0px))] pb-2.5 mb-3.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 shadow-2xs">
               <div className="flex items-center gap-3 min-w-0">
                 <button
                   type="button"

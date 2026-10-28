@@ -1,92 +1,121 @@
-# Kongre - Gestor Teocrático Integral
+# Kongre — Gestor Teocrático Integral
 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="public/logo/kongre_horizontal_dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="public/logo/kongre_horizontal_positivo.svg">
-    <img src="public/logo/kongre_horizontal_positivo.svg" width="280" alt="Kongre - Gestor Teocrático Integral" />
+    <img src="public/logo/kongre_horizontal_positivo.svg" width="300" alt="Kongre — Gestor Teocrático Integral" />
   </picture>
 </p>
 
 <p align="center">
-  <strong>Plataforma integral, moderna y segura para la administración y coordinación teocrática de congregaciones.</strong>
+  <strong>Plataforma integral, moderna y segura para la administración, asignación y coordinación teocrática de congregaciones.</strong><br>
+  <em>Disponible como Progressive Web App (PWA) Offline-First y aplicación nativa ultraligera para PC (Windows, macOS y Linux con Rust y Tauri v2).</em>
 </p>
 
 <p align="center">
-  <a href="https://www.kongre-app.com"><strong>🌐 https://www.kongre-app.com — Acceder a la Aplicación en Producción</strong></a>
+  <a href="https://www.kongre-app.com"><strong>🌐 Acceder a la Aplicación Web en Producción (https://www.kongre-app.com)</strong></a> •
+  <a href="https://github.com/softwarelab7/Kongre/releases"><strong>📥 Centro de Descargas para PC (GitHub Releases)</strong></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.35-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.35" />
-  <img src="https://img.shields.io/badge/Google%20OAuth-Brand%20Verified-4285F4?style=flat-square&logo=google&logoColor=white" alt="Google OAuth Brand Verified" />
-  <img src="https://img.shields.io/badge/2FA-Microsoft%20Authenticator-00A4EF?style=flat-square&logo=microsoft&logoColor=white" alt="2FA Microsoft Authenticator" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.36-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.36" />
+  <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
+  <img src="https://img.shields.io/badge/SO-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
-  <img src="https://img.shields.io/badge/TypeScript-7.0-3178c6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/TypeScript-5.8%2B-3178c6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Vite-8.3-646cff?style=flat-square&logo=vite&logoColor=white" alt="Vite 8" />
   <img src="https://img.shields.io/badge/TailwindCSS-v4-38bdf8?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" />
-  <img src="https://img.shields.io/badge/Security-Zero--Knowledge%20AES--256--GCM-blueviolet?style=flat-square&logo=shield" alt="Zero-Knowledge AES-256" />
-  <img src="https://img.shields.io/badge/Maps-OpenStreetMap%20%2F%20Leaflet-77dd77?style=flat-square&logo=leaflet&logoColor=white" alt="Leaflet / OSM" />
-  <img src="https://img.shields.io/badge/PWA-Offline%20Ready-5a0fc8?style=flat-square&logo=pwa&logoColor=white" alt="PWA Offline" />
+  <img src="https://img.shields.io/badge/Seguridad-Zero--Knowledge%20AES--256--GCM-blueviolet?style=flat-square&logo=shield" alt="Zero-Knowledge AES-256" />
+  <img src="https://img.shields.io/badge/2FA-TOTP%20RFC%206238-00A4EF?style=flat-square&logo=microsoft&logoColor=white" alt="2FA TOTP RFC 6238" />
+  <img src="https://img.shields.io/badge/PWA-Offline--First%20Ready-5a0fc8?style=flat-square&logo=pwa&logoColor=white" alt="PWA Offline Ready" />
 </p>
 
 ---
 
 ## 📖 Descripción General
 
-**Kongre** es una Progressive Web App (PWA) teocrática de última generación diseñada para asistir al cuerpo de ancianos, siervos ministeriales y publicadores en la organización eficiente, confidencial y armoniosa de las actividades de congregación:
+**Kongre** es un sistema teocrático integral diseñado para apoyar al cuerpo de ancianos, siervos ministeriales y publicadores en la organización ordenada, eficiente y confidencial de las actividades de congregación, bajo el principio bíblico:
 
-- **Reunión Vida y Ministerio & Fin de Semana**: Programación semanal de intervenciones, asignaciones estudiantiles y generación de plantillas oficiales S-89 en PDF.
-- **Territorios y Cartografía Interactiva**: Manzanas georreferenciadas con Leaflet y OpenStreetMap, polígonos interactivos, enlaces digitales por QR y turnos de predicación pública (carritos).
-- **Publicadores y Fichas S-21**: Control de informes, grupos de servicio, privilegios y deduplicación inteligente de registros.
-- **Asistencia S-88 y Dashboard Analítico**: Gráficos de tendencias mensuales y semanales con Recharts, desglose presencial/Zoom y métricas del año de servicio.
-- **Cuentas, Literatura y Mantenimiento del Salón**: Libro de transacciones, hojas de auditoría, inventario físico de publicaciones y cuadro de disyuntores eléctricos.
-- **Autenticación en Dos Pasos (2FA) TOTP**: Verificación opcional con **Microsoft Authenticator** (RFC 6238), códigos de respaldo y dispositivos de confianza por 30 días, 100% calculada en cliente de forma desconectada.
-- **Seguridad Cero Conocimiento (Zero-Knowledge)**: Cifrado en el dispositivo mediante **AES-256-GCM** y derivación **PBKDF2 (600.000 iteraciones en sincronización, 200.000 iteraciones en bóveda local)**, claves no extraíbles en IndexedDB (`extractable: false`) y rotación asistida de credenciales antes de sincronizarse con la nube mediante **Supabase**.
-- **Modo Offline & Modo Demo**: Soporte PWA 100% desconectado y entorno de demostración precargado para explorar sin modificar datos reales.
+> *«Pero que todas las cosas se hagan de forma digna y ordenada.»*  
+> — **1 Corintios 14:40**
+
+La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de última generación con la velocidad y seguridad de una **aplicación nativa de escritorio compilada con Rust (Tauri v2)**, permitiendo operar tanto con sincronización en la nube como de forma 100% desconectada (Offline-First).
 
 ---
 
-## ✨ Novedades Recientes (v2.12.11)
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.36`)
 
-### 🛡️ Autenticación de Dos Pasos (2FA) con Microsoft Authenticator y Códigos de Respaldo
-- **Motor Criptográfico TOTP Cliente Nativo (RFC 6238)**: Algoritmo HMAC-SHA1 ejecutado directamente en el navegador con la Web Crypto API (`window.crypto.subtle`), con intervalos de 30 segundos, código de 6 dígitos y tolerancia de desfase horario ($\pm 30$s). Funciona totalmente fuera de línea sin servidores de terceros.
-- **Configuración Intuitiva con Microsoft Authenticator**: Asistente en 3 pasos con código QR oficial `otpauth://totp/...` y copiado de clave secreta manual.
-- **8 Códigos de Respaldo de Emergencia**: Códigos alfanuméricos de un solo uso protegidos en reposo mediante hash SHA-256 (arquitectura de conocimiento cero) descargables en archivo `.txt`.
-- **Dispositivos de Confianza ("Recordar por 30 días")**: Posibilidad de marcar el dispositivo de uso personal para no solicitar el código de 6 dígitos en cada inicio de sesión, exigiéndolo solo en navegadores nuevos o tras 30 días de inactividad.
-- **Gestión Teocrática**: Insignia verde `[2FA]` en el Directorio y botón de restablecimiento de emergencia exclusivo para ancianos en caso de extravío de teléfono.
+Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/CHANGELOG.md) y la documentación de compilación de escritorio en [DESKTOP_RUST.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/DESKTOP_RUST.md).
 
-### 📜 Páginas Legales Oficiales y Rutas Directas (v2.12.10)
-- **Acceso Público a Documentos Legales**: Rutas directas `#privacy`, `#terms`, `/privacy` y `/terms` disponibles tanto en la PWA como mediante páginas HTML estáticas autónomas (`privacy.html`, `terms.html`).
-- **Verificación de Marca Google OAuth**: Declaración transparente de cumplimiento de la *Google API Services User Data Policy* y requisitos de *Limited Use*, garantizando que ningún dato de perfil es comercializado ni compartido con terceros.
+### 🏛️ Rediseño Integral de la Sección «Acerca de Kongre»
+- **Cockpit Teocrático en Vivo:** Maqueta interactiva con 4 pestañas reactivas (*Reunión Vida y Ministerio*, *Asistencia S-88*, *Territorios S-13* e *Informes de Servicio*) que simula en tiempo real la experiencia operativa del sistema.
+- **Bento Grid Asimétrico con Iconografía Oficial:** Cuadrícula con ritmo visual diferenciado que integra los SVGs originales de la aplicación (`clm_vmc.svg`, `predicacion.svg`, `supervision.svg`, `discursos.svg`, `secretaria.svg`, `informes_servicio.svg`) y enlaces directos a la Guía de Usuario.
+- **Flujo Teocrático en 3 Pasos:** Secuencia clara de adopción: *1. Inicialización e Importación local*, *2. Asignación y Programación Inteligente*, *3. Coordinación y Consulta Segura por portal o PDF/WhatsApp*.
+- **Seguridad Cero Conocimiento y Principio Bíblico:** Bloque documental enfocado en el almacenamiento local cifrado (AES-256 + PBKDF2), cero telemetría y respeto a la confidencialidad ministerial.
 
-### 🔄 Selector y Cambio Fluido de Cuentas Google (v2.12.9)
-- Selector de cuentas limpio e interactivo al pulsar "Cambiar cuenta", evitando bloqueos de pantalla o reapariciones involuntarias del botón de inicio.
+### 🔘 Botón Estándar `DemoModeButton` y Purga de Artificios Visuales
+- **Componente Unificado `DemoModeButton`:** Botón minimalista y serio en tonos slate neutros (`bg-slate-100 dark:bg-slate-800`), homogéneo en la web oficial, cabecera de PC, barra móvil, modal de acceso y panel interno.
+- **Purga Total de Estrellas (`Sparkles`):** Erradicación de iconos de estrellas en botones e insignias teocráticas en favor de iconografía teocrática formal (`Building2`, `CheckCircle2`, `Download`, `BookOpen`) o tipografía sobria.
 
-### 💻 Portal de Bienvenida Teocrático para PC y Móviles
-- Selector de tema de 3 modos: **Claro**, **Oscuro** y **Cabina A/V** (modo de contraste especial para cabina de sonido).
-- Acceso directo a **Modo Demo** con un solo clic para capacitación y pruebas.
-- Opciones de acceso unificadas: Registro de congregación, PIN teocrático, Google Sign-In y Códigos de Invitación.
+### 🖥️ Pantalla de Bienvenida 100% Zero-Scroll en Escritorio
+- **Contenedor a Pantalla Completa:** Optimización estructural (`lg:h-screen lg:max-h-screen lg:overflow-hidden`) con centrado automático `my-auto`, permitiendo visualizar las 4 vías de acceso simultáneamente en monitores sin necesidad de scroll vertical.
+- **Eliminación de Redundancias:** Retiro de botones duplicados en la tarjeta de inicio de sesión y banner lateral simplificado.
 
----
+### 🦀 Kongre App Nativa para Escritorio (Rust + Tauri v2)
+- **Rendimiento Excepcional:** Binario ultraligero que arranca en milisegundos y consume apenas ~15 MB de memoria RAM (frente a los ~150 MB de entornos tradicionales basados en Chromium/Electron).
+- **Paquetes Oficiales Multiplataforma:**
+  - **Windows 10 / 11:** Instalador `.exe` (NSIS) y paquete `.msi`.
+  - **macOS:** Binario Universal `.dmg` compatible con procesadores Apple Silicon (M1 a M4) e Intel.
+  - **Linux Fedora / RHEL:** Paquete nativo `.rpm` de 64 bits.
+  - **Linux Ubuntu / Debian:** Paquete nativo `.deb`.
+  - **Linux Universal:** Paquete portátil `.AppImage`.
+- **Detección Automática de SO en Bienvenida:** Banner interactivo que detecta el sistema operativo del usuario y ofrece la descarga directa del instalador correspondiente.
 
-## 🛠️ Tecnologías Empleadas
-
-- **Frontend**: [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite 8](https://vitejs.dev/)
-- **Estilos & Diseño**: [Tailwind CSS v4](https://tailwindcss.com/) con sistema de tokens (`kongre-theme.css`, `kongre-welcome.css`) y temas Claro / Oscuro / Cabina A/V
-- **Gráficos & Métricas**: [Recharts](https://recharts.org/)
-- **Cartografía**: [Leaflet 1.9](https://leafletjs.com/), [OpenStreetMap](https://www.openstreetmap.org/), CartoDB, Esri
-- **Base de Datos & Tiempo Real**: [Supabase](https://supabase.com/) (PostgreSQL, Realtime & Authentication)
-- **Criptografía**: Web Crypto API nativa (AES-256-GCM, PBKDF2 SHA-256, HMAC-SHA1 TOTP RFC 6238, CSPRNG)
-- **Documentos PDF**: [jsPDF](https://github.com/parallax/jsPDF) & [html2canvas](https://html2canvas.hertzen.com/)
-- **Iconografía**: [Lucide React](https://lucide.dev/)
-- **Entorno de Ejecución**: [Bun](https://bun.sh/) o Node.js v20+
+### 🔐 Seguridad Cero Conocimiento (Fase 2) y Bóveda Criptográfica en Reposo
+- **Bóveda no extraíble `atRestVault`:** Almacenamiento seguro con clave criptográfica AES-256 no extraíble (`extractable: false`) en IndexedDB (`kongre_vault_db`).
+- **Token de Rol Firmado en Servidor (`kgr_srt1` HMAC-SHA256):** Validación en Edge Function de privilegios que impide la manipulación no autorizada en DevTools o variables locales.
+- **Protección de Datos Médicos DPA y Notas:** Cifrado en modo CTR con nonce CSPRNG (`kgr_sec4:`) para directrices médicas (`dpa_date`, representantes de salud) y notas confidenciales del comité.
 
 ---
 
-## 🚀 Instalación y Puesta en Marcha
+## 🏛️ Módulos y Capacidades del Sistema
+
+| Módulo | Icono Oficial | Descripción y Funcionalidades |
+| :--- | :---: | :--- |
+| **Reunión Vida y Ministerio** | `clm_vmc.svg` | Programación semanal, asignaciones estudiantiles (Lectura, Primera Conversación, Revisitas, Discursos), exportación de plantillas oficiales **S-89** en PDF y control de sustituciones en tiempo real. |
+| **Reunión Pública y Fin de Semana** | `discursos.svg` | Agenda de discursos públicos (1–194), coordinación de oradores visitantes, hospedaje, asignación de presidentes y lectores de La Atalaya. |
+| **Territorios y Cartografía** | `predicacion.svg` | Cartografía interactiva con Leaflet y OpenStreetMap, polígonos de manzanas, asignaciones **S-13**, códigos QR para publicadores y registro de turnos en carritos públicos. |
+| **Directorio de Publicadores (S-21)** | `supervision.svg` | Ficha personal completa, grupos de servicio, estado espiritual, control de nombramientos, ausencias acumuladas, directriz médica DPA y deduplicación inteligente de registros. |
+| **Asistencia a las Reuniones (S-88)** | `secretaria.svg` | Registro numérico presencial vs. Zoom, cálculo automático de promedios mensuales y gráficas analíticas por año de servicio con Recharts. |
+| **Informes del Servicio del Campo** | `informes_servicio.svg` | Consolidación mensual de informes de publicadores, horas de precursores regulares y auxiliares, notas confidenciales de secretaría y generación de resúmenes congregacionales. |
+| **Cuentas y Mantenimiento del Salón** | — | Libro de transacciones de congregación, arqueo de fondos, inventario físico de publicaciones y diagrama del panel de disyuntores eléctricos de cabina. |
+
+---
+
+## 🛠️ Stack Tecnológico
+
+| Capa | Tecnologías |
+| :--- | :--- |
+| **Frontend Web** | [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite 8](https://vitejs.dev/) |
+| **Escritorio Nativo** | [Rust 2021](https://www.rust-lang.org/), [Tauri v2](https://v2.tauri.app/) (Edge WebView2 en Windows, WebKitGTK en Linux, WebKit nativo en macOS) |
+| **Estilos & UI** | [Tailwind CSS v4](https://tailwindcss.com/) con sistema centralizado de variables de tema |
+| **Temas Visuales** | **Claro**, **Oscuro** y modo especial de alto contraste para cabina de audio/video |
+| **Gráficos & Visualización** | [Recharts](https://recharts.org/) |
+| **Cartografía** | [Leaflet](https://leafletjs.com/), [OpenStreetMap](https://www.openstreetmap.org/), CartoDB, Esri World Imagery |
+| **Criptografía** | Web Crypto API nativa: AES-256-GCM, PBKDF2 (hasta 600.000 iteraciones), HMAC-SHA1 TOTP (RFC 6238), CSPRNG |
+| **Documentos & Exportación** | [jsPDF](https://github.com/parallax/jsPDF), [pdf-lib](https://pdf-lib.js.org/) y [html2canvas](https://html2canvas.hertzen.com/) |
+| **Iconografía** | [Lucide React](https://lucide.dev/) + SVGs vectoriales teocráticos institucionales |
+| **Almacenamiento Local** | IndexedDB (`kongre_vault_db`, `localforage`) y `localStorage` blindado |
+| **Nube & Sincronización** | [Supabase](https://supabase.com/) (PostgreSQL, Realtime, Edge Functions seguras con Deno) |
+
+---
+
+## 💻 Instalación y Desarrollo Local
 
 ### Prerrequisitos
-- [Bun](https://bun.sh/) (recomendado) o Node.js v20+
+- **Node.js** v20+ o [Bun](https://bun.sh/)
+- **Rust y Cargo** (solo si compilarás la versión de escritorio de forma local): [rustup.rs](https://rustup.rs/)
 
 ### 1. Clonar el repositorio
 ```bash
@@ -96,51 +125,61 @@ cd Kongre
 
 ### 2. Instalar dependencias
 ```bash
-bun install
+npm install
 ```
 
-### 3. Configurar variables de entorno (Opcional)
-Crea un archivo `.env` en la raíz del proyecto para conectar tu propia instancia de Supabase:
+### 3. Configuración de entorno (Opcional para sincronización en la nube)
+Crea un archivo `.env` en la raíz si deseas conectar tu propio proyecto de Supabase:
 ```env
-# URL de tu proyecto Supabase (Reemplazar con tus credenciales)
 VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
-VITE_SUPABASE_ANON_KEY=tu_clave_publica_anon_aqui
+VITE_SUPABASE_ANON_KEY=tu_clave_anon_publica
 ```
-
 > [!NOTE]
-> Kongre está diseñado con arquitectura **Offline-First**: funciona al 100% de manera local y en modo offline sin requerir servicios en la nube.
+> Kongre cuenta con arquitectura **Offline-First**: no requiere Supabase para funcionar; todos los módulos operan al 100% en modo local de forma desconectada.
 
-### 4. Iniciar servidor de desarrollo
-```bash
-bun run dev
-```
-La aplicación estará disponible de inmediato en `http://localhost:3050`.
+### 4. Scripts de Desarrollo y Compilación
 
-### 5. Verificación de calidad y compilación para producción
+#### Versión Web:
 ```bash
+# Iniciar servidor de desarrollo en http://localhost:3000
+npm run dev
+
+# Verificación estricta de tipos TypeScript
+npm run lint
+
 # Ejecutar suite de pruebas unitarias y de integración
-bun run test
+npm test
 
-# Comprobación estricta de tipos TypeScript
-bun x tsc --noEmit
+# Compilar para producción (carpeta dist/)
+npm run build
+```
 
-# Compilación optimizada para producción con CSP reforzado
-bun run build
+#### Versión de Escritorio (Rust + Tauri v2):
+```bash
+# Ejecutar la ventana nativa de escritorio con HMR
+npm run desktop:dev
+
+# Compilar el binario instalador nativo según tu sistema operativo (.exe, .dmg, .rpm, .deb, .AppImage)
+npm run desktop:build
 ```
 
 ---
 
-## 🔒 Confidencialidad y Privacidad Teocrática
+## 🔒 Privacidad Teocrática y Seguridad Cero Conocimiento
 
-Kongre ha sido concebido bajo los más rigurosos principios de confidencialidad cristiana y protección de datos teocráticos:
+Kongre fue diseñado desde el primer día con los más estrictos estándares de confidencialidad y principios bíblicos de respeto a los datos teocráticos:
 
-1. **Cifrado de Extremo a Extremo en el Dispositivo**: Los datos sensibles (asignaciones, notas de pastoreo, fichas de publicadores) se cifran antes de abandonar el navegador.
-2. **Control de Acceso por Roles (RBAC)**: Cada hermano solo puede visualizar y editar la información correspondiente a su nombramiento o asignación oficial.
-3. **Autenticación en Dos Pasos (2FA)**: Protección robusta opcional para evitar suplantaciones o accesos no autorizados en dispositivos nuevos o prestados.
-4. **Auditoría Inmutable**: Registro cronológico local de eventos críticos firmado criptográficamente para trazabilidad.
+1. **Cifrado de Conocimiento Cero (Zero-Knowledge):** Los datos teocráticos sensibles (asignaciones, notas de pastoreo, fichas de publicadores, teléfonos) se cifran en el propio dispositivo antes de cualquier transmisión.
+2. **Sin Rastreo ni Telemetría Comercial:** Ningún dato personal o de actividad es vendido, monetizado ni compartido con terceros.
+3. **Autenticación en Dos Pasos (2FA) TOTP Offline:** Compatible con **Microsoft Authenticator** y Google Authenticator sin requerir conexión a internet para la validación.
+4. **Cumplimiento de Marca Google OAuth:** Declaración de uso transparente (*Limited Use Policy*) para el inicio de sesión asistido con cuenta de Google.
+
+Las políticas legales completas están disponibles en:
+- [Términos y Condiciones](file:///home/hectorgutierrezjimenez/Documentos/Kongre/public/terms.html)
+- [Política de Privacidad y Protección de Datos](file:///home/hectorgutierrezjimenez/Documentos/Kongre/public/privacy.html)
 
 ---
 
 ## 📄 Licencia
 
-Este proyecto está disponible para el uso interno y teocrático de las congregaciones.
+Este proyecto está destinado para el uso ordenado, interno y teocrático de las congregaciones cristianas. Todos los derechos reservados.

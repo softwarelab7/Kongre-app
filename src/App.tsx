@@ -408,10 +408,12 @@ const AppContent: React.FC = () => {
 
   // Comprobación automática de actualización en PC (Desktop App)
   useEffect(() => {
-    // Si la app está en PC o en modo online, busca actualizaciones tras el arranque inicial
+    // Solo la app de escritorio (Tauri) consulta GitHub Releases; la PWA se actualiza vía Service Worker.
+    if (!isDesktopApp()) return;
     const timer = setTimeout(async () => {
       try {
-        const update = await checkForDesktopUpdate();
+        // force=true: en cada arranque se consulta siempre, sin el candado de 4 horas
+        const update = await checkForDesktopUpdate(true);
         if (update && update.hasUpdate) {
           setDesktopUpdate(update);
           setIsDesktopUpdateOpen(true);
@@ -1345,7 +1347,8 @@ const AppContent: React.FC = () => {
   // Official Product Presentation & Documentation Website (www.kongre-app.com / root URL)
   if (showOfficialWebsite) {
     return (
-      <KongreOfficialWebsite
+      <>
+        <KongreOfficialWebsite
         initialSection={websiteInitialSection}
         onGoToPortal={(initialPortalTab) => {
           try {
@@ -1392,8 +1395,15 @@ const AppContent: React.FC = () => {
           );
         }}
       />
-    );
-  }
+      {/* Aviso de actualización para PC en la vista de presentación/web */}
+      <DesktopUpdateModal
+        isOpen={isDesktopUpdateOpen}
+        updateInfo={desktopUpdate}
+        onClose={() => setIsDesktopUpdateOpen(false)}
+      />
+    </>
+  );
+}
 
   if (showWelcomeLanding || !isCongregationRegistered) {
     return (
@@ -1451,6 +1461,8 @@ const AppContent: React.FC = () => {
               '#descargas'
             );
           }}
+          desktopUpdate={desktopUpdate}
+          onOpenDesktopUpdate={() => setIsDesktopUpdateOpen(true)}
         />
         <JoinCongregationModal
           isOpen={isJoinModalOpen}
@@ -1469,6 +1481,12 @@ const AppContent: React.FC = () => {
           onClose={() => closeModalWithHistory('cola_offline', setIsQueueModalOpen)}
           isOnline={isOnline}
           onSyncNow={syncOfflineQueueNow}
+        />
+        {/* Aviso de actualización para PC también en la pantalla de bienvenida */}
+        <DesktopUpdateModal
+          isOpen={isDesktopUpdateOpen}
+          updateInfo={desktopUpdate}
+          onClose={() => setIsDesktopUpdateOpen(false)}
         />
       </>
     );
@@ -1705,6 +1723,8 @@ const AppContent: React.FC = () => {
         <AppFooter
           onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
           onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
+          desktopUpdate={desktopUpdate}
+          onOpenDesktopUpdate={() => setIsDesktopUpdateOpen(true)}
           isOnline={isOnline}
           isDemoMode={isDemoMode}
         />

@@ -56,6 +56,7 @@ import DemoModeButton from './DemoModeButton';
 import { AppFooter } from './AppFooter';
 import { CURRENT_APP_VERSION, BUILD_DATE } from '../utils/versionLog';
 import { supabaseSyncService } from '../services/supabaseSyncService';
+import { DesktopUpdateInfo } from '../services/desktopUpdateService';
 import {
   LegalConsentCheckbox,
   hasAcceptedLegalTerms,
@@ -71,6 +72,8 @@ interface CongregationWelcomeLandingProps {
   onOpenJoinModal?: () => void;
   onOpenVersionModal?: () => void;
   onOpenDownloads?: () => void;
+  desktopUpdate?: DesktopUpdateInfo | null;
+  onOpenDesktopUpdate?: () => void;
 }
 
 type FeatureAccent = 'indigo' | 'emerald' | 'amber' | 'sky';
@@ -295,6 +298,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   onOpenJoinModal,
   onOpenVersionModal,
   onOpenDownloads,
+  desktopUpdate,
+  onOpenDesktopUpdate,
 }) => {
   const {
     user,
@@ -1544,14 +1549,32 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <button
               type="button"
-              onClick={handleOpenDownloads}
-              className="hidden sm:flex group items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-2xs shrink-0"
-              title="Instalar Kongre en tu dispositivo (PC o Móvil)"
+              onClick={desktopUpdate?.hasUpdate && onOpenDesktopUpdate ? onOpenDesktopUpdate : handleOpenDownloads}
+              className={`hidden sm:flex group items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs border transition-all cursor-pointer shadow-2xs shrink-0 ${
+                desktopUpdate?.hasUpdate
+                  ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-200 border-amber-300 dark:border-amber-750 ring-2 ring-amber-500/25 animate-pulse'
+                  : 'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border-slate-200 dark:border-slate-700'
+              }`}
+              title={
+                desktopUpdate?.hasUpdate
+                  ? `¡Nueva versión v${desktopUpdate.latestVersion} disponible! Pulsa para ver el anuncio e instalar.`
+                  : 'Instalar Kongre en tu dispositivo (PC o Móvil)'
+              }
             >
-              <Monitor className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
-              <span>Versión PC</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
-                v{CURRENT_APP_VERSION}
+              {desktopUpdate?.hasUpdate ? (
+                <Sparkles className="w-3.5 h-3.5 text-amber-500 group-hover:scale-110 transition-transform" />
+              ) : (
+                <Monitor className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
+              )}
+              <span>{desktopUpdate?.hasUpdate ? '¡Actualizar PC!' : 'Versión PC'}</span>
+              <span
+                className={`px-1.5 py-0.2 rounded-full text-[9px] font-extrabold ${
+                  desktopUpdate?.hasUpdate
+                    ? 'bg-amber-200 dark:bg-amber-900/80 text-amber-900 dark:text-amber-100'
+                    : 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300'
+                }`}
+              >
+                {desktopUpdate?.hasUpdate ? `v${desktopUpdate.latestVersion}` : `v${CURRENT_APP_VERSION}`}
               </span>
             </button>
             <DemoModeButton onClick={handleEnterDemoMode} size="sm" />
@@ -2571,6 +2594,8 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
       <AppFooter
         variant="landing"
         onOpenVersionModal={onOpenVersionModal}
+        desktopUpdate={desktopUpdate}
+        onOpenDesktopUpdate={onOpenDesktopUpdate}
       />
 
       {/* Demo Mode Startup & Data Preparation Modal */}

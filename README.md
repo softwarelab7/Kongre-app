@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.37-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.37" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.38-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.38" />
   <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
   <img src="https://img.shields.io/badge/SO-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
@@ -52,12 +52,21 @@ La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de �
 
 ---
 
-## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.37`)
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.38`)
 
 Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/CHANGELOG.md) y la documentación de compilación de escritorio en [DESKTOP_RUST.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/DESKTOP_RUST.md).
 
-### 📥 Navegación Directa a «Instalar App (PC / Móvil)»
-- **Acceso Sin Modales:** El botón «Versión PC» en la cabecera del portal abre directamente la pestaña 3 («Instalar en PC / Móvil») de la web oficial de presentación, permitiendo acceder a los instaladores nativos para Windows, macOS, Ubuntu y Fedora, o a las instrucciones PWA móvil sin ventanas emergentes.
+### ⚡ Actualizador Nativo en 1 Clic (Tauri Updater)
+- **Actualización Automática sin Salir de la App:** Integración con `@tauri-apps/plugin-updater` y `@tauri-apps/plugin-process` para actualizar automáticamente en Windows (`.exe`), macOS (`.dmg`) y Linux (`.AppImage`) con barra de progreso en vivo y reinicio asistido.
+- **Validación Criptográfica Minisign:** Comprobación estricta de firma digital en cada paquete antes de su ejecución para máxima seguridad.
+
+### 🐧 Detección Inteligente para Fedora y Ubuntu
+- **Comando IPC `install_kind`:** Detecta si la aplicación se ejecuta instalada como paquete del sistema (`linux-rpm` o `linux-deb`) o como paquete portable (`appimage`).
+- **Instalación Asistida para `.rpm` y `.deb`:** Presenta botón de descarga directa y el comando exacto para terminal listo para copiar con 1 clic (ej. `sudo dnf install ./Kongre-0.1.0-alpha.38-1.x86_64.rpm`).
+
+### 🔔 Notificación Inmediata en Cabecera y Pie
+- **Chequeo Inmediato al Iniciar:** Verificación sin tiempo de espera al arrancar la versión de escritorio y comparación SemVer estricta.
+- **Aviso Visual:** Botón destacado en cabecera (*«¡Actualizar PC! v0.1.0-alpha.38»*) y en pie de página para abrir el panel de actualización.
 - **Historial Integrado:** Soporte reactivo de rutas `#descargas`, `#downloads` e `#instalar` con navegación fluida de ida y vuelta.
 
 ### 🏛️ Rediseño Integral de la Sección «Acerca de Kongre»
@@ -135,11 +144,11 @@ Descarga el instalador correspondiente a tu sistema operativo desde el **[Centro
 
 | Sistema Operativo | Paquete Oficial | Método de Instalación |
 | :--- | :--- | :--- |
-| **🪟 Windows 10 / 11** | `Kongre_0.1.0-alpha.37_x64-setup.exe` | Ejecuta el instalador con doble clic y sigue el asistente interactivo de instalación. |
-| **🍎 macOS (Apple Silicon M1-M4 & Intel)** | `Kongre_0.1.0-alpha.37_universal.dmg` | Abre el archivo `.dmg` y arrastra el icono de **Kongre** a la carpeta `Aplicaciones`. |
-| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.37-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.37-1.x86_64.rpm` |
-| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.37_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.37_amd64.deb` |
-| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.37_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
+| **🪟 Windows 10 / 11** | `Kongre_0.1.0-alpha.38_x64-setup.exe` | Ejecuta el instalador con doble clic y sigue el asistente interactivo de instalación. |
+| **🍎 macOS (Apple Silicon M1-M4 & Intel)** | `Kongre_0.1.0-alpha.38_universal.dmg` | Abre el archivo `.dmg` y arrastra el icono de **Kongre** a la carpeta `Aplicaciones`. |
+| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.38-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.38-1.x86_64.rpm` |
+| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.38_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.38_amd64.deb` |
+| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.38_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
 
 > [!TIP]
 > **Consumo ultraligero:** La aplicación nativa para PC está escrita en **Rust con Tauri v2** y consume únicamente ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.

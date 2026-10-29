@@ -25,19 +25,50 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '0.1.0-alpha.37';
+export const CURRENT_APP_VERSION = '0.1.0-alpha.38';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.10.28.8037';
+export const CURRENT_BUILD_CODE = '2026.10.28.8038';
 export const BUILD_DATE = '28 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '0.1.0-alpha.38',
+    buildCode: '2026.10.28.8038',
+    date: '28 de Octubre, 2026',
+    title: 'Actualizador Nativo de Escritorio en 1 Clic y Aviso Inteligente para Fedora / Ubuntu',
+    isCurrent: true,
+    highlight: 'Integración completa del plugin Tauri Updater para actualizaciones directas en 1 clic (Windows, macOS y AppImage) y aviso inteligente con botón de descarga y comando terminal para paquetes RPM (Fedora) y DEB (Ubuntu).',
+    environment: 'Fase Alfa Preliminar (Web & Desktop)',
+    changes: [
+      {
+        category: 'feature',
+        text: 'Actualizador Nativo en 1 Clic (Tauri Updater & Process): Soporte de actualización automática sin salir de la app para Windows (.exe), macOS (.dmg) y Linux (.AppImage) con barra de progreso reactiva y reinicio automático seguro.',
+      },
+      {
+        category: 'feature',
+        text: 'Detección Inteligente de Tipo de Instalación (install_kind): Comando nativo IPC en Rust que detecta si el sistema corre bajo AppImage, Linux RPM (Fedora/RHEL), Linux DEB (Ubuntu/Debian), Windows o macOS mediante /etc/os-release y variables de entorno.',
+      },
+      {
+        category: 'improvement',
+        text: 'Modal Global de Actualización (DesktopUpdateModal.tsx): Integración permanente en pantalla de bienvenida, portal oficial y vistas autenticadas; muestra botón de descarga directa y comando terminal (sudo dnf install ./...) con copiado en 1 clic para Fedora y Debian.',
+      },
+      {
+        category: 'improvement',
+        text: 'Insignia de Actualización Reactiva en Cabecera y Pie (CongregationWelcomeLanding.tsx, AppFooter.tsx): Muestra notificación visual en la cabecera («¡Actualizar PC! vX.Y.Z») y botón pulsante en el pie de página junto a la píldora de versión cuando hay una versión más reciente disponible.',
+      },
+      {
+        category: 'fix',
+        text: 'Verificación Inmediata en Arranque de PC: Eliminada la limitación de 4 horas en el chequeo de versión en aplicaciones de escritorio y añadida comparación SemVer estricta para evitar falsas alarmas.',
+      },
+    ],
+  },
+  {
     version: '0.1.0-alpha.37',
     buildCode: '2026.10.28.8037',
     date: '28 de Octubre, 2026',
     title: 'Navegación Directa a Instaladores PC/Móvil e Historial Reactivo',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Transición directa desde el botón «Versión PC» en la cabecera de bienvenida hacia la pestaña 3 (Instalar en PC / Móvil) sin popup modal, con enrutamiento hash e integración de historial.',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [

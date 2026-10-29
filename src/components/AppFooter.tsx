@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollText, ShieldCheck, Scale, CloudOff } from 'lucide-react';
+import { ScrollText, ShieldCheck, Scale, CloudOff, Sparkles } from 'lucide-react';
 import { CURRENT_APP_VERSION } from '../utils/versionLog';
 import Logo from '../Logo';
 import { OfflineSyncBadge } from './OfflineSyncBadge';
 import { TermsAndPrivacyModal, LegalModalTab, detectLegalRoute } from './TermsAndPrivacyModal';
+import { DesktopUpdateInfo } from '../services/desktopUpdateService';
 
 interface AppFooterProps {
   onOpenVersionModal?: () => void;
   onOpenQueueModal?: () => void;
+  desktopUpdate?: DesktopUpdateInfo | null;
+  onOpenDesktopUpdate?: () => void;
   isOnline?: boolean;
   isDemoMode?: boolean;
   variant?: 'app' | 'landing';
@@ -16,6 +19,8 @@ interface AppFooterProps {
 export const AppFooter: React.FC<AppFooterProps> = ({
   onOpenVersionModal,
   onOpenQueueModal,
+  desktopUpdate,
+  onOpenDesktopUpdate,
   isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true,
   isDemoMode = false,
   variant = 'app',
@@ -185,6 +190,19 @@ export const AppFooter: React.FC<AppFooterProps> = ({
                   isOnline={isOnline}
                   onOpenQueueModal={onOpenQueueModal}
                 />
+              )}
+
+              {/* Desktop Update Available Pill */}
+              {desktopUpdate?.hasUpdate && (
+                <button
+                  type="button"
+                  onClick={onOpenDesktopUpdate}
+                  className="group inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white shadow-md shadow-amber-500/25 transition-all cursor-pointer text-xs font-bold animate-pulse"
+                  title={`¡Actualización disponible a v${desktopUpdate.latestVersion}! Pulsa para ver detalles.`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" />
+                  <span>Actualizar a v{desktopUpdate.latestVersion}</span>
+                </button>
               )}
 
               {/* Version Pill */}

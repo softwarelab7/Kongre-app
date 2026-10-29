@@ -9,6 +9,10 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 ### [v0.1.0-alpha.36] — 28 de Octubre, 2026
 **Optimización Móvil Integral, Select Portaled Bottom-Sheet, Transiciones Ligeras y Empaquetado Rust Multiplataforma**
 
+- 📥 **Navegación Directa a «Instalar App (PC / Móvil)» desde la Pantalla de Bienvenida (`CongregationWelcomeLanding.tsx`, `KongreOfficialWebsite.tsx`, `App.tsx`):**
+  - Al pulsar el botón *«Versión PC»* en la barra superior de la pantalla de bienvenida, la aplicación abre directamente la **Pestaña 3 («Instalar en PC / Móvil»)** de la presentación oficial en lugar de abrir una ventana emergente / pop-up modal.
+  - Ofrece acceso simultáneo a los instaladores nativos para PC (Windows, macOS, Ubuntu, Fedora) y a las instrucciones y código QR para PWA Móvil (Android e iOS).
+  - Integración completa con el historial del navegador (`#descargas`, `#downloads`, `#instalar`), permitiendo alternar fluidamente entre las pestañas *«Acerca de Kongre»*, *«Guía de Usuario»* e *«Instalar App»*, y volver al portal con el botón *«Usar Kongre»* o el botón «Atrás».
 - 📱 **Selector Desplegable `Select` con Bottom-Sheet Portaled para Móviles (`Select.tsx`):**
   - Implementación de renderizado mediante `createPortal` en `document.body` cuando se detecta un dispositivo móvil (`window.innerWidth < 640px`).
   - Presentación nativa estilo *Bottom-Sheet* modal con fondo oscuro semitransparente difuminado (`backdrop-blur-[2px]`), animación fluida de deslizamiento ascendente (`slide-in-from-bottom-4`) y respeto automático a la barra de inicio y gestos del sistema (`env(safe-area-inset-bottom)`).

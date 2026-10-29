@@ -43,6 +43,10 @@ export const VERSION_HISTORY: VersionRecord[] = [
     changes: [
       {
         category: 'improvement',
+        text: 'Navegación Directa a «Instalar App (PC / Móvil)» desde la Pantalla de Bienvenida (CongregationWelcomeLanding.tsx, KongreOfficialWebsite.tsx, App.tsx): Al pulsar el botón «Versión PC» en la cabecera superior, la aplicación abre directamente la pestaña 3 (Instalar App) con las opciones de Celular y Computadora en lugar de mostrar un pop-up modal.',
+      },
+      {
+        category: 'improvement',
         text: 'Selector Desplegable Select con Bottom-Sheet Portaled para Móviles (Select.tsx): Renderizado reactivo con createPortal en el document.body cuando se detecta un móvil (< 640px), desplegando un modal inferior con fondo difuminado, animación fluida y soporte para safe-area.',
       },
       {

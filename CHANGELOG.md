@@ -6,6 +6,17 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.39] — 28 de Octubre, 2026
+**Empaquetado Nativo RPM para Fedora y Corrección de Conflicto en Filesystem**
+
+- 🛠️ **Empaquetado Nativo RPM sin Alien (`desktop-release.yml`, `tauri.conf.json`):**
+  - Sustituida la conversión mediante `alien` por la compilación nativa directa del motor de empaquetado de Tauri v2 (`--bundles deb,appimage,rpm`).
+  - Corrige el error en Fedora 40+ (`el archivo /usr/bin de la instalación de kongre entra en conflicto con el archivo del paquete filesystem`). El paquete RPM generado ahora solo reclama la propiedad de los binarios y lanzadores de Kongre, respetando las políticas de `filesystem`.
+- 📦 **Dependencias Declaradas para RPM (`tauri.conf.json`):**
+  - Inclusión explícita de `webkit2gtk4.1` y `libsoup3` como dependencias del paquete RPM para garantizar instalación fluida en DNF.
+
+---
+
 ### [v0.1.0-alpha.38] — 28 de Octubre, 2026
 **Actualizador Nativo de Escritorio en 1 Clic, Detección de Distribución y Aviso Inteligente para Fedora / Ubuntu**
 

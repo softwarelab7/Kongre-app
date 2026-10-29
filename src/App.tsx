@@ -60,7 +60,7 @@ import { AutoLockToastWarning } from './components/AutoLockToastWarning';
 import { JoinCongregationModal } from './components/JoinCongregationModal';
 import { InvitationManagerModal } from './components/InvitationManagerModal';
 import { CongregationWelcomeLanding } from './components/CongregationWelcomeLanding';
-import { KongreOfficialWebsite } from './components/KongreOfficialWebsite';
+import { KongreOfficialWebsite, WebsiteSection } from './components/KongreOfficialWebsite';
 import { RegisterCongregationWizard } from './components/RegisterCongregationWizard';
 import { AppLockPinSuggestionModal } from './components/AppLockPinSuggestionModal';
 import { AccountLinkRequestsModal } from './components/AccountLinkRequestsModal';
@@ -146,7 +146,15 @@ export const VALID_TABS_MAP: Record<string, ActiveTab> = {
 export function parseAppHash(hashString: string) {
   const clean = (hashString || '').replace(/^#\/?/, '').trim();
   if (!clean) {
-    return { tab: null, modal: null, semana: null, isLanding: false, isLegal: false, isWebsite: true };
+    return {
+      tab: null,
+      modal: null,
+      semana: null,
+      isLanding: false,
+      isLegal: false,
+      isWebsite: true,
+      websiteSection: 'about' as WebsiteSection,
+    };
   }
   const [routePart, queryPart] = clean.split('?');
   const normalizedRoute = routePart.toLowerCase().trim();
@@ -155,18 +163,35 @@ export function parseAppHash(hashString: string) {
   const modal = searchParams.get('modal') || null;
   const semana = searchParams.get('semana') || null;
   const isLanding = normalizedRoute === 'portal' || normalizedRoute === 'bienvenida';
+  const isDownloads =
+    normalizedRoute === 'descargas' ||
+    normalizedRoute === 'downloads' ||
+    normalizedRoute === 'instalar' ||
+    searchParams.get('seccion') === 'downloads' ||
+    searchParams.get('section') === 'downloads' ||
+    searchParams.get('tab') === 'downloads';
+  const isGuide =
+    normalizedRoute === 'docs' ||
+    normalizedRoute === 'guia' ||
+    normalizedRoute === 'documentacion' ||
+    searchParams.get('seccion') === 'guide' ||
+    searchParams.get('section') === 'guide' ||
+    searchParams.get('tab') === 'guide';
   const isWebsite =
+    isDownloads ||
+    isGuide ||
     normalizedRoute === 'web' ||
     normalizedRoute === 'sitio' ||
     normalizedRoute === 'presentacion' ||
-    normalizedRoute === 'docs' ||
-    normalizedRoute === 'documentacion';
+    normalizedRoute === 'about' ||
+    normalizedRoute === 'acerca';
+  const websiteSection: WebsiteSection = isDownloads ? 'downloads' : isGuide ? 'guide' : 'about';
   const isLegal =
     normalizedRoute === 'privacy' ||
     normalizedRoute === 'terms' ||
     normalizedRoute === 'privacidad' ||
     normalizedRoute === 'terminos';
-  return { tab, modal, semana, isLanding, isLegal, isWebsite };
+  return { tab, modal, semana, isLanding, isLegal, isWebsite, websiteSection };
 }
 
 const AppContent: React.FC = () => {
@@ -252,6 +277,15 @@ const AppContent: React.FC = () => {
   const [isQueueModalOpen, setIsQueueModalOpen] = useState(false);
   const [desktopUpdate, setDesktopUpdate] = useState<DesktopUpdateInfo | null>(null);
   const [isDesktopUpdateOpen, setIsDesktopUpdateOpen] = useState(false);
+  const [websiteInitialSection, setWebsiteInitialSection] = useState<WebsiteSection>(() => {
+    if (typeof window !== 'undefined') {
+      const hashInfo = parseAppHash(window.location.hash);
+      if (hashInfo?.websiteSection) {
+        return hashInfo.websiteSection;
+      }
+    }
+    return 'about';
+  });
 
   const [showOfficialWebsite, setShowOfficialWebsite] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
@@ -497,6 +531,11 @@ const AppContent: React.FC = () => {
 
       if (isWebsite) {
         setShowOfficialWebsite(true);
+        if (state?.section) {
+          setWebsiteInitialSection(state.section);
+        } else if (hashInfo?.websiteSection) {
+          setWebsiteInitialSection(hashInfo.websiteSection);
+        }
         setShowWelcomeLanding(false);
         setIsConflictsModalOpen(false);
         setIsQrModalOpen(false);
@@ -1307,6 +1346,7 @@ const AppContent: React.FC = () => {
   if (showOfficialWebsite) {
     return (
       <KongreOfficialWebsite
+        initialSection={websiteInitialSection}
         onGoToPortal={(initialPortalTab) => {
           try {
             sessionStorage.setItem('kongre_portal_explicit_v2', 'true');
@@ -1400,6 +1440,16 @@ const AppContent: React.FC = () => {
           }}
           onOpenVersionModal={() => {
             openModalWithHistory('versiones', setIsVersionModalOpen);
+          }}
+          onOpenDownloads={() => {
+            setWebsiteInitialSection('downloads');
+            setShowOfficialWebsite(true);
+            setShowWelcomeLanding(false);
+            window.history.pushState(
+              { tab: activeTab, modal: null, landing: false, website: true, section: 'downloads' },
+              '',
+              '#descargas'
+            );
           }}
         />
         <JoinCongregationModal

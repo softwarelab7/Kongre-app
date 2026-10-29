@@ -59,15 +59,16 @@ import DemoModeButton from './DemoModeButton';
 import { AppFooter } from './AppFooter';
 import { motion, AnimatePresence } from 'motion/react';
 
+export type WebsiteSection = 'about' | 'guide' | 'downloads';
+
 interface KongreOfficialWebsiteProps {
+  initialSection?: WebsiteSection;
   onGoToPortal: (initialPortalTab?: string) => void;
   onStartDemoMode: () => void;
   onOpenVersionModal: () => void;
   isSignedInOrRegistered?: boolean;
   onEnterAppDirectly?: () => void;
 }
-
-type WebsiteSection = 'about' | 'guide' | 'downloads';
 
 type RolePersonaId = 'elders' | 'servants' | 'pioneers' | 'publishers';
 
@@ -949,6 +950,7 @@ const FAQ_ITEMS = [
 ];
 
 export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
+  initialSection = 'about',
   onGoToPortal,
   onStartDemoMode,
   onOpenVersionModal,
@@ -956,7 +958,13 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
   onEnterAppDirectly,
 }) => {
   const { themeMode: theme, toggleTheme: handleToggleTheme } = useTheme();
-  const [activeSection, setActiveSection] = useState<WebsiteSection>('about');
+  const [activeSection, setActiveSection] = useState<WebsiteSection>(initialSection);
+
+  useEffect(() => {
+    if (initialSection) {
+      setActiveSection(initialSection);
+    }
+  }, [initialSection]);
   const [selectedRolePersona, setSelectedRolePersona] = useState<RolePersonaId>('elders');
   const [selectedDocId, setSelectedDocId] = useState<DocArticleId>('app-overview');
   const [expandedCategories, setExpandedCategories] = useState<Record<GuideSectionCategory, boolean>>({

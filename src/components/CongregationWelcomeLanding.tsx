@@ -70,6 +70,7 @@ interface CongregationWelcomeLandingProps {
   onEnterApp: () => void;
   onOpenJoinModal?: () => void;
   onOpenVersionModal?: () => void;
+  onOpenDownloads?: () => void;
 }
 
 type FeatureAccent = 'indigo' | 'emerald' | 'amber' | 'sky';
@@ -293,6 +294,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   onEnterApp,
   onOpenJoinModal,
   onOpenVersionModal,
+  onOpenDownloads,
 }) => {
   const {
     user,
@@ -455,6 +457,14 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
   } | null>(null);
   const [isSubmittingRequest, setIsSubmittingRequest] = useState(false);
   const [desktopModalOpen, setDesktopModalOpen] = useState(false);
+
+  const handleOpenDownloads = () => {
+    if (onOpenDownloads) {
+      onOpenDownloads();
+    } else {
+      setDesktopModalOpen(true);
+    }
+  };
 
   // Three credentials (PIN Personal es opcional para coordinadores):
   // 1. ID de la Congregación
@@ -1334,9 +1344,9 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 />
                 <button
                   type="button"
-                  onClick={() => setDesktopModalOpen(true)}
+                  onClick={handleOpenDownloads}
                   className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-xs backdrop-blur-xs transition-all cursor-pointer shadow-xs active:scale-95"
-                  title="Descargar versión nativa para PC"
+                  title="Instalar Kongre en tu dispositivo (PC o Móvil)"
                 >
                   <Monitor className="w-3.5 h-3.5" />
                   <span>PC</span>
@@ -1423,7 +1433,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
                 badge={{ label: 'PC · Rust', tone: 'lectura' }}
                 title="Descargar Kongre para PC"
                 description="Instalador nativo para Windows (.exe), macOS (.dmg) o Linux (.rpm / .deb)."
-                onClick={() => setDesktopModalOpen(true)}
+                onClick={handleOpenDownloads}
               />
             </div>
 
@@ -1489,7 +1499,7 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
               <div className="mt-4">
                 <DesktopCompatibilityBanner
                   variant="mobile-banner"
-                  onOpenAllDownloads={() => setDesktopModalOpen(true)}
+                  onOpenAllDownloads={handleOpenDownloads}
                 />
               </div>
 
@@ -1534,9 +1544,9 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <button
               type="button"
-              onClick={() => setDesktopModalOpen(true)}
+              onClick={handleOpenDownloads}
               className="hidden sm:flex group items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold text-xs border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-2xs shrink-0"
-              title="Descargar Kongre App para PC (Windows, macOS, Linux)"
+              title="Instalar Kongre en tu dispositivo (PC o Móvil)"
             >
               <Monitor className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
               <span>Versión PC</span>

@@ -15,7 +15,7 @@
 
 <p align="center">
   <a href="https://www.kongre-app.com"><strong>🌐 Acceder a la Aplicación Web en Producción (https://www.kongre-app.com)</strong></a> •
-  <a href="https://github.com/softwarelab7/Kongre/releases"><strong>📥 Centro de Descargas para PC (GitHub Releases)</strong></a>
+  <a href="https://github.com/softwarelab7/Kongre-app/releases"><strong>📥 Centro Oficial de Descargas para PC (GitHub Releases)</strong></a>
 </p>
 
 <p align="center">
@@ -115,57 +115,47 @@ Para consultar el registro cronológico exhaustivo con todas las versiones y cor
 
 ---
 
-## 💻 Instalación y Desarrollo Local
+## 📥 Instalación y Acceso Oficial
 
-### Prerrequisitos
-- **Node.js** v20+ o [Bun](https://bun.sh/)
-- **Rust y Cargo** (solo si compilarás la versión de escritorio de forma local): [rustup.rs](https://rustup.rs/)
+**Kongre** es una solución teocrática cerrada y privada. Para utilizarla, **no se requiere clonar código fuente ni compilar paquetes manualmente**. Todos los instaladores se distribuyen listos para usar como binarios precompilados y firmados, o a través de la aplicación web en producción.
 
-### 1. Clonar el repositorio
-```bash
-git clone https://github.com/softwarelab7/Kongre.git
-cd Kongre
-```
+---
 
-### 2. Instalar dependencias
-```bash
-npm install
-```
+### Opción 1: Aplicación Nativa para PC (Recomendada para Salones y Escritorio)
 
-### 3. Configuración de entorno (Opcional para sincronización en la nube)
-Crea un archivo `.env` en la raíz si deseas conectar tu propio proyecto de Supabase:
-```env
-VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
-VITE_SUPABASE_ANON_KEY=tu_clave_anon_publica
-```
+Descarga el instalador correspondiente a tu sistema operativo desde el **[Centro Oficial de Descargas de Kongre](https://github.com/softwarelab7/Kongre-app/releases/latest)**:
+
+| Sistema Operativo | Paquete Oficial | Método de Instalación |
+| :--- | :--- | :--- |
+| **🪟 Windows 10 / 11** | `Kongre_0.1.0-alpha.37_x64-setup.exe` | Ejecuta el instalador con doble clic y sigue el asistente interactivo de instalación. |
+| **🍎 macOS (Apple Silicon M1-M4 & Intel)** | `Kongre_0.1.0-alpha.37_universal.dmg` | Abre el archivo `.dmg` y arrastra el icono de **Kongre** a la carpeta `Aplicaciones`. |
+| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.37-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.37-1.x86_64.rpm` |
+| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.37_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.37_amd64.deb` |
+| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.37_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
+
+> [!TIP]
+> **Consumo ultraligero:** La aplicación nativa para PC está escrita en **Rust con Tauri v2** y consume únicamente ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.
+
+---
+
+### Opción 2: Versión Web y Progressive Web App (Móvil & Tablets)
+
+Puedes acceder de forma inmediata a la versión web completa desde cualquier dispositivo:
+
+🌐 **Portal Web Oficial:** [https://www.kongre-app.com](https://www.kongre-app.com)
+
+#### Cómo instalar como App en Teléfonos y Tablets (PWA Offline-First):
+- **Android (Chrome / Firefox):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), toca los tres puntos verticales `⋮` de la barra superior y selecciona **«Instalar aplicación»** o **«Agregar a la pantalla principal»**.
+- **iPhone / iPad (Safari):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), toca el botón **Compartir** (icono de cuadrado con flecha hacia arriba) y selecciona **«Agregar al inicio»**.
+
 > [!NOTE]
-> Kongre cuenta con arquitectura **Offline-First**: no requiere Supabase para funcionar; todos los módulos operan al 100% en modo local de forma desconectada.
+> La aplicación web cuenta con soporte **100% Offline-First**: una vez cargada por primera vez, todos los módulos operan normalmente sin necesidad de conexión activa a internet.
 
-### 4. Scripts de Desarrollo y Compilación
+---
 
-#### Versión Web:
-```bash
-# Iniciar servidor de desarrollo en http://localhost:3000
-npm run dev
-
-# Verificación estricta de tipos TypeScript
-npm run lint
-
-# Ejecutar suite de pruebas unitarias y de integración
-npm test
-
-# Compilar para producción (carpeta dist/)
-npm run build
-```
-
-#### Versión de Escritorio (Rust + Tauri v2):
-```bash
-# Ejecutar la ventana nativa de escritorio con HMR
-npm run desktop:dev
-
-# Compilar el binario instalador nativo según tu sistema operativo (.exe, .dmg, .rpm, .deb, .AppImage)
-npm run desktop:build
-```
+### 🛡️ Naturaleza del Software y Uso Institucional
+- **Software Privativo y Confidencial:** Kongre no es un proyecto de código abierto abierto a contribuciones externas públicas; está reservado para la administración teocrática confidencial de las congregaciones.
+- **Equipo de Desarrollo Interno:** Los desarrolladores y administradores autorizados con acceso al repositorio privado pueden consultar la guía técnica de desarrollo en `DEVELOPMENT.md`.
 
 ---
 

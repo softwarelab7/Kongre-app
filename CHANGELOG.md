@@ -6,13 +6,21 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
-### [v0.1.0-alpha.36] — 28 de Octubre, 2026
-**Optimización Móvil Integral, Select Portaled Bottom-Sheet, Transiciones Ligeras y Empaquetado Rust Multiplataforma**
+### [v0.1.0-alpha.37] — 28 de Octubre, 2026
+**Navegación Directa a Instaladores PC/Móvil, Pestaña de Descargas Dedicada e Historial Reactivo**
 
 - 📥 **Navegación Directa a «Instalar App (PC / Móvil)» desde la Pantalla de Bienvenida (`CongregationWelcomeLanding.tsx`, `KongreOfficialWebsite.tsx`, `App.tsx`):**
   - Al pulsar el botón *«Versión PC»* en la barra superior de la pantalla de bienvenida, la aplicación abre directamente la **Pestaña 3 («Instalar en PC / Móvil»)** de la presentación oficial en lugar de abrir una ventana emergente / pop-up modal.
-  - Ofrece acceso simultáneo a los instaladores nativos para PC (Windows, macOS, Ubuntu, Fedora) y a las instrucciones y código QR para PWA Móvil (Android e iOS).
+  - Ofrece acceso simultáneo y organizado a los instaladores nativos para PC (Windows `.exe`, macOS `.dmg`, Ubuntu `.deb`, Fedora `.rpm`, `.AppImage`) y a las instrucciones y código QR para PWA Móvil (Android e iOS).
   - Integración completa con el historial del navegador (`#descargas`, `#downloads`, `#instalar`), permitiendo alternar fluidamente entre las pestañas *«Acerca de Kongre»*, *«Guía de Usuario»* e *«Instalar App»*, y volver al portal con el botón *«Usar Kongre»* o el botón «Atrás».
+- 📱 **Sincronización de Accesos en Móvil y Banners de Compatibilidad (`CongregationWelcomeLanding.tsx`):**
+  - El botón *«PC»* de la cabecera móvil y las tarjetas de descarga en el flujo de bienvenida ahora dirigen de forma homogénea a la pestaña dedicada de instalación oficial.
+
+---
+
+### [v0.1.0-alpha.36] — 28 de Octubre, 2026
+**Optimización Móvil Integral, Select Portaled Bottom-Sheet, Transiciones Ligeras y Empaquetado Rust Multiplataforma**
+
 - 📱 **Selector Desplegable `Select` con Bottom-Sheet Portaled para Móviles (`Select.tsx`):**
   - Implementación de renderizado mediante `createPortal` en `document.body` cuando se detecta un dispositivo móvil (`window.innerWidth < 640px`).
   - Presentación nativa estilo *Bottom-Sheet* modal con fondo oscuro semitransparente difuminado (`backdrop-blur-[2px]`), animación fluida de deslizamiento ascendente (`slide-in-from-bottom-4`) y respeto automático a la barra de inicio y gestos del sistema (`env(safe-area-inset-bottom)`).

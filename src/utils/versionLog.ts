@@ -25,26 +25,45 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '0.1.0-alpha.36';
+export const CURRENT_APP_VERSION = '0.1.0-alpha.37';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.10.28.8036';
+export const CURRENT_BUILD_CODE = '2026.10.28.8037';
 export const BUILD_DATE = '28 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
-    version: '0.1.0-alpha.36',
-    buildCode: '2026.10.28.8036',
+    version: '0.1.0-alpha.37',
+    buildCode: '2026.10.28.8037',
     date: '28 de Octubre, 2026',
-    title: 'Optimización Móvil Integral, Select Portaled Bottom-Sheet y Empaquetado Rust Multiplataforma',
+    title: 'Navegación Directa a Instaladores PC/Móvil e Historial Reactivo',
     isCurrent: true,
-    highlight: 'Optimización responsiva integral para móviles con menú Bottom-Sheet portaled para Select, ajustes en selector iOS, purga de will-change en animaciones y pipeline de empaquetado Rust multiplataforma (.exe, .dmg, .deb, .rpm, .AppImage)',
+    highlight: 'Transición directa desde el botón «Versión PC» en la cabecera de bienvenida hacia la pestaña 3 (Instalar en PC / Móvil) sin popup modal, con enrutamiento hash e integración de historial.',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [
       {
         category: 'improvement',
         text: 'Navegación Directa a «Instalar App (PC / Móvil)» desde la Pantalla de Bienvenida (CongregationWelcomeLanding.tsx, KongreOfficialWebsite.tsx, App.tsx): Al pulsar el botón «Versión PC» en la cabecera superior, la aplicación abre directamente la pestaña 3 (Instalar App) con las opciones de Celular y Computadora en lugar de mostrar un pop-up modal.',
       },
+      {
+        category: 'feature',
+        text: 'Enrutamiento Hash y Sincronización de Historial (App.tsx): Reconocimiento nativo de rutas #descargas, #downloads e #instalar para activar de inmediato la sección de instaladores, permitiendo volver a la pantalla de bienvenida con el botón del navegador o con el botón «Usar Kongre».',
+      },
+      {
+        category: 'improvement',
+        text: 'Sincronización de Botones Móviles y Banners (CongregationWelcomeLanding.tsx): Unificación del botón de PC móvil y el banner de compatibilidad para navegar directamente a la pestaña de descargas oficiales.',
+      },
+    ],
+  },
+  {
+    version: '0.1.0-alpha.36',
+    buildCode: '2026.10.28.8036',
+    date: '28 de Octubre, 2026',
+    title: 'Optimización Móvil Integral, Select Portaled Bottom-Sheet y Empaquetado Rust Multiplataforma',
+    isCurrent: false,
+    highlight: 'Optimización responsiva integral para móviles con menú Bottom-Sheet portaled para Select, ajustes en selector iOS, purga de will-change en animaciones y pipeline de empaquetado Rust multiplataforma (.exe, .dmg, .deb, .rpm, .AppImage)',
+    environment: 'Fase Alfa Preliminar (Web & Desktop)',
+    changes: [
       {
         category: 'improvement',
         text: 'Selector Desplegable Select con Bottom-Sheet Portaled para Móviles (Select.tsx): Renderizado reactivo con createPortal en el document.body cuando se detecta un móvil (< 640px), desplegando un modal inferior con fondo difuminado, animación fluida y soporte para safe-area.',

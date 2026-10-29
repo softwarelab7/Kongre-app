@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.36-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.36" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.37-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.37" />
   <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
   <img src="https://img.shields.io/badge/SO-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
@@ -44,9 +44,13 @@ La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de �
 
 ---
 
-## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.36`)
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.37`)
 
 Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/CHANGELOG.md) y la documentación de compilación de escritorio en [DESKTOP_RUST.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/DESKTOP_RUST.md).
+
+### 📥 Navegación Directa a «Instalar App (PC / Móvil)»
+- **Acceso Sin Modales:** El botón «Versión PC» en la cabecera del portal abre directamente la pestaña 3 («Instalar en PC / Móvil») de la web oficial de presentación, permitiendo acceder a los instaladores nativos para Windows, macOS, Ubuntu y Fedora, o a las instrucciones PWA móvil sin ventanas emergentes.
+- **Historial Integrado:** Soporte reactivo de rutas `#descargas`, `#downloads` e `#instalar` con navegación fluida de ida y vuelta.
 
 ### 🏛️ Rediseño Integral de la Sección «Acerca de Kongre»
 - **Cockpit Teocrático en Vivo:** Maqueta interactiva con 4 pestañas reactivas (*Reunión Vida y Ministerio*, *Asistencia S-88*, *Territorios S-13* e *Informes de Servicio*) que simula en tiempo real la experiencia operativa del sistema.

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Cloud, ShieldCheck, Lock } from 'lucide-react';
-import { useCongregation } from '../context/CongregationContext';
+import { useOptionalCongregation } from '../context/CongregationContext';
 import { ActiveTab } from './Navbar';
 
 export interface LoadingSpinnerProps {
@@ -59,13 +59,14 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   activeTab,
   mode = 'overlay',
 }) => {
-  const congregation = useCongregation();
+  const congregation = useOptionalCongregation();
 
   const isSyncing =
     isVisible !== undefined
       ? isVisible
       : Boolean(
-          !congregation.isDemoMode &&
+          congregation &&
+            !congregation.isDemoMode &&
             (congregation.isSupabaseSyncing || congregation.syncStatus === 'saving')
         );
 

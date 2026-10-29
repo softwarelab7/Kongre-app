@@ -1,6 +1,6 @@
 [package]
 name = "kongre"
-version = "0.1.0-alpha.39"
+version = "0.1.0-alpha.40"
 description = "Kongre App - Gestor Teocrático para PC Windows, Linux y Mac"
 authors = ["SoftwareLab"]
 license = "MIT"

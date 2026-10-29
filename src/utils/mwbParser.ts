@@ -18,6 +18,22 @@ export interface ParsedMwbWeek {
 }
 
 export const PRESET_SAMPLE_MWB_WEEKS: Record<string, ParsedMwbWeek> = {
+  'jeremias_47': {
+    bibleReadingRange: 'JEREMÍAS 47, 48',
+    discursoTitle: '“Jehová es un juez justo y misericordioso” (10 min.)',
+    perlasTitle: 'Busquemos perlas escondidas en Jeremías 47 y 48 (10 min.)',
+    lecturaBibliaTitle: 'Lectura de la Biblia: Jeremías 48:1-13 (4 min.)',
+    demonstrations: [
+      { title: 'Empiece conversaciones: De casa en casa (3 min.)', timeMinutes: 3 },
+      { title: 'Haga revisitas: Predicación informal (4 min.)', timeMinutes: 4 },
+      { title: 'Haga discípulos: Anime a su estudiante a orar con más frecuencia (5 min.)', timeMinutes: 5 },
+    ],
+    vidaPartes: [
+      { title: 'Necesidades de la congregación (15 min.)', timeMinutes: 15 },
+    ],
+    estudioBiblicoTitle: 'Estudio bíblico de la congregación: libro "wcg" cap. 14',
+    atalayaTheme: 'Valoremos el privilegio de darle a Jehová “servicio sagrado sin temor”',
+  },
   'salmos_80': {
     bibleReadingRange: 'Salmos 80 a 82',
     discursoTitle: '“El Dios que escucha nuestras oraciones” (10 min.)',

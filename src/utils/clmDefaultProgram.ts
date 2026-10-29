@@ -327,7 +327,7 @@ export function createDefaultPrograma(
     estado: 'borrador',
     partes,
     congregation_id: congregationId || null,
-    lectura_semana: week?.midweek?.bibleReading || org?.bibleReading || 'Salmos 85 a 88',
+    lectura_semana: week?.midweek?.bibleReading || org?.bibleReading || 'JEREMÍAS 47, 48',
     rango_semana:
       org?.weekDateRange ||
       (week ? `Semana del ${week.weekStartDate} al ${week.weekEndDate}` : `Semana del ${semanaFecha}`),

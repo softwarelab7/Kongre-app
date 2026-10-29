@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.39-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.39" />
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.40-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.40" />
   <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
   <img src="https://img.shields.io/badge/SO-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=flat-square" alt="Sistemas Operativos" />
   <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
@@ -52,26 +52,23 @@ La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de �
 
 ---
 
-## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.39`)
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.40`)
 
 Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/CHANGELOG.md) y la documentación de compilación de escritorio en [DESKTOP_RUST.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/DESKTOP_RUST.md).
 
-### 🛠️ Empaquetado Nativo RPM para Fedora y Corrección de Filesystem
-- **RPM Nativo Oficial con Tauri v2:** Compilación directa mediante `rpmbuild` en lugar de conversión `alien`, solucionando el conflicto de directorios protegidos del sistema (`/usr/bin`) en Fedora 40+.
-- **Resolución Automática de Dependencias:** Declaración explícita de `webkit2gtk4.1` y `libsoup3` para instalación fluida en DNF.
+### 🔐 Seguridad: PINs Personales v2 con Sal por Publicador y Mínimo de 6 Dígitos
+- **Sal PBKDF2 Única por Publicador:** Derivación criptográfica con `kongre-personal-pin-v2|congId|publisherId` para asegurar que verificadores de publicadores con PINs idénticos no compartan hash en base de datos.
+- **Migración Transparente y Suave:** Adopción automática a v2 en el próximo sync del coordinador sin intervención manual ni cortes de servicio.
+- **Mínimo de 6 Dígitos:** Incremento de la longitud mínima requerida para nuevos PINs personales para una protección robusta contra ataques de diccionario y fuerza bruta.
 
-### ⚡ Actualizador Nativo en 1 Clic (Tauri Updater)
-- **Actualización Automática sin Salir de la App:** Integración con `@tauri-apps/plugin-updater` y `@tauri-apps/plugin-process` para actualizar automáticamente en Windows (`.exe`), macOS (`.dmg`) y Linux (`.AppImage`) con barra de progreso en vivo y reinicio asistido.
-- **Validación Criptográfica Minisign:** Comprobación estricta de firma digital en cada paquete antes de su ejecución para máxima seguridad.
+### 🛡️ Endurecimiento de Seguridad CSP en la App de Escritorio
+- **Content Security Policy Estricto en Tauri:** Reemplazo de directiva abierta por reglas rigurosas sin scripts inline y restricción estricta de conexiones a Supabase, mapas y GitHub Releases.
 
-### 🐧 Detección Inteligente para Fedora y Ubuntu
-- **Comando IPC `install_kind`:** Detecta si la aplicación se ejecuta instalada como paquete del sistema (`linux-rpm` o `linux-deb`) o como paquete portable (`appimage`).
-- **Instalación Asistida para `.rpm` y `.deb`:** Presenta botón de descarga directa y el comando exacto para terminal listo para copiar con 1 clic (ej. `sudo dnf install ./Kongre-0.1.0-alpha.39-1.x86_64.rpm`).
+### 🧩 Resiliencia de Contexto y Estabilidad de Renderizado
+- **Prevención de Excepciones de Montaje:** Hook `useOptionalCongregation()` y estado seguro `FALLBACK_CONGREGATION_CONTEXT` para blindar componentes globales y evitar pantallas rojas de error.
 
-### 🔔 Notificación Inmediata en Cabecera y Pie
-- **Chequeo Inmediato al Iniciar:** Verificación sin tiempo de espera al arrancar la versión de escritorio y comparación SemVer estricta.
-- **Aviso Visual:** Botón destacado en cabecera (*«¡Actualizar PC! v0.1.0-alpha.39»*) y en pie de página para abrir el panel de actualización.
-- **Historial Integrado:** Soporte reactivo de rutas `#descargas`, `#downloads` e `#instalar` con navegación fluida de ida y vuelta.
+### 📖 Sincronización Bíblica y Programa CLM/VMC Actualizado
+- **Alineación con Jeremías 38 a 48:** Actualización de cronogramas semanales, lectura bíblica asignada, perlas escondidas y estudio bíblico de congregación.
 
 ### 🏛️ Rediseño Integral de la Sección «Acerca de Kongre»
 - **Cockpit Teocrático en Vivo:** Maqueta interactiva con 4 pestañas reactivas (*Reunión Vida y Ministerio*, *Asistencia S-88*, *Territorios S-13* e *Informes de Servicio*) que simula en tiempo real la experiencia operativa del sistema.
@@ -148,11 +145,11 @@ Descarga el instalador correspondiente a tu sistema operativo desde el **[Centro
 
 | Sistema Operativo | Paquete Oficial | Método de Instalación |
 | :--- | :--- | :--- |
-| **🪟 Windows 10 / 11** | `Kongre_0.1.0-alpha.39_x64-setup.exe` | Ejecuta el instalador con doble clic y sigue el asistente interactivo de instalación. |
-| **🍎 macOS (Apple Silicon M1-M4 & Intel)** | `Kongre_0.1.0-alpha.39_universal.dmg` | Abre el archivo `.dmg` y arrastra el icono de **Kongre** a la carpeta `Aplicaciones`. |
-| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.39-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.39-1.x86_64.rpm` |
-| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.39_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.39_amd64.deb` |
-| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.39_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
+| **🪟 Windows 10 / 11** | `Kongre_0.1.0-alpha.40_x64-setup.exe` | Ejecuta el instalador con doble clic y sigue el asistente interactivo de instalación. |
+| **🍎 macOS (Apple Silicon M1-M4 & Intel)** | `Kongre_0.1.0-alpha.40_universal.dmg` | Abre el archivo `.dmg` y arrastra el icono de **Kongre** a la carpeta `Aplicaciones`. |
+| **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.40-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.40-1.x86_64.rpm` |
+| **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.40_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.40_amd64.deb` |
+| **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.40_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
 
 > [!TIP]
 > **Consumo ultraligero:** La aplicación nativa para PC está escrita en **Rust con Tauri v2** y consume únicamente ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.

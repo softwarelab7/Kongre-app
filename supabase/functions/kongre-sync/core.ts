@@ -20,6 +20,8 @@ export interface PersonalVerifier {
   role: string;
   privilege?: string;
   theocraticRoles?: string[];
+  /** Versión del verificador: 2 = HMAC con publisherId en el mensaje y sal por publicador en el cliente. Sin valor = heredado. */
+  v?: number;
 }
 
 export interface SyncRow {
@@ -93,6 +95,13 @@ export async function verifierOfPersonal(pepper: string, congId: string, token: 
   return toHex(sig);
 }
 
+/** v2: el publisherId forma parte del mensaje, así dos publicadores con el mismo PIN ya no comparten verificador. */
+export async function verifierOfPersonalV2(pepper: string, congId: string, pubId: string, token: string): Promise<string> {
+  const key = await crypto.subtle.importKey('raw', enc.encode(pepper), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(`personal2|${congId}|${pubId}|${token}`));
+  return toHex(sig);
+}
+
 async function buildPersonalVerifiers(pepper: string, congId: string, list: any[]): Promise<PersonalVerifier[]> {
   const out: PersonalVerifier[] = [];
   for (const item of list) {
@@ -100,10 +109,14 @@ async function buildPersonalVerifiers(pepper: string, congId: string, list: any[
     const pubId = typeof item.id === 'string' ? item.id.trim() : '';
     const token = typeof item.token === 'string' ? item.token.trim() : '';
     if (!pubId || !PUB_ID_RE.test(pubId) || !TOKEN_RE.test(token)) continue;
-    const verifier = await verifierOfPersonal(pepper, congId, token);
+    const isV2 = item.v === 2;
+    const verifier = isV2
+      ? await verifierOfPersonalV2(pepper, congId, pubId, token)
+      : await verifierOfPersonal(pepper, congId, token);
     out.push({
       id: pubId,
       verifier,
+      ...(isV2 ? { v: 2 } : {}),
       name: typeof item.name === 'string' ? item.name.trim().slice(0, 120) : '',
       role: typeof item.role === 'string' ? item.role.trim().slice(0, 40) : 'publico',
       privilege: typeof item.privilege === 'string' ? item.privilege.trim().slice(0, 40) : undefined,
@@ -389,9 +402,10 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     if (!tier) return reject(); // Requiere credenciales válidas de la congregación
 
     const pinToken = typeof body?.pin_token === 'string' ? body.pin_token.trim() : '';
-    if (!TOKEN_RE.test(pinToken)) {
-      return json(req, env, 400, { ok: false, error: 'bad_pin_token' });
-    }
+    const pinTokenV2 = typeof body?.pin_token_v2 === 'string' ? body.pin_token_v2.trim() : '';
+    if (!pinToken && !pinTokenV2) return json(req, env, 400, { ok: false, error: 'bad_pin_token' });
+    if (pinToken && !TOKEN_RE.test(pinToken)) return json(req, env, 400, { ok: false, error: 'bad_pin_token' });
+    if (pinTokenV2 && !TOKEN_RE.test(pinTokenV2)) return json(req, env, 400, { ok: false, error: 'bad_pin_token' });
 
     // Seguridad: publisher_id es OBLIGATORIO para evitar ataques de colisión aleatoria
     // contra cualquier publicador de la congregación.
@@ -419,8 +433,16 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
       return json(req, env, 429, { ok: false, error: 'rate_limited', retry_after: Math.ceil((lockedPub - now()) / 1000) });
     }
 
-    const expectedVerifier = await verifierOfPersonal(env.pepper, id, pinToken);
-    const matched = safeEqual(expectedVerifier, targetPublisher.verifier);
+    // Un verificador v2 solo se acepta con el token v2 (sin degradación al esquema heredado).
+    // Los verificadores heredados siguen funcionando hasta que el PIN maestro sincroniza de nuevo.
+    let matched = false;
+    if (targetPublisher.v === 2) {
+      if (!pinTokenV2) return json(req, env, 400, { ok: false, error: 'bad_pin_token' });
+      matched = safeEqual(await verifierOfPersonalV2(env.pepper, id, targetPublisher.id, pinTokenV2), targetPublisher.verifier);
+    } else {
+      if (!pinToken) return json(req, env, 400, { ok: false, error: 'bad_pin_token' });
+      matched = safeEqual(await verifierOfPersonal(env.pepper, id, pinToken), targetPublisher.verifier);
+    }
 
     if (!matched) {
       const pubLock = await db.registerFailure(kPub, LIMITS.pub.limit, LIMITS.pub.window, LIMITS.pub.lock);

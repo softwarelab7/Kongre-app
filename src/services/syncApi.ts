@@ -187,6 +187,30 @@ export async function derivePersonalPinToken(pin: string, congregationId: string
   return token;
 }
 
+/** v2: la sal incluye el publisherId, así un mismo PIN produce tokens distintos en cada publicador. */
+export async function derivePersonalPinTokenV2(pin: string, congregationId: string, publisherId: string): Promise<string> {
+  const cleanPin = normalizePin(pin);
+  const cacheKey = `personal2|${congregationId}|${publisherId}|${cleanPin}`;
+  const cached = tokenCache.get(cacheKey);
+  if (cached) return cached;
+
+  const enc = new TextEncoder();
+  const base = await crypto.subtle.importKey('raw', enc.encode(cleanPin), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: enc.encode(`kongre-personal-pin-v2|${congregationId}|${publisherId}`),
+      iterations: AUTH_ITERATIONS,
+      hash: 'SHA-256',
+    },
+    base,
+    256
+  );
+  const token = toHex(bits);
+  tokenCache.set(cacheKey, token);
+  return token;
+}
+
 export interface VerifiedPublisher {
   id: string;
   name: string;
@@ -265,12 +289,13 @@ export async function syncPush(params: {
     if (params.rotateTo.masterPin) rotate_to.master = await deriveAuthToken(params.rotateTo.masterPin, params.id, 'master');
     if (params.rotateTo.publicPin) rotate_to.public = await deriveAuthToken(params.rotateTo.publicPin, params.id, 'public');
   }
-  let personal_pins: Array<{ id: string; token: string; name: string; role: string; privilege?: string; theocraticRoles?: string[] }> | undefined;
+  let personal_pins: Array<{ id: string; token: string; v: 2; name: string; role: string; privilege?: string; theocraticRoles?: string[] }> | undefined;
   if (params.personalPins && params.personalPins.length > 0) {
     personal_pins = await Promise.all(
       params.personalPins.map(async (p) => ({
         id: p.id,
-        token: await derivePersonalPinToken(p.pin, params.id),
+        token: await derivePersonalPinTokenV2(p.pin, params.id, p.id),
+        v: 2 as const,
         name: p.name,
         role: p.role,
         privilege: p.privilege,

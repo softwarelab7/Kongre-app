@@ -72,6 +72,17 @@ const env = {
   legacyClaim: Deno.env.get('LEGACY_CLAIM') === 'true',
 };
 
+// Avisos de configuración al arrancar (visibles en Dashboard → Edge Functions → Logs).
+if (env.allowedOrigins.length === 0) {
+  console.warn(
+    'AVISO: ALLOWED_ORIGINS vacío; CORS responde "*" (cualquier origen). En producción define ALLOWED_ORIGINS ' +
+      '(incluye también los orígenes de la app de escritorio: tauri://localhost y http://tauri.localhost).'
+  );
+}
+if (env.legacyClaim) {
+  console.warn('AVISO: LEGACY_CLAIM=true. Debe usarse solo durante la migración de congregaciones existentes; desactívalo después.');
+}
+
 Deno.serve(async (req) => {
   if (pepper.length < 32) {
     return new Response(JSON.stringify({ ok: false, error: 'server_misconfigured' }), {

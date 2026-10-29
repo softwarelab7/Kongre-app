@@ -1,7 +1,7 @@
 /**
  * src/utils/crypto.ts
  * Motor criptográfico de Cero Conocimiento (Zero-Knowledge) para Kongre2.
- * Implementa cifrado AES-256-GCM y derivación de claves PBKDF2 (100,000 iteraciones)
+ * Implementa cifrado AES-256-GCM y derivación de claves PBKDF2 (600.000 iteraciones en v2; 100.000 en el formato v1 heredado)
  * mediante la API nativa del navegador (Web Crypto API).
  *
  * Compatible tanto con formato Base64 como con el formato Hex de Supabase sync_queue:

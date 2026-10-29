@@ -88,8 +88,18 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
 
             {this.state.error && (
-              <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-left overflow-x-auto text-[11px] font-mono text-rose-300">
-                {this.state.error.toString()}
+              <div className="space-y-2">
+                <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-left overflow-x-auto text-[11px] font-mono text-rose-300">
+                  {this.state.error.toString()}
+                </div>
+                {this.state.errorInfo?.componentStack && (
+                  <details className="text-left text-[10px] text-slate-400 font-mono bg-slate-950/40 border border-slate-800/60 rounded-xl p-2.5 cursor-pointer">
+                    <summary className="hover:text-slate-300 select-none">Detalles técnicos del fallo</summary>
+                    <pre className="mt-2 whitespace-pre-wrap max-h-40 overflow-y-auto text-slate-400">
+                      {this.state.errorInfo.componentStack}
+                    </pre>
+                  </details>
+                )}
               </div>
             )}
 

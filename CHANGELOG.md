@@ -6,6 +6,44 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.40] — 29 de Octubre, 2026
+**PINs Personales v2 con Sal Única por Publicador, CSP Estricto en PC, Resiliencia de Contexto y Actualización de Cronograma CLM (Jeremías 38-48)**
+
+- 🔐 **Seguridad: Derivación de PIN Personal v2 con Sal por Publicador (`core.ts`, `syncApi.ts`, `AccessCredentialsSection.tsx`, `personal-pin-v2.test.ts`):**
+  - Implementación de derivación criptográfica PBKDF2 v2 incorporando `publisherId` en la sal (`kongre-personal-pin-v2|congId|publisherId`). Con esto se garantiza que dos o más publicadores que elijan el mismo PIN numérico generen verificadores hash completamente independientes en la base de datos de Supabase.
+  - Migración silenciosa y transparente a esquema v2 (`v: 2`) durante la siguiente sincronización ordinaria del coordinador, sin requerir migraciones manuales en SQL ni causar interrupción para los publicadores activos.
+  - Establecido un umbral mínimo de 6 dígitos para la creación o modificación de nuevos PINs personales en la interfaz de administración, aumentando sustancialmente el espacio de entropía contra ataques de fuerza bruta local o distribuida.
+- 🛡️ **Endurecimiento de Política de Seguridad CSP en la App de Escritorio (`tauri.conf.json`):**
+  - Reemplazo de la directiva no restrictiva (`"csp": null`) por un Content Security Policy exhaustivo adaptado a Tauri v2: bloqueo de scripts inline (`unsafe-inline`), restricción de orígenes de conexión (`connect-src`) estrictamente limitados a Supabase (REST y WebSockets en tiempo real), cartografía oficial (OpenStreetMap, CartoDB, ArcGIS), fuentes de Google Fonts y servidores de GitHub Releases para la descarga del actualizador nativo.
+- 🧩 **Resiliencia de Contexto y Erradicación de Pantallas Rojas de Error (`CongregationContext.tsx`, `LoadingSpinner.tsx`, `OfflineSyncBadge.tsx`, `ErrorBoundary.tsx`):**
+  - Creación del hook especializado `useOptionalCongregation()` para componentes transversales, de telemetría o de carga global que pueden evaluarse en fases tempranas de hidratación o fuera del árbol `<CongregationProvider>`.
+  - Incorporación de un estado seguro de respaldo (`FALLBACK_CONGREGATION_CONTEXT`) dentro de `useCongregation()` para emitir advertencias diagnósticas controladas (`console.warn`) en lugar de arrojar excepciones fatales no controladas.
+  - Ampliación de la pantalla de contingencia en `ErrorBoundary` con visualización plegable de la traza de componentes (`componentStack`).
+- 🛠️ **Esquema de Validación de Capacidades Tauri (`desktop-schema.json`, `src-tauri/.gitignore`):**
+  - Integración del archivo de esquema JSON local `src-tauri/gen/schemas/desktop-schema.json` referenciado por `capabilities/default.json` y ajuste en `.gitignore` para asegurar su permanencia y validación sin advertencias en editores de código.
+- 🏛️ **Arquitectura y Modularización de Ajustes (`SettingsTab.tsx`, `src/components/Settings/`):**
+  - Desacople y fragmentación del componente monolítico `SettingsTab.tsx` (originalmente de 3.922 líneas) en 9 submódulos especializados de alta cohesión bajo `src/components/Settings/sections/`:
+    - `AllSettingsOverview.tsx`: Hub central con tarjetas de resumen dinámico y accesos rápidos.
+    - `NotificationsSection.tsx`: Configuración de anticipación, sincronización de service worker y pruebas de notificación push.
+    - `GeneralSettingsSection.tsx`: Parámetros de congregación, Salón del Reino y horarios de reuniones.
+    - `RulesSettingsSection.tsx`: Motor de detección de cruces, límites de semanas y reglas de bosquejos.
+    - `InvitacionesSection.tsx`: Registro teocrático, generación de códigos QR y canje de invitaciones.
+    - `SecuritySection.tsx`: PIN de bloqueo de sesión, auto-bloqueo por inactividad y privacidad PII.
+    - `CloudSettingsSection.tsx`: Sincronización colaborativa granular (Fase 4) y conexión con Supabase.
+    - `BackupsSection.tsx`: Exportación e importación de copias JSON y archivos cifrados AES-256-GCM.
+    - `MaintenanceSection.tsx`: Limpieza de datos de prueba, vaciado de directorio y restablecimiento total.
+  - Creación de `types.ts` y `config.ts` (`SETTINGS_TABS_CONFIG`) conservando el 100% de retrocompatibilidad con las importaciones globales.
+- 🔐 **Modularización Criptográfica Teocrática (`theocraticSecurity.ts`, `src/utils/security/`):**
+  - Fragmentación del archivo monolítico de seguridad (2.318 líneas) en 17 módulos independientes bajo `src/utils/security/` (`bytes.ts`, `random.ts`, `sha256.ts`, `slowHash.ts`, `passphraseCrypto.ts`, `masking.ts`, `pinPolicy.ts`, `congregationCredentials.ts`, `personalPin.ts`, `atRestPin.ts`, `sensitiveFields.ts`, `roleSession.ts`, `shareTokens.ts`, `backupIntegrity.ts`, `invitations.ts`, `assignmentSignature.ts`, `inputSanitizing.ts`), más `congregationIdentity.ts`.
+  - `theocraticSecurity.ts` preservado como barril de reexportación limpio para compatibilidad absoluta sin modificar los 32 archivos consumidores.
+- ⚙️ **Endurecimiento de CI/CD y Orden Cronológico de Migraciones:**
+  - Fijación de las 6 GitHub Actions por SHA estricto con `toolchain: stable` y compilación determinista con `npm ci`.
+  - Corrección de nomenclatura cronológica ISO para migraciones Supabase (`20261022000001_sync_auth_prepare.sql`, `20261022000002_personal_pin_verifiers.sql`, `20261022000003_sync_lockdown.sql`) y creación de `SEGURIDAD.md`.
+- 📖 **Alineación de Cronograma Teocrático y Lectura de la Biblia VMC (`organizedSync.ts`, `clmBridge.ts`, `mwbParser.ts`, `clmDefaultProgram.ts`, `ClmScheduleView.tsx`):**
+  - Actualización y sincronización de las semanas de estudio correspondientes al bloque de lectura de Jeremías 38 a 48, vinculando discursos principales, perlas escondidas, lecturas asignadas, demostraciones de predicación y estudio bíblico de congregación.
+
+---
+
 ### [v0.1.0-alpha.39] — 28 de Octubre, 2026
 **Empaquetado Nativo RPM para Fedora y Corrección de Conflicto en Filesystem**
 

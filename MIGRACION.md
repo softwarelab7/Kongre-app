@@ -17,9 +17,9 @@ Mantiene el cero conocimiento: el servidor nunca ve PINs ni claves de cifrado.
 
 ## Archivos
 
-- `supabase/migrations/20261022_01_sync_auth_prepare.sql` — aditiva, segura antes de desplegar.
-- `supabase/migrations/20261023_03_personal_pin_verifiers.sql` — agrega personal_verifiers para validación segura de PINs personales.
-- `supabase/migrations/20261022_02_sync_lockdown.sql` — el cierre. **Solo al final.**
+- `supabase/migrations/20261022000001_sync_auth_prepare.sql` — aditiva, segura antes de desplegar.
+- `supabase/migrations/20261022000002_personal_pin_verifiers.sql` — agrega personal_verifiers para validación segura de PINs personales.
+- `supabase/migrations/20261022000003_sync_lockdown.sql` — el cierre. **Solo al final.** Ojo: `supabase db push` aplica TODAS las migraciones en orden, incluido este cierre. Aplícalo desde el SQL Editor, paso a paso, como indica el procedimiento.
 - `supabase/rollback/rollback_lockdown.sql` — emergencia (reabre el acceso inseguro). **Solo para ejecutar a mano** en el SQL Editor si se requiere vuelta atrás. Se movió fuera de `migrations/` porque herramientas como `supabase db push` o `db reset` lo aplicarían automáticamente por orden alfabético después de la `02_lockdown`, reabriendo el acceso público a `sync_queue`.
 - `supabase/functions/kongre-sync/{core.ts,index.ts}` y `supabase/config.toml.snippet`.
 - `src/services/syncApi.ts` (nuevo) y 4 archivos modificados (ver `cambios-src.patch`).

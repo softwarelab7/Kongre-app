@@ -6,8 +6,8 @@
  * autenticación" derivados del PIN (PBKDF2 con una sal distinta de la usada para cifrar), nunca el PIN.
  * El servidor valida el token, limita los intentos y decide qué nivel de datos devuelve.
  */
-import { SUPABASE_URL } from '../lib/supabase.ts';
-import { normalizePin } from '../utils/crypto.ts';
+import { SUPABASE_URL } from '../lib/supabase';
+import { normalizePin } from '../utils/crypto';
 
 const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/kongre-sync`;
 const AUTH_ITERATIONS = 100_000;
@@ -62,27 +62,87 @@ export async function tokensFromSinglePin(pin: string, congregationId: string): 
   return { master, public: pub };
 }
 
-async function call<T>(body: Record<string, unknown>): Promise<SyncResult<T>> {
-  // Si fetch falla por red lanza TypeError('Failed to fetch'); se deja propagar a propósito
-  // para que la UI existente siga mostrando su mensaje de conexión/bloqueadores.
-  const res = await fetch(FUNCTION_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  let json: any = null;
-  try {
-    json = await res.json();
-  } catch {
-    /* respuesta no JSON */
+function getSyncEndpoint(): string {
+  if (typeof window !== 'undefined') {
+    const host = window.location?.hostname || '';
+    if (
+      (typeof import.meta !== 'undefined' && import.meta.env?.DEV) ||
+      host.includes('.run.app') ||
+      host === 'localhost' ||
+      host === '127.0.0.1'
+    ) {
+      return '/api/kongre-sync';
+    }
   }
-  if (res.ok && json?.ok) return json as SyncResult<T>;
-  return {
-    ok: false,
-    status: res.status,
-    error: json?.error || 'server_error',
-    retryAfter: typeof json?.retry_after === 'number' ? json.retry_after : undefined,
-  };
+  return FUNCTION_URL;
+}
+
+function shouldSkipCloudCall(body: Record<string, unknown>): boolean {
+  if (typeof window !== 'undefined') {
+    try {
+      if (
+        localStorage.getItem('kongre_demo_mode') === 'true' ||
+        sessionStorage.getItem('kongre_demo_mode') === 'true' ||
+        localStorage.getItem('kongre_is_guest') === 'true'
+      ) {
+        return true;
+      }
+    } catch {}
+  }
+  const rawId = String(body?.id || '').trim().replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  if (
+    !rawId ||
+    rawId.startsWith('DEMO') ||
+    ['1001', 'CENTRAL', 'MAIN', 'ID', 'CONGCENTRAL', 'CONGREGACIONCENTRAL'].includes(rawId)
+  ) {
+    return true;
+  }
+  return false;
+}
+
+async function call<T>(body: Record<string, unknown>): Promise<SyncResult<T>> {
+  if (shouldSkipCloudCall(body)) {
+    return {
+      ok: false,
+      status: 200,
+      error: 'demo_mode',
+    };
+  }
+
+  try {
+    const endpoint = getSyncEndpoint();
+    let res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (res.status === 404 && endpoint !== FUNCTION_URL) {
+      res = await fetch(FUNCTION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+    }
+    let json: any = null;
+    try {
+      json = await res.json();
+    } catch {
+      /* respuesta no JSON */
+    }
+    if (res.ok && json?.ok) return json as SyncResult<T>;
+    return {
+      ok: false,
+      status: res.status,
+      error: json?.error || 'server_error',
+      retryAfter: typeof json?.retry_after === 'number' ? json.retry_after : undefined,
+    };
+  } catch {
+    return {
+      ok: false,
+      status: 0,
+      error: 'network_error',
+    };
+  }
 }
 
 export interface PullData {
@@ -127,6 +187,30 @@ export async function derivePersonalPinToken(pin: string, congregationId: string
   return token;
 }
 
+/** v2: la sal incluye el publisherId, así un mismo PIN produce tokens distintos en cada publicador. */
+export async function derivePersonalPinTokenV2(pin: string, congregationId: string, publisherId: string): Promise<string> {
+  const cleanPin = normalizePin(pin);
+  const cacheKey = `personal2|${congregationId}|${publisherId}|${cleanPin}`;
+  const cached = tokenCache.get(cacheKey);
+  if (cached) return cached;
+
+  const enc = new TextEncoder();
+  const base = await crypto.subtle.importKey('raw', enc.encode(cleanPin), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: enc.encode(`kongre-personal-pin-v2|${congregationId}|${publisherId}`),
+      iterations: AUTH_ITERATIONS,
+      hash: 'SHA-256',
+    },
+    base,
+    256
+  );
+  const token = toHex(bits);
+  tokenCache.set(cacheKey, token);
+  return token;
+}
+
 export interface VerifiedPublisher {
   id: string;
   name: string;
@@ -156,12 +240,14 @@ export function syncVerifyPersonalPin(
   return Promise.all([
     deriveAuthToken(congregationPin, id, 'public'),
     derivePersonalPinToken(personalPin, id),
-  ]).then(([publicToken, pinToken]) =>
+    derivePersonalPinTokenV2(personalPin, id, publisherId.trim()),
+  ]).then(([publicToken, pinToken, pinTokenV2]) =>
     call<{ publisher: VerifiedPublisher; session_token?: string; expires_at?: number }>({
       action: 'verify_personal_pin',
       id,
       tokens: { public: publicToken },
       pin_token: pinToken,
+      pin_token_v2: pinTokenV2,
       publisher_id: publisherId.trim(),
     })
   );
@@ -205,12 +291,13 @@ export async function syncPush(params: {
     if (params.rotateTo.masterPin) rotate_to.master = await deriveAuthToken(params.rotateTo.masterPin, params.id, 'master');
     if (params.rotateTo.publicPin) rotate_to.public = await deriveAuthToken(params.rotateTo.publicPin, params.id, 'public');
   }
-  let personal_pins: Array<{ id: string; token: string; name: string; role: string; privilege?: string; theocraticRoles?: string[] }> | undefined;
+  let personal_pins: Array<{ id: string; token: string; v: 2; name: string; role: string; privilege?: string; theocraticRoles?: string[] }> | undefined;
   if (params.personalPins && params.personalPins.length > 0) {
     personal_pins = await Promise.all(
       params.personalPins.map(async (p) => ({
         id: p.id,
-        token: await derivePersonalPinToken(p.pin, params.id),
+        token: await derivePersonalPinTokenV2(p.pin, params.id, p.id),
+        v: 2 as const,
         name: p.name,
         role: p.role,
         privilege: p.privilege,
@@ -238,12 +325,21 @@ export function syncDelete(id: string, masterPin: string) {
 
 /** Mensaje en español para el usuario a partir de un resultado de error. */
 export function describeSyncError(r: { status: number; error: string; retryAfter?: number }): string {
+  if (r.status === 0 || r.error === 'network_error') {
+    return 'No se pudo conectar con el servidor en la nube (Failed to fetch). Tus cambios se guardaron localmente.';
+  }
   if (r.status === 429) {
     const mins = r.retryAfter ? Math.max(1, Math.ceil(r.retryAfter / 60)) : 1;
     return `Demasiados intentos. Espera ${mins} minuto${mins === 1 ? '' : 's'} antes de volver a intentar.`;
   }
   if (r.status === 401) return 'El ID de congregación o el PIN no son correctos.';
   if (r.status === 403) return 'Tu nivel de acceso no permite esta operación.';
+  if (r.error === 'rotation_requires_master_payload') {
+    return 'No se puede rotar el PIN Maestro porque este dispositivo no tiene la lista completa de publicadores sincronizada. Sincroniza primero y vuelve a intentarlo.';
+  }
+  if (r.error === 'rotation_requires_public_payload') {
+    return 'No se puede rotar el PIN de congregación sin los datos públicos. Sincroniza primero y vuelve a intentarlo.';
+  }
   if (r.status === 413) return 'Los datos son demasiado grandes para sincronizar.';
   return 'El servidor de sincronización no pudo procesar la solicitud. Inténtalo de nuevo.';
 }

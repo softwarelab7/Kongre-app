@@ -7,9 +7,11 @@
  *  - Con KONGRE_CSP=enforce también inserta la CSP como <meta> (red de seguridad si el host no permite cabeceras;
  *    ojo: <meta> no soporta frame-ancestors; esa directiva solo funciona como cabecera).
  *
- * MODO POR DEFECTO = solo informe (Content-Security-Policy-Report-Only): no bloquea nada, solo avisa en la consola
- * del navegador. Despliega así, navega por TODAS las pantallas (mapas, PDF, login con Google, impresión,
- * notificaciones), corrige lo que avise y entonces compila con KONGRE_CSP=enforce.
+ * MODO POR DEFECTO = ENFORCE (Content-Security-Policy): bloquea lo que incumpla la política.
+ * Con KONGRE_CSP=report-only se emite Content-Security-Policy-Report-Only: no bloquea nada, solo avisa
+ * en la consola del navegador. Para ajustar la política, compila en report-only, navega por TODAS las
+ * pantallas (mapas, PDF, login con Google, impresión, notificaciones), corrige lo que avise y vuelve a
+ * compilar en el modo por defecto.
  */
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';

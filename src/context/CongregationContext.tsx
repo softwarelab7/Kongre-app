@@ -3791,7 +3791,11 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   };
 
   const getClmPrograma = (semanaFecha: string): ClmPrograma | null => {
+    const week = weeks.find(w => w.weekStartDate === semanaFecha);
     if (clmProgramas[semanaFecha] && clmProgramas[semanaFecha].partes && clmProgramas[semanaFecha].partes.length > 0) {
+      if (week && week.midweek?.bibleReading && clmProgramas[semanaFecha].lectura_semana !== week.midweek.bibleReading) {
+        return bridgeWeekToClm(week, clmProgramas[semanaFecha], publishers);
+      }
       return clmProgramas[semanaFecha];
     }
     const local = localStorage.getItem(`clm_programa_${semanaFecha}`);
@@ -3799,11 +3803,13 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       try {
         const parsed = JSON.parse(local);
         if (parsed && parsed.partes && parsed.partes.length > 0) {
+          if (week && week.midweek?.bibleReading && parsed.lectura_semana !== week.midweek.bibleReading) {
+            return bridgeWeekToClm(week, parsed, publishers);
+          }
           return parsed;
         }
       } catch {}
     }
-    const week = weeks.find(w => w.weekStartDate === semanaFecha);
     if (week) {
       return bridgeWeekToClm(week, clmProgramas[semanaFecha] || null, publishers);
     }
@@ -6331,8 +6337,186 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   );
 };
 
-export const useCongregation = () => {
+export const useOptionalCongregation = () => {
+  return useContext(CongregationContext);
+};
+
+const FALLBACK_CONGREGATION_CONTEXT: CongregationContextType = {
+  publishers: [],
+  weeks: [],
+  currentWeek: undefined,
+  currentWeekId: '',
+  setCurrentWeekId: () => {},
+  preachingGroups: [],
+  customDuties: [],
+  settings: INITIAL_SETTINGS,
+  conflicts: [],
+  allWeeksConflicts: [],
+  syncStatus: 'synced',
+  outgoingSpeakers: [],
+  fieldServiceMeetings: [],
+  cartLocations: [],
+  cartShifts: [],
+  notices: [],
+  monthlyReports: [],
+  territories: [],
+  circuitVisit: null,
+  transactions: [],
+  quarterlyAudits: [],
+  memorialPlans: [],
+  theocraticAssemblies: [],
+  congregationEvents: [],
+  literatureItems: [],
+  specialOrders: [],
+  groupDistributions: [],
+  inventoryRecords: [],
+  addPublisher: () => {},
+  updatePublisher: () => {},
+  deletePublisher: () => {},
+  deletePublishersBatch: () => {},
+  importPublishersFromCSV: () => 0,
+  importPublishersBatch: () => 0,
+  cleanDuplicatePublishers: () => ({ mergedCount: 0, remainingCount: 0 }),
+  updateWeek: () => {},
+  addNextWeek: () => {},
+  addWeekForDate: () => ({} as any),
+  copyWeekStructure: () => {},
+  syncWeekWithOrganized: () => {},
+  syncAllWeeksWithOrganized: () => {},
+  autoAssignCurrentWeek: () => {},
+  autoAssignAllWeeksInMonth: () => {},
+  clearWeekAssignments: () => {},
+  replaceAssignment: () => {},
+  updateAssignmentStatus: () => {},
+  advancePublisherLesson: () => {},
+  repeatPublisherLesson: () => {},
+  updateMeetingAttendance: () => {},
+  clmProgramas: {},
+  updateClmPrograma: async () => {},
+  getClmPrograma: () => null,
+  addOutgoingSpeaker: () => {},
+  updateOutgoingSpeaker: () => {},
+  deleteOutgoingSpeaker: () => {},
+  hospitalityHosts: [],
+  addHospitalityHost: () => {},
+  updateHospitalityHost: () => {},
+  deleteHospitalityHost: () => {},
+  breakers: [],
+  addBreaker: () => {},
+  updateBreaker: () => {},
+  deleteBreaker: () => {},
+  toggleBreakerStatus: () => {},
+  setMeetingBreakersPower: () => {},
+  reorderBreakers: () => {},
+  maintenanceSheets: [],
+  addMaintenanceSheet: () => {},
+  updateMaintenanceSheet: () => {},
+  deleteMaintenanceSheet: () => {},
+  toggleMaintenanceSheetActive: () => {},
+  markMaintenanceSheetCompleted: () => {},
+  reorderMaintenanceSheets: () => {},
+  auxPioneerRequests: [],
+  addAuxPioneerRequest: () => {},
+  updateAuxPioneerRequest: () => {},
+  deleteAuxPioneerRequest: () => {},
+  setAuxPioneerRequestStatus: () => {},
+  branchReportsS1: [],
+  updateBranchReportS1: () => {},
+  markBranchReportS1Status: () => {},
+  addFieldServiceMeeting: () => {},
+  updateFieldServiceMeeting: () => {},
+  deleteFieldServiceMeeting: () => {},
+  replaceFieldServiceMeetings: () => {},
+  addCartLocation: () => {},
+  updateCartLocation: () => {},
+  deleteCartLocation: () => {},
+  addCartShift: () => {},
+  updateCartShift: () => {},
+  deleteCartShift: () => {},
+  addNotice: () => {},
+  updateNotice: () => {},
+  deleteNotice: () => {},
+  updateMonthlyReport: () => {},
+  batchUpdateMonthlyReports: () => {},
+  addTerritory: () => {},
+  updateTerritory: () => {},
+  deleteTerritory: () => {},
+  assignTerritory: () => {},
+  returnTerritory: () => {},
+  extendTerritoryDueDate: () => {},
+  addNoVisitAddress: () => {},
+  removeNoVisitAddress: () => {},
+  updateCircuitVisit: () => {},
+  updateMealArrangement: () => {},
+  updateMinistryArrangement: () => {},
+  toggleVisitChecklistItem: () => {},
+  addSpecialMeeting: () => {},
+  removeSpecialMeeting: () => {},
+  addTransaction: () => {},
+  updateTransaction: () => {},
+  deleteTransaction: () => {},
+  updateQuarterlyAudit: () => {},
+  updateMemorialPlan: () => {},
+  addTheocraticAssembly: () => {},
+  updateTheocraticAssembly: () => {},
+  deleteTheocraticAssembly: () => {},
+  addCongregationEvent: () => {},
+  updateCongregationEvent: () => {},
+  deleteCongregationEvent: () => {},
+  addLiteratureItem: () => {},
+  updateLiteratureItem: () => {},
+  deleteLiteratureItem: () => {},
+  addSpecialOrder: () => {},
+  updateSpecialOrder: () => {},
+  deleteSpecialOrder: () => {},
+  updateGroupDistribution: () => {},
+  recordPhysicalCount: () => {},
+  getS89SlipsForWeek: () => [],
+  updatePreachingGroups: () => {},
+  addCustomDuty: () => {},
+  updateCustomDuty: () => {},
+  deleteCustomDuty: () => {},
+  updateSettings: () => {},
+  exportBackupJSON: () => '',
+  getBackupJSON: () => '',
+  importBackupJSON: () => false,
+  publishersMap: new Map(),
+  cleanSampleData: () => {},
+  clearAllPublishers: () => {},
+  resetAllCongregationData: () => {},
+  isDemoMode: false,
+  loadDemoData: () => {},
+  exitDemoMode: () => {},
+  deleteAllRegisteredCongregations: async () => ({ success: false, message: '' }),
+  restorePreviousRegistration: async () => {},
+  uploadLocalDataToGoogle: async () => ({ success: false, message: '' }),
+  downloadDataFromGoogle: async () => ({ success: false, message: '' }),
+  loadCongregationFromCloud: async () => ({ success: false, message: '' }),
+  hydrateCongregation: () => {},
+  findUserCongregationId: async () => null,
+  accountLinkRequests: [],
+  createAccountLinkRequest: async () => ({} as any),
+  approveAccountLinkRequest: async () => {},
+  rejectAccountLinkRequest: async () => {},
+  isGranularSyncActive: false,
+  granularSyncStats: null,
+  checkGranularStatus: async () => ({} as any),
+  forceSubcollectionsMigration: async () => ({ success: false, message: '' }),
+  downloadFullBackup: async () => false,
+  lastSupabaseSyncAt: null,
+  isSupabaseSyncing: false,
+  syncNowWithSupabase: async () => ({ success: false, message: '' }),
+  rotateCredentials: async () => ({ success: false, message: '' }),
+  isOnline: true,
+  offlineQueueStats: { pendingCount: 0, syncingCount: 0, errorCount: 0, totalCount: 0, lastQueuedAt: null },
+  syncOfflineQueueNow: async () => ({ success: false, syncedCount: 0, message: '' }),
+};
+
+export const useCongregation = (): CongregationContextType => {
   const context = useContext(CongregationContext);
-  if (!context) throw new Error('useCongregation must be used within a CongregationProvider');
+  if (!context) {
+    console.warn('[CongregationContext] useCongregation invoked outside CongregationProvider. Returning resilient fallback state.');
+    return FALLBACK_CONGREGATION_CONTEXT;
+  }
   return context;
 };

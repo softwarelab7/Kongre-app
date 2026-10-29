@@ -265,6 +265,36 @@ export function bridgeWeekToClm(
   });
 
   // Vida Cristiana
+  if (week.midweek.vidaCristiana?.items) {
+    const regularVidaItems = week.midweek.vidaCristiana.items.filter(
+      item => !item.id?.includes("cbs") && !item.title?.toLowerCase().includes("estudio b")
+    );
+    const clmVidaPartes = deduplicatedPartes.filter(
+      p => p.seccion === "vida_cristiana" && p.tipo !== "canto" && p.tipo !== "estudio_biblico_grupo" && p.tipo !== "lector_estudio"
+    );
+    regularVidaItems.forEach((item, idx) => {
+      const target = clmVidaPartes[idx];
+      if (target && item.title) {
+        target.titulo = item.title;
+        if (item.publisherId) {
+          target.asignado_nid = item.publisherId;
+          const pub = findPublisher(publishers, item.publisherId);
+          target.asignado_nombre = pub?.full_name || pub?.name || "";
+        }
+      }
+    });
+
+    const cbsItem = week.midweek.vidaCristiana.items.find(
+      item => item.id?.includes("cbs") || item.title?.toLowerCase().includes("estudio b")
+    );
+    if (cbsItem && cbsItem.title) {
+      const cbsPart = deduplicatedPartes.find(p => p.tipo === "estudio_biblico_grupo");
+      if (cbsPart) {
+        cbsPart.titulo = cbsItem.title;
+      }
+    }
+  }
+
   helperSet('estudio_biblico_grupo', week.midweek.vidaCristiana.estudioBiblico.conductorId, false);
   helperSet('lector_estudio', week.midweek.vidaCristiana.estudioBiblico.lectorId, false);
 

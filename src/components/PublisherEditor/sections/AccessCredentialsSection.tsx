@@ -5,6 +5,9 @@ import { useAuth } from '../../../context/AuthContext';
 import { useCongregation } from '../../../context/CongregationContext';
 import { TheocraticRole, THEOCRATIC_ROLES } from '../../../utils/rbac';
 import { evaluatePinStrength } from '../../../utils/theocraticSecurity';
+
+// Mínimo para PINs personales NUEVOS (4 dígitos = solo 10.000 combinaciones). Los PINs existentes de 4 dígitos siguen funcionando.
+const MIN_PERSONAL_PIN_LENGTH = 6;
 import {
   KeyRound,
   Shield,
@@ -64,9 +67,9 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
   const currentRole: TheocraticRole = formData.theocraticRole || 'publico';
 
   const handleSavePin = async () => {
-    if (!currentPin || currentPin.trim().length < 4) {
+    if (!currentPin || currentPin.trim().length < MIN_PERSONAL_PIN_LENGTH) {
       if (showToast) {
-        showToast('El PIN debe tener al menos 4 dígitos para poder guardarlo', 'error');
+        showToast('El PIN debe tener al menos 6 dígitos para poder guardarlo', 'error');
       }
       return;
     }
@@ -144,7 +147,7 @@ export const AccessCredentialsSection: React.FC<AccessCredentialsSectionProps> =
     const numericVal = val.replace(/\D/g, '').slice(0, 8);
     handleChange('personalPin', numericVal);
 
-    if (numericVal.length >= 4) {
+    if (numericVal.length >= MIN_PERSONAL_PIN_LENGTH) {
       assignPersonalPinToPublisher(
         publisherId,
         numericVal,
@@ -324,7 +327,7 @@ Usa este PIN personal para consultar tus asignaciones en vivo, confirmar asisten
           <button
             type="button"
             onClick={handleSavePin}
-            disabled={!currentPin || currentPin.length < 4 || isSavingLocal}
+            disabled={!currentPin || currentPin.length < MIN_PERSONAL_PIN_LENGTH || isSavingLocal}
             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-40 ${
               saveSuccess
                 ? 'bg-emerald-600 hover:bg-emerald-500'

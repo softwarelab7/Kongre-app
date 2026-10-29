@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { WifiOff, RefreshCw, CloudCheck, CloudUpload, AlertCircle } from 'lucide-react';
 import { getOfflineQueueStats, QueueStats } from '../services/indexedDbQueue';
-import { useCongregation } from '../context/CongregationContext';
+import { useOptionalCongregation } from '../context/CongregationContext';
 import { isSafeDemoMode } from '../utils/theocraticSecurity';
 
 interface OfflineSyncBadgeProps {
@@ -21,7 +21,11 @@ export const OfflineSyncBadge: React.FC<OfflineSyncBadgeProps> = ({
   onOpenQueueModal,
   className = '',
 }) => {
-  const { offlineQueueStats, isSupabaseSyncing, isDemoMode, settings } = useCongregation();
+  const congregation = useOptionalCongregation();
+  const offlineQueueStats = congregation?.offlineQueueStats;
+  const isSupabaseSyncing = congregation?.isSupabaseSyncing ?? false;
+  const isDemoMode = congregation?.isDemoMode ?? false;
+  const settings = congregation?.settings;
 
   const [stats, setStats] = useState<QueueStats>({
     pendingCount: 0,

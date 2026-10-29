@@ -25,19 +25,50 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '0.1.0-alpha.39';
+export const CURRENT_APP_VERSION = '0.1.0-alpha.40';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.10.28.8039';
-export const BUILD_DATE = '28 de Octubre, 2026';
+export const CURRENT_BUILD_CODE = '2026.10.29.8040';
+export const BUILD_DATE = '29 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
+  {
+    version: '0.1.0-alpha.40',
+    buildCode: '2026.10.29.8040',
+    date: '29 de Octubre, 2026',
+    title: 'PINs Personales v2 con Sal por Publicador, CSP Estricto en PC, Resiliencia de Contexto y Actualización CLM',
+    isCurrent: true,
+    highlight: 'Fortalecimiento de la seguridad con derivación de PIN personal v2 (sal única por publicador con PBKDF2), política CSP estricta en la app de escritorio Tauri, prevención de fallos de montaje mediante hooks opcionales y sincronización de lecturas bíblicas con Jeremías 38-48.',
+    environment: 'Fase Alfa Preliminar (Web & Desktop)',
+    changes: [
+      {
+        category: 'security',
+        text: 'PINs Personales v2 con Sal Única por Publicador (core.ts, syncApi.ts, AccessCredentialsSection.tsx): Incorporada derivación PBKDF2 v2 combinando congregationId y publisherId en la sal criptográfica. Evita colisiones de verificación entre publicadores con el mismo PIN, migra automáticamente de forma transparente en el siguiente guardado maestro y exige un mínimo de 6 dígitos para nuevos PINs.',
+      },
+      {
+        category: 'security',
+        text: 'Política CSP Rigurosa en la Aplicación de Escritorio (tauri.conf.json): Sustituida la directiva abierta ("csp": null) por una política restrictiva sin scripts inline, bloqueando conexiones a orígenes no autorizados y limitando accesos a Supabase, servidores de mapas (OSM, Carto, Esri), Google Fonts y GitHub Releases.',
+      },
+      {
+        category: 'fix',
+        text: 'Resiliencia de Contexto y Prevención de Excepciones de Montaje (CongregationContext.tsx, LoadingSpinner.tsx, OfflineSyncBadge.tsx, ErrorBoundary.tsx): Creado hook useOptionalCongregation() y estado de reserva FALLBACK_CONGREGATION_CONTEXT para salvaguardar componentes globales contra excepciones de evaluación temprana fuera del proveedor, incorporando además diagnóstico ampliado de trazas en ErrorBoundary.',
+      },
+      {
+        category: 'fix',
+        text: 'Esquema de Validación de Capacidades Tauri (desktop-schema.json, .gitignore): Generado el esquema JSON local requerido por default.json en src-tauri/capabilities y ajustado .gitignore para mantenerlo rastreado y sin advertencias en el IDE.',
+      },
+      {
+        category: 'improvement',
+        text: 'Actualización de Cronograma Teocrático y Lectura Bíblica CLM/VMC (organizedSync.ts, clmBridge.ts, mwbParser.ts, ClmScheduleView.tsx): Sincronizadas las semanas y lecturas bíblicas correspondientes a Jeremías 38 a 48, vinculando temas de reunión de entre semana, estudio bíblico de congregación y cánticos.',
+      },
+    ],
+  },
   {
     version: '0.1.0-alpha.39',
     buildCode: '2026.10.28.8039',
     date: '28 de Octubre, 2026',
     title: 'Empaquetado Nativo RPM para Fedora y Corrección de Conflicto en Filesystem',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Generación directa de paquetes RPM nativos con el motor de empaquetado de Tauri v2 y rpmbuild, eliminando la conversión alien y erradicando el conflicto con el paquete base filesystem (/usr/bin).',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [

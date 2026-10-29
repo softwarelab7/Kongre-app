@@ -1916,7 +1916,7 @@ export default function ClmScheduleView({
                 </span>
                 <span className="text-slate-300 dark:text-slate-600">|</span>
                 <span className="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                  {programa?.lectura_semana || 'JEREMÍAS 40, 41'}
+                  {programa?.lectura_semana || currentWeek?.midweek?.bibleReading || 'JEREMÍAS 47, 48'}
                 </span>
                 <span className="text-slate-400 dark:text-slate-500 font-medium">
                   Semana {programa?.semana_num || '41'}
@@ -1988,7 +1988,7 @@ export default function ClmScheduleView({
                   Reunión Entre Semana (VMC)
                 </span>
                 <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/60 font-bold text-[10px] sm:text-[11px] uppercase tracking-wide whitespace-nowrap">
-                  {effectivePrograma?.lectura_semana || 'JEREMÍAS 40, 41'}
+                  {effectivePrograma?.lectura_semana || currentWeek?.midweek?.bibleReading || 'JEREMÍAS 47, 48'}
                 </span>
               </div>
               {currentWeek?.midweek?.date && (

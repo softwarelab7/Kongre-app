@@ -33,6 +33,14 @@
 
 ---
 
+> [!IMPORTANT]
+> ### 🏛️ Nota Importante sobre el Ecosistema Kongre
+> 1. **`Kongre` (`softwarelab7/Kongre`):** Repositorio privado principal donde se guarda el proyecto y el código fuente. Se utiliza para el desarrollo interno y para enviar todas las actualizaciones a la app PWA en producción en **[kongre-app.com](https://www.kongre-app.com)**.
+> 2. **`Kongre-app` (`softwarelab7/Kongre-app`):** Repositorio público oficial de la versión para PC, diseñado para que los usuarios, siervos y congregaciones puedan descargar e instalar fácilmente la aplicación de escritorio (`.exe`, `.dmg`, `.rpm`, `.deb`, `.AppImage`).
+> 3. **Software de Código Cerrado:** Kongre es una aplicación de **código cerrado y privativa**. Solo el desarrollador conoce y tiene acceso al código fuente, resguardando la confidencialidad y la integridad teocrática del sistema.
+
+---
+
 ## 📖 Descripción General
 
 **Kongre** es un sistema teocrático integral diseñado para apoyar al cuerpo de ancianos, siervos ministeriales y publicadores en la organización ordenada, eficiente y confidencial de las actividades de congregación, bajo el principio bíblico:

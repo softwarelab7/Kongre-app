@@ -1,7 +1,10 @@
 # 🛠️ Guía de Desarrollo Interno — Kongre (Privado)
 
 > [!IMPORTANT]
-> Este documento es exclusivamente para el equipo interno de desarrollo y mantenimiento de **Kongre**. El código fuente de Kongre es privado y privativo. La distribución a usuarios finales se realiza únicamente a través de los instaladores compilados y la aplicación web en producción.
+> ### 🏛️ Arquitectura del Ecosistema y Gobernanza de Código
+> 1. **`Kongre` (`softwarelab7/Kongre`):** Repositorio privado donde se guarda el proyecto y el código fuente. Se utiliza para el desarrollo y para enviar actualizaciones a la app PWA en **[kongre-app.com](https://www.kongre-app.com)**.
+> 2. **`Kongre-app` (`softwarelab7/Kongre-app`):** Repositorio público oficial donde se distribuye la versión para PC para que los usuarios finales instalen los paquetes oficiales.
+> 3. **Código Cerrado y Privativo:** La aplicación es de **código cerrado**; únicamente el desarrollador conoce y tiene acceso al código fuente. Jamás sincronizar código fuente no compilado al repositorio público.
 
 ---
 

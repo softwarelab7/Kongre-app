@@ -45,9 +45,9 @@ begin
 end $$;
 
 -- 5) (Recomendado) Que las tablas futuras NO nazcan expuestas a anon/authenticated.
---    Descomenta si todas tus tablas nuevas deben pasar por funciones o políticas explícitas.
--- alter default privileges in schema public revoke all on tables    from anon, authenticated;
--- alter default privileges in schema public revoke all on functions from anon, authenticated;
+--    Activado: todas las tablas nuevas deben pasar por funciones o políticas explícitas.
+alter default privileges in schema public revoke all on tables    from anon, authenticated;
+alter default privileges in schema public revoke all on functions from anon, authenticated;
 
 -- 6) Verificación: no debe devolver filas.
 -- select table_name, grantee, privilege_type

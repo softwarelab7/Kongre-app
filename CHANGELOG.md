@@ -6,9 +6,26 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
-### [v0.1.0-alpha.36] — 27 de Octubre, 2026
-**Rediseño Acerca de Kongre, Unificación de Modo Demo y Bienvenida Zero-Scroll**
+### [v0.1.0-alpha.36] — 28 de Octubre, 2026
+**Optimización Móvil Integral, Select Portaled Bottom-Sheet, Transiciones Ligeras y Empaquetado Rust Multiplataforma**
 
+- 📱 **Selector Desplegable `Select` con Bottom-Sheet Portaled para Móviles (`Select.tsx`):**
+  - Implementación de renderizado mediante `createPortal` en `document.body` cuando se detecta un dispositivo móvil (`window.innerWidth < 640px`).
+  - Presentación nativa estilo *Bottom-Sheet* modal con fondo oscuro semitransparente difuminado (`backdrop-blur-[2px]`), animación fluida de deslizamiento ascendente (`slide-in-from-bottom-4`) y respeto automático a la barra de inicio y gestos del sistema (`env(safe-area-inset-bottom)`).
+  - En pantallas de escritorio, el selector conserva su menú flotante contextual optimizado (`absolute`) con orientación ascendente/descendente automática según el espacio en pantalla (`openUpward`).
+- ⏱️ **Selector de Tiempo iOS Responsivo (`IosTimePicker.tsx`):**
+  - Detección reactiva de móvil y pantalla táctil con controles ergonómicos adaptados para agilizar la selección precisa de horas y minutos en reuniones y asignaciones teocráticas.
+- ⚡ **Optimización de Rendimiento Gráfico y Purga de `will-change` (`kongre-welcome.css`):**
+  - Eliminación de propiedades `will-change` excesivas en cajas de registro y animaciones de bienvenida, reduciendo el consumo innecesario de memoria en GPU y batería en dispositivos móviles.
+  - Simplificación de transformaciones CSS en estados finales de animación (`transform: none`, `filter: none`) para garantizar transiciones suaves a 60 fps sin micro-tirones.
+- 🧭 **Navegación Móvil Segmentada y Margen Seguro para Muescas (`KongreOfficialWebsite.tsx`, `Navbar.tsx`):**
+  - Integración de margen superior de seguridad para dispositivos con muesca o notch (`pt-[env(safe-area-inset-top,0px)]`) en la barra de navegación fija y cabecera de la web oficial.
+  - Rediseño de la barra de navegación secundaria en móviles en una cuadrícula simétrica de 3 columnas (`grid-cols-3`) a ancho completo con etiquetas abreviadas inteligentes (*«Acerca de»*, *«Guía»*, *«Instalar App»*) para erradicar cualquier desbordamiento o salto de línea.
+  - Dimensiones optimizadas en los botones de acceso (*«Mi Congregación»* / *«Usar Kongre»*) y selector de tema (`size={28}`) para pantallas pequeñas.
+- 🦀 **Empaquetado Multiplataforma de Escritorio Rust + Tauri v2 (`desktop-release.yml`, `Cargo.toml`, `tauri.conf.json`):**
+  - Sincronización oficial de versión en el motor nativo de escritorio a `v0.1.0-alpha.36` tanto en `Cargo.toml` como en `tauri.conf.json`.
+  - Configuración del bundle de Windows a `--bundles nsis` para compilar el instalador ejecutable `.exe` oficial sin bloqueos de sintaxis en identificadores SemVer preliminares.
+  - Integración en CI/CD de conversión automatizada de paquetes DEB a RPM mediante `alien` en Linux Ubuntu, garantizando la disponibilidad de instaladores para distribuciones Fedora, Red Hat y openSUSE.
 - 🏛️ **Cockpit Teocrático en Vivo (`KongreOfficialWebsite.tsx`, `kongre-about-animations.css`):**
   - Maqueta interactiva con 4 pestañas reactivas (*Reunión Vida y Ministerio*, *Asistencia S-88*, *Territorios S-13* e *Informes de Servicio*) que simula el entorno real y operativo de una congregación en tiempo real.
 - 🍱 **Bento Grid Asimétrico con Iconografía Vectorial Oficial (`KongreOfficialWebsite.tsx`):**

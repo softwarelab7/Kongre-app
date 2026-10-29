@@ -27,20 +27,40 @@ export interface VersionRecord {
 
 export const CURRENT_APP_VERSION = '0.1.0-alpha.36';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.10.27.8036';
-export const BUILD_DATE = '27 de Octubre, 2026';
+export const CURRENT_BUILD_CODE = '2026.10.28.8036';
+export const BUILD_DATE = '28 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
     version: '0.1.0-alpha.36',
-    buildCode: '2026.10.27.8036',
-    date: '27 de Octubre, 2026',
-    title: 'Rediseño Acerca de Kongre, Unificación de Modo Demo y Bienvenida Zero-Scroll',
+    buildCode: '2026.10.28.8036',
+    date: '28 de Octubre, 2026',
+    title: 'Optimización Móvil Integral, Select Portaled Bottom-Sheet y Empaquetado Rust Multiplataforma',
     isCurrent: true,
-    highlight: 'Rediseño integral de Acerca de Kongre con Bento Grid y Cockpit en vivo, nuevo componente estándar DemoModeButton en tonos neutros sin artificios, y pantalla de bienvenida 100% Zero-Scroll en escritorio',
+    highlight: 'Optimización responsiva integral para móviles con menú Bottom-Sheet portaled para Select, ajustes en selector iOS, purga de will-change en animaciones y pipeline de empaquetado Rust multiplataforma (.exe, .dmg, .deb, .rpm, .AppImage)',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [
+      {
+        category: 'improvement',
+        text: 'Selector Desplegable Select con Bottom-Sheet Portaled para Móviles (Select.tsx): Renderizado reactivo con createPortal en el document.body cuando se detecta un móvil (< 640px), desplegando un modal inferior con fondo difuminado, animación fluida y soporte para safe-area.',
+      },
+      {
+        category: 'improvement',
+        text: 'Selector de Tiempo iOS Responsivo (IosTimePicker.tsx): Adaptabilidad para gestos táctiles y pantallas pequeñas en la selección de horarios de reuniones y eventos.',
+      },
+      {
+        category: 'improvement',
+        text: 'Optimización Gráfica y Purga de will-change (kongre-welcome.css): Eliminación de will-change innecesarios y simplificación de transforms para transiciones ligeras a 60 fps y menor consumo de memoria GPU y batería.',
+      },
+      {
+        category: 'improvement',
+        text: 'Navegación Móvil Adaptable con Safe-Area (KongreOfficialWebsite.tsx, Navbar.tsx): Margen superior de seguridad para dispositivos con notch (safe-area-inset-top) y barra secundaria en 3 columnas full-width con etiquetas truncables.',
+      },
+      {
+        category: 'feature',
+        text: 'Empaquetado Multiplataforma de Escritorio Rust + Tauri v2: Versionado oficial en Cargo.toml y tauri.conf.json a 0.1.0-alpha.36, instalador oficial NSIS (.exe) para Windows y conversión de DEB a RPM con alien en Linux.',
+      },
       {
         category: 'feature',
         text: 'Cockpit Teocrático en Vivo (KongreOfficialWebsite.tsx): Maqueta interactiva con 4 vistas reactivas (Reunión Vida y Ministerio, Asistencia S-88, Territorios S-13 e Informes de Servicio) que simula el entorno real de una congregación.',

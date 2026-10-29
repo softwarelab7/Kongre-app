@@ -7,7 +7,7 @@
  * El servidor valida el token, limita los intentos y decide qué nivel de datos devuelve.
  */
 import { SUPABASE_URL } from '../lib/supabase';
-import { normalizePin } from '../utils/crypto';
+import { normalizePin, normalizePinV2, isLegacyPinFormat } from '../utils/crypto';
 
 const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/kongre-sync`;
 const AUTH_ITERATIONS = 100_000;
@@ -17,6 +17,8 @@ export type SyncRole = 'master' | 'public';
 export interface SyncTokens {
   master?: string;
   public?: string;
+  master_legacy?: string;
+  public_legacy?: string;
 }
 
 export type SyncResult<T> =
@@ -30,9 +32,14 @@ function toHex(buf: ArrayBuffer): string {
 }
 
 /** Token de autenticación determinista: PBKDF2-SHA256(PIN normalizado, sal = rol|congregación). */
-export async function deriveAuthToken(pin: string, congregationId: string, role: SyncRole): Promise<string> {
-  const cleanPin = normalizePin(pin);
-  const cacheKey = `${role}|${congregationId}|${cleanPin}`;
+export async function deriveAuthToken(
+  pin: string,
+  congregationId: string,
+  role: SyncRole,
+  legacy: boolean = false
+): Promise<string> {
+  const cleanPin = legacy ? normalizePin(pin) : normalizePinV2(pin);
+  const cacheKey = `${role}|${congregationId}|${legacy ? 'leg:' : 'v2:'}${cleanPin}`;
   const cached = tokenCache.get(cacheKey);
   if (cached) return cached;
 
@@ -53,13 +60,24 @@ export async function deriveAuthToken(pin: string, congregationId: string, role:
   return token;
 }
 
-/** Tokens para una sesión con un único PIN (no se sabe si es el maestro o el de congregación). */
+/** Tokens para una sesión con un único PIN (soporta derivación dual v2 con fallback transparente a v1). */
 export async function tokensFromSinglePin(pin: string, congregationId: string): Promise<SyncTokens> {
+  const isLegacy = isLegacyPinFormat(pin);
   const [master, pub] = await Promise.all([
-    deriveAuthToken(pin, congregationId, 'master'),
-    deriveAuthToken(pin, congregationId, 'public'),
+    deriveAuthToken(pin, congregationId, 'master', false),
+    deriveAuthToken(pin, congregationId, 'public', false),
   ]);
-  return { master, public: pub };
+
+  const tokens: SyncTokens = { master, public: pub };
+  if (isLegacy) {
+    const [masterLegacy, pubLegacy] = await Promise.all([
+      deriveAuthToken(pin, congregationId, 'master', true),
+      deriveAuthToken(pin, congregationId, 'public', true),
+    ]);
+    tokens.master_legacy = masterLegacy;
+    tokens.public_legacy = pubLegacy;
+  }
+  return tokens;
 }
 
 function getSyncEndpoint(): string {
@@ -281,15 +299,25 @@ export async function syncPush(params: {
   /** Rotación de credenciales: PINs nuevos. Los PINs actuales (masterPin/publicPin) autentican la operación. */
   rotateTo?: { masterPin?: string; publicPin?: string };
 }) {
+  const masterLegacy = isLegacyPinFormat(params.masterPin);
+  const publicLegacy = isLegacyPinFormat(params.publicPin);
+
   const tokens: SyncTokens = {
-    master: await deriveAuthToken(params.masterPin, params.id, 'master'),
-    public: await deriveAuthToken(params.publicPin, params.id, 'public'),
+    master: await deriveAuthToken(params.masterPin, params.id, 'master', false),
+    public: await deriveAuthToken(params.publicPin, params.id, 'public', false),
   };
+  if (masterLegacy) {
+    tokens.master_legacy = await deriveAuthToken(params.masterPin, params.id, 'master', true);
+  }
+  if (publicLegacy) {
+    tokens.public_legacy = await deriveAuthToken(params.publicPin, params.id, 'public', true);
+  }
+
   let rotate_to: SyncTokens | undefined;
   if (params.rotateTo) {
     rotate_to = {};
-    if (params.rotateTo.masterPin) rotate_to.master = await deriveAuthToken(params.rotateTo.masterPin, params.id, 'master');
-    if (params.rotateTo.publicPin) rotate_to.public = await deriveAuthToken(params.rotateTo.publicPin, params.id, 'public');
+    if (params.rotateTo.masterPin) rotate_to.master = await deriveAuthToken(params.rotateTo.masterPin, params.id, 'master', false);
+    if (params.rotateTo.publicPin) rotate_to.public = await deriveAuthToken(params.rotateTo.publicPin, params.id, 'public', false);
   }
   let personal_pins: Array<{ id: string; token: string; v: 2; name: string; role: string; privilege?: string; theocraticRoles?: string[] }> | undefined;
   if (params.personalPins && params.personalPins.length > 0) {

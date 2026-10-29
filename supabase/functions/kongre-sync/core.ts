@@ -218,7 +218,12 @@ function json(req: Request, env: SyncEnv, status: number, body: unknown): Respon
   });
 }
 
-interface Tokens { master?: string; public?: string }
+interface Tokens {
+  master?: string;
+  public?: string;
+  master_legacy?: string;
+  public_legacy?: string;
+}
 
 function parseTokens(raw: any): Tokens | null {
   if (!raw || typeof raw !== 'object') return null;
@@ -231,7 +236,15 @@ function parseTokens(raw: any): Tokens | null {
     if (typeof raw.public !== 'string' || !TOKEN_RE.test(raw.public)) return null;
     out.public = raw.public;
   }
-  return out.master || out.public ? out : null;
+  if (raw.master_legacy !== undefined) {
+    if (typeof raw.master_legacy !== 'string' || !TOKEN_RE.test(raw.master_legacy)) return null;
+    out.master_legacy = raw.master_legacy;
+  }
+  if (raw.public_legacy !== undefined) {
+    if (typeof raw.public_legacy !== 'string' || !TOKEN_RE.test(raw.public_legacy)) return null;
+    out.public_legacy = raw.public_legacy;
+  }
+  return out.master || out.public || out.master_legacy || out.public_legacy ? out : null;
 }
 
 export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Promise<Response> {
@@ -277,12 +290,29 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     return json(req, env, 401, { ok: false, error: 'invalid_credentials' });
   };
 
-  const tierOf = async (row: SyncRow): Promise<Tier | null> => {
-    const mv = tokens.master ? await verifierOf(env.pepper, 'master', id, tokens.master) : null;
-    const pv = tokens.public ? await verifierOf(env.pepper, 'public', id, tokens.public) : null;
-    if (mv && row.master_verifier && safeEqual(mv, row.master_verifier)) return 'master';
-    if (pv && row.public_verifier && safeEqual(pv, row.public_verifier)) return 'public';
+  const authOf = async (row: SyncRow): Promise<{ tier: Tier; isLegacy: boolean } | null> => {
+    if (tokens.master && row.master_verifier) {
+      const mv = await verifierOf(env.pepper, 'master', id, tokens.master);
+      if (safeEqual(mv, row.master_verifier)) return { tier: 'master', isLegacy: false };
+    }
+    if (tokens.master_legacy && row.master_verifier) {
+      const mvl = await verifierOf(env.pepper, 'master', id, tokens.master_legacy);
+      if (safeEqual(mvl, row.master_verifier)) return { tier: 'master', isLegacy: true };
+    }
+    if (tokens.public && row.public_verifier) {
+      const pv = await verifierOf(env.pepper, 'public', id, tokens.public);
+      if (safeEqual(pv, row.public_verifier)) return { tier: 'public', isLegacy: false };
+    }
+    if (tokens.public_legacy && row.public_verifier) {
+      const pvl = await verifierOf(env.pepper, 'public', id, tokens.public_legacy);
+      if (safeEqual(pvl, row.public_verifier)) return { tier: 'public', isLegacy: true };
+    }
     return null;
+  };
+
+  const tierOf = async (row: SyncRow): Promise<Tier | null> => {
+    const res = await authOf(row);
+    return res ? res.tier : null;
   };
 
   const row = await db.getRow(id);
@@ -356,8 +386,9 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
       return json(req, env, 200, { ok: true, created_at: nowIso, tier: 'master', claimed: true });
     }
 
-    const tier = await tierOf(current);
-    if (!tier) return reject();
+    const auth = await authOf(current);
+    if (!auth) return reject();
+    const tier = auth.tier;
     await db.clearFailures(kCongIp);
 
     // Seguridad: solo el nivel maestro puede escribir/actualizar datos (payload o payload_public).
@@ -369,6 +400,14 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
     const patch: Partial<SyncRow> = { created_at: nowIso, type: 'full_sync' };
     if (typeof payloadPublic === 'string') patch.payload_public = payloadPublic;
     if (typeof payload === 'string' && !body.preserve_master) patch.payload = payload;
+
+    // Actualización automática transparente de verificador legado a V2 (Fase 2 de migración)
+    if (auth.isLegacy && tokens.master && typeof payload === 'string' && !body.preserve_master) {
+      patch.master_verifier = await verifierOf(env.pepper, 'master', id, tokens.master);
+      if (tokens.public && typeof payloadPublic === 'string') {
+        patch.public_verifier = await verifierOf(env.pepper, 'public', id, tokens.public);
+      }
+    }
     if (Array.isArray(body.personal_pins)) {
       if (body.personal_pins.length > MAX_PERSONAL_PINS) {
         return json(req, env, 400, { ok: false, error: 'too_many_publishers' });
@@ -511,18 +550,20 @@ export async function handleRequest(req: Request, db: SyncDb, env: SyncEnv): Pro
 
   // ---------- PULL / META / DELETE ----------
   if (!row || !row.master_verifier) return reject();
-  const tier = await tierOf(row);
-  if (!tier) return reject();
+  const auth = await authOf(row);
+  if (!auth) return reject();
+  const tier = auth.tier;
   await db.clearFailures(kCongIp);
 
   if (action === 'meta') {
-    return json(req, env, 200, { ok: true, created_at: row.created_at, type: row.type, tier });
+    return json(req, env, 200, { ok: true, created_at: row.created_at, type: row.type, tier, is_legacy: auth.isLegacy });
   }
 
   if (action === 'pull') {
     return json(req, env, 200, {
       ok: true,
       tier,
+      is_legacy: auth.isLegacy,
       created_at: row.created_at,
       type: row.type,
       payload: tier === 'master' ? row.payload : null,

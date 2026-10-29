@@ -15,7 +15,7 @@ import {
   type PersonalPinEntry,
   type VerifiedPublisher,
 } from './syncApi';
-import { encryptForSupabase, decryptFromSupabase, normalizePin } from '../utils/crypto';
+import { encryptForSupabase, decryptFromSupabase, normalizePin, normalizePinV2 } from '../utils/crypto';
 import {
   hashPersonalPin,
   encryptPinAtRest,
@@ -365,8 +365,8 @@ export const supabaseSyncService = {
     rotateFrom?: { pinMaestro?: string; pinCongregacion?: string };
   }): Promise<{ success: boolean; error?: string }> {
     const cleanId = normalizeCongregationId(params.congregationId);
-    const cleanMasterPin = normalizePin(params.pinMaestro);
-    const cleanPublicPin = normalizePin(params.pinCongregacion || params.pinMaestro);
+    const cleanMasterPin = normalizePinV2(params.pinMaestro);
+    const cleanPublicPin = normalizePinV2(params.pinCongregacion || params.pinMaestro);
 
     if (!cleanId) return { success: false, error: 'ID de congregación requerido' };
     if (!cleanMasterPin) return { success: false, error: 'PIN maestro requerido para cifrar' };
@@ -539,8 +539,8 @@ export const supabaseSyncService = {
       const rotating = Boolean(params.rotateFrom && (params.rotateFrom.pinMaestro || params.rotateFrom.pinCongregacion));
       const pushRes = await syncPush({
         id: cleanId,
-        masterPin: params.rotateFrom?.pinMaestro ? normalizePin(params.rotateFrom.pinMaestro) : cleanMasterPin,
-        publicPin: params.rotateFrom?.pinCongregacion ? normalizePin(params.rotateFrom.pinCongregacion) : cleanPublicPin,
+        masterPin: params.rotateFrom?.pinMaestro ? normalizePinV2(params.rotateFrom.pinMaestro) : cleanMasterPin,
+        publicPin: params.rotateFrom?.pinCongregacion ? normalizePinV2(params.rotateFrom.pinCongregacion) : cleanPublicPin,
         payload: encryptedAdmin,
         payloadPublic: encryptedPublic,
         preserveMaster,
@@ -600,7 +600,7 @@ export const supabaseSyncService = {
     if (!rawPin) return { hasUpdate: false, error: 'PIN requerido para consultar actualizaciones' };
 
     try {
-      const res = await syncMeta(cleanId, normalizePin(rawPin));
+      const res = await syncMeta(cleanId, normalizePinV2(rawPin));
       if (!res.ok) {
         return { hasUpdate: false, error: describeSyncError(res) };
       }
@@ -633,7 +633,7 @@ export const supabaseSyncService = {
     rawPin: string
   ): Promise<{ success: boolean; data?: any; isMaster?: boolean; error?: string }> {
     const cleanId = normalizeCongregationId(rawId);
-    const cleanPin = normalizePin(rawPin);
+    const cleanPin = normalizePinV2(rawPin);
 
     if (!cleanId) return { success: false, error: 'ID de congregación requerido' };
     if (!cleanPin) return { success: false, error: 'PIN requerido' };
@@ -1024,7 +1024,7 @@ export const supabaseSyncService = {
     if (!cleanId || !masterPin) return { success: false, error: 'ID y PIN maestro requeridos' };
     if (isDemoModeActive(cleanId)) return { success: true };
     try {
-      const res = await syncDelete(cleanId, normalizePin(masterPin));
+      const res = await syncDelete(cleanId, normalizePinV2(masterPin));
       return res.ok ? { success: true } : { success: false, error: describeSyncError(res) };
     } catch (err: any) {
       return { success: false, error: err?.message };

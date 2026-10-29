@@ -559,3 +559,57 @@ test('signServerRoleToken: caracteres separadores en role o theocraticRoles no r
   assert.equal(check.body.valid, true);
   assert.equal(check.body.publisher_id, 'pub.con.punto');
 });
+
+test('migración transparente: push con master_legacy autentica y actualiza verificadores a v2', async () => {
+  const { call, rows } = setup();
+  // 1. Alta con verificadores legados (T.masterA, T.publicA)
+  await call({
+    action: 'push',
+    id: 'CONGMIGRATION',
+    tokens: { master: T.masterA, public: T.publicA },
+    payload: 'ADMIN_V1',
+    payload_public: 'PUB_V1',
+  });
+
+  // Comprobar que pull inicial autentica con T.masterA
+  const pullV1 = await call({
+    action: 'pull',
+    id: 'CONGMIGRATION',
+    tokens: { master: T.masterA },
+  });
+  assert.equal(pullV1.status, 200);
+  assert.equal(pullV1.body.tier, 'master');
+
+  // 2. Cliente v2 sincroniza con token nuevo (T.masterNew) y provee fallback (T.masterA en master_legacy)
+  const pushMigrate = await call({
+    action: 'push',
+    id: 'CONGMIGRATION',
+    tokens: {
+      master: T.masterNew,
+      public: T.publicNew,
+      master_legacy: T.masterA,
+      public_legacy: T.publicA,
+    },
+    payload: 'ADMIN_V2',
+    payload_public: 'PUB_V2',
+  });
+  assert.equal(pushMigrate.status, 200);
+
+  // 3. El verificador en el servidor fue actualizado automáticamente a V2 (T.masterNew)
+  const pullV2 = await call({
+    action: 'pull',
+    id: 'CONGMIGRATION',
+    tokens: { master: T.masterNew },
+  });
+  assert.equal(pullV2.status, 200);
+  assert.equal(pullV2.body.payload, 'ADMIN_V2');
+  assert.equal(pullV2.body.is_legacy, false);
+
+  // 4. El token legado antiguo (T.masterA) ya no abre sin token v2 nuevo
+  const pullOldRejected = await call({
+    action: 'pull',
+    id: 'CONGMIGRATION',
+    tokens: { master: T.masterA },
+  }, '2.2.2.2');
+  assert.equal(pullOldRejected.status, 401);
+});

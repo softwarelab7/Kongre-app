@@ -107,7 +107,7 @@ import {
   computeBackupIntegritySeal,
   verifyBackupIntegritySeal,
 } from '../utils/theocraticSecurity';
-import { normalizePin } from '../utils/crypto';
+import { normalizePin, normalizePinV2 } from '../utils/crypto';
 import { insertAuditLog } from '../services/auditLogService';
 import {
   normalizePersonName,
@@ -2296,13 +2296,13 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       return { success: false, message: 'La rotación de credenciales no está disponible en modo demostración.' };
     }
 
-    const cleanCurrentMaster = normalizePin(params.currentMasterPin);
+    const cleanCurrentMaster = normalizePinV2(params.currentMasterPin);
     if (!cleanCurrentMaster) {
       return { success: false, message: 'Se requiere el PIN Maestro actual para autorizar la rotación en el servidor.' };
     }
 
-    const cleanNewCongPin = params.newCongregationPin ? normalizePin(params.newCongregationPin) : undefined;
-    const cleanNewMasterPin = params.newMasterPin ? normalizePin(params.newMasterPin) : undefined;
+    const cleanNewCongPin = params.newCongregationPin ? normalizePinV2(params.newCongregationPin) : undefined;
+    const cleanNewMasterPin = params.newMasterPin ? normalizePinV2(params.newMasterPin) : undefined;
 
     if (!cleanNewCongPin && !cleanNewMasterPin) {
       return { success: false, message: 'Debes indicar al menos un PIN nuevo para rotar.' };
@@ -2319,7 +2319,7 @@ export const CongregationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     // No hacer fallback silencioso al PIN Maestro: si el coordinador está en un dispositivo donde
     // nunca se guardó el PIN de congregación y solo rota el PIN Maestro, cifrar payload_public con
     // el PIN Maestro dejaría fuera a todos los publicadores (su PIN dejaría de abrir el bloque público).
-    const explicitCurrentPublic = params.currentCongregationPin ? normalizePin(params.currentCongregationPin) : '';
+    const explicitCurrentPublic = params.currentCongregationPin ? normalizePinV2(params.currentCongregationPin) : '';
     const knownPublicPin =
       explicitCurrentPublic ||
       getSecureLocalPin('kongre_registered_cong_pin') ||

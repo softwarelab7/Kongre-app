@@ -45,12 +45,27 @@ export function normalizePin(pin: string): string {
     .replace(/[^A-Z0-9]/g, '');
 }
 
+export function normalizePinV2(pin: string): string {
+  const clean = String(pin || '').normalize('NFKC').trim();
+  // Formato canónico para PIN estándar de congregación (XXXX-XXXX o 8 caracteres Crockford alfanuméricos)
+  if (/^[A-Za-z0-9]{4}-?[A-Za-z0-9]{4}$/.test(clean)) {
+    const raw = clean.toUpperCase().replace(/-/g, '');
+    return `${raw.slice(0, 4)}-${raw.slice(4)}`;
+  }
+  return clean;
+}
+
+export function isLegacyPinFormat(pin: string): boolean {
+  if (!pin) return false;
+  return normalizePin(pin) !== normalizePinV2(pin);
+}
+
 /**
  * Deriva una clave AES-GCM de 256 bits a partir de un PIN y un salt usando PBKDF2-SHA-256
  */
-async function deriveKey(pin: string, salt: Uint8Array): Promise<CryptoKey> {
+async function deriveKey(pin: string, salt: Uint8Array, raw: boolean = false): Promise<CryptoKey> {
   const encoder = new TextEncoder();
-  const cleanPin = normalizePin(pin);
+  const cleanPin = raw ? normalizePinV2(pin) : normalizePin(pin);
 
   const baseKey = await crypto.subtle.importKey(
     'raw',
@@ -85,7 +100,7 @@ export async function encryptForSupabase(data: any, pin: string): Promise<string
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
 
-  const key = await deriveKey(pin, salt);
+  const key = await deriveKey(pin, salt, true);
   const encryptedBuf = await crypto.subtle.encrypt(
     { name: ALGO, iv: iv as unknown as BufferSource },
     key,
@@ -101,16 +116,8 @@ export async function encryptForSupabase(data: any, pin: string): Promise<string
   return `${bytesToHex(salt)}:${bytesToHex(iv)}:${bytesToHex(authTag)}:${bytesToHex(ciphertext)}`;
 }
 
-/**
- * Descifra datos provenientes de Supabase sync_queue (o formato Base64)
- */
-export async function decryptFromSupabase(encryptedString: string, pin: string): Promise<any> {
-  if (!encryptedString || typeof encryptedString !== 'string') {
-    throw new Error('Payload cifrado inválido o vacío.');
-  }
-
+async function doDecryptSupabase(encryptedString: string, pin: string, raw: boolean): Promise<any> {
   const decoder = new TextDecoder();
-  const cleanPin = normalizePin(pin);
 
   // Formato Hex delimitado por ':' (saltHex:ivHex:authTagHex:ciphertextHex)
   if (encryptedString.includes(':')) {
@@ -126,7 +133,7 @@ export async function decryptFromSupabase(encryptedString: string, pin: string):
       combinedCiphertext.set(ciphertext, 0);
       combinedCiphertext.set(authTag, ciphertext.length);
 
-      const key = await deriveKey(cleanPin, salt);
+      const key = await deriveKey(pin, salt, raw);
       const decryptedBuf = await crypto.subtle.decrypt(
         { name: ALGO, iv: iv as unknown as BufferSource },
         key,
@@ -137,20 +144,36 @@ export async function decryptFromSupabase(encryptedString: string, pin: string):
   }
 
   // Fallback: Formato Base64 combinado (salt 16 + iv 12 + ciphertext)
-  try {
-    const combined = base64ToBytes(encryptedString);
-    const salt = combined.slice(0, 16);
-    const iv = combined.slice(16, 28);
-    const data = combined.slice(28);
+  const combined = base64ToBytes(encryptedString);
+  const salt = combined.slice(0, 16);
+  const iv = combined.slice(16, 28);
+  const data = combined.slice(28);
 
-    const key = await deriveKey(cleanPin, salt);
-    const decryptedBuf = await crypto.subtle.decrypt(
-      { name: ALGO, iv: iv as unknown as BufferSource },
-      key,
-      data as unknown as BufferSource
-    );
-    return JSON.parse(decoder.decode(decryptedBuf));
+  const key = await deriveKey(pin, salt, raw);
+  const decryptedBuf = await crypto.subtle.decrypt(
+    { name: ALGO, iv: iv as unknown as BufferSource },
+    key,
+    data as unknown as BufferSource
+  );
+  return JSON.parse(decoder.decode(decryptedBuf));
+}
+
+/**
+ * Descifra datos provenientes de Supabase sync_queue (o formato Base64) con fallback transparente v2 -> v1
+ */
+export async function decryptFromSupabase(encryptedString: string, pin: string): Promise<any> {
+  if (!encryptedString || typeof encryptedString !== 'string') {
+    throw new Error('Payload cifrado inválido o vacío.');
+  }
+
+  try {
+    return await doDecryptSupabase(encryptedString, pin, true);
   } catch (err) {
+    if (isLegacyPinFormat(pin)) {
+      try {
+        return await doDecryptSupabase(encryptedString, pin, false);
+      } catch {}
+    }
     throw new Error('PIN incorrecto o payload cifrado dañado.');
   }
 }

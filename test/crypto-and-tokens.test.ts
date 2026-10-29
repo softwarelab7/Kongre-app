@@ -1,6 +1,58 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { encryptForSupabase, decryptFromSupabase, encryptData, decryptData } from '../src/utils/crypto.ts';
+import {
+  encryptForSupabase,
+  decryptFromSupabase,
+  encryptData,
+  decryptData,
+  normalizePin,
+  normalizePinV2,
+  isLegacyPinFormat,
+} from '../src/utils/crypto.ts';
+
+test('normalización v2: preserva símbolos, mayúsculas/minúsculas y realiza NFKC trim', () => {
+  assert.equal(normalizePinV2('  Teo#2026!  '), 'Teo#2026!');
+  assert.equal(normalizePinV2('8X4W-9M2K'), '8X4W-9M2K');
+  assert.equal(normalizePinV2('user@cong_123'), 'user@cong_123');
+
+  // Comparación contra v1
+  assert.equal(normalizePin('  Teo#2026!  '), 'TEO2026');
+  assert.equal(isLegacyPinFormat('Teo#2026!'), true);
+  assert.equal(isLegacyPinFormat('8X4W-9M2K'), true); // v1 elimina el guion
+  assert.equal(isLegacyPinFormat('123456789012'), false); // numérico puro es idéntico
+});
+
+test('cifrado v2 con símbolos: ida y vuelta con caracteres especiales', async () => {
+  const pinWithSymbols = 'Kgr#Beto-2026!@$';
+  const data = { congregacion: 'Centro', secreto: 42, tags: ['ancianos', 'auditoria'] };
+  const encrypted = await encryptForSupabase(data, pinWithSymbols);
+  assert.ok(encrypted.startsWith('v2:'));
+  const decrypted = await decryptFromSupabase(encrypted, pinWithSymbols);
+  assert.deepEqual(decrypted, data);
+});
+
+test('cifrado: fallback dual transparente para descifrar datos legados (v1 normalizado)', async () => {
+  const { webcrypto } = await import('node:crypto');
+  const enc = new TextEncoder();
+  // Simular ciphertext legado v1 cifrado con PIN que fue normalizado a mayúsculas sin símbolos
+  const rawPin = 'MyPass#2026!';
+  const legacyNormalizedPin = normalizePin(rawPin); // "MYPASS2026"
+  const salt = webcrypto.getRandomValues(new Uint8Array(16));
+  const iv = webcrypto.getRandomValues(new Uint8Array(12));
+  const base = await webcrypto.subtle.importKey('raw', enc.encode(legacyNormalizedPin), 'PBKDF2', false, ['deriveKey']);
+  const key = await webcrypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt']);
+  const buf = new Uint8Array(await webcrypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify({ legacy: true, secret: 999 }))));
+  const h = (b: Uint8Array) => Array.from(b).map((x) => x.toString(16).padStart(2, '0')).join('');
+  const legacyCiphertext = `${h(salt)}:${h(iv)}:${h(buf.slice(-16))}:${h(buf.slice(0, -16))}`;
+
+  // El usuario introduce su PIN con símbolos rawPin ("MyPass#2026!").
+  // El primer intento v2 fallará el auth tag, y el fallback v1 lo descifrará con éxito.
+  const decrypted = await decryptFromSupabase(legacyCiphertext, rawPin);
+  assert.deepEqual(decrypted, { legacy: true, secret: 999 });
+
+  // Si se introduce un PIN incorrecto, falla limpiamente
+  await assert.rejects(decryptFromSupabase(legacyCiphertext, 'WrongPass#2026!'), /PIN incorrecto/);
+});
 import {
   encodeSecureShareToken,
   decodeSecureShareToken,

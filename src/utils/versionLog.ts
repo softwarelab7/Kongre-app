@@ -25,19 +25,38 @@ export interface VersionRecord {
   changes: VersionChangeItem[];
 }
 
-export const CURRENT_APP_VERSION = '0.1.0-alpha.38';
+export const CURRENT_APP_VERSION = '0.1.0-alpha.39';
 export const CURRENT_APP_STAGE = 'Alfa';
-export const CURRENT_BUILD_CODE = '2026.10.28.8038';
+export const CURRENT_BUILD_CODE = '2026.10.28.8039';
 export const BUILD_DATE = '28 de Octubre, 2026';
 export const BUILD_ENVIRONMENT = 'Fase Alfa Preliminar (Web & Desktop)';
 
 export const VERSION_HISTORY: VersionRecord[] = [
   {
+    version: '0.1.0-alpha.39',
+    buildCode: '2026.10.28.8039',
+    date: '28 de Octubre, 2026',
+    title: 'Empaquetado Nativo RPM para Fedora y Corrección de Conflicto en Filesystem',
+    isCurrent: true,
+    highlight: 'Generación directa de paquetes RPM nativos con el motor de empaquetado de Tauri v2 y rpmbuild, eliminando la conversión alien y erradicando el conflicto con el paquete base filesystem (/usr/bin).',
+    environment: 'Fase Alfa Preliminar (Web & Desktop)',
+    changes: [
+      {
+        category: 'fix',
+        text: 'Empaquetado Nativo RPM sin Alien (.github/workflows/desktop-release.yml, tauri.conf.json): Sustituida la conversión mediante alien por compilación nativa directa con Tauri v2 (--bundles deb,appimage,rpm), asegurando que el RPM solo reclame los binarios de la aplicación y respete la propiedad estricta de /usr/bin en Fedora 40+.',
+      },
+      {
+        category: 'improvement',
+        text: 'Dependencias Oficiales RPM (tauri.conf.json): Declaración explícita de webkit2gtk4.1 y libsoup3 como dependencias del sistema en el manifiesto RPM para resolución limpia en DNF.',
+      },
+    ],
+  },
+  {
     version: '0.1.0-alpha.38',
     buildCode: '2026.10.28.8038',
     date: '28 de Octubre, 2026',
     title: 'Actualizador Nativo de Escritorio en 1 Clic y Aviso Inteligente para Fedora / Ubuntu',
-    isCurrent: true,
+    isCurrent: false,
     highlight: 'Integración completa del plugin Tauri Updater para actualizaciones directas en 1 clic (Windows, macOS y AppImage) y aviso inteligente con botón de descarga y comando terminal para paquetes RPM (Fedora) y DEB (Ubuntu).',
     environment: 'Fase Alfa Preliminar (Web & Desktop)',
     changes: [

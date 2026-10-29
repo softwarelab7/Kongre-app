@@ -1,137 +1,189 @@
-<div align="center">
+# Kongre — Gestor Teocrático Integral
 
-<br />
-<img src="assets/logo.png" width="100" height="100" alt="Kongre App Logo" style="border-radius: 22px;" />
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="public/logo/kongre_horizontal_dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="public/logo/kongre_horizontal_positivo.svg">
+    <img src="public/logo/kongre_horizontal_positivo.svg" width="300" alt="Kongre — Gestor Teocrático Integral" />
+  </picture>
+</p>
 
-# 🏛️ Kongre App
+<p align="center">
+  <strong>Plataforma integral, moderna y segura para la administración, asignación y coordinación teocrática de congregaciones.</strong><br>
+  <em>Disponible como Progressive Web App (PWA) Offline-First y aplicación nativa ultraligera para PC (Windows, macOS y Linux con Rust y Tauri v2).</em>
+</p>
 
-### Gestor Teocrático Integral para las Congregaciones de los Testigos de Jehová
+<p align="center">
+  <a href="https://www.kongre-app.com"><strong>🌐 Acceder a la Aplicación Web en Producción (https://www.kongre-app.com)</strong></a> •
+  <a href="https://github.com/softwarelab7/Kongre/releases"><strong>📥 Centro de Descargas para PC (GitHub Releases)</strong></a>
+</p>
 
-**Aplicación nativa de alto rendimiento desarrollada con Rust, React y Tauri v2 para Windows, macOS y Linux & PWA Web Offline-First.**
-
-[![Fase](https://img.shields.io/badge/Estado-Versi%C3%B3n%20Alfa%20Preliminar-EA580C?style=for-the-badge&logo=speedtest)](https://github.com/softwarelab7/Kongre-app/releases)
-[![Build](https://img.shields.io/badge/Build-v0.1.0--alpha.36%20(Alfa)-4F46E5?style=for-the-badge&logo=rocket)](https://github.com/softwarelab7/Kongre-app/releases)
-[![Plataformas](https://img.shields.io/badge/Plataformas-Windows%20%7C%20macOS%20%7C%20Linux-0EA5E9?style=for-the-badge&logo=linux)](https://github.com/softwarelab7/Kongre-app/releases)
-[![Seguridad](https://img.shields.io/badge/Cifrado-Zero--Knowledge%20AES--256--GCM-10B981?style=for-the-badge&logo=shield)](https://kongre-app.com)
-[![Modo](https://img.shields.io/badge/Operaci%C3%B3n-100%25%20Offline-F59E0B?style=for-the-badge&logo=offline)](https://kongre-app.com)
-[![Filosofia](https://img.shields.io/badge/Proyecto-100%25%20Gratuito%20y%20con%20Amor%20%E2%9D%A4%EF%B8%8F-EC4899?style=for-the-badge)](https://kongre-app.com)
-
-🌐 **Sitio Web Oficial:** [https://kongre-app.com](https://kongre-app.com)
-
----
-
-</div>
-
-> ⚠️ **Nota de Versión Alfa (Acceso Anticipado / Pruebas Activas):**  
-> Kongre App se encuentra actualmente en fase de **desarrollo Alfa preliminar (v0.1.0-alpha.36)**. Todos los módulos clave (reuniones VMC, discursos públicos, hojas S-89, tarjetas S-21, asistencia S-88, territorios S-13 y la bóveda criptográfica) están totalmente operativos y listos para uso congregacional.  
-> Los instaladores nativos para PC se distribuyen bajo el release oficial verificado de la serie Alfa, y la plataforma web se sincroniza continuamente con las últimas optimizaciones visuales y de rendimiento.  
-> 📋 **Historial de Novedades y Versiones:** Consulta el registro cronológico detallado de cada iteración en [CHANGELOG.md](CHANGELOG.md).
-
----
-
-## 📖 Acerca de Kongre App
-
-> *«Pero que todas las cosas se hagan de forma digna y ordenada.»* — 1 Corintios 14:40  
-> *«Recibieron gratis; den gratis.»* — Mateo 10:8
-
-**Kongre App** es una plataforma integral desarrollada **con amor y de forma 100% gratuita** para simplificar y optimizar la organización en las **congregaciones de los testigos de Jehová**. Proporciona a ancianos, siervos ministeriales y publicadores herramientas teocráticas modernas, organizadas y seguras.
-
-* 🎁 **100% Gratuito para siempre:** Este proyecto se entrega con cariño como un aporte voluntario para el beneficio de todas las congregaciones. No tiene fines comerciales, publicidad, suscripciones, licencias de pago ni funciones bloqueadas.
-* 💻 **Verdaderamente Multiplataforma (Windows, macOS y Linux):** Desarrollada de forma nativa con **Rust, React y Tauri v2**, garantiza instaladores ultraligeros y veloces (~15 MB de RAM) tanto para PC con Windows 10/11, como para Mac (Apple Silicon M1-M4 e Intel) y distribuciones Linux (Fedora, Ubuntu, Debian, Arch y AppImage universal).
-* 🔒 **100% Offline y Privada:** Su arquitectura **Offline-First** con cifrado local **Zero-Knowledge AES-256-GCM** permite utilizar todas las funciones en el Salón del Reino o en predicación sin necesidad de conexión a Internet, sincronizando los cambios cuando se restablece la red y manteniendo la información siempre bajo el control de los hermanos.
-* 🛡️ **Seguridad Cero Conocimiento:** Claves criptográficas locales no extraíbles respaldadas por IndexedDB, validación de privilegios RBAC firmados con HMAC-SHA256 y cifrado CSPRNG de directrices médicas (DPA) y notas de pastoreo.
+<p align="center">
+  <img src="https://img.shields.io/badge/Versi%C3%B3n-v0.1.0--alpha.37-4C3AED?style=flat-square&logo=git&logoColor=white" alt="Versión v0.1.0-alpha.37" />
+  <img src="https://img.shields.io/badge/Desktop-Rust%20%2B%20Tauri%20v2-orange?style=flat-square&logo=rust&logoColor=white" alt="Rust + Tauri v2" />
+  <img src="https://img.shields.io/badge/SO-Windows%20%7C%20macOS%20%7C%20Linux-blue?style=flat-square" alt="Sistemas Operativos" />
+  <img src="https://img.shields.io/badge/React-19.0-61dafb?style=flat-square&logo=react&logoColor=black" alt="React 19" />
+  <img src="https://img.shields.io/badge/TypeScript-5.8%2B-3178c6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Vite-8.3-646cff?style=flat-square&logo=vite&logoColor=white" alt="Vite 8" />
+  <img src="https://img.shields.io/badge/TailwindCSS-v4-38bdf8?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" />
+  <img src="https://img.shields.io/badge/Seguridad-Zero--Knowledge%20AES--256--GCM-blueviolet?style=flat-square&logo=shield" alt="Zero-Knowledge AES-256" />
+  <img src="https://img.shields.io/badge/2FA-TOTP%20RFC%206238-00A4EF?style=flat-square&logo=microsoft&logoColor=white" alt="2FA TOTP RFC 6238" />
+  <img src="https://img.shields.io/badge/PWA-Offline--First%20Ready-5a0fc8?style=flat-square&logo=pwa&logoColor=white" alt="PWA Offline Ready" />
+</p>
 
 ---
 
-## 📥 Descargas Oficiales para PC (Windows, macOS y Linux)
+## 📖 Descripción General
 
-Descarga el instalador correspondiente a tu sistema operativo con un solo clic:
+**Kongre** es un sistema teocrático integral diseñado para apoyar al cuerpo de ancianos, siervos ministeriales y publicadores en la organización ordenada, eficiente y confidencial de las actividades de congregación, bajo el principio bíblico:
 
-| Sistema Operativo | Formato de Paquete | Arquitectura | Enlace de Descarga Directa | Tamaño | Estado |
-| :--- | :--- | :--- | :--- | :--- | :---: |
-| 🪟 **Windows 10 / 11** | Instalador oficial (`.exe`) | x64 (64 bits) | [⬇️ **Descargar Setup (.exe)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.36/Kongre_0.1.0-alpha.36_x64-setup.exe) | 22.0 MB | ✅ Verificado |
-| 🍎 **macOS (Apple)** | Imagen de disco (`.dmg`) | Universal (Apple Silicon M1-M4 & Intel) | [⬇️ **Descargar para Mac (.dmg)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.36/Kongre_0.1.0-alpha.36_universal.dmg) | 45.5 MB | ✅ Verificado |
-| 🔵 **Fedora Linux / Red Hat** | Paquete RPM (`.rpm`) | x86_64 | [⬇️ **Descargar para Fedora (.rpm)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.36/Kongre-0.1.0-alpha.36-1.x86_64.rpm) | 22.7 MB | ✅ Verificado |
-| 🟠 **Ubuntu / Debian / Mint** | Paquete Debian (`.deb`) | amd64 | [⬇️ **Descargar para Ubuntu (.deb)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.36/Kongre_0.1.0-alpha.36_amd64.deb) | 22.7 MB | ✅ Verificado |
-| 🐧 **Linux (Universal)** | Binario Portable (`.AppImage`) | x86_64 | [⬇️ **Descargar Portable (.AppImage)**](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.36/Kongre_0.1.0-alpha.36_amd64.AppImage) | 97.5 MB | ✅ Verificado |
+> *«Pero que todas las cosas se hagan de forma digna y ordenada.»*  
+> — **1 Corintios 14:40**
+
+La aplicación combina la flexibilidad de una **Progressive Web App (PWA)** de última generación con la velocidad y seguridad de una **aplicación nativa de escritorio compilada con Rust (Tauri v2)**, permitiendo operar tanto con sincronización en la nube como de forma 100% desconectada (Offline-First).
 
 ---
 
-## 🚀 Guía de Instalación Rápida
+## 🚀 Novedades de la Versión Actual (`v0.1.0-alpha.37`)
 
-### 🪟 Windows (10 / 11)
-1. Descarga el instalador oficial [Kongre_0.1.0-alpha.36_x64-setup.exe](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.36/Kongre_0.1.0-alpha.36_x64-setup.exe).
-2. Haz doble clic sobre el archivo descargado.
-3. Sigue los pasos del asistente de instalación (*Siguiente → Instalar*).
-4. El acceso directo se creará automáticamente en tu Escritorio y Menú Inicio.
+Para consultar el registro cronológico exhaustivo con todas las versiones y correcciones, revisa el [CHANGELOG.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/CHANGELOG.md) y la documentación de compilación de escritorio en [DESKTOP_RUST.md](file:///home/hectorgutierrezjimenez/Documentos/Kongre/DESKTOP_RUST.md).
 
-### 🍎 macOS (Apple Silicon M1-M4 e Intel)
-1. Descarga la imagen de disco [Kongre_0.1.0-alpha.36_universal.dmg](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.36/Kongre_0.1.0-alpha.36_universal.dmg).
-2. Abre la imagen descargada con doble clic.
-3. Arrastra el icono de **Kongre App** a la carpeta **Aplicaciones**.
-4. ¡Listo! Compatible de forma nativa con procesadores M1, M2, M3, M4 e Intel.
-> 💡 **Nota para usuarios de Mac:** Al ser un proyecto 100% gratuito y comunitario, el instalador no incluye un certificado comercial de pago de Apple Developer. Si al abrir la app macOS muestra un aviso indicando que *"no se puede verificar"* o que *"está dañada"*, abre la aplicación **Terminal** y ejecuta este comando una sola vez para autorizarla:
-> <pre><code>xattr -cr "/Applications/Kongre App.app"</code></pre>
+### 📥 Navegación Directa a «Instalar App (PC / Móvil)»
+- **Acceso Sin Modales:** El botón «Versión PC» en la cabecera del portal abre directamente la pestaña 3 («Instalar en PC / Móvil») de la web oficial de presentación, permitiendo acceder a los instaladores nativos para Windows, macOS, Ubuntu y Fedora, o a las instrucciones PWA móvil sin ventanas emergentes.
+- **Historial Integrado:** Soporte reactivo de rutas `#descargas`, `#downloads` e `#instalar` con navegación fluida de ida y vuelta.
 
-### 🔵 Fedora Linux / Red Hat / openSUSE
-Abre la terminal en tu carpeta de descargas y ejecuta:
-<pre><code>sudo dnf install ./Kongre-0.1.0-alpha.36-1.x86_64.rpm</code></pre>
-*O haz doble clic sobre el archivo `.rpm` para instalarlo desde el centro de software de GNOME o KDE Discover.*
+### 🏛️ Rediseño Integral de la Sección «Acerca de Kongre»
+- **Cockpit Teocrático en Vivo:** Maqueta interactiva con 4 pestañas reactivas (*Reunión Vida y Ministerio*, *Asistencia S-88*, *Territorios S-13* e *Informes de Servicio*) que simula en tiempo real la experiencia operativa del sistema.
+- **Bento Grid Asimétrico con Iconografía Oficial:** Cuadrícula con ritmo visual diferenciado que integra los SVGs originales de la aplicación (`clm_vmc.svg`, `predicacion.svg`, `supervision.svg`, `discursos.svg`, `secretaria.svg`, `informes_servicio.svg`) y enlaces directos a la Guía de Usuario.
+- **Flujo Teocrático en 3 Pasos:** Secuencia clara de adopción: *1. Inicialización e Importación local*, *2. Asignación y Programación Inteligente*, *3. Coordinación y Consulta Segura por portal o PDF/WhatsApp*.
+- **Seguridad Cero Conocimiento y Principio Bíblico:** Bloque documental enfocado en el almacenamiento local cifrado (AES-256 + PBKDF2), cero telemetría y respeto a la confidencialidad ministerial.
 
-### 🟠 Ubuntu / Debian / Linux Mint
-Abre la terminal en tu carpeta de descargas y ejecuta:
-<pre><code>sudo apt install ./Kongre_0.1.0-alpha.36_amd64.deb</code></pre>
+### 🔘 Botón Estándar `DemoModeButton` y Purga de Artificios Visuales
+- **Componente Unificado `DemoModeButton`:** Botón minimalista y serio en tonos slate neutros (`bg-slate-100 dark:bg-slate-800`), homogéneo en la web oficial, cabecera de PC, barra móvil, modal de acceso y panel interno.
+- **Purga Total de Estrellas (`Sparkles`):** Erradicación de iconos de estrellas en botones e insignias teocráticas en favor de iconografía teocrática formal (`Building2`, `CheckCircle2`, `Download`, `BookOpen`) o tipografía sobria.
 
-### 🐧 Linux Universal (Cualquier distribución sin instalar)
-1. Descarga el binario [Kongre_0.1.0-alpha.36_amd64.AppImage](https://github.com/softwarelab7/Kongre-app/releases/download/v0.1.0-alpha.36/Kongre_0.1.0-alpha.36_amd64.AppImage).
-2. Otorga permisos de ejecución:
-<pre><code>chmod +x Kongre_0.1.0-alpha.36_amd64.AppImage</code></pre>
-3. Ejecútalo con `./Kongre_0.1.0-alpha.36_amd64.AppImage` o con doble clic desde tu explorador de archivos.
+### 🖥️ Pantalla de Bienvenida 100% Zero-Scroll en Escritorio
+- **Contenedor a Pantalla Completa:** Optimización estructural (`lg:h-screen lg:max-h-screen lg:overflow-hidden`) con centrado automático `my-auto`, permitiendo visualizar las 4 vías de acceso simultáneamente en monitores sin necesidad de scroll vertical.
+- **Eliminación de Redundancias:** Retiro de botones duplicados en la tarjeta de inicio de sesión y banner lateral simplificado.
 
----
+### 🦀 Kongre App Nativa para Escritorio (Rust + Tauri v2)
+- **Rendimiento Excepcional:** Binario ultraligero que arranca en milisegundos y consume apenas ~15 MB de memoria RAM (frente a los ~150 MB de entornos tradicionales basados en Chromium/Electron).
+- **Paquetes Oficiales Multiplataforma:**
+  - **Windows 10 / 11:** Instalador `.exe` (NSIS) y paquete `.msi`.
+  - **macOS:** Binario Universal `.dmg` compatible con procesadores Apple Silicon (M1 a M4) e Intel.
+  - **Linux Fedora / RHEL:** Paquete nativo `.rpm` de 64 bits.
+  - **Linux Ubuntu / Debian:** Paquete nativo `.deb`.
+  - **Linux Universal:** Paquete portátil `.AppImage`.
+- **Detección Automática de SO en Bienvenida:** Banner interactivo que detecta el sistema operativo del usuario y ofrece la descarga directa del instalador correspondiente.
 
-## ✨ Módulos Teocráticos y Capacidades
-
-* 📅 **Reunión Vida y Ministerio (VMC):** Programa semanal completo, asignaciones estudiantiles (Lectura, Primera Conversación, Revisitas, Discursos), oraciones y presidencia.
-* 📋 **Hojas de Asignación S-89:** Generación, previsualización e impresión instantánea en formato oficial PDF con respaldo offline.
-* 🎤 **Reunión Pública y Fin de Semana:** Agenda de discursos públicos (1–194), oradores visitantes, coordinación de hospedaje, presidentes y lectores de La Atalaya.
-* 👥 **Fichas S-21 y Directorio de Publicadores:** Tarjetas de registro de publicador S-21, horas anuales, grupos de servicio, precursores auxiliares y regulares, y directriz médica DPA.
-* 🗺️ **Territorios y Cartografía (S-13):** Manzanas interactivas con mapas satelitales y de calles en caché offline (OpenStreetMap, CartoDB, Esri Satelital) con alertas de rotación y QR.
-* 📊 **Asistencia a Reuniones (S-88):** Registro en vivo de asistentes presenciales y por videoconferencia (Zoom), promedios mensuales y gráficas anuales de servicio.
-* ⏱️ **Cronómetro de Ministerio Personal:** Registro de horas, revisitas, cursos bíblicos e informes mensuales de predicación para publicadores.
-* 🧹 **Mantenimiento y Cuadrantes del Salón:** Aseo del Salón del Reino, cabina de audio y video, panel eléctrico y conservación física del recinto.
-* 📢 **Tablero de Anuncios:** Avisos fijados, eventos de congregación y cartas importantes al alcance de todos los hermanos.
-* 🔔 **Notificaciones Push Teocráticas:** Recordatorios de asignaciones y avisos en tiempo real en tu dispositivo sin intermediarios.
-* 🔘 **Modo Demostración Integrado:** Explora de inmediato la plataforma con datos de prueba realistas para familiarizarte con las herramientas antes de la puesta en marcha.
+### 🔐 Seguridad Cero Conocimiento (Fase 2) y Bóveda Criptográfica en Reposo
+- **Bóveda no extraíble `atRestVault`:** Almacenamiento seguro con clave criptográfica AES-256 no extraíble (`extractable: false`) en IndexedDB (`kongre_vault_db`).
+- **Token de Rol Firmado en Servidor (`kgr_srt1` HMAC-SHA256):** Validación en Edge Function de privilegios que impide la manipulación no autorizada en DevTools o variables locales.
+- **Protección de Datos Médicos DPA y Notas:** Cifrado en modo CTR con nonce CSPRNG (`kgr_sec4:`) para directrices médicas (`dpa_date`, representantes de salud) y notas confidenciales del comité.
 
 ---
 
-## 🔒 Privacidad, Seguridad y Bóveda Criptográfica
+## 🏛️ Módulos y Capacidades del Sistema
 
-Kongre App incorpora una arquitectura de seguridad diseñada bajo los más rigurosos estándares de protección de datos:
-
-* 🔐 **Bóveda AES-256-GCM + PBKDF2:** Todos los datos confidenciales almacenados localmente están cifrados en reposo con claves criptográficas no extraíbles respaldadas por IndexedDB.
-* 🔑 **Autenticación en 2 Pasos (2FA TOTP):** Compatible con Microsoft Authenticator y Google Authenticator para accesos de coordinador y ancianos.
-* 🛡️ **Control de Acceso por Roles (RBAC):** Privilegios estrictos según la responsabilidad teocrática (Coordinador, Anciano, Siervo Ministerial, Publicador) validados criptográficamente.
-* 🔒 **Bloqueo Rápido de Sesión:** Bloqueo instantáneo con PIN local para proteger la pantalla si debes ausentarte temporalmente del equipo.
-
----
-
-## 💻 Requisitos del Sistema
-
-* **Windows:** Windows 10 o Windows 11 (64 bits).
-* **macOS:** macOS 11 (Big Sur) o superior (Apple Silicon M1/M2/M3/M4 o procesador Intel).
-* **Linux:** Cualquier distribución moderna con glibc 2.31+ (Fedora 34+, Ubuntu 20.04+, Debian 11+, Arch Linux, openSUSE, etc.).
-* **Memoria RAM:** Mínimo 2 GB (Recomendado 4 GB).
-* **Espacio en disco:** Menos de 100 MB libres.
+| Módulo | Icono Oficial | Descripción y Funcionalidades |
+| :--- | :---: | :--- |
+| **Reunión Vida y Ministerio** | `clm_vmc.svg` | Programación semanal, asignaciones estudiantiles (Lectura, Primera Conversación, Revisitas, Discursos), exportación de plantillas oficiales **S-89** en PDF y control de sustituciones en tiempo real. |
+| **Reunión Pública y Fin de Semana** | `discursos.svg` | Agenda de discursos públicos (1–194), coordinación de oradores visitantes, hospedaje, asignación de presidentes y lectores de La Atalaya. |
+| **Territorios y Cartografía** | `predicacion.svg` | Cartografía interactiva con Leaflet y OpenStreetMap, polígonos de manzanas, asignaciones **S-13**, códigos QR para publicadores y registro de turnos en carritos públicos. |
+| **Directorio de Publicadores (S-21)** | `supervision.svg` | Ficha personal completa, grupos de servicio, estado espiritual, control de nombramientos, ausencias acumuladas, directriz médica DPA y deduplicación inteligente de registros. |
+| **Asistencia a las Reuniones (S-88)** | `secretaria.svg` | Registro numérico presencial vs. Zoom, cálculo automático de promedios mensuales y gráficas analíticas por año de servicio con Recharts. |
+| **Informes del Servicio del Campo** | `informes_servicio.svg` | Consolidación mensual de informes de publicadores, horas de precursores regulares y auxiliares, notas confidenciales de secretaría y generación de resúmenes congregacionales. |
+| **Cuentas y Mantenimiento del Salón** | — | Libro de transacciones de congregación, arqueo de fondos, inventario físico de publicaciones y diagrama del panel de disyuntores eléctricos de cabina. |
 
 ---
 
-<div align="center">
+## 🛠️ Stack Tecnológico
 
-### 🌐 Conoce más y accede a la versión en la nube:
-### 👉 [https://kongre-app.com](https://kongre-app.com)
+| Capa | Tecnologías |
+| :--- | :--- |
+| **Frontend Web** | [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite 8](https://vitejs.dev/) |
+| **Escritorio Nativo** | [Rust 2021](https://www.rust-lang.org/), [Tauri v2](https://v2.tauri.app/) (Edge WebView2 en Windows, WebKitGTK en Linux, WebKit nativo en macOS) |
+| **Estilos & UI** | [Tailwind CSS v4](https://tailwindcss.com/) con sistema centralizado de variables de tema |
+| **Temas Visuales** | **Claro**, **Oscuro** y modo especial de alto contraste para cabina de audio/video |
+| **Gráficos & Visualización** | [Recharts](https://recharts.org/) |
+| **Cartografía** | [Leaflet](https://leafletjs.com/), [OpenStreetMap](https://www.openstreetmap.org/), CartoDB, Esri World Imagery |
+| **Criptografía** | Web Crypto API nativa: AES-256-GCM, PBKDF2 (hasta 600.000 iteraciones), HMAC-SHA1 TOTP (RFC 6238), CSPRNG |
+| **Documentos & Exportación** | [jsPDF](https://github.com/parallax/jsPDF), [pdf-lib](https://pdf-lib.js.org/) y [html2canvas](https://html2canvas.hertzen.com/) |
+| **Iconografía** | [Lucide React](https://lucide.dev/) + SVGs vectoriales teocráticos institucionales |
+| **Almacenamiento Local** | IndexedDB (`kongre_vault_db`, `localforage`) y `localStorage` blindado |
+| **Nube & Sincronización** | [Supabase](https://supabase.com/) (PostgreSQL, Realtime, Edge Functions seguras con Deno) |
 
-*Kongre App es una herramienta desarrollada con ❤️, 100% gratuita, para el beneficio de las congregaciones de los testigos de Jehová.*
+---
 
-</div>
+## 💻 Instalación y Desarrollo Local
+
+### Prerrequisitos
+- **Node.js** v20+ o [Bun](https://bun.sh/)
+- **Rust y Cargo** (solo si compilarás la versión de escritorio de forma local): [rustup.rs](https://rustup.rs/)
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/softwarelab7/Kongre.git
+cd Kongre
+```
+
+### 2. Instalar dependencias
+```bash
+npm install
+```
+
+### 3. Configuración de entorno (Opcional para sincronización en la nube)
+Crea un archivo `.env` en la raíz si deseas conectar tu propio proyecto de Supabase:
+```env
+VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
+VITE_SUPABASE_ANON_KEY=tu_clave_anon_publica
+```
+> [!NOTE]
+> Kongre cuenta con arquitectura **Offline-First**: no requiere Supabase para funcionar; todos los módulos operan al 100% en modo local de forma desconectada.
+
+### 4. Scripts de Desarrollo y Compilación
+
+#### Versión Web:
+```bash
+# Iniciar servidor de desarrollo en http://localhost:3000
+npm run dev
+
+# Verificación estricta de tipos TypeScript
+npm run lint
+
+# Ejecutar suite de pruebas unitarias y de integración
+npm test
+
+# Compilar para producción (carpeta dist/)
+npm run build
+```
+
+#### Versión de Escritorio (Rust + Tauri v2):
+```bash
+# Ejecutar la ventana nativa de escritorio con HMR
+npm run desktop:dev
+
+# Compilar el binario instalador nativo según tu sistema operativo (.exe, .dmg, .rpm, .deb, .AppImage)
+npm run desktop:build
+```
+
+---
+
+## 🔒 Privacidad Teocrática y Seguridad Cero Conocimiento
+
+Kongre fue diseñado desde el primer día con los más estrictos estándares de confidencialidad y principios bíblicos de respeto a los datos teocráticos:
+
+1. **Cifrado de Conocimiento Cero (Zero-Knowledge):** Los datos teocráticos sensibles (asignaciones, notas de pastoreo, fichas de publicadores, teléfonos) se cifran en el propio dispositivo antes de cualquier transmisión.
+2. **Sin Rastreo ni Telemetría Comercial:** Ningún dato personal o de actividad es vendido, monetizado ni compartido con terceros.
+3. **Autenticación en Dos Pasos (2FA) TOTP Offline:** Compatible con **Microsoft Authenticator** y Google Authenticator sin requerir conexión a internet para la validación.
+4. **Cumplimiento de Marca Google OAuth:** Declaración de uso transparente (*Limited Use Policy*) para el inicio de sesión asistido con cuenta de Google.
+
+Las políticas legales completas están disponibles en:
+- [Términos y Condiciones](file:///home/hectorgutierrezjimenez/Documentos/Kongre/public/terms.html)
+- [Política de Privacidad y Protección de Datos](file:///home/hectorgutierrezjimenez/Documentos/Kongre/public/privacy.html)
+
+---
+
+## 📄 Licencia
+
+Este proyecto está destinado para el uso ordenado, interno y teocrático de las congregaciones cristianas. Todos los derechos reservados.

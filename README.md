@@ -24,7 +24,8 @@
 
 > ⚠️ **Nota de Versión Alfa (Acceso Anticipado / Pruebas Activas):**  
 > Kongre App se encuentra actualmente en fase de **desarrollo Alfa preliminar (v0.1.0-alpha.36)**. Todos los módulos clave (reuniones VMC, discursos públicos, hojas S-89, tarjetas S-21, asistencia S-88, territorios S-13 y la bóveda criptográfica) están totalmente operativos y listos para uso congregacional.  
-> Los instaladores nativos para PC se distribuyen bajo el release oficial verificado de la serie Alfa, y la plataforma web se sincroniza continuamente con las últimas optimizaciones visuales y de rendimiento.
+> Los instaladores nativos para PC se distribuyen bajo el release oficial verificado de la serie Alfa, y la plataforma web se sincroniza continuamente con las últimas optimizaciones visuales y de rendimiento.  
+> 📋 **Historial de Novedades y Versiones:** Consulta el registro cronológico detallado de cada iteración en [CHANGELOG.md](CHANGELOG.md).
 
 ---
 

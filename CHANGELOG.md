@@ -6,6 +6,28 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 
 ## 🚀 Versión Actual
 
+### [v0.1.0-alpha.38] — 28 de Octubre, 2026
+**Actualizador Nativo de Escritorio en 1 Clic, Detección de Distribución y Aviso Inteligente para Fedora / Ubuntu**
+
+- ⚡ **Actualizador Nativo en 1 Clic con Tauri Updater & Process (`@tauri-apps/plugin-updater`, `@tauri-apps/plugin-process`):**
+  - Soporte de actualización automática sin salir de la app para Windows (`.exe` NSIS), macOS (`.dmg`) y Linux (`.AppImage`).
+  - Descarga e instala en segundo plano con barra de progreso reactiva en tiempo real y reinicio automático seguro del sistema.
+  - Firma criptográfica Minisign integrada con validación de integridad (`latest.json` y archivos `.sig`).
+- 🐧 **Detección Inteligente de Tipo de Instalación (`src-tauri/src/lib.rs`):**
+  - Nuevo comando IPC nativo en Rust `install_kind` que inspecciona las variables de entorno (`APPIMAGE`) y `/etc/os-release` para determinar si el usuario corre bajo `linux-rpm` (Fedora, RHEL, openSUSE), `linux-deb` (Ubuntu, Debian, Mint), `appimage`, `windows` o `macos`.
+- 🖥️ **Modal Global de Actualización de Escritorio (`DesktopUpdateModal.tsx`, `desktopUpdateService.ts`):**
+  - Para usuarios en Fedora (`.rpm`) o Ubuntu (`.deb`): muestra botón de descarga directa del paquete y un comando de terminal listo para copiar con 1 clic (ej. `sudo dnf install ./Kongre-0.1.0-alpha.38-1.x86_64.rpm` o `sudo dpkg -i ./Kongre_0.1.0-alpha.38_amd64.deb`).
+  - Para usuarios en Windows, macOS o AppImage: botón directo *«Actualizar ahora en 1 clic»* con descarga asistida y reinicio seguro.
+  - Integrado globalmente en la pantalla de bienvenida (`CongregationWelcomeLanding`), la web oficial y las vistas de congregación.
+- 🔔 **Insignia Reactiva de Actualización en Cabecera y Pie (`CongregationWelcomeLanding.tsx`, `AppFooter.tsx`):**
+  - Botón de cabecera con aviso visual dinámico (*«¡Actualizar PC! v0.1.0-alpha.38»* con anillo pulsante).
+  - Botón interactivo de actualización directa en el pie de página junto a la píldora de versión.
+- ⏱️ **Verificación Inmediata y Comparación SemVer Estricta (`desktopUpdateService.ts`):**
+  - Chequeo inmediato al abrir la aplicación en PC (`force: true`), eliminando la espera de 4 horas de la caché de comprobación anterior.
+  - Comparación SemVer formal (`compareVersions`) que asegura que solo se muestren notificaciones ante versiones estrictamente superiores a la instalada.
+
+---
+
 ### [v0.1.0-alpha.37] — 28 de Octubre, 2026
 **Navegación Directa a Instaladores PC/Móvil, Pestaña de Descargas Dedicada e Historial Reactivo**
 

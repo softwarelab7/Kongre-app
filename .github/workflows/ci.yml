@@ -1,10 +1,9 @@
 name: CI (tipos, tests y build)
 
-# Solo Linux: es el runner más barato (1x) y no consume apenas minutos de la cuota.
+# Desactivada la ejecución automática en push para garantizar costo $0.00 en repo privado.
+# Se puede ejecutar manualmente desde la pestaña Actions cuando se desee.
 on:
-  pull_request:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read

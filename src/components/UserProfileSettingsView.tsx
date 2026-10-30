@@ -30,6 +30,7 @@ import {
   Moon,
   Building2,
   LogOut,
+  Lock,
 } from 'lucide-react';
 import {
   isNotificationSupported,
@@ -131,6 +132,12 @@ export const UserProfileSettingsView: React.FC = () => {
       sessionStorage.setItem('kongre_show_landing', 'true');
     } catch {}
     window.location.hash = '#portal';
+    window.location.reload();
+  };
+
+  const handleLockSession = () => {
+    sessionStorage.setItem('kongre_session_locked', 'true');
+    window.location.hash = '#bloqueo';
     window.location.reload();
   };
 
@@ -436,16 +443,20 @@ export const UserProfileSettingsView: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSave} className="w-full space-y-5">
+    <form onSubmit={handleSave} className="w-full space-y-6 max-w-6xl mx-auto pb-16 animate-in fade-in duration-200">
       {/* ========================================================================= */}
-      {/* 1. TOP IDENTITY & CONTROL CARD                                            */}
+      {/* 1. HERO IDENTITY & AVATAR BANNER                                          */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-5">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          {/* Avatar + Identity Info */}
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 text-center sm:text-left">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-indigo-500/10 via-slate-50/60 to-white dark:from-indigo-950/30 dark:via-slate-900/60 dark:to-slate-900 border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 shadow-sm">
+        {/* Subtle decorative ambient lights */}
+        <div className="absolute -right-12 -top-12 w-52 h-52 bg-indigo-500/10 dark:bg-indigo-400/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -left-12 -bottom-12 w-52 h-52 bg-purple-500/10 dark:bg-purple-400/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
+          {/* Avatar + Info Block */}
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
             <div className="relative group shrink-0">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl border-2 border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-sm">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden ring-4 ring-white dark:ring-slate-800 shadow-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center transition-transform group-hover:scale-[1.02]">
                 {photoURL ? (
                   <img
                     src={photoURL}
@@ -457,49 +468,48 @@ export const UserProfileSettingsView: React.FC = () => {
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center text-2xl sm:text-3xl font-extrabold tracking-wider select-none">
+                  <div className="w-full h-full bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 text-white flex items-center justify-center text-3xl sm:text-4xl font-black tracking-wider select-none">
                     {getInitials(displayName || user?.displayName || user?.email || '')}
                   </div>
                 )}
               </div>
 
+              {/* Upload button on avatar */}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-md flex items-center justify-center transition-transform active:scale-95 cursor-pointer border-2 border-white dark:border-slate-900"
-                title="Cambiar foto de perfil"
+                className="absolute -bottom-1.5 -right-1.5 w-9 h-9 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg flex items-center justify-center transition-transform active:scale-90 cursor-pointer ring-3 ring-white dark:ring-slate-900"
+                title="Subir o cambiar foto de perfil"
               >
-                <Camera className="w-3.5 h-3.5" />
+                <Camera className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-1.5 min-w-0">
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate">
-                  {displayName || 'Tu Nombre Visible'}
-                </h2>
-              </div>
+            <div className="space-y-2 min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight truncate">
+                {displayName || 'Tu Nombre'}
+              </h1>
 
-              {/* Clean unboxed metadata row */}
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-2 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
-                <span className="inline-flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400">
-                  <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+              {/* Verified Theocratic Badges */}
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-bold bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800/70 shadow-2xs">
+                  <ShieldCheck className="w-3.5 h-3.5 shrink-0 text-indigo-600 dark:text-indigo-400" />
                   <span>{effectiveRoleInfo.name}</span>
                 </span>
-                <span aria-hidden="true">·</span>
-                <span className="inline-flex items-center gap-1">
+
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700/70">
                   <Building2 className="w-3.5 h-3.5 shrink-0 text-slate-400" />
                   <span>{settings?.congregationName || 'Congregación Local'}</span>
                 </span>
-                <span aria-hidden="true">·</span>
+
                 {user ? (
-                  <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
-                    <CloudCheck className="w-3.5 h-3.5 shrink-0" />
-                    <span>Sincronizado en Nube</span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/70">
+                    <CloudCheck className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
+                    <span>Nube Sincronizada</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">
-                    <Cloud className="w-3.5 h-3.5 shrink-0" />
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold bg-amber-50 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-200/70 dark:border-amber-800/70">
+                    <Cloud className="w-3.5 h-3.5 shrink-0 text-amber-500" />
                     <span>Modo Local</span>
                     {!activeIsDemo && (
                       <button
@@ -509,16 +519,16 @@ export const UserProfileSettingsView: React.FC = () => {
                             await signInWithGoogle();
                           } catch {}
                         }}
-                        className="ml-1 underline hover:text-amber-700 dark:hover:text-amber-300 cursor-pointer"
+                        className="underline hover:text-amber-800 dark:hover:text-amber-200 cursor-pointer ml-1"
                       >
-                        (Conectar Google)
+                        (Vincular Google)
                       </button>
                     )}
                   </span>
                 )}
               </div>
 
-              {/* Photo Actions Row */}
+              {/* Photo Management Pill Buttons */}
               <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-2">
                 <input
                   type="file"
@@ -531,7 +541,7 @@ export const UserProfileSettingsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-200/80 dark:border-slate-700"
+                  className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-200/90 dark:border-slate-700 shadow-2xs"
                 >
                   <Camera className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                   <span>Subir Foto</span>
@@ -550,7 +560,7 @@ export const UserProfileSettingsView: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleRestoreGooglePhoto}
-                        className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-200/80 dark:border-slate-700"
+                        className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-200/90 dark:border-slate-700 shadow-2xs"
                       >
                         <span>Foto Google</span>
                       </button>
@@ -562,17 +572,17 @@ export const UserProfileSettingsView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowUrlInput((prev) => !prev)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-200/80 dark:border-slate-700"
+                  className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-slate-200/90 dark:border-slate-700 shadow-2xs"
                 >
                   <ImageIcon className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Enlace URL</span>
+                  <span>Enlace Web</span>
                 </button>
 
                 {photoURL && (
                   <button
                     type="button"
                     onClick={handleRemovePhoto}
-                    className="px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 text-xs font-semibold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-rose-200 dark:border-rose-800/60"
+                    className="px-3.5 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 text-xs font-bold transition-all inline-flex items-center gap-1.5 cursor-pointer border border-rose-200 dark:border-rose-800/60 shadow-2xs"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Quitar</span>
@@ -582,12 +592,12 @@ export const UserProfileSettingsView: React.FC = () => {
             </div>
           </div>
 
-          {/* Primary Save Action */}
-          <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end justify-between gap-2 shrink-0 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-100 dark:border-slate-800">
+          {/* Save Changes Hero Button */}
+          <div className="flex flex-col items-center md:items-end justify-center gap-2 shrink-0 w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-slate-200/70 dark:border-slate-800">
             <button
               type="submit"
               disabled={isSaving}
-              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white text-xs sm:text-sm font-bold transition-all shadow-md hover:shadow-indigo-500/25 flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
             >
               {isSaving ? (
                 <>
@@ -602,39 +612,44 @@ export const UserProfileSettingsView: React.FC = () => {
               )}
             </button>
             {userProfile?.updatedAt && (
-              <span className="text-[11px] text-slate-400 dark:text-slate-500 text-center sm:text-right">
-                Última actualización: {new Date(userProfile.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              <span className="text-[11px] text-slate-400 dark:text-slate-500 text-center md:text-right">
+                Última sincronización: {new Date(userProfile.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             )}
           </div>
         </div>
 
-        {/* URL Input collapse */}
+        {/* Collapsible Direct URL input */}
         {showUrlInput && (
-          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <div className="mt-4 p-3.5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shadow-2xs">
             <input
               type="url"
               value={customUrlTemp}
               onChange={(e) => setCustomUrlTemp(e.target.value)}
               placeholder="Pegar enlace directo de imagen (https://ejemplo.com/mi-foto.jpg)"
-              className="flex-1 px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-white"
+              className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:outline-hidden font-mono"
             />
             <button
               type="button"
               onClick={handleApplyCustomUrl}
-              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer shrink-0"
+              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold cursor-pointer shrink-0"
             >
-              Aplicar URL
+              Aplicar Imagen
             </button>
           </div>
         )}
 
-        {/* Compact Avatar Presets Bar */}
-        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0">
-            Avatares predefinidos:
-          </span>
-          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 w-full flex-1">
+        {/* Theocratic Avatar Selector */}
+        <div className="mt-6 pt-5 border-t border-slate-200/70 dark:border-slate-800">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span>Avatares e insignias teocráticas recomendadas</span>
+            </span>
+            <span className="text-[11px] text-slate-400">Selección rápida</span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
             {AVATAR_PRESETS.map((preset) => {
               const isSelected = selectedPresetId === preset.id || photoURL === preset.dataUrl;
               return (
@@ -642,15 +657,24 @@ export const UserProfileSettingsView: React.FC = () => {
                   key={preset.id}
                   type="button"
                   onClick={() => handleSelectPreset(preset)}
-                  className={`px-2.5 py-1.5 rounded-xl border text-center flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  className={`group relative p-2.5 rounded-2xl border text-center flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-2xs font-bold'
-                      : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200/80 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
+                      ? 'bg-indigo-50 dark:bg-indigo-950/70 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-2xs font-bold ring-2 ring-indigo-500/20'
+                      : 'bg-white/80 dark:bg-slate-800/50 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-300'
                   }`}
                   title={preset.name}
                 >
-                  <span className="text-sm">{preset.icon}</span>
-                  <span className="text-[10px] truncate">{preset.name.split(' ')[0]}</span>
+                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center text-xl ${preset.bgColor} text-white shadow-xs transition-transform group-hover:scale-105`}>
+                    {preset.icon}
+                  </div>
+                  <span className="text-[10.5px] truncate w-full text-center leading-tight">
+                    {preset.name.split(' ')[0]}
+                  </span>
+                  {isSelected && (
+                    <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-xs">
+                      <Check className="w-2.5 h-2.5" />
+                    </div>
+                  )}
                 </button>
               );
             })}
@@ -658,39 +682,47 @@ export const UserProfileSettingsView: React.FC = () => {
         </div>
       </div>
 
-      {/* Feedback Notifications */}
+      {/* Feedback Alerts */}
       {saveSuccess && (
-        <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between text-xs font-semibold text-emerald-900 dark:text-emerald-200 shadow-2xs">
-          <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span>Perfil y preferencias actualizados correctamente.</span>
+        <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 flex items-center justify-between text-xs font-semibold text-emerald-900 dark:text-emerald-200 shadow-xs animate-in fade-in">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+            <span>Tu perfil y tus preferencias se actualizaron y sincronizaron con éxito.</span>
           </div>
         </div>
       )}
 
       {saveError && (
-        <div className="p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 flex items-center gap-2.5 text-xs font-semibold text-rose-900 dark:text-rose-200">
-          <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/70 border border-rose-200 dark:border-rose-800 flex items-center gap-3 text-xs font-semibold text-rose-900 dark:text-rose-200 shadow-xs animate-in fade-in">
+          <div className="w-8 h-8 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+            <AlertCircle className="w-4 h-4" />
+          </div>
           <span>{saveError}</span>
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* 2. TWO-COLUMN DESKTOP WORKSPACE GRID                                      */}
+      {/* 2. MAIN SETTINGS WORKSPACE (2-COLUMN BALANCED GRID)                        */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        {/* LEFT COLUMN (7 cols): Identity, Contact Channels & Schedule Preferences */}
-        <div className="lg:col-span-7 space-y-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* LEFT COLUMN: Personal Info & Communication Preferences (7 cols) */}
+        <div className="lg:col-span-7 space-y-6">
           {/* Card A: Datos Personales y Canales de Contacto */}
-          <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-5">
-            <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <span>Identidad y Canales de Contacto</span>
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Información visible en los tableros de asignaciones y directorio de la congregación.
-              </p>
+          <div className="bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5">
+            <div className="pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <span>Identidad y Datos de Contacto</span>
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Visible en tableros de asignaciones y listado de publicadores.
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -705,20 +737,20 @@ export const UserProfileSettingsView: React.FC = () => {
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Ej. Carlos Mendoza"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 text-slate-900 dark:text-white text-sm font-semibold focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden transition"
                 />
               </div>
 
-              {/* Correo de Cuenta (Solo lectura) */}
+              {/* Cuenta Vinculada */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Cuenta Vinculada
+                  Cuenta Principal
                 </label>
-                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 text-xs">
+                <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-300 text-xs">
                   <span className="font-mono truncate">
-                    {user?.email || (activeIsDemo ? 'modo.prueba@kongre.org' : 'Sesión local activa')}
+                    {user?.email || (activeIsDemo ? 'modo.prueba@kongre.org' : 'Sesión local')}
                   </span>
-                  <span className="text-[10px] font-semibold text-slate-400 shrink-0 ml-2">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 shrink-0 ml-2">
                     {user ? 'Verificada' : 'Local'}
                   </span>
                 </div>
@@ -735,8 +767,9 @@ export const UserProfileSettingsView: React.FC = () => {
                       href={`https://wa.me/${cleanPhoneForWa}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1 font-semibold"
+                      className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1 font-bold"
                     >
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                       <span>Probar chat</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
@@ -748,7 +781,7 @@ export const UserProfileSettingsView: React.FC = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+52 55 1234 5678"
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden font-mono"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 text-slate-900 dark:text-white text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden transition"
                   />
                   <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 </div>
@@ -765,7 +798,7 @@ export const UserProfileSettingsView: React.FC = () => {
                     value={secondaryEmail}
                     onChange={(e) => setSecondaryEmail(e.target.value)}
                     placeholder="correo.alternativo@ejemplo.com"
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden transition"
                   />
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                 </div>
@@ -774,47 +807,57 @@ export const UserProfileSettingsView: React.FC = () => {
           </div>
 
           {/* Card B: Preferencias de Comunicación y Disponibilidad */}
-          <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-5">
-            <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5">
+            <div className="pb-4 border-b border-slate-100 dark:border-slate-800">
               <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <span>Preferencias de Comunicación y Horario</span>
+                <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                  <Sliders className="w-4 h-4" />
+                </div>
+                <span>Canales de Contacto y Horarios</span>
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Elige cómo y cuándo prefieres recibir confirmaciones de partes y avisos de la congregación.
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Elige cómo y cuándo prefieres recibir confirmaciones y asignaciones.
               </p>
             </div>
 
             {/* Método de Contacto Preferido */}
             <div className="space-y-2">
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                Canal de Contacto Preferido
+                Canal Preferido de Contacto
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 {[
                   {
                     id: 'whatsapp' as PreferredContactMethod,
                     title: 'WhatsApp',
-                    desc: 'Mensajes directos',
+                    desc: 'Avisos directos',
                     icon: MessageSquare,
+                    color: 'text-emerald-600 dark:text-emerald-400',
+                    bg: 'bg-emerald-50 dark:bg-emerald-950/60',
                   },
                   {
                     id: 'email' as PreferredContactMethod,
                     title: 'Correo',
-                    desc: 'Hojas S-89 y PDF',
+                    desc: 'Hojas S-89 PDF',
                     icon: Mail,
+                    color: 'text-indigo-600 dark:text-indigo-400',
+                    bg: 'bg-indigo-50 dark:bg-indigo-950/60',
                   },
                   {
                     id: 'phone' as PreferredContactMethod,
                     title: 'Llamada',
                     desc: 'Avisos urgentes',
                     icon: Phone,
+                    color: 'text-amber-600 dark:text-amber-400',
+                    bg: 'bg-amber-50 dark:bg-amber-950/60',
                   },
                   {
                     id: 'sms' as PreferredContactMethod,
                     title: 'SMS',
                     desc: 'Sin datos móviles',
                     icon: Send,
+                    color: 'text-violet-600 dark:text-violet-400',
+                    bg: 'bg-violet-50 dark:bg-violet-950/60',
                   },
                 ].map((method) => {
                   const Icon = method.icon;
@@ -824,19 +867,25 @@ export const UserProfileSettingsView: React.FC = () => {
                       key={method.id}
                       type="button"
                       onClick={() => setPreferredContactMethod(method.id)}
-                      className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
+                      className={`p-3 rounded-2xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
                         isSelected
-                          ? 'bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 text-indigo-900 dark:text-indigo-200 ring-2 ring-indigo-500/15 shadow-2xs'
-                          : 'bg-slate-50/70 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
+                          ? 'bg-indigo-50/80 dark:bg-indigo-950/50 border-indigo-500 text-indigo-950 dark:text-indigo-100 ring-2 ring-indigo-500/20 shadow-xs'
+                          : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <Icon className={`w-4 h-4 ${isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'}`} />
-                        {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />}
+                        <div className={`w-7 h-7 rounded-lg ${method.bg} ${method.color} flex items-center justify-center`}>
+                          <Icon className="w-3.5 h-3.5" />
+                        </div>
+                        {isSelected && (
+                          <div className="w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center">
+                            <Check className="w-2.5 h-2.5" />
+                          </div>
+                        )}
                       </div>
                       <div>
                         <span className="block text-xs font-bold leading-tight">{method.title}</span>
-                        <span className="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{method.desc}</span>
+                        <span className="block text-[10.5px] text-slate-500 dark:text-slate-400 mt-0.5">{method.desc}</span>
                       </div>
                     </button>
                   );
@@ -851,10 +900,10 @@ export const UserProfileSettingsView: React.FC = () => {
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 {[
-                  { id: 'morning' as ContactTimePreference, label: 'Mañanas', sub: '8:00 – 12:00', icon: Sun },
-                  { id: 'afternoon' as ContactTimePreference, label: 'Tardes', sub: '12:00 – 18:00', icon: Sunset },
-                  { id: 'evening' as ContactTimePreference, label: 'Noches', sub: '18:00 – 21:30', icon: Moon },
-                  { id: 'anytime' as ContactTimePreference, label: 'Cualquier hora', sub: 'Disponible', icon: Clock },
+                  { id: 'morning' as ContactTimePreference, label: 'Mañanas', sub: '8:00 – 12:00', icon: Sun, color: 'text-amber-500' },
+                  { id: 'afternoon' as ContactTimePreference, label: 'Tardes', sub: '12:00 – 18:00', icon: Sunset, color: 'text-orange-500' },
+                  { id: 'evening' as ContactTimePreference, label: 'Noches', sub: '18:00 – 21:30', icon: Moon, color: 'text-indigo-400' },
+                  { id: 'anytime' as ContactTimePreference, label: 'Cualquier hora', sub: 'Disponible', icon: Clock, color: 'text-emerald-500' },
                 ].map((time) => {
                   const TimeIcon = time.icon;
                   const isSelected = contactTimePreference === time.id;
@@ -863,16 +912,16 @@ export const UserProfileSettingsView: React.FC = () => {
                       key={time.id}
                       type="button"
                       onClick={() => setContactTimePreference(time.id)}
-                      className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                      className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                         isSelected
                           ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
-                          : 'bg-slate-50/70 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
+                          : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800'
                       }`}
                     >
-                      <TimeIcon className={`w-4 h-4 mb-1.5 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
+                      <TimeIcon className={`w-4 h-4 mb-2 ${isSelected ? 'text-white' : time.color}`} />
                       <div>
                         <span className="block text-xs font-bold leading-tight">{time.label}</span>
-                        <span className={`block text-[10px] mt-0.5 ${isSelected ? 'text-indigo-100' : 'text-slate-400'}`}>
+                        <span className={`block text-[10.5px] mt-0.5 ${isSelected ? 'text-indigo-100' : 'text-slate-400'}`}>
                           {time.sub}
                         </span>
                       </div>
@@ -892,69 +941,26 @@ export const UserProfileSettingsView: React.FC = () => {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Ej. Disponible fines de semana sin restricción. Jueves en turno laboral vespertino."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-hidden"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-hidden transition"
               />
             </div>
           </div>
         </div>
 
-        {/* RIGHT COLUMN (5 cols): Account Summary & Web Push Notifications */}
-        <div className="lg:col-span-5 space-y-5">
-          {/* Card C: Ficha Resumen de Cuenta */}
-          <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
-            <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
-              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                <span>Resumen de Ficha Personal</span>
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Así se muestra tu perfil en las asignaciones y listas de contacto.
-              </p>
-            </div>
-
-            <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
-              <div className="py-2.5 flex items-center justify-between gap-2">
-                <span className="text-slate-500 dark:text-slate-400">Rol activo</span>
-                <span className="font-bold text-slate-900 dark:text-white">{effectiveRoleInfo.name}</span>
-              </div>
-              <div className="py-2.5 flex items-center justify-between gap-2">
-                <span className="text-slate-500 dark:text-slate-400">Canal preferido</span>
-                <span className="font-bold text-slate-900 dark:text-white">{contactMethodLabels[preferredContactMethod]}</span>
-              </div>
-              <div className="py-2.5 flex items-center justify-between gap-2">
-                <span className="text-slate-500 dark:text-slate-400">Horario de contacto</span>
-                <span className="font-bold text-slate-900 dark:text-white">{contactTimeLabels[contactTimePreference]}</span>
-              </div>
-              <div className="py-2.5 flex items-center justify-between gap-2">
-                <span className="text-slate-500 dark:text-slate-400">Teléfono registrado</span>
-                <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
-                  {phone || 'No especificado'}
-                </span>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
-              <button
-                type="button"
-                onClick={handleProfileLogout}
-                className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800/70 text-rose-600 dark:text-rose-400 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <LogOut className="w-4 h-4 shrink-0" />
-                <span>Cerrar Sesión en este Dispositivo</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Card D: Notificaciones Web Push y Recordatorios */}
-          <div className="bg-white dark:bg-slate-900 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs space-y-4">
-            <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+        {/* RIGHT COLUMN: Push Notifications & Session Security (5 cols) */}
+        <div className="lg:col-span-5 space-y-6">
+          {/* Card C: Notificaciones Web Push y Recordatorios */}
+          <div className="bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-5">
+            <div className="pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
               <div>
                 <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                    <Bell className="w-4 h-4" />
+                  </div>
                   <span>Avisos Push y Recordatorios</span>
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Alertas automáticas en tu dispositivo antes de tus asignaciones.
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Alertas antes de tus asignaciones en este equipo.
                 </p>
               </div>
 
@@ -992,9 +998,9 @@ export const UserProfileSettingsView: React.FC = () => {
               compact
             />
 
-            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs">
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3.5 text-xs">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-slate-600 dark:text-slate-400 font-medium">Anticipación de aviso:</span>
+                <span className="text-slate-600 dark:text-slate-300 font-semibold">Anticipación de aviso:</span>
                 <select
                   value={notifPrefs.notifyDaysBefore}
                   onChange={(e) => {
@@ -1002,7 +1008,7 @@ export const UserProfileSettingsView: React.FC = () => {
                     saveNotificationPreferences({ notifyDaysBefore: days });
                     setNotifPrefs((prev) => ({ ...prev, notifyDaysBefore: days }));
                   }}
-                  className="py-1.5 px-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-semibold text-slate-800 dark:text-slate-200"
+                  className="py-1.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 font-bold text-slate-800 dark:text-slate-200 cursor-pointer"
                 >
                   <option value={1}>1 día antes (24h)</option>
                   <option value={2}>2 días antes (48h)</option>
@@ -1011,7 +1017,7 @@ export const UserProfileSettingsView: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between gap-2">
-                <span className="text-slate-600 dark:text-slate-400 font-medium">Incluir turnos de audio, micro y aseo:</span>
+                <span className="text-slate-600 dark:text-slate-300 font-semibold">Incluir turnos (audio, micro, aseo):</span>
                 <input
                   type="checkbox"
                   checked={notifPrefs.notifyDuties}
@@ -1024,23 +1030,63 @@ export const UserProfileSettingsView: React.FC = () => {
               </div>
 
               {isNotificationSupported() && browserPermission === 'granted' && (
-                <div className="pt-1">
+                <div className="pt-2">
                   <button
                     type="button"
                     disabled={isSendingTestNotif}
                     onClick={handleSendTestNotification}
-                    className="w-full py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <Bell className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                    <Bell className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                     <span>{isSendingTestNotif ? 'Enviando prueba...' : 'Enviar Notificación de Prueba'}</span>
                   </button>
                   {testNotifResult && (
-                    <p className={`mt-1.5 text-[11px] font-medium ${testNotifResult.success ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                    <p className={`mt-2 text-[11px] font-semibold text-center ${testNotifResult.success ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                       {testNotifResult.msg}
                     </p>
                   )}
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Card D: Seguridad de la Sesión en este Dispositivo */}
+          <div className="bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4">
+            <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <span>Seguridad de Sesión</span>
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Controles de acceso local y cierre de cuenta en este equipo.
+              </p>
+            </div>
+
+            <div className="space-y-2.5">
+              {!isDemoMode && (
+                <button
+                  type="button"
+                  onClick={handleLockSession}
+                  className="w-full py-2.5 px-4 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs transition flex items-center justify-between cursor-pointer border border-slate-200/70 dark:border-slate-700/70"
+                >
+                  <span className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span>Bloquear Sesión con PIN</span>
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-normal">Inmediato</span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={handleProfileLogout}
+                className="w-full py-3 px-4 rounded-2xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800/70 text-rose-600 dark:text-rose-400 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+              >
+                <LogOut className="w-4 h-4 shrink-0" />
+                <span>Cerrar Sesión en este Dispositivo</span>
+              </button>
             </div>
           </div>
         </div>

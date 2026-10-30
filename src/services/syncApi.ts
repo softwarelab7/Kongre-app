@@ -21,9 +21,9 @@ export interface SyncTokens {
   public_legacy?: string;
 }
 
-export type SyncResult<T> =
-  | ({ ok: true } & T)
-  | { ok: false; status: number; error: string; retryAfter?: number };
+export type SyncSuccess<T> = { ok: true } & T;
+export type SyncFailure = { ok: false; status: number; error: string; retryAfter?: number };
+export type SyncResult<T> = SyncSuccess<T> | SyncFailure;
 
 const tokenCache = new Map<string, string>();
 
@@ -353,7 +353,7 @@ export function syncDelete(id: string, masterPin: string) {
 }
 
 /** Mensaje en español para el usuario a partir de un resultado de error. */
-export function describeSyncError(r: { status: number; error: string; retryAfter?: number }): string {
+export function describeSyncError(r: SyncFailure | { status?: number; error?: string; retryAfter?: number } | any): string {
   if (r.status === 0 || r.error === 'network_error') {
     return 'No se pudo conectar con el servidor en la nube (Failed to fetch). Tus cambios se guardaron localmente.';
   }

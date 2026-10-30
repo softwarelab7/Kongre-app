@@ -14,6 +14,7 @@ import {
   describeSyncError,
   type PersonalPinEntry,
   type VerifiedPublisher,
+  type SyncFailure,
 } from './syncApi';
 import { encryptForSupabase, decryptFromSupabase, normalizePin, normalizePinV2 } from '../utils/crypto';
 import {
@@ -594,17 +595,18 @@ export const supabaseSyncService = {
       });
 
       if (!pushRes.ok) {
-        const message = describeSyncError(pushRes);
+        const err = pushRes as SyncFailure;
+        const message = describeSyncError(err);
         // Errores de acceso o de límite de intentos no se reintentan desde la cola offline.
-        if (pushRes.status === 401 || pushRes.status === 403 || pushRes.status === 429) {
+        if (err.status === 401 || err.status === 403 || err.status === 429) {
           return {
             success: false,
-            error: pushRes.status === 401
+            error: err.status === 401
               ? 'Acceso denegado: Las credenciales no coinciden con el registro de esta congregación en la nube.'
               : message,
           };
         }
-        console.warn('Sync push error:', pushRes.status, pushRes.error);
+        console.warn('Sync push error:', err.status, err.error);
         if (!params.skipOfflineEnqueue) {
           this.enqueueOfflineChange(cleanId, params.data);
         }

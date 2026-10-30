@@ -279,6 +279,12 @@ export const Navbar: React.FC<NavbarProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+  const lastNonMenuTabRef = useRef<ActiveTab>('inicio');
+  useEffect(() => {
+    if (activeTab !== 'menu') {
+      lastNonMenuTabRef.current = activeTab;
+    }
+  }, [activeTab]);
 
   const overdueTerritoriesCount = territories.filter(
     (t) =>
@@ -803,34 +809,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           aria-label="Barra lateral de navegación por departamentos"
           className="hidden md:flex flex-col items-center fixed left-0 top-0 bottom-0 w-16 z-40 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 py-3 select-none transition-all duration-200 overflow-visible"
         >
-          {/* Top Hamburger Menu Button (JW Library style) */}
-          <button
-            type="button"
-            onClick={() => {
-              onSelectCategoryHub?.('all');
-              handleSelectTab('menu');
-            }}
-            aria-label="Catálogo general de módulos (JW Library)"
-            aria-expanded={activeTab === 'menu' && selectedCategoryHub === 'all'}
-            className={`w-10 h-10 flex items-center justify-center rounded-xl cursor-pointer transition-all mb-1 shrink-0 ${
-              activeTab === 'menu' && selectedCategoryHub === 'all'
-                ? 'bg-indigo-600 text-white shadow-2xs font-bold'
-                : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
-            title="Catálogo general de módulos (JW Library)"
-          >
-            <Menu className="w-5 h-5 stroke-[2]" />
-          </button>
-
-          {/* Top Brand Squircle Logo Button */}
+          {/* Top Brand Squircle Logo Button - Fixed, firmly anchored at top */}
           <button
             type="button"
             onClick={() => handleSelectTab('inicio')}
             aria-label="Ir al inicio - Mi Ministerio"
-            className="w-10 h-10 flex items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95 mb-3 shrink-0 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 rounded-2xl"
+            className="w-10 h-10 flex items-center justify-center cursor-pointer mb-3 shrink-0 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
             title="Kongre - Mi Ministerio"
           >
-            <Logo variant="isotipo" className="w-10 h-10 object-contain shadow-xs hover:shadow-md transition-shadow" />
+            <Logo variant="isotipo" className="w-10 h-10 object-contain shadow-xs" />
           </button>
 
           {/* Vertical Categories Stack */}
@@ -957,19 +944,27 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  onSelectCategoryHub?.('all');
-                  handleSelectTab('menu');
+                  if (activeTab === 'menu') {
+                    handleSelectTab(lastNonMenuTabRef.current || 'inicio');
+                  } else {
+                    onSelectCategoryHub?.('all');
+                    handleSelectTab('menu');
+                  }
                 }}
-                aria-label="Catálogo general de módulos (JW Library)"
-                aria-expanded={activeTab === 'menu' && selectedCategoryHub === 'all'}
+                aria-label={activeTab === 'menu' ? 'Volver a la vista anterior' : 'Catálogo general de módulos (JW Library)'}
+                aria-expanded={activeTab === 'menu'}
                 className={`hidden md:flex w-9 h-9 rounded-xl items-center justify-center transition-all cursor-pointer shrink-0 ${
-                  activeTab === 'menu' && selectedCategoryHub === 'all'
+                  activeTab === 'menu'
                     ? 'bg-indigo-600 text-white shadow-2xs font-bold'
                     : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
-                title="Catálogo general de módulos (JW Library)"
+                title={activeTab === 'menu' ? 'Volver a la vista anterior' : 'Catálogo general de módulos (JW Library)'}
               >
-                <Menu className="w-5 h-5 stroke-[2]" />
+                {activeTab === 'menu' ? (
+                  <X className="w-5 h-5 stroke-[2]" />
+                ) : (
+                  <Menu className="w-5 h-5 stroke-[2]" />
+                )}
               </button>
             )}
 

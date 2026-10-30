@@ -7,8 +7,22 @@ Bienvenido al historial oficial de actualizaciones de **Kongre**. Aquí encontra
 ## 🚀 Versión Actual
 
 ### [v0.1.0-alpha.40] — 29 de Octubre, 2026
-**PINs Personales v2 con Sal Única por Publicador, CSP Estricto en PC, Resiliencia de Contexto y Actualización de Cronograma CLM (Jeremías 38-48)**
+**Compartimentos Zero-Trust (Envelope Encryption), Validación Estricta de PINs, Pipeline CI con Barrera de Release y CSP Estricto en PC**
 
+- 🛡️ **Criptografía Estricta por Rol (Zero-Trust Compartments & Envelope Encryption — `compartments.ts`, `supabaseSyncService.ts`, `compartments.test.ts`):**
+  - Implementación del motor de cifrado envoltorio (Envelope Encryption) con generación de Claves de Cifrado de Datos (DEK) efímeras de alta entropía AES-GCM-256.
+  - Envoltorio dual de la clave DEK: se envuelve para el cuerpo de ancianos (`K_master`) y de forma individual para cada siervo ministerial o publicador autorizado (`K_personal_${publisherId}`).
+  - **Compartimento Departamental (`payload_dept`):** Aísla Cuentas (S-26), Territorios detallados (S-13), Almacén de Literatura (S-14) y Mantenimiento del salón. Un publicador general o dispositivo sin credenciales autorizadas no puede descifrar la DEK ni los registros departamentales aunque intercepte el tráfico de red.
+  - **Compartimento Personal (`payload_personal_${id}`):** Cifrado granular de informes mensuales de predicación (tarjetas S-21) y notas privadas, accesible únicamente por el publicador dueño o por los ancianos para la compilación del informe mensual S-1 a la sucursal.
+  - Creación de 7 pruebas unitarias específicas de compartimentos con validación de accesos, rechazo de no autorizados, detección de manipulación (*tampering*) y soporte completo de símbolos UTF-8.
+- 🔏 **Validación Estricta de Longitud Neta de PIN de Congregación (`congregationCredentials.ts`, `RegisterCongregationWizard.tsx`, `RotateCredentialsModal.tsx`, `congregation-pin-policy.test.ts`):**
+  - Incorporación de `countCongregationPinChars` y `isValidCongregationPinLength`, descontando guiones de formato y espacios decorativos. Corrige el caso límite donde combinaciones de 7 caracteres con guion (`ABCD-EFG`) eran admitidas erróneamente por conteo de longitud de cadena.
+  - Preservación del estándar de 8 caracteres alfanuméricos netos para mantener compatibilidad total con códigos de invitación compuestos (`KGR-...-XXXXXXXX-PIN`) y códigos QR de bienvenida.
+- 🚀 **Pipeline de Integración Continua y Barrera de Seguridad (`ci.yml`, `desktop-release.yml`):**
+  - Nuevo workflow de GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) sobre Linux que verifica tipos (`tsc`), corre la suite completa de 88 tests, valida el build web con Vite y audita dependencias de producción en cada push y pull request.
+  - Incorporación del job de barrera `verify` en [`.github/workflows/desktop-release.yml`](.github/workflows/desktop-release.yml) (`needs: verify`): bloquea de forma preventiva la compilación de instaladores de escritorio (Windows, macOS, Linux) si algún test o verificación de tipos falla.
+- 🛑 **Blindaje Local Pre-Push en Git (`.git/hooks/pre-push`):**
+  - Configuración de un hook local ejecutable que intercepta cualquier `git push` y corre automáticamente `npm run lint` y `npm test`, cancelando de inmediato la subida a GitHub si se detecta cualquier inconsistencia en el código.
 - 🔐 **Seguridad: Derivación de PIN Personal v2 con Sal por Publicador (`core.ts`, `syncApi.ts`, `AccessCredentialsSection.tsx`, `personal-pin-v2.test.ts`):**
   - Implementación de derivación criptográfica PBKDF2 v2 incorporando `publisherId` en la sal (`kongre-personal-pin-v2|congId|publisherId`). Con esto se garantiza que dos o más publicadores que elijan el mismo PIN numérico generen verificadores hash completamente independientes en la base de datos de Supabase.
   - Migración silenciosa y transparente a esquema v2 (`v: 2`) durante la siguiente sincronización ordinaria del coordinador, sin requerir migraciones manuales en SQL ni causar interrupción para los publicadores activos.

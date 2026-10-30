@@ -461,58 +461,17 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
   return (
     <div className="w-full max-w-[1600px] mx-auto space-y-6 pb-12 select-none">
       {/* =========================================================================
-          1. HEADER ESTILO JW LIBRARY: Título, Subtítulo y Pestañas Horizontales
+          BARRA COMPACTA DE CATEGORÍAS Y BÚSQUEDA (ESTILO JW LIBRARY)
          ========================================================================= */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl p-5 sm:p-7 shadow-xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-indigo-50 text-indigo-700 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-800/60">
-                Departamentos y Módulos
-              </span>
-              <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">
-                {displayCongregationName}
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              {activeCategoryTitle}
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              {totalCardsCount} {totalCardsCount === 1 ? 'módulo disponible' : 'módulos disponibles'} en esta sección
-            </p>
-          </div>
-
-          {/* Buscador Integrado estilo JW Library */}
-          <div className="relative w-full md:w-72 lg:w-80 shrink-0">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar cualquier módulo o tarjeta..."
-              className="w-full h-11 pl-10 pr-9 text-xs sm:text-sm rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-all"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
-                aria-label="Limpiar búsqueda"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Pestañas Horizontales Estilo JW Library (PUBLICATIONS | VIDEO | AUDIO | DOWNLOADED) */}
-        <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/80 dark:border-slate-800">
+        {/* Pestañas Horizontales compactas estilo JW Library */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 min-w-0">
           <button
             type="button"
             onClick={() => handleCategoryChange('all')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 cursor-pointer relative ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
               activeCategory === 'all'
-                ? 'bg-indigo-600 text-white shadow-xs'
+                ? 'bg-indigo-600 text-white shadow-2xs'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
@@ -527,17 +486,39 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
                 key={dept.id}
                 type="button"
                 onClick={() => handleCategoryChange(dept.id)}
-                className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shrink-0 flex items-center gap-2 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
                   isCatSelected
-                    ? 'bg-indigo-600 text-white shadow-xs'
+                    ? 'bg-indigo-600 text-white shadow-2xs font-bold'
                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                <DeptIcon className="w-4 h-4 stroke-[2]" />
+                <DeptIcon className="w-3.5 h-3.5 stroke-[2]" />
                 <span>{dept.shortTitle}</span>
               </button>
             );
           })}
+        </div>
+
+        {/* Buscador ultra compacto a la derecha */}
+        <div className="relative w-full sm:w-56 md:w-64 shrink-0">
+          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Buscar módulo..."
+            className="w-full h-8 pl-8 pr-7 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all shadow-2xs"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+              aria-label="Limpiar búsqueda"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       </div>
 

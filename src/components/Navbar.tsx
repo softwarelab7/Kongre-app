@@ -779,8 +779,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         return 'Ajustes de la Congregación';
       case 'roles':
         return 'Roles Teocráticos y PINs';
-      case 'menu':
-        return 'Menú y Departamentos';
+      case 'menu': {
+        if (selectedCategoryHub && selectedCategoryHub !== 'all') {
+          const found = categoriesList.find((c) => c.id === selectedCategoryHub);
+          return found ? found.title.split('•')[0].trim() : 'Departamentos';
+        }
+        return 'Departamentos y Módulos';
+      }
       default:
         return 'Kongre';
     }
@@ -1030,7 +1035,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                 <div className="inline-flex items-center gap-1.5 min-w-0">
                   {(() => {
-                    const ActiveModIcon = NAV_ICONS[activeTab] || Compass;
+                    const selectedCatObj = activeTab === 'menu' && selectedCategoryHub && selectedCategoryHub !== 'all'
+                      ? categoriesList.find((c) => c.id === selectedCategoryHub)
+                      : null;
+                    const ActiveModIcon = selectedCatObj ? selectedCatObj.icon : (NAV_ICONS[activeTab] || Compass);
                     return (
                       <span className="hidden md:inline-flex items-center justify-center w-6 h-6 rounded-lg bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 shrink-0">
                         <ActiveModIcon className="w-3.5 h-3.5 stroke-[2]" />

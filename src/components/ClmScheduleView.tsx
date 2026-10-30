@@ -58,20 +58,23 @@ import {
   Edit3,
   Bot,
 } from 'lucide-react';
+import { DrillDownPicker, InlineReferenceToken, FloatingHighlightBar } from './jw';
+import { useStudyInspector } from '../context/StudyInspectorContext';
+import type { DrillDownLevel, HighlightColor, UserAnnotation, ReferenceItem } from '../types/jwDesignSystem';
 
-// Banners oficiales por sección
+// Banners oficiales por sección según el Design System JW Library
 const SECTION_BANNERS = {
   tesoros: {
     label: 'TESOROS DE LA BIBLIA',
-    bgColor: '#2a6b77', // Verde azulado oficial
+    bgColor: '#0D9488', // Teal 600 semántico JW
   },
   maestros: {
     label: 'SEAMOS MEJORES MAESTROS',
-    bgColor: '#9b6d17', // Ocre dorado oficial
+    bgColor: '#D97706', // Ámbar 600 semántico JW
   },
   vida_cristiana: {
     label: 'NUESTRA VIDA CRISTIANA',
-    bgColor: '#942926', // Rojo teocrático oficial
+    bgColor: '#E11D48', // Carmesí 600 semántico JW
   },
 };
 
@@ -297,6 +300,159 @@ export default function ClmScheduleView({
   const auxCounselorPart = useMemo(() => {
     return programa?.partes.find((p) => p.tipo === 'conductor_auxiliar');
   }, [programa]);
+
+  // JW Design System: Study Inspector Context & User Annotations (Zero Context-Switching)
+  const { openReference, openAnnotation } = useStudyInspector();
+
+  const [annotations, setAnnotations] = useState<Record<string, UserAnnotation>>(() => {
+    try {
+      const stored = localStorage.getItem('kongre_jw_annotations');
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const handleApplyHighlight = (partId: string, color: HighlightColor) => {
+    setAnnotations((prev) => {
+      const current = prev[partId] || {
+        id: partId,
+        blockId: partId,
+        noteText: '',
+        tags: [],
+        updatedAt: new Date().toISOString(),
+      };
+      const updated = {
+        ...current,
+        highlightColor: color,
+        updatedAt: new Date().toISOString(),
+      };
+      const next = { ...prev, [partId]: updated };
+      try {
+        localStorage.setItem('kongre_jw_annotations', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const handleClearHighlight = (partId: string) => {
+    setAnnotations((prev) => {
+      if (!prev[partId]) return prev;
+      const next = { ...prev };
+      delete next[partId];
+      try {
+        localStorage.setItem('kongre_jw_annotations', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const handleOpenPartNote = (part: ClmParte) => {
+    const ann: UserAnnotation = annotations[part.id] || {
+      id: part.id,
+      blockId: part.id,
+      noteText: '',
+      tags: [part.seccion.replace('_', ' ')],
+      updatedAt: new Date().toISOString(),
+    };
+    openAnnotation(ann);
+  };
+
+  // Drill-Down Picker Levels (Regla de los 3 Toques JW Library: Mes -> Semana -> Sección)
+  const drillDownLevels: DrillDownLevel[] = useMemo(() => {
+    const monthsMap = new Map<string, Array<{ weekStartDate: string; range: string; reading?: string }>>();
+
+    const sorted = [...weeks].sort((a, b) => a.weekStartDate.localeCompare(b.weekStartDate));
+    sorted.forEach((w) => {
+      const monthKey = w.weekStartDate.substring(0, 7);
+      if (!monthsMap.has(monthKey)) {
+        monthsMap.set(monthKey, []);
+      }
+      monthsMap.get(monthKey)!.push({
+        weekStartDate: w.weekStartDate,
+        range: formatTheocraticWeekRange(w.weekStartDate),
+        reading: w.midweek?.bibleReading,
+      });
+    });
+
+    if (monthsMap.size === 0) {
+      const currentMonday = semanaFechaStr;
+      const mKey = currentMonday.substring(0, 7);
+      monthsMap.set(mKey, [{
+        weekStartDate: currentMonday,
+        range: formatTheocraticWeekRange(currentMonday),
+        reading: programa?.lectura_semana || 'Lectura Bíblica',
+      }]);
+    }
+
+    const monthEntries = Array.from(monthsMap.entries());
+    const activeMonthKey = semanaFechaStr.substring(0, 7);
+    const activeMonthIdx = Math.max(0, monthEntries.findIndex(([k]) => k === activeMonthKey));
+    const activeMonthWeeks = monthEntries[activeMonthIdx]?.[1] || [];
+
+    const monthNames = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+
+    const level0Items = monthEntries.map(([mKey]) => {
+      const [year, month] = mKey.split('-');
+      const mIndex = parseInt(month, 10) - 1;
+      const monthName = monthNames[mIndex] || mKey;
+      return {
+        id: mKey,
+        label: `${monthName} ${year}`,
+        badge: `${monthsMap.get(mKey)?.length || 0} sem`,
+      };
+    });
+
+    const level1Items = activeMonthWeeks.map((w, idx) => ({
+      id: w.weekStartDate,
+      label: `Sem. ${idx + 1} (${w.range})`,
+      sublabel: w.reading,
+    }));
+
+    const level2Items = [
+      { id: 'tesoros', label: 'Tesoros de la Biblia', sublabel: '10 min + Perlas + Lectura', badge: 'Teal' },
+      { id: 'maestros', label: 'Seamos Mejores Maestros', sublabel: 'Demostraciones y Discursos', badge: 'Ámbar' },
+      { id: 'vida_cristiana', label: 'Nuestra Vida Cristiana', sublabel: 'Necesidades y Estudio Bíblico', badge: 'Carmesí' },
+    ];
+
+    return [
+      { levelTitle: 'Mes', items: level0Items },
+      { levelTitle: 'Semana', items: level1Items.length > 0 ? level1Items : [{ id: semanaFechaStr, label: formatTheocraticWeekRange(semanaFechaStr) }] },
+      { levelTitle: 'Sección', items: level2Items },
+    ];
+  }, [weeks, semanaFechaStr, programa?.lectura_semana]);
+
+  const currentPathIndices = useMemo(() => {
+    const monthKey = semanaFechaStr.substring(0, 7);
+    const monthIdx = Math.max(0, drillDownLevels[0]?.items.findIndex((it) => it.id === monthKey) ?? 0);
+    const weekIdx = Math.max(0, drillDownLevels[1]?.items.findIndex((it) => it.id === semanaFechaStr) ?? 0);
+    return [monthIdx, weekIdx, 0];
+  }, [drillDownLevels, semanaFechaStr]);
+
+  const handleSelectDrillDownPath = (indices: number[]) => {
+    const weekItem = drillDownLevels[1]?.items[indices[1]];
+    const sectionItem = drillDownLevels[2]?.items[indices[2]];
+
+    if (weekItem?.id && weekItem.id !== semanaFechaStr) {
+      const d = new Date(weekItem.id.length === 10 ? weekItem.id + 'T12:00:00' : weekItem.id);
+      if (!isNaN(d.getTime())) {
+        setSemanaActual(d);
+        onWeekChange?.(weekItem.id);
+      }
+    }
+
+    if (sectionItem?.id) {
+      setTimeout(() => {
+        const el = document.getElementById(`section-${sectionItem.id}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 120);
+    }
+  };
 
   // Sincronizar showAuxRoom respetando la preferencia del usuario o si el programa tiene sala auxiliar habilitada
   useEffect(() => {
@@ -1188,8 +1344,21 @@ export default function ClmScheduleView({
     const assignedLessonNum = part.leccion_numero || studentPub?.currentLessonNumber || 1;
     const assignedLessonObj = OFFICIAL_STUDENT_LESSONS.find((l) => l.number === assignedLessonNum);
 
+    const partAnnotation = annotations[part.id];
+    const highlightClass = partAnnotation?.highlightColor === 'yellow'
+      ? 'border-l-[3px] border-amber-500 bg-amber-500/10 dark:bg-amber-500/15'
+      : partAnnotation?.highlightColor === 'emerald'
+      ? 'border-l-[3px] border-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/15'
+      : partAnnotation?.highlightColor === 'blue'
+      ? 'border-l-[3px] border-blue-500 bg-blue-500/10 dark:bg-blue-500/15'
+      : partAnnotation?.highlightColor === 'rose'
+      ? 'border-l-[3px] border-pink-500 bg-pink-500/10 dark:bg-pink-500/15'
+      : partAnnotation?.highlightColor === 'violet'
+      ? 'border-l-[3px] border-purple-500 bg-purple-500/10 dark:bg-purple-500/15'
+      : '';
+
     return (
-      <div key={part.id} className="border-b border-slate-100 dark:border-white/[0.04]">
+      <div key={part.id} className={`group/row border-b border-slate-100 dark:border-white/[0.04] transition-colors ${highlightClass}`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors gap-2.5 sm:gap-4">
           {/* Lado izquierdo: Ícono/Número + Título + Subtítulo */}
           <div className="flex items-start sm:items-center gap-2.5 sm:gap-3.5 min-w-0 sm:pr-4 flex-1">
@@ -1209,7 +1378,7 @@ export default function ClmScheduleView({
                       setIsTimerModalOpen(true);
                     }}
                     title="Abrir esta intervención en Modo Atril y Cronómetro de Presidencia"
-                    className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-normal shrink-0 cursor-pointer transition-colors"
+                    className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-mono tabular-nums shrink-0 cursor-pointer transition-colors"
                   >
                     <Clock size={11} />
                     <span>({part.duracion_min} min)</span>
@@ -1243,9 +1412,16 @@ export default function ClmScheduleView({
               {/* Barra de Lección de Estudiante (Folleto th / lmd) */}
               {isStudentPart && part.asignado_nombre && (
                 <div className="mt-2 flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <InlineReferenceToken
+                    reference={{
+                      id: `th-${assignedLessonNum}`,
+                      code: `th lecc. ${assignedLessonNum}`,
+                      title: assignedLessonObj?.title || `Lección ${assignedLessonNum}`,
+                      extract: `Punto de consejo oficial: ${assignedLessonObj?.title || 'Lección de oratoria'}. Aplica a la lectura, revisita, curso bíblico o discurso según la Guía de Actividades.`,
+                    }}
+                    onSelectReference={(ref) => openReference(ref)}
+                  />
                   <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-indigo-50/90 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/60 text-[11px] text-indigo-900 dark:text-indigo-200">
-                    <BookOpen size={12} className="text-indigo-500 shrink-0" />
-                    <span className="font-bold">Lecc. #{assignedLessonNum}:</span>
                     <span className="truncate max-w-[170px] sm:max-w-[240px]">
                       {part.leccion_titulo || assignedLessonObj?.title || `Lección ${assignedLessonNum}`}
                     </span>
@@ -1302,6 +1478,15 @@ export default function ClmScheduleView({
           <div className="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-2 shrink-0 pl-8 sm:pl-0 flex-wrap">
             {isSong ? (
               <div className="flex items-center gap-1.5">
+                <InlineReferenceToken
+                  reference={{
+                    id: `canto-${part.titulo}`,
+                    code: part.titulo,
+                    title: `${part.titulo} — Cantemos con gozo`,
+                    extract: `Cántico oficial para la reunión Vida y Ministerio Cristianos. Melodía y texto lírico para la congregación.`,
+                  }}
+                  onSelectReference={(ref) => openReference(ref)}
+                />
                 <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                   Congregación
                 </span>
@@ -1456,6 +1641,50 @@ export default function ClmScheduleView({
                 + Sin Asignar
               </button>
             )}
+
+            {/* JW Design System Note & Highlight Action */}
+            <div className="flex items-center gap-1 shrink-0 ml-1">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenPartNote(part);
+                }}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  partAnnotation?.noteText || partAnnotation?.highlightColor
+                    ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/70 shadow-2xs font-bold'
+                    : 'text-slate-300 dark:text-zinc-600 hover:text-slate-700 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-[#18181F]'
+                }`}
+                title={partAnnotation?.noteText ? `Nota vinculada: "${partAnnotation.noteText.slice(0, 30)}..."` : 'Vincular nota de estudio o subrayar en el panel lateral'}
+              >
+                <FileText size={13} />
+              </button>
+
+              <div className="hidden sm:inline-flex items-center gap-1 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                {(['yellow', 'emerald', 'blue', 'rose', 'violet'] as HighlightColor[]).map((col) => (
+                  <button
+                    key={col}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (partAnnotation?.highlightColor === col) {
+                        handleClearHighlight(part.id);
+                      } else {
+                        handleApplyHighlight(part.id, col);
+                      }
+                    }}
+                    className={`w-2.5 h-2.5 rounded-full transition-transform cursor-pointer ${
+                      col === 'yellow' ? 'bg-amber-400' :
+                      col === 'emerald' ? 'bg-emerald-500' :
+                      col === 'blue' ? 'bg-blue-500' :
+                      col === 'rose' ? 'bg-pink-500' :
+                      'bg-purple-500'
+                    } ${partAnnotation?.highlightColor === col ? 'ring-2 ring-white scale-125' : 'hover:scale-125'}`}
+                    title={`Subrayar en ${col}`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1898,38 +2127,54 @@ export default function ClmScheduleView({
             </div>
           </div>
 
-          {/* ── BARRA DE NAVEGACIÓN Y SELECTOR DE FECHAS STANDALONE ── */}
-          <div className="px-6 py-3.5 bg-slate-50/70 dark:bg-slate-900/40 border-b border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between gap-4 flex-wrap">
-            {/* Cápsula de navegación semanal */}
-            <div className="flex items-center bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-full px-3 py-1.5 shadow-xs gap-3">
-              <button
-                onClick={handlePrevWeek}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-                title="Semana anterior"
-              >
-                <ChevronLeft size={16} />
-              </button>
+          {/* ── BARRA DE NAVEGACIÓN Y SELECTOR DE FECHAS STANDALONE (DRILL-DOWN JW LIBRARY) ── */}
+          <div className="px-6 py-3.5 bg-slate-50/70 dark:bg-[#121216] border-b border-slate-200/80 dark:border-[#27272A] flex items-center justify-between gap-4 flex-wrap">
+            {/* Cápsula de navegación semanal con Drill-Down Matricial */}
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Selector Matricial 3-Toques (Mes > Semana > Sección) */}
+              <DrillDownPicker
+                levels={drillDownLevels}
+                selectedIndices={currentPathIndices}
+                onSelectPath={handleSelectDrillDownPath}
+                titlePlaceholder="Explorar reunión..."
+              />
 
-              <div className="flex items-center gap-2.5 text-xs">
-                <span className="font-bold text-slate-900 dark:text-white">
-                  {programa?.rango_semana || formatTheocraticWeekRange(semanaFechaStr)}
-                </span>
-                <span className="text-slate-300 dark:text-slate-600">|</span>
-                <span className="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                  {programa?.lectura_semana || currentWeek?.midweek?.bibleReading || 'JEREMÍAS 47, 48'}
-                </span>
-                <span className="text-slate-400 dark:text-slate-500 font-medium">
-                  Semana {programa?.semana_num || '41'}
-                </span>
+              <div className="flex items-center bg-white dark:bg-[#18181F] border border-slate-200 dark:border-[#27272A] rounded-full px-3 py-1.5 shadow-xs gap-3">
+                <button
+                  onClick={handlePrevWeek}
+                  className="p-1 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#121216] transition-colors cursor-pointer"
+                  title="Semana anterior"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="font-bold text-slate-900 dark:text-zinc-100">
+                    {programa?.rango_semana || formatTheocraticWeekRange(semanaFechaStr)}
+                  </span>
+                  <span className="text-slate-300 dark:text-zinc-700">|</span>
+                  <InlineReferenceToken
+                    reference={{
+                      id: `reading-${semanaFechaStr}`,
+                      code: (programa?.lectura_semana || currentWeek?.midweek?.bibleReading || 'JEREMÍAS 47, 48').toUpperCase(),
+                      title: `Lectura Semanal: ${programa?.lectura_semana || currentWeek?.midweek?.bibleReading || 'Biblia'}`,
+                      extract: `Lectura y examen del texto bíblico programado para la semana del ${programa?.rango_semana || semanaFechaStr}. Puntos sobresalientes del texto bíblico para el análisis con la congregación.`,
+                    }}
+                    onSelectReference={(ref) => openReference(ref)}
+                  />
+                  <span className="text-slate-400 dark:text-zinc-500 font-mono tabular-nums text-[11px]">
+                    Sem. {programa?.semana_num || '41'}
+                  </span>
+                </div>
+
+                <button
+                  onClick={handleNextWeek}
+                  className="p-1 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#121216] transition-colors cursor-pointer"
+                  title="Semana siguiente"
+                >
+                  <ChevronRight size={16} />
+                </button>
               </div>
-
-              <button
-                onClick={handleNextWeek}
-                className="p-1 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
-                title="Semana siguiente"
-              >
-                <ChevronRight size={16} />
-              </button>
             </div>
 
             {/* Checkbox de Sala Auxiliar */}
@@ -2171,7 +2416,7 @@ export default function ClmScheduleView({
 
         {/* 2. Sección: TESOROS DE LA BIBLIA */}
         {groupedSections.tesoros.length > 0 && (
-          <div className="mt-2">
+          <div id="section-tesoros" className="mt-2 scroll-mt-24">
             <div
               style={{ backgroundColor: SECTION_BANNERS.tesoros.bgColor }}
               className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
@@ -2184,7 +2429,7 @@ export default function ClmScheduleView({
 
         {/* 3. Sección: SEAMOS MEJORES MAESTROS */}
         {groupedSections.maestros.length > 0 && (
-          <div className="mt-2">
+          <div id="section-maestros" className="mt-2 scroll-mt-24">
             <div
               style={{ backgroundColor: SECTION_BANNERS.maestros.bgColor }}
               className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"
@@ -2200,7 +2445,7 @@ export default function ClmScheduleView({
 
         {/* 5. Sección: NUESTRA VIDA CRISTIANA */}
         {groupedSections.vidaCristiana.length > 0 && (
-          <div className="mt-2">
+          <div id="section-vida_cristiana" className="mt-2 scroll-mt-24">
             <div
               style={{ backgroundColor: SECTION_BANNERS.vida_cristiana.bgColor }}
               className="w-full text-white py-2.5 px-6 font-bold uppercase text-xs sm:text-sm tracking-wider text-center shadow-xs select-none"

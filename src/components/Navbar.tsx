@@ -140,6 +140,8 @@ interface NavbarProps {
   onOpenVersionModal?: () => void;
   onOpenQueueModal?: () => void;
   onOpenRegisterModal?: () => void;
+  onToggleInspector?: () => void;
+  isInspectorOpen?: boolean;
 }
 
 interface NavSubItem {
@@ -184,6 +186,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenVersionModal,
   onOpenQueueModal,
   onOpenRegisterModal,
+  onToggleInspector,
+  isInspectorOpen,
 }) => {
   const { user, userProfile, signInWithGoogle, signOutUser, activeRole, effectiveRoleInfo, currentBrotherName, isCoordinator, permissions } = useAuth();
   const canManageRoles = !effectiveRoleInfo.isReadOnly && activeRole !== 'publico' && (isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano');
@@ -262,7 +266,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   };
   const pendingAuxPioneersCount = (auxPioneerRequests || []).filter((r) => (r.status || r.estado || 'pendiente') === 'pendiente').length;
-  const { themeMode, toggleTheme, isDark, isCabinaMode } = useTheme();
+  const { themeMode, setThemeMode, toggleTheme, isDark, isSepia, isCabinaMode } = useTheme();
   const { isPinEnabled, lockSession } = useSecurity();
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -1191,14 +1195,46 @@ export const Navbar: React.FC<NavbarProps> = ({
                 )}
               </button>
 
+              {/* Panel de Estudio e Inspector Toggle (Zero Context-Switching JW) */}
+              {onToggleInspector && (
+                <button
+                  type="button"
+                  onClick={onToggleInspector}
+                  aria-label="Panel de Estudio e Inspector (Referencias cruzadas y Notas)"
+                  aria-expanded={isInspectorOpen}
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                    isInspectorOpen
+                      ? 'bg-indigo-600 text-white shadow-2xs font-bold'
+                      : 'text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs'
+                  }`}
+                  title="Panel de Estudio e Inspector (Referencias cruzadas y Notas)"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                </button>
+              )}
+
               {/* Dark Mode Moon / Sun Toggle Integrated in Dock */}
               <div className="flex items-center justify-center w-7 h-7 rounded-lg hover:bg-white dark:hover:bg-slate-700 hover:shadow-2xs transition-all">
                 <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={26} />
               </div>
             </div>
 
-            {/* Mobile-only Theme Toggle (< sm) */}
-            <div className="flex sm:hidden items-center">
+            {/* Mobile-only Study & Theme Buttons (< sm) */}
+            <div className="flex sm:hidden items-center gap-1">
+              {onToggleInspector && (
+                <button
+                  type="button"
+                  onClick={onToggleInspector}
+                  aria-label="Panel de Estudio e Inspector"
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                    isInspectorOpen
+                      ? 'bg-indigo-600 text-white'
+                      : 'text-slate-500 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <BookOpen className="w-4 h-4" />
+                </button>
+              )}
               <ThemeToggle isDark={isDark} onToggle={toggleTheme} size={30} />
             </div>
 
@@ -1451,44 +1487,57 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <Download className="w-3.5 h-3.5 text-indigo-500 group-hover:translate-y-0.5 transition-transform shrink-0" />
                     </button>
 
-                    {/* iOS-Style Theme Switcher Row */}
+                    {/* iOS-Style Theme Switcher Row (Claro / Sepia / AMOLED) */}
                     <div className="flex items-center justify-between px-2.5 py-2 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60 mt-1">
                       <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                        {isDark ? (
+                        {themeMode === 'dark' ? (
                           <Moon className="w-4 h-4 text-indigo-400" />
+                        ) : themeMode === 'sepia' ? (
+                          <BookOpen className="w-4 h-4 text-amber-700" />
                         ) : (
                           <Sun className="w-4 h-4 text-amber-500" />
                         )}
                         <span>Tema visual</span>
                       </span>
-                      <div className="inline-flex items-center p-0.5 rounded-lg bg-slate-200/70 dark:bg-slate-900 border border-slate-300/60 dark:border-slate-700/80">
+                      <div className="inline-flex items-center p-0.5 rounded-lg bg-slate-200/70 dark:bg-slate-900 border border-slate-300/60 dark:border-slate-700/80 gap-0.5">
                         <button
                           type="button"
-                          onClick={() => {
-                            if (isDark) toggleTheme();
-                          }}
-                          className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10.5px] font-bold transition-all cursor-pointer ${
-                            !isDark
+                          onClick={() => setThemeMode('light')}
+                          className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                            themeMode === 'light'
                               ? 'bg-white text-slate-900 shadow-xs'
-                              : 'text-slate-400 hover:text-slate-200'
+                              : 'text-slate-400 hover:text-slate-800'
                           }`}
+                          title="Modo Claro"
                         >
                           <Sun className="w-3 h-3 text-amber-500" />
                           <span>Claro</span>
                         </button>
                         <button
                           type="button"
-                          onClick={() => {
-                            if (!isDark) toggleTheme();
-                          }}
-                          className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[10.5px] font-bold transition-all cursor-pointer ${
-                            isDark
-                              ? 'bg-slate-800 text-white shadow-xs'
-                              : 'text-slate-400 hover:text-slate-800'
+                          onClick={() => setThemeMode('sepia')}
+                          className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                            themeMode === 'sepia'
+                              ? 'bg-[#EAE0C8] text-[#2C221E] shadow-xs'
+                              : 'text-slate-400 hover:text-amber-800'
                           }`}
+                          title="Modo Sepia (Lectura Prolongada)"
+                        >
+                          <BookOpen className="w-3 h-3 text-amber-700" />
+                          <span>Sepia</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setThemeMode('dark')}
+                          className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                            themeMode === 'dark'
+                              ? 'bg-slate-800 text-white shadow-xs'
+                              : 'text-slate-400 hover:text-slate-200'
+                          }`}
+                          title="Modo AMOLED"
                         >
                           <Moon className="w-3 h-3 text-indigo-400" />
-                          <span>Oscuro</span>
+                          <span>AMOLED</span>
                         </button>
                       </div>
                     </div>

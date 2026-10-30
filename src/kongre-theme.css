@@ -101,7 +101,8 @@
 }
 
 /* ---------- Sepia (Lectura Prolongada) ---------- */
-[data-theme="sepia"] {
+[data-theme="sepia"],
+.theme-sepia {
   --brand: #4F46E5;
   --brand-hover: #4338CA;
   --brand-soft: #EAE0C8;

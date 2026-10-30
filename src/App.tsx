@@ -86,6 +86,8 @@ import {
 } from './services/notificationService';
 import { ToastProvider, useToast } from './context/ToastContext';
 import { ModalProvider } from './context/ModalContext';
+import { StudyInspectorProvider, useStudyInspector } from './context/StudyInspectorContext';
+import { StudyInspectorPanel } from './components/jw';
 
 export const VALID_TABS_MAP: Record<string, ActiveTab> = {
   inicio: 'inicio',
@@ -216,6 +218,15 @@ const AppContent: React.FC = () => {
     permissions,
   } = useAuth();
   const { showToast } = useToast();
+  const {
+    isInspectorOpen,
+    closeInspector,
+    activeReference,
+    references,
+    activeAnnotation,
+    saveAnnotation,
+    toggleInspector,
+  } = useStudyInspector();
   const canManageRoles = isCoordinator || activeRole === 'coordinador' || activeRole === 'anciano';
   const [isLockPinSuggestionOpen, setIsLockPinSuggestionOpen] = useState(false);
   const [isPinsModalOpen, setIsPinsModalOpen] = useState(false);
@@ -1570,9 +1581,11 @@ const AppContent: React.FC = () => {
         onOpenVersionModal={() => openModalWithHistory('versiones', setIsVersionModalOpen)}
         onOpenQueueModal={() => openModalWithHistory('cola_offline', setIsQueueModalOpen)}
         onOpenRegisterModal={() => openModalWithHistory('registro_congregacion', setIsRegisterWizardOpen)}
+        onToggleInspector={toggleInspector}
+        isInspectorOpen={isInspectorOpen}
       />
 
-      <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} transition-all duration-200 flex flex-col justify-between overflow-x-clip`}>
+      <main className={`flex-1 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} ${isInspectorOpen ? 'lg:pr-[380px]' : ''} transition-all duration-200 flex flex-col justify-between overflow-x-clip`}>
         <div className="relative flex-1 w-full px-2.5 sm:px-4 md:px-6 lg:px-7 xl:px-8 py-2.5 sm:py-5 pb-6">
           {!['inicio', 'programacion', 'calendario', 'panorama_general', 'menu'].includes(activeTab) && (
             <div className="md:hidden sticky top-[calc(env(safe-area-inset-top,0px)+3.5rem)] z-30 -mx-2.5 px-3 pt-[max(0.625rem,env(safe-area-inset-top,0px))] pb-2.5 mb-3.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-3 shadow-2xs">
@@ -1919,6 +1932,16 @@ const AppContent: React.FC = () => {
         onAccepted={() => setHasAcceptedTermsState(true)}
       />
 
+      {/* Panel de Estudio e Inspector Acoplado (Zero Context-Switching JW) */}
+      <StudyInspectorPanel
+        isOpen={isInspectorOpen}
+        onClose={closeInspector}
+        activeReference={activeReference}
+        references={references}
+        activeAnnotation={activeAnnotation}
+        onSaveAnnotation={saveAnnotation}
+      />
+
     </div>
   );
 };
@@ -1931,7 +1954,9 @@ export default function App() {
           <SecurityProvider>
             <ToastProvider>
               <ModalProvider>
-                <AppContent />
+                <StudyInspectorProvider>
+                  <AppContent />
+                </StudyInspectorProvider>
               </ModalProvider>
             </ToastProvider>
           </SecurityProvider>

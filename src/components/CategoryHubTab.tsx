@@ -463,7 +463,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
       {/* =========================================================================
           BARRA COMPACTA DE CATEGORÍAS Y BÚSQUEDA (ESTILO JW LIBRARY)
          ========================================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/80 dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/80 dark:border-[#27272A]">
         {/* Pestañas Horizontales compactas estilo JW Library */}
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 min-w-0">
           <button
@@ -472,7 +472,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
               activeCategory === 'all'
                 ? 'bg-indigo-600 text-white shadow-2xs'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-[#18181F] hover:text-slate-900 dark:hover:text-zinc-100'
             }`}
           >
             Todos los Módulos
@@ -489,7 +489,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
                   isCatSelected
                     ? 'bg-indigo-600 text-white shadow-2xs font-bold'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                    : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-[#18181F] hover:text-slate-900 dark:hover:text-zinc-100'
                 }`}
               >
                 <DeptIcon className="w-3.5 h-3.5 stroke-[2]" />
@@ -501,13 +501,13 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
 
         {/* Buscador ultra compacto a la derecha */}
         <div className="relative w-full sm:w-56 md:w-64 shrink-0">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar módulo..."
-            className="w-full h-8 pl-8 pr-7 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all shadow-2xs"
+            className="w-full h-8 pl-8 pr-7 text-xs rounded-xl bg-white dark:bg-[#121216] border border-slate-200 dark:border-[#27272A] text-slate-800 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all shadow-2xs"
           />
           {searchQuery && (
             <button
@@ -526,15 +526,15 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
           2. CUADRÍCULA DE TARJETAS ESTILO JW LIBRARY INTEGRADA EN TODA LA PANTALLA
          ========================================================================= */}
       {filteredDepartments.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200/90 dark:border-slate-800 space-y-4">
+        <div className="bg-white dark:bg-[#121216] rounded-3xl p-12 text-center border border-slate-200/90 dark:border-[#27272A] space-y-4">
           <div className="w-14 h-14 mx-auto rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
             <Search className="w-6 h-6" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
+            <h3 className="text-base font-bold text-slate-800 dark:text-zinc-100">
               No se encontraron tarjetas que coincidan
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+            <p className="text-xs text-slate-500 dark:text-zinc-400 max-w-md mx-auto">
               No hay módulos que coincidan con &quot;{searchQuery}&quot;. Intenta con otro término o restablece los filtros.
             </p>
           </div>
@@ -562,7 +562,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
                       <div className={`w-7 h-7 rounded-lg ${dept.accentBg} ${dept.accentText} flex items-center justify-center font-bold`}>
                         <DeptIcon className="w-4 h-4 stroke-[2]" />
                       </div>
-                      <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                      <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-700 dark:text-zinc-300">
                         {dept.title}
                       </h2>
                     </div>
@@ -592,7 +592,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                           }
                         }}
-                        className="group relative p-5 rounded-2xl text-left bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-slate-50/80 dark:hover:bg-slate-850/80 shadow-2xs hover:shadow-md transition-all duration-150 cursor-pointer flex items-center gap-4.5"
+                        className="group relative p-5 rounded-2xl text-left bg-white dark:bg-[#121216] border border-slate-200/90 dark:border-[#27272A] hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-slate-50/80 dark:hover:bg-[#18181F] shadow-2xs hover:shadow-xs transition-all duration-150 cursor-pointer flex items-center gap-4.5"
                       >
                         {/* Icono Outline Espacioso Estilo JW Library */}
                         <div
@@ -604,12 +604,12 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
                         {/* Texto y Título */}
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-1.5">
-                            <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug truncate transition-colors">
+                            <h3 className="text-sm sm:text-base font-bold text-slate-800 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 leading-snug truncate transition-colors">
                               {item.label}
                             </h3>
                             {item.badge && (
                               <span
-                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-mono tabular-nums shrink-0 ${
                                   item.badgeColor || 'bg-amber-500 text-white'
                                 }`}
                               >
@@ -617,12 +617,12 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
                             {item.description}
                           </p>
                         </div>
 
-                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all shrink-0" />
+                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-zinc-600 group-hover:text-indigo-500 group-hover:translate-x-0.5 transition-all shrink-0" />
                       </button>
                     );
                   })}
@@ -636,13 +636,13 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
       {/* =========================================================================
           3. ACCESOS RÁPIDOS INFERIORES Y METADATOS
          ========================================================================= */}
-      <div className="pt-8 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
+      <div className="pt-8 border-t border-slate-200/80 dark:border-[#27272A] flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
         <div className="flex items-center gap-3">
           {onOpenPinsModal && (
             <button
               type="button"
               onClick={onOpenPinsModal}
-              className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-400 font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-slate-200 dark:border-[#27272A] hover:border-amber-400 font-semibold text-slate-700 dark:text-zinc-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
               <KeyRound className="w-3.5 h-3.5 text-amber-500" />
               <span>Directorio de PINs</span>
@@ -653,7 +653,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
             <button
               type="button"
               onClick={onOpenConflictsModal}
-              className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-400 font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-slate-200 dark:border-[#27272A] hover:border-amber-400 font-semibold text-slate-700 dark:text-zinc-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
               <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
               <span>Centro de Conflictos ({conflicts.length})</span>
@@ -664,7 +664,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
             <button
               type="button"
               onClick={onOpenQueueModal}
-              className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-indigo-400 font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#121216] border border-slate-200 dark:border-[#27272A] hover:border-indigo-400 font-semibold text-slate-700 dark:text-zinc-300 flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
               <Wifi className={`w-3.5 h-3.5 ${!isOnline ? 'text-amber-500' : 'text-sky-500'}`} />
               <span>Sincronía Offline ({offlineQueueStats?.pendingCount || 0})</span>
@@ -676,7 +676,7 @@ export const CategoryHubTab: React.FC<CategoryHubTabProps> = ({
           <button
             type="button"
             onClick={onOpenVersionModal}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-850 border border-slate-200 dark:border-slate-700/80 font-semibold text-slate-600 dark:text-slate-300 cursor-pointer shadow-2xs"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-100 dark:bg-[#18181F] border border-slate-200 dark:border-[#27272A] font-semibold text-slate-600 dark:text-zinc-300 cursor-pointer shadow-2xs"
           >
             <span>Kongre</span>
             <span className="font-mono text-indigo-600 dark:text-indigo-400 font-bold">v{CURRENT_APP_VERSION}</span>

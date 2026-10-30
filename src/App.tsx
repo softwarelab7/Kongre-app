@@ -53,6 +53,7 @@ import { PanoramaGeneralTab } from './components/PanoramaGeneralTab';
 import { MinisterioPublicadorTab } from './components/MinisterioPublicadorTab';
 import { RolesManagerTab } from './components/RolesManagerTab';
 import { MobileMenuTab } from './components/MobileMenuTab';
+import { CategoryHubTab } from './components/CategoryHubTab';
 import { AccessRestrictedView } from './components/AccessRestrictedView';
 import { SecurityProvider } from './context/SecurityContext';
 import { SessionLockModal } from './components/SessionLockModal';
@@ -159,7 +160,11 @@ export function parseAppHash(hashString: string) {
   const [routePart, queryPart] = clean.split('?');
   const normalizedRoute = routePart.toLowerCase().trim();
   const searchParams = new URLSearchParams(queryPart || '');
-  const tab = VALID_TABS_MAP[normalizedRoute] || null;
+  const isCategoryRoute = ['reuniones', 'secretaria', 'predicacion', 'salon', 'supervision'].includes(normalizedRoute);
+  const tab = isCategoryRoute ? ('menu' as ActiveTab) : (VALID_TABS_MAP[normalizedRoute] || null);
+  const categoryParam = isCategoryRoute
+    ? normalizedRoute
+    : (searchParams.get('cat') || searchParams.get('categoria') || null);
   const modal = searchParams.get('modal') || null;
   const semana = searchParams.get('semana') || null;
   const isLanding = normalizedRoute === 'portal' || normalizedRoute === 'bienvenida';
@@ -191,7 +196,7 @@ export function parseAppHash(hashString: string) {
     normalizedRoute === 'terms' ||
     normalizedRoute === 'privacidad' ||
     normalizedRoute === 'terminos';
-  return { tab, modal, semana, isLanding, isLegal, isWebsite, websiteSection };
+  return { tab, modal, semana, isLanding, isLegal, isWebsite, websiteSection, categoryParam };
 }
 
 const AppContent: React.FC = () => {
@@ -225,6 +230,14 @@ const AppContent: React.FC = () => {
       if (urlParams.get('modo') === 'tablero') return 'mi_vista';
     }
     return 'inicio';
+  });
+
+  const [selectedCategoryHub, setSelectedCategoryHub] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const parsed = parseAppHash(window.location.hash);
+      if (parsed?.categoryParam) return parsed.categoryParam;
+    }
+    return 'all';
   });
 
   const [confirmationParams, setConfirmationParams] = useState<{
@@ -590,6 +603,10 @@ const AppContent: React.FC = () => {
       }
 
       setRawActiveTab(targetTab);
+
+      if (hashInfo?.categoryParam) {
+        setSelectedCategoryHub(hashInfo.categoryParam);
+      }
 
       // Sync modals with history (enforcing RBAC guards for administrative modals)
       const allowAdminModals = Boolean(canManageRoles || isDemoMode);
@@ -1530,6 +1547,8 @@ const AppContent: React.FC = () => {
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        selectedCategoryHub={selectedCategoryHub}
+        onSelectCategoryHub={setSelectedCategoryHub}
         isSidebarVisible={isSidebarVisible}
         onToggleSidebar={handleToggleSidebar}
         onOpenConflictsModal={openConflictsView}
@@ -1705,8 +1724,10 @@ const AppContent: React.FC = () => {
               />
             )}
             {activeTab === 'menu' && (
-              <MobileMenuTab
+              <CategoryHubTab
                 setActiveTab={setActiveTab}
+                selectedCategory={selectedCategoryHub}
+                onSelectCategory={setSelectedCategoryHub}
                 onOpenConflictsModal={openConflictsView}
                 onOpenQrModal={() => openModalWithHistory('qr', setIsQrModalOpen)}
                 onOpenTimerModal={() => openModalWithHistory('cronometro', setIsTimerModalOpen)}

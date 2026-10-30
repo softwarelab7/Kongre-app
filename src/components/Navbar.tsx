@@ -120,6 +120,8 @@ export type ActiveTab =
 interface NavbarProps {
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
+  selectedCategoryHub?: string;
+  onSelectCategoryHub?: (category: string) => void;
   isSidebarVisible?: boolean;
   onToggleSidebar?: () => void;
   onOpenConflictsModal: () => void;
@@ -162,6 +164,8 @@ interface Department {
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
+  selectedCategoryHub = 'all',
+  onSelectCategoryHub,
   isSidebarVisible = true,
   onToggleSidebar,
   onOpenConflictsModal,
@@ -284,21 +288,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const pinnedNoticesCount = notices.filter((n) => n.pinned).length;
 
-  // Panel desplegable de categorías estilo JW Library (Desktop/Tablet)
-  const [jwPanelCategory, setJwPanelCategory] = useState<string | null>(null);
-  const [jwSearch, setJwSearch] = useState('');
-  const jwPanelRef = useRef<HTMLDivElement | null>(null);
 
-  // Cerrar el panel con la tecla Escape
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && jwPanelCategory) {
-        setJwPanelCategory(null);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [jwPanelCategory]);
 
   // Full raw departments catalogue
   const allDepartments: Department[] = [
@@ -796,34 +786,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     }
   };
 
-  // JW Library Panel computation:
-  const jwActiveCategory = categoriesList.find((c) => c.id === jwPanelCategory);
-  const jwAllItems = useMemo<NavSubItem[]>(() => {
-    const seen = new Set<string>();
-    const items: NavSubItem[] = [];
-    categoriesList.forEach((c) => {
-      c.items.forEach((item) => {
-        if (!seen.has(item.id)) {
-          seen.add(item.id);
-          items.push(item);
-        }
-      });
-    });
-    return items;
-  }, [categoriesList]);
 
-  const jwDisplayedItems = useMemo<NavSubItem[]>(() => {
-    let base: NavSubItem[] = jwPanelCategory === 'all'
-      ? jwAllItems
-      : (jwActiveCategory?.items || []);
-    if (jwSearch.trim()) {
-      const q = jwSearch.toLowerCase().trim();
-      base = (jwPanelCategory === 'all' ? jwAllItems : (jwActiveCategory?.items || jwAllItems)).filter(
-        (it: NavSubItem) => it.label.toLowerCase().includes(q) || it.description.toLowerCase().includes(q)
-      );
-    }
-    return base;
-  }, [jwPanelCategory, jwActiveCategory, jwAllItems, jwSearch]);
 
   return (
     <>
@@ -838,15 +801,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Top Hamburger Menu Button (JW Library style) */}
           <button
             type="button"
-            onClick={() => setJwPanelCategory((prev) => (prev ? null : 'all'))}
-            aria-label="Abrir panel de categorías (JW Library)"
-            aria-expanded={Boolean(jwPanelCategory)}
+            onClick={() => {
+              onSelectCategoryHub?.('all');
+              handleSelectTab('menu');
+            }}
+            aria-label="Catálogo general de módulos (JW Library)"
+            aria-expanded={activeTab === 'menu' && selectedCategoryHub === 'all'}
             className={`w-10 h-10 flex items-center justify-center rounded-xl cursor-pointer transition-all mb-1 shrink-0 ${
-              jwPanelCategory
+              activeTab === 'menu' && selectedCategoryHub === 'all'
                 ? 'bg-indigo-600 text-white shadow-2xs font-bold'
                 : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
-            title="Menú de categorías (JW Library)"
+            title="Catálogo general de módulos (JW Library)"
           >
             <Menu className="w-5 h-5 stroke-[2]" />
           </button>
@@ -854,10 +820,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Top Brand Squircle Logo Button */}
           <button
             type="button"
-            onClick={() => {
-              handleSelectTab('inicio');
-              setJwPanelCategory(null);
-            }}
+            onClick={() => handleSelectTab('inicio')}
             aria-label="Ir al inicio - Mi Ministerio"
             className="w-10 h-10 flex items-center justify-center cursor-pointer transition-transform hover:scale-105 active:scale-95 mb-3 shrink-0 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 rounded-2xl"
             title="Kongre - Mi Ministerio"
@@ -869,22 +832,28 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex-1 w-full flex flex-col items-center gap-1.5 overflow-visible py-1">
             {categoriesList.map((cat) => {
               const Icon = cat.icon;
-              const isCatActive = cat.tabIds.includes(activeTab);
-              const isPanelOpen = jwPanelCategory === cat.id;
-              const isSelected = isCatActive || isPanelOpen;
+              const isCatActive =
+                (activeTab === 'menu' && selectedCategoryHub === cat.id) ||
+                (activeTab !== 'menu' && cat.tabIds.includes(activeTab));
 
               return (
                 <div key={cat.id} className="relative w-full flex justify-center">
                   <button
                     type="button"
                     onClick={() => {
-                      setJwPanelCategory((prev) => (prev === cat.id ? null : cat.id));
+                      if (cat.id === 'inicio') {
+                        handleSelectTab('inicio');
+                      } else if (cat.id === 'panorama_general') {
+                        handleSelectTab('panorama_general');
+                      } else {
+                        onSelectCategoryHub?.(cat.id);
+                        handleSelectTab('menu');
+                      }
                     }}
                     aria-label={cat.title}
                     aria-current={isCatActive ? 'page' : undefined}
-                    aria-expanded={isPanelOpen}
                     className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-                      isSelected
+                      isCatActive
                         ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60 shadow-2xs font-bold'
                         : 'text-slate-400 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
@@ -898,7 +867,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     )}
 
                     {/* Active Accent Indicator (JW Library Purple/Indigo vertical bar on left edge) */}
-                    {isSelected && (
+                    {isCatActive && (
                       <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-r-full bg-indigo-600 dark:bg-indigo-400 pointer-events-none" />
                     )}
                   </button>
@@ -911,10 +880,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="mt-auto pt-2 flex flex-col items-center gap-1.5 border-t border-slate-100 dark:border-slate-800 w-full shrink-0">
             <button
               type="button"
-              onClick={() => {
-                handleSelectTab('perfil');
-                setJwPanelCategory(null);
-              }}
+              onClick={() => handleSelectTab('perfil')}
               aria-label="Mi Perfil y Contacto"
               aria-current={activeTab === 'perfil' ? 'page' : undefined}
               className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
@@ -929,10 +895,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {isTabAllowedForRole(effectiveRoleInfo.id, 'ajustes') && (
               <button
                 type="button"
-                onClick={() => {
-                  handleSelectTab('ajustes');
-                  setJwPanelCategory(null);
-                }}
+                onClick={() => handleSelectTab('ajustes')}
                 aria-label="Ajustes de la Congregación"
                 aria-current={activeTab === 'ajustes' ? 'page' : undefined}
                 className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
@@ -950,10 +913,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {onToggleSidebar && (
               <button
                 type="button"
-                onClick={() => {
-                  onToggleSidebar();
-                  setJwPanelCategory(null);
-                }}
+                onClick={onToggleSidebar}
                 aria-label="Ocultar barra lateral"
                 className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-all cursor-pointer group"
                 title="Ocultar barra lateral (Ctrl+B / ⌘B)"
@@ -981,205 +941,6 @@ export const Navbar: React.FC<NavbarProps> = ({
       )}
 
       {/* =========================================================================
-          JW LIBRARY SLIDE-OUT CATEGORY PANEL (DESKTOP / TABLET)
-         ========================================================================= */}
-      {isSidebarVisible && jwPanelCategory && (
-        <>
-          {/* Backdrop overlay */}
-          <div
-            className="hidden md:block fixed inset-0 bg-slate-950/20 dark:bg-slate-950/40 backdrop-blur-[2px] z-40 transition-opacity animate-in fade-in duration-150"
-            onClick={() => setJwPanelCategory(null)}
-            aria-hidden="true"
-          />
-
-          {/* Slide-out panel */}
-          <div
-            ref={jwPanelRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Panel de navegación por categorías"
-            className="hidden md:flex fixed left-16 top-0 bottom-0 w-[580px] max-w-[calc(100vw-5rem)] bg-white/98 dark:bg-slate-900/98 backdrop-blur-xl border-r border-slate-200/90 dark:border-slate-800/90 shadow-2xl z-50 flex-col animate-in slide-in-from-left-4 duration-200 select-none"
-          >
-            {/* Header del Panel */}
-            <div className="p-4 sm:p-5 border-b border-slate-200/80 dark:border-slate-800/80 flex flex-col gap-3 shrink-0 bg-slate-50/70 dark:bg-slate-850/60">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div
-                    className={`w-9 h-9 rounded-xl ${
-                      jwActiveCategory?.colorClass || 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400'
-                    } flex items-center justify-center shrink-0 shadow-2xs`}
-                  >
-                    {jwActiveCategory ? (
-                      <jwActiveCategory.icon className="w-5 h-5 stroke-[2]" />
-                    ) : (
-                      <Menu className="w-5 h-5 stroke-[2]" />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider truncate">
-                      {jwActiveCategory?.title || 'Menú Departamental • Todas las Categorías'}
-                    </h3>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                      {jwDisplayedItems.length} módulos disponibles
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setJwPanelCategory(null)}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0"
-                  aria-label="Cerrar panel (Esc)"
-                  title="Cerrar panel (Esc)"
-                >
-                  <X className="w-4 h-4 stroke-[2]" />
-                </button>
-              </div>
-
-              {/* Pestañas de categorías estilo JW Library (PUBLICATIONS | VIDEO | AUDIO | DOWNLOADED) */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar pt-1">
-                <button
-                  type="button"
-                  onClick={() => setJwPanelCategory('all')}
-                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
-                    jwPanelCategory === 'all'
-                      ? 'bg-indigo-600 text-white shadow-2xs'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/70 dark:hover:bg-slate-800'
-                  }`}
-                >
-                  Todos
-                </button>
-                {categoriesList.map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setJwPanelCategory(cat.id)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
-                      jwPanelCategory === cat.id
-                        ? 'bg-indigo-600 text-white shadow-2xs font-bold'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200/70 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <cat.icon className="w-3.5 h-3.5 stroke-[2]" />
-                    <span>{cat.shortTitle || cat.title.split('•')[0].trim()}</span>
-                    {cat.badge && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-                    )}
-                  </button>
-                ))}
-              </div>
-
-              {/* Buscador de módulos dentro del panel */}
-              <div className="relative w-full">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  value={jwSearch}
-                  onChange={(e) => setJwSearch(e.target.value)}
-                  placeholder="Filtrar módulos de esta categoría..."
-                  className="w-full h-8 pl-8 pr-3 text-xs rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                />
-                {jwSearch && (
-                  <button
-                    type="button"
-                    onClick={() => setJwSearch('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Cuadrícula de Tarjetas estilo JW Library */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 no-scrollbar">
-              {jwDisplayedItems.length === 0 ? (
-                <div className="text-center py-12 text-slate-400 text-xs">
-                  No se encontraron módulos coincidentes con "{jwSearch}".
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-3">
-                  {jwDisplayedItems.map((item) => {
-                    const SubIcon = item.icon;
-                    const isItemActive = activeTab === item.id;
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => {
-                          handleSelectTab(item.id);
-                          setJwPanelCategory(null);
-                        }}
-                        className={`group relative p-3.5 rounded-xl text-left transition-all duration-150 cursor-pointer flex items-center gap-3.5 border ${
-                          isItemActive
-                            ? 'bg-indigo-50/90 dark:bg-indigo-950/70 border-indigo-500 dark:border-indigo-500 shadow-xs ring-1 ring-indigo-500/30'
-                            : 'bg-white dark:bg-slate-850 border-slate-200/90 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-slate-50/80 dark:hover:bg-slate-800/90 hover:shadow-xs'
-                        }`}
-                      >
-                        {/* Icono outline espacioso estilo JW Library */}
-                        <div
-                          className={`w-11 h-11 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                            isItemActive
-                              ? 'bg-indigo-600 text-white shadow-2xs'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/70 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
-                          }`}
-                        >
-                          <SubIcon className="w-5 h-5 stroke-[1.8]" />
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-1">
-                            <h4
-                              className={`text-xs sm:text-[13px] font-bold leading-tight truncate transition-colors ${
-                                isItemActive
-                                  ? 'text-indigo-950 dark:text-indigo-200 font-extrabold'
-                                  : 'text-slate-800 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400'
-                              }`}
-                            >
-                              {item.label}
-                            </h4>
-                            {item.badge && (
-                              <span
-                                className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold shrink-0 ${
-                                  item.badgeColor || 'bg-amber-500 text-white'
-                                }`}
-                              >
-                                {item.badge}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-1 leading-normal">
-                            {item.description}
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Footer del panel */}
-            <div className="p-3 px-5 border-t border-slate-200/80 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-850/80 flex items-center justify-between text-xs text-slate-500 shrink-0">
-              <span className="text-[11px] text-slate-400">
-                Presiona <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-[10px]">Esc</kbd> para cerrar
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  handleSelectTab('panorama_general');
-                  setJwPanelCategory(null);
-                }}
-                className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
-              >
-                Ver Cartelera y Congregación →
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* =========================================================================
           2. TOP HEADER BAR (EXACT REFERENCE DESIGN)
          ========================================================================= */}
       <header className={`sticky top-0 z-30 w-full ${isSidebarVisible ? 'md:pl-16' : 'pl-0'} pt-[env(safe-area-inset-top,0px)] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 transition-all duration-200`}>
@@ -1190,15 +951,18 @@ export const Navbar: React.FC<NavbarProps> = ({
             {isSidebarVisible && (
               <button
                 type="button"
-                onClick={() => setJwPanelCategory((prev) => (prev ? null : 'all'))}
-                aria-label="Abrir menú de categorías (JW Library)"
-                aria-expanded={Boolean(jwPanelCategory)}
+                onClick={() => {
+                  onSelectCategoryHub?.('all');
+                  handleSelectTab('menu');
+                }}
+                aria-label="Catálogo general de módulos (JW Library)"
+                aria-expanded={activeTab === 'menu' && selectedCategoryHub === 'all'}
                 className={`hidden md:flex w-9 h-9 rounded-xl items-center justify-center transition-all cursor-pointer shrink-0 ${
-                  Boolean(jwPanelCategory)
+                  activeTab === 'menu' && selectedCategoryHub === 'all'
                     ? 'bg-indigo-600 text-white shadow-2xs font-bold'
                     : 'text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
-                title="Menú de categorías (JW Library)"
+                title="Catálogo general de módulos (JW Library)"
               >
                 <Menu className="w-5 h-5 stroke-[2]" />
               </button>

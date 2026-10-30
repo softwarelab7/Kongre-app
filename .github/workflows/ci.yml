@@ -1,0 +1,46 @@
+name: CI (tipos, tests y build)
+
+# Solo Linux: es el runner más barato (1x) y no consume apenas minutos de la cuota.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+
+      # --ignore-scripts: no ejecuta scripts de instalación de dependencias (reduce riesgo de cadena de suministro).
+      - name: Instalar dependencias
+        run: npm ci --legacy-peer-deps --ignore-scripts
+
+      - name: Tipos (tsc)
+        run: npm run lint
+
+      - name: Tests (cifrado, tokens, Edge Function, roles)
+        run: npm test
+
+      - name: Build web
+        run: npm run build
+
+      # Informativo: no bloquea, pero deja constancia en el log si aparece una vulnerabilidad en producción.
+      - name: Auditoría de dependencias de producción
+        continue-on-error: true
+        run: npm audit --omit=dev --audit-level=high

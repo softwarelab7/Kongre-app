@@ -29,6 +29,7 @@ import {
 import {
   formatCongregationPinInput,
   generateSecureCongregationPin,
+  isValidCongregationPinLength,
   generateSecureMasterPin,
 } from '../utils/theocraticSecurity';
 
@@ -158,7 +159,7 @@ export const RotateCredentialsModal: React.FC<RotateCredentialsModalProps> = ({
         setErrorMsg('Ingresa o genera el nuevo PIN de la congregación.');
         return;
       }
-      if (cleanNewCong.length < 8) {
+      if (!isValidCongregationPinLength(cleanNewCong)) {
         setErrorMsg('El PIN de congregación debe tener al menos 8 caracteres.');
         return;
       }

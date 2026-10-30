@@ -11,7 +11,7 @@ export type { EncryptedPayload } from './security/passphraseCrypto.ts';
 export { getSecureRandomBytes, secureRandomInt } from './security/random.ts';
 export { SLOW_HASH_PREFIX, DEFAULT_SLOW_HASH_ITERATIONS, hashPasscode, hashPasscodeSlow, isSlowHash, verifyPasscode } from './security/slowHash.ts';
 export { maskPhoneNumber, maskHomeAddress, maskPrivateNotes } from './security/masking.ts';
-export { generateMilitaryGradeCongregationId, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput, generateSecureCongregationPin, generateSecurePublisherPin, generateSecureRolePin, generateSecureMasterPin } from './security/congregationCredentials.ts';
+export { generateMilitaryGradeCongregationId, formatCanonicalCongregationId, formatCongregationIdInput, formatCongregationPinInput, isValidCongregationPinLength, countCongregationPinChars, MIN_CONGREGATION_PIN_CHARS, generateSecureCongregationPin, generateSecurePublisherPin, generateSecureRolePin, generateSecureMasterPin } from './security/congregationCredentials.ts';
 export { evaluatePinStrength, getPinLockoutRemainingSeconds, recordFailedPinAttempt, resetFailedPinAttempts } from './security/pinPolicy.ts';
 export type { PinStrengthResult } from './security/pinPolicy.ts';
 export { isSafeDemoMode, isCongregationIdString, getFriendlyCongregationName, sanitizeForFirestore, GENERIC_IDENTITY_NAMES, isGenericIdentityName } from './congregationIdentity.ts';

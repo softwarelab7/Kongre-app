@@ -135,6 +135,21 @@ export function formatCongregationPinInput(input: string, prev: string = ''): st
   return `${clean.slice(0, 4)}-${clean.slice(4)}`;
 }
 
+/** Mínimo de caracteres alfanuméricos del PIN de congregación (el guion de formato NO cuenta). */
+export const MIN_CONGREGATION_PIN_CHARS = 8;
+
+/**
+ * Cuenta solo letras y números del PIN de congregación. Antes se validaba `pin.length >= 8` sobre el texto
+ * formateado, de modo que "ABCD-EFG" (7 caracteres reales + guion) pasaba como válido.
+ */
+export function countCongregationPinChars(pin: string): number {
+  return String(pin ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '').length;
+}
+
+export function isValidCongregationPinLength(pin: string): boolean {
+  return countCongregationPinChars(pin) >= MIN_CONGREGATION_PIN_CHARS;
+}
+
 /**
  * Genera una clave/PIN de Congregación de Alta Seguridad Criptográfica:
  * - Entropía criptográfica real de grado militar (CSPRNG vía Web Crypto API)

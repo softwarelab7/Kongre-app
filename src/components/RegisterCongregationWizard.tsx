@@ -10,6 +10,7 @@ import {
   generateMilitaryGradeCongregationId,
   formatCanonicalCongregationId,
   generateSecureCongregationPin,
+  isValidCongregationPinLength,
   generateSecureMasterPin,
   isCongregationIdString,
   setSecureLocalPin,
@@ -341,7 +342,7 @@ export const RegisterCongregationWizard: React.FC<RegisterCongregationWizardProp
         setError('El PIN de la Congregación es obligatorio.');
         return false;
       }
-      if (congregationPin.trim().length < 8) {
+      if (!isValidCongregationPinLength(congregationPin)) {
         setError('El PIN de la Congregación debe tener al menos 8 caracteres.');
         return false;
       }

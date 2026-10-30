@@ -7,6 +7,7 @@
 /* "dark:" aplica en Oscuro y en Cabina A/V (compatible con data-theme y clase .dark) */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, [data-theme="cabina"], [data-theme="cabina"] *, .dark, .dark *));
 @custom-variant cabina (&:where([data-theme="cabina"], [data-theme="cabina"] *, .theme-cabina, .theme-cabina *));
+@custom-variant sepia (&:where([data-theme="sepia"], [data-theme="sepia"] *, .theme-sepia, .theme-sepia *));
 
 /* Conecta las variables con clases: bg-brand, text-muted, border-line, etc. */
 @theme inline {
@@ -23,6 +24,27 @@
   --color-warning: var(--warning);
   --color-danger: var(--error);
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* Tokens Semánticos JW Library */
+  --color-jw-canvas: var(--jw-canvas);
+  --color-jw-surface: var(--jw-surface);
+  --color-jw-elevated: var(--jw-elevated);
+  --color-jw-border: var(--jw-border);
+  --color-jw-text-primary: var(--jw-text-primary);
+  --color-jw-text-secondary: var(--jw-text-secondary);
+  --color-jw-accent: var(--jw-accent);
+
+  /* Secciones Semánticas JW */
+  --color-jw-teal: #0D9488;
+  --color-jw-amber: #D97706;
+  --color-jw-rose: #E11D48;
+
+  /* Marcadores de Usuario JW (Highlights) */
+  --color-jw-hl-yellow: #EAB308;
+  --color-jw-hl-emerald: #10B981;
+  --color-jw-hl-blue: #3B82F6;
+  --color-jw-hl-rose: #EC4899;
+  --color-jw-hl-violet: #8B5CF6;
 }
 
 /* ---------- Claro (por defecto) ---------- */
@@ -40,10 +62,19 @@
   --success: #16A34A;
   --warning: #F59E0B;
   --error: #DC2626;
+
+  /* JW Library Tokens - Modo Claro */
+  --jw-canvas: #F8FAFC;
+  --jw-surface: #FFFFFF;
+  --jw-elevated: #F1F5F9;
+  --jw-border: #E2E8F0;
+  --jw-text-primary: #0F172A;
+  --jw-text-secondary: #475569;
+  --jw-accent: #4F46E5;
   color-scheme: light;
 }
 
-/* ---------- Oscuro ---------- */
+/* ---------- Oscuro (AMOLED-First) ---------- */
 [data-theme="dark"] {
   --brand: #9085F4;
   --brand-hover: #A9A0F6;
@@ -57,7 +88,42 @@
   --success: #22C55E;
   --warning: #FBBF24;
   --error: #F87171;
+
+  /* JW Library Tokens - Modo AMOLED */
+  --jw-canvas: #09090B;
+  --jw-surface: #121216;
+  --jw-elevated: #18181F;
+  --jw-border: #27272A;
+  --jw-text-primary: #F4F4F5;
+  --jw-text-secondary: #A1A1AA;
+  --jw-accent: #6366F1;
   color-scheme: dark;
+}
+
+/* ---------- Sepia (Lectura Prolongada) ---------- */
+[data-theme="sepia"] {
+  --brand: #4F46E5;
+  --brand-hover: #4338CA;
+  --brand-soft: #EAE0C8;
+  --on-brand: #FFFFFF;
+  --bg: #F4ECD8;
+  --surface: #EAE0C8;
+  --border: #D0C2A2;
+  --text: #2C221E;
+  --text-muted: #5C4B3B;
+  --success: #16A34A;
+  --warning: #D97706;
+  --error: #DC2626;
+
+  /* JW Library Tokens - Modo Sepia */
+  --jw-canvas: #F4ECD8;
+  --jw-surface: #EAE0C8;
+  --jw-elevated: #DFD3B6;
+  --jw-border: #D0C2A2;
+  --jw-text-primary: #2C221E;
+  --jw-text-secondary: #5C4B3B;
+  --jw-accent: #4F46E5;
+  color-scheme: light;
 }
 
 /* ---------- Cabina A/V ----------
@@ -76,6 +142,15 @@
   --success: #22C55E;
   --warning: #FBBF24;
   --error: #F87171;
+
+  /* JW Library Tokens - AMOLED Profundo */
+  --jw-canvas: #000000;
+  --jw-surface: #0A0A0F;
+  --jw-elevated: #141418;
+  --jw-border: #27272A;
+  --jw-text-primary: #E5E7EB;
+  --jw-text-secondary: #9CA3AF;
+  --jw-accent: #818CF8;
   color-scheme: dark;
 }
 

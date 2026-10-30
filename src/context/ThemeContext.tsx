@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { applyTheme, Theme as BrandTheme } from '../theme';
 
-export type ThemeMode = 'light' | 'dark';
+export type ThemeMode = 'light' | 'dark' | 'sepia';
 
 interface ThemeContextType {
   themeMode: ThemeMode;
   setThemeMode: (mode: ThemeMode) => void;
   toggleTheme: () => void;
   isDark: boolean;
+  isSepia: boolean;
   isCabinaMode: boolean;
 }
 
@@ -33,7 +34,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [themeMode]);
 
   const setThemeMode = (mode: ThemeMode) => {
-    const cleanMode: ThemeMode = mode === 'dark' ? 'dark' : 'light';
+    const cleanMode: ThemeMode = mode === 'dark' ? 'dark' : mode === 'sepia' ? 'sepia' : 'light';
     try {
       localStorage.setItem('kongre_theme', cleanMode);
       localStorage.setItem('kongre-theme', cleanMode);
@@ -63,6 +64,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setThemeMode,
         toggleTheme,
         isDark: themeMode === 'dark',
+        isSepia: themeMode === 'sepia',
         isCabinaMode: false,
       }}
     >

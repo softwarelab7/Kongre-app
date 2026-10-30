@@ -24,6 +24,9 @@ import {
   sanitizeInvitationsForPublicPayload,
   hashInvitationCode,
   isSafeDemoMode,
+  packageDepartmentCompartment,
+  unpackageDepartmentCompartment,
+  type EncryptedCompartmentEnvelope,
 } from '../utils/theocraticSecurity';
 import {
   Publisher,
@@ -164,6 +167,7 @@ export interface PublicFilteredData {
   memorialPlans?: MemorialPlan[];
   theocraticAssemblies?: TheocraticAssembly[];
   monthlyReports?: MonthlyServiceReport[];
+  departmentalEnvelope?: EncryptedCompartmentEnvelope;
 }
 
 import {
@@ -526,6 +530,42 @@ export const supabaseSyncService = {
         }
       }
 
+      // 3b. Criptografía Estricta por Rol (Zero-Trust Compartments 1.3):
+      // Generar compartimento departamental cifrado con Envelope Encryption para siervos autorizados
+      try {
+        const authorizedPublishers = personalPinsList
+          .filter((p) => {
+            const roles = [p.role, ...(p.theocraticRoles || [])];
+            return (
+              p.privilege === 'anciano' ||
+              p.privilege === 'siervo_ministerial' ||
+              roles.some((r) =>
+                ['siervo_cuentas', 'siervo_territorios', 'siervo_literatura', 'encargado_mantenimiento'].includes(r)
+              )
+            );
+          })
+          .map((p) => ({ publisherId: p.id, personalPin: p.pin }));
+
+        const deptData = {
+          transactions: params.data.transactions || [],
+          audits: params.data.audits || [],
+          territories: params.data.territories || [],
+          literatureItems: params.data.literatureItems || [],
+          literatureOrders: params.data.literatureOrders || [],
+          literatureDistributions: params.data.literatureDistributions || [],
+          literatureInventory: params.data.literatureInventory || [],
+          maintenanceSheets: params.data.maintenanceSheets || [],
+        };
+
+        publicPayload.departmentalEnvelope = await packageDepartmentCompartment({
+          data: deptData,
+          masterPin: cleanMasterPin,
+          authorizedPublishers,
+        });
+      } catch (deptErr) {
+        console.warn('[Sync] Aviso al empaquetar compartimento departamental:', deptErr);
+      }
+
       // 4. Cifrar ambos payloads en el dispositivo (Cero Conocimiento).
       const encryptedAdmin = await encryptForSupabase(adminPayload, cleanMasterPin);
       const encryptedPublic = await encryptForSupabase(publicPayload, cleanPublicPin);
@@ -708,6 +748,31 @@ export const supabaseSyncService = {
         success: false,
         error: err?.message || 'Error al conectar con la base de datos de la congregación.',
       };
+    }
+  },
+
+  /**
+   * Desempaqueta el compartimento departamental de un payload público si el usuario
+   * cuenta con credenciales autorizadas (PIN Maestro o PIN Personal de siervo ministerial).
+   */
+  async unwrapDepartmentalData(
+    publicData: PublicFilteredData,
+    credentials: { masterPin?: string; publisherId?: string; personalPin?: string }
+  ): Promise<{
+    transactions?: AccountTransaction[];
+    audits?: QuarterlyAudit[];
+    territories?: Territory[];
+    literatureItems?: LiteratureItem[];
+    literatureOrders?: LiteratureSpecialOrder[];
+    literatureDistributions?: LiteratureGroupDistribution[];
+    literatureInventory?: LiteratureInventoryRecord[];
+    maintenanceSheets?: MaintenanceSheet[];
+  } | null> {
+    if (!publicData?.departmentalEnvelope) return null;
+    try {
+      return await unpackageDepartmentCompartment(publicData.departmentalEnvelope, credentials);
+    } catch {
+      return null;
     }
   },
 

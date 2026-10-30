@@ -27,3 +27,5 @@ export { sanitizeImportedBackupObject, computeBackupIntegritySeal, verifyBackupI
 export { hashInvitationCode, hashInvitationCodeV1, verifyInvitationCodeMatch, sanitizeInvitationsForPublicPayload } from './security/invitations.ts';
 export { computeAssignmentConfirmSignature, verifyAssignmentConfirmSignature } from './security/assignmentSignature.ts';
 export { sanitizeCsvFormulaInjection, sanitizeImportedCsvText, openSafeExternalUrl } from './security/inputSanitizing.ts';
+export { packageDepartmentCompartment, unpackageDepartmentCompartment, packagePersonalCompartment, unpackagePersonalCompartment } from './security/compartments.ts';
+export type { WrappedKey, EncryptedCompartmentEnvelope, EncryptedPersonalEnvelope } from './security/compartments.ts';

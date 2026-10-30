@@ -52,6 +52,10 @@ server.js
 supabase/.temp/
 .temp/
 .aistudio/
+public/assets/aistudio/
+public/assets/temp/
+*.tmp
+*.dump
 
 # Developer internal changelog (private, not public)
 CHANGELOG_DEV.md

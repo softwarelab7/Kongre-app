@@ -48,7 +48,6 @@ import { DesktopCompatibilityBanner } from './DesktopCompatibilityBanner';
 import { IconCongregationAccess } from './IconCongregationAccess';
 import { RegisterCongregationWizard } from './RegisterCongregationWizard';
 import { PendingApprovalView } from './PendingApprovalView';
-import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
 import AnimatedLogo from '../AnimatedLogo';
 import ThemeToggle from './ThemeToggle';

@@ -21,7 +21,6 @@ import { COUNTRIES_WITH_CITIES, COUNTRIES_LIST } from '../data/countriesAndCitie
 import { SearchableCombobox } from './SearchableCombobox';
 import { Select } from './Select';
 import { IosTimePicker } from './IosTimePicker';
-import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
 import {
   LegalConsentCheckbox,

@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { useCongregation } from '../context/CongregationContext';
 import { useAuth } from '../context/AuthContext';
 import { THEOCRATIC_ROLES, TheocraticRole } from '../utils/rbac';
-import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
 import {
   Clock,

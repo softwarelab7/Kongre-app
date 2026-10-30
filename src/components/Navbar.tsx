@@ -5,7 +5,6 @@ import { useCongregation } from '../context/CongregationContext';
 import { useTheme } from '../context/ThemeContext';
 import { useSecurity } from '../context/SecurityContext';
 import { PWAInstallButton } from './PWAInstallButton';
-import { KongreLogo } from './KongreLogo';
 import Logo from '../Logo';
 import ThemeToggle from './ThemeToggle';
 import { AutoLockTimerChip } from './AutoLockTimerChip';

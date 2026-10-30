@@ -139,32 +139,34 @@ Para consultar el registro cronológico exhaustivo con todas las versiones y cor
 
 ---
 
-### Opción 1: Aplicación Nativa para PC (Recomendada para Salones y Escritorio)
+---
 
-Descarga el instalador correspondiente a tu sistema operativo desde el **[Centro Oficial de Descargas de Kongre](https://github.com/softwarelab7/Kongre-app/releases/latest)**:
+### Opción 1: Aplicación Nativa para Linux (PC y Cabina de Sonido)
+
+Para sistemas Linux, descarga el paquete correspondiente desde el **[Centro Oficial de Descargas de Kongre](https://github.com/softwarelab7/Kongre-app/releases/latest)**:
 
 | Sistema Operativo | Paquete Oficial | Método de Instalación |
 | :--- | :--- | :--- |
-| **🪟 Windows 10 / 11** | `Kongre_0.1.0-alpha.40_x64-setup.exe` | Ejecuta el instalador con doble clic y sigue el asistente interactivo de instalación. |
-| **🍎 macOS (Apple Silicon M1-M4 & Intel)** | `Kongre_0.1.0-alpha.40_universal.dmg` | Abre el archivo `.dmg` y arrastra el icono de **Kongre** a la carpeta `Aplicaciones`. |
 | **🔵 Fedora Linux / Red Hat / openSUSE** | `Kongre-0.1.0-alpha.40-1.x86_64.rpm` | Ejecuta en terminal: `sudo dnf install ./Kongre-0.1.0-alpha.40-1.x86_64.rpm` |
 | **🟠 Ubuntu / Debian / Linux Mint** | `Kongre_0.1.0-alpha.40_amd64.deb` | Ejecuta en terminal: `sudo dpkg -i ./Kongre_0.1.0-alpha.40_amd64.deb` |
 | **🐧 Linux Universal (Portable)** | `Kongre_0.1.0-alpha.40_amd64.AppImage` | Asigna permisos y ejecuta: `chmod +x Kongre_*.AppImage && ./Kongre_*.AppImage` |
 
 > [!TIP]
-> **Consumo ultraligero:** La aplicación nativa para PC está escrita en **Rust con Tauri v2** y consume únicamente ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.
+> **Consumo ultraligero:** La aplicación nativa para Linux está escrita en **Rust con Tauri v2** y consume únicamente ~15 MB de memoria RAM, garantizando arranque instantáneo y estabilidad continua incluso en computadoras modestas de cabina de sonido.
 
 ---
 
-### Opción 2: Versión Web y Progressive Web App (Móvil & Tablets)
+### Opción 2: Aplicación Web y PWA de Escritorio (Windows, macOS, Móviles y Tablets)
 
-Puedes acceder de forma inmediata a la versión web completa desde cualquier dispositivo:
+Para **Windows** y **macOS**, la experiencia oficial y recomendada es la **Progressive Web App (PWA)** desde el portal oficial:
 
 🌐 **Portal Web Oficial:** [https://www.kongre-app.com](https://www.kongre-app.com)
 
-#### Cómo instalar como App en Teléfonos y Tablets (PWA Offline-First):
-- **Android (Chrome / Firefox):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), toca los tres puntos verticales `⋮` de la barra superior y selecciona **«Instalar aplicación»** o **«Agregar a la pantalla principal»**.
-- **iPhone / iPad (Safari):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), toca el botón **Compartir** (icono de cuadrado con flecha hacia arriba) y selecciona **«Agregar al inicio»**.
+#### Cómo instalar como App Nativa en 1 Clic (Sin certificados de pago ni advertencias):
+* **🪟 Windows (Google Chrome / Microsoft Edge):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), haz clic en el icono de instalación en la barra de direcciones `⊕` (o en los tres puntos `⋮` $\rightarrow$ **«Instalar Kongre»**). Se anclará al Menú Inicio y a la Barra de Tareas, abriendo en su propia ventana nativa independiente y sin advertencias de SmartScreen.
+* **🍎 macOS (Google Chrome / Safari / Edge):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), ve a **Archivo** $\rightarrow$ **«Agregar al Dock»** (o en Chrome: `⋮` $\rightarrow$ **«Instalar Kongre»**). Funcionará como una app de escritorio nativa en el Dock sin restricciones de Gatekeeper.
+* **📱 Android (Chrome / Firefox):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), toca `⋮` $\rightarrow$ **«Instalar aplicación»** o **«Agregar a la pantalla principal»**.
+* **🍏 iPhone / iPad (Safari):** Abre [https://www.kongre-app.com](https://www.kongre-app.com), toca el botón **Compartir** $\rightarrow$ **«Agregar al inicio»**.
 
 > [!NOTE]
 > La aplicación web cuenta con soporte **100% Offline-First**: una vez cargada por primera vez, todos los módulos operan normalmente sin necesidad de conexión activa a internet.

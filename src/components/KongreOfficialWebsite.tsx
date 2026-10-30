@@ -467,25 +467,25 @@ const DOC_ARTICLES: DocArticle[] = [
     categoryKey: 'install',
     categoryLabel: 'Abrir e Instalar la App',
     audience: 'Ancianos, Siervos y Computadora del Salón del Reino',
-    title: 'Instalar en Windows, macOS y Linux (Escritorio)',
+    title: 'Instalar en Linux (Nativo) y Windows / macOS (PWA)',
     summary:
-      'Elige entre instalar el ejecutable nativo ultraligero en Rust (Tauri) para la PC del Salón del Reino o instalar la aplicación desde Chrome/Edge.',
+      'Elige entre instalar el paquete nativo ultraligero en Rust (Tauri) para Linux en el Salón del Reino o instalar en 1 clic como PWA desde Chrome, Edge o Safari para Windows y Mac.',
     readTime: '3 min',
     menuPath: 'Descargas PC / Navegador de Escritorio',
     steps: [
       {
         id: 'desktop-opcion-1',
-        title: 'Opción A: Instalador Nativo de Escritorio en Rust (Recomendado para el Salón)',
-        badge: 'App Nativa PC/Mac',
+        title: 'Opción A: Instalador Nativo Linux en Rust (Recomendado para el Salón)',
+        badge: 'Nativo Linux',
         detail:
-          'Ve a la pestaña "Descargas PC / Móvil" de este sitio y descarga el instalador correspondiente a tu sistema: Windows (.exe / .msi), macOS (.dmg para Apple Silicon o Intel) o Linux (.deb / .AppImage). Pesa menos de 15 MB y arranca al instante.',
+          'Ve a la pestaña "Descargas PC / Móvil" de este sitio y descarga el paquete nativo para tu distribución: Ubuntu/Debian (.deb), Fedora/Red Hat (.rpm) o Linux Portable (.AppImage). Pesa menos de 16 MB y arranca al instante.',
       },
       {
         id: 'desktop-opcion-2',
-        title: 'Opción B: Instalación rápida como PWA desde Chrome o Microsoft Edge',
-        badge: 'Desde Navegador',
+        title: 'Opción B: Instalación en 1 Clic como PWA (Windows y macOS)',
+        badge: '1 Clic Navegador',
         detail:
-          'Si estás en Windows, Mac o Chromebook, abre kongre-app.com/#portal en Chrome o Edge. Haz clic en el ícono de computadora con una flecha situado en el extremo derecho de la barra de direcciones y pulsa "Instalar".',
+          'En Windows o Mac, abre kongre-app.com en Chrome, Edge o Safari. Haz clic en el ícono de instalación ⊕ de la barra de direcciones o menú ⋮ → «Instalar Kongre». Se ejecuta en su propia ventana sin advertencias de certificados.',
       },
     ],
     tip: 'En la computadora del Salón del Reino puedes anclar Kongre a la barra de tareas para abrir rápidamente el «Modo Tablero del Salón» antes de cada reunión.',
@@ -977,9 +977,20 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
   const [docSearchQuery, setDocSearchQuery] = useState('');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [desktopModalOpen, setDesktopModalOpen] = useState(false);
-  const [selectedMobileTab, setSelectedMobileTab] = useState<'android' | 'ios'>('android');
+  const [selectedMobileTab, setSelectedMobileTab] = useState<'windows' | 'mac' | 'android' | 'ios'>(() => {
+    if (typeof window !== 'undefined') {
+      const ua = (navigator.userAgent || '').toLowerCase();
+      if (ua.includes('win')) return 'windows';
+      if (ua.includes('mac') && !/iphone|ipad|ipod/.test(ua)) return 'mac';
+      if (/iphone|ipad|ipod/.test(ua)) return 'ios';
+    }
+    return 'android';
+  });
   const detectedPlatform = useMemo(() => detectUserPlatform(), []);
-  const [selectedPcOs, setSelectedPcOs] = useState<PlatformId>(() => detectedPlatform.id);
+  const [selectedPcOs, setSelectedPcOs] = useState<PlatformId>(() => {
+    if (detectedPlatform.id === 'fedora') return 'fedora';
+    return 'linux';
+  });
   const [qrCopied, setQrCopied] = useState(false);
   const [heroPreviewTab, setHeroPreviewTab] = useState<'reuniones' | 'asistencia' | 'territorios' | 'ministerio'>('reuniones');
   const qrCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -2852,7 +2863,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
 
             {/* 2 MAIN CARDS: MOBILE vs DESKTOP (EQUAL HEIGHT, ULTRA-COMPACT & BALANCED) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 sm:gap-5 items-stretch relative z-10">
-              {/* CARD 1: EN TU MÓVIL (PWA) */}
+              {/* CARD 1: PWA OFICIAL (WINDOWS, MACOS, ANDROID & IOS) */}
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -2865,10 +2876,10 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                        PWA Móvil · Android & iOS
+                        PWA Oficial · Windows, macOS, Android & iOS
                       </span>
                       <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
-                        En Celular o Tableta
+                        Aplicación Web & PWA
                       </h2>
                     </div>
                     <div className="w-9 h-9 rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20 shrink-0">
@@ -2884,10 +2895,10 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     <div className="space-y-1 min-w-0 flex-1">
                       <div className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-white">
                         <QrCode className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                        <span>Apunta tu cámara móvil</span>
+                        <span>Apunta tu cámara móvil o PC</span>
                       </div>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
-                        Escanea el QR para abrir la app sin teclear la dirección.
+                        Abre la app al instante con soporte 100% desconectado.
                       </p>
                       <button
                         type="button"
@@ -2900,37 +2911,71 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     </div>
                   </div>
 
-                  {/* Android / iPhone Clean Instructions */}
+                  {/* OS / Platform Clean Instructions */}
                   <div className="space-y-1.5">
-                    <div className="flex rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5 text-xs font-bold">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5 text-xs font-bold gap-0.5">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedMobileTab('windows')}
+                        className={`py-1 rounded-md transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                          selectedMobileTab === 'windows'
+                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs font-extrabold'
+                            : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        <Laptop className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                        <span>Windows</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedMobileTab('mac')}
+                        className={`py-1 rounded-md transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                          selectedMobileTab === 'mac'
+                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs font-extrabold'
+                            : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        <Apple className="w-3.5 h-3.5 text-slate-700 dark:text-slate-300" />
+                        <span>macOS</span>
+                      </button>
                       <button
                         type="button"
                         onClick={() => setSelectedMobileTab('android')}
-                        className={`flex-1 py-1 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        className={`py-1 rounded-md transition-all flex items-center justify-center gap-1 cursor-pointer ${
                           selectedMobileTab === 'android'
                             ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs font-extrabold'
                             : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         <Smartphone className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                        <span>Android (Chrome)</span>
+                        <span>Android</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setSelectedMobileTab('ios')}
-                        className={`flex-1 py-1 rounded-md transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        className={`py-1 rounded-md transition-all flex items-center justify-center gap-1 cursor-pointer ${
                           selectedMobileTab === 'ios'
                             ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs font-extrabold'
                             : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         <Apple className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                        <span>iPhone / iPad (Safari)</span>
+                        <span>iOS</span>
                       </button>
                     </div>
 
                     <div className="p-2 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-700/70 text-[11px] leading-snug text-slate-600 dark:text-slate-300">
-                      {selectedMobileTab === 'android' ? (
+                      {selectedMobileTab === 'windows' ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-bold text-blue-600 dark:text-blue-400 shrink-0">Instalación:</span>
+                          <span>Abre en Chrome o Edge → clic en <strong>⊕</strong> en barra de direcciones (o menú <strong>⋮</strong> → <strong>«Instalar Kongre»</strong>).</span>
+                        </div>
+                      ) : selectedMobileTab === 'mac' ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-bold text-slate-700 dark:text-slate-300 shrink-0">Instalación:</span>
+                          <span>Abre en Safari → <strong>Archivo</strong> → <strong>«Agregar al Dock»</strong> (o en Chrome: menú <strong>⋮</strong> → <strong>«Instalar»</strong>).</span>
+                        </div>
+                      ) : selectedMobileTab === 'android' ? (
                         <div className="flex items-center gap-1.5">
                           <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">Instalación:</span>
                           <span>Abre en Chrome → menú (<strong>⋮</strong>) → <strong>«Instalar aplicación»</strong>.</span>
@@ -2960,7 +3005,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                 </div>
               </motion.div>
 
-              {/* CARD 2: EN COMPUTADORA / SALÓN (RUST NATIVO) */}
+              {/* CARD 2: EN COMPUTADORA / SALÓN (RUST NATIVO LINUX) */}
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -2973,10 +3018,10 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                        Rust Nativo · PC & Mac & Linux
+                        Rust Nativo · Linux (Salón & Cabina)
                       </span>
                       <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
-                        En Computadora / Salón
+                        En Computadora / Linux
                       </h2>
                     </div>
                     <div className="w-9 h-9 rounded-xl bg-linear-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center shadow-md shadow-indigo-600/25 shrink-0">
@@ -2984,11 +3029,11 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                     </div>
                   </div>
 
-                  {/* OS Selector Pills (4 options in a single neat row) */}
+                  {/* OS Selector Pills (3 options for Linux) */}
                   <div className="space-y-1">
                     <div className="flex items-center justify-between text-[10.5px]">
                       <span className="font-bold text-slate-500 dark:text-slate-400">
-                        Sistema operativo:
+                        Paquete para Linux:
                       </span>
                       {selectedPcOs === detectedPlatform.id && (
                         <span className="inline-flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400 text-[10px]">
@@ -2998,12 +3043,11 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       )}
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                    <div className="grid grid-cols-3 gap-1.5">
                       {[
-                        { id: 'windows' as PlatformId, name: 'Windows', icon: Laptop, ext: '.exe' },
-                        { id: 'mac' as PlatformId, name: 'macOS', icon: Apple, ext: '.dmg' },
                         { id: 'linux' as PlatformId, name: 'Ubuntu', icon: Terminal, ext: '.deb' },
                         { id: 'fedora' as PlatformId, name: 'Fedora', icon: Monitor, ext: '.rpm' },
+                        { id: 'appimage' as PlatformId, name: 'Portable', icon: HardDrive, ext: '.AppImage' },
                       ].map((item) => {
                         const Icon = item.icon;
                         const isSelected = selectedPcOs === item.id;
@@ -3092,7 +3136,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
                       onClick={() => setDesktopModalOpen(true)}
                       className="text-[10.5px] font-semibold text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition cursor-pointer"
                     >
-                      Ver sumas SHA-256 e instaladores avanzados (MSI / AppImage / Portátiles)
+                      Ver sumas SHA-256 e instaladores avanzados para Linux
                     </button>
                   </div>
                 </div>
@@ -3113,7 +3157,7 @@ export const KongreOfficialWebsite: React.FC<KongreOfficialWebsiteProps> = ({
               <span className="hidden sm:inline text-slate-300 dark:text-slate-700">•</span>
               <span className="inline-flex items-center gap-1.5 font-medium">
                 <Zap className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Código Abierto y Gratuito</span>
+                <span>100% Gratuito y Privado</span>
               </span>
             </div>
           </div>

@@ -1435,9 +1435,9 @@ export const CongregationWelcomeLanding: React.FC<CongregationWelcomeLandingProp
 
               <LandingOptionRow
                 icon={Monitor}
-                badge={{ label: 'PC · Rust', tone: 'lectura' }}
+                badge={{ label: 'PC · Linux & PWA', tone: 'lectura' }}
                 title="Descargar Kongre para PC"
-                description="Instalador nativo para Windows (.exe), macOS (.dmg) o Linux (.rpm / .deb)."
+                description="Paquete nativo para Linux (.rpm / .deb / .AppImage) o PWA en 1 clic para Windows y Mac."
                 onClick={handleOpenDownloads}
               />
             </div>

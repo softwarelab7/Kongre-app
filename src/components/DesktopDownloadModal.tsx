@@ -44,22 +44,22 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
 
   const platforms = [
     {
-      id: 'windows',
-      name: 'Windows',
-      desc: 'Windows 10 / 11 (64 bits)',
+      id: 'linux',
+      name: 'Ubuntu / Debian',
+      desc: 'Ubuntu 20+, Debian 11+, Linux Mint, Pop!_OS, Arch',
       icon: Monitor,
-      color: 'from-blue-600 to-cyan-500',
-      badge: 'Instalador oficial',
+      color: 'from-amber-600 to-orange-500',
+      badge: 'Paquete DEB',
       primaryFile: {
-        name: 'Kongre Setup (.exe)',
-        size: '15.3 MB',
-        url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_x64-setup.exe`,
+        name: 'Paquete Debian (.deb)',
+        size: '16.1 MB',
+        url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_amd64.deb`,
         recommended: true,
       },
       secondaryFile: {
-        name: 'Paquete MSI (.msi)',
-        size: '16.1 MB',
-        url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_x64_en-US.msi`,
+        name: 'Portable (.AppImage)',
+        size: '90.9 MB',
+        url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_amd64.AppImage`,
       },
     },
     {
@@ -68,7 +68,7 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
       desc: 'Fedora 38+, RHEL, CentOS, openSUSE',
       icon: Monitor,
       color: 'from-blue-500 to-indigo-600',
-      badge: 'Paquete Nativo RPM',
+      badge: 'Paquete RPM',
       primaryFile: {
         name: 'Kongre RPM (.rpm)',
         size: '16.1 MB',
@@ -82,41 +82,17 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
       },
     },
     {
-      id: 'mac',
-      name: 'macOS',
-      desc: 'Apple Silicon (M1-M4) & Intel',
-      icon: Apple,
-      color: 'from-slate-700 to-slate-900',
-      badge: 'Binario Universal',
+      id: 'appimage',
+      name: 'Linux Portable Universal',
+      desc: 'Compatible con cualquier distribución Linux x86_64',
+      icon: HardDrive,
+      color: 'from-purple-600 to-indigo-600',
+      badge: 'Portable AppImage',
       primaryFile: {
-        name: 'Kongre para Mac (.dmg)',
-        size: '32.2 MB',
-        url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_universal.dmg`,
-        recommended: true,
-      },
-      secondaryFile: {
-        name: 'Paquete Tarball (.tar.gz)',
-        size: '32.1 MB',
-        url: `${DOWNLOAD_BASE_URL}/Kongre_universal.app.tar.gz`,
-      },
-    },
-    {
-      id: 'linux',
-      name: 'Ubuntu / Debian / Otros Linux',
-      desc: 'Ubuntu, Debian, Mint, Arch, etc.',
-      icon: Monitor,
-      color: 'from-amber-600 to-orange-500',
-      badge: 'Debian & Universal',
-      primaryFile: {
-        name: 'Paquete Debian (.deb)',
-        size: '16.1 MB',
-        url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_amd64.deb`,
-        recommended: true,
-      },
-      secondaryFile: {
-        name: 'Portable (.AppImage)',
+        name: 'Kongre Portable (.AppImage)',
         size: '90.9 MB',
         url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_amd64.AppImage`,
+        recommended: true,
       },
     },
   ];
@@ -181,10 +157,21 @@ export const DesktopDownloadModal: React.FC<DesktopDownloadModalProps> = ({ isOp
           </div>
         </div>
 
+        {/* PWA Notice for Windows / macOS */}
+        <div className="p-3.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/80 text-xs text-slate-700 dark:text-slate-300 space-y-1">
+          <div className="font-extrabold text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
+            <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <span>¿Usas Windows o macOS?</span>
+          </div>
+          <p className="leading-relaxed text-[11.5px] text-slate-600 dark:text-slate-300">
+            En Windows y Mac la experiencia oficial recomendada es la <strong>Progressive Web App (PWA)</strong>: abre Kongre en Chrome, Edge o Safari y selecciona <strong>«Instalar Kongre»</strong> o <strong>«Agregar al Dock»</strong> para usarla como app de escritorio sin descargas de instaladores externos ni avisos de seguridad.
+          </p>
+        </div>
+
         {/* Platforms List */}
         <div className="space-y-3">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-1">
-            Selecciona tu sistema operativo
+            Paquetes Oficiales para Linux (Salón & Cabina)
           </h3>
 
           <div className="space-y-2.5">

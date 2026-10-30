@@ -15,14 +15,14 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { CURRENT_APP_VERSION } from '../utils/versionLog';
 
-export type PlatformId = 'windows' | 'mac' | 'fedora' | 'linux';
+export type PlatformId = 'linux' | 'fedora' | 'appimage';
 
 const DOWNLOAD_BASE_URL = 'https://github.com/softwarelab7/Kongre-app/releases/latest/download';
 
 export interface PlatformConfig {
   id: PlatformId;
   name: string;
-  osFamily: 'Windows' | 'macOS' | 'Linux';
+  osFamily: 'Linux';
   badge: string;
   architecture: string;
   icon: React.ComponentType<{ className?: string }>;
@@ -43,72 +43,6 @@ export interface PlatformConfig {
 }
 
 export const PLATFORMS_DATA: Record<PlatformId, PlatformConfig> = {
-  windows: {
-    id: 'windows',
-    name: 'Windows',
-    osFamily: 'Windows',
-    badge: 'Instalador Oficial .exe',
-    architecture: 'Windows 10 / 11 (64-bit)',
-    icon: Monitor,
-    compatibilityNote: 'Compatible con Windows 10, Windows 11 y Windows Server',
-    primaryFile: {
-      name: 'Instalador Kongre Setup (.exe)',
-      ext: '.exe',
-      size: '15.3 MB',
-      url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_x64-setup.exe`,
-    },
-    secondaryFile: {
-      name: 'Paquete MSI (.msi)',
-      ext: '.msi',
-      size: '16.1 MB',
-      url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_x64_en-US.msi`,
-    },
-    gradient: 'from-blue-600 via-indigo-600 to-cyan-500',
-  },
-  mac: {
-    id: 'mac',
-    name: 'macOS',
-    osFamily: 'macOS',
-    badge: 'Binario Universal .dmg',
-    architecture: 'Apple Silicon (M1-M4) & Intel',
-    icon: Apple,
-    compatibilityNote: 'Universal: Optimizado nativamente para chips M1, M2, M3, M4 e Intel',
-    primaryFile: {
-      name: 'Imagen de Disco Kongre (.dmg)',
-      ext: '.dmg',
-      size: '32.2 MB',
-      url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_universal.dmg`,
-    },
-    secondaryFile: {
-      name: 'Paquete Tarball (.tar.gz)',
-      ext: '.tar.gz',
-      size: '32.1 MB',
-      url: `${DOWNLOAD_BASE_URL}/Kongre_universal.app.tar.gz`,
-    },
-    gradient: 'from-slate-800 via-slate-700 to-zinc-900',
-  },
-  fedora: {
-    id: 'fedora',
-    name: 'Fedora / Red Hat',
-    osFamily: 'Linux',
-    badge: 'Paquete RPM Nativo',
-    architecture: 'Fedora 38+, RHEL, openSUSE (x86_64)',
-    icon: Monitor,
-    compatibilityNote: 'Integración nativa con GNOME / KDE y WebKitGTK',
-    primaryFile: {
-      name: 'Paquete Nativo Kongre (.rpm)',
-      ext: '.rpm',
-      size: '16.1 MB',
-      url: `${DOWNLOAD_BASE_URL}/Kongre-${CURRENT_APP_VERSION}-1.x86_64.rpm`,
-    },
-    secondaryFile: {
-      name: 'Portable (.AppImage)',
-      ext: '.AppImage',
-      size: '90.9 MB',
-      url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_amd64.AppImage`,
-    },
-    gradient: 'from-blue-500 via-indigo-700 to-indigo-900',
-  },
   linux: {
     id: 'linux',
     name: 'Ubuntu / Debian',
@@ -118,7 +52,7 @@ export const PLATFORMS_DATA: Record<PlatformId, PlatformConfig> = {
     icon: Monitor,
     compatibilityNote: 'Empaquetado oficial con dependencias WebKitGTK incluidas',
     primaryFile: {
-      name: 'Paquete Debian Kongre (.deb)',
+      name: 'Paquete Debian (.deb)',
       ext: '.deb',
       size: '16.1 MB',
       url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_amd64.deb`,
@@ -131,25 +65,65 @@ export const PLATFORMS_DATA: Record<PlatformId, PlatformConfig> = {
     },
     gradient: 'from-amber-600 via-orange-600 to-red-600',
   },
+  fedora: {
+    id: 'fedora',
+    name: 'Fedora / Red Hat',
+    osFamily: 'Linux',
+    badge: 'Paquete RPM Nativo',
+    architecture: 'Fedora 38+, RHEL, openSUSE (x86_64)',
+    icon: Monitor,
+    compatibilityNote: 'Integración nativa con GNOME / KDE y WebKitGTK',
+    primaryFile: {
+      name: 'Paquete Nativo (.rpm)',
+      ext: '.rpm',
+      size: '16.1 MB',
+      url: `${DOWNLOAD_BASE_URL}/Kongre-${CURRENT_APP_VERSION}-1.x86_64.rpm`,
+    },
+    secondaryFile: {
+      name: 'Portable (.AppImage)',
+      ext: '.AppImage',
+      size: '90.9 MB',
+      url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_amd64.AppImage`,
+    },
+    gradient: 'from-blue-500 via-indigo-700 to-indigo-900',
+  },
+  appimage: {
+    id: 'appimage',
+    name: 'Linux Portable',
+    osFamily: 'Linux',
+    badge: 'AppImage Universal',
+    architecture: 'Cualquier distribución Linux (x86_64)',
+    icon: HardDrive,
+    compatibilityNote: 'Sin instalación ni dependencias; dale permisos de ejecución y abre al instante',
+    primaryFile: {
+      name: 'Kongre Portable (.AppImage)',
+      ext: '.AppImage',
+      size: '90.9 MB',
+      url: `${DOWNLOAD_BASE_URL}/Kongre_${CURRENT_APP_VERSION}_amd64.AppImage`,
+    },
+    gradient: 'from-purple-600 via-indigo-600 to-slate-800',
+  },
 };
 
-export function detectUserPlatform(): { id: PlatformId; isMobile: boolean } {
+export function detectUserPlatform(): {
+  id: PlatformId;
+  isMobile: boolean;
+  osFamily: 'windows' | 'mac' | 'linux';
+} {
   if (typeof window === 'undefined') {
-    return { id: 'windows', isMobile: false };
+    return { id: 'linux', isMobile: false, osFamily: 'linux' };
   }
   const ua = (navigator.userAgent || '').toLowerCase();
   const isMobile = /android|iphone|ipad|ipod|mobile/i.test(ua);
 
+  let osFamily: 'windows' | 'mac' | 'linux' = 'linux';
+  if (ua.includes('win')) osFamily = 'windows';
+  else if (ua.includes('mac') || ua.includes('darwin')) osFamily = 'mac';
+
   if (ua.includes('fedora') || ua.includes('red hat') || ua.includes('rhel')) {
-    return { id: 'fedora', isMobile };
+    return { id: 'fedora', isMobile, osFamily };
   }
-  if (ua.includes('mac') || ua.includes('darwin')) {
-    return { id: 'mac', isMobile };
-  }
-  if (ua.includes('linux')) {
-    return { id: 'linux', isMobile };
-  }
-  return { id: 'windows', isMobile };
+  return { id: 'linux', isMobile, osFamily };
 }
 
 interface DesktopCompatibilityBannerProps {
@@ -161,14 +135,16 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
   variant = 'hero-card',
   onOpenAllDownloads,
 }) => {
-  const [detectedPlatformId, setDetectedPlatformId] = useState<PlatformId>('windows');
-  const [selectedPlatformId, setSelectedPlatformId] = useState<PlatformId>('windows');
+  const [detectedPlatformId, setDetectedPlatformId] = useState<PlatformId>('linux');
+  const [selectedPlatformId, setSelectedPlatformId] = useState<PlatformId>('linux');
+  const [detectedOsFamily, setDetectedOsFamily] = useState<'windows' | 'mac' | 'linux'>('linux');
   const [isMobileDevice, setIsMobileDevice] = useState<boolean>(false);
 
   useEffect(() => {
-    const { id, isMobile } = detectUserPlatform();
+    const { id, isMobile, osFamily } = detectUserPlatform();
     setDetectedPlatformId(id);
     setSelectedPlatformId(id);
+    setDetectedOsFamily(osFamily);
     setIsMobileDevice(isMobile);
   }, []);
 
@@ -203,13 +179,13 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
             <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10.5px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
               <span>Versión para PC</span>
               <span aria-hidden="true">·</span>
-              <span className="font-mono">Rust v{CURRENT_APP_VERSION}</span>
+              <span className="font-mono">Linux Nativo v{CURRENT_APP_VERSION}</span>
             </div>
             <h3 className="text-[15px] sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug mt-0.5">
-              Kongre App para Escritorio
+              Kongre App para Linux & PWA
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mt-0.5">
-              Ideal para la computadora del Salón del Reino y estudio personal con operación 100% offline.
+              Paquetes nativos ultraligeros para cabina y Salón del Reino con operación 100% offline.
             </p>
           </div>
         </div>
@@ -218,9 +194,9 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
         <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 shrink-0 sm:self-start">
           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span>
-            {isMobileDevice
-              ? 'Windows · macOS · Linux'
-              : `Recomendado: ${detectedConfig.name}`}
+            {detectedOsFamily !== 'linux'
+              ? 'Windows / macOS: Recomendado PWA 1 Clic'
+              : `Recomendado: ${detectedConfig?.name || 'Linux'}`}
           </span>
         </div>
       </div>
@@ -229,11 +205,11 @@ export const DesktopCompatibilityBanner: React.FC<DesktopCompatibilityBannerProp
       <div className="py-3">
         <div className="flex items-center justify-between gap-2 mb-2">
           <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-            Elige el sistema operativo de tu PC:
+            Elige el paquete oficial para Linux:
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           {(Object.keys(PLATFORMS_DATA) as PlatformId[]).map((pid) => {
             const p = PLATFORMS_DATA[pid];
             const isSelected = selectedPlatformId === pid;

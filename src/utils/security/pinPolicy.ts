@@ -17,13 +17,13 @@ const TRIVIAL_PINS = new Set([
 ]);
 
 export function evaluatePinStrength(pin: string): PinStrengthResult {
-  if (!pin || pin.length < 4) {
+  if (!pin || pin.length < 6) {
     return {
       score: 0,
       label: 'Muy corto',
       color: 'bg-slate-300 text-slate-500',
       isWeak: true,
-      message: 'Mínimo 4 caracteres o dígitos'
+      message: 'Mínimo 6 caracteres o dígitos'
     };
   }
 

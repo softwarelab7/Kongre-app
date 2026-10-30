@@ -200,7 +200,7 @@ test('límite de creaciones por IP', async () => {
   const { call } = setup();
   const codes: number[] = [];
   for (let i = 0; i < 12; i++) codes.push((await create(call, `NEW${100 + i}`)).status);
-  assert.equal(codes.filter((c) => c === 200).length, 9);
+  assert.equal(codes.filter((c) => c === 200).length, 4);
   assert.ok(codes.includes(429));
 });
 

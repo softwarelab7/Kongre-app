@@ -62,7 +62,7 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev libxdo-dev libfuse2 file xdg-utils rpm
 
       - name: Install frontend dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci --legacy-peer-deps --ignore-scripts
 
       - name: Build Desktop Application (Tauri v2 - Linux Native)
         id: tauri_build

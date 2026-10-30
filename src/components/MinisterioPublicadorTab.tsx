@@ -44,6 +44,7 @@ import {
 } from 'lucide-react';
 import { MinistryStopwatchDial } from './MinistryStopwatchDial';
 import { getAvailableServiceYears, getServiceYearMonths } from '../utils/s21Helper';
+import { getVaultValue, setVaultValue } from '../utils/atRestVault';
 
 export type MinistrySubTab =
   | 'resumen'
@@ -394,7 +395,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
   const [timeLogs, setTimeLogs] = useState<MinistryTimeLog[]>(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY_LOGS);
+      const raw = getVaultValue(STORAGE_KEY_LOGS) || localStorage.getItem(STORAGE_KEY_LOGS);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
@@ -420,7 +421,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(timeLogs));
+      setVaultValue(STORAGE_KEY_LOGS, JSON.stringify(timeLogs));
     } catch {}
   }, [timeLogs]);
 
@@ -597,7 +598,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
   const [returnVisits, setReturnVisits] = useState<ReturnVisitRecord[]>(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY_RV);
+      const raw = getVaultValue(STORAGE_KEY_RV) || localStorage.getItem(STORAGE_KEY_RV);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
@@ -631,7 +632,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY_RV, JSON.stringify(returnVisits));
+      setVaultValue(STORAGE_KEY_RV, JSON.stringify(returnVisits));
     } catch {}
   }, [returnVisits]);
 
@@ -786,7 +787,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
   const [bibleStudies, setBibleStudies] = useState<BibleStudyRecord[]>(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY_STUDIES);
+      const raw = getVaultValue(STORAGE_KEY_STUDIES) || localStorage.getItem(STORAGE_KEY_STUDIES);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
@@ -816,7 +817,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY_STUDIES, JSON.stringify(bibleStudies));
+      setVaultValue(STORAGE_KEY_STUDIES, JSON.stringify(bibleStudies));
     } catch {}
   }, [bibleStudies]);
 
@@ -1042,7 +1043,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         const otherMonths = prev.filter((l) => l.month !== currentMonthKey);
         const next = [...existingS4Report.timeLogs!, ...otherMonths];
         try {
-          localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(next));
+          setVaultValue(STORAGE_KEY_LOGS, JSON.stringify(next));
         } catch {}
         return next;
       });
@@ -1067,7 +1068,7 @@ export const MinisterioPublicadorTab: React.FC<MinisterioPublicadorTabProps> = (
         const otherMonths = prev.filter((l) => l.month !== currentMonthKey);
         const next = [synthesizedLog, ...otherMonths];
         try {
-          localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(next));
+          setVaultValue(STORAGE_KEY_LOGS, JSON.stringify(next));
         } catch {}
         return next;
       });

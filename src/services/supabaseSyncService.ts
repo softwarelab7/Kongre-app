@@ -515,11 +515,11 @@ export const supabaseSyncService = {
         // y solo viajan en el payload maestro para el cuerpo de ancianos, nunca en el payload público común.
       };
 
-      // 3. Extraer PINs personales para verificación segura en la Edge Function
+      // 3. Extraer PINs personales para verificación segura en la Edge Function (mínimo 6 dígitos estrictos)
       const personalPinsList: PersonalPinEntry[] = [];
       for (const p of params.data.publishers || []) {
         const pin = p.personalPin ? String(p.personalPin).trim() : '';
-        if (pin.length >= 4) {
+        if (pin.length >= 6) {
           personalPinsList.push({
             id: p.id,
             pin,
@@ -531,41 +531,11 @@ export const supabaseSyncService = {
         }
       }
 
-      // 3b. Criptografía Estricta por Rol (Zero-Trust Compartments 1.3):
-      // Generar compartimento departamental cifrado con Envelope Encryption para siervos autorizados
-      try {
-        const authorizedPublishers = personalPinsList
-          .filter((p) => {
-            const roles = [p.role, ...(p.theocraticRoles || [])];
-            return (
-              p.privilege === 'anciano' ||
-              p.privilege === 'siervo_ministerial' ||
-              roles.some((r) =>
-                ['siervo_cuentas', 'siervo_territorios', 'siervo_literatura', 'encargado_mantenimiento'].includes(r)
-              )
-            );
-          })
-          .map((p) => ({ publisherId: p.id, personalPin: p.pin }));
-
-        const deptData = {
-          transactions: params.data.transactions || [],
-          audits: params.data.audits || [],
-          territories: params.data.territories || [],
-          literatureItems: params.data.literatureItems || [],
-          literatureOrders: params.data.literatureOrders || [],
-          literatureDistributions: params.data.literatureDistributions || [],
-          literatureInventory: params.data.literatureInventory || [],
-          maintenanceSheets: params.data.maintenanceSheets || [],
-        };
-
-        publicPayload.departmentalEnvelope = await packageDepartmentCompartment({
-          data: deptData,
-          masterPin: cleanMasterPin,
-          authorizedPublishers,
-        });
-      } catch (deptErr) {
-        console.warn('[Sync] Aviso al empaquetar compartimento departamental:', deptErr);
-      }
+      // 3b. Seguridad y Privacidad Departamental:
+      // Los datos confidenciales (cuentas, territorios con direcciones, literatura, auditorías)
+      // residen de forma estricta en el payload maestro (adminPayload).
+      // NO se adjunta el sobre departamental en publicPayload para evitar vectores de fuerza bruta offline
+      // por parte de publicadores con PIN de congregación común.
 
       // 4. Cifrar ambos payloads en el dispositivo (Cero Conocimiento).
       const encryptedAdmin = await encryptForSupabase(adminPayload, cleanMasterPin);

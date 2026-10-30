@@ -69,7 +69,7 @@ const LIMITS = {
   congIp: { limit: 8, window: 900, lock: 900 },
   ip: { limit: 40, window: 900, lock: 900 },
   cong: { limit: 300, window: 3600, lock: 300 },
-  create: { limit: 10, window: 3600, lock: 3600 },
+  create: { limit: 5, window: 3600, lock: 3600 },
   // Límite por (congregación, publicador) para PIN personal. Los PIN personales suelen ser de 4 dígitos
   // (9.000 combinaciones): sin este tope un atacante con el PIN de congregación los recorre en ~1,5 días.
   // Con 6 fallos/hora y 30 min de bloqueo, el máximo es ~12 intentos/hora por publicador (>30 días para
